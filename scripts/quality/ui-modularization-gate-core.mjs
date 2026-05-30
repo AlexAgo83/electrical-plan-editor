@@ -36,6 +36,8 @@ export const ALLOWED_OVERSIZE = {
     "Catalog integration coverage spans navigation, create/edit, and scroll behavior on one shared fixture surface; split deferred until catalog form fixtures are extracted.",
   "src/tests/app.ui.list-ergonomics.spec.tsx":
     "List ergonomics coverage stays consolidated around shared table filtering, sorting, and selection fixtures; split deferred until list helper extraction is complete.",
+  "src/tests/app.ui.settings.spec.tsx":
+    "Settings integration coverage still spans persisted app-wide preferences, AI provider readiness, and local storage reload behavior on one shared app fixture; split deferred until settings fixture extraction is complete.",
   "src/app/styles/canvas/canvas-toolbar-and-shell.css":
     "Canvas toolbar and shell rules stay centralized while responsive canvas controls and shell tokens still share tightly coupled selectors.",
   "src/app/styles/canvas/canvas-diagram-and-overlays.css":

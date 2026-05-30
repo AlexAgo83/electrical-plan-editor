@@ -18,6 +18,8 @@ export const ALLOWED_HOOKS_OVERSIZE = {
     "Workspace handlers span network create/select/rename/delete and active-network handoff flows that share confirm-dialog and selection bindings; split deferred until workspace dialog fixtures are extracted.",
   "src/app/hooks/controller/useAppControllerNetworkSummaryPanelDomain.tsx":
     "Network-summary panel domain assembly centralizes canvas-display, callout, viewport, and BOM-preview bindings; split deferred until per-domain panel slices land (see logics/architecture/app-controller-decomposition-plan.md).",
+  "src/app/hooks/controller/useAppControllerWorkspaceContentAssembly.tsx":
+    "Workspace content assembly now wires AI Agent proposal, validation, apply, and rollback flows alongside screen content composition; split deferred until AI Agent controller extraction lands (see logics/architecture/app-controller-decomposition-plan.md).",
   "src/app/hooks/validation/buildValidationIssues.ts":
     "Validation issue builder consolidates rule evaluation across connectors, splices, segments, wires, catalog and harness contexts on a single iteration pass for determinism; split planned after rule-set extraction.",
   "src/app/hooks/useSpliceHandlers.ts":

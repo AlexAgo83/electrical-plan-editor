@@ -9,16 +9,8 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactElement
 } from "react";
-import type {
-  ConnectorId,
-  NodeId,
-  Segment,
-  SegmentId,
-  SpliceId
-} from "../../core/entities";
-import type {
-  NodePosition
-} from "../types/app-controller";
+import type { ConnectorId, NodeId, Segment, SegmentId, SpliceId } from "../../core/entities";
+import type { NodePosition } from "../types/app-controller";
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
 import { NetworkSummaryEditMenu } from "./network-summary/NetworkSummaryEditMenu";
 import { NetworkSummaryViewMenu } from "./network-summary/NetworkSummaryViewMenu";
@@ -42,14 +34,8 @@ import {
   type CalloutTargetKey,
   type DraggingCalloutState
 } from "./network-summary/callouts/calloutLayout";
-import {
-  buildRenderedNodes,
-  buildRenderedSegments
-} from "./network-summary/graph/networkSummaryGraphModel";
-import {
-  type SvgPreviewOptions,
-  useNetworkSummaryExportActions
-} from "./network-summary/export/useNetworkSummaryExportActions";
+import { buildRenderedNodes, buildRenderedSegments } from "./network-summary/graph/networkSummaryGraphModel";
+import { type SvgPreviewOptions, useNetworkSummaryExportActions } from "./network-summary/export/useNetworkSummaryExportActions";
 import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
 import { SvgExportPreviewDialog } from "./dialogs/SvgExportPreviewDialog";
 import { PreviewLoadingDialog } from "./dialogs/PreviewLoadingDialog";
