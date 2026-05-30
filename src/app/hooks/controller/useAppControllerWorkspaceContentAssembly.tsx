@@ -206,7 +206,7 @@ export function useAppControllerWorkspaceContentAssembly({
     handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange
   });
 
-  const { networkSummaryPanel, networkFunctionalSchematicPanel, headerHarnessAssemblyFunctionalScopeNavigation } =
+  const { networkSummaryPanel, networkFunctionalSchematicPanel, headerHarnessAssemblyFunctionalScopeNavigation, selectedHarnessAssemblyId } =
     useAppControllerNetworkSummaryPanelDomain({
     NetworkSummaryPanelComponent: components.NetworkSummaryPanelComponent,
     networkSummaryPanelRef: domains.workspaceNetworkDomain.networkSummaryPanelRef,
@@ -481,12 +481,12 @@ export function useAppControllerWorkspaceContentAssembly({
       contextSummaries={{
         activeNetwork: buildAiAgentContext(handlers.store.getState(), "activeNetwork").summary,
         currentSelection: buildAiAgentContext(handlers.store.getState(), "currentSelection").summary,
-        selectedHarness: buildAiAgentContext(handlers.store.getState(), "selectedHarness").summary,
+        selectedHarness: buildAiAgentContext(handlers.store.getState(), "selectedHarness", { selectedHarnessAssemblyId }).summary,
         allNetworks: buildAiAgentContext(handlers.store.getState(), "allNetworks").summary
       }}
       onPrepareProposal={async (request) => {
         const currentState = handlers.store.getState();
-        const context = buildAiAgentContext(currentState, request.scope);
+        const context = buildAiAgentContext(currentState, request.scope, { selectedHarnessAssemblyId });
         try {
           const providerResponse = await requestAiAgentProviderProposal({
             settings: models.aiSettings.settings,

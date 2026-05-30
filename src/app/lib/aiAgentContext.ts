@@ -2,6 +2,7 @@ import type {
   CatalogItem,
   Connector,
   HarnessAssembly,
+  HarnessAssemblyId,
   Network,
   NetworkNode,
   Segment,
@@ -11,6 +12,10 @@ import type {
 import type { AppState, LayoutNodePosition, SelectionState } from "../../store/types";
 import { selectActiveNetwork, selectCatalogItems, selectConnectors, selectNodes, selectSegments, selectSplices, selectWires } from "../../store";
 import type { AiAgentScope } from "./aiAgentOperationContract";
+
+export interface BuildAiAgentContextOptions {
+  selectedHarnessAssemblyId?: HarnessAssemblyId | null;
+}
 
 export interface AiAgentContextSummary {
   scope: AiAgentScope;
@@ -234,12 +239,15 @@ function mergeScopedEntities(
   );
 }
 
-function selectDefaultHarnessAssembly(state: AppState): HarnessAssembly | null {
+function selectHarnessAssembly(state: AppState, selectedHarnessAssemblyId: HarnessAssemblyId | null | undefined): HarnessAssembly | null {
+  if (selectedHarnessAssemblyId !== null && selectedHarnessAssemblyId !== undefined) {
+    return state.harnessAssemblies.byId[selectedHarnessAssemblyId] ?? null;
+  }
   const firstHarnessId = state.harnessAssemblies.allIds[0];
   return firstHarnessId === undefined ? null : state.harnessAssemblies.byId[firstHarnessId] ?? null;
 }
 
-export function buildAiAgentContext(state: AppState, scope: AiAgentScope): AiAgentContext {
+export function buildAiAgentContext(state: AppState, scope: AiAgentScope, options: BuildAiAgentContextOptions = {}): AiAgentContext {
   const activeNetwork = selectActiveNetwork(state);
   if (activeNetwork === null) {
     const summary = buildEmptySummary(scope, "No active network is available.");
@@ -280,7 +288,7 @@ export function buildAiAgentContext(state: AppState, scope: AiAgentScope): AiAge
   }
 
   if (scope === "selectedHarness") {
-    const harness = selectDefaultHarnessAssembly(state);
+    const harness = selectHarnessAssembly(state, options.selectedHarnessAssemblyId);
     if (harness === null) {
       const summary = buildEmptySummary(scope, "No harness assembly is available.");
       return {

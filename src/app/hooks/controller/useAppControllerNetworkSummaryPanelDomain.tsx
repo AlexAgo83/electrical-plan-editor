@@ -751,6 +751,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
   return {
     networkSummaryPanel,
     networkFunctionalSchematicPanel,
-    headerHarnessAssemblyFunctionalScopeNavigation
+    headerHarnessAssemblyFunctionalScopeNavigation,
+    selectedHarnessAssemblyId: displayedHarnessAssembly?.id ?? null
   };
 }

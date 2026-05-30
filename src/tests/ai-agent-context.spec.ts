@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { CatalogItemId, ConnectorId } from "../core/entities";
-import { createEmptyWorkspaceState, createSampleNetworkState } from "../store";
+import type { CatalogItemId, ConnectorId, HarnessAssemblyId } from "../core/entities";
+import { appActions, appReducer, createEmptyWorkspaceState, createSampleNetworkState } from "../store";
 import { buildAiAgentContext } from "../app/lib/aiAgentContext";
 
 describe("AI agent context builder", () => {
@@ -99,5 +99,33 @@ describe("AI agent context builder", () => {
     expect(selectedHarnessContext.summary.counts.connectors).toBeGreaterThan(state.connectors.allIds.length);
     expect(allNetworksContext.summary.scopeLabel).toBe("All networks");
     expect(allNetworksContext.summary.counts.wires).toBeGreaterThan(state.wires.allIds.length);
+  });
+
+  it("uses the displayed harness assembly for selected-harness scope", () => {
+    const baseState = createSampleNetworkState();
+    const activeNetworkId = baseState.activeNetworkId;
+    if (activeNetworkId === null) {
+      throw new Error("Expected sample state to have an active network.");
+    }
+    const state = appReducer(
+      baseState,
+      appActions.upsertHarnessAssembly({
+        id: "assembly-active-only" as HarnessAssemblyId,
+        name: "Active only assembly",
+        technicalId: "ASM-ACTIVE-ONLY",
+        members: [{ networkId: activeNetworkId, color: "#2563eb" }],
+        masterConnectorRefs: [{ networkId: activeNetworkId, connectorId: "C-SRC" as ConnectorId }],
+        connectorLinks: [],
+        createdAt: "2026-05-30T08:00:00.000Z",
+        updatedAt: "2026-05-30T08:00:00.000Z"
+      })
+    );
+
+    const context = buildAiAgentContext(state, "selectedHarness", {
+      selectedHarnessAssemblyId: "assembly-active-only" as HarnessAssemblyId
+    });
+
+    expect(context.summary.selectionLabel).toBe("Harness ASM-ACTIVE-ONLY");
+    expect(context.summary.counts.connectors).toBe(state.connectors.allIds.length);
   });
 });
