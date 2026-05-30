@@ -73,6 +73,7 @@ export interface UndoHistoryEntry {
   navigationSelectionKind?: "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
   navigationSelectionId?: string;
   label: string;
+  detailLabel?: string;
   timestampIso: string;
 }
 

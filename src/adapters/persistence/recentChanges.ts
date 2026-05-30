@@ -91,6 +91,7 @@ function normalizeRecentChangesEntries(rawEntries: unknown, historyLimit: number
       navigationSelectionKind,
       navigationSelectionId,
       label,
+      detailLabel,
       timestampIso
     } = rawEntry;
 
@@ -137,6 +138,9 @@ function normalizeRecentChangesEntries(rawEntries: unknown, historyLimit: number
     }
     if (typeof navigationSelectionId === "string" && navigationSelectionId.length > 0) {
       normalizedEntry.navigationSelectionId = navigationSelectionId;
+    }
+    if (typeof detailLabel === "string" && detailLabel.trim().length > 0) {
+      normalizedEntry.detailLabel = detailLabel.trim();
     }
 
     normalized.push(normalizedEntry);

@@ -464,6 +464,85 @@ function buildLabelRoot(targetKind: UndoHistoryTargetKind, displayRef: string | 
   return `${targetKindLabel(targetKind)} '${displayRef}'`;
 }
 
+function stableSerialize(value: unknown): string {
+  return JSON.stringify(value ?? null);
+}
+
+function valuesDiffer(left: unknown, right: unknown): boolean {
+  return stableSerialize(left) !== stableSerialize(right);
+}
+
+function joinChangeDetails(details: string[]): string | null {
+  if (details.length === 0) {
+    return null;
+  }
+
+  return details.slice(0, 3).join(" / ");
+}
+
+function describeCatalogChange(action: Extract<AppAction, { type: "catalog/upsert" }>, previousState: AppState): string | null {
+  const previousItem = previousState.catalogItems.byId[action.payload.id];
+  if (previousItem === undefined) {
+    return `${action.payload.connectionCount}-connection item`;
+  }
+
+  const details: string[] = [];
+  if (previousItem.manufacturerReference !== action.payload.manufacturerReference || previousItem.name !== action.payload.name) {
+    details.push("Identity");
+  }
+  if (previousItem.connectionCount !== action.payload.connectionCount) {
+    details.push("Connection count");
+  }
+  if (previousItem.unitPriceExclTax !== action.payload.unitPriceExclTax) {
+    details.push("Pricing");
+  }
+  if (previousItem.url !== action.payload.url) {
+    details.push("Supplier link");
+  }
+  if (valuesDiffer(previousItem.additionalAccessories, action.payload.additionalAccessories)) {
+    details.push("Accessories");
+  }
+  if (valuesDiffer(previousItem.connectorDefaults, action.payload.connectorDefaults)) {
+    details.push("Terminal defaults");
+  }
+  if (valuesDiffer(previousItem.connectorLayout, action.payload.connectorLayout)) {
+    details.push("Physical layout");
+  }
+
+  return joinChangeDetails(details) ?? "No field delta";
+}
+
+function describeRecentChangeDetail(action: AppAction, previousState: AppState): string | null {
+  switch (action.type) {
+    case "catalog/upsert":
+      return describeCatalogChange(action, previousState);
+    case "network/importMany":
+      return action.payload.overwriteNetworkIds !== undefined && action.payload.overwriteNetworkIds.length > 0
+        ? "Import with overwrite"
+        : "Import new networks";
+    case "connector/removeCascade":
+    case "splice/removeCascade":
+      return "Cascade delete";
+    case "splice/applyOptimizedPlacement":
+      return `${Object.keys(action.payload.segmentLengths).length} segment length(s)`;
+    case "layout/setNodePositions":
+      return `${Object.keys(action.payload.positions).length} node position(s)`;
+    case "wire/lockRoute":
+      return `${action.payload.segmentIds.length} segment route`;
+    default:
+      return null;
+  }
+}
+
+function buildRecentChangeLabel(targetKind: UndoHistoryTargetKind, displayRef: string | null, verb: string, detailLabel: string | null): string {
+  const root = buildLabelRoot(targetKind, displayRef);
+  if (verb === "updated" && detailLabel !== null && detailLabel !== "No field delta") {
+    return `${root} ${detailLabel.toLowerCase()} updated`;
+  }
+
+  return `${root} ${verb}`;
+}
+
 function buildSelectionNavigationTarget(
   navigationSubScreen: SubScreenId,
   navigationSelectionKind: NonNullable<UndoHistoryEntry["navigationSelectionKind"]>,
@@ -551,6 +630,7 @@ export function buildUndoHistoryEntry(
   const targetKind = toTargetKind(action.type);
   const displayRef = resolveDisplayRef(action, previousState, nextState);
   const navigationTarget = resolveNavigationTarget(action);
+  const detailLabel = describeRecentChangeDetail(action, previousState);
   return {
     sequence,
     actionType: action.type,
@@ -558,7 +638,8 @@ export function buildUndoHistoryEntry(
     targetId: displayRef,
     networkId: resolveEntryNetworkId(action, previousState, nextState),
     ...(navigationTarget ?? {}),
-    label: `${buildLabelRoot(targetKind, displayRef)} ${actionVerb(action, previousState)}`,
+    label: buildRecentChangeLabel(targetKind, displayRef, actionVerb(action, previousState), detailLabel),
+    ...(detailLabel === null ? {} : { detailLabel }),
     timestampIso: nowIso
   };
 }

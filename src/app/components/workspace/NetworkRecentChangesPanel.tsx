@@ -142,6 +142,11 @@ export function NetworkRecentChangesList({ entries, onOpenEntryTarget }: Network
                 <span className="network-recent-changes-meta">
                   <span className="network-recent-changes-kind">{targetKindLabel}</span>
                   <span className={`network-recent-changes-action is-${tone}`}>{actionLabel}</span>
+                  {entry.detailLabel !== undefined ? (
+                    <span className="network-recent-changes-detail" title={entry.detailLabel}>
+                      {entry.detailLabel}
+                    </span>
+                  ) : null}
                   <span className="network-recent-changes-target" title={targetReference}>
                     {targetReference}
                   </span>

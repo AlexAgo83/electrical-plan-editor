@@ -86,6 +86,42 @@ describe("recent change labels", () => {
 
     expect(entry.targetId).toBe("CAT-HIST");
     expect(entry.label).toBe("Catalog item 'CAT-HIST' created");
+    expect(entry.detailLabel).toBe("6-connection item");
+  });
+
+  it("adds catalog update sub-reasons for recent change logs", () => {
+    const previousState = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-HIST"),
+        manufacturerReference: "CAT-HIST",
+        connectionCount: 6,
+        name: "History catalog"
+      })
+    );
+    const action = appActions.upsertCatalogItem({
+      id: asCatalogItemId("CAT-HIST"),
+      manufacturerReference: "CAT-HIST",
+      connectionCount: 8,
+      name: "History catalog",
+      unitPriceExclTax: 12.5,
+      connectorLayout: {
+        version: 1,
+        units: "grid",
+        width: 4,
+        height: 2,
+        ways: [
+          { cavityIndex: 0, x: 0, y: 0, shape: "round" },
+          { cavityIndex: 1, x: 1, y: 0, shape: "round" }
+        ]
+      }
+    });
+    const nextState = appReducer(previousState, action);
+    const entry = buildUndoHistoryEntry(action, previousState, nextState, 1, "2026-03-27T12:00:00.000Z");
+
+    expect(entry.targetId).toBe("CAT-HIST");
+    expect(entry.detailLabel).toBe("Connection count / Pricing / Physical layout");
+    expect(entry.label).toBe("Catalog item 'CAT-HIST' connection count / pricing / physical layout updated");
   });
 
   it("keeps readable wire identity for route and delete actions", () => {

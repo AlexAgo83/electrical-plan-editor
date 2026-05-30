@@ -146,6 +146,7 @@
 
 .network-recent-changes-kind,
 .network-recent-changes-action,
+.network-recent-changes-detail,
 .network-recent-changes-target {
   min-width: 0;
   max-width: 100%;
@@ -177,6 +178,12 @@
 .network-recent-changes-action.is-route,
 .network-recent-changes-action.is-occupancy {
   background: color-mix(in srgb, var(--theme-primary, currentColor) 14%, transparent);
+}
+
+.network-recent-changes-detail {
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 20%, transparent);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 5%, transparent);
+  color: color-mix(in srgb, currentColor 78%, transparent);
 }
 
 .network-recent-changes-target {
