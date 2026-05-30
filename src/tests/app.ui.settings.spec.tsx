@@ -13,6 +13,7 @@ import {
 } from "./helpers/app-ui-test-utils";
 import { appActions, appReducer, createInitialState, createSampleNetworkState } from "../store";
 import { buildAiAgentContext } from "../app/lib/aiAgentContext";
+import { AI_AGENT_PANEL_PREFERENCES_STORAGE_KEY } from "../app/lib/aiAgentPanelPreferences";
 import { buildAiAgentEditablePlan } from "../app/lib/aiAgentPlanDiff";
 
 describe("App integration UI - settings", () => {
@@ -276,6 +277,88 @@ describe("App integration UI - settings", () => {
     fireEvent.keyDown(document, { key: "z", metaKey: true });
     expect(within(screen.getByLabelText("AI context entity counts")).getByLabelText("3 nodes")).toBeInTheDocument();
     expect(screen.queryByLabelText("Use configured provider for proposal generation")).not.toBeInTheDocument();
+  });
+
+  it("persists AI Agent panel preferences across remounts", async () => {
+    const firstRender = renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const aiProviderPanel = getPanelByHeading("AI provider");
+    fireEvent.change(within(aiProviderPanel).getByLabelText("API key"), {
+      target: { value: "sk-local-test" }
+    });
+    fireEvent.click(within(aiProviderPanel).getByLabelText("Enable experimental direct execution"));
+
+    switchScreenDrawerAware("modeling");
+    fireEvent.click(within(screen.getByRole("region", { name: "Quick entity navigation" })).getByRole("button", { name: "AI Agent" }));
+    fireEvent.change(screen.getByLabelText("Target scope"), {
+      target: { value: "allNetworks" }
+    });
+    fireEvent.change(screen.getByLabelText("Agent mode"), {
+      target: { value: "direct" }
+    });
+    fireEvent.click(screen.getByLabelText("Add connectors, splices, nodes, segments, or valid wires"));
+    fireEvent.click(screen.getByLabelText("Delete entities"));
+
+    await waitFor(() => {
+      expect(JSON.parse(localStorage.getItem(AI_AGENT_PANEL_PREFERENCES_STORAGE_KEY) ?? "{}")).toMatchObject({
+        targetScope: "allNetworks",
+        agentMode: "direct",
+        permissions: {
+          add: false,
+          delete: true
+        }
+      });
+    });
+
+    firstRender.unmount();
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("modeling");
+    fireEvent.click(within(screen.getByRole("region", { name: "Quick entity navigation" })).getByRole("button", { name: "AI Agent" }));
+
+    expect(screen.getByLabelText("Target scope")).toHaveValue("allNetworks");
+    expect(screen.getByLabelText("Agent mode")).toHaveValue("direct");
+    expect(screen.getByLabelText("Add connectors, splices, nodes, segments, or valid wires")).not.toBeChecked();
+    expect(screen.getByLabelText("Delete entities")).toBeChecked();
+  });
+
+  it("keeps persisted AI Agent direct mode behind the experimental setting", async () => {
+    localStorage.setItem(
+      AI_AGENT_PANEL_PREFERENCES_STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: 1,
+        targetScope: "currentSelection",
+        agentMode: "direct",
+        permissions: {
+          add: true,
+          move: true,
+          update: true,
+          route: true,
+          delete: true
+        }
+      })
+    );
+
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const aiProviderPanel = getPanelByHeading("AI provider");
+    fireEvent.change(within(aiProviderPanel).getByLabelText("API key"), {
+      target: { value: "sk-local-test" }
+    });
+
+    switchScreenDrawerAware("modeling");
+    fireEvent.click(within(screen.getByRole("region", { name: "Quick entity navigation" })).getByRole("button", { name: "AI Agent" }));
+
+    expect(screen.getByLabelText("Target scope")).toHaveValue("currentSelection");
+    expect(screen.getByLabelText("Agent mode")).toHaveValue("assisted");
+    expect(screen.getByLabelText("Delete entities")).toBeChecked();
+
+    await waitFor(() => {
+      expect(JSON.parse(localStorage.getItem(AI_AGENT_PANEL_PREFERENCES_STORAGE_KEY) ?? "{}")).toMatchObject({
+        agentMode: "assisted"
+      });
+    });
   });
 
   it("applies provider modified plans to visible connector fields", async () => {

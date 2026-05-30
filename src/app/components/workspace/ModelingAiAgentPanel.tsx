@@ -1,6 +1,11 @@
-import { useMemo, useState, type ReactElement } from "react";
+import { useEffect, useMemo, useState, type ReactElement } from "react";
 import type { AiAgentContextSummary } from "../../lib/aiAgentContext";
 import { buildAiAgentImpactPreview, type AiAgentImpactPreview } from "../../lib/aiAgentApply";
+import {
+  readAiAgentPanelPreferences,
+  writeAiAgentPanelPreferences,
+  type AiAgentMode
+} from "../../lib/aiAgentPanelPreferences";
 import type {
   AiAgentOperationPermissions,
   AiAgentOperationValidationResult,
@@ -26,8 +31,6 @@ interface ModelingAiAgentPanelProps {
   };
   onRollbackLastSession: () => boolean;
 }
-
-type AgentMode = "assisted" | "direct";
 
 function formatAiAgentValue(value: unknown): string {
   if (typeof value === "string") {
@@ -122,16 +125,11 @@ export function ModelingAiAgentPanel({
   onApplyProposal,
   onRollbackLastSession
 }: ModelingAiAgentPanelProps): ReactElement {
+  const [initialPreferences] = useState(() => readAiAgentPanelPreferences());
   const [instruction, setInstruction] = useState("");
-  const [targetScope, setTargetScope] = useState<AiAgentScope>("activeNetwork");
-  const [agentMode, setAgentMode] = useState<AgentMode>("assisted");
-  const [permissions, setPermissions] = useState<AiAgentOperationPermissions>({
-    add: true,
-    move: true,
-    update: true,
-    route: true,
-    delete: false
-  });
+  const [targetScope, setTargetScope] = useState<AiAgentScope>(initialPreferences.targetScope);
+  const [agentMode, setAgentMode] = useState<AiAgentMode>(initialPreferences.agentMode);
+  const [permissions, setPermissions] = useState<AiAgentOperationPermissions>(initialPreferences.permissions);
   const [draftStatus, setDraftStatus] = useState<string | null>(null);
   const [draftRawResponse, setDraftRawResponse] = useState<string | null>(null);
   const [proposalValidation, setProposalValidation] = useState<AiAgentOperationValidationResult | null>(null);
@@ -169,6 +167,20 @@ export function ModelingAiAgentPanel({
     setDraftStatus(null);
     setDraftRawResponse(null);
   };
+
+  useEffect(() => {
+    if (agentMode === "direct" && !experimentalDirectExecutionEnabled) {
+      setAgentMode("assisted");
+    }
+  }, [agentMode, experimentalDirectExecutionEnabled]);
+
+  useEffect(() => {
+    writeAiAgentPanelPreferences({
+      targetScope,
+      agentMode: selectedMode,
+      permissions
+    });
+  }, [agentMode, permissions, selectedMode, targetScope]);
 
   return (
     <article className="panel ai-agent-panel" aria-label="AI Agent modeling workspace">
@@ -249,7 +261,7 @@ export function ModelingAiAgentPanel({
             <select
               value={selectedMode}
               onChange={(event) => {
-                setAgentMode(event.target.value as AgentMode);
+                setAgentMode(event.target.value as AiAgentMode);
                 setProposalValidation(null);
                 setDraftStatus(null);
                 setDraftRawResponse(null);
