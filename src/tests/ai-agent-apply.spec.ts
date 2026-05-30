@@ -1,0 +1,56 @@
+import { describe, expect, it } from "vitest";
+import type { NodeId, WireId } from "../core/entities";
+import { createSampleNetworkState } from "../store";
+import { applyAiAgentAcceptedOperations } from "../app/lib/aiAgentApply";
+import type { AiAgentOperationValidationResult } from "../app/lib/aiAgentOperationContract";
+
+describe("AI agent apply", () => {
+  it("applies accepted add_node operations without mutating the input state", () => {
+    const state = createSampleNetworkState();
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "add_node",
+          label: "AI proposed routing node",
+          position: { x: 80, y: 90 }
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+
+    const result = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(result.appliedCount).toBe(1);
+    expect(result.skippedCount).toBe(0);
+    expect(state.nodes.byId["AI-NODE-001" as NodeId]).toBeUndefined();
+    expect(result.nextState.nodes.byId["AI-NODE-001" as NodeId]).toEqual({
+      id: "AI-NODE-001",
+      kind: "intermediate",
+      label: "AI proposed routing node"
+    });
+    expect(result.nextState.nodePositions["AI-NODE-001" as NodeId]).toEqual({ x: 80, y: 90 });
+  });
+
+  it("skips accepted operations that are not mapped to an app mutation yet", () => {
+    const state = createSampleNetworkState();
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "regenerate_route",
+          wireIds: ["W-001" as WireId]
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+
+    const result = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(result.nextState).toBe(state);
+    expect(result.appliedCount).toBe(0);
+    expect(result.skippedCount).toBe(1);
+  });
+});

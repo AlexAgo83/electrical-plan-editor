@@ -12,6 +12,7 @@ import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSel
 import type { ValidationModel } from "../useValidationModel";
 import type { AiSettingsModel } from "../useAiSettings";
 import { ModelingAiAgentPanel } from "../../components/workspace/ModelingAiAgentPanel";
+import { applyAiAgentAcceptedOperations } from "../../lib/aiAgentApply";
 import { buildAiAgentContext } from "../../lib/aiAgentContext";
 import { prepareAiAgentProposalDraft } from "../../lib/aiAgentProposal";
 import type { AiProviderReadiness } from "../../lib/aiSettings";
@@ -482,6 +483,16 @@ export function useAppControllerWorkspaceContentAssembly({
           permissions: request.permissions
         })
       }
+      onApplyProposal={(validation) => {
+        const result = applyAiAgentAcceptedOperations(handlers.store.getState(), validation);
+        if (result.nextState !== handlers.store.getState()) {
+          handlers.replaceStateWithHistory(result.nextState);
+        }
+        return {
+          appliedCount: result.appliedCount,
+          skippedCount: result.skippedCount
+        };
+      }}
       onOpenSettings={handlers.handleOpenSettingsScreen}
     />
   ) : null;

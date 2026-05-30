@@ -13,6 +13,7 @@ interface ModelingAiAgentPanelProps {
     instruction: string;
     permissions: AiAgentOperationPermissions;
   }) => { summary: string; validation: AiAgentOperationValidationResult };
+  onApplyProposal: (validation: AiAgentOperationValidationResult) => { appliedCount: number; skippedCount: number };
 }
 
 type AgentMode = "assisted" | "direct";
@@ -22,7 +23,8 @@ export function ModelingAiAgentPanel({
   experimentalDirectExecutionEnabled,
   contextSummaries,
   onOpenSettings,
-  onPrepareProposal
+  onPrepareProposal,
+  onApplyProposal
 }: ModelingAiAgentPanelProps): ReactElement {
   const [instruction, setInstruction] = useState("");
   const [targetScope, setTargetScope] = useState<AiAgentScope>("activeNetwork");
@@ -246,7 +248,20 @@ export function ModelingAiAgentPanel({
         </div>
       ) : null}
       <div className="row-actions settings-actions">
-        <button type="button" disabled>
+        <button
+          type="button"
+          disabled={proposalValidation === null || proposalValidation.accepted.length === 0}
+          onClick={() => {
+            if (proposalValidation === null) {
+              return;
+            }
+            const result = onApplyProposal(proposalValidation);
+            setProposalValidation(null);
+            setDraftStatus(
+              `Applied ${result.appliedCount} accepted operation${result.appliedCount === 1 ? "" : "s"}. ${result.skippedCount} accepted operation${result.skippedCount === 1 ? "" : "s"} skipped.`
+            );
+          }}
+        >
           Apply proposal
         </button>
         <button

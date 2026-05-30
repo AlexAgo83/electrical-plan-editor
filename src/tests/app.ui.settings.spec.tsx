@@ -243,8 +243,12 @@ describe("App integration UI - settings", () => {
     expect(within(proposalSummary).getByText("Unsupported")).toBeInTheDocument();
     expect(within(proposalSummary).getByText("add_node")).toBeInTheDocument();
     expect(within(proposalSummary).getByText("assign_endpoint")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Apply proposal" })).toBeDisabled();
+    const applyProposalButton = screen.getByRole("button", { name: "Apply proposal" });
+    expect(applyProposalButton).toBeEnabled();
     expect(screen.getByRole("button", { name: "Reject proposal" })).toBeEnabled();
+    fireEvent.click(applyProposalButton);
+    expect(screen.getByText("Applied 1 accepted operation. 0 accepted operations skipped.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Apply proposal" })).toBeDisabled();
   });
 
   it("keeps settings and import/export controls operable on mobile baseline viewports", async () => {
