@@ -79,6 +79,15 @@ export function OperationsHealthPanel({
         <p className="meta-line">
           Mode: {workspaceFileStatus.mode === "linked" ? "Linked file" : "Local only"}
         </p>
+        <p className="meta-line">
+          Autosave: {workspaceFileStatus.saveTarget === "linked-file" ? "Linked file" : workspaceFileStatus.saveTarget === "download" ? "Downloaded copy" : "Local cache"}
+        </p>
+        <p className="meta-line">
+          Resume: {workspaceFileStatus.resumeStatus === "available" ? "Available" : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Unavailable" : "None"}
+        </p>
+        <p className="meta-line">
+          Direct file access: {workspaceFileStatus.directFileAccessSupported ? "Supported" : "Fallback download only"}
+        </p>
         {workspaceFileStatus.fileName !== null ? <p className="meta-line">File: {workspaceFileStatus.fileName}</p> : null}
         {workspaceFileStatus.mode !== "linked" && workspaceFileStatus.resumeFileName !== null ? (
           <p className="meta-line">Resume: {workspaceFileStatus.resumeFileName}</p>

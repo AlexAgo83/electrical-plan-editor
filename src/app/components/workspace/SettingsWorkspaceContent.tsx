@@ -548,11 +548,18 @@ export function SettingsWorkspaceContent({
           <span className="settings-state-chip">
             Permission: {workspaceFileStatus.permission}
           </span>
+          <span className="settings-state-chip">
+            {workspaceFileStatus.directFileAccessSupported ? "Direct file access" : "Fallback download"}
+          </span>
         </div>
         <dl className="settings-storage-details">
           <div>
             <dt>{renderSettingLabel("Persistence mode")}</dt>
             <dd>{workspaceFileStatus.mode === "linked" ? "Linked file with local cache" : "Local browser storage only"}</dd>
+          </div>
+          <div>
+            <dt>Autosave target</dt>
+            <dd>{workspaceFileStatus.saveTarget === "linked-file" ? "Linked workspace file" : workspaceFileStatus.saveTarget === "download" ? "Downloaded workspace copy" : "Local browser cache"}</dd>
           </div>
           <div>
             <dt>{renderSettingLabel("Linked file")}</dt>
@@ -589,6 +596,10 @@ export function SettingsWorkspaceContent({
                 </button>
               )}
             </dd>
+          </div>
+          <div>
+            <dt>Resume status</dt>
+            <dd>{workspaceFileStatus.resumeStatus === "available" ? "Resume available" : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Resume unavailable" : "No resumable file"}</dd>
           </div>
           <div>
             <dt>Last saved</dt>

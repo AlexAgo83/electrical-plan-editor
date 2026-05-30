@@ -51,6 +51,9 @@ export interface WorkspaceFileStorageStatus {
   fileName: string | null;
   resumeFileName: string | null;
   canResume: boolean;
+  resumeStatus: "none" | "available" | "permission-required" | "unavailable";
+  directFileAccessSupported: boolean;
+  saveTarget: "local-cache" | "linked-file" | "download";
   lastSavedAtIso: string | null;
   permission: "unknown" | "granted" | "prompt" | "denied" | "unavailable";
   message: string | null;
@@ -96,6 +99,11 @@ const WORKSPACE_FILE_HANDLE_KEY = "last-linked-handle";
 
 function resolveWorkspaceFileWindow(): WorkspaceFileWindow | null {
   return typeof window === "undefined" ? null : (window as WorkspaceFileWindow);
+}
+
+function isDirectFileAccessSupported(): boolean {
+  const fileWindow = resolveWorkspaceFileWindow();
+  return typeof fileWindow?.showOpenFilePicker === "function" && typeof fileWindow.showSaveFilePicker === "function";
 }
 
 function openWorkspaceFileDb(): Promise<IDBDatabase | null> {
@@ -251,6 +259,9 @@ export function useWorkspaceFileStorage({
     fileName: null,
     resumeFileName: null,
     canResume: false,
+    resumeStatus: "none",
+    directFileAccessSupported: isDirectFileAccessSupported(),
+    saveTarget: "local-cache",
     lastSavedAtIso: null,
     permission: "unavailable",
     message: "Workspace changes are saved in this browser only.",
@@ -305,6 +316,9 @@ export function useWorkspaceFileStorage({
         fileName: sourceLabel,
         resumeFileName: handle === null ? null : sourceLabel,
         canResume: handle !== null,
+        resumeStatus: handle === null ? "none" : nextPermission === "granted" || nextPermission === "unknown" ? "available" : "permission-required",
+        directFileAccessSupported: isDirectFileAccessSupported(),
+        saveTarget: handle === null ? "local-cache" : "linked-file",
         lastSavedAtIso: parsed.payload.updatedAtIso,
         permission: nextPermission,
         message:
@@ -333,6 +347,8 @@ export function useWorkspaceFileStorage({
         ...current,
         resumeFileName: storedHandle.name,
         canResume: true,
+        resumeStatus: "available",
+        directFileAccessSupported: isDirectFileAccessSupported(),
         message:
           current.mode === "linked"
             ? current.message
@@ -349,6 +365,7 @@ export function useWorkspaceFileStorage({
           ...current,
           canResume: false,
           resumeFileName: null,
+          resumeStatus: "unavailable",
           message: "No previous workspace file handle is available in this browser."
         }));
         notifyToast("Workspace file cannot be resumed", {
@@ -487,6 +504,9 @@ export function useWorkspaceFileStorage({
             fileName: handle.name,
             resumeFileName: handle.name,
             canResume: true,
+            resumeStatus: permission === "granted" || permission === "unknown" ? "available" : "permission-required",
+            directFileAccessSupported: isDirectFileAccessSupported(),
+            saveTarget: "linked-file",
             lastSavedAtIso: payload.updatedAtIso,
             permission,
             conflict: false,
@@ -521,6 +541,9 @@ export function useWorkspaceFileStorage({
         fileName,
         resumeFileName: current.resumeFileName,
         canResume: current.canResume,
+        resumeStatus: current.resumeStatus,
+        directFileAccessSupported: isDirectFileAccessSupported(),
+        saveTarget: "download",
         lastSavedAtIso: payload.updatedAtIso,
         permission: "unavailable",
         conflict: false,
@@ -542,6 +565,9 @@ export function useWorkspaceFileStorage({
       fileName: null,
       resumeFileName: null,
       canResume: false,
+      resumeStatus: "none",
+      directFileAccessSupported: isDirectFileAccessSupported(),
+      saveTarget: "local-cache",
       lastSavedAtIso: null,
       permission: "unavailable",
       message: "Workspace changes are saved in this browser only.",
