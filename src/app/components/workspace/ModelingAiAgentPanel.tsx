@@ -7,7 +7,6 @@ interface ModelingAiAgentPanelProps {
   providerReadiness: AiProviderReadiness;
   experimentalDirectExecutionEnabled: boolean;
   contextSummaries: Record<AiAgentScope, AiAgentContextSummary>;
-  onOpenSettings: () => void;
   onPrepareProposal: (request: {
     scope: AiAgentScope;
     instruction: string;
@@ -22,7 +21,6 @@ export function ModelingAiAgentPanel({
   providerReadiness,
   experimentalDirectExecutionEnabled,
   contextSummaries,
-  onOpenSettings,
   onPrepareProposal,
   onApplyProposal
 }: ModelingAiAgentPanelProps): ReactElement {
@@ -54,7 +52,7 @@ export function ModelingAiAgentPanel({
   };
 
   return (
-    <article className="panel" aria-label="AI Agent modeling workspace">
+    <article className="panel ai-agent-panel" aria-label="AI Agent modeling workspace">
       <header className="list-panel-header">
         <div>
           <h2>AI Agent</h2>
@@ -209,13 +207,36 @@ export function ModelingAiAgentPanel({
           >
             {isPreparingProposal ? "Preparing..." : "Prepare proposal"}
           </button>
-          <button type="button" onClick={onOpenSettings}>
-            Open AI settings
+          <button
+            type="button"
+            disabled={proposalValidation === null || proposalValidation.accepted.length === 0}
+            onClick={() => {
+              if (proposalValidation === null) {
+                return;
+              }
+              const result = onApplyProposal(proposalValidation);
+              setProposalValidation(null);
+              setDraftStatus(
+                `Applied ${result.appliedCount} accepted operation${result.appliedCount === 1 ? "" : "s"}. ${result.skippedCount} accepted operation${result.skippedCount === 1 ? "" : "s"} skipped.`
+              );
+            }}
+          >
+            Apply proposal
+          </button>
+          <button
+            type="button"
+            disabled={proposalValidation === null}
+            onClick={() => {
+              setProposalValidation(null);
+              setDraftStatus("Proposal rejected. Modeling state was not changed.");
+            }}
+          >
+            Reject proposal
           </button>
         </div>
       </form>
       {proposalValidation !== null ? (
-        <div className="settings-import-summary" role="region" aria-label="AI proposal summary">
+        <div className="settings-import-summary ai-agent-proposal-summary" role="region" aria-label="AI proposal summary">
           <p className="meta-line">
             <span>Accepted</span> <strong>{proposalValidation.accepted.length}</strong>
           </p>
@@ -240,34 +261,6 @@ export function ModelingAiAgentPanel({
           ))}
         </div>
       ) : null}
-      <div className="row-actions settings-actions">
-        <button
-          type="button"
-          disabled={proposalValidation === null || proposalValidation.accepted.length === 0}
-          onClick={() => {
-            if (proposalValidation === null) {
-              return;
-            }
-            const result = onApplyProposal(proposalValidation);
-            setProposalValidation(null);
-            setDraftStatus(
-              `Applied ${result.appliedCount} accepted operation${result.appliedCount === 1 ? "" : "s"}. ${result.skippedCount} accepted operation${result.skippedCount === 1 ? "" : "s"} skipped.`
-            );
-          }}
-        >
-          Apply proposal
-        </button>
-        <button
-          type="button"
-          disabled={proposalValidation === null}
-          onClick={() => {
-            setProposalValidation(null);
-            setDraftStatus("Proposal rejected. Modeling state was not changed.");
-          }}
-        >
-          Reject proposal
-        </button>
-      </div>
     </article>
   );
 }

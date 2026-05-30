@@ -540,6 +540,14 @@
   color: #20435f;
 }
 
+.ai-agent-proposal-summary {
+  margin-bottom: 0.6rem;
+}
+
+.ai-agent-panel .settings-actions {
+  border-top: 0;
+}
+
 .settings-import-details {
   margin-top: 0.55rem;
   border: 1px solid #d5c27b;

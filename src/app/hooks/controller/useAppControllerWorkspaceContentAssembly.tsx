@@ -519,7 +519,6 @@ export function useAppControllerWorkspaceContentAssembly({
           skippedCount: result.skippedCount
         };
       }}
-      onOpenSettings={handlers.handleOpenSettingsScreen}
     />
   ) : null;
 
