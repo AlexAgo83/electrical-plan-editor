@@ -2,8 +2,8 @@
 > From version: 1.11.0
 > Schema version: 1.0
 > Status: Done
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 91%
+> Confidence: 86%
 > Progress: 100%
 > Complexity: Medium
 > Theme: UI
@@ -67,7 +67,7 @@ flowchart LR
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
 - Request: `logics/request/req_131_settings_search_and_sectioned_navigation.md`
-- Primary task(s): (none yet)
+- Primary task(s): `task_113_settings_search_and_label_highlighting`
 
 # AI Context
 - Summary: Settings search and label highlighting
@@ -84,6 +84,7 @@ flowchart LR
 - Source file: `logics/request/req_131_settings_search_and_sectioned_navigation.md`.
 - Generated locally by logics-manager.
 - Task `task_113_settings_search_and_label_highlighting` was finished via `logics-manager flow finish task` on 2026-05-30.
+- Post-finish polish on 2026-05-30 kept label highlights inline inside `.settings-label-text` so highlighted substrings no longer become standalone grid/flex items or force label line breaks.
 
 # Tasks
 - `task_113_settings_search_and_label_highlighting`

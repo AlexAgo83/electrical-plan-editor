@@ -2,8 +2,8 @@
 > From version: 1.11.0
 > Schema version: 1.0
 > Status: Done
-> Understanding: 92%
-> Confidence: 88%
+> Understanding: 93%
+> Confidence: 89%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -103,8 +103,14 @@ flowchart LR
 - Related request: `logics/request/req_130_ai_agent_follow_up_memory_persistence_and_workflow_polish.md` for Settings-adjacent AI provider preferences.
 
 # Delivery Status
-- Not started.
-- Intended as a post-`1.11.0` Settings usability improvement.
+- Delivered on 2026-05-30.
+- Implemented as two slices: Settings search/highlight, then section glossary and grouped Settings navigation.
+- Follow-up polish delivered after initial implementation:
+  - new Settings search, section navigation, and result summary styling now follow app themes;
+  - the right-side Settings groups are constrained to a single-column list beside the section rail;
+  - the section rail stays below the sticky header and section jumps preserve header clearance;
+  - label highlights remain inline and do not force line breaks;
+  - the section rail exposes the active section with `aria-current="location"`.
 
 # References
 - `src/app/components/workspace/SettingsWorkspaceContent.tsx`
@@ -120,6 +126,5 @@ flowchart LR
 - Skip when: Work targets unrelated Modeling, Analysis, Network Summary exports, or AI Agent operation behavior.
 
 # Backlog
-- To be created from this request.
 - `item_605_settings_search_and_label_highlighting`
 - `item_606_settings_section_glossary_and_grouped_preferences_layout`

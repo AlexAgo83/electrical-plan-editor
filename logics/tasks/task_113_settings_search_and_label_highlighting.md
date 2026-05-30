@@ -2,8 +2,8 @@
 > From version: 1.11.0
 > Schema version: 1.0
 > Status: Done
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 91%
+> Confidence: 86%
 > Progress: 100%
 > Complexity: Medium
 > Theme: UI
@@ -56,10 +56,15 @@ flowchart LR
 - Run `python3 -m logics_manager flow finish task task_113_settings_search_and_label_highlighting.md` after implementation.
 - Finish workflow executed on 2026-05-30.
 - Linked backlog/request close verification passed.
+- Post-finish polish validation on 2026-05-30:
+  - `rtk npm test -- --run src/tests/app.ui.settings.spec.tsx` passed with 26 tests.
+  - `rtk npm run -s typecheck` passed.
+  - `git diff --check` passed.
 
 # Report
-- Not started.
 - Finished on 2026-05-30.
+- Delivered Settings search input, case-insensitive label matching, inline label highlighting, no-match feedback, and clear-search behavior.
+- Follow-up fix kept highlighted substrings inline so long labels do not wrap around a full-width highlight element.
 - Linked backlog item(s): `item_605_settings_search_and_label_highlighting`
 - Related request(s): `req_131_settings_search_and_sectioned_navigation`
 

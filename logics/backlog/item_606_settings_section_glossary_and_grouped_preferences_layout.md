@@ -2,8 +2,8 @@
 > From version: 1.11.0
 > Schema version: 1.0
 > Status: Done
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 91%
+> Confidence: 86%
 > Progress: 100%
 > Complexity: Medium
 > Theme: UI
@@ -68,7 +68,7 @@ flowchart LR
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
 - Request: `logics/request/req_131_settings_search_and_sectioned_navigation.md`
-- Primary task(s): (none yet)
+- Primary task(s): `task_114_settings_section_glossary_and_grouped_preferences_layout`
 
 # AI Context
 - Summary: Settings section glossary and grouped preferences layout
@@ -85,6 +85,7 @@ flowchart LR
 - Source file: `logics/request/req_131_settings_search_and_sectioned_navigation.md`.
 - Generated locally by logics-manager.
 - Task `task_114_settings_section_glossary_and_grouped_preferences_layout` was finished via `logics-manager flow finish task` on 2026-05-30.
+- Post-finish polish on 2026-05-30 aligned new search/section UI with theme colors, constrained the right-side grouped list to one column, offset the sticky section rail below the header, and added active-section feedback in the rail.
 
 # Tasks
 - `task_114_settings_section_glossary_and_grouped_preferences_layout`
