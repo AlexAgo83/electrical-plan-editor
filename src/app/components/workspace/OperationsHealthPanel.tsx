@@ -55,6 +55,10 @@ export function OperationsHealthPanel({
   handleOpenValidationScreen,
   moveValidationIssueCursor
 }: OperationsHealthPanelProps): ReactElement {
+  const relinkWorkspaceLabel = workspaceFileStatus.mode === "linked" || workspaceFileStatus.resumeFileName !== null ? "Relink" : "Link";
+  const relinkWorkspaceAriaLabel =
+    relinkWorkspaceLabel === "Relink" ? "Relink workspace file" : "Link workspace file";
+
   return (
     <section className="workspace-ops-content panel">
       <h2>Operations and health</h2>
@@ -108,23 +112,49 @@ export function OperationsHealthPanel({
             className="button-with-icon"
             onClick={onResumeWorkspaceFile}
             disabled={!workspaceFileStatus.canResume || workspaceFileStatus.mode === "linked"}
+            aria-label="Resume workspace file"
+            title="Resume the last workspace file remembered by this browser"
           >
             <span className="action-button-icon is-redo" aria-hidden="true" />
             Resume
           </button>
-          <button type="button" className="button-with-icon" onClick={onOpenWorkspaceFile}>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={onOpenWorkspaceFile}
+            aria-label="Open workspace file"
+            title="Open a workspace file and replace the current workspace"
+          >
             <span className="action-button-icon is-open" aria-hidden="true" />
             Open
           </button>
-          <button type="button" className="button-with-icon" onClick={onRelinkWorkspaceFile}>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={onRelinkWorkspaceFile}
+            aria-label={relinkWorkspaceAriaLabel}
+            title={`${relinkWorkspaceLabel} a workspace file for direct file autosave when supported`}
+          >
             <span className="action-button-icon is-swap" aria-hidden="true" />
-            Relink
+            {relinkWorkspaceLabel}
           </button>
-          <button type="button" className="button-with-icon" onClick={onSaveWorkspaceFileNow}>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={onSaveWorkspaceFileNow}
+            aria-label="Save workspace file now"
+            title="Save the current workspace to the linked file or choose a save target"
+          >
             <span className="action-button-icon is-save" aria-hidden="true" />
             Save now
           </button>
-          <button type="button" className="button-with-icon" onClick={onSaveWorkspaceFileAs}>
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={onSaveWorkspaceFileAs}
+            aria-label="Save workspace file as"
+            title="Save a new workspace file copy"
+          >
             <span className="action-button-icon is-save" aria-hidden="true" />
             Save as
           </button>
@@ -133,6 +163,8 @@ export function OperationsHealthPanel({
             className="button-with-icon"
             onClick={onUnlinkWorkspaceFile}
             disabled={workspaceFileStatus.mode !== "linked"}
+            aria-label="Unlink workspace file"
+            title="Stop autosaving to the linked file and keep browser-local persistence"
           >
             <span className="action-button-icon is-swap" aria-hidden="true" />
             Unlink

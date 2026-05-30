@@ -437,6 +437,9 @@ export function SettingsWorkspaceContent({
   const contentRef = useRef<HTMLElement | null>(null);
   const sectionVisibilityRatiosRef = useRef<Map<string, number>>(new Map());
   const [activeSettingsSectionId, setActiveSettingsSectionId] = useState("settings-ai-provider");
+  const relinkWorkspaceLabel = workspaceFileStatus.mode === "linked" || workspaceFileStatus.resumeFileName !== null ? "Relink" : "Link";
+  const relinkWorkspaceAriaLabel =
+    relinkWorkspaceLabel === "Relink" ? "Relink workspace file" : "Link workspace file";
   const renderSettingLabel = (text: string): ReactNode => (
     <SettingsLabelText text={text} normalizedQuery={normalizedSettingsSearch} />
   );
@@ -619,14 +622,50 @@ export function SettingsWorkspaceContent({
             type="button"
             onClick={resumeWorkspaceFile}
             disabled={!workspaceFileStatus.canResume || workspaceFileStatus.mode === "linked"}
+            aria-label="Resume workspace file"
+            title="Resume the last workspace file remembered by this browser"
           >
             Resume
           </button>
-          <button type="button" onClick={openWorkspaceFile}>{renderSettingLabel("Open")}</button>
-          <button type="button" onClick={relinkWorkspaceFile}>Relink</button>
-          <button type="button" onClick={saveWorkspaceFileNow}>Save now</button>
-          <button type="button" onClick={saveWorkspaceFileAs}>{renderSettingLabel("Save as")}</button>
-          <button type="button" onClick={unlinkWorkspaceFile} disabled={workspaceFileStatus.mode !== "linked"}>
+          <button
+            type="button"
+            onClick={openWorkspaceFile}
+            aria-label="Open workspace file"
+            title="Open a workspace file and replace the current workspace"
+          >
+            {renderSettingLabel("Open")}
+          </button>
+          <button
+            type="button"
+            onClick={relinkWorkspaceFile}
+            aria-label={relinkWorkspaceAriaLabel}
+            title={`${relinkWorkspaceLabel} a workspace file for direct file autosave when supported`}
+          >
+            {relinkWorkspaceLabel}
+          </button>
+          <button
+            type="button"
+            onClick={saveWorkspaceFileNow}
+            aria-label="Save workspace file now"
+            title="Save the current workspace to the linked file or choose a save target"
+          >
+            Save now
+          </button>
+          <button
+            type="button"
+            onClick={saveWorkspaceFileAs}
+            aria-label="Save workspace file as"
+            title="Save a new workspace file copy"
+          >
+            {renderSettingLabel("Save as")}
+          </button>
+          <button
+            type="button"
+            onClick={unlinkWorkspaceFile}
+            disabled={workspaceFileStatus.mode !== "linked"}
+            aria-label="Unlink workspace file"
+            title="Stop autosaving to the linked file and keep browser-local persistence"
+          >
             {renderSettingLabel("Unlink")}
           </button>
         </div>
