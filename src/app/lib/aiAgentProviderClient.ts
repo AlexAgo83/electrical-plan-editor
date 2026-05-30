@@ -55,6 +55,59 @@ function asUnknownArray(value: unknown): unknown[] {
   return Array.isArray(value) ? (value as unknown[]) : [];
 }
 
+function buildOperationResponseJsonSchema() {
+  return {
+    type: "object",
+    additionalProperties: false,
+    required: ["schemaVersion", "operations"],
+    properties: {
+      schemaVersion: {
+        type: "number",
+        enum: [AI_AGENT_OPERATION_SCHEMA_VERSION]
+      },
+      operations: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: true,
+          required: ["type"],
+          properties: {
+            type: {
+              type: "string"
+            }
+          }
+        }
+      }
+    }
+  };
+}
+
+async function readProviderError(response: Response, providerLabel: string): Promise<string> {
+  const requestId = response.headers.get("x-request-id");
+  let detail = "";
+  try {
+    const payload: unknown = await response.json();
+    if (typeof payload === "object" && payload !== null) {
+      const error = (payload as Record<string, unknown>).error;
+      if (typeof error === "object" && error !== null) {
+        const message = (error as Record<string, unknown>).message;
+        if (typeof message === "string") {
+          detail = message;
+        }
+      }
+    }
+  } catch {
+    try {
+      detail = await response.text();
+    } catch {
+      detail = "";
+    }
+  }
+  const requestSuffix = requestId === null ? "" : ` Request ID: ${requestId}.`;
+  const detailSuffix = detail.trim().length === 0 ? "" : ` ${detail.trim()}`;
+  return `${providerLabel} proposal request failed with HTTP ${response.status}.${detailSuffix}${requestSuffix}`;
+}
+
 function extractOpenAiText(payload: unknown): string {
   if (typeof payload !== "object" || payload === null) {
     return "";
@@ -135,13 +188,17 @@ export async function requestAiAgentProviderProposal({
         input: prompt,
         text: {
           format: {
-            type: "json_object"
+            type: "json_schema",
+            name: "ai_agent_operation_proposal",
+            schema: buildOperationResponseJsonSchema(),
+            strict: false
           }
-        }
+        },
+        truncation: "auto"
       })
     });
     if (!response.ok) {
-      throw new Error(`OpenAI proposal request failed with HTTP ${response.status}.`);
+      throw new Error(await readProviderError(response, "OpenAI"));
     }
     const responsePayload: unknown = await response.json();
     const rawText = extractOpenAiText(responsePayload);
@@ -179,7 +236,7 @@ export async function requestAiAgentProviderProposal({
     }
   );
   if (!response.ok) {
-    throw new Error(`Gemini proposal request failed with HTTP ${response.status}.`);
+    throw new Error(await readProviderError(response, "Gemini"));
   }
   const responsePayload: unknown = await response.json();
   const rawText = extractGeminiText(responsePayload);

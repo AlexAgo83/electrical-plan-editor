@@ -52,6 +52,14 @@ describe("AI agent provider client", () => {
     const openAiRequestInit = fetchMock.mock.calls[0]?.[1];
     expect(openAiRequestInit?.method).toBe("POST");
     expect((openAiRequestInit?.headers as Record<string, string> | undefined)?.Authorization).toBe("Bearer test-openai-key");
+    expect(typeof openAiRequestInit?.body).toBe("string");
+    const openAiBody = JSON.parse(openAiRequestInit?.body as string) as {
+      text?: { format?: { type?: string; name?: string } };
+      truncation?: string;
+    };
+    expect(openAiBody.text?.format?.type).toBe("json_schema");
+    expect(openAiBody.text?.format?.name).toBe("ai_agent_operation_proposal");
+    expect(openAiBody.truncation).toBe("auto");
     expect(result.payload).toEqual({
       schemaVersion: 1,
       operations: [{ type: "add_node", label: "Provider node", position: { x: 1, y: 2 } }]
@@ -124,5 +132,36 @@ describe("AI agent provider client", () => {
         instruction: "Return broken JSON."
       })
     ).rejects.toThrow("AI provider returned invalid JSON for the operation contract.");
+  });
+
+  it("includes OpenAI error details when a proposal request fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>(() =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify({
+              error: {
+                message: "Unsupported response format."
+              }
+            }),
+            {
+              status: 400,
+              headers: {
+                "x-request-id": "req-test"
+              }
+            }
+          )
+        )
+      )
+    );
+
+    await expect(
+      requestAiAgentProviderProposal({
+        settings: buildSettings("openai"),
+        context: buildAiAgentContext(createSampleNetworkState(), "activeNetwork"),
+        instruction: "Generate a proposal."
+      })
+    ).rejects.toThrow("OpenAI proposal request failed with HTTP 400. Unsupported response format. Request ID: req-test.");
   });
 });
