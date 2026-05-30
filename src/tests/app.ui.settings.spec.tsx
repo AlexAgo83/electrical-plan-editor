@@ -249,6 +249,9 @@ describe("App integration UI - settings", () => {
     fireEvent.click(applyProposalButton);
     expect(screen.getByText("Applied 1 accepted operation. 0 accepted operations skipped.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Apply proposal" })).toBeDisabled();
+    expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("4 nodes");
+    fireEvent.keyDown(document, { key: "z", metaKey: true });
+    expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("3 nodes");
   });
 
   it("keeps settings and import/export controls operable on mobile baseline viewports", async () => {
