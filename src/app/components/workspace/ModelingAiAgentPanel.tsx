@@ -12,7 +12,6 @@ interface ModelingAiAgentPanelProps {
     scope: AiAgentScope;
     instruction: string;
     permissions: AiAgentOperationPermissions;
-    useConfiguredProvider: boolean;
   }) => Promise<{ summary: string; validation: AiAgentOperationValidationResult }>;
   onApplyProposal: (validation: AiAgentOperationValidationResult) => { appliedCount: number; skippedCount: number };
 }
@@ -39,16 +38,12 @@ export function ModelingAiAgentPanel({
   });
   const [draftStatus, setDraftStatus] = useState<string | null>(null);
   const [proposalValidation, setProposalValidation] = useState<AiAgentOperationValidationResult | null>(null);
-  const [useConfiguredProvider, setUseConfiguredProvider] = useState(false);
   const [isPreparingProposal, setIsPreparingProposal] = useState(false);
   const selectedMode = agentMode === "direct" && !experimentalDirectExecutionEnabled ? "assisted" : agentMode;
   const selectedContextSummary = contextSummaries[targetScope];
   const canPrepareProposal =
     providerReadiness.isReady && selectedContextSummary.isAvailable && instruction.trim().length > 0 && !isPreparingProposal;
-  const enabledPermissionCount = useMemo(
-    () => Object.values(permissions).filter(Boolean).length,
-    [permissions]
-  );
+  const enabledPermissionCount = useMemo(() => Object.values(permissions).filter(Boolean).length, [permissions]);
   const updatePermission = (key: keyof AiAgentOperationPermissions, value: boolean) => {
     setPermissions((current) => ({
       ...current,
@@ -65,24 +60,7 @@ export function ModelingAiAgentPanel({
           <h2>AI Agent</h2>
           <p className="meta-line">Prepare controlled modeling operations from a scoped instruction.</p>
         </div>
-        <span className={providerReadiness.isReady ? "settings-state-chip is-ok" : "settings-state-chip is-warn"}>
-          {providerReadiness.isReady ? "Provider ready" : "Provider required"}
-        </span>
       </header>
-      <div className="settings-import-summary">
-        <p className="meta-line">
-          <span>Provider</span> <strong>{providerReadiness.provider === "openai" ? "OpenAI" : "Gemini"}</strong>
-        </p>
-        <p className="meta-line">
-          <span>Status</span> <strong>{providerReadiness.message}</strong>
-        </p>
-        <p className="meta-line">
-          <span>Mode</span> <strong>{selectedMode === "assisted" ? "Assisted proposal" : "Experimental direct execution"}</strong>
-        </p>
-        <p className="meta-line">
-          <span>Permissions</span> <strong>{enabledPermissionCount} enabled</strong>
-        </p>
-      </div>
       <div className="settings-import-summary" role="region" aria-label="AI context summary">
         <p className="meta-line">
           <span>Context</span> <strong>{selectedContextSummary.scopeLabel}</strong>
@@ -199,18 +177,6 @@ export function ModelingAiAgentPanel({
             Delete entities
           </label>
         </fieldset>
-        <label className="settings-checkbox">
-          <input
-            type="checkbox"
-            checked={useConfiguredProvider}
-            onChange={(event) => {
-              setUseConfiguredProvider(event.target.checked);
-              setProposalValidation(null);
-              setDraftStatus(null);
-            }}
-          />
-          Use configured provider for proposal generation
-        </label>
 
         {draftStatus !== null ? <p className="meta-line">{draftStatus}</p> : null}
 
@@ -220,14 +186,11 @@ export function ModelingAiAgentPanel({
             disabled={!canPrepareProposal}
             onClick={() => {
               setIsPreparingProposal(true);
-              setDraftStatus(
-                useConfiguredProvider ? "Requesting proposal from configured provider..." : "Preparing local proposal preview..."
-              );
+              setDraftStatus("Requesting proposal from configured provider...");
               void onPrepareProposal({
                 scope: targetScope,
                 instruction,
-                permissions,
-                useConfiguredProvider
+                permissions
               })
                 .then((draft) => {
                   setProposalValidation(draft.validation);

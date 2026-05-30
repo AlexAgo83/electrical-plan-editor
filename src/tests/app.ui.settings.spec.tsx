@@ -228,7 +228,8 @@ describe("App integration UI - settings", () => {
     expect(enabledAiAgentButton).toBeEnabled();
     fireEvent.click(enabledAiAgentButton);
     expect(screen.getByRole("heading", { name: "AI Agent" })).toBeInTheDocument();
-    expect(screen.getByText("Provider ready")).toBeInTheDocument();
+    expect(screen.queryByText("Provider ready")).not.toBeInTheDocument();
+    expect(screen.queryByText("OpenAI provider is ready.")).not.toBeInTheDocument();
     const activeQuickEntityNavigation = screen.getByRole("region", { name: "Quick entity navigation" });
     expect(within(activeQuickEntityNavigation).getByRole("button", { name: /Connectors/ })).toHaveAttribute("aria-pressed", "false");
     expect(within(activeQuickEntityNavigation).getByRole("button", { name: "AI Agent" })).toHaveAttribute("aria-pressed", "true");
@@ -244,23 +245,6 @@ describe("App integration UI - settings", () => {
     });
     const prepareProposalButton = screen.getByRole("button", { name: "Prepare proposal" });
     expect(prepareProposalButton).toBeEnabled();
-    fireEvent.click(prepareProposalButton);
-    expect(await screen.findByText(/Local draft generated/)).toBeInTheDocument();
-    const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
-    expect(within(proposalSummary).getByText("Accepted")).toBeInTheDocument();
-    expect(within(proposalSummary).getByText("Unsupported")).toBeInTheDocument();
-    expect(within(proposalSummary).getByText("add_node")).toBeInTheDocument();
-    expect(within(proposalSummary).getByText("assign_endpoint")).toBeInTheDocument();
-    const applyProposalButton = screen.getByRole("button", { name: "Apply proposal" });
-    expect(applyProposalButton).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Reject proposal" })).toBeEnabled();
-    fireEvent.click(applyProposalButton);
-    expect(screen.getByText("Applied 1 accepted operation. 0 accepted operations skipped.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Apply proposal" })).toBeDisabled();
-    expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("4 nodes");
-    fireEvent.keyDown(document, { key: "z", metaKey: true });
-    expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("3 nodes");
-
     fetchMock.mockImplementationOnce(() =>
       Promise.resolve(
         new Response(
@@ -274,11 +258,21 @@ describe("App integration UI - settings", () => {
         )
       )
     );
-    fireEvent.click(screen.getByLabelText("Use configured provider for proposal generation"));
-    fireEvent.click(screen.getByRole("button", { name: "Prepare proposal" }));
+    fireEvent.click(prepareProposalButton);
     expect(await screen.findByText(/Provider draft generated/)).toBeInTheDocument();
-    const providerProposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
-    expect(within(providerProposalSummary).getByText("add_node")).toBeInTheDocument();
+    const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
+    expect(within(proposalSummary).getByText("Accepted")).toBeInTheDocument();
+    expect(within(proposalSummary).getByText("add_node")).toBeInTheDocument();
+    const applyProposalButton = screen.getByRole("button", { name: "Apply proposal" });
+    expect(applyProposalButton).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Reject proposal" })).toBeEnabled();
+    fireEvent.click(applyProposalButton);
+    expect(screen.getByText("Applied 1 accepted operation. 0 accepted operations skipped.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Apply proposal" })).toBeDisabled();
+    expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("4 nodes");
+    fireEvent.keyDown(document, { key: "z", metaKey: true });
+    expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("3 nodes");
+    expect(screen.queryByLabelText("Use configured provider for proposal generation")).not.toBeInTheDocument();
   });
 
   it("keeps settings and import/export controls operable on mobile baseline viewports", async () => {

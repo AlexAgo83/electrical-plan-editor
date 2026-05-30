@@ -701,6 +701,14 @@
 }
 
 @media (max-width: 670px) {
+  .header-block:has(.header-center-content) .header-title {
+    display: none;
+  }
+
+  .header-block:has(.header-center-content) .header-brand {
+    gap: 0.35rem;
+  }
+
   .header-center-content {
     width: 100%;
   }
