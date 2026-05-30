@@ -1,0 +1,145 @@
+.settings-workspace .settings-section-list {
+  gap: 0;
+  padding: 0.25rem 0.85rem 0.45rem;
+}
+
+.settings-workspace .settings-section-list > .settings-panel {
+  gap: 0.42rem;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 1rem 0 1.15rem;
+}
+
+.settings-workspace .settings-section-list > .settings-panel:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-panel-header {
+  padding: 0 0.15rem;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-panel-intro {
+  max-width: 52rem;
+  padding: 0 0.15rem 0.35rem;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid {
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > label:not(.settings-checkbox),
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > .settings-checkbox {
+  min-height: 2.95rem;
+  margin: 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0.58rem 0.15rem;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > label:not(.settings-checkbox) {
+  grid-template-columns: minmax(12rem, 18rem) minmax(12rem, 26rem);
+  align-items: center;
+  column-gap: 1rem;
+  justify-content: start;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > .settings-checkbox {
+  display: grid;
+  grid-template-columns: minmax(12rem, 18rem) auto;
+  align-items: center;
+  column-gap: 1rem;
+  justify-content: start;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > .settings-checkbox > input {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > .settings-checkbox > .settings-label-text {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > label:not(.settings-checkbox):hover,
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > .settings-checkbox:hover {
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 7%, transparent);
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > label.settings-locale-field {
+  border-inline: 0;
+  border-top: 0;
+  border-radius: 0;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > label.settings-locale-field:hover {
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 7%, transparent);
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > label.settings-locale-field .settings-locale-label {
+  grid-column: 1;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > label.settings-locale-field .settings-locale-select,
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > label.settings-locale-field .settings-locale-hint {
+  grid-column: 2;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > label:not(.settings-checkbox) input,
+.settings-workspace .settings-section-list > .settings-panel > .settings-grid > label:not(.settings-checkbox) select,
+.settings-workspace .settings-section-list > .settings-panel .settings-range-control {
+  width: min(100%, 26rem);
+  justify-self: stretch;
+}
+
+.settings-workspace .settings-section-list > .settings-panel .settings-range-control {
+  min-width: 0;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-state-row,
+.settings-workspace .settings-section-list > .settings-panel > .settings-actions,
+.settings-workspace .settings-section-list > .settings-panel > .settings-shortcut-list,
+.settings-workspace .settings-section-list > .settings-panel > .settings-import-export-grid,
+.settings-workspace .settings-section-list > .settings-panel > .settings-import-summary,
+.settings-workspace .settings-section-list > .settings-panel > .meta-line {
+  margin-inline: 0.15rem;
+}
+
+.settings-workspace .settings-section-list > .settings-panel > .settings-actions {
+  margin-top: 0.25rem;
+  border-top-color: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+@media (max-width: 760px) {
+  .settings-workspace .settings-section-list > .settings-panel > .settings-grid > label:not(.settings-checkbox),
+  .settings-workspace .settings-section-list > .settings-panel > .settings-grid > .settings-checkbox {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    row-gap: 0.34rem;
+  }
+
+  .settings-workspace .settings-section-list > .settings-panel > .settings-grid > .settings-checkbox > input,
+  .settings-workspace .settings-section-list > .settings-panel > .settings-grid > .settings-checkbox > .settings-label-text,
+  .settings-workspace .settings-section-list > .settings-panel > .settings-grid > label.settings-locale-field .settings-locale-label,
+  .settings-workspace .settings-section-list > .settings-panel > .settings-grid > label.settings-locale-field .settings-locale-select,
+  .settings-workspace .settings-section-list > .settings-panel > .settings-grid > label.settings-locale-field .settings-locale-hint {
+    grid-column: 1;
+  }
+
+  .settings-workspace .settings-section-list > .settings-panel > .settings-grid > .settings-checkbox > input {
+    grid-row: 2;
+  }
+
+  .settings-workspace .settings-section-list > .settings-panel > .settings-grid > .settings-checkbox > .settings-label-text {
+    grid-row: 1;
+  }
+}

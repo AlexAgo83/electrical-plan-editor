@@ -490,7 +490,7 @@ export function SettingsWorkspaceContent({
             );
           })}
         </nav>
-        <section ref={contentRef} className="panel-grid settings-panel-grid settings-section-list" aria-label="Settings sections list">
+        <section ref={contentRef} className="panel settings-panel panel-grid settings-panel-grid settings-section-list" aria-label="Settings sections list">
       <section id="settings-ai-provider" className="panel settings-panel" data-onboarding-panel="settings-ai-provider">
         <header className="settings-panel-header">
           <h2>AI provider</h2>
