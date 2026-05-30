@@ -1,4 +1,8 @@
 import { describe, expect, it } from "vitest";
+import {
+  PERSISTED_STATE_PAYLOAD_KIND,
+  PERSISTED_STATE_SCHEMA_VERSION
+} from "../adapters/persistence";
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../core/schema";
 import { createSampleNetworkState } from "../store";
 import {
@@ -43,5 +47,27 @@ describe("workspace file format", () => {
 
   it("builds a stable workspace file name", () => {
     expect(buildWorkspaceFileName("2026-05-30T10:11:12.000Z")).toBe("electrical-workspace-2026-05-30_10-11-12.epe.json");
+  });
+
+  it("derives stable revisions when importing legacy persisted workspace snapshots", () => {
+    const state = createSampleNetworkState();
+    const legacySnapshot = JSON.stringify({
+      payloadKind: PERSISTED_STATE_PAYLOAD_KIND,
+      schemaVersion: PERSISTED_STATE_SCHEMA_VERSION,
+      appVersion: APP_RELEASE_VERSION,
+      appSchemaVersion: APP_SCHEMA_VERSION,
+      createdAtIso: "2026-05-30T09:00:00.000Z",
+      updatedAtIso: "2026-05-30T09:30:00.000Z",
+      state
+    });
+
+    const first = parseWorkspaceFilePayload(legacySnapshot, "2026-05-30T10:00:00.000Z");
+    const second = parseWorkspaceFilePayload(legacySnapshot, "2026-05-30T10:10:00.000Z");
+
+    expect(first.error).toBeNull();
+    expect(second.error).toBeNull();
+    expect(first.payload?.workspaceId).toBe(second.payload?.workspaceId);
+    expect(first.payload?.revisionId).toBe(second.payload?.revisionId);
+    expect(first.payload?.revisionId).toMatch(/^rev_/);
   });
 });

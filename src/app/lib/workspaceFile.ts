@@ -36,6 +36,16 @@ function createPortableId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function createStablePortableId(prefix: string, source: string): string {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < source.length; index += 1) {
+    hash ^= source.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+
+  return `${prefix}_${(hash >>> 0).toString(36)}`;
+}
+
 function isValidIsoDate(value: string): boolean {
   return Number.isFinite(Date.parse(value));
 }
@@ -156,6 +166,8 @@ export function parseWorkspaceFilePayload(rawJson: string, nowIso: string = new 
     return {
       payload: {
         ...payload,
+        workspaceId: createStablePortableId("workspace", rawJson),
+        revisionId: createStablePortableId("rev", rawJson),
         createdAtIso: migration.snapshot.createdAtIso,
         updatedAtIso: migration.snapshot.updatedAtIso
       },

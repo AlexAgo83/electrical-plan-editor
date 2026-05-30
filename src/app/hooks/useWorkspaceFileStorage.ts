@@ -565,6 +565,7 @@ export function useWorkspaceFileStorage({
         return;
       }
 
+      linkedHandleRef.current = null;
       lastLoadedPayloadRef.current = payload;
       setStatusBase((current) => ({
         ...current,
