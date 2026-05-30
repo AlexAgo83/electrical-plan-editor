@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import type { AppAction } from "../../../store/actions";
 import type { AppStore } from "../../../store";
 import type { ScreenId, SubScreenId, UndoHistoryEntry } from "../../types/app-controller";
@@ -12,7 +13,7 @@ import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSel
 import type { ValidationModel } from "../useValidationModel";
 import type { AiSettingsModel } from "../useAiSettings";
 import { ModelingAiAgentPanel } from "../../components/workspace/ModelingAiAgentPanel";
-import { applyAiAgentAcceptedOperations } from "../../lib/aiAgentApply";
+import { applyAiAgentAcceptedOperations, createAiAgentSessionSnapshot, rollbackAiAgentSession, type AiAgentSessionSnapshot } from "../../lib/aiAgentApply";
 import { buildAiAgentContext } from "../../lib/aiAgentContext";
 import { prepareAiAgentProposalDraft } from "../../lib/aiAgentProposal";
 import { requestAiAgentProviderProposal } from "../../lib/aiAgentProviderClient";
@@ -182,6 +183,7 @@ export function useAppControllerWorkspaceContentAssembly({
   domains,
   handlers
 }: AppControllerWorkspaceContentAssemblyParams) {
+  const lastAiAgentSessionSnapshotRef = useRef<AiAgentSessionSnapshot | null>(null);
   const { homeWorkspaceContent } = useAppControllerHomeWorkspaceContent({
     HomeWorkspaceContentComponent: components.HomeWorkspaceContentComponent,
     hasActiveNetwork: state.hasActiveNetwork,
@@ -529,14 +531,28 @@ export function useAppControllerWorkspaceContentAssembly({
         }
       }}
       onApplyProposal={(validation) => {
-        const result = applyAiAgentAcceptedOperations(handlers.store.getState(), validation);
-        if (result.nextState !== handlers.store.getState()) {
+        const currentState = handlers.store.getState();
+        const snapshot = createAiAgentSessionSnapshot(currentState, validation, "AI modeling proposal");
+        const result = applyAiAgentAcceptedOperations(currentState, validation);
+        if (result.nextState !== currentState) {
+          lastAiAgentSessionSnapshotRef.current = snapshot;
           handlers.replaceStateWithHistory(result.nextState);
         }
         return {
           appliedCount: result.appliedCount,
-          skippedCount: result.skippedCount
+          skippedCount: result.skippedCount,
+          impactPreview: snapshot.impactPreview,
+          canRollback: result.nextState !== currentState
         };
+      }}
+      onRollbackLastSession={() => {
+        const snapshot = lastAiAgentSessionSnapshotRef.current;
+        if (snapshot === null) {
+          return false;
+        }
+        handlers.replaceStateWithHistory(rollbackAiAgentSession(snapshot));
+        lastAiAgentSessionSnapshotRef.current = null;
+        return true;
       }}
     />
   ) : null;

@@ -1,5 +1,6 @@
 import { useMemo, useState, type ReactElement } from "react";
 import type { AiAgentContextSummary } from "../../lib/aiAgentContext";
+import { buildAiAgentImpactPreview, type AiAgentImpactPreview } from "../../lib/aiAgentApply";
 import type {
   AiAgentOperationPermissions,
   AiAgentOperationValidationResult,
@@ -17,7 +18,13 @@ interface ModelingAiAgentPanelProps {
     instruction: string;
     permissions: AiAgentOperationPermissions;
   }) => Promise<{ summary: string; validation: AiAgentOperationValidationResult; rawResponse?: string }>;
-  onApplyProposal: (validation: AiAgentOperationValidationResult) => { appliedCount: number; skippedCount: number };
+  onApplyProposal: (validation: AiAgentOperationValidationResult) => {
+    appliedCount: number;
+    skippedCount: number;
+    impactPreview: AiAgentImpactPreview;
+    canRollback: boolean;
+  };
+  onRollbackLastSession: () => boolean;
 }
 
 type AgentMode = "assisted" | "direct";
@@ -112,7 +119,8 @@ export function ModelingAiAgentPanel({
   experimentalDirectExecutionEnabled,
   contextSummaries,
   onPrepareProposal,
-  onApplyProposal
+  onApplyProposal,
+  onRollbackLastSession
 }: ModelingAiAgentPanelProps): ReactElement {
   const [instruction, setInstruction] = useState("");
   const [targetScope, setTargetScope] = useState<AiAgentScope>("activeNetwork");
@@ -127,12 +135,18 @@ export function ModelingAiAgentPanel({
   const [draftStatus, setDraftStatus] = useState<string | null>(null);
   const [draftRawResponse, setDraftRawResponse] = useState<string | null>(null);
   const [proposalValidation, setProposalValidation] = useState<AiAgentOperationValidationResult | null>(null);
+  const [lastAppliedImpactPreview, setLastAppliedImpactPreview] = useState<AiAgentImpactPreview | null>(null);
+  const [canRollbackLastSession, setCanRollbackLastSession] = useState(false);
   const [isPreparingProposal, setIsPreparingProposal] = useState(false);
   const selectedMode = agentMode === "direct" && !experimentalDirectExecutionEnabled ? "assisted" : agentMode;
   const selectedContextSummary = contextSummaries[targetScope];
   const canPrepareProposal =
     providerReadiness.isReady && selectedContextSummary.isAvailable && instruction.trim().length > 0 && !isPreparingProposal;
   const enabledPermissionCount = useMemo(() => Object.values(permissions).filter(Boolean).length, [permissions]);
+  const proposalImpactPreview = useMemo(
+    () => (proposalValidation === null ? null : buildAiAgentImpactPreview(proposalValidation)),
+    [proposalValidation]
+  );
   const entityCountEntries: EntityCountEntry[] = [
     { key: "connectors", count: selectedContextSummary.counts.connectors, singular: "connector" },
     { key: "splices", count: selectedContextSummary.counts.splices, singular: "splice" },
@@ -353,12 +367,28 @@ export function ModelingAiAgentPanel({
               const result = onApplyProposal(proposalValidation);
               setProposalValidation(null);
               setDraftRawResponse(null);
+              setLastAppliedImpactPreview(result.impactPreview);
+              setCanRollbackLastSession(result.canRollback);
               setDraftStatus(
                 `Applied ${result.appliedCount} accepted operation${result.appliedCount === 1 ? "" : "s"}. ${result.skippedCount} accepted operation${result.skippedCount === 1 ? "" : "s"} skipped.`
               );
             }}
           >
             Apply proposal
+          </button>
+          <button
+            type="button"
+            disabled={!canRollbackLastSession}
+            onClick={() => {
+              const didRollback = onRollbackLastSession();
+              setCanRollbackLastSession(false);
+              setLastAppliedImpactPreview(null);
+              setProposalValidation(null);
+              setDraftRawResponse(null);
+              setDraftStatus(didRollback ? "Rolled back the last applied AI session." : "No AI session is available to roll back.");
+            }}
+          >
+            Rollback last AI session
           </button>
           <button
             type="button"
@@ -375,6 +405,15 @@ export function ModelingAiAgentPanel({
       </form>
       {proposalValidation !== null ? (
         <div className="settings-import-summary ai-agent-proposal-summary" role="region" aria-label="AI proposal summary">
+          {proposalImpactPreview !== null ? (
+            <p className="meta-line">
+              <span>Impact</span>
+              <strong>
+                {proposalImpactPreview.addCount} add / {proposalImpactPreview.updateCount} update / {proposalImpactPreview.moveCount} move /{" "}
+                {proposalImpactPreview.routeCount} route / {proposalImpactPreview.deleteCount} delete
+              </strong>
+            </p>
+          ) : null}
           <p className="meta-line">
             <span>Accepted</span> <strong>{proposalValidation.accepted.length}</strong>
           </p>
@@ -404,6 +443,17 @@ export function ModelingAiAgentPanel({
               <span>Unsupported operation</span> <strong>{issue.operationType}</strong>
             </p>
           ))}
+        </div>
+      ) : null}
+      {lastAppliedImpactPreview !== null ? (
+        <div className="settings-import-summary ai-agent-proposal-summary" role="region" aria-label="Last AI session impact">
+          <p className="meta-line">
+            <span>Last impact</span>
+            <strong>
+              {lastAppliedImpactPreview.addCount} add / {lastAppliedImpactPreview.updateCount} update / {lastAppliedImpactPreview.moveCount} move /{" "}
+              {lastAppliedImpactPreview.routeCount} route / {lastAppliedImpactPreview.deleteCount} delete
+            </strong>
+          </p>
         </div>
       ) : null}
     </article>
