@@ -216,10 +216,8 @@ describe("App integration UI - settings", () => {
       target: { value: "sk-local-test" }
     });
     expect(within(aiProviderPanel).getByText("OpenAI provider is ready.")).toBeInTheDocument();
-    vi.stubGlobal(
-      "fetch",
-      vi.fn(() => Promise.resolve(new Response("{}", { status: 200 })))
-    );
+    const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(new Response("{}", { status: 200 })));
+    vi.stubGlobal("fetch", fetchMock);
     fireEvent.click(within(aiProviderPanel).getByRole("button", { name: "Test connection" }));
     expect(await within(aiProviderPanel).findByText("OpenAI connection succeeded.")).toBeInTheDocument();
 
@@ -262,6 +260,25 @@ describe("App integration UI - settings", () => {
     expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("4 nodes");
     fireEvent.keyDown(document, { key: "z", metaKey: true });
     expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("3 nodes");
+
+    fetchMock.mockImplementationOnce(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            output_text: JSON.stringify({
+              schemaVersion: 1,
+              operations: [{ type: "add_node", label: "Provider proposed node", position: { x: 100, y: 120 } }]
+            })
+          }),
+          { status: 200 }
+        )
+      )
+    );
+    fireEvent.click(screen.getByLabelText("Use configured provider for proposal generation"));
+    fireEvent.click(screen.getByRole("button", { name: "Prepare proposal" }));
+    expect(await screen.findByText(/Provider draft generated/)).toBeInTheDocument();
+    const providerProposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
+    expect(within(providerProposalSummary).getByText("add_node")).toBeInTheDocument();
   });
 
   it("keeps settings and import/export controls operable on mobile baseline viewports", async () => {
