@@ -145,14 +145,6 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
           rows={3}
         />
       </label>
-      <button
-        type="button"
-        className="button-with-icon"
-        onClick={connectorHandlers.handleClearConnectorTerminalAndSealOverrides}
-      >
-        <span className="action-button-icon is-delete" aria-hidden="true" />
-        Clear terminal and seal overrides
-      </button>
     </fieldset>
     <label className="settings-checkbox">
       <input
@@ -187,6 +179,16 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         {connectorFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
         {connectorFormMode === "edit" ? "Cancel edit" : "Cancel"}
       </button>
+      {connectorFormMode === "edit" ? (
+        <button
+          type="button"
+          className="button-with-icon"
+          onClick={connectorHandlers.handleClearConnectorTerminalAndSealOverrides}
+        >
+          <span className="action-button-icon is-cancel" aria-hidden="true" />
+          Clear terminal and seal overrides
+        </button>
+      ) : null}
     </div>
     {connectorFormError !== null ? <small className="inline-error">{connectorFormError}</small> : null}
   </form>
