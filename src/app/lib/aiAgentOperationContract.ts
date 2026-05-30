@@ -60,6 +60,7 @@ export type AiAgentSupportedOperation =
   | AiAgentAddSegmentOperation
   | AiAgentAddWireOperation
   | AiAgentMoveEntityOperation
+  | AiAgentBatchMoveEntitiesOperation
   | AiAgentPlaceEntityRelativeToEntityOperation
   | AiAgentUpdateEntityOperation
   | AiAgentRegenerateRouteOperation
@@ -123,6 +124,21 @@ export interface AiAgentMoveEntityOperation {
     dx: number;
     dy: number;
   };
+}
+
+export interface AiAgentBatchMoveEntityEntry {
+  entityKind: "connector" | "splice" | "node";
+  entityId: string;
+  position?: LayoutNodePosition;
+  relativeMove?: {
+    dx: number;
+    dy: number;
+  };
+}
+
+export interface AiAgentBatchMoveEntitiesOperation {
+  type: "batch_move_entities";
+  moves: AiAgentBatchMoveEntityEntry[];
 }
 
 export interface AiAgentPlaceEntityRelativeToEntityOperation {
@@ -352,6 +368,16 @@ function resolveUniqueEntityReference<Id extends string>(
 }
 
 function readRelativeMove(operation: Record<string, unknown>): AiAgentMoveEntityOperation["relativeMove"] | null {
+  const nestedMove = isRecord(operation.relativeMove) ? operation.relativeMove : null;
+  const nestedDx = nestedMove !== null && typeof nestedMove.dx === "number" && Number.isFinite(nestedMove.dx) ? nestedMove.dx : null;
+  const nestedDy = nestedMove !== null && typeof nestedMove.dy === "number" && Number.isFinite(nestedMove.dy) ? nestedMove.dy : null;
+  if (nestedDx !== null || nestedDy !== null) {
+    return {
+      dx: nestedDx ?? 0,
+      dy: nestedDy ?? 0
+    };
+  }
+
   const directDx = typeof operation.deltaX === "number" && Number.isFinite(operation.deltaX) ? operation.deltaX : null;
   const directDy = typeof operation.deltaY === "number" && Number.isFinite(operation.deltaY) ? operation.deltaY : null;
   if (directDx !== null || directDy !== null) {
@@ -657,7 +683,38 @@ function getMoveSelectionFallback(
         entityKind: selection.kind,
         entityId: selection.id
       }
-    : null;
+      : null;
+}
+
+function parseBatchMoveEntries(value: unknown): AiAgentBatchMoveEntityEntry[] | null {
+  if (!Array.isArray(value) || value.length === 0) {
+    return null;
+  }
+
+  const moves: AiAgentBatchMoveEntityEntry[] = [];
+  for (const entry of value) {
+    if (!isRecord(entry)) {
+      return null;
+    }
+    const entityKind = readString(entry.entityKind);
+    const entityId = readString(entry.entityId);
+    const position = readPosition(entry.position);
+    const relativeMove = readRelativeMove(entry);
+    if (
+      (entityKind !== "connector" && entityKind !== "splice" && entityKind !== "node") ||
+      entityId === null ||
+      (position === null && relativeMove === null)
+    ) {
+      return null;
+    }
+    moves.push({
+      entityKind,
+      entityId,
+      ...(position === null ? {} : { position }),
+      ...(relativeMove === null ? {} : { relativeMove })
+    });
+  }
+  return moves;
 }
 
 function parseOperation(
@@ -835,6 +892,13 @@ function parseOperation(
       (position !== null || relativeMove !== null)
       ? { type, entityKind, entityId, ...(position === null ? {} : { position }), ...(relativeMove === null ? {} : { relativeMove }) }
       : reject(operationIndex, type, "Move operation requires supported entityKind, entityId, and position or relative direction.");
+  }
+
+  if (type === "batch_move_entities") {
+    const moves = parseBatchMoveEntries(operation.moves);
+    return moves !== null
+      ? { type, moves }
+      : reject(operationIndex, type, "Batch move operation requires one or more valid moves.");
   }
 
   if (type === "place_entity_relative_to_entity") {
@@ -1023,6 +1087,31 @@ function normalizeOperationEntityReferences(state: AppState, operation: AiAgentS
       }
     };
   }
+  if (operation.type === "batch_move_entities") {
+    return {
+      ...operation,
+      moves: operation.moves.map((move) => {
+        const entityId = resolveEntityId(state, move.entityKind, move.entityId);
+        const normalizedMove = {
+          ...move,
+          entityId
+        };
+        if (move.position !== undefined || move.relativeMove === undefined) {
+          return normalizedMove;
+        }
+        const currentPosition = getEntityPosition(state, move.entityKind, entityId);
+        return currentPosition === null
+          ? normalizedMove
+          : {
+              ...normalizedMove,
+              position: {
+                x: currentPosition.x + move.relativeMove.dx,
+                y: currentPosition.y + move.relativeMove.dy
+              }
+            };
+      })
+    };
+  }
   if (operation.type === "place_entity_relative_to_entity") {
     const entityId = resolveEntityId(state, operation.entityKind, operation.entityId);
     const referenceEntityId = resolveEntityId(state, operation.referenceEntityKind, operation.referenceEntityId);
@@ -1162,7 +1251,7 @@ function permissionForOperation(operation: AiAgentSupportedOperation): keyof AiA
   if (operation.type === "clarification_required") {
     return "update";
   }
-  if (operation.type === "move_entity") {
+  if (operation.type === "move_entity" || operation.type === "batch_move_entities") {
     return "move";
   }
   if (operation.type === "place_entity_relative_to_entity") {
@@ -1259,6 +1348,17 @@ function entityExists(
       state.wires.byId[operation.wireId] !== undefined &&
       operation.segmentIds.every((segmentId) => state.segments.byId[segmentId] !== undefined)
     );
+  }
+  if (operation.type === "batch_move_entities") {
+    return operation.moves.every((move) => {
+      if (move.entityKind === "connector") {
+        return state.connectors.byId[move.entityId as ConnectorId] !== undefined;
+      }
+      if (move.entityKind === "splice") {
+        return state.splices.byId[move.entityId as SpliceId] !== undefined;
+      }
+      return state.nodes.byId[move.entityId as NodeId] !== undefined;
+    });
   }
   if (operation.type === "clarification_required") {
     return true;
@@ -1526,6 +1626,9 @@ function isWithinSelectionScope(operation: AiAgentSupportedOperation, selection:
   if (operation.type === "move_entity" || operation.type === "place_entity_relative_to_entity" || operation.type === "update_entity") {
     return operation.entityKind === selection.kind && operation.entityId === selection.id;
   }
+  if (operation.type === "batch_move_entities") {
+    return operation.moves.every((move) => move.entityKind === selection.kind && move.entityId === selection.id);
+  }
   if (operation.type === "regenerate_route") {
     return selection.kind === "wire" && operation.wireIds.includes(selection.id as WireId);
   }
@@ -1675,6 +1778,13 @@ export function validateAiAgentOperations({
       prospectiveNormalized.position === undefined
     ) {
       result.rejected.push(reject(operationIndex, prospectiveNormalized.type, "Move operation could not resolve a canvas position."));
+      return;
+    }
+    if (
+      prospectiveNormalized.type === "batch_move_entities" &&
+      prospectiveNormalized.moves.some((move) => move.position === undefined)
+    ) {
+      result.rejected.push(reject(operationIndex, prospectiveNormalized.type, "Batch move operation could not resolve every canvas position."));
       return;
     }
     const endpointConflictMessage = wireEndpointConflictMessage(state, prospectiveNormalized);

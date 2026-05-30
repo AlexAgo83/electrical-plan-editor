@@ -103,6 +103,38 @@ describe("AI agent apply", () => {
     expect(result.nextState.nodePositions["N-C-SRC" as NodeId]).toEqual({ x: 120, y: 180 });
   });
 
+  it("applies batch canvas moves in a single layout update", () => {
+    const state = createSampleNetworkState();
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "batch_move_entities",
+          moves: [
+            {
+              entityKind: "connector",
+              entityId: "C-SRC",
+              position: { x: 160, y: 220 }
+            },
+            {
+              entityKind: "node",
+              entityId: "N-MID-A",
+              position: { x: 260, y: 180 }
+            }
+          ]
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+
+    const result = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(result.appliedCount).toBe(1);
+    expect(result.nextState.nodePositions["N-C-SRC" as NodeId]).toEqual({ x: 160, y: 220 });
+    expect(result.nextState.nodePositions["N-MID-A" as NodeId]).toEqual({ x: 260, y: 180 });
+  });
+
   it("applies update_entity operations to safe scalar fields", () => {
     const state = createSampleNetworkState();
     const validation: AiAgentOperationValidationResult = {

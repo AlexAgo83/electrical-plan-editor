@@ -885,6 +885,60 @@ describe("AI agent operation contract", () => {
     ]);
   });
 
+  it("accepts batch canvas moves and resolves relative positions", () => {
+    const state = createSampleNetworkState();
+    const generatedPositions = createNodePositionMap(
+      state.nodes.allIds.map((nodeId) => state.nodes.byId[nodeId]).filter((node) => node !== undefined),
+      state.segments.allIds.map((segmentId) => state.segments.byId[segmentId]).filter((segment) => segment !== undefined)
+    );
+    const sourcePosition = state.nodePositions["N-C-SRC" as NodeId] ?? generatedPositions["N-C-SRC" as NodeId] ?? { x: 0, y: 0 };
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "batch_move_entities",
+            moves: [
+              {
+                entityKind: "connector",
+                entityId: "CONN-SRC-01",
+                relativeMove: { dx: 15, dy: -10 }
+              },
+              {
+                entityKind: "node",
+                entityId: "N-MID-A",
+                position: { x: 320, y: 180 }
+              }
+            ]
+          }
+        ]
+      }
+    });
+
+    expect(result.rejected).toHaveLength(0);
+    expect(result.accepted).toEqual([
+      expect.objectContaining({
+        type: "batch_move_entities",
+        moves: [
+          expect.objectContaining({
+            entityKind: "connector",
+            entityId: "C-SRC",
+            position: { x: sourcePosition.x + 15, y: sourcePosition.y - 10 }
+          }),
+          expect.objectContaining({
+            entityKind: "node",
+            entityId: "N-MID-A",
+            position: { x: 320, y: 180 }
+          })
+        ]
+      })
+    ]);
+  });
+
   it("validates delete impact and cascade mode for non-wire entities", () => {
     const state = appReducer(createSampleNetworkState(), appActions.upsertConnector({
       id: "C-AI-DELETE" as ConnectorId,

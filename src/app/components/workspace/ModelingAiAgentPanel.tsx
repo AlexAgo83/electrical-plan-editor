@@ -54,6 +54,9 @@ function formatAiAgentOperationDetails(operation: AiAgentSupportedOperation): st
   if (operation.type === "place_entity_relative_to_entity") {
     return `${operation.entityKind} ${operation.entityId} ${operation.placement} ${operation.referenceEntityKind} ${operation.referenceEntityId}`;
   }
+  if (operation.type === "batch_move_entities") {
+    return `${operation.moves.length} canvas move${operation.moves.length === 1 ? "" : "s"}`;
+  }
   if (operation.type === "add_connector") {
     return `${operation.id === undefined ? "" : `${operation.id} · `}${operation.technicalId} · ${operation.name} · ${operation.cavityCount} ways`;
   }

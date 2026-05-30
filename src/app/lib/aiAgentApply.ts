@@ -70,6 +70,22 @@ function isWireEndpoint(value: unknown): value is WireEndpoint {
   return false;
 }
 
+function getNodeIdForMovableEntity(
+  state: AppState,
+  entityKind: "connector" | "splice" | "node",
+  entityId: string
+): NodeId | undefined {
+  return entityKind === "node"
+    ? (entityId as NodeId)
+    : state.nodes.allIds.find((candidateNodeId) => {
+        const node = state.nodes.byId[candidateNodeId];
+        if (entityKind === "connector") {
+          return node?.kind === "connector" && node.connectorId === entityId;
+        }
+        return node?.kind === "splice" && node.spliceId === entityId;
+      });
+}
+
 function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOperation): AppState {
   if (operation.type === "create_catalog_item") {
     const catalogItemId =
@@ -173,32 +189,29 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
     if (operation.position === undefined) {
       return state;
     }
-    const nodeId =
-      operation.entityKind === "node"
-        ? (operation.entityId as NodeId)
-        : state.nodes.allIds.find((candidateNodeId) => {
-            const node = state.nodes.byId[candidateNodeId];
-            if (operation.entityKind === "connector") {
-              return node?.kind === "connector" && node.connectorId === operation.entityId;
-            }
-            return node?.kind === "splice" && node.spliceId === operation.entityId;
-          });
+    const nodeId = getNodeIdForMovableEntity(state, operation.entityKind, operation.entityId);
     return nodeId === undefined ? state : appReducer(state, appActions.setNodePosition(nodeId, operation.position));
+  }
+  if (operation.type === "batch_move_entities") {
+    const positions: Partial<Record<NodeId, { x: number; y: number }>> = {};
+    for (const move of operation.moves) {
+      if (move.position === undefined) {
+        continue;
+      }
+      const nodeId = getNodeIdForMovableEntity(state, move.entityKind, move.entityId);
+      if (nodeId !== undefined) {
+        positions[nodeId] = move.position;
+      }
+    }
+    return Object.keys(positions).length === 0
+      ? state
+      : appReducer(state, appActions.setNodePositions(positions as Record<NodeId, { x: number; y: number }>));
   }
   if (operation.type === "place_entity_relative_to_entity") {
     if (operation.position === undefined) {
       return state;
     }
-    const nodeId =
-      operation.entityKind === "node"
-        ? (operation.entityId as NodeId)
-        : state.nodes.allIds.find((candidateNodeId) => {
-            const node = state.nodes.byId[candidateNodeId];
-            if (operation.entityKind === "connector") {
-              return node?.kind === "connector" && node.connectorId === operation.entityId;
-            }
-            return node?.kind === "splice" && node.spliceId === operation.entityId;
-          });
+    const nodeId = getNodeIdForMovableEntity(state, operation.entityKind, operation.entityId);
     return nodeId === undefined ? state : appReducer(state, appActions.setNodePosition(nodeId, operation.position));
   }
   if (operation.type === "update_entity") {
