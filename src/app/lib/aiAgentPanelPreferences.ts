@@ -6,6 +6,7 @@ export const AI_AGENT_PANEL_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ai
 export type AiAgentMode = "assisted" | "direct";
 
 export interface AiAgentPanelPreferences {
+  instruction: string;
   targetScope: AiAgentScope;
   agentMode: AiAgentMode;
   permissions: AiAgentOperationPermissions;
@@ -16,6 +17,7 @@ interface AiAgentPanelPreferencesPayload extends AiAgentPanelPreferences {
 }
 
 export const DEFAULT_AI_AGENT_PANEL_PREFERENCES: AiAgentPanelPreferences = {
+  instruction: "",
   targetScope: "activeNetwork",
   agentMode: "assisted",
   permissions: {
@@ -45,6 +47,10 @@ function normalizeBoolean(value: unknown, fallback: boolean): boolean {
   return typeof value === "boolean" ? value : fallback;
 }
 
+function normalizeString(value: unknown, fallback: string): string {
+  return typeof value === "string" ? value : fallback;
+}
+
 function normalizePermissions(value: unknown): AiAgentOperationPermissions {
   const fallback = DEFAULT_AI_AGENT_PANEL_PREFERENCES.permissions;
   if (!isRecord(value)) {
@@ -68,6 +74,7 @@ function normalizeAiAgentPanelPreferencesPayload(parsed: unknown): AiAgentPanelP
     return null;
   }
   return {
+    instruction: normalizeString(parsed.instruction, DEFAULT_AI_AGENT_PANEL_PREFERENCES.instruction),
     targetScope: normalizeTargetScope(parsed.targetScope),
     agentMode: normalizeAgentMode(parsed.agentMode),
     permissions: normalizePermissions(parsed.permissions)

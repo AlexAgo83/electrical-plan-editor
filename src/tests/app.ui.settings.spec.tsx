@@ -297,11 +297,15 @@ describe("App integration UI - settings", () => {
     fireEvent.change(screen.getByLabelText("Agent mode"), {
       target: { value: "direct" }
     });
+    fireEvent.change(screen.getByLabelText("Instruction"), {
+      target: { value: "Keep this instruction available for the next AI Agent session." }
+    });
     fireEvent.click(screen.getByLabelText("Add connectors, splices, nodes, segments, or valid wires"));
     fireEvent.click(screen.getByLabelText("Delete entities"));
 
     await waitFor(() => {
       expect(JSON.parse(localStorage.getItem(AI_AGENT_PANEL_PREFERENCES_STORAGE_KEY) ?? "{}")).toMatchObject({
+        instruction: "Keep this instruction available for the next AI Agent session.",
         targetScope: "allNetworks",
         agentMode: "direct",
         permissions: {
@@ -319,6 +323,7 @@ describe("App integration UI - settings", () => {
 
     expect(screen.getByLabelText("Target scope")).toHaveValue("allNetworks");
     expect(screen.getByLabelText("Agent mode")).toHaveValue("direct");
+    expect(screen.getByLabelText("Instruction")).toHaveValue("Keep this instruction available for the next AI Agent session.");
     expect(screen.getByLabelText("Add connectors, splices, nodes, segments, or valid wires")).not.toBeChecked();
     expect(screen.getByLabelText("Delete entities")).toBeChecked();
   });
@@ -328,6 +333,7 @@ describe("App integration UI - settings", () => {
       AI_AGENT_PANEL_PREFERENCES_STORAGE_KEY,
       JSON.stringify({
         schemaVersion: 1,
+        instruction: "Persisted instruction text",
         targetScope: "currentSelection",
         agentMode: "direct",
         permissions: {
@@ -352,6 +358,7 @@ describe("App integration UI - settings", () => {
 
     expect(screen.getByLabelText("Target scope")).toHaveValue("currentSelection");
     expect(screen.getByLabelText("Agent mode")).toHaveValue("assisted");
+    expect(screen.getByLabelText("Instruction")).toHaveValue("Persisted instruction text");
     expect(screen.getByLabelText("Delete entities")).toBeChecked();
 
     await waitFor(() => {

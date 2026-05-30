@@ -126,7 +126,7 @@ export function ModelingAiAgentPanel({
   onRollbackLastSession
 }: ModelingAiAgentPanelProps): ReactElement {
   const [initialPreferences] = useState(() => readAiAgentPanelPreferences());
-  const [instruction, setInstruction] = useState("");
+  const [instruction, setInstruction] = useState(initialPreferences.instruction);
   const [targetScope, setTargetScope] = useState<AiAgentScope>(initialPreferences.targetScope);
   const [agentMode, setAgentMode] = useState<AiAgentMode>(initialPreferences.agentMode);
   const [permissions, setPermissions] = useState<AiAgentOperationPermissions>(initialPreferences.permissions);
@@ -176,11 +176,12 @@ export function ModelingAiAgentPanel({
 
   useEffect(() => {
     writeAiAgentPanelPreferences({
+      instruction,
       targetScope,
       agentMode: selectedMode,
       permissions
     });
-  }, [agentMode, permissions, selectedMode, targetScope]);
+  }, [agentMode, instruction, permissions, selectedMode, targetScope]);
 
   return (
     <article className="panel ai-agent-panel" aria-label="AI Agent modeling workspace">
