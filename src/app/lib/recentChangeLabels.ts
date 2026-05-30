@@ -687,6 +687,45 @@ function describeWireChange(
   return joinChangeDetails(details) ?? "No field delta";
 }
 
+function describeNodeChange(action: Extract<AppAction, { type: "node/upsert" }>, previousState: AppState): string | null {
+  const previousNode = previousState.nodes.byId[action.payload.id];
+  if (previousNode === undefined) {
+    return `${action.payload.kind} node`;
+  }
+
+  const details: string[] = [];
+  if (previousNode.kind !== action.payload.kind) {
+    details.push("Node kind");
+  }
+  if (valuesDiffer(previousNode, action.payload)) {
+    details.push(action.payload.kind === "intermediate" ? "Intermediate label" : "Endpoint binding");
+  }
+
+  return joinChangeDetails(details) ?? "No field delta";
+}
+
+function describeSegmentChange(action: Extract<AppAction, { type: "segment/upsert" }>, previousState: AppState): string | null {
+  const previousSegment = previousState.segments.byId[action.payload.id];
+  if (previousSegment === undefined) {
+    const endpointA = resolveNodeDisplayRef(previousState, action.payload.nodeA);
+    const endpointB = resolveNodeDisplayRef(previousState, action.payload.nodeB);
+    return endpointA !== null && endpointB !== null ? `${endpointA} -> ${endpointB}` : `${action.payload.lengthMm} mm segment`;
+  }
+
+  const details: string[] = [];
+  if (previousSegment.nodeA !== action.payload.nodeA || previousSegment.nodeB !== action.payload.nodeB) {
+    details.push("Endpoints");
+  }
+  if (previousSegment.lengthMm !== action.payload.lengthMm) {
+    details.push("Length");
+  }
+  if (previousSegment.subNetworkTag !== action.payload.subNetworkTag) {
+    details.push("Sub-network");
+  }
+
+  return joinChangeDetails(details) ?? "No field delta";
+}
+
 function describeRecentChangeDetail(action: AppAction, previousState: AppState): string | null {
   switch (action.type) {
     case "network/update":
@@ -702,6 +741,10 @@ function describeRecentChangeDetail(action: AppAction, previousState: AppState):
     case "wire/save":
     case "wire/upsert":
       return describeWireChange(action, previousState);
+    case "node/upsert":
+      return describeNodeChange(action, previousState);
+    case "segment/upsert":
+      return describeSegmentChange(action, previousState);
     case "network/importMany":
       return action.payload.overwriteNetworkIds !== undefined && action.payload.overwriteNetworkIds.length > 0
         ? "Import with overwrite"

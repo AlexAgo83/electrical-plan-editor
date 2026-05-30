@@ -77,6 +77,7 @@ describe("recent change labels", () => {
 
     expect(entry.targetId).toBe("C-HIST");
     expect(entry.label).toBe("Node 'C-HIST' created");
+    expect(entry.detailLabel).toBe("connector node");
   });
 
   it("uses manufacturer reference for catalog history labels", () => {
@@ -301,6 +302,37 @@ describe("recent change labels", () => {
 
     expect(entry.detailLabel).toBe("Endpoints / Electrical spec / Color");
     expect(entry.label).toBe("Wire 'W-1' endpoints / electrical spec / color updated");
+  });
+
+  it("adds node and segment update sub-reasons for recent change logs", () => {
+    const previousState = createUiIntegrationState();
+    const nodeAction = appActions.upsertNode({
+      id: asNodeId("N-MID"),
+      kind: "intermediate",
+      label: "MID-REV"
+    });
+    const nodeEntry = buildUndoHistoryEntry(nodeAction, previousState, appReducer(previousState, nodeAction), 1, "2026-03-27T12:00:00.000Z");
+
+    expect(nodeEntry.detailLabel).toBe("Intermediate label");
+    expect(nodeEntry.label).toBe("Node 'MID-REV' intermediate label updated");
+
+    const segmentAction = appActions.upsertSegment({
+      id: asSegmentId("SEG-A"),
+      nodeA: asNodeId("N-C1"),
+      nodeB: asNodeId("N-S1"),
+      lengthMm: 42,
+      subNetworkTag: "BRANCH"
+    });
+    const segmentEntry = buildUndoHistoryEntry(
+      segmentAction,
+      previousState,
+      appReducer(previousState, segmentAction),
+      2,
+      "2026-03-27T12:01:00.000Z"
+    );
+
+    expect(segmentEntry.detailLabel).toBe("Endpoints / Length / Sub-network");
+    expect(segmentEntry.label).toBe("Segment 'SEG-A' endpoints / length / sub-network updated");
   });
 
   it("keeps layout history labels human-readable via node references", () => {
