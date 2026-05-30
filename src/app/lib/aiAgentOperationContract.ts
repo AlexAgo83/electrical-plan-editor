@@ -1253,8 +1253,7 @@ function permissionForOperation(operation: AiAgentSupportedOperation): keyof AiA
   if (
     operation.type === "assign_catalog_item" ||
     operation.type === "update_catalog_connector_layout" ||
-    operation.type === "set_connector_terminal_material" ||
-    operation.type === "lock_wire_route"
+    operation.type === "set_connector_terminal_material"
   ) {
     return "update";
   }

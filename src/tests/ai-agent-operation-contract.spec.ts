@@ -1026,6 +1026,37 @@ describe("AI agent operation contract", () => {
     ]);
   });
 
+  it("requires route permission for locking wire routes", () => {
+    const state = createSampleNetworkState();
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: {
+        ...DEFAULT_PERMISSIONS,
+        route: false
+      },
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "lock_wire_route",
+            wireId: "WIRE-FEED-J1",
+            segmentIds: ["SEG-001", "SEG-002"]
+          }
+        ]
+      }
+    });
+
+    expect(result.accepted).toHaveLength(0);
+    expect(result.rejected).toEqual([
+      expect.objectContaining({
+        operationType: "lock_wire_route",
+        message: "route permission is disabled."
+      })
+    ]);
+  });
+
   it("rejects wire sizing updates below the computed recommendation", () => {
     const initialState = createSampleNetworkState();
     const networkId = initialState.activeNetworkId as NetworkId;
