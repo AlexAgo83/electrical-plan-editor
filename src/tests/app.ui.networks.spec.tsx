@@ -103,7 +103,7 @@ describe("App integration UI - networks", () => {
     expect(recentChangesList.compareDocumentPosition(whatsNewHeading) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
 
     const workspacePanel = getPanelByHeading("Workspace");
-    expect(within(workspacePanel).getByText("Network 'NET-MAIN-SAMPLE' updated")).toBeInTheDocument();
+    expect(within(workspacePanel).getByText("Network 'NET-MAIN-SAMPLE' metadata / export cartouche / logo updated")).toBeInTheDocument();
     const firstTime = recentChangesList.querySelector("time")?.textContent ?? "";
     expect(firstTime).toMatch(/^\d{2}:\d{2}:\d{2}$/);
 
@@ -132,7 +132,7 @@ describe("App integration UI - networks", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Recent changes list")).toBeInTheDocument();
     });
-    expect(screen.getByText("Network 'NET-MAIN-SAMPLE' updated")).toBeInTheDocument();
+    expect(screen.getByText("Network 'NET-MAIN-SAMPLE' metadata / export cartouche / logo updated")).toBeInTheDocument();
 
     firstRender.unmount();
 
@@ -142,7 +142,7 @@ describe("App integration UI - networks", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Recent changes list")).toBeInTheDocument();
     });
-    expect(screen.getByText("Network 'NET-MAIN-SAMPLE' updated")).toBeInTheDocument();
+    expect(screen.getByText("Network 'NET-MAIN-SAMPLE' metadata / export cartouche / logo updated")).toBeInTheDocument();
   });
 
   it("hides the edit network panel again when returning to Network Scope", () => {
