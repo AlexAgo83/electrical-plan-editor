@@ -10,6 +10,7 @@ import {
   asConnectorId,
   asNodeId,
   asSegmentId,
+  asSpliceId,
   asWireId,
   createUiIntegrationState
 } from "./helpers/app-ui-test-utils";
@@ -122,6 +123,66 @@ describe("recent change labels", () => {
     expect(entry.targetId).toBe("CAT-HIST");
     expect(entry.detailLabel).toBe("Connection count / Pricing / Physical layout");
     expect(entry.label).toBe("Catalog item 'CAT-HIST' connection count / pricing / physical layout updated");
+  });
+
+  it("adds connector and splice update sub-reasons for recent change logs", () => {
+    const withConnector = appReducer(
+      createInitialState(),
+      appActions.upsertConnector({
+        id: asConnectorId("C-HIST"),
+        name: "History connector",
+        technicalId: "C-HIST",
+        cavityCount: 2
+      })
+    );
+    const connectorAction = appActions.upsertConnector({
+      id: asConnectorId("C-HIST"),
+      name: "History connector",
+      technicalId: "C-HIST-REV",
+      cavityCount: 4,
+      isMainHarnessConnector: true,
+      terminalOverrides: {
+        0: { terminalReference: "TERM-A" }
+      }
+    });
+    const connectorEntry = buildUndoHistoryEntry(
+      connectorAction,
+      withConnector,
+      appReducer(withConnector, connectorAction),
+      1,
+      "2026-03-27T12:00:00.000Z"
+    );
+
+    expect(connectorEntry.detailLabel).toBe("Identity / Cavity count / Harness role");
+    expect(connectorEntry.label).toBe("Connector 'C-HIST-REV' identity / cavity count / harness role updated");
+
+    const withSplice = appReducer(
+      createInitialState(),
+      appActions.upsertSplice({
+        id: asSpliceId("S-HIST"),
+        name: "History splice",
+        technicalId: "S-HIST",
+        portCount: 2
+      })
+    );
+    const spliceAction = appActions.upsertSplice({
+      id: asSpliceId("S-HIST"),
+      name: "History splice",
+      technicalId: "S-HIST",
+      portCount: 4,
+      portMode: "directional",
+      manufacturerReference: "SPL-CAT"
+    });
+    const spliceEntry = buildUndoHistoryEntry(
+      spliceAction,
+      withSplice,
+      appReducer(withSplice, spliceAction),
+      2,
+      "2026-03-27T12:01:00.000Z"
+    );
+
+    expect(spliceEntry.detailLabel).toBe("Port count / Port mode / Catalog link");
+    expect(spliceEntry.label).toBe("Splice 'S-HIST' port count / port mode / catalog link updated");
   });
 
   it("keeps readable wire identity for route and delete actions", () => {

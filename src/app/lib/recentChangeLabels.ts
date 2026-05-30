@@ -512,10 +512,82 @@ function describeCatalogChange(action: Extract<AppAction, { type: "catalog/upser
   return joinChangeDetails(details) ?? "No field delta";
 }
 
+function describeConnectorChange(action: Extract<AppAction, { type: "connector/upsert" }>, previousState: AppState): string | null {
+  const previousConnector = previousState.connectors.byId[action.payload.id];
+  if (previousConnector === undefined) {
+    return `${action.payload.cavityCount}-cavity connector`;
+  }
+
+  const details: string[] = [];
+  if (previousConnector.technicalId !== action.payload.technicalId || previousConnector.name !== action.payload.name) {
+    details.push("Identity");
+  }
+  if (previousConnector.cavityCount !== action.payload.cavityCount) {
+    details.push("Cavity count");
+  }
+  if (
+    previousConnector.catalogItemId !== action.payload.catalogItemId ||
+    previousConnector.manufacturerReference !== action.payload.manufacturerReference
+  ) {
+    details.push("Catalog link");
+  }
+  if (
+    previousConnector.isMainHarnessConnector !== action.payload.isMainHarnessConnector ||
+    previousConnector.isTerminalConnector !== action.payload.isTerminalConnector
+  ) {
+    details.push("Harness role");
+  }
+  if (
+    previousConnector.applyCatalogPlugs !== action.payload.applyCatalogPlugs ||
+    previousConnector.applyCatalogSeals !== action.payload.applyCatalogSeals ||
+    valuesDiffer(previousConnector.terminalOverrides, action.payload.terminalOverrides)
+  ) {
+    details.push("Terminal defaults");
+  }
+  if (valuesDiffer(previousConnector.cableCalloutPosition, action.payload.cableCalloutPosition)) {
+    details.push("Callout position");
+  }
+
+  return joinChangeDetails(details) ?? "No field delta";
+}
+
+function describeSpliceChange(action: Extract<AppAction, { type: "splice/upsert" }>, previousState: AppState): string | null {
+  const previousSplice = previousState.splices.byId[action.payload.id];
+  if (previousSplice === undefined) {
+    return `${action.payload.portCount}-port splice`;
+  }
+
+  const details: string[] = [];
+  if (previousSplice.technicalId !== action.payload.technicalId || previousSplice.name !== action.payload.name) {
+    details.push("Identity");
+  }
+  if (previousSplice.portCount !== action.payload.portCount) {
+    details.push("Port count");
+  }
+  if (previousSplice.portMode !== action.payload.portMode || previousSplice.sideInverted !== action.payload.sideInverted) {
+    details.push("Port mode");
+  }
+  if (
+    previousSplice.catalogItemId !== action.payload.catalogItemId ||
+    previousSplice.manufacturerReference !== action.payload.manufacturerReference
+  ) {
+    details.push("Catalog link");
+  }
+  if (valuesDiffer(previousSplice.cableCalloutPosition, action.payload.cableCalloutPosition)) {
+    details.push("Callout position");
+  }
+
+  return joinChangeDetails(details) ?? "No field delta";
+}
+
 function describeRecentChangeDetail(action: AppAction, previousState: AppState): string | null {
   switch (action.type) {
     case "catalog/upsert":
       return describeCatalogChange(action, previousState);
+    case "connector/upsert":
+      return describeConnectorChange(action, previousState);
+    case "splice/upsert":
+      return describeSpliceChange(action, previousState);
     case "network/importMany":
       return action.payload.overwriteNetworkIds !== undefined && action.payload.overwriteNetworkIds.length > 0
         ? "Import with overwrite"
