@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogItemId, ConnectorId, NetworkId, NodeId, SegmentId, WireId } from "../core/entities";
 import { appActions, appReducer, createSampleNetworkState } from "../store";
-import { applyAiAgentAcceptedOperations, buildAiAgentImpactPreview } from "../app/lib/aiAgentApply";
+import {
+  applyAiAgentAcceptedOperations,
+  buildAiAgentImpactPreview,
+  createAiAgentSessionSnapshot,
+  rollbackAiAgentSession
+} from "../app/lib/aiAgentApply";
 import type { AiAgentOperationValidationResult } from "../app/lib/aiAgentOperationContract";
 
 describe("AI agent apply", () => {
@@ -51,6 +56,36 @@ describe("AI agent apply", () => {
         delete_entity: 1
       }
     });
+  });
+
+  it("creates and rolls back an explicit AI session snapshot", () => {
+    const state = createSampleNetworkState();
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "add_node",
+          label: "AI proposed routing node",
+          position: { x: 80, y: 90 }
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+    const snapshot = createAiAgentSessionSnapshot(state, validation, "proposal 1", new Date("2026-05-30T08:00:00.000Z"));
+    const applied = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(applied.nextState.nodes.byId["AI-NODE-001" as NodeId]).toBeDefined();
+    expect(snapshot).toEqual(
+      expect.objectContaining({
+        id: "ai-session-2026-05-30T08:00:00.000Z",
+        createdAtIso: "2026-05-30T08:00:00.000Z",
+        label: "proposal 1",
+        impactPreview: expect.objectContaining({ acceptedCount: 1, addCount: 1 })
+      })
+    );
+    expect(rollbackAiAgentSession(snapshot)).toEqual(state);
+    expect(rollbackAiAgentSession(snapshot)).not.toBe(snapshot.state);
   });
 
   it("applies accepted add_node operations without mutating the input state", () => {

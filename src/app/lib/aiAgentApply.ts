@@ -21,6 +21,14 @@ export interface AiAgentImpactPreview {
   byOperationType: Record<string, number>;
 }
 
+export interface AiAgentSessionSnapshot {
+  id: string;
+  createdAtIso: string;
+  label?: string;
+  state: AppState;
+  impactPreview: AiAgentImpactPreview;
+}
+
 function classifyImpactOperation(operation: AiAgentSupportedOperation): keyof Pick<
   AiAgentImpactPreview,
   "addCount" | "updateCount" | "moveCount" | "routeCount" | "deleteCount"
@@ -67,6 +75,25 @@ export function buildAiAgentImpactPreview(validation: AiAgentOperationValidation
   }
 
   return preview;
+}
+
+export function createAiAgentSessionSnapshot(
+  state: AppState,
+  validation: AiAgentOperationValidationResult,
+  label?: string,
+  now: Date = new Date()
+): AiAgentSessionSnapshot {
+  return {
+    id: `ai-session-${now.toISOString()}`,
+    createdAtIso: now.toISOString(),
+    ...(label === undefined || label.trim().length === 0 ? {} : { label: label.trim() }),
+    state: structuredClone(state) as AppState,
+    impactPreview: buildAiAgentImpactPreview(validation)
+  };
+}
+
+export function rollbackAiAgentSession(snapshot: AiAgentSessionSnapshot): AppState {
+  return structuredClone(snapshot.state) as AppState;
 }
 
 function buildNextAiNodeId(state: AppState): NodeId {
