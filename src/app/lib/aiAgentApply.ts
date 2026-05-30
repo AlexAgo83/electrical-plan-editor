@@ -352,6 +352,9 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
   if (operation.type === "delete_entity") {
     return appReducer(state, appActions.removeWire(operation.entityId as WireId));
   }
+  if (operation.type === "regenerate_route") {
+    return operation.wireIds.reduce((nextState, wireId) => appReducer(nextState, appActions.resetWireRoute(wireId)), state);
+  }
   return state;
 }
 

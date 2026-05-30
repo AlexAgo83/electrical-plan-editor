@@ -284,4 +284,29 @@ describe("AI agent plan diff", () => {
       position: { x: 80, y: 240 }
     });
   });
+
+  it("emits a rejectable connector add operation when the modified plan omits the linked node", () => {
+    const state = appReducer(createSampleNetworkState(), appActions.selectNetwork("network-charging-service-demo" as NetworkId));
+    const beforePlan = buildAiAgentEditablePlan(buildAiAgentContext(state, "activeNetwork"));
+    const modifiedPlan = {
+      ...beforePlan,
+      connectors: [
+        ...beforePlan.connectors,
+        {
+          id: "H-C-AI-ORPHAN" as ConnectorId,
+          name: "AI Orphan Connector",
+          technicalId: "H-CONN-AI-ORPHAN",
+          cavityCount: 2
+        }
+      ]
+    };
+
+    expect(buildAiAgentOperationsFromPlanDiff(beforePlan, modifiedPlan)).toContainEqual({
+      type: "add_connector",
+      id: "H-C-AI-ORPHAN",
+      name: "AI Orphan Connector",
+      technicalId: "H-CONN-AI-ORPHAN",
+      cavityCount: 2
+    });
+  });
 });

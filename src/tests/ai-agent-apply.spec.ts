@@ -33,7 +33,7 @@ describe("AI agent apply", () => {
     expect(result.nextState.nodePositions["AI-NODE-001" as NodeId]).toEqual({ x: 80, y: 90 });
   });
 
-  it("skips accepted operations that are not mapped to an app mutation yet", () => {
+  it("applies route regeneration operations through reset route", () => {
     const state = createSampleNetworkState();
     const validation: AiAgentOperationValidationResult = {
       accepted: [
@@ -49,9 +49,10 @@ describe("AI agent apply", () => {
 
     const result = applyAiAgentAcceptedOperations(state, validation);
 
-    expect(result.nextState).toBe(state);
-    expect(result.appliedCount).toBe(0);
-    expect(result.skippedCount).toBe(1);
+    expect(result.nextState).not.toBe(state);
+    expect(result.appliedCount).toBe(1);
+    expect(result.skippedCount).toBe(0);
+    expect(result.nextState.wires.byId["W-001" as WireId]?.routeSegmentIds.length).toBeGreaterThan(0);
   });
 
   it("applies move_entity operations to the selected canvas node position", () => {

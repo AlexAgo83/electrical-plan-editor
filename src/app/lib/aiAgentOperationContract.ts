@@ -194,6 +194,10 @@ function normalizeEntityReference(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "");
 }
 
+function normalizeTechnicalId(value: string): string {
+  return value.trim().toLowerCase();
+}
+
 const GENERIC_ENTITY_REFERENCE_TOKENS = new Set([
   "connector",
   "connecteur",
@@ -883,6 +887,59 @@ function normalizeOperationEntityReferences(state: AppState, operation: AiAgentS
   return operation;
 }
 
+function addProspectiveReferences(target: Map<string, string>, id: string, references: string[]): void {
+  for (const reference of references) {
+    if (reference.trim().length === 0) {
+      continue;
+    }
+    target.set(normalizeEntityReference(reference), id);
+  }
+}
+
+function resolveProspectiveReference(references: Map<string, string>, value: string): string {
+  return references.get(normalizeEntityReference(value)) ?? value;
+}
+
+function resolveProspectiveEndpointReferences(
+  endpoint: WireEndpoint,
+  prospectiveConnectorReferences: Map<string, string>,
+  prospectiveSpliceReferences: Map<string, string>
+): WireEndpoint {
+  if (endpoint.kind === "connectorCavity") {
+    return {
+      ...endpoint,
+      connectorId: resolveProspectiveReference(prospectiveConnectorReferences, endpoint.connectorId) as ConnectorId
+    };
+  }
+  return {
+    ...endpoint,
+    spliceId: resolveProspectiveReference(prospectiveSpliceReferences, endpoint.spliceId) as SpliceId
+  };
+}
+
+function resolveProspectiveOperationReferences(
+  operation: AiAgentSupportedOperation,
+  prospectiveConnectorReferences: Map<string, string>,
+  prospectiveSpliceReferences: Map<string, string>,
+  prospectiveNodeReferences: Map<string, string>
+): AiAgentSupportedOperation {
+  if (operation.type === "add_segment") {
+    return {
+      ...operation,
+      nodeA: resolveProspectiveReference(prospectiveNodeReferences, operation.nodeA) as NodeId,
+      nodeB: resolveProspectiveReference(prospectiveNodeReferences, operation.nodeB) as NodeId
+    };
+  }
+  if (operation.type === "add_wire") {
+    return {
+      ...operation,
+      endpointA: resolveProspectiveEndpointReferences(operation.endpointA, prospectiveConnectorReferences, prospectiveSpliceReferences),
+      endpointB: resolveProspectiveEndpointReferences(operation.endpointB, prospectiveConnectorReferences, prospectiveSpliceReferences)
+    };
+  }
+  return operation;
+}
+
 function permissionForOperation(operation: AiAgentSupportedOperation): keyof AiAgentOperationPermissions {
   if (
     operation.type === "add_connector" ||
@@ -1021,6 +1078,125 @@ function wireEndpointConflictMessage(state: AppState, operation: AiAgentSupporte
     : null;
 }
 
+function prospectiveWireEndpointConflictMessage(operation: AiAgentSupportedOperation, prospectiveWireEndpointKeys: Set<string>): string | null {
+  if (operation.type === "add_wire") {
+    const endpointAKey = wireEndpointKey(operation.endpointA);
+    const endpointBKey = wireEndpointKey(operation.endpointB);
+    if (endpointAKey === endpointBKey) {
+      return "Wire endpoints must be different.";
+    }
+    return prospectiveWireEndpointKeys.has(endpointAKey) || prospectiveWireEndpointKeys.has(endpointBKey)
+      ? "Wire endpoint is already used by another accepted AI operation."
+      : null;
+  }
+  if (operation.type !== "update_entity" || operation.entityKind !== "wire") {
+    return null;
+  }
+  const endpointA = operation.fields.endpointA as WireEndpoint | undefined;
+  const endpointB = operation.fields.endpointB as WireEndpoint | undefined;
+  if (endpointA === undefined && endpointB === undefined) {
+    return null;
+  }
+  const endpointKeys = [endpointA, endpointB].filter((endpoint): endpoint is WireEndpoint => endpoint !== undefined).map(wireEndpointKey);
+  return endpointKeys.some((endpointKey) => prospectiveWireEndpointKeys.has(endpointKey))
+    ? "Wire endpoint is already used by another accepted AI operation."
+    : null;
+}
+
+function existingTechnicalIdConflictMessage(state: AppState, operation: AiAgentSupportedOperation): string | null {
+  if (operation.type === "add_connector") {
+    return state.connectors.allIds.some(
+      (connectorId) => normalizeTechnicalId(state.connectors.byId[connectorId]?.technicalId ?? "") === normalizeTechnicalId(operation.technicalId)
+    )
+      ? "Connector technical ID already exists."
+      : null;
+  }
+  if (operation.type === "add_splice") {
+    return state.splices.allIds.some(
+      (spliceId) => normalizeTechnicalId(state.splices.byId[spliceId]?.technicalId ?? "") === normalizeTechnicalId(operation.technicalId)
+    )
+      ? "Splice technical ID already exists."
+      : null;
+  }
+  if (operation.type === "add_wire") {
+    return state.wires.allIds.some(
+      (wireId) => normalizeTechnicalId(state.wires.byId[wireId]?.technicalId ?? "") === normalizeTechnicalId(operation.technicalId)
+    )
+      ? "Wire technical ID already exists."
+      : null;
+  }
+  if (operation.type !== "update_entity" || typeof operation.fields.technicalId !== "string") {
+    return null;
+  }
+  const technicalId = normalizeTechnicalId(operation.fields.technicalId);
+  if (operation.entityKind === "connector") {
+    return state.connectors.allIds.some(
+      (connectorId) =>
+        connectorId !== operation.entityId &&
+        normalizeTechnicalId(state.connectors.byId[connectorId]?.technicalId ?? "") === technicalId
+    )
+      ? "Connector technical ID already exists."
+      : null;
+  }
+  if (operation.entityKind === "splice") {
+    return state.splices.allIds.some(
+      (spliceId) => spliceId !== operation.entityId && normalizeTechnicalId(state.splices.byId[spliceId]?.technicalId ?? "") === technicalId
+    )
+      ? "Splice technical ID already exists."
+      : null;
+  }
+  if (operation.entityKind === "wire") {
+    return state.wires.allIds.some(
+      (wireId) => wireId !== operation.entityId && normalizeTechnicalId(state.wires.byId[wireId]?.technicalId ?? "") === technicalId
+    )
+      ? "Wire technical ID already exists."
+      : null;
+  }
+  return null;
+}
+
+function prospectiveTechnicalIdConflictMessage(
+  operation: AiAgentSupportedOperation,
+  prospectiveConnectorTechnicalIds: Set<string>,
+  prospectiveSpliceTechnicalIds: Set<string>,
+  prospectiveWireTechnicalIds: Set<string>
+): string | null {
+  if (operation.type === "add_connector") {
+    return prospectiveConnectorTechnicalIds.has(normalizeTechnicalId(operation.technicalId))
+      ? "Connector technical ID is duplicated in this AI proposal."
+      : null;
+  }
+  if (operation.type === "add_splice") {
+    return prospectiveSpliceTechnicalIds.has(normalizeTechnicalId(operation.technicalId))
+      ? "Splice technical ID is duplicated in this AI proposal."
+      : null;
+  }
+  if (operation.type === "add_wire") {
+    return prospectiveWireTechnicalIds.has(normalizeTechnicalId(operation.technicalId))
+      ? "Wire technical ID is duplicated in this AI proposal."
+      : null;
+  }
+  if (operation.type !== "update_entity" || typeof operation.fields.technicalId !== "string") {
+    return null;
+  }
+  if (operation.entityKind === "connector") {
+    return prospectiveConnectorTechnicalIds.has(normalizeTechnicalId(operation.fields.technicalId))
+      ? "Connector technical ID is duplicated in this AI proposal."
+      : null;
+  }
+  if (operation.entityKind === "splice") {
+    return prospectiveSpliceTechnicalIds.has(normalizeTechnicalId(operation.fields.technicalId))
+      ? "Splice technical ID is duplicated in this AI proposal."
+      : null;
+  }
+  if (operation.entityKind === "wire") {
+    return prospectiveWireTechnicalIds.has(normalizeTechnicalId(operation.fields.technicalId))
+      ? "Wire technical ID is duplicated in this AI proposal."
+      : null;
+  }
+  return null;
+}
+
 function entityReferenceExists(
   state: AppState,
   entityKind: AiAgentPlaceEntityRelativeToEntityOperation["referenceEntityKind"],
@@ -1074,6 +1250,13 @@ export function validateAiAgentOperations({
   const prospectiveNodeIds = new Set<string>(state.nodes.allIds);
   const prospectiveConnectors = new Map<string, number>();
   const prospectiveSplices = new Map<string, number>();
+  const prospectiveConnectorReferences = new Map<string, string>();
+  const prospectiveSpliceReferences = new Map<string, string>();
+  const prospectiveNodeReferences = new Map<string, string>();
+  const prospectiveWireEndpointKeys = new Set<string>();
+  const prospectiveConnectorTechnicalIds = new Set<string>();
+  const prospectiveSpliceTechnicalIds = new Set<string>();
+  const prospectiveWireTechnicalIds = new Set<string>();
 
   envelope.operations.forEach((operation, operationIndex) => {
     const parsed = parseOperation(operation, operationIndex, selection, instruction);
@@ -1086,7 +1269,12 @@ export function validateAiAgentOperations({
       return;
     }
 
-    const normalized = normalizeOperationEntityReferences(state, parsed);
+    const normalized = resolveProspectiveOperationReferences(
+      normalizeOperationEntityReferences(state, parsed),
+      prospectiveConnectorReferences,
+      prospectiveSpliceReferences,
+      prospectiveNodeReferences
+    );
     const permission = permissionForOperation(normalized);
     if (!permissions[permission]) {
       result.rejected.push(reject(operationIndex, normalized.type, `${permission} permission is disabled.`));
@@ -1094,6 +1282,21 @@ export function validateAiAgentOperations({
     }
     if (!entityExists(state, normalized, prospectiveNodeIds, prospectiveConnectors, prospectiveSplices)) {
       result.rejected.push(reject(operationIndex, normalized.type, "Operation references unknown modeling entities."));
+      return;
+    }
+    const existingTechnicalIdMessage = existingTechnicalIdConflictMessage(state, normalized);
+    if (existingTechnicalIdMessage !== null) {
+      result.rejected.push(reject(operationIndex, normalized.type, existingTechnicalIdMessage));
+      return;
+    }
+    const prospectiveTechnicalIdMessage = prospectiveTechnicalIdConflictMessage(
+      normalized,
+      prospectiveConnectorTechnicalIds,
+      prospectiveSpliceTechnicalIds,
+      prospectiveWireTechnicalIds
+    );
+    if (prospectiveTechnicalIdMessage !== null) {
+      result.rejected.push(reject(operationIndex, normalized.type, prospectiveTechnicalIdMessage));
       return;
     }
     if (
@@ -1115,6 +1318,11 @@ export function validateAiAgentOperations({
       result.rejected.push(reject(operationIndex, normalized.type, endpointConflictMessage));
       return;
     }
+    const prospectiveEndpointConflictMessage = prospectiveWireEndpointConflictMessage(normalized, prospectiveWireEndpointKeys);
+    if (prospectiveEndpointConflictMessage !== null) {
+      result.rejected.push(reject(operationIndex, normalized.type, prospectiveEndpointConflictMessage));
+      return;
+    }
     if (scope === "currentSelection" && !isWithinSelectionScope(normalized, selection)) {
       result.rejected.push(reject(operationIndex, normalized.type, "Operation is outside the current selection scope."));
       return;
@@ -1123,18 +1331,51 @@ export function validateAiAgentOperations({
     result.accepted.push(normalized);
     if (normalized.type === "add_connector" && normalized.id !== undefined) {
       prospectiveConnectors.set(normalized.id, normalized.cavityCount);
+      prospectiveConnectorTechnicalIds.add(normalizeTechnicalId(normalized.technicalId));
+      addProspectiveReferences(prospectiveConnectorReferences, normalized.id, [normalized.id, normalized.technicalId, normalized.name]);
       if (normalized.nodeId !== undefined) {
         prospectiveNodeIds.add(normalized.nodeId);
+        addProspectiveReferences(prospectiveNodeReferences, normalized.nodeId, [normalized.nodeId, normalized.technicalId, normalized.name]);
       }
     }
     if (normalized.type === "add_splice" && normalized.id !== undefined) {
       prospectiveSplices.set(normalized.id, normalized.portCount);
+      prospectiveSpliceTechnicalIds.add(normalizeTechnicalId(normalized.technicalId));
+      addProspectiveReferences(prospectiveSpliceReferences, normalized.id, [normalized.id, normalized.technicalId, normalized.name]);
       if (normalized.nodeId !== undefined) {
         prospectiveNodeIds.add(normalized.nodeId);
+        addProspectiveReferences(prospectiveNodeReferences, normalized.nodeId, [normalized.nodeId, normalized.technicalId, normalized.name]);
       }
     }
     if (normalized.type === "add_node" && normalized.id !== undefined) {
       prospectiveNodeIds.add(normalized.id);
+      addProspectiveReferences(prospectiveNodeReferences, normalized.id, [normalized.id, normalized.label]);
+    }
+    if (normalized.type === "add_wire") {
+      prospectiveWireTechnicalIds.add(normalizeTechnicalId(normalized.technicalId));
+      prospectiveWireEndpointKeys.add(wireEndpointKey(normalized.endpointA));
+      prospectiveWireEndpointKeys.add(wireEndpointKey(normalized.endpointB));
+    }
+    if (normalized.type === "update_entity" && typeof normalized.fields.technicalId === "string") {
+      if (normalized.entityKind === "connector") {
+        prospectiveConnectorTechnicalIds.add(normalizeTechnicalId(normalized.fields.technicalId));
+      }
+      if (normalized.entityKind === "splice") {
+        prospectiveSpliceTechnicalIds.add(normalizeTechnicalId(normalized.fields.technicalId));
+      }
+      if (normalized.entityKind === "wire") {
+        prospectiveWireTechnicalIds.add(normalizeTechnicalId(normalized.fields.technicalId));
+      }
+    }
+    if (normalized.type === "update_entity" && normalized.entityKind === "wire") {
+      const endpointA = normalized.fields.endpointA as WireEndpoint | undefined;
+      const endpointB = normalized.fields.endpointB as WireEndpoint | undefined;
+      if (endpointA !== undefined) {
+        prospectiveWireEndpointKeys.add(wireEndpointKey(endpointA));
+      }
+      if (endpointB !== undefined) {
+        prospectiveWireEndpointKeys.add(wireEndpointKey(endpointB));
+      }
     }
   });
 

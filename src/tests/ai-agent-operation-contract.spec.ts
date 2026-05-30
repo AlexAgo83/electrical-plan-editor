@@ -382,6 +382,189 @@ describe("AI agent operation contract", () => {
     expect(result.accepted.map((operation) => operation.type)).toEqual(["add_connector", "add_segment", "add_wire"]);
   });
 
+  it("resolves same-plan connector aliases in dependent segments and wire endpoints", () => {
+    const state = appReducer(createSampleNetworkState(), appActions.selectNetwork("network-charging-service-demo" as NetworkId));
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "add_connector",
+            id: "H-C-AI-SERVICE",
+            nodeId: "H-N-AI-SERVICE",
+            name: "AI Service Connector",
+            technicalId: "H-CONN-AI-SERVICE",
+            cavityCount: 2,
+            position: { x: 80, y: 240 }
+          },
+          {
+            type: "add_segment",
+            nodeA: "AI Service Connector",
+            nodeB: "H-N-HVIL",
+            lengthMm: 25
+          },
+          {
+            type: "add_wire",
+            name: "AI service to OBC",
+            technicalId: "H-WIRE-AI-SERVICE-OBC",
+            endpointA: { kind: "connectorCavity", connectorId: "AI Service Connector", cavityIndex: 1 },
+            endpointB: { kind: "connectorCavity", connectorId: "H-C-OBC", cavityIndex: 12 },
+            sectionMm2: 0.5
+          }
+        ]
+      }
+    });
+
+    expect(result.rejected).toHaveLength(0);
+    expect(result.accepted).toEqual([
+      expect.objectContaining({ type: "add_connector", id: "H-C-AI-SERVICE" }),
+      expect.objectContaining({ type: "add_segment", nodeA: "H-N-AI-SERVICE" }),
+      expect.objectContaining({
+        type: "add_wire",
+        endpointA: { kind: "connectorCavity", connectorId: "H-C-AI-SERVICE", cavityIndex: 1 }
+      })
+    ]);
+  });
+
+  it("accepts same-plan splice additions with dependent segments and wire endpoints", () => {
+    const state = appReducer(createSampleNetworkState(), appActions.selectNetwork("network-charging-service-demo" as NetworkId));
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "add_splice",
+            id: "H-S-AI-SPLICE",
+            nodeId: "H-N-AI-SPLICE",
+            name: "AI HVIL Splice",
+            technicalId: "H-SPL-AI",
+            portCount: 2,
+            position: { x: 120, y: 240 }
+          },
+          {
+            type: "add_segment",
+            nodeA: "H-N-AI-SPLICE",
+            nodeB: "H-N-OBC",
+            lengthMm: 30
+          },
+          {
+            type: "add_wire",
+            name: "AI splice to OBC",
+            technicalId: "H-WIRE-AI-SPLICE-OBC",
+            endpointA: { kind: "splicePort", spliceId: "AI HVIL Splice", portIndex: 1 },
+            endpointB: { kind: "connectorCavity", connectorId: "H-C-OBC", cavityIndex: 12 },
+            sectionMm2: 0.5
+          }
+        ]
+      }
+    });
+
+    expect(result.rejected).toHaveLength(0);
+    expect(result.accepted).toEqual([
+      expect.objectContaining({ type: "add_splice", id: "H-S-AI-SPLICE" }),
+      expect.objectContaining({ type: "add_segment", nodeA: "H-N-AI-SPLICE" }),
+      expect.objectContaining({
+        type: "add_wire",
+        endpointA: { kind: "splicePort", spliceId: "H-S-AI-SPLICE", portIndex: 1 }
+      })
+    ]);
+  });
+
+  it("rejects endpoint reuse within the same AI proposal", () => {
+    const state = appReducer(createSampleNetworkState(), appActions.selectNetwork("network-charging-service-demo" as NetworkId));
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "add_wire",
+            name: "First AI wire",
+            technicalId: "H-WIRE-AI-001",
+            endpointA: { kind: "connectorCavity", connectorId: "H-C-INLET", cavityIndex: 7 },
+            endpointB: { kind: "connectorCavity", connectorId: "H-C-OBC", cavityIndex: 12 },
+            sectionMm2: 0.5
+          },
+          {
+            type: "add_wire",
+            name: "Second AI wire",
+            technicalId: "H-WIRE-AI-002",
+            endpointA: { kind: "connectorCavity", connectorId: "H-C-INLET", cavityIndex: 7 },
+            endpointB: { kind: "connectorCavity", connectorId: "H-C-SERVICE", cavityIndex: 4 },
+            sectionMm2: 0.5
+          }
+        ]
+      }
+    });
+
+    expect(result.accepted).toHaveLength(1);
+    expect(result.rejected).toEqual([
+      expect.objectContaining({
+        operationIndex: 1,
+        message: "Wire endpoint is already used by another accepted AI operation."
+      })
+    ]);
+  });
+
+  it("rejects existing and same-proposal technical ID duplicates", () => {
+    const state = appReducer(createSampleNetworkState(), appActions.selectNetwork("network-charging-service-demo" as NetworkId));
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "add_connector",
+            id: "H-C-DUP-EXISTING",
+            nodeId: "H-N-DUP-EXISTING",
+            name: "Duplicate Existing",
+            technicalId: "H-CONN-OBC",
+            cavityCount: 2,
+            position: { x: 80, y: 240 }
+          },
+          {
+            type: "add_connector",
+            id: "H-C-AI-ONE",
+            nodeId: "H-N-AI-ONE",
+            name: "AI One",
+            technicalId: "H-CONN-AI-DUP",
+            cavityCount: 2,
+            position: { x: 100, y: 240 }
+          },
+          {
+            type: "add_connector",
+            id: "H-C-AI-TWO",
+            nodeId: "H-N-AI-TWO",
+            name: "AI Two",
+            technicalId: "H-CONN-AI-DUP",
+            cavityCount: 2,
+            position: { x: 120, y: 240 }
+          }
+        ]
+      }
+    });
+
+    expect(result.accepted.map((operation) => operation.type)).toEqual(["add_connector"]);
+    expect(result.rejected).toEqual([
+      expect.objectContaining({ operationIndex: 0, message: "Connector technical ID already exists." }),
+      expect.objectContaining({ operationIndex: 2, message: "Connector technical ID is duplicated in this AI proposal." })
+    ]);
+  });
+
   it("accepts relative moves that reference connector technical IDs", () => {
     const baseState = createSampleNetworkState();
     const state = appReducer(baseState, appActions.select({ kind: "connector", id: "C-SRC" as ConnectorId }));

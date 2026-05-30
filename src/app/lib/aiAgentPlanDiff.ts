@@ -5,6 +5,8 @@ import { AI_AGENT_OPERATION_SCHEMA_VERSION } from "./aiAgentOperationContract";
 import type { AiAgentSupportedOperation } from "./aiAgentOperationContract";
 import { createNodePositionMap } from "./layout/generation";
 
+type AiAgentPlanDiffOperation = AiAgentSupportedOperation | Record<string, unknown>;
+
 export type AiAgentEditableNode = NetworkNode & {
   position?: LayoutNodePosition;
 };
@@ -118,7 +120,7 @@ function nodeEntityReference(node: AiAgentEditableNode): {
 }
 
 function pushConnectorUpdate(
-  operations: AiAgentSupportedOperation[],
+  operations: AiAgentPlanDiffOperation[],
   before: Pick<
     Connector,
     | "id"
@@ -169,11 +171,18 @@ function pushConnectorUpdate(
 }
 
 function pushAddedConnector(
-  operations: AiAgentSupportedOperation[],
+  operations: AiAgentPlanDiffOperation[],
   connector: AiAgentEditablePlan["connectors"][number],
   node: AiAgentEditableNode | undefined
 ) {
   if (node?.kind !== "connector" || node.position === undefined) {
+    operations.push({
+      type: "add_connector",
+      id: connector.id,
+      name: connector.name,
+      technicalId: connector.technicalId,
+      cavityCount: connector.cavityCount
+    });
     return;
   }
   operations.push({
@@ -188,7 +197,7 @@ function pushAddedConnector(
 }
 
 function pushCatalogItemUpdate(
-  operations: AiAgentSupportedOperation[],
+  operations: AiAgentPlanDiffOperation[],
   before: Pick<
     CatalogItem,
     | "id"
@@ -231,7 +240,7 @@ function pushCatalogItemUpdate(
 }
 
 function pushSpliceUpdate(
-  operations: AiAgentSupportedOperation[],
+  operations: AiAgentPlanDiffOperation[],
   before: Pick<Splice, "id" | "name" | "technicalId" | "portCount" | "manufacturerReference" | "catalogItemId">,
   after: Pick<Splice, "id" | "name" | "technicalId" | "portCount" | "manufacturerReference" | "catalogItemId">
 ) {
@@ -247,11 +256,18 @@ function pushSpliceUpdate(
 }
 
 function pushAddedSplice(
-  operations: AiAgentSupportedOperation[],
+  operations: AiAgentPlanDiffOperation[],
   splice: AiAgentEditablePlan["splices"][number],
   node: AiAgentEditableNode | undefined
 ) {
   if (node?.kind !== "splice" || node.position === undefined) {
+    operations.push({
+      type: "add_splice",
+      id: splice.id,
+      name: splice.name,
+      technicalId: splice.technicalId,
+      portCount: splice.portCount
+    });
     return;
   }
   operations.push({
@@ -266,7 +282,7 @@ function pushAddedSplice(
 }
 
 function pushWireUpdate(
-  operations: AiAgentSupportedOperation[],
+  operations: AiAgentPlanDiffOperation[],
   before: Pick<
     Wire,
     | "id"
@@ -333,7 +349,7 @@ function pushWireUpdate(
   }
 }
 
-function pushAddedWire(operations: AiAgentSupportedOperation[], wire: Partial<Wire> & { id: string }) {
+function pushAddedWire(operations: AiAgentPlanDiffOperation[], wire: Partial<Wire> & { id: string }) {
   const name = typeof wire.name === "string" && wire.name.trim().length > 0 ? wire.name.trim() : null;
   const technicalId =
     typeof wire.technicalId === "string" && wire.technicalId.trim().length > 0 ? wire.technicalId.trim() : null;
@@ -353,7 +369,7 @@ function pushAddedWire(operations: AiAgentSupportedOperation[], wire: Partial<Wi
 }
 
 function pushSegmentUpdate(
-  operations: AiAgentSupportedOperation[],
+  operations: AiAgentPlanDiffOperation[],
   before: Pick<Segment, "id" | "lengthMm" | "subNetworkTag">,
   after: Pick<Segment, "id" | "lengthMm" | "subNetworkTag">
 ) {
@@ -372,8 +388,8 @@ function pushSegmentUpdate(
 export function buildAiAgentOperationsFromPlanDiff(
   beforePlan: AiAgentEditablePlan,
   modifiedPlan: AiAgentEditablePlan
-): AiAgentSupportedOperation[] {
-  const operations: AiAgentSupportedOperation[] = [];
+): AiAgentPlanDiffOperation[] {
+  const operations: AiAgentPlanDiffOperation[] = [];
   const beforeConnectors = indexById(beforePlan.connectors);
   const beforeSplices = indexById(beforePlan.splices);
   const beforeCatalogItems = indexById(beforePlan.catalogItems);
