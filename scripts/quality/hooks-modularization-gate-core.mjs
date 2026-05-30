@@ -14,6 +14,8 @@ export const ALLOWED_HOOKS_OVERSIZE = {
     "UI preferences hub centralizes locale, theme, table density, currency/tax, BOM column toggles, and validation labels; split planned alongside preference-slice extraction.",
   "src/app/hooks/useNetworkImportExport.ts":
     "Network import/export hook handles file parse, validation prompts, overwrite confirmation, and grouped/network-scoped flows on shared dialog wiring; split deferred until import dialog fixtures are extracted.",
+  "src/app/hooks/useWorkspaceFileStorage.ts":
+    "Workspace file storage hook coordinates browser picker, resume, autosave, conflict, and explicit save flows on shared linked-file status wiring; pure File System Access helpers are extracted, and further split is deferred until workspace-file state transitions have dedicated fixtures.",
   "src/app/hooks/useWorkspaceHandlers.ts":
     "Workspace handlers span network create/select/rename/delete and active-network handoff flows that share confirm-dialog and selection bindings; split deferred until workspace dialog fixtures are extracted.",
   "src/app/hooks/controller/useAppControllerNetworkSummaryPanelDomain.tsx":
