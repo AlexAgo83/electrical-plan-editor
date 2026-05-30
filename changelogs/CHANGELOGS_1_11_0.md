@@ -9,6 +9,8 @@
 - Added proposal preview, operation details, impact summaries, explicit apply/reject controls, and last-session rollback support.
 - Expanded AI scope handling across active network, current selection, selected harness, and all networks, including network-scoped validation/apply for non-active networks.
 - Hardened business validations for route locks, endpoint occupancy, technical-ID conflicts, delete impact, catalog references, and wire sizing recommendations.
+- Polished the AI Agent proposal action row with compact `Prepare`, `Apply`, `Reject`, and `Rollback` controls.
+- Added a post-1.11.0 AI Agent follow-up request covering instruction history, persisted panel settings, session review polish, and privacy-safe local reset behavior.
 - Covered the AI workflow with focused unit and UI integration tests, plus a live OpenAI smoke test run locally against the configured `.env.local` key.
 
 ## Version 1.11.0 - Modeling AI Agent Workspace
@@ -22,6 +24,7 @@
 ### Assisted proposal workflow
 
 - Added the Modeling AI Agent panel with scoped instruction entry, permission toggles, assisted proposal generation, raw-response inspection, accepted/rejected/unsupported operation reporting, and apply/reject controls.
+- Finalized the compact action row labels and ordering as `Prepare`, `Apply`, `Reject`, and `Rollback`.
 - Added local fallback proposals when provider calls fail, keeping the workflow testable without network access.
 - Added provider `modifiedPlan` handling and plan-diff conversion so the preferred response shape can edit a scoped JSON model while the app still applies only validated operations.
 
@@ -53,10 +56,17 @@
 - Added focused tests for AI context building, provider client behavior, operation contract validation, plan diffing, proposal fallback, application, undo/rollback behavior, and UI provider workflows.
 - Ran a local live OpenAI smoke test using `.env.local` to confirm a real provider proposal validates and applies without exposing the API key.
 
+### Follow-up planning and workflow polish
+
+- Moved `Clear terminal and seal overrides` into the connector edit action row next to `Cancel edit`, matching the edit-action button style while keeping cleanup behavior unchanged.
+- Added `req_130_ai_agent_follow_up_memory_persistence_and_workflow_polish` for instruction history, persisted Agent IA panel preferences, unsent draft preservation, session review, rollback clarity, and privacy/export boundaries.
+
 ## Validation and Regression Evidence
 
 - `rtk npm run -s lint`
 - `rtk npm run -s typecheck`
 - `rtk npm test -- --run src/tests/ai-agent-context.spec.ts src/tests/ai-agent-operation-contract.spec.ts src/tests/ai-agent-apply.spec.ts src/tests/ai-agent-plan-diff.spec.ts src/tests/ai-agent-proposal.spec.ts src/tests/ai-agent-provider-client.spec.ts src/tests/app.ui.settings.spec.tsx src/tests/store.reducer.sync-invariant.spec.ts src/tests/app.ui.network-summary-bom-export.spec.tsx`
+- `rtk npm test -- --run src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
 - `rtk npm run -s build`
+- `rtk python3 -m logics_manager lint --require-status`
 - Local live provider smoke: `rtk npm test -- --run src/tests/ai-agent-live-openai.local.spec.ts` (temporary uncommitted test file removed after run)
