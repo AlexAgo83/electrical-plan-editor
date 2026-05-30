@@ -465,7 +465,11 @@ export function useAppControllerWorkspaceContentAssembly({
     });
 
   const aiAgentWorkspaceContent = state.isAiAgentModelingOpen ? (
-    <ModelingAiAgentPanel providerReadiness={state.aiProviderReadiness} onOpenSettings={handlers.handleOpenSettingsScreen} />
+    <ModelingAiAgentPanel
+      providerReadiness={state.aiProviderReadiness}
+      experimentalDirectExecutionEnabled={models.aiSettings.settings.experimentalDirectExecutionEnabled}
+      onOpenSettings={handlers.handleOpenSettingsScreen}
+    />
   ) : null;
 
   const modelingLeftColumnContentForActiveMode = state.isAiAgentModelingOpen

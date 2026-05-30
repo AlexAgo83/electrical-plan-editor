@@ -224,6 +224,20 @@ describe("App integration UI - settings", () => {
     fireEvent.click(enabledAiAgentButton);
     expect(screen.getByRole("heading", { name: "AI Agent" })).toBeInTheDocument();
     expect(screen.getByText("Provider ready")).toBeInTheDocument();
+    expect(screen.getByLabelText("Instruction")).toBeInTheDocument();
+    expect(screen.getByLabelText("Target scope")).toHaveValue("activeNetwork");
+    expect(screen.getByLabelText("Agent mode")).toHaveValue("assisted");
+    expect(screen.getByLabelText("Delete entities")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Prepare proposal" })).toBeDisabled();
+
+    fireEvent.change(screen.getByLabelText("Instruction"), {
+      target: { value: "Move selected routing nodes to reduce crossings." }
+    });
+    const prepareProposalButton = screen.getByRole("button", { name: "Prepare proposal" });
+    expect(prepareProposalButton).toBeEnabled();
+    fireEvent.click(prepareProposalButton);
+    expect(screen.getByText(/Draft ready for active network scope/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Apply proposal" })).toBeDisabled();
   });
 
   it("keeps settings and import/export controls operable on mobile baseline viewports", async () => {
