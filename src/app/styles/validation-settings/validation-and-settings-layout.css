@@ -540,12 +540,41 @@
   color: #20435f;
 }
 
+.ai-agent-panel {
+  display: grid;
+  align-content: start;
+  gap: 0.7rem;
+}
+
+.ai-agent-panel .list-panel-header,
+.ai-agent-panel .settings-import-summary,
 .ai-agent-proposal-summary {
-  margin-bottom: 0.6rem;
+  margin: 0;
+}
+
+.ai-agent-panel .list-panel-header .meta-line,
+.ai-agent-panel .stack-form > .meta-line {
+  margin: 0;
 }
 
 .ai-agent-panel .settings-actions {
+  margin-top: 0;
+  padding-top: 0;
   border-top: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ai-agent-panel .stack-form {
+  gap: 0.65rem;
+}
+
+.ai-agent-panel .form-split {
+  gap: 0.55rem;
+}
+
+.ai-agent-panel .inline-fieldset {
+  padding: 0.55rem 0.6rem;
+  gap: 0.45rem;
 }
 
 .settings-import-details {

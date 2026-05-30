@@ -136,7 +136,7 @@ export function WorkspaceNavigation({
             {!isAnalysisScreen ? (
               <button
                 type="button"
-                className={isAiAgentOpen ? "workspace-tab is-active" : "workspace-tab"}
+                className={isAiAgentOpen ? "workspace-tab is-ai-agent-tab is-active" : "workspace-tab is-ai-agent-tab"}
                 onClick={onOpenAiAgent}
                 aria-description={isAiAgentReady ? "AI Agent modeling workspace" : aiAgentDisabledReason}
                 disabled={!isAiAgentReady || onOpenAiAgent === undefined}

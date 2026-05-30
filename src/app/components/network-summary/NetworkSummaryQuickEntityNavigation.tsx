@@ -89,7 +89,7 @@ export function NetworkSummaryQuickEntityNavigation({
         {quickEntityNavigationMode === "modeling" ? (
           <button
             type="button"
-            className={isAiAgentOpen ? "filter-chip is-active" : "filter-chip"}
+            className={isAiAgentOpen ? "filter-chip is-ai-agent-tab is-active" : "filter-chip is-ai-agent-tab"}
             onClick={onOpenAiAgent}
             aria-pressed={isAiAgentOpen}
             disabled={!isAiAgentReady || onOpenAiAgent === undefined}

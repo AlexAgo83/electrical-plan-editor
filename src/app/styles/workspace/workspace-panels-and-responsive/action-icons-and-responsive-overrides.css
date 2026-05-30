@@ -138,8 +138,25 @@
 }
 
 .action-button-icon.is-ai-agent {
-  -webkit-mask: url("/icons/settings.svg") center / contain no-repeat;
-  mask: url("/icons/settings.svg") center / contain no-repeat;
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-basis: 0.95rem;
+  -webkit-mask: url("/icons/ico_ai_agent.svg") center / contain no-repeat;
+  mask: url("/icons/ico_ai_agent.svg") center / contain no-repeat;
+}
+
+.workspace-tab.is-ai-agent-tab:disabled,
+.filter-chip.is-ai-agent-tab:disabled {
+  border-color: color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 5%, transparent);
+  color: color-mix(in srgb, currentColor 46%, transparent);
+  filter: saturate(0.55);
+  opacity: 0.62;
+}
+
+.workspace-tab.is-ai-agent-tab:disabled .action-button-icon,
+.filter-chip.is-ai-agent-tab:disabled .action-button-icon {
+  opacity: 0.58;
 }
 
 .action-button-icon.is-validation {
