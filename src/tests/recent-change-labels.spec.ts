@@ -90,6 +90,27 @@ describe("recent change labels", () => {
     expect(entry.detailLabel).toBe("6-connection item");
   });
 
+  it("adds network update sub-reasons for recent change logs", () => {
+    const previousState = createUiIntegrationState();
+    const action = appActions.updateNetwork(
+      previousState.activeNetworkId!,
+      "Updated network",
+      "NET-REV",
+      "2026-03-27T12:00:00.000Z",
+      "Updated description",
+      {
+        voltageV: 48,
+        author: "Engineering",
+        projectCode: "PRJ-42",
+        exportNotes: "For review"
+      }
+    );
+    const entry = buildUndoHistoryEntry(action, previousState, appReducer(previousState, action), 1, "2026-03-27T12:00:00.000Z");
+
+    expect(entry.detailLabel).toBe("Identity / Metadata / Export cartouche");
+    expect(entry.label).toBe("Network 'NET-REV' identity / metadata / export cartouche updated");
+  });
+
   it("adds catalog update sub-reasons for recent change logs", () => {
     const previousState = appReducer(
       createInitialState(),

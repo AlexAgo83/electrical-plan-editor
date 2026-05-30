@@ -512,6 +512,32 @@ function describeCatalogChange(action: Extract<AppAction, { type: "catalog/upser
   return joinChangeDetails(details) ?? "No field delta";
 }
 
+function describeNetworkChange(action: Extract<AppAction, { type: "network/update" }>, previousState: AppState): string | null {
+  const previousNetwork = previousState.networks.byId[action.payload.id];
+  if (previousNetwork === undefined) {
+    return null;
+  }
+
+  const details: string[] = [];
+  if (previousNetwork.technicalId !== action.payload.technicalId || previousNetwork.name !== action.payload.name) {
+    details.push("Identity");
+  }
+  if (previousNetwork.description !== action.payload.description || previousNetwork.author !== action.payload.author) {
+    details.push("Metadata");
+  }
+  if (previousNetwork.projectCode !== action.payload.projectCode || previousNetwork.exportNotes !== action.payload.exportNotes) {
+    details.push("Export cartouche");
+  }
+  if (previousNetwork.logoUrl !== action.payload.logoUrl) {
+    details.push("Logo");
+  }
+  if (previousNetwork.voltageV !== action.payload.voltageV) {
+    details.push("Voltage");
+  }
+
+  return joinChangeDetails(details) ?? "No field delta";
+}
+
 function describeConnectorChange(action: Extract<AppAction, { type: "connector/upsert" }>, previousState: AppState): string | null {
   const previousConnector = previousState.connectors.byId[action.payload.id];
   if (previousConnector === undefined) {
@@ -640,6 +666,8 @@ function describeWireChange(
 
 function describeRecentChangeDetail(action: AppAction, previousState: AppState): string | null {
   switch (action.type) {
+    case "network/update":
+      return describeNetworkChange(action, previousState);
     case "catalog/upsert":
       return describeCatalogChange(action, previousState);
     case "connector/upsert":
