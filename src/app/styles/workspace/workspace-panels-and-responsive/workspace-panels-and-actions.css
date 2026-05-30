@@ -408,6 +408,30 @@
   padding: 0.4rem 0.7rem;
 }
 
+.row-actions.workspace-storage-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 0.35rem;
+}
+
+.row-actions.workspace-storage-actions > button {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .row-actions.workspace-storage-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .row-actions.workspace-storage-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 .row-actions {
   display: flex;
   flex-wrap: wrap;

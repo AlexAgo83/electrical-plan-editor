@@ -213,11 +213,11 @@ describe("App integration UI - settings", () => {
     expect(within(workspaceStoragePanel).getAllByText("Local only").length).toBeGreaterThan(0);
     expect(within(workspaceStoragePanel).getByText("Local browser cache")).toBeInTheDocument();
     expect(within(workspaceStoragePanel).getByText("No resumable file")).toBeInTheDocument();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Resume workspace file" })).toBeDisabled();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Open workspace file" })).toBeEnabled();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Relink workspace file" })).toBeEnabled();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file now" })).toBeEnabled();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file as" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Resume" })).toBeDisabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Open" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Relink" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Save now" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Save as" })).toBeEnabled();
   });
 
   it("configures AI provider readiness and gates the Modeling AI Agent entry", async () => {

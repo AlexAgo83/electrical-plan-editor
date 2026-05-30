@@ -37,7 +37,7 @@ const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
   {
     id: "settings-workspace-storage",
     title: "Workspace storage",
-    labels: ["Persistence mode", "Linked file", "Permission", "Open workspace file", "Save workspace file as", "Unlink workspace file"]
+    labels: ["Persistence mode", "Linked file", "Permission", "Open", "Save as", "Unlink"]
   },
   {
     id: "settings-ai-provider",
@@ -620,14 +620,14 @@ export function SettingsWorkspaceContent({
             onClick={resumeWorkspaceFile}
             disabled={!workspaceFileStatus.canResume || workspaceFileStatus.mode === "linked"}
           >
-            Resume workspace file
+            Resume
           </button>
-          <button type="button" onClick={openWorkspaceFile}>{renderSettingLabel("Open workspace file")}</button>
-          <button type="button" onClick={relinkWorkspaceFile}>Relink workspace file</button>
-          <button type="button" onClick={saveWorkspaceFileNow}>Save workspace file now</button>
-          <button type="button" onClick={saveWorkspaceFileAs}>{renderSettingLabel("Save workspace file as")}</button>
+          <button type="button" onClick={openWorkspaceFile}>{renderSettingLabel("Open")}</button>
+          <button type="button" onClick={relinkWorkspaceFile}>Relink</button>
+          <button type="button" onClick={saveWorkspaceFileNow}>Save now</button>
+          <button type="button" onClick={saveWorkspaceFileAs}>{renderSettingLabel("Save as")}</button>
           <button type="button" onClick={unlinkWorkspaceFile} disabled={workspaceFileStatus.mode !== "linked"}>
-            {renderSettingLabel("Unlink workspace file")}
+            {renderSettingLabel("Unlink")}
           </button>
         </div>
         {workspaceFileStatus.conflict ? (
