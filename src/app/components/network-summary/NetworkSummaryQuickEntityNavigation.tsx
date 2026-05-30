@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { getCountedNavigationAriaLabel, getCountedNavigationLabel } from "../../lib/compactNavigationLabel";
 import type { SubScreenId } from "../../types/app-controller";
 
 interface NetworkSummaryQuickEntityNavigationProps {
@@ -70,33 +71,38 @@ export function NetworkSummaryQuickEntityNavigation({
       data-quick-entity-nav-source={variant === "panel" ? "true" : undefined}
     >
       <div className={groupClassName} role="group" aria-label="Quick entity navigation strip">
-        {QUICK_ENTITY_NAV_ITEMS[quickEntityNavigationMode].map((item) => (
-          <button
-            key={item.subScreen}
-            type="button"
-            className={!isAiAgentOpen && activeSubScreen === item.subScreen ? "filter-chip is-active" : "filter-chip"}
-            onClick={() => onQuickEntityNavigation(item.subScreen)}
-            aria-pressed={!isAiAgentOpen && activeSubScreen === item.subScreen}
-          >
-            <span
-              className={`action-button-icon network-summary-quick-entity-nav-icon ${SUB_SCREEN_ICON_CLASS_BY_ID[item.subScreen]}`}
-              aria-hidden="true"
-            />
-            <span className="network-summary-quick-entity-nav-label">{item.label}</span>
-            <span className="filter-chip-count">{entityCountBySubScreen[item.subScreen]}</span>
-          </button>
-        ))}
+        {QUICK_ENTITY_NAV_ITEMS[quickEntityNavigationMode].map((item) => {
+          const entityCount = entityCountBySubScreen[item.subScreen];
+          const navigationLabel = getCountedNavigationLabel(item.label, entityCount);
+          return (
+            <button
+              key={item.subScreen}
+              type="button"
+              className={!isAiAgentOpen && activeSubScreen === item.subScreen ? "filter-chip is-active" : "filter-chip"}
+              onClick={() => onQuickEntityNavigation(item.subScreen)}
+              aria-pressed={!isAiAgentOpen && activeSubScreen === item.subScreen}
+              aria-label={navigationLabel === item.label ? undefined : getCountedNavigationAriaLabel(item.label, entityCount)}
+            >
+              <span
+                className={`action-button-icon network-summary-quick-entity-nav-icon ${SUB_SCREEN_ICON_CLASS_BY_ID[item.subScreen]}`}
+                aria-hidden="true"
+              />
+              <span className="network-summary-quick-entity-nav-label">{navigationLabel}</span>
+              <span className="filter-chip-count">{entityCount}</span>
+            </button>
+          );
+        })}
         {quickEntityNavigationMode === "modeling" ? (
           <button
             type="button"
             className={isAiAgentOpen ? "filter-chip is-ai-agent-tab is-active" : "filter-chip is-ai-agent-tab"}
             onClick={onOpenAiAgent}
+            aria-label="AI Agent"
             aria-pressed={isAiAgentOpen}
             disabled={!isAiAgentReady || onOpenAiAgent === undefined}
             title={isAiAgentReady ? "Open AI Agent" : aiAgentDisabledReason}
           >
             <span className="action-button-icon network-summary-quick-entity-nav-icon is-ai-agent" aria-hidden="true" />
-            <span className="network-summary-quick-entity-nav-label">AI Agent</span>
           </button>
         ) : null}
       </div>

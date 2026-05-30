@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { getCountedNavigationAriaLabel, getCountedNavigationLabel } from "../lib/compactNavigationLabel";
 import type { ScreenId, SubScreenId } from "../types/app-controller";
 
 interface WorkspaceNavigationProps {
@@ -117,34 +118,39 @@ export function WorkspaceNavigation({
         <section className="workspace-nav-subsection" aria-label="Entity navigation">
           <p className="meta-line workspace-nav-divider">Entity navigation</p>
           <div className="workspace-nav-row secondary">
-            {subScreenEntries.map(([subScreenId, label]) => (
-              <button
-                key={subScreenId}
-                type="button"
-                className={!isAiAgentOpen && activeSubScreen === subScreenId ? "workspace-tab is-active" : "workspace-tab"}
-                onClick={() => onSubScreenChange(subScreenId)}
-              >
-                <span className="workspace-tab-content">
-                  <span className={`action-button-icon ${subScreenIconClassById[subScreenId]}`} aria-hidden="true" />
-                  <span>{label}</span>
-                  <span className="workspace-tab-badge" aria-hidden="true">
-                    {entityCountBySubScreen[subScreenId]}
+            {subScreenEntries.map(([subScreenId, label]) => {
+              const entityCount = entityCountBySubScreen[subScreenId];
+              const navigationLabel = getCountedNavigationLabel(label, entityCount);
+              return (
+                <button
+                  key={subScreenId}
+                  type="button"
+                  className={!isAiAgentOpen && activeSubScreen === subScreenId ? "workspace-tab is-active" : "workspace-tab"}
+                  onClick={() => onSubScreenChange(subScreenId)}
+                  aria-label={navigationLabel === label ? undefined : getCountedNavigationAriaLabel(label, entityCount)}
+                >
+                  <span className="workspace-tab-content">
+                    <span className={`action-button-icon ${subScreenIconClassById[subScreenId]}`} aria-hidden="true" />
+                    <span>{navigationLabel}</span>
+                    <span className="workspace-tab-badge" aria-hidden="true">
+                      {entityCount}
+                    </span>
                   </span>
-                </span>
-              </button>
-            ))}
+                </button>
+              );
+            })}
             {!isAnalysisScreen ? (
               <button
                 type="button"
                 className={isAiAgentOpen ? "workspace-tab is-ai-agent-tab is-active" : "workspace-tab is-ai-agent-tab"}
                 onClick={onOpenAiAgent}
+                aria-label="AI Agent"
                 aria-description={isAiAgentReady ? "AI Agent modeling workspace" : aiAgentDisabledReason}
                 disabled={!isAiAgentReady || onOpenAiAgent === undefined}
                 title={isAiAgentReady ? "Open AI Agent" : aiAgentDisabledReason}
               >
                 <span className="workspace-tab-content">
                   <span className="action-button-icon is-ai-agent" aria-hidden="true" />
-                  <span>AI Agent</span>
                 </span>
               </button>
             ) : null}

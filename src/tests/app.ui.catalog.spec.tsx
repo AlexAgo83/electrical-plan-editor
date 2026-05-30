@@ -54,6 +54,41 @@ describe("App integration UI - catalog", () => {
     expect(screen.queryByRole("heading", { name: "Edit catalog item" })).not.toBeInTheDocument();
   });
 
+  it("abbreviates counted navigation labels when an entity count exceeds 9", () => {
+    const stateWithManyConnectors = Array.from({ length: 10 }, (_, index) => index + 1).reduce(
+      (state, index) =>
+        appReducer(
+          state,
+          appActions.upsertConnector({
+            id: asConnectorId(`C-MANY-${index}`),
+            name: `Connector many ${index}`,
+            technicalId: `C-MANY-${index}`,
+            cavityCount: 2
+          })
+        ),
+      createUiIntegrationState()
+    );
+
+    renderAppWithState(stateWithManyConnectors);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+
+    switchScreenDrawerAware("modeling");
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    const connectorSecondaryButton = within(secondaryNavRow as HTMLElement).getByRole("button", {
+      name: /^Connector\s+\d+$/,
+      hidden: true
+    });
+    expect(connectorSecondaryButton.textContent).toMatch(/^Conn\.\d+$/);
+
+    const quickNavPanel = document.querySelector("[data-quick-entity-nav-source='true']");
+    const quickNavGroup = quickNavPanel?.querySelector(".network-summary-quick-entity-nav");
+    expect(quickNavGroup).not.toBeNull();
+    const connectorQuickNavButton = within(quickNavGroup as HTMLElement).getByRole("button", { name: /^Connectors\s+\d+$/ });
+    expect(connectorQuickNavButton.textContent).toMatch(/^Conn\.\d+$/);
+  });
+
   it("docks quick entity navigation into the header after the source strip scrolls under it", async () => {
     renderAppWithState(createUiIntegrationState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
