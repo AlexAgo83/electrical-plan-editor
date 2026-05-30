@@ -5,7 +5,7 @@ A local-first electrical network editor for modeling, validating, and documentin
 The app treats connectors, splices, nodes, segments, and wires as a graph, computes routes deterministically, and keeps canvas preferences and export outputs aligned with the current workspace state.
 
 [![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/electrical-plan-editor)](LICENSE)
-[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.11.1-4C8BF5)
+[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.11.2-4C8BF5)
 
 <img width="1173" height="810" alt="image" src="https://github.com/user-attachments/assets/b4d0b4a9-1fee-43a4-bfb1-ae72caf97302" />
 <img width="1159" height="280" alt="image" src="https://github.com/user-attachments/assets/7bfad15a-cc62-446a-abc6-b06c15ec1466" />
@@ -32,7 +32,7 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 
 - Production: [https://e-plan-editor.onrender.com](https://e-plan-editor.onrender.com)
 - Hosting: Render Static Site (Blueprint via `render.yaml`)
-- Current version: `1.11.1`
+- Current version: `1.11.2`
 - CI status: see the GitHub Actions badge above
 
 ## Product
@@ -82,7 +82,7 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 
 ## AI Agent Workspace
 
-Version `1.11.1` refines the Modeling `AI Agent` and Settings workflows introduced in `1.11.0`. The agent keeps its local panel preferences and instruction drafts across remounts, the entry point scrolls directly to the panel after opening, and Settings now provide searchable, sectioned navigation for the growing preferences surface.
+Version `1.11.2` adds cloud-file workspace storage, richer Home recent-change logs, and visible `AI Agent` navigation labels. Workspace files can be linked, resumed, saved manually, saved as a copy, relinked, or unlinked from the Workspace storage controls while preserving local browser persistence as a fallback.
 
 The Modeling `AI Agent` workspace supports controlled, reversible AI-assisted plan edits. The agent is not allowed to patch raw application state. It receives scoped electrical-plan context, asks the configured provider for a structured plan change, then lets the app derive, validate, preview, and apply bounded operations through the same domain rules as manual Modeling.
 
