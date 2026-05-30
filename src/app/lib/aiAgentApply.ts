@@ -48,6 +48,14 @@ function buildNextAiSegmentId(state: AppState): SegmentId {
   return `AI-SEG-${String(index).padStart(3, "0")}` as SegmentId;
 }
 
+function buildNextAiCatalogItemId(state: AppState): CatalogItemId {
+  let index = 1;
+  while (state.catalogItems.byId[`AI-CAT-${String(index).padStart(3, "0")}` as CatalogItemId] !== undefined) {
+    index += 1;
+  }
+  return `AI-CAT-${String(index).padStart(3, "0")}` as CatalogItemId;
+}
+
 function isWireEndpoint(value: unknown): value is WireEndpoint {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -63,6 +71,21 @@ function isWireEndpoint(value: unknown): value is WireEndpoint {
 }
 
 function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOperation): AppState {
+  if (operation.type === "create_catalog_item") {
+    const catalogItemId =
+      operation.id !== undefined && state.catalogItems.byId[operation.id] === undefined ? operation.id : buildNextAiCatalogItemId(state);
+    return appReducer(
+      state,
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: operation.manufacturerReference,
+        connectionCount: operation.connectionCount,
+        name: operation.name,
+        unitPriceExclTax: operation.unitPriceExclTax,
+        url: operation.url
+      })
+    );
+  }
   if (operation.type === "add_connector") {
     const connectorId =
       operation.id !== undefined && state.connectors.byId[operation.id] === undefined ? operation.id : buildNextAiConnectorId(state);
@@ -350,10 +373,74 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
         );
   }
   if (operation.type === "delete_entity") {
+    if (operation.entityKind === "catalog") {
+      return appReducer(state, appActions.removeCatalogItem(operation.entityId as CatalogItemId));
+    }
+    if (operation.entityKind === "connector") {
+      return appReducer(
+        state,
+        operation.mode === "cascade"
+          ? appActions.removeConnectorCascade(operation.entityId as ConnectorId)
+          : appActions.removeConnector(operation.entityId as ConnectorId)
+      );
+    }
+    if (operation.entityKind === "splice") {
+      return appReducer(
+        state,
+        operation.mode === "cascade"
+          ? appActions.removeSpliceCascade(operation.entityId as SpliceId)
+          : appActions.removeSplice(operation.entityId as SpliceId)
+      );
+    }
+    if (operation.entityKind === "node") {
+      return appReducer(state, appActions.removeNode(operation.entityId as NodeId));
+    }
+    if (operation.entityKind === "segment") {
+      return appReducer(state, appActions.removeSegment(operation.entityId as SegmentId));
+    }
     return appReducer(state, appActions.removeWire(operation.entityId as WireId));
   }
   if (operation.type === "regenerate_route") {
     return operation.wireIds.reduce((nextState, wireId) => appReducer(nextState, appActions.resetWireRoute(wireId)), state);
+  }
+  if (operation.type === "lock_wire_route") {
+    return appReducer(state, appActions.lockWireRoute(operation.wireId, operation.segmentIds));
+  }
+  if (operation.type === "assign_catalog_item") {
+    const catalogItemId = operation.catalogItemId as CatalogItemId;
+    if (operation.entityKind === "connector") {
+      const connector = state.connectors.byId[operation.entityId as ConnectorId];
+      return connector === undefined ? state : appReducer(state, appActions.upsertConnector({ ...connector, catalogItemId }));
+    }
+    if (operation.entityKind === "splice") {
+      const splice = state.splices.byId[operation.entityId as SpliceId];
+      return splice === undefined ? state : appReducer(state, appActions.upsertSplice({ ...splice, catalogItemId }));
+    }
+    const wire = state.wires.byId[operation.entityId as WireId];
+    return wire === undefined
+      ? state
+      : appReducer(
+          state,
+          appActions.saveWire({
+            ...wire,
+            protection: { kind: "fuse", catalogItemId }
+          })
+        );
+  }
+  if (operation.type === "set_connector_terminal_material") {
+    const connector = state.connectors.byId[operation.connectorId as ConnectorId];
+    return connector === undefined
+      ? state
+      : appReducer(
+          state,
+          appActions.upsertConnector({
+            ...connector,
+            terminalOverrides: {
+              ...(connector.terminalOverrides ?? {}),
+              [operation.cavityIndex]: operation.material
+            }
+          })
+        );
   }
   return state;
 }
