@@ -184,7 +184,7 @@ export function ModelingAiAgentPanel({
   }, [agentMode, instruction, permissions, selectedMode, targetScope]);
 
   return (
-    <article className="panel ai-agent-panel" aria-label="AI Agent modeling workspace">
+    <article className="panel ai-agent-panel" data-ai-agent-panel="true" aria-label="AI Agent modeling workspace">
       <header className="list-panel-header">
         <div>
           <h2>AI Agent</h2>

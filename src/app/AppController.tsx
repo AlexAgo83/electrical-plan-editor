@@ -48,6 +48,46 @@ import {
   useAppControllerInspectorSelectionSourceEffect,
   useAppControllerThemeSyncEffect
 } from "./hooks/controller/useAppControllerLifecycleEffects";
+
+const AI_AGENT_PANEL_SELECTOR = "[data-ai-agent-panel='true']";
+const AI_AGENT_PANEL_SCROLL_ATTEMPTS = 10;
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    return false;
+  }
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function scrollToAiAgentPanel(): void {
+  if (typeof document === "undefined" || typeof window === "undefined") {
+    return;
+  }
+
+  const tryScroll = (remainingAttempts: number): void => {
+    const target = document.querySelector(AI_AGENT_PANEL_SELECTOR);
+    if (target instanceof HTMLElement && !target.hidden && typeof target.scrollIntoView === "function") {
+      target.scrollIntoView({
+        block: "start",
+        inline: "nearest",
+        behavior: prefersReducedMotion() ? "auto" : "smooth"
+      });
+      return;
+    }
+
+    if (remainingAttempts <= 0) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      tryScroll(remainingAttempts - 1);
+    });
+  };
+
+  window.requestAnimationFrame(() => {
+    tryScroll(AI_AGENT_PANEL_SCROLL_ATTEMPTS);
+  });
+}
 import { useEntityListModel } from "./hooks/useEntityListModel";
 import { useEntityFormsState } from "./hooks/useEntityFormsState";
 import { useNetworkScopeFormState } from "./hooks/useNetworkScopeFormState";
@@ -233,6 +273,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     }
     setActiveScreen("modeling");
     setIsAiAgentModelingOpen(true);
+    scrollToAiAgentPanel();
   }, [aiSettings.readiness.isReady, setActiveScreen]);
   const aiAgentDisabledReason = aiSettings.readiness.isReady
     ? "AI Agent is ready."
