@@ -1,4 +1,4 @@
-import type { Connector, NetworkNode, Segment, Splice, Wire } from "../../core/entities";
+import type { CatalogItem, Connector, NetworkNode, Segment, Splice, Wire, WireEndpoint } from "../../core/entities";
 import type { LayoutNodePosition } from "../../store/types";
 import type { AiAgentContext } from "./aiAgentContext";
 import { AI_AGENT_OPERATION_SCHEMA_VERSION } from "./aiAgentOperationContract";
@@ -13,6 +13,7 @@ export interface AiAgentEditablePlan {
   schemaVersion: 1;
   connectors: AiAgentContext["entities"]["connectors"];
   splices: AiAgentContext["entities"]["splices"];
+  catalogItems: AiAgentContext["entities"]["catalogItems"];
   nodes: AiAgentEditableNode[];
   segments: AiAgentContext["entities"]["segments"];
   wires: AiAgentContext["entities"]["wires"];
@@ -35,6 +36,19 @@ function hasChanged(left: unknown, right: unknown): boolean {
   return left !== right;
 }
 
+function isWireEndpoint(value: unknown): value is WireEndpoint {
+  if (!isRecord(value)) {
+    return false;
+  }
+  if (value.kind === "connectorCavity") {
+    return typeof value.connectorId === "string" && typeof value.cavityIndex === "number" && Number.isFinite(value.cavityIndex);
+  }
+  if (value.kind === "splicePort") {
+    return typeof value.spliceId === "string" && typeof value.portIndex === "number" && Number.isFinite(value.portIndex);
+  }
+  return false;
+}
+
 function readArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
 }
@@ -53,6 +67,7 @@ export function buildAiAgentEditablePlan(context: AiAgentContext): AiAgentEditab
     schemaVersion: AI_AGENT_OPERATION_SCHEMA_VERSION,
     connectors: context.entities.connectors,
     splices: context.entities.splices,
+    catalogItems: context.entities.catalogItems,
     nodes: context.entities.nodes.map((node) => ({
       ...node,
       ...(nodePositions[node.id] === undefined ? {} : { position: nodePositions[node.id] })
@@ -74,6 +89,7 @@ export function extractAiAgentModifiedPlan(payload: unknown): AiAgentEditablePla
     schemaVersion: AI_AGENT_OPERATION_SCHEMA_VERSION,
     connectors: readArray(planCandidate.connectors) as AiAgentEditablePlan["connectors"],
     splices: readArray(planCandidate.splices) as AiAgentEditablePlan["splices"],
+    catalogItems: readArray(planCandidate.catalogItems) as AiAgentEditablePlan["catalogItems"],
     nodes: readArray(planCandidate.nodes) as AiAgentEditableNode[],
     segments: readArray(planCandidate.segments) as AiAgentEditablePlan["segments"],
     wires: readArray(planCandidate.wires) as AiAgentEditablePlan["wires"]
@@ -114,6 +130,26 @@ function pushConnectorUpdate(
   }
 }
 
+function pushCatalogItemUpdate(
+  operations: AiAgentSupportedOperation[],
+  before: Pick<CatalogItem, "id" | "manufacturerReference" | "connectionCount" | "name">,
+  after: Pick<CatalogItem, "id" | "manufacturerReference" | "connectionCount" | "name">
+) {
+  const fields: Record<string, unknown> = {};
+  if (hasChanged(before.manufacturerReference, after.manufacturerReference)) {
+    fields.manufacturerReference = after.manufacturerReference;
+  }
+  if (hasChanged(before.connectionCount, after.connectionCount)) {
+    fields.connectionCount = after.connectionCount;
+  }
+  if (hasChanged(before.name, after.name)) {
+    fields.name = after.name;
+  }
+  if (Object.keys(fields).length > 0) {
+    operations.push({ type: "update_entity", entityKind: "catalog", entityId: before.id, fields });
+  }
+}
+
 function pushSpliceUpdate(
   operations: AiAgentSupportedOperation[],
   before: Pick<Splice, "id" | "name" | "technicalId">,
@@ -148,6 +184,25 @@ function pushWireUpdate(
   }
 }
 
+function pushAddedWire(operations: AiAgentSupportedOperation[], wire: Partial<Wire> & { id: string }) {
+  const name = typeof wire.name === "string" && wire.name.trim().length > 0 ? wire.name.trim() : null;
+  const technicalId =
+    typeof wire.technicalId === "string" && wire.technicalId.trim().length > 0 ? wire.technicalId.trim() : null;
+  const sectionMm2 =
+    typeof wire.sectionMm2 === "number" && Number.isFinite(wire.sectionMm2) && wire.sectionMm2 > 0 ? wire.sectionMm2 : 0.5;
+  if (name === null || technicalId === null || !isWireEndpoint(wire.endpointA) || !isWireEndpoint(wire.endpointB)) {
+    return;
+  }
+  operations.push({
+    type: "add_wire",
+    name,
+    technicalId,
+    endpointA: wire.endpointA,
+    endpointB: wire.endpointB,
+    sectionMm2
+  });
+}
+
 function pushSegmentUpdate(
   operations: AiAgentSupportedOperation[],
   before: Pick<Segment, "id" | "lengthMm" | "subNetworkTag">,
@@ -172,6 +227,7 @@ export function buildAiAgentOperationsFromPlanDiff(
   const operations: AiAgentSupportedOperation[] = [];
   const beforeConnectors = indexById(beforePlan.connectors);
   const beforeSplices = indexById(beforePlan.splices);
+  const beforeCatalogItems = indexById(beforePlan.catalogItems);
   const beforeNodes = indexById(beforePlan.nodes);
   const beforeSegments = indexById(beforePlan.segments);
   const beforeWires = indexById(beforePlan.wires);
@@ -190,6 +246,14 @@ export function buildAiAgentOperationsFromPlanDiff(
       continue;
     }
     pushSpliceUpdate(operations, before, splice);
+  }
+
+  for (const catalogItem of modifiedPlan.catalogItems) {
+    const before = beforeCatalogItems.get(catalogItem.id);
+    if (before === undefined) {
+      continue;
+    }
+    pushCatalogItemUpdate(operations, before, catalogItem);
   }
 
   for (const node of modifiedPlan.nodes) {
@@ -216,6 +280,7 @@ export function buildAiAgentOperationsFromPlanDiff(
   for (const wire of modifiedPlan.wires) {
     const before = beforeWires.get(wire.id);
     if (before === undefined) {
+      pushAddedWire(operations, wire);
       continue;
     }
     pushWireUpdate(operations, before, wire);

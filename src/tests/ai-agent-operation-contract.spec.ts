@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ConnectorId, NetworkId, NodeId, WireId } from "../core/entities";
+import type { CatalogItemId, ConnectorId, NetworkId, NodeId, WireId } from "../core/entities";
 import { appActions, appReducer, createSampleNetworkState } from "../store";
 import { validateAiAgentOperations, type AiAgentOperationPermissions } from "../app/lib/aiAgentOperationContract";
 import { createNodePositionMap } from "../app/lib/layout/generation";
@@ -176,6 +176,75 @@ describe("AI agent operation contract", () => {
         fields: {
           name: "test"
         }
+      })
+    ]);
+  });
+
+  it("accepts catalog update operations that reference manufacturer references", () => {
+    const state = createSampleNetworkState();
+    const result = validateAiAgentOperations({
+      state,
+      scope: "currentSelection",
+      selection: {
+        kind: "catalog",
+        id: "CAT-SAMPLE-SRC-12W" as CatalogItemId
+      },
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "update_entity",
+            entityKind: "catalog",
+            entityId: "SAMPLE-SRC-12W",
+            fields: {
+              connectionCount: 24
+            }
+          }
+        ]
+      }
+    });
+
+    expect(result.rejected).toHaveLength(0);
+    expect(result.accepted).toEqual([
+      expect.objectContaining({
+        type: "update_entity",
+        entityKind: "catalog",
+        entityId: "CAT-SAMPLE-SRC-12W",
+        fields: {
+          connectionCount: 24
+        }
+      })
+    ]);
+  });
+
+  it("accepts add_wire operations with valid connector cavity endpoints", () => {
+    const state = appReducer(createSampleNetworkState(), appActions.selectNetwork("network-charging-service-demo" as NetworkId));
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "add_wire",
+            name: "Inlet to OBC pin bridge",
+            technicalId: "H-WIRE-INLET-OBC-P7-P12",
+            endpointA: { kind: "connectorCavity", connectorId: "H-C-INLET", cavityIndex: 7 },
+            endpointB: { kind: "connectorCavity", connectorId: "H-C-OBC", cavityIndex: 12 },
+            sectionMm2: 0.5
+          }
+        ]
+      }
+    });
+
+    expect(result.rejected).toHaveLength(0);
+    expect(result.accepted).toEqual([
+      expect.objectContaining({
+        type: "add_wire",
+        technicalId: "H-WIRE-INLET-OBC-P7-P12"
       })
     ]);
   });

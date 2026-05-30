@@ -1,5 +1,5 @@
 import type { AppState, LayoutNodePosition, SelectionState } from "../../store/types";
-import type { ConnectorId, NodeId, SegmentId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
+import type { CatalogItemId, ConnectorId, NodeId, SegmentId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
 import { createNodePositionMap } from "./layout/generation";
 
 export const AI_AGENT_OPERATION_SCHEMA_VERSION = 1;
@@ -108,7 +108,7 @@ export interface AiAgentPlaceEntityRelativeToEntityOperation {
 
 export interface AiAgentUpdateEntityOperation {
   type: "update_entity";
-  entityKind: "connector" | "splice" | "node" | "segment" | "wire";
+  entityKind: "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
   entityId: string;
   fields: Record<string, unknown>;
 }
@@ -306,11 +306,22 @@ function readSafeUpdateFields(entityKind: AiAgentUpdateEntityOperation["entityKi
 
   const fields: Record<string, unknown> = {};
   if (
-    (entityKind === "connector" || entityKind === "splice" || entityKind === "wire") &&
+    (entityKind === "catalog" || entityKind === "connector" || entityKind === "splice" || entityKind === "wire") &&
     typeof value.name === "string" &&
     value.name.trim().length > 0
   ) {
     fields.name = value.name.trim();
+  }
+  if (entityKind === "catalog" && typeof value.manufacturerReference === "string" && value.manufacturerReference.trim().length > 0) {
+    fields.manufacturerReference = value.manufacturerReference.trim();
+  }
+  if (
+    entityKind === "catalog" &&
+    typeof value.connectionCount === "number" &&
+    Number.isInteger(value.connectionCount) &&
+    value.connectionCount > 0
+  ) {
+    fields.connectionCount = value.connectionCount;
   }
   if (
     (entityKind === "connector" || entityKind === "splice" || entityKind === "wire") &&
@@ -512,6 +523,7 @@ function parseOperation(
     const entityId = readString(operation.entityId);
     const supportedEntityKind =
       entityKind === "connector" ||
+      entityKind === "catalog" ||
       entityKind === "splice" ||
       entityKind === "node" ||
       entityKind === "segment" ||
@@ -537,6 +549,14 @@ function resolveEntityId(
   entityKind: AiAgentUpdateEntityOperation["entityKind"] | AiAgentPlaceEntityRelativeToEntityOperation["referenceEntityKind"],
   entityId: string
 ): string {
+  if (entityKind === "catalog") {
+    return (
+      resolveUniqueEntityReference(state.catalogItems.allIds, entityId, (candidateId) => {
+        const catalogItem = state.catalogItems.byId[candidateId];
+        return catalogItem === undefined ? [] : [catalogItem.id, catalogItem.manufacturerReference, catalogItem.name ?? ""];
+      }) ?? entityId
+    );
+  }
   if (entityKind === "connector") {
     return (
       resolveUniqueEntityReference(state.connectors.allIds, entityId, (candidateId) => {
@@ -709,13 +729,27 @@ function permissionForOperation(operation: AiAgentSupportedOperation): keyof AiA
 }
 
 function entityExists(state: AppState, operation: AiAgentSupportedOperation): boolean {
+  const endpointExists = (endpoint: WireEndpoint): boolean => {
+    if (endpoint.kind === "connectorCavity") {
+      const connector = state.connectors.byId[endpoint.connectorId];
+      return connector !== undefined && Number.isInteger(endpoint.cavityIndex) && endpoint.cavityIndex >= 1 && endpoint.cavityIndex <= connector.cavityCount;
+    }
+    const splice = state.splices.byId[endpoint.spliceId];
+    return splice !== undefined && Number.isInteger(endpoint.portIndex) && endpoint.portIndex >= 1 && endpoint.portIndex <= splice.portCount;
+  };
   if (operation.type === "add_segment") {
     return state.nodes.byId[operation.nodeA] !== undefined && state.nodes.byId[operation.nodeB] !== undefined;
+  }
+  if (operation.type === "add_wire") {
+    return endpointExists(operation.endpointA) && endpointExists(operation.endpointB);
   }
   if (operation.type === "regenerate_route") {
     return operation.wireIds.every((wireId) => state.wires.byId[wireId] !== undefined);
   }
   if (operation.type === "move_entity" || operation.type === "place_entity_relative_to_entity" || operation.type === "update_entity") {
+    if (operation.entityKind === "catalog") {
+      return state.catalogItems.byId[operation.entityId as CatalogItemId] !== undefined;
+    }
     if (operation.entityKind === "connector") {
       return state.connectors.byId[operation.entityId as ConnectorId] !== undefined;
     }

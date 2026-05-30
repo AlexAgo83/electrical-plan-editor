@@ -501,6 +501,7 @@ export function useAppControllerWorkspaceContentAssembly({
                 };
           return {
             summary: `Provider draft generated from ${providerResponse.rawText.length} response characters.`,
+            rawResponse: providerResponse.rawText,
             validation: validateAiAgentOperations({
               state: currentState,
               payload,

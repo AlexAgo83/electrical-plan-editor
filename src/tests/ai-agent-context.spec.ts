@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ConnectorId } from "../core/entities";
+import type { CatalogItemId, ConnectorId } from "../core/entities";
 import { createEmptyWorkspaceState, createSampleNetworkState } from "../store";
 import { buildAiAgentContext } from "../app/lib/aiAgentContext";
 
@@ -16,7 +16,8 @@ describe("AI agent context builder", () => {
       splices: state.splices.allIds.length,
       nodes: state.nodes.allIds.length,
       segments: state.segments.allIds.length,
-      wires: state.wires.allIds.length
+      wires: state.wires.allIds.length,
+      catalogItems: state.catalogItems.allIds.length
     });
     expect(context.entities.connectors).toContainEqual(
       expect.objectContaining({
@@ -43,6 +44,32 @@ describe("AI agent context builder", () => {
     expect(context.summary.selectionLabel).toBe("Connector CONN-SRC-01");
     expect(context.summary.counts.connectors).toBe(1);
     expect(context.summary.counts.wires).toBe(0);
+    expect(context.summary.counts.catalogItems).toBe(0);
+  });
+
+  it("builds a narrow current-selection context when a catalog item is selected", () => {
+    const baseState = createSampleNetworkState();
+    const state = {
+      ...baseState,
+      ui: {
+        ...baseState.ui,
+        selected: {
+          kind: "catalog" as const,
+          id: "CAT-SAMPLE-SRC-12W" as CatalogItemId
+        }
+      }
+    };
+    const context = buildAiAgentContext(state, "currentSelection");
+
+    expect(context.summary.isAvailable).toBe(true);
+    expect(context.summary.selectionLabel).toBe("Catalog SAMPLE-CAT-SRC-12W");
+    expect(context.summary.counts.catalogItems).toBe(1);
+    expect(context.entities.catalogItems).toEqual([
+      expect.objectContaining({
+        id: "CAT-SAMPLE-SRC-12W",
+        connectionCount: 12
+      })
+    ]);
   });
 
   it("marks current-selection context unavailable without a valid selected entity", () => {
@@ -59,5 +86,6 @@ describe("AI agent context builder", () => {
     expect(context.summary.isAvailable).toBe(false);
     expect(context.summary.unavailableReason).toBe("No active network is available.");
     expect(context.entities.connectors).toHaveLength(0);
+    expect(context.entities.catalogItems).toHaveLength(0);
   });
 });

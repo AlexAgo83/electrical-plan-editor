@@ -1,4 +1,4 @@
-import type { ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../core/entities";
+import type { CatalogItemId, ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../core/entities";
 import { appActions, appReducer, type AppState } from "../../store";
 import type { AiAgentOperationValidationResult, AiAgentSupportedOperation } from "./aiAgentOperationContract";
 
@@ -16,6 +16,14 @@ function buildNextAiNodeId(state: AppState): NodeId {
   return `AI-NODE-${String(index).padStart(3, "0")}` as NodeId;
 }
 
+function buildNextAiWireId(state: AppState): WireId {
+  let index = 1;
+  while (state.wires.byId[`AI-WIRE-${String(index).padStart(3, "0")}` as WireId] !== undefined) {
+    index += 1;
+  }
+  return `AI-WIRE-${String(index).padStart(3, "0")}` as WireId;
+}
+
 function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOperation): AppState {
   if (operation.type === "add_node") {
     const nodeId = buildNextAiNodeId(state);
@@ -28,6 +36,19 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
       })
     );
     return appReducer(withNode, appActions.setNodePosition(nodeId, operation.position));
+  }
+  if (operation.type === "add_wire") {
+    return appReducer(
+      state,
+      appActions.saveWire({
+        id: buildNextAiWireId(state),
+        name: operation.name,
+        technicalId: operation.technicalId,
+        endpointA: operation.endpointA,
+        endpointB: operation.endpointB,
+        sectionMm2: operation.sectionMm2
+      })
+    );
   }
   if (operation.type === "move_entity") {
     if (operation.position === undefined) {
@@ -62,6 +83,24 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
     return nodeId === undefined ? state : appReducer(state, appActions.setNodePosition(nodeId, operation.position));
   }
   if (operation.type === "update_entity") {
+    if (operation.entityKind === "catalog") {
+      const catalogItem = state.catalogItems.byId[operation.entityId as CatalogItemId];
+      return catalogItem === undefined
+        ? state
+        : appReducer(
+            state,
+            appActions.upsertCatalogItem({
+              ...catalogItem,
+              manufacturerReference:
+                typeof operation.fields.manufacturerReference === "string"
+                  ? operation.fields.manufacturerReference
+                  : catalogItem.manufacturerReference,
+              connectionCount:
+                typeof operation.fields.connectionCount === "number" ? operation.fields.connectionCount : catalogItem.connectionCount,
+              name: typeof operation.fields.name === "string" ? operation.fields.name : catalogItem.name
+            })
+          );
+    }
     if (operation.entityKind === "connector") {
       const connector = state.connectors.byId[operation.entityId as ConnectorId];
       return connector === undefined

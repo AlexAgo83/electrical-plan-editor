@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { ConnectorId, NodeId, WireId } from "../core/entities";
-import { createSampleNetworkState } from "../store";
+import type { CatalogItemId, ConnectorId, NetworkId, NodeId, WireId } from "../core/entities";
+import { appActions, appReducer, createSampleNetworkState } from "../store";
 import { applyAiAgentAcceptedOperations } from "../app/lib/aiAgentApply";
 import type { AiAgentOperationValidationResult } from "../app/lib/aiAgentOperationContract";
 
@@ -126,5 +126,64 @@ describe("AI agent apply", () => {
     expect(result.skippedCount).toBe(0);
     expect(state.connectors.byId["C-SRC" as ConnectorId]?.name).toBe("Power Source Connector");
     expect(result.nextState.connectors.byId["C-SRC" as ConnectorId]?.name).toBe("test");
+  });
+
+  it("applies catalog update operations and propagates linked connector capacity", () => {
+    const state = createSampleNetworkState();
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "update_entity",
+          entityKind: "catalog",
+          entityId: "CAT-SAMPLE-SRC-12W",
+          fields: {
+            connectionCount: 24
+          }
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+
+    const result = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(result.appliedCount).toBe(1);
+    expect(result.skippedCount).toBe(0);
+    expect(result.nextState.catalogItems.byId["CAT-SAMPLE-SRC-12W" as CatalogItemId]?.connectionCount).toBe(24);
+    expect(result.nextState.connectors.byId["C-SRC" as ConnectorId]?.cavityCount).toBe(24);
+  });
+
+  it("applies add_wire operations through the normal wire save path", () => {
+    const state = appReducer(createSampleNetworkState(), appActions.selectNetwork("network-charging-service-demo" as NetworkId));
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "add_wire",
+          name: "Inlet to OBC pin bridge",
+          technicalId: "H-WIRE-INLET-OBC-P7-P12",
+          endpointA: { kind: "connectorCavity", connectorId: "H-C-INLET" as ConnectorId, cavityIndex: 7 },
+          endpointB: { kind: "connectorCavity", connectorId: "H-C-OBC" as ConnectorId, cavityIndex: 12 },
+          sectionMm2: 0.5
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+
+    const result = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(result.appliedCount).toBe(1);
+    expect(result.skippedCount).toBe(0);
+    expect(result.nextState.wires.byId["AI-WIRE-001" as WireId]).toEqual(
+      expect.objectContaining({
+        name: "Inlet to OBC pin bridge",
+        technicalId: "H-WIRE-INLET-OBC-P7-P12",
+        endpointA: { kind: "connectorCavity", connectorId: "H-C-INLET", cavityIndex: 7 },
+        endpointB: { kind: "connectorCavity", connectorId: "H-C-OBC", cavityIndex: 12 },
+        routeSegmentIds: ["H-SEG-001", "H-SEG-002"]
+      })
+    );
   });
 });

@@ -16,7 +16,7 @@ interface ModelingAiAgentPanelProps {
     scope: AiAgentScope;
     instruction: string;
     permissions: AiAgentOperationPermissions;
-  }) => Promise<{ summary: string; validation: AiAgentOperationValidationResult }>;
+  }) => Promise<{ summary: string; validation: AiAgentOperationValidationResult; rawResponse?: string }>;
   onApplyProposal: (validation: AiAgentOperationValidationResult) => { appliedCount: number; skippedCount: number };
 }
 
@@ -68,6 +68,17 @@ function formatAiAgentOperationDetails(operation: AiAgentSupportedOperation): st
   return `${operation.wireIds.length} wire${operation.wireIds.length === 1 ? "" : "s"}`;
 }
 
+function formatCountLabel(count: number, singular: string, plural = `${singular}s`): string {
+  return count === 1 ? singular : plural;
+}
+
+type EntityCountEntry = {
+  key: string;
+  count: number;
+  singular: string;
+  plural?: string;
+};
+
 export function ModelingAiAgentPanel({
   providerReadiness,
   experimentalDirectExecutionEnabled,
@@ -86,6 +97,7 @@ export function ModelingAiAgentPanel({
     delete: false
   });
   const [draftStatus, setDraftStatus] = useState<string | null>(null);
+  const [draftRawResponse, setDraftRawResponse] = useState<string | null>(null);
   const [proposalValidation, setProposalValidation] = useState<AiAgentOperationValidationResult | null>(null);
   const [isPreparingProposal, setIsPreparingProposal] = useState(false);
   const selectedMode = agentMode === "direct" && !experimentalDirectExecutionEnabled ? "assisted" : agentMode;
@@ -93,6 +105,19 @@ export function ModelingAiAgentPanel({
   const canPrepareProposal =
     providerReadiness.isReady && selectedContextSummary.isAvailable && instruction.trim().length > 0 && !isPreparingProposal;
   const enabledPermissionCount = useMemo(() => Object.values(permissions).filter(Boolean).length, [permissions]);
+  const entityCountEntries: EntityCountEntry[] = [
+    { key: "connectors", count: selectedContextSummary.counts.connectors, singular: "connector" },
+    { key: "splices", count: selectedContextSummary.counts.splices, singular: "splice" },
+    { key: "nodes", count: selectedContextSummary.counts.nodes, singular: "node" },
+    { key: "segments", count: selectedContextSummary.counts.segments, singular: "segment" },
+    { key: "wires", count: selectedContextSummary.counts.wires, singular: "wire" },
+    {
+      key: "catalog-items",
+      count: selectedContextSummary.counts.catalogItems,
+      singular: "catalog item",
+      plural: "catalog items"
+    }
+  ];
   const updatePermission = (key: keyof AiAgentOperationPermissions, value: boolean) => {
     setPermissions((current) => ({
       ...current,
@@ -100,6 +125,7 @@ export function ModelingAiAgentPanel({
     }));
     setProposalValidation(null);
     setDraftStatus(null);
+    setDraftRawResponse(null);
   };
 
   return (
@@ -117,16 +143,22 @@ export function ModelingAiAgentPanel({
         <p className="meta-line">
           <span>Network</span> <strong>{selectedContextSummary.networkName ?? "None"}</strong>
         </p>
-        <p className="meta-line">
-          <span>Entities</span>{" "}
-          <strong>
-            {selectedContextSummary.counts.connectors} connectors, {selectedContextSummary.counts.splices} splices,{" "}
-            {selectedContextSummary.counts.nodes} nodes, {selectedContextSummary.counts.segments} segments,{" "}
-            {selectedContextSummary.counts.wires} wires
+        <p className="meta-line ai-agent-context-entities">
+          <span>Entities</span>
+          <strong className="ai-agent-entity-counts" aria-label="AI context entity counts">
+            {entityCountEntries.map(({ key, count, singular, plural }) => {
+              const countLabel = `${count} ${formatCountLabel(count, singular, plural)}`;
+              return (
+                <span className="ai-agent-entity-count" key={key} aria-label={countLabel}>
+                  <span className="ai-agent-entity-count-value">{count}</span>
+                  <span>{formatCountLabel(count, singular, plural)}</span>
+                </span>
+              );
+            })}
           </strong>
         </p>
         {selectedContextSummary.selectionLabel !== null ? (
-          <p className="meta-line">
+          <p className="meta-line ai-agent-context-selection">
             <span>Selection</span> <strong>{selectedContextSummary.selectionLabel}</strong>
           </p>
         ) : null}
@@ -146,6 +178,7 @@ export function ModelingAiAgentPanel({
             onChange={(event) => {
               setInstruction(event.target.value);
               setDraftStatus(null);
+              setDraftRawResponse(null);
               setProposalValidation(null);
             }}
             placeholder="Add a routing node near the dashboard connector and prepare route updates for selected wires."
@@ -160,6 +193,7 @@ export function ModelingAiAgentPanel({
                 setTargetScope(event.target.value as AiAgentScope);
                 setProposalValidation(null);
                 setDraftStatus(null);
+                setDraftRawResponse(null);
               }}
             >
               <option value="activeNetwork">Active network</option>
@@ -177,6 +211,7 @@ export function ModelingAiAgentPanel({
                 setAgentMode(event.target.value as AgentMode);
                 setProposalValidation(null);
                 setDraftStatus(null);
+                setDraftRawResponse(null);
               }}
             >
               <option value="assisted">Assisted proposal</option>
@@ -227,7 +262,23 @@ export function ModelingAiAgentPanel({
           </label>
         </fieldset>
 
-        {draftStatus !== null ? <p className="meta-line">{draftStatus}</p> : null}
+        {draftStatus !== null ? (
+          <p className="meta-line ai-agent-draft-status">
+            {draftStatus}
+            {isPreparingProposal ? <span className="ai-agent-status-loader" aria-label="Preparing proposal" /> : null}
+            {draftRawResponse !== null ? (
+              <span className="ai-agent-response-hover">
+                <button type="button" className="ai-agent-response-info" aria-label="Show AI response">
+                  i
+                </button>
+                <span className="ai-agent-response-popover" role="tooltip">
+                  <span className="ai-agent-response-popover-title">AI response</span>
+                  <code>{draftRawResponse}</code>
+                </span>
+              </span>
+            ) : null}
+          </p>
+        ) : null}
 
         <div className="row-actions settings-actions">
           <button
@@ -236,6 +287,7 @@ export function ModelingAiAgentPanel({
             onClick={() => {
               setIsPreparingProposal(true);
               setDraftStatus("Requesting proposal from configured provider...");
+              setDraftRawResponse(null);
               void onPrepareProposal({
                 scope: targetScope,
                 instruction,
@@ -246,10 +298,12 @@ export function ModelingAiAgentPanel({
                   setDraftStatus(
                     `${draft.summary} ${selectedContextSummary.scopeLabel} scope, ${enabledPermissionCount} enabled permission groups.`
                   );
+                  setDraftRawResponse(draft.rawResponse ?? null);
                 })
                 .catch((error: unknown) => {
                   setProposalValidation(null);
                   setDraftStatus(error instanceof Error ? error.message : "Proposal generation failed.");
+                  setDraftRawResponse(null);
                 })
                 .finally(() => {
                   setIsPreparingProposal(false);
@@ -267,6 +321,7 @@ export function ModelingAiAgentPanel({
               }
               const result = onApplyProposal(proposalValidation);
               setProposalValidation(null);
+              setDraftRawResponse(null);
               setDraftStatus(
                 `Applied ${result.appliedCount} accepted operation${result.appliedCount === 1 ? "" : "s"}. ${result.skippedCount} accepted operation${result.skippedCount === 1 ? "" : "s"} skipped.`
               );
@@ -280,6 +335,7 @@ export function ModelingAiAgentPanel({
             onClick={() => {
               setProposalValidation(null);
               setDraftStatus("Proposal rejected. Modeling state was not changed.");
+              setDraftRawResponse(null);
             }}
           >
             Reject proposal
@@ -301,19 +357,19 @@ export function ModelingAiAgentPanel({
             <span>Warnings</span> <strong>{proposalValidation.warnings.length}</strong>
           </p>
           {proposalValidation.accepted.map((operation, index) => (
-            <p className="meta-line" key={`${operation.type}-${index}`}>
-              <span>Accepted operation</span>{" "}
-              <strong>{operation.type}</strong>{" "}
+            <p className="meta-line ai-agent-operation-line" key={`${operation.type}-${index}`}>
+              <span>Accepted operation</span>
+              <strong>{operation.type}</strong>
               <small>{formatAiAgentOperationDetails(operation)}</small>
             </p>
           ))}
           {proposalValidation.rejected.map((issue) => (
-            <p className="meta-line" key={`rejected-${issue.operationType}-${issue.operationIndex}`}>
+            <p className="meta-line ai-agent-operation-line" key={`rejected-${issue.operationType}-${issue.operationIndex}`}>
               <span>Rejected operation</span> <strong>{issue.message}</strong>
             </p>
           ))}
           {proposalValidation.unsupported.map((issue) => (
-            <p className="meta-line" key={`${issue.operationType}-${issue.operationIndex}`}>
+            <p className="meta-line ai-agent-operation-line" key={`${issue.operationType}-${issue.operationIndex}`}>
               <span>Unsupported operation</span> <strong>{issue.operationType}</strong>
             </p>
           ))}

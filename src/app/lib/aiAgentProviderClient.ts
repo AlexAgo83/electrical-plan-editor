@@ -28,7 +28,7 @@ function buildProviderPrompt(context: AiAgentContext, instruction: string): stri
         modifiedPlan: editablePlan
       },
       editableFields:
-        "Only change existing scoped entities needed by the instruction. For rename requests, edit name or technicalId on the target entity. For movement, edit node.position on the connector/splice/intermediate node. Preserve ids and references.",
+        "Only change existing scoped entities needed by the instruction, except add new wires to wires when the instruction asks for a new wire. For new wires include id, name, technicalId, endpointA, endpointB, and sectionMm2. For catalog requests, edit catalogItems fields such as manufacturerReference, name, or connectionCount. For rename requests, edit name or technicalId on the target entity. For movement, edit node.position on the connector/splice/intermediate node. Preserve ids and references.",
       deferredChanges: ["assign_endpoint", "assign_catalog_reference", "delete_entity"],
       compatibility:
         "If you cannot return modifiedPlan, you may return the legacy {schemaVersion, operations} contract, but modifiedPlan is preferred."

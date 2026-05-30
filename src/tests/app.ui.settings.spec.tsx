@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { NetworkId } from "../core/entities";
+import type { CatalogItemId, ConnectorId, NetworkId } from "../core/entities";
 import {
   asConnectorId,
   createConnectorSortingState,
@@ -262,6 +262,7 @@ describe("App integration UI - settings", () => {
     );
     fireEvent.click(prepareProposalButton);
     expect(await screen.findByText(/Provider draft generated/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Show AI response" })).toBeInTheDocument();
     const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
     expect(within(proposalSummary).getByText("Accepted")).toBeInTheDocument();
     expect(within(proposalSummary).getByText("add_node")).toBeInTheDocument();
@@ -271,9 +272,9 @@ describe("App integration UI - settings", () => {
     fireEvent.click(applyProposalButton);
     expect(screen.getByText("Applied 1 accepted operation. 0 accepted operations skipped.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Apply proposal" })).toBeDisabled();
-    expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("4 nodes");
+    expect(within(screen.getByLabelText("AI context entity counts")).getByLabelText("4 nodes")).toBeInTheDocument();
     fireEvent.keyDown(document, { key: "z", metaKey: true });
-    expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("3 nodes");
+    expect(within(screen.getByLabelText("AI context entity counts")).getByLabelText("3 nodes")).toBeInTheDocument();
     expect(screen.queryByLabelText("Use configured provider for proposal generation")).not.toBeInTheDocument();
   });
 
@@ -327,6 +328,137 @@ describe("App integration UI - settings", () => {
     const connectorsPanel = getPanelByHeading("Connectors");
     expect(within(connectorsPanel).getByText("Connector 1 (2 pins)")).toBeInTheDocument();
     expect(within(connectorsPanel).queryByText("Connector 1")).not.toBeInTheDocument();
+  });
+
+  it("applies provider modified plans to selected catalog item connection count", async () => {
+    const baseState = createSampleNetworkState();
+    const chargingState = appReducer(baseState, appActions.selectNetwork("network-charging-service-demo" as NetworkId));
+    const state = appReducer(
+      chargingState,
+      appActions.select({ kind: "catalog", id: "CAT-CHG-SERVICE-4W" as CatalogItemId })
+    );
+    const editablePlan = buildAiAgentEditablePlan(buildAiAgentContext(state, "currentSelection"));
+    const modifiedPlan = {
+      ...editablePlan,
+      catalogItems: editablePlan.catalogItems.map((item) =>
+        item.id === ("CAT-CHG-SERVICE-4W" as CatalogItemId) ? { ...item, connectionCount: item.connectionCount * 2 } : item
+      )
+    };
+
+    renderAppWithState(state);
+    switchScreenDrawerAware("settings");
+    const aiProviderPanel = getPanelByHeading("AI provider");
+    fireEvent.change(within(aiProviderPanel).getByLabelText("API key"), {
+      target: { value: "sk-local-test" }
+    });
+    const fetchMock = vi.fn<typeof fetch>(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            output_text: JSON.stringify({
+              schemaVersion: 1,
+              modifiedPlan
+            })
+          }),
+          { status: 200 }
+        )
+      )
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    switchScreenDrawerAware("modeling");
+    fireEvent.click(within(screen.getByRole("region", { name: "Quick entity navigation" })).getByRole("button", { name: "AI Agent" }));
+    fireEvent.change(screen.getByLabelText("Target scope"), {
+      target: { value: "currentSelection" }
+    });
+    expect(within(screen.getByLabelText("AI context entity counts")).getByLabelText("1 catalog item")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Instruction"), {
+      target: { value: "Double the number of ways on the selected catalog item." }
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Prepare proposal" }));
+
+    expect(await screen.findByText(/Provider draft generated/)).toBeInTheDocument();
+    const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
+    expect(within(proposalSummary).getByText("update_entity")).toBeInTheDocument();
+    expect(within(proposalSummary).getByText("catalog CAT-CHG-SERVICE-4W · connectionCount: 8")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Apply proposal" }));
+    expect(screen.getByText("Applied 1 accepted operation. 0 accepted operations skipped.")).toBeInTheDocument();
+
+    switchSubScreenDrawerAware("catalog");
+    const catalogPanel = getPanelByHeading("Catalog");
+    expect(within(catalogPanel).getByText("CHG-CAT-SVC-4W")).toBeInTheDocument();
+    const catalogItemRow = within(catalogPanel).getByText("CHG-CAT-SVC-4W").closest("tr");
+    expect(catalogItemRow).not.toBeNull();
+    expect(within(catalogItemRow as HTMLTableRowElement).getByText("8")).toBeInTheDocument();
+
+    switchSubScreenDrawerAware("connector");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    const serviceConnectorRow = within(connectorsPanel).getByText("Service Disconnect Connector").closest("tr");
+    expect(serviceConnectorRow).not.toBeNull();
+    expect(within(serviceConnectorRow as HTMLTableRowElement).getByText("8")).toBeInTheDocument();
+  });
+
+  it("applies provider modified plans that add a new wire", async () => {
+    const baseState = createSampleNetworkState();
+    const state = appReducer(baseState, appActions.selectNetwork("network-charging-service-demo" as NetworkId));
+    const editablePlan = buildAiAgentEditablePlan(buildAiAgentContext(state, "activeNetwork"));
+    const modifiedPlan = {
+      ...editablePlan,
+      wires: [
+        ...editablePlan.wires,
+        {
+          id: "AI-WIRE-INLET-OBC",
+          name: "Inlet to OBC pin bridge",
+          technicalId: "H-WIRE-INLET-OBC-P7-P12",
+          endpointA: { kind: "connectorCavity" as const, connectorId: "H-C-INLET" as ConnectorId, cavityIndex: 7 },
+          endpointB: { kind: "connectorCavity" as const, connectorId: "H-C-OBC" as ConnectorId, cavityIndex: 12 },
+          sectionMm2: 0.5,
+          routeSegmentIds: [],
+          lengthMm: 0
+        }
+      ]
+    };
+
+    renderAppWithState(state);
+    switchScreenDrawerAware("settings");
+    const aiProviderPanel = getPanelByHeading("AI provider");
+    fireEvent.change(within(aiProviderPanel).getByLabelText("API key"), {
+      target: { value: "sk-local-test" }
+    });
+    const fetchMock = vi.fn<typeof fetch>(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            output_text: JSON.stringify({
+              schemaVersion: 1,
+              modifiedPlan
+            })
+          }),
+          { status: 200 }
+        )
+      )
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    switchScreenDrawerAware("modeling");
+    fireEvent.click(within(screen.getByRole("region", { name: "Quick entity navigation" })).getByRole("button", { name: "AI Agent" }));
+    fireEvent.change(screen.getByLabelText("Instruction"), {
+      target: { value: "Create a new wire from INLET pin 7 to OBC pin 12." }
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Prepare proposal" }));
+
+    expect(await screen.findByText(/Provider draft generated/)).toBeInTheDocument();
+    const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
+    expect(within(proposalSummary).getByText("add_wire")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Apply proposal" }));
+    expect(screen.getByText("Applied 1 accepted operation. 0 accepted operations skipped.")).toBeInTheDocument();
+
+    switchSubScreenDrawerAware("wire");
+    const wiresPanel = getPanelByHeading("Wires");
+    expect(within(wiresPanel).getByText("H-WIRE-INLET-OBC-P7-P12")).toBeInTheDocument();
+    expect(within(wiresPanel).getByText("Inlet to OBC pin bridge")).toBeInTheDocument();
   });
 
   it("keeps settings and import/export controls operable on mobile baseline viewports", async () => {

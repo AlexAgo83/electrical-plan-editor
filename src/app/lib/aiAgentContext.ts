@@ -8,7 +8,7 @@ import type {
   Wire
 } from "../../core/entities";
 import type { AppState, LayoutNodePosition, SelectionState } from "../../store/types";
-import { selectActiveNetwork, selectConnectors, selectNodes, selectSegments, selectSplices, selectWires } from "../../store";
+import { selectActiveNetwork, selectCatalogItems, selectConnectors, selectNodes, selectSegments, selectSplices, selectWires } from "../../store";
 import type { AiAgentScope } from "./aiAgentOperationContract";
 
 export interface AiAgentContextSummary {
@@ -24,6 +24,7 @@ export interface AiAgentContextSummary {
     nodes: number;
     segments: number;
     wires: number;
+    catalogItems: number;
   };
 }
 
@@ -36,9 +37,12 @@ export interface AiAgentContext {
   entities: {
     connectors: Array<Pick<Connector, "id" | "name" | "technicalId" | "cavityCount">>;
     splices: Array<Pick<Splice, "id" | "name" | "technicalId" | "portCount" | "portMode">>;
+    catalogItems: Array<Pick<CatalogItem, "id" | "manufacturerReference" | "connectionCount" | "name">>;
     nodes: NetworkNode[];
     segments: Array<Pick<Segment, "id" | "nodeA" | "nodeB" | "lengthMm" | "subNetworkTag">>;
-    wires: Array<Pick<Wire, "id" | "name" | "technicalId" | "endpointA" | "endpointB" | "routeSegmentIds" | "lengthMm">>;
+    wires: Array<
+      Pick<Wire, "id" | "name" | "technicalId" | "endpointA" | "endpointB" | "routeSegmentIds" | "lengthMm" | "sectionMm2">
+    >;
     nodePositions: Record<string, LayoutNodePosition>;
   };
 }
@@ -56,7 +60,8 @@ function buildEmptySummary(scope: AiAgentScope, unavailableReason: string): AiAg
       splices: 0,
       nodes: 0,
       segments: 0,
-      wires: 0
+      wires: 0,
+      catalogItems: 0
     }
   };
 }
@@ -98,9 +103,12 @@ function filterSelectionEntities(state: AppState, selection: SelectionState): Ai
   const selectedNode = selection.kind === "node" ? state.nodes.byId[selection.id as NetworkNode["id"]] : undefined;
   const selectedSegment = selection.kind === "segment" ? state.segments.byId[selection.id as Segment["id"]] : undefined;
   const selectedWire = selection.kind === "wire" ? state.wires.byId[selection.id as Wire["id"]] : undefined;
+  const selectedCatalogItem =
+    selection.kind === "catalog" ? state.catalogItems.byId[selection.id as CatalogItem["id"]] : undefined;
   return {
     connectors: selectedConnector === undefined ? [] : [selectedConnector],
     splices: selectedSplice === undefined ? [] : [selectedSplice],
+    catalogItems: selectedCatalogItem === undefined ? [] : [selectedCatalogItem],
     nodes: selectedNode === undefined ? [] : [selectedNode],
     segments: selectedSegment === undefined ? [] : [selectedSegment],
     wires: selectedWire === undefined ? [] : [selectedWire],
@@ -126,7 +134,8 @@ function summarizeEntities(
       splices: entities.splices.length,
       nodes: entities.nodes.length,
       segments: entities.segments.length,
-      wires: entities.wires.length
+      wires: entities.wires.length,
+      catalogItems: entities.catalogItems.length
     }
   };
 }
@@ -144,6 +153,7 @@ export function buildAiAgentContext(state: AppState, scope: AiAgentScope): AiAge
       entities: {
         connectors: [],
         splices: [],
+        catalogItems: [],
         nodes: [],
         segments: [],
         wires: [],
@@ -175,6 +185,7 @@ export function buildAiAgentContext(state: AppState, scope: AiAgentScope): AiAge
         entities: {
           connectors: [],
           splices: [],
+          catalogItems: [],
           nodes: [],
           segments: [],
           wires: [],
@@ -196,6 +207,7 @@ export function buildAiAgentContext(state: AppState, scope: AiAgentScope): AiAge
   const entities = {
     connectors: selectConnectors(state),
     splices: selectSplices(state),
+    catalogItems: selectCatalogItems(state),
     nodes: selectNodes(state),
     segments: selectSegments(state),
     wires: selectWires(state),
