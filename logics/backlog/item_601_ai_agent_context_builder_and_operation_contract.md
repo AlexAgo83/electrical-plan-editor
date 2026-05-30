@@ -1,10 +1,10 @@
 ## item_601_ai_agent_context_builder_and_operation_contract - AI Agent Context Builder and Operation Contract
 > From version: 1.10.3
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 97%
-> Confidence: 90%
-> Progress: 0%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: High
 > Theme: AI
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -15,16 +15,16 @@ A stable scoped context format and a validated operation vocabulary are required
 
 # Scope
 - In:
-  - Build scoped AI context for current selection and active network.
-  - Defer selected-harness mutation scope to V2 while reusing selected-harness agent JSON concepts later.
-  - Define a V1 operation schema for safe add, move, update, and route regeneration.
+  - Build scoped AI context for current selection, active network, selected harness, and all networks.
+  - Require explicit or locally inferable `networkId` targeting for multi-network operations.
+  - Define a V1.11.0 operation schema for safe add, move, update, route regeneration, delete, catalog, connector layout, terminal-material, batch move, and route-lock operations.
   - Implement local operation parsing and validation boundaries.
   - Return structured validation results with accepted, rejected, and unsupported operations.
 - Out:
   - Direct provider execution.
   - Full visual diff rendering.
-  - Selected-harness and global all-harness mutation scope in V1.
-  - Endpoint assignment, catalog assignment, and delete in the first operation vocabulary.
+  - Endpoint assignment in the first operation vocabulary.
+  - Autonomous provider tool execution that bypasses local validation.
   - Raw store patching.
 
 ```mermaid
@@ -44,7 +44,7 @@ flowchart TD
 # Acceptance criteria
 - AC1: The app can build structured AI context for current selection.
 - AC2: The app can build structured AI context for active network.
-- AC3: Selected-harness mutation scope is explicitly deferred to V2 and appears as unavailable or unsupported in V1.
+- AC3: Selected-harness and all-networks scopes are supported with network-scoped validation/apply.
 - AC4: The V1 operation schema is versioned and documented.
 - AC5: Operation parsing rejects malformed, unknown, or unsupported operation types.
 - AC6: Validation rejects operations outside the selected scope.
@@ -63,9 +63,15 @@ The application derives the following operation vocabulary from the before/after
 - `add_segment`: Create one segment between existing nodes in the active network.
 - `add_wire`: Create one wire with supported endpoint references only when both endpoints are already valid and unambiguous; otherwise reject with a validation message.
 - `move_entity`: Move a connector, splice, node, or selected supported canvas entity to a validated coordinate.
+- `batch_move_entities`: Move multiple supported canvas entities as one validated operation family.
 - `place_entity_relative_to_entity`: Place a connector, splice, or node relative to another validated connector, splice, or node (`leftOf`, `rightOf`, `above`, `below`) for instructions that name both a target and an anchor.
 - `update_entity`: Update safe scalar fields only: name, technical ID, wire section, material, color, protection, route lock, and display metadata.
-- `regenerate_route`: Regenerate routes for selected wires or all active-network wires when route permission is enabled.
+- `regenerate_route`: Regenerate routes for selected or scoped wires when route permission is enabled.
+- `delete_entity`: Delete connectors, splices, nodes, segments, or wires only when delete permission is explicitly enabled.
+- `create_catalog_item`, `assign_catalog_item`, and `update_catalog_connector_layout`: Apply catalog-backed changes through local validation.
+- `set_connector_terminal_material`: Apply terminal material changes to validated connector ways.
+- `lock_wire_route`: Preserve forced routes for validated wire/segment references.
+- `clarification_required`: Return a non-mutating request for more user intent.
 
 # Identity and Position Resolution
 - The editable plan includes generated canvas positions when no persisted manual node position exists, so providers can reason over visible layout.
@@ -76,9 +82,8 @@ The application derives the following operation vocabulary from the before/after
 
 # Deferred operation vocabulary
 - `assign_endpoint`: Deferred to V2 because connector cavity and splice port assignment can invalidate occupancy rules.
-- `assign_catalog_reference`: Deferred to V2 because catalog material precedence needs richer preview.
-- `delete_entity`: Deferred until assisted mode and rollback have proven stable; remains blocked unless explicitly reintroduced.
-- `selected_harness_operation`: Deferred to V2 because selected harness means a saved multi-network harness assembly, not just the current network.
+- autonomous provider tool streaming and background execution;
+- persistent AI session history beyond the latest rollbackable session.
 
 # AC Traceability
 - request-AC5 -> backlog AC4, AC5, AC6, AC7, AC8, AC9.
@@ -120,11 +125,18 @@ The application derives the following operation vocabulary from the before/after
 - Add validator tests for permission gates, invalid IDs, invalid coordinates, and out-of-scope operations.
 - Run `npm run -s typecheck` and targeted test suites.
 
+# Delivery Status
+- Delivered in release `1.11.0`.
+- Context scopes cover active network, current selection, selected harness, and all networks.
+- Multi-network validation/apply uses `networkId` and rejects ambiguous operations.
+- Covered by `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`.
+- Validation evidence: AI context, operation contract, apply, plan diff, and proposal targeted tests plus lint/typecheck/build.
+
 # AI Context
 - Summary: Define scoped AI context and validated operation schema for AI-assisted Modeling changes.
-- Keywords: AI context, operation schema, validation, scope, current selection, active network, selected harness deferred, provider output
+- Keywords: AI context, operation schema, validation, scope, current selection, active network, selected harness, all networks, provider output
 - Use when: Implementing the shared foundation for assisted and experimental AI execution.
 - Skip when: Work only targets provider settings UI.
 
 # Tasks
-- none
+- `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`

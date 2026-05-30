@@ -1,10 +1,10 @@
 ## item_602_modeling_ai_agent_assisted_proposal_workflow - Modeling AI Agent Assisted Proposal Workflow
 > From version: 1.10.3
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 97%
-> Confidence: 90%
-> Progress: 0%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: High
 > Theme: AI
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -105,6 +105,14 @@ flowchart LR
 - Add reducer/history tests for grouped transaction application.
 - Run targeted Modeling UI tests, `npm run -s typecheck`, and `npm run -s lint`.
 
+# Delivery Status
+- Delivered in release `1.11.0`.
+- Modeling exposes the `AI Agent` entry beside `Wires`, gated by provider readiness.
+- Assisted mode prepares provider-backed or local fallback proposals, validates operations, exposes accepted/rejected/unsupported/warning details, and supports apply/reject.
+- Applied proposals create a rollbackable AI session and use the existing history replacement path.
+- Covered by `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`.
+- Validation evidence: AI proposal, provider client, plan diff, operation contract, apply, settings UI, and home UI targeted tests plus lint/typecheck/build.
+
 # AI Context
 - Summary: Add the default assisted AI Agent workflow in Modeling, with proposal review and grouped undoable apply.
 - Keywords: Modeling AI Agent, assisted mode, proposal, apply, reject, undo, operation summary
@@ -112,4 +120,4 @@ flowchart LR
 - Skip when: Implementing experimental direct execution.
 
 # Tasks
-- none
+- `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`

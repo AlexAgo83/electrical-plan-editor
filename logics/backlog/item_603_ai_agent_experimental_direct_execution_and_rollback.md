@@ -1,26 +1,28 @@
 ## item_603_ai_agent_experimental_direct_execution_and_rollback - AI Agent Experimental Direct Execution and Rollback
 > From version: 1.10.3
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 94%
-> Confidence: 82%
-> Progress: 0%
+> Status: In progress
+> Understanding: 98%
+> Confidence: 91%
+> Progress: 70%
 > Complexity: High
 > Theme: AI
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
 
 # Problem
 Advanced users want an experimental mode where the AI Agent can apply validated changes directly.
-This mode is useful only if it is explicitly gated, constrained by the same operation validator, and reversible as a single AI session.
+Release 1.11.0 delivers the settings gate, UI affordance, shared local validator/executor path, pre-apply snapshot, and latest-session rollback.
+True no-confirmation direct execution remains a follow-up so the first shipped mutation path stays reviewable.
 
 # Scope
 - In:
   - Gate direct execution behind the global AI settings opt-in.
   - Show direct execution as experimental in Modeling.
-  - Create a pre-run snapshot before direct execution.
+  - Create a pre-run snapshot before AI proposal application.
   - Execute only operations accepted by local validation.
   - Stop, skip, or reject invalid operations with visible result details.
   - Offer one-click rollback for the completed AI session.
+  - Keep 1.11.0 mutation behind the same validated proposal/apply controls until direct execution semantics are finalized.
 - Out:
   - Unbounded raw store mutation.
   - Deleting entities without explicit delete permission.
@@ -44,23 +46,24 @@ flowchart TD
 # Acceptance criteria
 - AC1: Experimental direct mode is unavailable until the global AI settings opt-in is enabled.
 - AC2: The UI clearly marks direct execution as experimental.
-- AC3: A pre-run snapshot is created before any direct execution mutation.
+- AC3: A pre-run snapshot is created before any AI proposal application.
 - AC4: Direct execution uses the same operation validator and executor as assisted mode.
 - AC5: Invalid, unsupported, or out-of-permission operations are rejected without mutation.
 - AC6: Delete operations remain blocked unless delete permission is explicitly enabled for the run.
 - AC7: The session result summarizes applied, rejected, skipped, and failed operations.
-- AC8: The user can roll back the whole direct execution session in one action.
+- AC8: The user can roll back the whole applied AI session in one action.
 - AC9: Rollback restores the exact pre-run modeling state.
-- AC10: Tests cover opt-in gating, snapshot creation, rejected direct operations, delete gating, successful direct apply, and rollback.
+- AC10: Tests cover opt-in gating, snapshot creation, rejected operations, delete gating, validated apply, and rollback.
 
 # AC Traceability
 - request-AC8 -> backlog AC1 and AC2.
-- request-AC9 -> backlog AC3, AC4, AC5.
-- request-AC10 -> backlog AC8 and AC9.
-- request-AC11 -> backlog AC4 and AC5.
-- request-AC12 -> backlog AC6.
-- request-AC13 -> backlog AC7.
-- request-AC15 -> backlog AC10.
+- request-AC9 -> backlog AC1 and AC2.
+- request-AC10 -> backlog AC3, AC4, and AC5.
+- request-AC11 -> backlog AC8 and AC9.
+- request-AC12 -> backlog AC4 and AC5.
+- request-AC13 -> backlog AC6.
+- request-AC14 -> backlog AC7.
+- request-AC16 -> backlog AC10.
 
 # Decision framing
 - Product framing: Covered by `prod_004_ai_agent_modeling_workspace`.
@@ -93,11 +96,18 @@ flowchart TD
 - Add destructive permission tests.
 - Run targeted AI Agent and history tests, `npm run -s typecheck`, and `npm run -s lint`.
 
+# Delivery Status
+- Partially delivered in release `1.11.0`.
+- Delivered: Settings opt-in, experimental mode UI gating, shared local validation/executor path, delete permission gating, impact summary, pre-apply snapshot, and latest-session rollback.
+- Not delivered yet: true one-click direct execution that skips the assisted proposal apply step.
+- Covered by `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`.
+- Validation evidence: AI apply, operation contract, proposal, settings UI, lint, typecheck, build, and Logics lint.
+
 # AI Context
-- Summary: Add opt-in experimental AI direct execution with pre-run snapshots and one-click rollback.
-- Keywords: experimental AI mode, direct execution, snapshot, rollback, permissions, delete gate
-- Use when: Implementing direct AI mutation behavior after assisted mode exists.
+- Summary: Add opt-in experimental AI mode affordance with validated apply, pre-run snapshots, and one-click rollback; true no-confirmation direct execution remains future work.
+- Keywords: experimental AI mode, direct execution follow-up, snapshot, rollback, permissions, delete gate
+- Use when: Implementing experimental AI mutation behavior after assisted mode exists.
 - Skip when: Implementing provider settings or assisted proposal review.
 
 # Tasks
-- none
+- `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`

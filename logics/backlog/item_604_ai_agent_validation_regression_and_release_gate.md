@@ -1,10 +1,10 @@
 ## item_604_ai_agent_validation_regression_and_release_gate - AI Agent Validation Regression and Release Gate
 > From version: 1.10.3
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 94%
-> Confidence: 87%
-> Progress: 0%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: AI
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -19,7 +19,7 @@ The feature needs explicit regression coverage and release gates before it can s
   - Add tests for provider settings and readiness states.
   - Add tests for context building and operation validation.
   - Add UI tests for assisted proposal review and grouped undo.
-  - Add tests for experimental direct execution rollback when that mode is implemented.
+  - Add tests for experimental mode gating and latest-session rollback.
   - Add documentation for unsupported provider or disabled AI states.
 - Out:
   - Replacing the full CI pipeline.
@@ -40,10 +40,10 @@ flowchart LR
 # Acceptance criteria
 - AC1: A validation matrix lists AI settings, context builder, operation validator, assisted workflow, experimental rollback, and release checks.
 - AC2: Provider settings tests cover persisted config, readiness, failed connection, and experimental opt-in gating.
-- AC3: Context builder tests cover selection, active network, missing scope, and selected-harness support or deferral.
+- AC3: Context builder tests cover selection, active network, selected harness, all networks, and missing scope.
 - AC4: Operation validator tests cover malformed operations, invalid IDs, out-of-scope operations, permission gates, and delete blocking.
 - AC5: Assisted workflow tests cover proposal summary, detail review, reject, apply, and single-action undo.
-- AC6: Experimental direct tests cover snapshot, valid operation execution, rejected operations, delete gating, and rollback.
+- AC6: Experimental-mode and rollback tests cover snapshot, valid operation application, rejected operations, delete gating, and rollback.
 - AC7: Live provider calls are not required in blocking CI; mocked provider behavior is enough for deterministic regression coverage.
 - AC8: Documentation explains disabled AI, missing provider, unsupported scope, failed validation, and rollback behavior.
 - AC9: The final task for the AI Agent feature records validation evidence before closure.
@@ -81,6 +81,12 @@ flowchart LR
 - Add pure validator tests for every operation family shipped in V1.
 - Run the relevant targeted suites plus `npm run -s typecheck`, `npm run -s lint`, and `npm run ci:blocking` before release closure.
 
+# Delivery Status
+- Delivered in release `1.11.0`.
+- Validation evidence is recorded in `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`.
+- Release gate evidence includes lint, typecheck, targeted AI/provider/settings/home tests, build, Logics lint, and a local live OpenAI smoke test with `.env.local`.
+- Blocking CI does not require live provider calls or GitHub-hosted API keys.
+
 # AI Context
 - Summary: Define regression coverage and release gates for AI-assisted Modeling.
 - Keywords: AI validation, regression, provider mock, operation validator, assisted workflow, rollback, release gate
@@ -88,4 +94,4 @@ flowchart LR
 - Skip when: Drafting product scope only.
 
 # Tasks
-- none
+- `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`

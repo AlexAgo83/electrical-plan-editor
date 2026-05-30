@@ -1,10 +1,10 @@
 ## adr_009_ai_agent_operation_contract_and_reversible_execution - AI Agent operation contract and reversible execution
 > Date: 2026-05-30
-> Status: Proposed
+> Status: Accepted
 > Drivers: AI-assisted modeling, local-first safety, reversible mutations, provider independence, domain validation
 > Related request: `req_128_ai_agent_modeling_workspace`
 > Related backlog: `item_600_ai_provider_settings_and_capability_contract`, `item_601_ai_agent_context_builder_and_operation_contract`, `item_602_modeling_ai_agent_assisted_proposal_workflow`, `item_603_ai_agent_experimental_direct_execution_and_rollback`, `item_604_ai_agent_validation_regression_and_release_gate`
-> Related task: TBD
+> Related task: `task_112_ai_agent_modeling_workspace_release_validation`
 > Reminder: Update status, linked refs, decision rationale, consequences, migration plan, and follow-up work when you edit this doc.
 
 # Overview
@@ -42,8 +42,8 @@ Use a provider-independent, operation-based architecture:
 - Support OpenAI and Gemini as the first provider adapters.
 - Let users enter API keys locally in app settings and persist those keys in local storage; `.env` keys may support developer workflows but are not the primary end-user path.
 - Use editable model-name fields for OpenAI and Gemini in V1 instead of a rigid model catalog.
-- Build scoped context from the current selection or active network in V1.
-- Defer selected-harness mutation scope to V2 because a selected harness is a saved multi-network harness assembly with a broader mutation surface than the active network.
+- Build scoped context from the current selection, active network, selected harness, or all networks in V1.11.0.
+- Require multi-network operations to carry an explicit or locally inferable `networkId`; reject ambiguous cross-network mutations.
 - Send structured context and user instructions to the configured provider through an `AIProviderService` boundary.
 - Prefer provider output as an edited scoped plan JSON, then derive app-owned operations from a local before/after diff.
 - Keep direct provider operation output as a compatibility path only.
@@ -61,12 +61,18 @@ The app then derives a narrow operation vocabulary from the diff and validates t
 
 The derived operation vocabulary should remain narrow and explicit.
 
-V1 families:
+V1.11.0 families:
 - `add_connector`, `add_splice`, `add_node`, `add_segment`, and tightly validated `add_wire`;
 - `move_entity`: connector, splice, node, or selected supported canvas entities;
+- `batch_move_entities`: grouped movement for multiple supported canvas entities;
 - `place_entity_relative_to_entity`: place a connector, splice, or node relative to another connector, splice, or node with explicit placement (`leftOf`, `rightOf`, `above`, `below`) and gap;
 - `update_entity`: label, technical ID, section, material, color, protection, route lock, display metadata;
-- `regenerate_route`: route recalculation within the current selection or active network.
+- `regenerate_route`: route recalculation within the selected scope;
+- `delete_entity`: destructive action, disabled by default and accepted only with explicit delete permission;
+- `create_catalog_item`, `assign_catalog_item`, and `update_catalog_connector_layout`;
+- `set_connector_terminal_material`;
+- `lock_wire_route`;
+- `clarification_required`: non-mutating provider request for missing user intent.
 
 V1 also accepts bounded identity resolution for provider output:
 - exact internal IDs remain preferred;
@@ -80,9 +86,8 @@ When no persisted manual canvas position exists, validation may use the generate
 
 Deferred families:
 - `assign_endpoint`: connector cavity or splice port assignment;
-- `assign_catalog_reference`: connector, splice, terminal, seal, plug, or protection catalog association;
-- `delete_entity`: destructive action, disabled until the assisted workflow and rollback path are proven;
-- selected-harness multi-network operations.
+- autonomous provider tool streaming and background execution;
+- persistent AI session history beyond the latest rollbackable session.
 
 Each operation should carry:
 - operation ID;
@@ -124,11 +129,17 @@ Validation must reject or downgrade operations when:
 - Some desired AI actions will be unsupported until the operation vocabulary expands.
 
 # Migration and rollout
-- Wave 1: AI settings and provider capability contract.
-- Wave 2: scoped context builder and operation schema/validator.
-- Wave 3: assisted proposal UI and grouped apply/reject behavior.
-- Wave 4: experimental direct execution using the same validator/executor path.
-- Wave 5: regression coverage, release gates, and Logics closure.
+- Wave 1: AI settings and provider capability contract. Delivered in `1.11.0`.
+- Wave 2: scoped context builder and operation schema/validator. Delivered in `1.11.0`.
+- Wave 3: assisted proposal UI and grouped apply/reject behavior. Delivered in `1.11.0`.
+- Wave 4: experimental mode gate plus shared validated apply/rollback path. Delivered in `1.11.0`; true no-confirmation direct execution remains future work.
+- Wave 5: regression coverage, release gates, and Logics closure. Delivered in `1.11.0`.
+
+# Delivery Status
+- Accepted for release `1.11.0`.
+- Closure task: `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`.
+- Release notes: `changelogs/CHANGELOGS_1_11_0.md`.
+- Validation evidence includes lint, typecheck, AI/provider/settings targeted tests, build, Logics lint, and a local live OpenAI smoke test with `.env.local`.
 
 # References
 - `logics/request/req_128_ai_agent_modeling_workspace.md`
@@ -138,6 +149,6 @@ Validation must reject or downgrade operations when:
 - `logics/architecture/adr_008_audit_hardening_delivery_strategy_for_security_ci_bundle_and_maintainability.md`
 
 # Follow-up work
-- Confirm implementation-time default model names for OpenAI and Gemini.
-- Define the exact user-facing copy that explains API keys are stored locally.
-- Add a task-level validation matrix when implementation begins.
+- Add true one-click direct execution semantics that run validated operations without the assisted proposal apply step.
+- Add endpoint assignment operations when occupancy preview is rich enough.
+- Add persistent AI session history if users need more than latest-session rollback.

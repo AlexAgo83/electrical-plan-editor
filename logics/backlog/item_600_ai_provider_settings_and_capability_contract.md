@@ -1,10 +1,10 @@
 ## item_600_ai_provider_settings_and_capability_contract - AI Provider Settings and Capability Contract
 > From version: 1.10.3
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 99%
-> Confidence: 93%
-> Progress: 0%
+> Confidence: 97%
+> Progress: 100%
 > Complexity: Medium
 > Theme: AI
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -92,6 +92,12 @@ flowchart LR
 - Add UI coverage for provider selection, connection test states, and experimental opt-in gating.
 - Run `npm run -s typecheck` and `npm run -s lint`.
 
+# Delivery Status
+- Delivered in release `1.11.0`.
+- Settings includes OpenAI/Gemini provider selection, editable model/endpoint/timeout/strictness, local API key storage, connection testing, readiness reporting, and experimental mode opt-in.
+- Covered by `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`.
+- Validation evidence: targeted settings/provider tests, lint, typecheck, build, and a local live OpenAI smoke test with `.env.local`.
+
 # AI Context
 - Summary: Add provider-neutral AI settings and capability reporting for the Modeling AI Agent.
 - Keywords: AI settings, OpenAI, Gemini, provider, editable model name, endpoint, local storage API key, capability contract, experimental opt-in
@@ -99,4 +105,4 @@ flowchart LR
 - Skip when: Implementing Modeling operation validation or rollback behavior.
 
 # Tasks
-- none
+- `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`

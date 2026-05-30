@@ -1,16 +1,16 @@
 ## prod_004_ai_agent_modeling_workspace - AI Agent Modeling Workspace
 > Date: 2026-05-30
-> Status: Draft
+> Status: Validated
 > Related request: `req_128_ai_agent_modeling_workspace`
 > Related backlog: `item_600_ai_provider_settings_and_capability_contract`, `item_601_ai_agent_context_builder_and_operation_contract`, `item_602_modeling_ai_agent_assisted_proposal_workflow`, `item_603_ai_agent_experimental_direct_execution_and_rollback`, `item_604_ai_agent_validation_regression_and_release_gate`
-> Related task: TBD
+> Related task: `task_112_ai_agent_modeling_workspace_release_validation`
 > Related architecture: `adr_009_ai_agent_operation_contract_and_reversible_execution`
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
 
 # Overview
 The product direction is to add an `AI Agent` workspace inside Modeling that helps users modify harness and network data through controlled, reversible operations.
 
-The agent should accelerate real Modeling work: creating or adjusting connectors, splices, wires, nodes, routes, catalog assignments, labels, and selected-harness context. It should not become a generic chatbot or an external sidecar. The user stays inside the Modeling workflow, chooses a target scope, gives an instruction, grants permissions, and either reviews a proposal or runs an experimental direct execution.
+The agent should accelerate real Modeling work: creating or adjusting connectors, splices, wires, nodes, routes, catalog assignments, labels, and selected-harness context. It should not become a generic chatbot or an external sidecar. The user stays inside the Modeling workflow, chooses a target scope, gives an instruction, grants permissions, and either reviews a proposal or uses the gated experimental mode affordance.
 
 The central product rule is reversibility. Every AI session must be grouped, visible, and undoable in one action.
 
@@ -20,7 +20,7 @@ flowchart LR
     Agent --> Scope[Selection, network, or harness scope]
     Scope --> Context[Structured agent context]
     Context --> Proposal[Assisted proposal]
-    Context --> Direct[Experimental direct execution]
+    Context --> Direct[Experimental mode]
     Proposal --> Transaction[Grouped history transaction]
     Direct --> Transaction
     Transaction --> Undo[One-click undo or rollback]
@@ -164,17 +164,17 @@ User instruction
 ## Experimental direct mode
 Experimental mode is opt-in and should be visually distinct.
 
-The agent can apply validated operations without asking for confirmation after each operation. The app still owns all mutation, validation, history, and rollback behavior.
+In 1.11.0, experimental mode is gated in Settings but still uses the same validated proposal/apply controls before mutation. The app owns all mutation, validation, history, and rollback behavior.
 
-Expected flow:
+Delivered 1.11.0 flow:
 
 ```text
 User instruction
 -> Snapshot
 -> Build scoped context
--> Agent calls bounded operations
--> Local validation per operation
--> Direct application
+-> Agent proposes bounded operations
+-> Local validation
+-> User applies accepted operations
 -> Summary
 -> One-click rollback
 ```
@@ -233,8 +233,8 @@ Required safeguards:
 - The operation contract is the shared foundation for both modes.
 - The app validates and executes operations; the provider only proposes or requests them.
 - Undo/rollback is a non-negotiable product requirement.
-- V1 should start with current-selection and active-network scopes; selected-harness scope is deferred to V2 because it spans multiple networks and has a larger mutation blast radius.
-- V1 should start with add, move, update, and route-regeneration operations; endpoint assignment, catalog assignment, delete, and selected-harness mutation should follow after the core contract is proven.
+- V1.11.0 ships active-network, current-selection, selected-harness, and all-networks context scopes; multi-network mutation requires explicit or inferable `networkId` targeting.
+- V1.11.0 ships add, move, update, route, delete, catalog assignment, connector layout, terminal-material, batch move, and route-lock operation families behind local validation and permissions.
 
 # Functional Scope
 In scope:
@@ -259,27 +259,26 @@ Out of scope:
 - unbounded tool execution.
 
 # MVP Direction
-Recommended V1:
+Delivered in V1.11.0:
 - AI settings with OpenAI and Gemini provider adapters behind one provider abstraction;
 - user-entered API keys persisted in local storage, with optional `.env` keys for development/test workflows;
 - editable model-name fields for OpenAI and Gemini instead of a fixed model selector;
 - Modeling `AI Agent` entry;
 - assisted mode only enabled by default;
-- scope limited to current selection or active network;
-- operation vocabulary limited to safe add, move, update, and route-regeneration operations;
-- delete unavailable or disabled by default;
+- scope support for current selection, active network, selected harness, and all networks;
+- operation vocabulary for safe add, move, update, route, delete, catalog, connector layout, terminal material, and batch movement operations;
+- delete disabled by default and gated by explicit permission;
 - validation summary and operation details;
 - apply as one history transaction;
-- undo restores the previous state.
+- undo restores the previous state;
+- impact preview and rollback for the last applied AI session.
 
 Recommended V2:
-- experimental direct execution;
-- selected-harness scope;
+- true one-click direct execution without the assisted proposal apply step;
 - endpoint assignment tools;
-- catalog-reference assignment tools;
 - richer visual diff on canvas;
 - session history;
-- provider capability reporting.
+- expanded provider capability reporting and local/custom provider support.
 
 # Success Signals
 - Users understand that the AI Agent modifies Modeling data through controlled operations.
@@ -291,10 +290,15 @@ Recommended V2:
 - The operation contract can support new actions without widening raw state access.
 
 # Open Questions
-- Which OpenAI and Gemini default model names should prefill the editable fields at implementation time?
 - How detailed should the visual diff be before V1 ships?
-- Should experimental mode require a per-run confirmation even after it is enabled in Settings?
+- Should true direct execution require a per-run confirmation even after it is enabled in Settings?
 - Should the app keep an AI session history, or only the latest session summary?
+
+# Delivery Status
+- Delivered in release `1.11.0`.
+- Closure task: `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`.
+- Release notes: `changelogs/CHANGELOGS_1_11_0.md`.
+- Validation evidence includes lint, typecheck, AI/provider/settings/home targeted tests, build, Logics lint, and a local live OpenAI smoke test with `.env.local`.
 
 # References
 - `logics/request/req_127_selected_harness_agent_json_export.md`
