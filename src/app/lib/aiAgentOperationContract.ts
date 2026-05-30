@@ -1,10 +1,26 @@
 import type { AppState, LayoutNodePosition, SelectionState } from "../../store/types";
-import type { CatalogItemId, ConnectorId, NodeId, SegmentId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
+import type {
+  CatalogItemId,
+  ConnectorId,
+  ConnectorTerminalMaterial,
+  NodeId,
+  SegmentId,
+  SpliceId,
+  WireEndpoint,
+  WireId
+} from "../../core/entities";
+import {
+  analyzeCatalogDeleteImpact,
+  analyzeConnectorDeleteImpact,
+  analyzeNodeDeleteImpact,
+  analyzeSegmentDeleteImpact,
+  analyzeSpliceDeleteImpact
+} from "../../store/deleteImpact";
 import { createNodePositionMap } from "./layout/generation";
 
 export const AI_AGENT_OPERATION_SCHEMA_VERSION = 1;
 
-export type AiAgentScope = "activeNetwork" | "currentSelection";
+export type AiAgentScope = "activeNetwork" | "currentSelection" | "selectedHarness" | "allNetworks";
 
 export interface AiAgentOperationPermissions {
   add: boolean;
@@ -45,7 +61,12 @@ export type AiAgentSupportedOperation =
   | AiAgentPlaceEntityRelativeToEntityOperation
   | AiAgentUpdateEntityOperation
   | AiAgentRegenerateRouteOperation
-  | AiAgentDeleteEntityOperation;
+  | AiAgentDeleteEntityOperation
+  | AiAgentCreateCatalogItemOperation
+  | AiAgentAssignCatalogItemOperation
+  | AiAgentSetConnectorTerminalMaterialOperation
+  | AiAgentLockWireRouteOperation
+  | AiAgentClarificationRequiredOperation;
 
 export interface AiAgentAddConnectorOperation {
   type: "add_connector";
@@ -121,13 +142,50 @@ export interface AiAgentUpdateEntityOperation {
 
 export interface AiAgentDeleteEntityOperation {
   type: "delete_entity";
-  entityKind: "wire";
+  entityKind: "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
   entityId: string;
+  mode?: "direct" | "cascade";
 }
 
 export interface AiAgentRegenerateRouteOperation {
   type: "regenerate_route";
   wireIds: WireId[];
+}
+
+export interface AiAgentLockWireRouteOperation {
+  type: "lock_wire_route";
+  wireId: WireId;
+  segmentIds: SegmentId[];
+}
+
+export interface AiAgentCreateCatalogItemOperation {
+  type: "create_catalog_item";
+  id?: CatalogItemId;
+  manufacturerReference: string;
+  name?: string;
+  connectionCount: number;
+  unitPriceExclTax?: number;
+  url?: string;
+}
+
+export interface AiAgentAssignCatalogItemOperation {
+  type: "assign_catalog_item";
+  entityKind: "connector" | "splice" | "wireProtection";
+  entityId: string;
+  catalogItemId: string;
+}
+
+export interface AiAgentSetConnectorTerminalMaterialOperation {
+  type: "set_connector_terminal_material";
+  connectorId: string;
+  cavityIndex: number;
+  material: ConnectorTerminalMaterial;
+}
+
+export interface AiAgentClarificationRequiredOperation {
+  type: "clarification_required";
+  question: string;
+  reasons: string[];
 }
 
 interface ValidateAiAgentOperationsParams {
@@ -188,6 +246,34 @@ function readOptionalRecord(value: unknown): Record<string, unknown> | undefined
 
 function readOptionalArray(value: unknown): unknown[] | undefined {
   return Array.isArray(value) ? value : undefined;
+}
+
+function readOptionalNonNegativeNumber(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : undefined;
+}
+
+function readTerminalMaterial(value: unknown): ConnectorTerminalMaterial | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+  const material: ConnectorTerminalMaterial = {};
+  const terminalReference = readOptionalString(value.terminalReference);
+  const terminalName = readOptionalString(value.terminalName);
+  const sealReference = readOptionalString(value.sealReference);
+  const sealName = readOptionalString(value.sealName);
+  if (terminalReference !== undefined && terminalReference.length > 0) {
+    material.terminalReference = terminalReference;
+  }
+  if (terminalName !== undefined && terminalName.length > 0) {
+    material.terminalName = terminalName;
+  }
+  if (sealReference !== undefined && sealReference.length > 0) {
+    material.sealReference = sealReference;
+  }
+  if (sealName !== undefined && sealName.length > 0) {
+    material.sealName = sealName;
+  }
+  return Object.keys(material).length > 0 ? material : null;
 }
 
 function normalizeEntityReference(value: string): string {
@@ -582,12 +668,66 @@ function parseOperation(
   if (type === "assign_endpoint" || type === "assign_catalog_reference") {
     return unsupported(operationIndex, type, `${type} is not supported in the V1 AI operation contract.`);
   }
+  if (type === "clarification_required") {
+    const question = readString(operation.question);
+    const reasons = readStringArray(operation.reasons);
+    return question !== null
+      ? { type, question, reasons: reasons ?? [] }
+      : reject(operationIndex, type, "Clarification requests require a user-facing question.");
+  }
   if (type === "delete_entity") {
     const entityKind = readString(operation.entityKind);
     const entityId = readString(operation.entityId);
-    return entityKind === "wire" && entityId !== null
-      ? { type, entityKind, entityId }
-      : unsupported(operationIndex, type, "Only wire delete_entity operations are supported in the V1 AI operation contract.");
+    const mode = operation.mode === "cascade" ? "cascade" : "direct";
+    return (entityKind === "catalog" ||
+      entityKind === "connector" ||
+      entityKind === "splice" ||
+      entityKind === "node" ||
+      entityKind === "segment" ||
+      entityKind === "wire") &&
+      entityId !== null
+      ? { type, entityKind, entityId, mode }
+      : reject(operationIndex, type, "Delete operation requires a supported entityKind and entityId.");
+  }
+
+  if (type === "create_catalog_item") {
+    const id = readString(operation.id);
+    const manufacturerReference = readString(operation.manufacturerReference);
+    const name = readOptionalString(operation.name);
+    const connectionCount = readPositiveNumber(operation.connectionCount);
+    const unitPriceExclTax = readOptionalNonNegativeNumber(operation.unitPriceExclTax);
+    const url = readOptionalString(operation.url);
+    return manufacturerReference !== null && connectionCount !== null
+      ? {
+          type,
+          ...(id === null ? {} : { id: id as CatalogItemId }),
+          manufacturerReference,
+          ...(name === undefined || name.length === 0 ? {} : { name }),
+          connectionCount,
+          ...(unitPriceExclTax === undefined ? {} : { unitPriceExclTax }),
+          ...(url === undefined || url.length === 0 ? {} : { url })
+        }
+      : reject(operationIndex, type, "Catalog item creation requires manufacturerReference and connectionCount.");
+  }
+
+  if (type === "assign_catalog_item") {
+    const entityKind = readString(operation.entityKind);
+    const entityId = readString(operation.entityId);
+    const catalogItemId = readString(operation.catalogItemId);
+    return (entityKind === "connector" || entityKind === "splice" || entityKind === "wireProtection") &&
+      entityId !== null &&
+      catalogItemId !== null
+      ? { type, entityKind, entityId, catalogItemId }
+      : reject(operationIndex, type, "Catalog assignment requires entityKind, entityId, and catalogItemId.");
+  }
+
+  if (type === "set_connector_terminal_material") {
+    const connectorId = readString(operation.connectorId);
+    const cavityIndex = readPositiveNumber(operation.cavityIndex);
+    const material = readTerminalMaterial(operation.material);
+    return connectorId !== null && cavityIndex !== null && material !== null
+      ? { type, connectorId, cavityIndex, material }
+      : reject(operationIndex, type, "Connector terminal material requires connectorId, cavityIndex, and material.");
   }
 
   if (type === "add_connector") {
@@ -714,6 +854,14 @@ function parseOperation(
     return wireIds !== null
       ? { type, wireIds: wireIds as WireId[] }
       : reject(operationIndex, type, "Route regeneration requires wireIds.");
+  }
+
+  if (type === "lock_wire_route") {
+    const wireId = readString(operation.wireId);
+    const segmentIds = readStringArray(operation.segmentIds);
+    return wireId !== null && segmentIds !== null && segmentIds.length > 0
+      ? { type, wireId: wireId as WireId, segmentIds: segmentIds as SegmentId[] }
+      : reject(operationIndex, type, "Wire route lock requires wireId and segmentIds.");
   }
 
   return unsupported(operationIndex, type, `${type} is not supported in the V1 AI operation contract.`);
@@ -884,6 +1032,25 @@ function normalizeOperationEntityReferences(state: AppState, operation: AiAgentS
       entityId: resolveEntityId(state, operation.entityKind, operation.entityId)
     };
   }
+  if (operation.type === "assign_catalog_item") {
+    return {
+      ...operation,
+      entityId: operation.entityKind === "wireProtection" ? resolveEntityId(state, "wire", operation.entityId) : resolveEntityId(state, operation.entityKind, operation.entityId),
+      catalogItemId: resolveEntityId(state, "catalog", operation.catalogItemId)
+    };
+  }
+  if (operation.type === "set_connector_terminal_material") {
+    return {
+      ...operation,
+      connectorId: resolveEntityId(state, "connector", operation.connectorId)
+    };
+  }
+  if (operation.type === "lock_wire_route") {
+    return {
+      ...operation,
+      wireId: resolveEntityId(state, "wire", operation.wireId) as WireId
+    };
+  }
   return operation;
 }
 
@@ -950,6 +1117,19 @@ function permissionForOperation(operation: AiAgentSupportedOperation): keyof AiA
   ) {
     return "add";
   }
+  if (operation.type === "create_catalog_item") {
+    return "add";
+  }
+  if (
+    operation.type === "assign_catalog_item" ||
+    operation.type === "set_connector_terminal_material" ||
+    operation.type === "lock_wire_route"
+  ) {
+    return "update";
+  }
+  if (operation.type === "clarification_required") {
+    return "update";
+  }
   if (operation.type === "move_entity") {
     return "move";
   }
@@ -970,7 +1150,8 @@ function entityExists(
   operation: AiAgentSupportedOperation,
   prospectiveNodeIds: Set<string>,
   prospectiveConnectors: Map<string, number>,
-  prospectiveSplices: Map<string, number>
+  prospectiveSplices: Map<string, number>,
+  prospectiveCatalogItems: Set<string>
 ): boolean {
   const endpointExists = (endpoint: WireEndpoint): boolean => {
     if (endpoint.kind === "connectorCavity") {
@@ -1003,10 +1184,66 @@ function entityExists(
   if (operation.type === "add_wire") {
     return endpointExists(operation.endpointA) && endpointExists(operation.endpointB);
   }
+  if (operation.type === "create_catalog_item") {
+    return (
+      (operation.id === undefined || state.catalogItems.byId[operation.id] === undefined) &&
+      !state.catalogItems.allIds.some(
+        (catalogItemId) =>
+          normalizeTechnicalId(state.catalogItems.byId[catalogItemId]?.manufacturerReference ?? "") ===
+          normalizeTechnicalId(operation.manufacturerReference)
+      )
+    );
+  }
+  if (operation.type === "assign_catalog_item") {
+    const catalogItem = state.catalogItems.byId[operation.catalogItemId as CatalogItemId];
+    if (catalogItem === undefined && !prospectiveCatalogItems.has(operation.catalogItemId)) {
+      return false;
+    }
+    if (operation.entityKind === "connector") {
+      return state.connectors.byId[operation.entityId as ConnectorId] !== undefined;
+    }
+    if (operation.entityKind === "splice") {
+      return state.splices.byId[operation.entityId as SpliceId] !== undefined;
+    }
+    return state.wires.byId[operation.entityId as WireId] !== undefined;
+  }
+  if (operation.type === "set_connector_terminal_material") {
+    const connector = state.connectors.byId[operation.connectorId as ConnectorId];
+    return (
+      connector !== undefined &&
+      Number.isInteger(operation.cavityIndex) &&
+      operation.cavityIndex >= 1 &&
+      operation.cavityIndex <= connector.cavityCount
+    );
+  }
   if (operation.type === "regenerate_route") {
     return operation.wireIds.every((wireId) => state.wires.byId[wireId] !== undefined);
   }
+  if (operation.type === "lock_wire_route") {
+    return (
+      state.wires.byId[operation.wireId] !== undefined &&
+      operation.segmentIds.every((segmentId) => state.segments.byId[segmentId] !== undefined)
+    );
+  }
+  if (operation.type === "clarification_required") {
+    return true;
+  }
   if (operation.type === "delete_entity") {
+    if (operation.entityKind === "catalog") {
+      return state.catalogItems.byId[operation.entityId as CatalogItemId] !== undefined;
+    }
+    if (operation.entityKind === "connector") {
+      return state.connectors.byId[operation.entityId as ConnectorId] !== undefined;
+    }
+    if (operation.entityKind === "splice") {
+      return state.splices.byId[operation.entityId as SpliceId] !== undefined;
+    }
+    if (operation.entityKind === "node") {
+      return state.nodes.byId[operation.entityId as NodeId] !== undefined;
+    }
+    if (operation.entityKind === "segment") {
+      return state.segments.byId[operation.entityId as SegmentId] !== undefined;
+    }
     return state.wires.byId[operation.entityId as WireId] !== undefined;
   }
   if (operation.type === "move_entity" || operation.type === "place_entity_relative_to_entity" || operation.type === "update_entity") {
@@ -1197,6 +1434,42 @@ function prospectiveTechnicalIdConflictMessage(
   return null;
 }
 
+function deleteImpactMessage(state: AppState, operation: AiAgentDeleteEntityOperation): string | null {
+  if (operation.entityKind === "wire") {
+    return null;
+  }
+  if (operation.entityKind === "catalog") {
+    const impact = analyzeCatalogDeleteImpact(state, operation.entityId as CatalogItemId);
+    return impact.kind === "direct" ? null : impact.message;
+  }
+  if (operation.entityKind === "connector") {
+    const impact = analyzeConnectorDeleteImpact(state, operation.entityId as ConnectorId);
+    if (impact.kind === "direct") {
+      return null;
+    }
+    if (impact.kind === "cascade" && operation.mode === "cascade") {
+      return null;
+    }
+    return impact.message;
+  }
+  if (operation.entityKind === "splice") {
+    const impact = analyzeSpliceDeleteImpact(state, operation.entityId as SpliceId);
+    if (impact.kind === "direct") {
+      return null;
+    }
+    if (impact.kind === "cascade" && operation.mode === "cascade") {
+      return null;
+    }
+    return impact.message;
+  }
+  if (operation.entityKind === "node") {
+    const impact = analyzeNodeDeleteImpact(state, operation.entityId as NodeId);
+    return impact.kind === "direct" ? null : impact.message;
+  }
+  const impact = analyzeSegmentDeleteImpact(state, operation.entityId as SegmentId);
+  return impact.kind === "direct" ? null : impact.message;
+}
+
 function entityReferenceExists(
   state: AppState,
   entityKind: AiAgentPlaceEntityRelativeToEntityOperation["referenceEntityKind"],
@@ -1222,7 +1495,19 @@ function isWithinSelectionScope(operation: AiAgentSupportedOperation, selection:
     return selection.kind === "wire" && operation.wireIds.includes(selection.id as WireId);
   }
   if (operation.type === "delete_entity") {
-    return selection.kind === "wire" && operation.entityId === selection.id;
+    return operation.entityKind === selection.kind && operation.entityId === selection.id;
+  }
+  if (operation.type === "assign_catalog_item") {
+    if (operation.entityKind === "wireProtection") {
+      return selection.kind === "wire" && operation.entityId === selection.id;
+    }
+    return selection.kind === operation.entityKind && operation.entityId === selection.id;
+  }
+  if (operation.type === "set_connector_terminal_material") {
+    return selection.kind === "connector" && operation.connectorId === selection.id;
+  }
+  if (operation.type === "lock_wire_route") {
+    return selection.kind === "wire" && operation.wireId === selection.id;
   }
   return true;
 }
@@ -1250,8 +1535,10 @@ export function validateAiAgentOperations({
   const prospectiveNodeIds = new Set<string>(state.nodes.allIds);
   const prospectiveConnectors = new Map<string, number>();
   const prospectiveSplices = new Map<string, number>();
+  const prospectiveCatalogItems = new Set<string>();
   const prospectiveConnectorReferences = new Map<string, string>();
   const prospectiveSpliceReferences = new Map<string, string>();
+  const prospectiveCatalogReferences = new Map<string, string>();
   const prospectiveNodeReferences = new Map<string, string>();
   const prospectiveWireEndpointKeys = new Set<string>();
   const prospectiveConnectorTechnicalIds = new Set<string>();
@@ -1275,101 +1562,149 @@ export function validateAiAgentOperations({
       prospectiveSpliceReferences,
       prospectiveNodeReferences
     );
+    const prospectiveNormalized =
+      normalized.type === "assign_catalog_item"
+        ? {
+            ...normalized,
+            catalogItemId: resolveProspectiveReference(prospectiveCatalogReferences, normalized.catalogItemId)
+          }
+        : normalized;
     const permission = permissionForOperation(normalized);
+    if (prospectiveNormalized.type === "clarification_required") {
+      result.rejected.push(
+        reject(
+          operationIndex,
+          prospectiveNormalized.type,
+          `Clarification required: ${prospectiveNormalized.question}${
+            prospectiveNormalized.reasons.length === 0 ? "" : ` (${prospectiveNormalized.reasons.join("; ")})`
+          }`
+        )
+      );
+      return;
+    }
     if (!permissions[permission]) {
-      result.rejected.push(reject(operationIndex, normalized.type, `${permission} permission is disabled.`));
+      result.rejected.push(reject(operationIndex, prospectiveNormalized.type, `${permission} permission is disabled.`));
       return;
     }
-    if (!entityExists(state, normalized, prospectiveNodeIds, prospectiveConnectors, prospectiveSplices)) {
-      result.rejected.push(reject(operationIndex, normalized.type, "Operation references unknown modeling entities."));
+    if (
+      !entityExists(
+        state,
+        prospectiveNormalized,
+        prospectiveNodeIds,
+        prospectiveConnectors,
+        prospectiveSplices,
+        prospectiveCatalogItems
+      )
+    ) {
+      result.rejected.push(reject(operationIndex, prospectiveNormalized.type, "Operation references unknown modeling entities."));
       return;
     }
-    const existingTechnicalIdMessage = existingTechnicalIdConflictMessage(state, normalized);
+    const existingTechnicalIdMessage = existingTechnicalIdConflictMessage(state, prospectiveNormalized);
     if (existingTechnicalIdMessage !== null) {
-      result.rejected.push(reject(operationIndex, normalized.type, existingTechnicalIdMessage));
+      result.rejected.push(reject(operationIndex, prospectiveNormalized.type, existingTechnicalIdMessage));
       return;
     }
     const prospectiveTechnicalIdMessage = prospectiveTechnicalIdConflictMessage(
-      normalized,
+      prospectiveNormalized,
       prospectiveConnectorTechnicalIds,
       prospectiveSpliceTechnicalIds,
       prospectiveWireTechnicalIds
     );
     if (prospectiveTechnicalIdMessage !== null) {
-      result.rejected.push(reject(operationIndex, normalized.type, prospectiveTechnicalIdMessage));
+      result.rejected.push(reject(operationIndex, prospectiveNormalized.type, prospectiveTechnicalIdMessage));
+      return;
+    }
+    if (prospectiveNormalized.type === "delete_entity") {
+      const impactMessage = deleteImpactMessage(state, prospectiveNormalized);
+      if (impactMessage !== null) {
+        result.rejected.push(reject(operationIndex, prospectiveNormalized.type, impactMessage));
+        return;
+      }
+    }
+    if (prospectiveNormalized.type === "assign_catalog_item" && !prospectiveCatalogItems.has(prospectiveNormalized.catalogItemId) && state.catalogItems.byId[prospectiveNormalized.catalogItemId as CatalogItemId] === undefined) {
+      result.rejected.push(reject(operationIndex, prospectiveNormalized.type, "Operation references unknown modeling entities."));
       return;
     }
     if (
-      normalized.type === "place_entity_relative_to_entity" &&
-      !entityReferenceExists(state, normalized.referenceEntityKind, normalized.referenceEntityId)
+      prospectiveNormalized.type === "place_entity_relative_to_entity" &&
+      !entityReferenceExists(state, prospectiveNormalized.referenceEntityKind, prospectiveNormalized.referenceEntityId)
     ) {
-      result.rejected.push(reject(operationIndex, normalized.type, "Relative placement references an unknown anchor entity."));
+      result.rejected.push(reject(operationIndex, prospectiveNormalized.type, "Relative placement references an unknown anchor entity."));
       return;
     }
     if (
-      (normalized.type === "move_entity" || normalized.type === "place_entity_relative_to_entity") &&
-      normalized.position === undefined
+      (prospectiveNormalized.type === "move_entity" || prospectiveNormalized.type === "place_entity_relative_to_entity") &&
+      prospectiveNormalized.position === undefined
     ) {
-      result.rejected.push(reject(operationIndex, normalized.type, "Move operation could not resolve a canvas position."));
+      result.rejected.push(reject(operationIndex, prospectiveNormalized.type, "Move operation could not resolve a canvas position."));
       return;
     }
-    const endpointConflictMessage = wireEndpointConflictMessage(state, normalized);
+    const endpointConflictMessage = wireEndpointConflictMessage(state, prospectiveNormalized);
     if (endpointConflictMessage !== null) {
-      result.rejected.push(reject(operationIndex, normalized.type, endpointConflictMessage));
+      result.rejected.push(reject(operationIndex, prospectiveNormalized.type, endpointConflictMessage));
       return;
     }
-    const prospectiveEndpointConflictMessage = prospectiveWireEndpointConflictMessage(normalized, prospectiveWireEndpointKeys);
+    const prospectiveEndpointConflictMessage = prospectiveWireEndpointConflictMessage(prospectiveNormalized, prospectiveWireEndpointKeys);
     if (prospectiveEndpointConflictMessage !== null) {
-      result.rejected.push(reject(operationIndex, normalized.type, prospectiveEndpointConflictMessage));
+      result.rejected.push(reject(operationIndex, prospectiveNormalized.type, prospectiveEndpointConflictMessage));
       return;
     }
-    if (scope === "currentSelection" && !isWithinSelectionScope(normalized, selection)) {
-      result.rejected.push(reject(operationIndex, normalized.type, "Operation is outside the current selection scope."));
+    if (scope === "currentSelection" && !isWithinSelectionScope(prospectiveNormalized, selection)) {
+      result.rejected.push(reject(operationIndex, prospectiveNormalized.type, "Operation is outside the current selection scope."));
       return;
     }
 
-    result.accepted.push(normalized);
-    if (normalized.type === "add_connector" && normalized.id !== undefined) {
-      prospectiveConnectors.set(normalized.id, normalized.cavityCount);
-      prospectiveConnectorTechnicalIds.add(normalizeTechnicalId(normalized.technicalId));
-      addProspectiveReferences(prospectiveConnectorReferences, normalized.id, [normalized.id, normalized.technicalId, normalized.name]);
-      if (normalized.nodeId !== undefined) {
-        prospectiveNodeIds.add(normalized.nodeId);
-        addProspectiveReferences(prospectiveNodeReferences, normalized.nodeId, [normalized.nodeId, normalized.technicalId, normalized.name]);
+    result.accepted.push(prospectiveNormalized);
+    if (prospectiveNormalized.type === "create_catalog_item") {
+      const catalogItemId = prospectiveNormalized.id ?? (`AI-CAT-${String(prospectiveCatalogItems.size + 1).padStart(3, "0")}` as CatalogItemId);
+      prospectiveCatalogItems.add(catalogItemId);
+      addProspectiveReferences(prospectiveCatalogReferences, catalogItemId, [
+        catalogItemId,
+        prospectiveNormalized.manufacturerReference,
+        prospectiveNormalized.name ?? ""
+      ]);
+    }
+    if (prospectiveNormalized.type === "add_connector" && prospectiveNormalized.id !== undefined) {
+      prospectiveConnectors.set(prospectiveNormalized.id, prospectiveNormalized.cavityCount);
+      prospectiveConnectorTechnicalIds.add(normalizeTechnicalId(prospectiveNormalized.technicalId));
+      addProspectiveReferences(prospectiveConnectorReferences, prospectiveNormalized.id, [prospectiveNormalized.id, prospectiveNormalized.technicalId, prospectiveNormalized.name]);
+      if (prospectiveNormalized.nodeId !== undefined) {
+        prospectiveNodeIds.add(prospectiveNormalized.nodeId);
+        addProspectiveReferences(prospectiveNodeReferences, prospectiveNormalized.nodeId, [prospectiveNormalized.nodeId, prospectiveNormalized.technicalId, prospectiveNormalized.name]);
       }
     }
-    if (normalized.type === "add_splice" && normalized.id !== undefined) {
-      prospectiveSplices.set(normalized.id, normalized.portCount);
-      prospectiveSpliceTechnicalIds.add(normalizeTechnicalId(normalized.technicalId));
-      addProspectiveReferences(prospectiveSpliceReferences, normalized.id, [normalized.id, normalized.technicalId, normalized.name]);
-      if (normalized.nodeId !== undefined) {
-        prospectiveNodeIds.add(normalized.nodeId);
-        addProspectiveReferences(prospectiveNodeReferences, normalized.nodeId, [normalized.nodeId, normalized.technicalId, normalized.name]);
+    if (prospectiveNormalized.type === "add_splice" && prospectiveNormalized.id !== undefined) {
+      prospectiveSplices.set(prospectiveNormalized.id, prospectiveNormalized.portCount);
+      prospectiveSpliceTechnicalIds.add(normalizeTechnicalId(prospectiveNormalized.technicalId));
+      addProspectiveReferences(prospectiveSpliceReferences, prospectiveNormalized.id, [prospectiveNormalized.id, prospectiveNormalized.technicalId, prospectiveNormalized.name]);
+      if (prospectiveNormalized.nodeId !== undefined) {
+        prospectiveNodeIds.add(prospectiveNormalized.nodeId);
+        addProspectiveReferences(prospectiveNodeReferences, prospectiveNormalized.nodeId, [prospectiveNormalized.nodeId, prospectiveNormalized.technicalId, prospectiveNormalized.name]);
       }
     }
-    if (normalized.type === "add_node" && normalized.id !== undefined) {
-      prospectiveNodeIds.add(normalized.id);
-      addProspectiveReferences(prospectiveNodeReferences, normalized.id, [normalized.id, normalized.label]);
+    if (prospectiveNormalized.type === "add_node" && prospectiveNormalized.id !== undefined) {
+      prospectiveNodeIds.add(prospectiveNormalized.id);
+      addProspectiveReferences(prospectiveNodeReferences, prospectiveNormalized.id, [prospectiveNormalized.id, prospectiveNormalized.label]);
     }
-    if (normalized.type === "add_wire") {
-      prospectiveWireTechnicalIds.add(normalizeTechnicalId(normalized.technicalId));
-      prospectiveWireEndpointKeys.add(wireEndpointKey(normalized.endpointA));
-      prospectiveWireEndpointKeys.add(wireEndpointKey(normalized.endpointB));
+    if (prospectiveNormalized.type === "add_wire") {
+      prospectiveWireTechnicalIds.add(normalizeTechnicalId(prospectiveNormalized.technicalId));
+      prospectiveWireEndpointKeys.add(wireEndpointKey(prospectiveNormalized.endpointA));
+      prospectiveWireEndpointKeys.add(wireEndpointKey(prospectiveNormalized.endpointB));
     }
-    if (normalized.type === "update_entity" && typeof normalized.fields.technicalId === "string") {
-      if (normalized.entityKind === "connector") {
-        prospectiveConnectorTechnicalIds.add(normalizeTechnicalId(normalized.fields.technicalId));
+    if (prospectiveNormalized.type === "update_entity" && typeof prospectiveNormalized.fields.technicalId === "string") {
+      if (prospectiveNormalized.entityKind === "connector") {
+        prospectiveConnectorTechnicalIds.add(normalizeTechnicalId(prospectiveNormalized.fields.technicalId));
       }
-      if (normalized.entityKind === "splice") {
-        prospectiveSpliceTechnicalIds.add(normalizeTechnicalId(normalized.fields.technicalId));
+      if (prospectiveNormalized.entityKind === "splice") {
+        prospectiveSpliceTechnicalIds.add(normalizeTechnicalId(prospectiveNormalized.fields.technicalId));
       }
-      if (normalized.entityKind === "wire") {
-        prospectiveWireTechnicalIds.add(normalizeTechnicalId(normalized.fields.technicalId));
+      if (prospectiveNormalized.entityKind === "wire") {
+        prospectiveWireTechnicalIds.add(normalizeTechnicalId(prospectiveNormalized.fields.technicalId));
       }
     }
-    if (normalized.type === "update_entity" && normalized.entityKind === "wire") {
-      const endpointA = normalized.fields.endpointA as WireEndpoint | undefined;
-      const endpointB = normalized.fields.endpointB as WireEndpoint | undefined;
+    if (prospectiveNormalized.type === "update_entity" && prospectiveNormalized.entityKind === "wire") {
+      const endpointA = prospectiveNormalized.fields.endpointA as WireEndpoint | undefined;
+      const endpointB = prospectiveNormalized.fields.endpointB as WireEndpoint | undefined;
       if (endpointA !== undefined) {
         prospectiveWireEndpointKeys.add(wireEndpointKey(endpointA));
       }
