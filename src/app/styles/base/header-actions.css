@@ -89,10 +89,12 @@
 }
 
 .header-update-toggle {
-  --header-update-glow-color: color-mix(in srgb, var(--theme-primary, currentColor) 24%, #fff);
+  --header-update-glow-color: color-mix(in srgb, var(--theme-primary, currentColor) 42%, #5ef08a);
+  --header-update-glow-accent: color-mix(in srgb, var(--theme-primary, currentColor) 32%, #d8ffe5);
 
   border-color: #2f8f4e;
-  background: #e5f6eb;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, #f7fff9 86%, var(--theme-primary, currentColor) 14%), #dff5e7);
   color: #19542d;
   display: inline-flex;
   align-items: center;
@@ -114,44 +116,112 @@
 
 .header-update-toggle.is-ready-glow {
   box-shadow:
-    0 0 0.12rem color-mix(in srgb, var(--header-update-glow-color) 16%, transparent),
-    0 0 0.38rem color-mix(in srgb, var(--header-update-glow-color) 22%, transparent),
-    0 0 0.72rem color-mix(in srgb, var(--header-update-glow-color) 24%, transparent);
+    inset 0 1px 0 color-mix(in srgb, #fff 72%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--header-update-glow-color) 36%, transparent),
+    0 0 0.42rem color-mix(in srgb, var(--header-update-glow-color) 38%, transparent),
+    0 0 1.15rem color-mix(in srgb, var(--header-update-glow-color) 34%, transparent);
 }
 
+.header-update-toggle.is-ready-glow::before,
 .header-update-toggle.is-ready-glow::after {
   content: "";
   position: absolute;
-  inset: -0.32rem;
   z-index: -1;
-  border-radius: 0.72rem;
-  background: color-mix(in srgb, var(--header-update-glow-color) 18%, transparent);
-  box-shadow:
-    0 0 0.78rem color-mix(in srgb, var(--header-update-glow-color) 30%, transparent),
-    0 0 1.36rem color-mix(in srgb, var(--header-update-glow-color) 34%, transparent);
-  opacity: 0.36;
   pointer-events: none;
-  transform: scale(0.94);
-  animation: header-update-glow-breathe 4.8s ease-in-out infinite;
+}
+
+.header-update-toggle.is-ready-glow::before {
+  inset: -0.18rem;
+  border-radius: 0.64rem;
+  background:
+    conic-gradient(
+      from var(--header-update-glow-angle, 0deg),
+      transparent 0deg,
+      color-mix(in srgb, var(--header-update-glow-accent) 22%, transparent) 54deg,
+      color-mix(in srgb, var(--header-update-glow-color) 82%, transparent) 96deg,
+      color-mix(in srgb, var(--header-update-glow-accent) 28%, transparent) 138deg,
+      transparent 210deg,
+      transparent 360deg
+    );
+  filter: blur(0.02rem);
+  opacity: 0.82;
+  transform: scale(1);
+  animation:
+    header-update-glow-orbit 3.8s linear infinite,
+    header-update-glow-ring 2.4s ease-in-out infinite;
   will-change: opacity, transform;
+}
+
+.header-update-toggle.is-ready-glow::after {
+  inset: -0.42rem;
+  border-radius: 0.86rem;
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      color-mix(in srgb, var(--header-update-glow-accent) 34%, transparent) 0%,
+      color-mix(in srgb, var(--header-update-glow-color) 18%, transparent) 48%,
+      transparent 74%
+    );
+  box-shadow:
+    0 0 0.85rem color-mix(in srgb, var(--header-update-glow-color) 38%, transparent),
+    0 0 1.75rem color-mix(in srgb, var(--header-update-glow-color) 32%, transparent),
+    0 0 2.7rem color-mix(in srgb, var(--header-update-glow-accent) 18%, transparent);
+  opacity: 0.5;
+  transform: scale(0.95);
+  animation: header-update-glow-breathe 3.4s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+@property --header-update-glow-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes header-update-glow-orbit {
+  to {
+    --header-update-glow-angle: 360deg;
+  }
+}
+
+@keyframes header-update-glow-ring {
+  0%,
+  100% {
+    opacity: 0.52;
+    transform: scale(0.985);
+  }
+
+  50% {
+    opacity: 0.95;
+    transform: scale(1.025);
+  }
 }
 
 @keyframes header-update-glow-breathe {
   0%,
   100% {
-    opacity: 0.24;
+    opacity: 0.34;
     transform: scale(0.94);
   }
 
   50% {
-    opacity: 0.7;
-    transform: scale(1);
+    opacity: 0.82;
+    transform: scale(1.04);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .header-update-toggle.is-ready-glow::before,
   .header-update-toggle.is-ready-glow::after {
     animation: none;
+  }
+
+  .header-update-toggle.is-ready-glow::before {
+    opacity: 0.58;
+  }
+
+  .header-update-toggle.is-ready-glow::after {
+    opacity: 0.44;
   }
 }
 

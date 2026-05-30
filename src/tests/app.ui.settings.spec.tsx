@@ -874,7 +874,7 @@ describe("App integration UI - settings", () => {
     fireEvent.change(headerSearchInput, { target: { value: "tax" } });
 
     const sourceSearchInput = within(sourceSearchField as HTMLElement).getByRole("searchbox");
-    expect(sourceSearchInput.value).toBe("tax");
+    expect(sourceSearchInput).toHaveValue("tax");
     expect(screen.getByRole("status")).toHaveTextContent("matching setting labels");
   });
 
