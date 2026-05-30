@@ -1,10 +1,10 @@
 ## item_605_settings_search_and_label_highlighting - Settings search and label highlighting
 > From version: 1.11.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -83,6 +83,7 @@ flowchart LR
 - Hybrid rationale: First delivery slice from `req_131_settings_search_and_sectioned_navigation`, intentionally scoped to search/highlight before the larger layout refactor.
 - Source file: `logics/request/req_131_settings_search_and_sectioned_navigation.md`.
 - Generated locally by logics-manager.
+- Task `task_113_settings_search_and_label_highlighting` was finished via `logics-manager flow finish task` on 2026-05-30.
 
 # Tasks
 - `task_113_settings_search_and_label_highlighting`

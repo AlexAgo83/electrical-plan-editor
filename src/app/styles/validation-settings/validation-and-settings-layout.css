@@ -152,6 +152,149 @@
   margin-bottom: 0.65rem;
 }
 
+.settings-workspace {
+  display: grid;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.settings-search-toolbar {
+  display: grid;
+  grid-template-columns: minmax(16rem, 1fr) auto;
+  align-items: end;
+  gap: 0.65rem;
+}
+
+.settings-search-field {
+  display: grid;
+  gap: 0.32rem;
+  min-width: 0;
+  font-size: 0.9rem;
+  color: inherit;
+}
+
+.settings-search-field > span {
+  font-weight: 700;
+}
+
+.settings-search-field input {
+  width: 100%;
+  min-width: 0;
+  border-radius: 0.55rem;
+  border: 1px solid color-mix(in srgb, currentColor 26%, transparent);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 3%, #fff);
+  color: inherit;
+  font: inherit;
+  padding: 0.5rem 0.65rem;
+}
+
+.settings-search-summary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  min-width: 0;
+  color: color-mix(in srgb, currentColor 82%, transparent);
+  font-size: 0.84rem;
+}
+
+.settings-search-summary.is-empty {
+  color: color-mix(in srgb, currentColor 86%, var(--theme-primary, currentColor));
+}
+
+.settings-search-summary button {
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 42%, transparent);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 12%, transparent);
+  color: inherit;
+  border-radius: 0.5rem;
+  padding: 0.32rem 0.62rem;
+}
+
+.settings-sectioned-layout {
+  display: grid;
+  grid-template-columns: minmax(11rem, 14rem) minmax(0, 1fr);
+  align-items: start;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.settings-section-nav {
+  position: sticky;
+  top: 4.85rem;
+  display: grid;
+  gap: 0.28rem;
+  min-width: 0;
+  padding: 0.55rem;
+}
+
+.settings-section-nav-title {
+  margin: 0 0 0.2rem;
+  color: color-mix(in srgb, currentColor 72%, transparent);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.settings-section-nav-button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.84rem;
+  line-height: 1.15;
+  padding: 0.35rem 0.42rem;
+  text-align: left;
+}
+
+.settings-section-nav-button:hover,
+.settings-section-nav-button:focus-visible {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 42%, transparent);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 12%, transparent);
+}
+
+.settings-section-nav-button.is-dimmed {
+  opacity: 0.72;
+}
+
+.settings-section-match-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 14%, transparent);
+  color: inherit;
+  font-size: 0.74rem;
+  font-variant-numeric: tabular-nums;
+  padding: 0.08rem 0.34rem;
+}
+
+.settings-workspace .settings-section-list {
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  scroll-margin-top: 1rem;
+}
+
+.settings-workspace .settings-section-list > .settings-panel {
+  grid-column: 1;
+  scroll-margin-top: 5.2rem;
+}
+
+.settings-search-highlight {
+  border-radius: 0.22rem;
+  background: #ffe38a;
+  color: inherit;
+  padding: 0 0.08rem;
+}
+
 .settings-checkbox {
   display: flex;
   align-items: center;
@@ -515,6 +658,27 @@
 @container settings-import-export-panel (min-width: 656px) {
   .settings-import-export-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 860px) {
+  .settings-search-toolbar,
+  .settings-sectioned-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-section-nav {
+    position: static;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+  }
+
+  .settings-section-nav-title {
+    grid-column: 1 / -1;
+  }
+
+  .settings-search-summary {
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 }
 

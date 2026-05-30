@@ -1,21 +1,21 @@
 ## task_114_settings_section_glossary_and_grouped_preferences_layout - Settings section glossary and grouped preferences layout
 > From version: 1.11.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Definition of Done (DoD)
-- [ ] Settings are grouped into stable named sections.
-- [ ] Desktop/tablet Settings layout provides a left section glossary and right grouped settings list.
-- [ ] Mobile/narrow layout keeps all settings reachable without overlap.
-- [ ] Search results from `task_113` are reflected in the section glossary.
-- [ ] Existing Settings workflows still pass after layout migration.
-- [ ] Validation passes.
+- [x] Settings are grouped into stable named sections.
+- [x] Desktop/tablet Settings layout provides a left section glossary and right grouped settings list.
+- [x] Mobile/narrow layout keeps all settings reachable without overlap.
+- [x] Search results from `task_113` are reflected in the section glossary.
+- [x] Existing Settings workflows still pass after layout migration.
+- [x] Validation passes.
 
 # Backlog
 - `item_606_settings_section_glossary_and_grouped_preferences_layout`
@@ -61,9 +61,14 @@ flowchart LR
 - Run `npm run -s typecheck`.
 - Run focused Settings UI tests covering section navigation and migrated workflows.
 - Run `python3 -m logics_manager flow finish task task_114_settings_section_glossary_and_grouped_preferences_layout.md` after implementation.
+- Finish workflow executed on 2026-05-30.
+- Linked backlog/request close verification passed.
 
 # Report
 - Not started.
+- Finished on 2026-05-30.
+- Linked backlog item(s): `item_606_settings_section_glossary_and_grouped_preferences_layout`
+- Related request(s): `req_131_settings_search_and_sectioned_navigation`
 
 # AI Context
 - Summary: Implement settings section glossary and grouped preferences layout.

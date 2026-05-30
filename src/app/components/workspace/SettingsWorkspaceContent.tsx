@@ -1,4 +1,4 @@
-import type { ChangeEvent, ReactElement, RefObject } from "react";
+import { useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import { ImportOverwriteDialog } from "../dialogs/ImportOverwriteDialog";
 import type { NetworkId } from "../../../core/entities";
@@ -24,6 +24,132 @@ import type {
   WorkspacePanelsLayoutMode
 } from "../../types/app-controller";
 import type { ImportExportStatus } from "../../types/app-controller";
+
+interface SettingsSectionDefinition {
+  id: string;
+  title: string;
+  labels: string[];
+}
+
+const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
+  {
+    id: "settings-ai-provider",
+    title: "AI provider",
+    labels: ["Provider", "Model", "API key", "Endpoint", "Timeout (ms)", "Strict structured output mode", "Enable experimental direct execution"]
+  },
+  {
+    id: "settings-canvas-render",
+    title: "Canvas render preferences",
+    labels: [
+      "Label stroke mode",
+      "2D label size",
+      "Callout text size",
+      "Connector drawing display",
+      "Connector drawing size (%)",
+      "Summary global scale (%)",
+      "Auto segment label rotation",
+      "2D label rotation",
+      "Reset zoom target (%)",
+      "Viewport resize behavior"
+    ]
+  },
+  {
+    id: "settings-canvas-tools",
+    title: "Canvas tools preferences",
+    labels: [
+      "Show grid by default",
+      "Snap node movement by default",
+      "Lock node movement by default",
+      "Show info overlays by default",
+      "Show segment names",
+      "Show segment lengths by default",
+      "Show connector/splice cable callouts by default",
+      "Show only selected connector/splice callout",
+      "Show wire names in callout table",
+      "Keep connector/splice/node shape size constant while zooming",
+      "Node shape target size (%)",
+      "Include background in PNG export",
+      "Include frame in SVG/PNG export",
+      "Include identity cartouche in SVG/PNG export"
+    ]
+  },
+  {
+    id: "settings-appearance",
+    title: "Appearance preferences",
+    labels: ["Theme mode", "Table density", "Table font size", "Default sort column", "Default sort direction", "Default ID sort direction"]
+  },
+  {
+    id: "settings-global-preferences",
+    title: "Global preferences",
+    labels: [
+      "Show floating inspector panel on supported screens",
+      "Show route preview panel",
+      "Hide Wire analysis auto route panel",
+      "Workspace panels layout",
+      "Wide screen (remove app max width cap)",
+      "Default wire section (mm²)",
+      "Default auto-create linked nodes for connectors/splices",
+      "Directional splice imbalance limit (%)",
+      "Language"
+    ]
+  },
+  {
+    id: "settings-shortcuts",
+    title: "Action bar and shortcuts",
+    labels: ["Show shortcut hints in the action bar", "Enable keyboard shortcuts (undo/redo/navigation/issues/view)", "Restore network viewport on undo/redo"]
+  },
+  {
+    id: "settings-catalog-bom",
+    title: "Catalog & BOM setup",
+    labels: ["Currency (Catalog/BOM)", "Enable tax / VAT (TVA)", "Tabular export format", "Compact BOM export columns", "Hide BOM traceability labels", "Tax rate (%)"]
+  },
+  {
+    id: "settings-import-export",
+    title: "Import / Export networks",
+    labels: ["Selected networks for export", "Export active", "Export selected", "Export all", "Import from file"]
+  },
+  {
+    id: "settings-sample-network",
+    title: "Sample network controls",
+    labels: ["Recreate sample network", "Reset sample network to baseline"]
+  }
+];
+
+function normalizeSettingsSearch(value: string): string {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+function settingsLabelMatches(label: string, normalizedQuery: string): boolean {
+  return normalizedQuery.length > 0 && label.toLowerCase().includes(normalizedQuery);
+}
+
+function sectionMatches(section: SettingsSectionDefinition, normalizedQuery: string): number {
+  if (normalizedQuery.length === 0) {
+    return 0;
+  }
+
+  return [section.title, ...section.labels].filter((label) => settingsLabelMatches(label, normalizedQuery)).length;
+}
+
+function SettingsLabelText({ text, normalizedQuery }: { text: string; normalizedQuery: string }): ReactElement {
+  if (!settingsLabelMatches(text, normalizedQuery)) {
+    return <>{text}</>;
+  }
+
+  const lowerText = text.toLowerCase();
+  const matchIndex = lowerText.indexOf(normalizedQuery);
+  const before = text.slice(0, matchIndex);
+  const match = text.slice(matchIndex, matchIndex + normalizedQuery.length);
+  const after = text.slice(matchIndex + normalizedQuery.length);
+
+  return (
+    <>
+      {before}
+      <mark className="settings-search-highlight">{match}</mark>
+      {after}
+    </>
+  );
+}
 
 interface SettingsWorkspaceContentProps {
   isCurrentWorkspaceEmpty: boolean;
@@ -271,9 +397,62 @@ export function SettingsWorkspaceContent({
   aiSettings
 }: SettingsWorkspaceContentProps): ReactElement {
   const activeAiProviderConfig = aiSettings.settings.providers[aiSettings.settings.provider];
+  const [settingsSearchQuery, setSettingsSearchQuery] = useState("");
+  const normalizedSettingsSearch = normalizeSettingsSearch(settingsSearchQuery);
+  const matchedSectionCounts = SETTINGS_SECTIONS.map((section) => ({
+    id: section.id,
+    count: sectionMatches(section, normalizedSettingsSearch)
+  }));
+  const totalMatchCount = matchedSectionCounts.reduce((total, section) => total + section.count, 0);
+  const hasSearchQuery = normalizedSettingsSearch.length > 0;
+  const contentRef = useRef<HTMLElement | null>(null);
+  const renderSettingLabel = (text: string): ReactNode => (
+    <SettingsLabelText text={text} normalizedQuery={normalizedSettingsSearch} />
+  );
+  const scrollToSettingsSection = (sectionId: string): void => {
+    const sectionElement = contentRef.current?.querySelector<HTMLElement>(`#${sectionId}`);
+    sectionElement?.scrollIntoView({ block: "start", behavior: "smooth" });
+  };
+
   return (
-    <section className="panel-grid settings-panel-grid">
-      <section className="panel settings-panel" data-onboarding-panel="settings-ai-provider">
+    <section className="settings-workspace" aria-label="Settings workspace">
+      <div className="settings-search-toolbar">
+        <label className="settings-search-field">
+          <span>Search settings</span>
+          <input
+            type="search"
+            value={settingsSearchQuery}
+            onChange={(event) => setSettingsSearchQuery(event.target.value)}
+            placeholder="Search by setting label"
+          />
+        </label>
+        {hasSearchQuery ? (
+          <div className={totalMatchCount > 0 ? "settings-search-summary" : "settings-search-summary is-empty"} role="status">
+            {totalMatchCount > 0 ? `${totalMatchCount} matching setting label${totalMatchCount === 1 ? "" : "s"}` : "No setting label matches this search."}
+            <button type="button" onClick={() => setSettingsSearchQuery("")}>Clear</button>
+          </div>
+        ) : null}
+      </div>
+      <div className="settings-sectioned-layout">
+        <nav className="panel settings-panel settings-section-nav" aria-label="Settings sections">
+          <p className="settings-section-nav-title">Sections</p>
+          {SETTINGS_SECTIONS.map((section) => {
+            const matchCount = matchedSectionCounts.find((entry) => entry.id === section.id)?.count ?? 0;
+            return (
+              <button
+                key={section.id}
+                type="button"
+                className={hasSearchQuery && matchCount === 0 ? "settings-section-nav-button is-dimmed" : "settings-section-nav-button"}
+                onClick={() => scrollToSettingsSection(section.id)}
+              >
+                <span>{section.title}</span>
+                {hasSearchQuery ? <span className="settings-section-match-count">{matchCount}</span> : null}
+              </button>
+            );
+          })}
+        </nav>
+        <section ref={contentRef} className="panel-grid settings-panel-grid settings-section-list" aria-label="Settings sections list">
+      <section id="settings-ai-provider" className="panel settings-panel" data-onboarding-panel="settings-ai-provider">
         <header className="settings-panel-header">
           <h2>AI provider</h2>
           <span className="settings-panel-chip">AI</span>
@@ -289,7 +468,7 @@ export function SettingsWorkspaceContent({
         </div>
         <div className="settings-grid">
           <label className="settings-field">
-            Provider
+            {renderSettingLabel("Provider")}
             <select
               value={aiSettings.settings.provider}
               onChange={(event) => aiSettings.setProvider(event.target.value as AiProviderId)}
@@ -299,7 +478,7 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
-            Model
+            {renderSettingLabel("Model")}
             <input
               type="text"
               value={activeAiProviderConfig.model}
@@ -308,7 +487,7 @@ export function SettingsWorkspaceContent({
             />
           </label>
           <label className="settings-field">
-            API key
+            {renderSettingLabel("API key")}
             <input
               type="password"
               value={activeAiProviderConfig.apiKey}
@@ -318,7 +497,7 @@ export function SettingsWorkspaceContent({
             />
           </label>
           <label className="settings-field">
-            Endpoint
+            {renderSettingLabel("Endpoint")}
             <input
               type="url"
               value={activeAiProviderConfig.endpoint}
@@ -326,7 +505,7 @@ export function SettingsWorkspaceContent({
             />
           </label>
           <label className="settings-field">
-            Timeout (ms)
+            {renderSettingLabel("Timeout (ms)")}
             <input
               type="number"
               min={5000}
@@ -348,7 +527,7 @@ export function SettingsWorkspaceContent({
               checked={aiSettings.settings.strictMode}
               onChange={(event) => aiSettings.setStrictMode(event.target.checked)}
             />
-            Strict structured output mode
+            {renderSettingLabel("Strict structured output mode")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -356,7 +535,7 @@ export function SettingsWorkspaceContent({
               checked={aiSettings.settings.experimentalDirectExecutionEnabled}
               onChange={(event) => aiSettings.setExperimentalDirectExecutionEnabled(event.target.checked)}
             />
-            Enable experimental direct execution
+            {renderSettingLabel("Enable experimental direct execution")}
           </label>
         </div>
         <div className="row-actions settings-actions">
@@ -373,7 +552,7 @@ export function SettingsWorkspaceContent({
         <p className="meta-line">{aiSettings.connectionTest.message}</p>
       </section>
 
-      <section className="panel settings-panel">
+      <section id="settings-canvas-render" className="panel settings-panel">
         <header className="settings-panel-header">
           <h2>Canvas render preferences</h2>
           <span className="settings-panel-chip">Canvas Render</span>
@@ -381,7 +560,7 @@ export function SettingsWorkspaceContent({
         <p className="settings-panel-intro">Typography and rendering defaults used for labels, callouts, and view reset behavior.</p>
         <div className="settings-grid">
           <label className="settings-field">
-            Label stroke mode
+            {renderSettingLabel("Label stroke mode")}
             <select
               value={canvasDefaultLabelStrokeMode}
               onChange={(event) => setCanvasDefaultLabelStrokeMode(event.target.value as CanvasLabelStrokeMode)}
@@ -392,7 +571,7 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
-            2D label size
+            {renderSettingLabel("2D label size")}
             <select
               value={canvasDefaultLabelSizeMode}
               onChange={(event) => setCanvasDefaultLabelSizeMode(event.target.value as CanvasLabelSizeMode)}
@@ -405,7 +584,7 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
-            Callout text size
+            {renderSettingLabel("Callout text size")}
             <select
               value={canvasDefaultCalloutTextSize}
               onChange={(event) => setCanvasDefaultCalloutTextSize(event.target.value as CanvasCalloutTextSize)}
@@ -416,7 +595,7 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
-            Connector drawing display
+            {renderSettingLabel("Connector drawing display")}
             <select
               value={canvasConnectorDrawingDisplayMode}
               onChange={(event) => {
@@ -433,7 +612,7 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field settings-range-field">
-            Connector drawing size (%)
+            {renderSettingLabel("Connector drawing size (%)")}
             <div className="settings-range-control">
               <input
                 className="settings-range-input"
@@ -455,7 +634,7 @@ export function SettingsWorkspaceContent({
             </div>
           </label>
           <label className="settings-field settings-range-field">
-            Summary global scale (%)
+            {renderSettingLabel("Summary global scale (%)")}
             <div className="settings-range-control">
               <input
                 className="settings-range-input"
@@ -476,7 +655,7 @@ export function SettingsWorkspaceContent({
             </div>
           </label>
           <label className="settings-field">
-            Auto segment label rotation
+            {renderSettingLabel("Auto segment label rotation")}
             <select
               value={canvasDefaultAutoSegmentLabelRotation ? "yes" : "no"}
               onChange={(event) => setCanvasDefaultAutoSegmentLabelRotation(event.target.value === "yes")}
@@ -486,7 +665,7 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
-            2D label rotation
+            {renderSettingLabel("2D label rotation")}
             <select
               value={String(canvasDefaultLabelRotationDegrees)}
               disabled={canvasDefaultAutoSegmentLabelRotation}
@@ -502,11 +681,11 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
-            Reset zoom target (%)
+            {renderSettingLabel("Reset zoom target (%)")}
             <input type="number" value={canvasResetZoomPercentInput} onChange={(event) => setCanvasResetZoomPercentInput(event.target.value)} />
           </label>
           <label className="settings-field">
-            Viewport resize behavior
+            {renderSettingLabel("Viewport resize behavior")}
             <select
               value={canvasResizeBehaviorMode}
               disabled
@@ -521,7 +700,7 @@ export function SettingsWorkspaceContent({
         </div>
       </section>
 
-      <section className="panel settings-panel">
+      <section id="settings-canvas-tools" className="panel settings-panel">
         <header className="settings-panel-header">
           <h2>Canvas tools preferences</h2>
           <span className="settings-panel-chip">Canvas Tools</span>
@@ -530,7 +709,7 @@ export function SettingsWorkspaceContent({
         <div className="settings-grid">
           <label className="settings-checkbox">
             <input type="checkbox" checked={canvasDefaultShowGrid} onChange={(event) => setCanvasDefaultShowGrid(event.target.checked)} />
-            Show grid by default
+            {renderSettingLabel("Show grid by default")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -538,7 +717,7 @@ export function SettingsWorkspaceContent({
               checked={canvasDefaultSnapToGrid}
               onChange={(event) => setCanvasDefaultSnapToGrid(event.target.checked)}
             />
-            Snap node movement by default
+            {renderSettingLabel("Snap node movement by default")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -546,7 +725,7 @@ export function SettingsWorkspaceContent({
               checked={canvasDefaultLockEntityMovement}
               onChange={(event) => setCanvasDefaultLockEntityMovement(event.target.checked)}
             />
-            Lock node movement by default
+            {renderSettingLabel("Lock node movement by default")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -554,7 +733,7 @@ export function SettingsWorkspaceContent({
               checked={canvasDefaultShowInfoPanels}
               onChange={(event) => setCanvasDefaultShowInfoPanels(event.target.checked)}
             />
-            Show info overlays by default
+            {renderSettingLabel("Show info overlays by default")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -562,7 +741,7 @@ export function SettingsWorkspaceContent({
               checked={showSegmentNames}
               onChange={(event) => setShowSegmentNames(event.target.checked)}
             />
-            Show segment names
+            {renderSettingLabel("Show segment names")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -570,7 +749,7 @@ export function SettingsWorkspaceContent({
               checked={canvasDefaultShowSegmentLengths}
               onChange={(event) => setCanvasDefaultShowSegmentLengths(event.target.checked)}
             />
-            Show segment lengths by default
+            {renderSettingLabel("Show segment lengths by default")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -578,7 +757,7 @@ export function SettingsWorkspaceContent({
               checked={canvasDefaultShowCableCallouts}
               onChange={(event) => setCanvasDefaultShowCableCallouts(event.target.checked)}
             />
-            Show connector/splice cable callouts by default
+            {renderSettingLabel("Show connector/splice cable callouts by default")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -590,7 +769,7 @@ export function SettingsWorkspaceContent({
                 setShowSelectedCalloutOnly(checked);
               }}
             />
-            Show only selected connector/splice callout
+            {renderSettingLabel("Show only selected connector/splice callout")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -598,7 +777,7 @@ export function SettingsWorkspaceContent({
               checked={canvasShowCalloutWireNames}
               onChange={(event) => setCanvasShowCalloutWireNames(event.target.checked)}
             />
-            Show wire names in callout table
+            {renderSettingLabel("Show wire names in callout table")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -606,10 +785,10 @@ export function SettingsWorkspaceContent({
               checked={canvasZoomInvariantNodeShapes}
               onChange={(event) => setCanvasZoomInvariantNodeShapes(event.target.checked)}
             />
-            Keep connector/splice/node shape size constant while zooming
+            {renderSettingLabel("Keep connector/splice/node shape size constant while zooming")}
           </label>
           <label className="settings-field settings-range-field">
-            Node shape target size (%)
+            {renderSettingLabel("Node shape target size (%)")}
             <div className="settings-range-control">
               <input
                 className="settings-range-input"
@@ -636,7 +815,7 @@ export function SettingsWorkspaceContent({
               checked={canvasPngExportIncludeBackground}
               onChange={(event) => setCanvasPngExportIncludeBackground(event.target.checked)}
             />
-            Include background in PNG export
+            {renderSettingLabel("Include background in PNG export")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -644,7 +823,7 @@ export function SettingsWorkspaceContent({
               checked={canvasExportIncludeFrame}
               onChange={(event) => setCanvasExportIncludeFrame(event.target.checked)}
             />
-            Include frame in SVG/PNG export
+            {renderSettingLabel("Include frame in SVG/PNG export")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -652,12 +831,12 @@ export function SettingsWorkspaceContent({
               checked={canvasExportIncludeCartouche}
               onChange={(event) => setCanvasExportIncludeCartouche(event.target.checked)}
             />
-            Include identity cartouche in SVG/PNG export
+            {renderSettingLabel("Include identity cartouche in SVG/PNG export")}
           </label>
         </div>
       </section>
 
-      <section className="panel settings-panel">
+      <section id="settings-appearance" className="panel settings-panel">
         <header className="settings-panel-header">
           <h2>Appearance preferences</h2>
           <span className="settings-panel-chip">Display</span>
@@ -665,7 +844,7 @@ export function SettingsWorkspaceContent({
         <p className="settings-panel-intro">Global visual defaults for theme, table typography, density, and sorting across modeling and analysis views.</p>
         <div className="settings-grid">
           <label className="settings-field">
-            Theme mode
+            {renderSettingLabel("Theme mode")}
             <select value={themeMode} onChange={(event) => setThemeMode(event.target.value as ThemeMode)}>
               {THEME_MODE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -675,14 +854,14 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
-            Table density
+            {renderSettingLabel("Table density")}
             <select value={tableDensity} onChange={(event) => setTableDensity(event.target.value as TableDensity)}>
               <option value="comfortable">Comfortable</option>
               <option value="compact">Compact</option>
             </select>
           </label>
           <label className="settings-field">
-            Table font size
+            {renderSettingLabel("Table font size")}
             <select value={tableFontSize} onChange={(event) => setTableFontSize(event.target.value as TableFontSize)}>
               <option value="small">Small</option>
               <option value="normal">Normal</option>
@@ -690,21 +869,21 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
-            Default sort column
+            {renderSettingLabel("Default sort column")}
             <select value={defaultSortField} onChange={(event) => setDefaultSortField(event.target.value as SortField)}>
               <option value="name">Name</option>
               <option value="technicalId">Technical ID</option>
             </select>
           </label>
           <label className="settings-field">
-            Default sort direction
+            {renderSettingLabel("Default sort direction")}
             <select value={defaultSortDirection} onChange={(event) => setDefaultSortDirection(event.target.value as SortDirection)}>
               <option value="asc">Ascending</option>
               <option value="desc">Descending</option>
             </select>
           </label>
           <label className="settings-field">
-            Default ID sort direction
+            {renderSettingLabel("Default ID sort direction")}
             <select value={defaultIdSortDirection} onChange={(event) => setDefaultIdSortDirection(event.target.value as SortDirection)}>
               <option value="asc">Ascending</option>
               <option value="desc">Descending</option>
@@ -713,7 +892,7 @@ export function SettingsWorkspaceContent({
         </div>
       </section>
 
-      <section className="panel settings-panel" data-onboarding-panel="settings-global-preferences">
+      <section id="settings-global-preferences" className="panel settings-panel" data-onboarding-panel="settings-global-preferences">
         <header className="settings-panel-header">
           <h2>Global preferences</h2>
           <span className="settings-panel-chip">Defaults</span>
@@ -726,7 +905,7 @@ export function SettingsWorkspaceContent({
               checked={showFloatingInspectorPanel}
               onChange={(event) => setShowFloatingInspectorPanel(event.target.checked)}
             />
-            Show floating inspector panel on supported screens
+            {renderSettingLabel("Show floating inspector panel on supported screens")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -734,7 +913,7 @@ export function SettingsWorkspaceContent({
               checked={showRoutePreviewPanel}
               onChange={(event) => setShowRoutePreviewPanel(event.target.checked)}
             />
-            Show route preview panel
+            {renderSettingLabel("Show route preview panel")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -742,10 +921,10 @@ export function SettingsWorkspaceContent({
               checked={hideWireAnalysisRoutePanel}
               onChange={(event) => setHideWireAnalysisRoutePanel(event.target.checked)}
             />
-            Hide Wire analysis auto route panel
+            {renderSettingLabel("Hide Wire analysis auto route panel")}
           </label>
           <label className="settings-field">
-            Workspace panels layout
+            {renderSettingLabel("Workspace panels layout")}
             <select
               value={workspacePanelsLayoutMode}
               onChange={(event) => setWorkspacePanelsLayoutMode(event.target.value as WorkspacePanelsLayoutMode)}
@@ -761,10 +940,10 @@ export function SettingsWorkspaceContent({
               checked={workspaceWideScreen}
               onChange={(event) => setWorkspaceWideScreen(event.target.checked)}
             />
-            Wide screen (remove app max width cap)
+            {renderSettingLabel("Wide screen (remove app max width cap)")}
           </label>
           <label className="settings-field">
-            Default wire section (mm²)
+            {renderSettingLabel("Default wire section (mm²)")}
             <input
               type="number"
               min={0.01}
@@ -785,10 +964,10 @@ export function SettingsWorkspaceContent({
               checked={defaultAutoCreateLinkedNodes}
               onChange={(event) => setDefaultAutoCreateLinkedNodes(event.target.checked)}
             />
-            Default auto-create linked nodes for connectors/splices
+            {renderSettingLabel("Default auto-create linked nodes for connectors/splices")}
           </label>
           <label className="settings-field">
-            Directional splice imbalance limit (%)
+            {renderSettingLabel("Directional splice imbalance limit (%)")}
             <input
               type="number"
               min={100}
@@ -806,7 +985,7 @@ export function SettingsWorkspaceContent({
           <label className="settings-field settings-locale-field">
             <span className="settings-locale-label">
               <span className="action-button-icon is-settings settings-locale-icon" aria-hidden="true" />
-              <span>Language</span>
+              <span>{renderSettingLabel("Language")}</span>
             </span>
             <select
               className="settings-locale-select"
@@ -825,7 +1004,7 @@ export function SettingsWorkspaceContent({
         </div>
       </section>
 
-      <section className="panel settings-panel">
+      <section id="settings-shortcuts" className="panel settings-panel">
         <header className="settings-panel-header">
           <h2>Action bar and shortcuts</h2>
           <span className="settings-panel-chip">Shortcuts</span>
@@ -834,7 +1013,7 @@ export function SettingsWorkspaceContent({
         <div className="settings-grid">
           <label className="settings-checkbox">
             <input type="checkbox" checked={showShortcutHints} onChange={(event) => setShowShortcutHints(event.target.checked)} />
-            Show shortcut hints in the action bar
+            {renderSettingLabel("Show shortcut hints in the action bar")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -842,7 +1021,7 @@ export function SettingsWorkspaceContent({
               checked={keyboardShortcutsEnabled}
               onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
             />
-            Enable keyboard shortcuts (undo/redo/navigation/issues/view)
+            {renderSettingLabel("Enable keyboard shortcuts (undo/redo/navigation/issues/view)")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -850,7 +1029,7 @@ export function SettingsWorkspaceContent({
               checked={restoreViewportOnUndo}
               onChange={(event) => setRestoreViewportOnUndo(event.target.checked)}
             />
-            Restore network viewport on undo/redo
+            {renderSettingLabel("Restore network viewport on undo/redo")}
           </label>
         </div>
         <ul className="settings-shortcut-list">
@@ -865,7 +1044,7 @@ export function SettingsWorkspaceContent({
         </ul>
       </section>
 
-      <section className="panel settings-panel">
+      <section id="settings-catalog-bom" className="panel settings-panel">
         <header className="settings-panel-header">
           <h2>Catalog & BOM setup</h2>
           <span className="settings-panel-chip">Pricing</span>
@@ -878,7 +1057,7 @@ export function SettingsWorkspaceContent({
         </p>
         <div className="settings-grid">
           <label className="settings-field">
-            Currency (Catalog/BOM)
+            {renderSettingLabel("Currency (Catalog/BOM)")}
             <select
               value={workspaceCurrencyCode}
               onChange={(event) => setWorkspaceCurrencyCode(event.target.value as WorkspaceCurrencyCode)}
@@ -896,10 +1075,10 @@ export function SettingsWorkspaceContent({
               checked={workspaceTaxEnabled}
               onChange={(event) => setWorkspaceTaxEnabled(event.target.checked)}
             />
-            Enable tax / VAT (TVA)
+            {renderSettingLabel("Enable tax / VAT (TVA)")}
           </label>
           <label className="settings-field">
-            Tabular export format
+            {renderSettingLabel("Tabular export format")}
             <select value={tabularExportFormat} onChange={(event) => setTabularExportFormat(event.target.value as TabularExportFormat)}>
               <option value="csv">CSV</option>
               <option value="xlsx">XLSX</option>
@@ -911,7 +1090,7 @@ export function SettingsWorkspaceContent({
               checked={bomExportCompactColumns}
               onChange={(event) => setBomExportCompactColumns(event.target.checked)}
             />
-            Compact BOM export columns
+            {renderSettingLabel("Compact BOM export columns")}
           </label>
           <label className="settings-checkbox">
             <input
@@ -919,10 +1098,10 @@ export function SettingsWorkspaceContent({
               checked={bomTraceabilityLabelsHidden}
               onChange={(event) => setBomTraceabilityLabelsHidden(event.target.checked)}
             />
-            Hide BOM traceability labels
+            {renderSettingLabel("Hide BOM traceability labels")}
           </label>
           <label className="settings-field">
-            Tax rate (%)
+            {renderSettingLabel("Tax rate (%)")}
             <input
               type="number"
               min={0}
@@ -942,7 +1121,7 @@ export function SettingsWorkspaceContent({
         </div>
       </section>
 
-      <section className="panel settings-panel settings-panel--import-export">
+      <section id="settings-import-export" className="panel settings-panel settings-panel--import-export">
         <header className="settings-panel-header">
           <h2>Import / Export networks</h2>
           <span className="settings-panel-chip">Portability</span>
@@ -956,9 +1135,9 @@ export function SettingsWorkspaceContent({
         <div className="settings-import-export-grid">
           <div className="settings-import-export-actions-column">
             <div className="row-actions settings-actions">
-              <button type="button" onClick={() => handleExportNetworks("active")} disabled={activeNetworkId === null}>Export active</button>
-              <button type="button" onClick={() => handleExportNetworks("selected")} disabled={selectedExportNetworkIds.length === 0}>Export selected</button>
-              <button type="button" onClick={() => handleExportNetworks("all")} disabled={networks.length === 0}>Export all</button>
+              <button type="button" onClick={() => handleExportNetworks("active")} disabled={activeNetworkId === null}>{renderSettingLabel("Export active")}</button>
+              <button type="button" onClick={() => handleExportNetworks("selected")} disabled={selectedExportNetworkIds.length === 0}>{renderSettingLabel("Export selected")}</button>
+              <button type="button" onClick={() => handleExportNetworks("all")} disabled={networks.length === 0}>{renderSettingLabel("Export all")}</button>
             </div>
             <div className="row-actions settings-actions">
               <button
@@ -977,7 +1156,7 @@ export function SettingsWorkspaceContent({
               </button>
             </div>
             <div className="row-actions settings-actions">
-              <button type="button" onClick={handleOpenImportPicker}>Import from file</button>
+              <button type="button" onClick={handleOpenImportPicker}>{renderSettingLabel("Import from file")}</button>
               <input
                 ref={importFileInputRef}
                 type="file"
@@ -998,7 +1177,7 @@ export function SettingsWorkspaceContent({
             </div>
           </div>
           <fieldset className="inline-fieldset settings-export-fieldset settings-import-export-selection-column">
-            <legend>Selected networks for export</legend>
+            <legend>{renderSettingLabel("Selected networks for export")}</legend>
             {networks.length === 0 ? (
               <p className="empty-copy">No network available.</p>
             ) : (
@@ -1057,7 +1236,7 @@ export function SettingsWorkspaceContent({
         ) : null}
       </section>
 
-      <section className="panel settings-panel">
+      <section id="settings-sample-network" className="panel settings-panel">
         <header className="settings-panel-header">
           <h2>Sample network controls</h2>
           <span className="settings-panel-chip">Sample</span>
@@ -1073,13 +1252,15 @@ export function SettingsWorkspaceContent({
         </div>
         <div className="row-actions settings-actions">
           <button type="button" onClick={handleRecreateSampleNetwork}>
-            Recreate sample network
+            {renderSettingLabel("Recreate sample network")}
           </button>
           <button type="button" onClick={handleResetSampleNetwork} disabled={!hasBuiltInSampleState}>
-            Reset sample network to baseline
+            {renderSettingLabel("Reset sample network to baseline")}
           </button>
         </div>
       </section>
+        </section>
+      </div>
     </section>
   );
 }

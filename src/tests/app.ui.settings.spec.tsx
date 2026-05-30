@@ -765,4 +765,78 @@ describe("App integration UI - settings", () => {
     expect(document.querySelector("main.app-shell")).toHaveClass("workspace-wide-screen");
   });
 
+  it("searches settings labels, highlights matches, and preserves label wiring", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+
+    const searchInput = screen.getByLabelText("Search settings");
+    fireEvent.change(searchInput, { target: { value: "language" } });
+
+    const globalPreferencesPanel = getPanelByHeading("Global preferences");
+    expect(within(globalPreferencesPanel).getByLabelText("Language")).toHaveValue("en");
+    expect(within(globalPreferencesPanel).getByText("Language", { selector: "mark.settings-search-highlight" })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(/matching setting label/i);
+
+    fireEvent.change(searchInput, { target: { value: "" } });
+    expect(screen.queryByRole("status")).toBeNull();
+    expect(document.querySelector("mark.settings-search-highlight")).toBeNull();
+  });
+
+  it("shows no-match feedback without changing settings values", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+
+    const appearancePanel = getPanelByHeading("Appearance preferences");
+    const tableDensity = within(appearancePanel).getByLabelText("Table density");
+    const initialTableDensity = (tableDensity as HTMLSelectElement).value;
+
+    fireEvent.change(screen.getByLabelText("Search settings"), { target: { value: "does not exist" } });
+
+    expect(screen.getByRole("status")).toHaveTextContent("No setting label matches this search.");
+    expect(tableDensity).toHaveValue(initialTableDensity);
+    expect(getPanelByHeading("Appearance preferences")).toBeInTheDocument();
+  });
+
+  it("navigates settings sections and exposes search match counts in the glossary", () => {
+    const originalScrollIntoViewDescriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollIntoView");
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: scrollIntoView
+    });
+
+    try {
+      renderAppWithState(createUiIntegrationState());
+      switchScreenDrawerAware("settings");
+
+      const settingsNavigation = screen.getByRole("navigation", { name: "Settings sections" });
+      fireEvent.click(within(settingsNavigation).getByRole("button", { name: "Catalog & BOM setup" }));
+      expect(scrollIntoView).toHaveBeenCalledTimes(1);
+
+      fireEvent.change(screen.getByLabelText("Search settings"), { target: { value: "tax" } });
+
+      expect(within(settingsNavigation).getByRole("button", { name: "Catalog & BOM setup2" })).toBeInTheDocument();
+      expect(within(settingsNavigation).getByRole("button", { name: "AI provider0" })).toHaveClass("is-dimmed");
+      expect(within(getPanelByHeading("Catalog & BOM setup")).getAllByText(/tax/i, { selector: "mark.settings-search-highlight" }).length).toBeGreaterThan(0);
+    } finally {
+      if (originalScrollIntoViewDescriptor === undefined) {
+        Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
+      } else {
+        Object.defineProperty(HTMLElement.prototype, "scrollIntoView", originalScrollIntoViewDescriptor);
+      }
+    }
+  });
+
+  it("keeps settings section navigation reachable on narrow viewports", () => {
+    withViewportSize({ width: 390, height: 760 }, () => {
+      renderAppWithState(createUiIntegrationState());
+      switchScreenDrawerAware("settings");
+
+      expect(screen.getByRole("navigation", { name: "Settings sections" })).toBeInTheDocument();
+      expect(screen.getByLabelText("Search settings")).toBeInTheDocument();
+      expect(getPanelByHeading("AI provider")).toBeInTheDocument();
+      expect(getPanelByHeading("Sample network controls")).toBeInTheDocument();
+    });
+  });
+
 });

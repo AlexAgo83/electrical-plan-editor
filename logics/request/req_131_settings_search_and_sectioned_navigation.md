@@ -1,7 +1,7 @@
 ## req_131_settings_search_and_sectioned_navigation - Settings Search and Sectioned Navigation
 > From version: 1.11.0
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 92%
 > Confidence: 88%
 > Complexity: Medium

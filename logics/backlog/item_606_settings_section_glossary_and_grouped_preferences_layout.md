@@ -1,10 +1,10 @@
 ## item_606_settings_section_glossary_and_grouped_preferences_layout - Settings section glossary and grouped preferences layout
 > From version: 1.11.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -84,6 +84,7 @@ flowchart LR
 - Hybrid rationale: Second delivery slice from `req_131_settings_search_and_sectioned_navigation`, scoped to the Settings information architecture and layout migration after search/highlight exists.
 - Source file: `logics/request/req_131_settings_search_and_sectioned_navigation.md`.
 - Generated locally by logics-manager.
+- Task `task_114_settings_section_glossary_and_grouped_preferences_layout` was finished via `logics-manager flow finish task` on 2026-05-30.
 
 # Tasks
 - `task_114_settings_section_glossary_and_grouped_preferences_layout`
