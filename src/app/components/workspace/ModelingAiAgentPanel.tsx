@@ -355,7 +355,7 @@ export function ModelingAiAgentPanel({
                 });
             }}
           >
-            {isPreparingProposal ? "Preparing..." : "Prepare proposal"}
+            {isPreparingProposal ? "Preparing..." : "Prepare"}
           </button>
           <button
             type="button"
@@ -374,7 +374,18 @@ export function ModelingAiAgentPanel({
               );
             }}
           >
-            Apply proposal
+            Apply
+          </button>
+          <button
+            type="button"
+            disabled={proposalValidation === null}
+            onClick={() => {
+              setProposalValidation(null);
+              setDraftStatus("Proposal rejected. Modeling state was not changed.");
+              setDraftRawResponse(null);
+            }}
+          >
+            Reject
           </button>
           <button
             type="button"
@@ -388,18 +399,7 @@ export function ModelingAiAgentPanel({
               setDraftStatus(didRollback ? "Rolled back the last applied AI session." : "No AI session is available to roll back.");
             }}
           >
-            Rollback last AI session
-          </button>
-          <button
-            type="button"
-            disabled={proposalValidation === null}
-            onClick={() => {
-              setProposalValidation(null);
-              setDraftStatus("Proposal rejected. Modeling state was not changed.");
-              setDraftRawResponse(null);
-            }}
-          >
-            Reject proposal
+            Rollback
           </button>
         </div>
       </form>

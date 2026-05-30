@@ -726,7 +726,7 @@
   margin-top: 0;
   padding-top: 0;
   border-top: 0;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .ai-agent-panel .stack-form {

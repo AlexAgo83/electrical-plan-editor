@@ -240,12 +240,12 @@ describe("App integration UI - settings", () => {
     expect(screen.getByLabelText("Target scope")).toHaveValue("activeNetwork");
     expect(screen.getByLabelText("Agent mode")).toHaveValue("assisted");
     expect(screen.getByLabelText("Delete entities")).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Prepare proposal" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Prepare" })).toBeDisabled();
 
     fireEvent.change(screen.getByLabelText("Instruction"), {
       target: { value: "Move selected routing nodes to reduce crossings." }
     });
-    const prepareProposalButton = screen.getByRole("button", { name: "Prepare proposal" });
+    const prepareProposalButton = screen.getByRole("button", { name: "Prepare" });
     expect(prepareProposalButton).toBeEnabled();
     fetchMock.mockImplementationOnce(() =>
       Promise.resolve(
@@ -266,12 +266,12 @@ describe("App integration UI - settings", () => {
     const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
     expect(within(proposalSummary).getByText("Accepted")).toBeInTheDocument();
     expect(within(proposalSummary).getByText("add_node")).toBeInTheDocument();
-    const applyProposalButton = screen.getByRole("button", { name: "Apply proposal" });
+    const applyProposalButton = screen.getByRole("button", { name: "Apply" });
     expect(applyProposalButton).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Reject proposal" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Reject" })).toBeEnabled();
     fireEvent.click(applyProposalButton);
     expect(screen.getByText("Applied 1 accepted operation. 0 accepted operations skipped.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Apply proposal" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Apply" })).toBeDisabled();
     expect(within(screen.getByLabelText("AI context entity counts")).getByLabelText("4 nodes")).toBeInTheDocument();
     fireEvent.keyDown(document, { key: "z", metaKey: true });
     expect(within(screen.getByLabelText("AI context entity counts")).getByLabelText("3 nodes")).toBeInTheDocument();
@@ -314,14 +314,14 @@ describe("App integration UI - settings", () => {
     fireEvent.change(screen.getByLabelText("Instruction"), {
       target: { value: "Add the pin count in parentheses to connector names." }
     });
-    fireEvent.click(screen.getByRole("button", { name: "Prepare proposal" }));
+    fireEvent.click(screen.getByRole("button", { name: "Prepare" }));
 
     expect(await screen.findByText(/Provider draft generated/)).toBeInTheDocument();
     const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
     expect(within(proposalSummary).getByText("update_entity")).toBeInTheDocument();
     expect(within(proposalSummary).getByText('connector C1 · name: "Connector 1 (2 pins)"')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Apply proposal" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     expect(screen.getByText("Applied 1 accepted operation. 0 accepted operations skipped.")).toBeInTheDocument();
 
     switchSubScreenDrawerAware("connector");
@@ -375,14 +375,14 @@ describe("App integration UI - settings", () => {
     fireEvent.change(screen.getByLabelText("Instruction"), {
       target: { value: "Double the number of ways on the selected catalog item." }
     });
-    fireEvent.click(screen.getByRole("button", { name: "Prepare proposal" }));
+    fireEvent.click(screen.getByRole("button", { name: "Prepare" }));
 
     expect(await screen.findByText(/Provider draft generated/)).toBeInTheDocument();
     const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
     expect(within(proposalSummary).getByText("update_entity")).toBeInTheDocument();
     expect(within(proposalSummary).getByText("catalog CAT-CHG-SERVICE-4W · connectionCount: 8")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Apply proposal" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     expect(screen.getByText("Applied 1 accepted operation. 0 accepted operations skipped.")).toBeInTheDocument();
 
     switchSubScreenDrawerAware("catalog");
@@ -446,13 +446,13 @@ describe("App integration UI - settings", () => {
     fireEvent.change(screen.getByLabelText("Instruction"), {
       target: { value: "Create a new wire from INLET pin 7 to OBC pin 12." }
     });
-    fireEvent.click(screen.getByRole("button", { name: "Prepare proposal" }));
+    fireEvent.click(screen.getByRole("button", { name: "Prepare" }));
 
     expect(await screen.findByText(/Provider draft generated/)).toBeInTheDocument();
     const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
     expect(within(proposalSummary).getByText("add_wire")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Apply proposal" }));
+    fireEvent.click(screen.getByRole("button", { name: "Apply" }));
     expect(screen.getByText("Applied 1 accepted operation. 0 accepted operations skipped.")).toBeInTheDocument();
 
     switchSubScreenDrawerAware("wire");
