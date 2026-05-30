@@ -395,4 +395,42 @@ describe("AI agent apply", () => {
     expect(result.nextState.wires.byId["W-001" as WireId]?.isRouteLocked).toBe(true);
     expect(result.nextState.wires.byId["W-001" as WireId]?.routeSegmentIds).toEqual(["SEG-001", "SEG-002"]);
   });
+
+  it("applies dedicated connector layout updates to catalog items", () => {
+    const state = createSampleNetworkState();
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "update_catalog_connector_layout",
+          catalogItemId: "CAT-SAMPLE-SRC-12W",
+          connectorLayout: {
+            version: 1,
+            units: "grid",
+            width: 6,
+            height: 2,
+            ways: Array.from({ length: 12 }, (_, index) => ({
+              cavityIndex: index + 1,
+              x: (index % 6) + 1,
+              y: Math.floor(index / 6) + 1,
+              shape: index === 1 ? "square" : "round"
+            }))
+          }
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+
+    const result = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(result.appliedCount).toBe(1);
+    expect(result.nextState.catalogItems.byId["CAT-SAMPLE-SRC-12W" as CatalogItemId]?.connectorLayout).toEqual(
+      expect.objectContaining({
+        width: 6,
+        height: 2,
+        ways: expect.arrayContaining([expect.objectContaining({ cavityIndex: 2, shape: "square" })])
+      })
+    );
+  });
 });

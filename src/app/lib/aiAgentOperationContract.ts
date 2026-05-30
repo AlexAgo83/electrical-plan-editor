@@ -2,6 +2,7 @@ import type { AppState, LayoutNodePosition, SelectionState } from "../../store/t
 import type {
   CatalogItemId,
   ConnectorId,
+  ConnectorLayout,
   ConnectorTerminalMaterial,
   NodeId,
   SegmentId,
@@ -9,6 +10,7 @@ import type {
   WireEndpoint,
   WireId
 } from "../../core/entities";
+import { normalizeConnectorLayout } from "../../core/connectorLayout";
 import {
   analyzeCatalogDeleteImpact,
   analyzeConnectorDeleteImpact,
@@ -63,6 +65,7 @@ export type AiAgentSupportedOperation =
   | AiAgentRegenerateRouteOperation
   | AiAgentDeleteEntityOperation
   | AiAgentCreateCatalogItemOperation
+  | AiAgentUpdateCatalogConnectorLayoutOperation
   | AiAgentAssignCatalogItemOperation
   | AiAgentSetConnectorTerminalMaterialOperation
   | AiAgentLockWireRouteOperation
@@ -166,6 +169,12 @@ export interface AiAgentCreateCatalogItemOperation {
   connectionCount: number;
   unitPriceExclTax?: number;
   url?: string;
+}
+
+export interface AiAgentUpdateCatalogConnectorLayoutOperation {
+  type: "update_catalog_connector_layout";
+  catalogItemId: string;
+  connectorLayout: ConnectorLayout;
 }
 
 export interface AiAgentAssignCatalogItemOperation {
@@ -710,6 +719,22 @@ function parseOperation(
       : reject(operationIndex, type, "Catalog item creation requires manufacturerReference and connectionCount.");
   }
 
+  if (type === "update_catalog_connector_layout") {
+    const catalogItemId = readString(operation.catalogItemId);
+    const connectionCount = readPositiveNumber(operation.connectionCount);
+    const normalizedLayout =
+      catalogItemId === null || connectionCount === null
+        ? undefined
+        : normalizeConnectorLayout(operation.connectorLayout as Partial<ConnectorLayout> | undefined, connectionCount);
+    return catalogItemId !== null && normalizedLayout !== undefined
+      ? {
+          type,
+          catalogItemId,
+          connectorLayout: normalizedLayout
+        }
+      : reject(operationIndex, type, "Catalog connector layout update requires catalogItemId, connectionCount, and connectorLayout.");
+  }
+
   if (type === "assign_catalog_item") {
     const entityKind = readString(operation.entityKind);
     const entityId = readString(operation.entityId);
@@ -1039,6 +1064,12 @@ function normalizeOperationEntityReferences(state: AppState, operation: AiAgentS
       catalogItemId: resolveEntityId(state, "catalog", operation.catalogItemId)
     };
   }
+  if (operation.type === "update_catalog_connector_layout") {
+    return {
+      ...operation,
+      catalogItemId: resolveEntityId(state, "catalog", operation.catalogItemId)
+    };
+  }
   if (operation.type === "set_connector_terminal_material") {
     return {
       ...operation,
@@ -1122,6 +1153,7 @@ function permissionForOperation(operation: AiAgentSupportedOperation): keyof AiA
   }
   if (
     operation.type === "assign_catalog_item" ||
+    operation.type === "update_catalog_connector_layout" ||
     operation.type === "set_connector_terminal_material" ||
     operation.type === "lock_wire_route"
   ) {
@@ -1206,6 +1238,9 @@ function entityExists(
       return state.splices.byId[operation.entityId as SpliceId] !== undefined;
     }
     return state.wires.byId[operation.entityId as WireId] !== undefined;
+  }
+  if (operation.type === "update_catalog_connector_layout") {
+    return state.catalogItems.byId[operation.catalogItemId as CatalogItemId] !== undefined;
   }
   if (operation.type === "set_connector_terminal_material") {
     const connector = state.connectors.byId[operation.connectorId as ConnectorId];
@@ -1502,6 +1537,9 @@ function isWithinSelectionScope(operation: AiAgentSupportedOperation, selection:
       return selection.kind === "wire" && operation.entityId === selection.id;
     }
     return selection.kind === operation.entityKind && operation.entityId === selection.id;
+  }
+  if (operation.type === "update_catalog_connector_layout") {
+    return selection.kind === "catalog" && operation.catalogItemId === selection.id;
   }
   if (operation.type === "set_connector_terminal_material") {
     return selection.kind === "connector" && operation.connectorId === selection.id;

@@ -78,6 +78,9 @@ function formatAiAgentOperationDetails(operation: AiAgentSupportedOperation): st
   if (operation.type === "assign_catalog_item") {
     return `${operation.entityKind} ${operation.entityId} -> ${operation.catalogItemId}`;
   }
+  if (operation.type === "update_catalog_connector_layout") {
+    return `${operation.catalogItemId} · ${operation.connectorLayout.ways.length} ways layout`;
+  }
   if (operation.type === "set_connector_terminal_material") {
     return `${operation.connectorId} · way ${operation.cavityIndex}`;
   }

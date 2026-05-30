@@ -842,6 +842,49 @@ describe("AI agent operation contract", () => {
     ]);
   });
 
+  it("accepts dedicated connector layout updates for catalog items", () => {
+    const state = createSampleNetworkState();
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "update_catalog_connector_layout",
+            catalogItemId: "SAMPLE-CAT-SRC-12W",
+            connectionCount: 12,
+            connectorLayout: {
+              version: 1,
+              units: "grid",
+              width: 6,
+              height: 2,
+              ways: [
+                { cavityIndex: 1, x: 1, y: 1, shape: "round" },
+                { cavityIndex: 2, x: 2, y: 1, shape: "square" }
+              ]
+            }
+          }
+        ]
+      }
+    });
+
+    expect(result.rejected).toHaveLength(0);
+    expect(result.accepted).toEqual([
+      expect.objectContaining({
+        type: "update_catalog_connector_layout",
+        catalogItemId: "CAT-SAMPLE-SRC-12W",
+        connectorLayout: expect.objectContaining({
+          width: 6,
+          height: 2,
+          ways: expect.arrayContaining([expect.objectContaining({ cavityIndex: 2, shape: "square" })])
+        })
+      })
+    ]);
+  });
+
   it("validates delete impact and cascade mode for non-wire entities", () => {
     const state = appReducer(createSampleNetworkState(), appActions.upsertConnector({
       id: "C-AI-DELETE" as ConnectorId,

@@ -427,6 +427,18 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
           })
         );
   }
+  if (operation.type === "update_catalog_connector_layout") {
+    const catalogItem = state.catalogItems.byId[operation.catalogItemId as CatalogItemId];
+    return catalogItem === undefined
+      ? state
+      : appReducer(
+          state,
+          appActions.upsertCatalogItem({
+            ...catalogItem,
+            connectorLayout: operation.connectorLayout
+          })
+        );
+  }
   if (operation.type === "set_connector_terminal_material") {
     const connector = state.connectors.byId[operation.connectorId as ConnectorId];
     return connector === undefined
