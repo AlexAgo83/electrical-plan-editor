@@ -151,6 +151,7 @@ export function WorkspaceNavigation({
               >
                 <span className="workspace-tab-content">
                   <span className="action-button-icon is-ai-agent" aria-hidden="true" />
+                  <span>AI Agent</span>
                 </span>
               </button>
             ) : null}
