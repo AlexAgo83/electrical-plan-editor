@@ -1,6 +1,11 @@
 import { useMemo, useState, type ReactElement } from "react";
 import type { AiAgentContextSummary } from "../../lib/aiAgentContext";
-import type { AiAgentOperationPermissions, AiAgentOperationValidationResult, AiAgentScope } from "../../lib/aiAgentOperationContract";
+import type {
+  AiAgentOperationPermissions,
+  AiAgentOperationValidationResult,
+  AiAgentScope,
+  AiAgentSupportedOperation
+} from "../../lib/aiAgentOperationContract";
 import type { AiProviderReadiness } from "../../lib/aiSettings";
 
 interface ModelingAiAgentPanelProps {
@@ -16,6 +21,52 @@ interface ModelingAiAgentPanelProps {
 }
 
 type AgentMode = "assisted" | "direct";
+
+function formatAiAgentValue(value: unknown): string {
+  if (typeof value === "string") {
+    return `"${value}"`;
+  }
+  if (typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  if (value === undefined) {
+    return "cleared";
+  }
+  return JSON.stringify(value) ?? String(value);
+}
+
+function formatAiAgentOperationDetails(operation: AiAgentSupportedOperation): string {
+  if (operation.type === "update_entity") {
+    const fieldSummary = Object.entries(operation.fields)
+      .map(([fieldName, value]) => `${fieldName}: ${formatAiAgentValue(value)}`)
+      .join(", ");
+    return `${operation.entityKind} ${operation.entityId}${fieldSummary.length > 0 ? ` · ${fieldSummary}` : ""}`;
+  }
+  if (operation.type === "move_entity") {
+    return `${operation.entityKind} ${operation.entityId}${
+      operation.position === undefined ? "" : ` · x: ${operation.position.x}, y: ${operation.position.y}`
+    }`;
+  }
+  if (operation.type === "place_entity_relative_to_entity") {
+    return `${operation.entityKind} ${operation.entityId} ${operation.placement} ${operation.referenceEntityKind} ${operation.referenceEntityId}`;
+  }
+  if (operation.type === "add_connector") {
+    return `${operation.technicalId} · ${operation.name} · ${operation.cavityCount} ways`;
+  }
+  if (operation.type === "add_splice") {
+    return `${operation.technicalId} · ${operation.name} · ${operation.portCount} ports`;
+  }
+  if (operation.type === "add_node") {
+    return `${operation.label} · x: ${operation.position.x}, y: ${operation.position.y}`;
+  }
+  if (operation.type === "add_segment") {
+    return `${operation.nodeA} -> ${operation.nodeB} · ${operation.lengthMm} mm`;
+  }
+  if (operation.type === "add_wire") {
+    return `${operation.technicalId} · ${operation.name} · ${operation.sectionMm2} mm2`;
+  }
+  return `${operation.wireIds.length} wire${operation.wireIds.length === 1 ? "" : "s"}`;
+}
 
 export function ModelingAiAgentPanel({
   providerReadiness,
@@ -251,7 +302,9 @@ export function ModelingAiAgentPanel({
           </p>
           {proposalValidation.accepted.map((operation, index) => (
             <p className="meta-line" key={`${operation.type}-${index}`}>
-              <span>Accepted operation</span> <strong>{operation.type}</strong>
+              <span>Accepted operation</span>{" "}
+              <strong>{operation.type}</strong>{" "}
+              <small>{formatAiAgentOperationDetails(operation)}</small>
             </p>
           ))}
           {proposalValidation.rejected.map((issue) => (
