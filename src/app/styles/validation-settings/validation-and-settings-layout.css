@@ -260,6 +260,12 @@
   background: color-mix(in srgb, var(--theme-primary, currentColor) 12%, transparent);
 }
 
+.settings-section-nav-button.is-active {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 58%, transparent);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent);
+  font-weight: 700;
+}
+
 .settings-section-nav-button.is-dimmed {
   opacity: 0.72;
 }
@@ -289,10 +295,19 @@
 }
 
 .settings-search-highlight {
+  display: inline;
+  width: auto;
   border-radius: 0.22rem;
   background: #ffe38a;
   color: inherit;
   padding: 0 0.08rem;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.settings-label-text {
+  display: inline;
+  min-width: 0;
 }
 
 .settings-checkbox {

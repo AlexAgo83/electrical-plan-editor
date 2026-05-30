@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import { ImportOverwriteDialog } from "../dialogs/ImportOverwriteDialog";
 import type { NetworkId } from "../../../core/entities";
@@ -133,7 +133,7 @@ function sectionMatches(section: SettingsSectionDefinition, normalizedQuery: str
 
 function SettingsLabelText({ text, normalizedQuery }: { text: string; normalizedQuery: string }): ReactElement {
   if (!settingsLabelMatches(text, normalizedQuery)) {
-    return <>{text}</>;
+    return <span className="settings-label-text">{text}</span>;
   }
 
   const lowerText = text.toLowerCase();
@@ -143,11 +143,11 @@ function SettingsLabelText({ text, normalizedQuery }: { text: string; normalized
   const after = text.slice(matchIndex + normalizedQuery.length);
 
   return (
-    <>
+    <span className="settings-label-text">
       {before}
       <mark className="settings-search-highlight">{match}</mark>
       {after}
-    </>
+    </span>
   );
 }
 
@@ -406,13 +406,53 @@ export function SettingsWorkspaceContent({
   const totalMatchCount = matchedSectionCounts.reduce((total, section) => total + section.count, 0);
   const hasSearchQuery = normalizedSettingsSearch.length > 0;
   const contentRef = useRef<HTMLElement | null>(null);
+  const sectionVisibilityRatiosRef = useRef<Map<string, number>>(new Map());
+  const [activeSettingsSectionId, setActiveSettingsSectionId] = useState(SETTINGS_SECTIONS[0]?.id ?? "");
   const renderSettingLabel = (text: string): ReactNode => (
     <SettingsLabelText text={text} normalizedQuery={normalizedSettingsSearch} />
   );
   const scrollToSettingsSection = (sectionId: string): void => {
+    setActiveSettingsSectionId(sectionId);
     const sectionElement = contentRef.current?.querySelector<HTMLElement>(`#${sectionId}`);
     sectionElement?.scrollIntoView({ block: "start", behavior: "smooth" });
   };
+
+  useEffect(() => {
+    const contentElement = contentRef.current;
+    if (contentElement === null || typeof IntersectionObserver === "undefined") {
+      return;
+    }
+
+    const sectionElements = SETTINGS_SECTIONS.map((section) => contentElement.querySelector<HTMLElement>(`#${section.id}`)).filter((section): section is HTMLElement => section !== null);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          sectionVisibilityRatiosRef.current.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
+        }
+
+        const [nextActiveSectionId] = [...sectionVisibilityRatiosRef.current.entries()].reduce<[string, number]>(
+          (best, entry) => (entry[1] > best[1] ? entry : best),
+          [activeSettingsSectionId, 0]
+        );
+
+        if (nextActiveSectionId !== activeSettingsSectionId) {
+          setActiveSettingsSectionId(nextActiveSectionId);
+        }
+      },
+      {
+        root: null,
+        rootMargin: "-96px 0px -55% 0px",
+        threshold: [0, 0.2, 0.5, 0.8]
+      }
+    );
+
+    for (const sectionElement of sectionElements) {
+      sectionVisibilityRatiosRef.current.set(sectionElement.id, 0);
+      observer.observe(sectionElement);
+    }
+
+    return () => observer.disconnect();
+  }, [activeSettingsSectionId]);
 
   return (
     <section className="settings-workspace" aria-label="Settings workspace">
@@ -438,11 +478,17 @@ export function SettingsWorkspaceContent({
           <p className="settings-section-nav-title">Sections</p>
           {SETTINGS_SECTIONS.map((section) => {
             const matchCount = matchedSectionCounts.find((entry) => entry.id === section.id)?.count ?? 0;
+            const sectionButtonClassName = [
+              "settings-section-nav-button",
+              section.id === activeSettingsSectionId ? "is-active" : "",
+              hasSearchQuery && matchCount === 0 ? "is-dimmed" : ""
+            ].filter(Boolean).join(" ");
             return (
               <button
                 key={section.id}
                 type="button"
-                className={hasSearchQuery && matchCount === 0 ? "settings-section-nav-button is-dimmed" : "settings-section-nav-button"}
+                className={sectionButtonClassName}
+                aria-current={section.id === activeSettingsSectionId ? "location" : undefined}
                 onClick={() => scrollToSettingsSection(section.id)}
               >
                 <span>{section.title}</span>

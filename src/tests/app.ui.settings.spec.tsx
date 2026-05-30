@@ -810,8 +810,13 @@ describe("App integration UI - settings", () => {
       switchScreenDrawerAware("settings");
 
       const settingsNavigation = screen.getByRole("navigation", { name: "Settings sections" });
-      fireEvent.click(within(settingsNavigation).getByRole("button", { name: "Catalog & BOM setup" }));
+      expect(within(settingsNavigation).getByRole("button", { name: "AI provider" })).toHaveAttribute("aria-current", "location");
+
+      const catalogSectionButton = within(settingsNavigation).getByRole("button", { name: "Catalog & BOM setup" });
+      fireEvent.click(catalogSectionButton);
       expect(scrollIntoView).toHaveBeenCalledTimes(1);
+      expect(catalogSectionButton).toHaveClass("is-active");
+      expect(catalogSectionButton).toHaveAttribute("aria-current", "location");
 
       fireEvent.change(screen.getByLabelText("Search settings"), { target: { value: "tax" } });
 
