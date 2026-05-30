@@ -1,6 +1,7 @@
 import type {
   CatalogItem,
   Connector,
+  HarnessAssembly,
   Network,
   NetworkNode,
   Segment,
@@ -94,7 +95,14 @@ export interface AiAgentContext {
 function buildEmptySummary(scope: AiAgentScope, unavailableReason: string): AiAgentContextSummary {
   return {
     scope,
-    scopeLabel: scope === "activeNetwork" ? "Active network" : "Current selection",
+    scopeLabel:
+      scope === "activeNetwork"
+        ? "Active network"
+        : scope === "currentSelection"
+          ? "Current selection"
+          : scope === "selectedHarness"
+            ? "Selected harness"
+            : "All networks",
     isAvailable: false,
     unavailableReason,
     networkName: null,
@@ -168,7 +176,14 @@ function summarizeEntities(
 ): AiAgentContextSummary {
   return {
     scope,
-    scopeLabel: scope === "activeNetwork" ? "Active network" : "Current selection",
+    scopeLabel:
+      scope === "activeNetwork"
+        ? "Active network"
+        : scope === "currentSelection"
+          ? "Current selection"
+          : scope === "selectedHarness"
+            ? "Selected harness"
+            : "All networks",
     isAvailable: true,
     unavailableReason: null,
     networkName: activeNetwork.name,
@@ -182,6 +197,46 @@ function summarizeEntities(
       catalogItems: entities.catalogItems.length
     }
   };
+}
+
+function mergeScopedEntities(
+  state: AppState,
+  networkIds: readonly Network["id"][]
+): AiAgentContext["entities"] {
+  return networkIds.reduce<AiAgentContext["entities"]>(
+    (entities, networkId) => {
+      const scoped = state.networkStates[networkId];
+      if (scoped === undefined) {
+        return entities;
+      }
+      return {
+        connectors: [...entities.connectors, ...scoped.connectors.allIds.map((id) => scoped.connectors.byId[id]).filter((entry): entry is Connector => entry !== undefined)],
+        splices: [...entities.splices, ...scoped.splices.allIds.map((id) => scoped.splices.byId[id]).filter((entry): entry is Splice => entry !== undefined)],
+        catalogItems: [
+          ...entities.catalogItems,
+          ...scoped.catalogItems.allIds.map((id) => scoped.catalogItems.byId[id]).filter((entry): entry is CatalogItem => entry !== undefined)
+        ],
+        nodes: [...entities.nodes, ...scoped.nodes.allIds.map((id) => scoped.nodes.byId[id]).filter((entry): entry is NetworkNode => entry !== undefined)],
+        segments: [...entities.segments, ...scoped.segments.allIds.map((id) => scoped.segments.byId[id]).filter((entry): entry is Segment => entry !== undefined)],
+        wires: [...entities.wires, ...scoped.wires.allIds.map((id) => scoped.wires.byId[id]).filter((entry): entry is Wire => entry !== undefined)],
+        nodePositions: { ...entities.nodePositions, ...scoped.nodePositions }
+      };
+    },
+    {
+      connectors: [],
+      splices: [],
+      catalogItems: [],
+      nodes: [],
+      segments: [],
+      wires: [],
+      nodePositions: {}
+    }
+  );
+}
+
+function selectDefaultHarnessAssembly(state: AppState): HarnessAssembly | null {
+  const firstHarnessId = state.harnessAssemblies.allIds[0];
+  return firstHarnessId === undefined ? null : state.harnessAssemblies.byId[firstHarnessId] ?? null;
 }
 
 export function buildAiAgentContext(state: AppState, scope: AiAgentScope): AiAgentContext {
@@ -211,6 +266,56 @@ export function buildAiAgentContext(state: AppState, scope: AiAgentScope): AiAge
     name: activeNetwork.name,
     technicalId: activeNetwork.technicalId
   };
+
+  if (scope === "allNetworks") {
+    const entities = mergeScopedEntities(state, state.networks.allIds);
+    return {
+      schemaVersion: 1,
+      scope,
+      activeNetwork: activeNetworkIdentity,
+      selection: state.ui.selected,
+      summary: summarizeEntities(scope, activeNetwork, null, entities),
+      entities
+    };
+  }
+
+  if (scope === "selectedHarness") {
+    const harness = selectDefaultHarnessAssembly(state);
+    if (harness === null) {
+      const summary = buildEmptySummary(scope, "No harness assembly is available.");
+      return {
+        schemaVersion: 1,
+        scope,
+        activeNetwork: activeNetworkIdentity,
+        selection: state.ui.selected,
+        summary: {
+          ...summary,
+          networkName: activeNetwork.name
+        },
+        entities: {
+          connectors: [],
+          splices: [],
+          catalogItems: [],
+          nodes: [],
+          segments: [],
+          wires: [],
+          nodePositions: state.nodePositions
+        }
+      };
+    }
+    const entities = mergeScopedEntities(state, harness.members.map((member) => member.networkId));
+    return {
+      schemaVersion: 1,
+      scope,
+      activeNetwork: activeNetworkIdentity,
+      selection: state.ui.selected,
+      summary: {
+        ...summarizeEntities(scope, activeNetwork, `Harness ${harness.technicalId}`, entities),
+        networkName: harness.name
+      },
+      entities
+    };
+  }
 
   if (scope === "currentSelection") {
     const selection = state.ui.selected;

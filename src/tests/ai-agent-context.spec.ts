@@ -88,4 +88,16 @@ describe("AI agent context builder", () => {
     expect(context.entities.connectors).toHaveLength(0);
     expect(context.entities.catalogItems).toHaveLength(0);
   });
+
+  it("builds selected harness and all-network scopes", () => {
+    const state = createSampleNetworkState();
+    const selectedHarnessContext = buildAiAgentContext(state, "selectedHarness");
+    const allNetworksContext = buildAiAgentContext(state, "allNetworks");
+
+    expect(selectedHarnessContext.summary.scopeLabel).toBe("Selected harness");
+    expect(selectedHarnessContext.summary.isAvailable).toBe(true);
+    expect(selectedHarnessContext.summary.counts.connectors).toBeGreaterThan(state.connectors.allIds.length);
+    expect(allNetworksContext.summary.scopeLabel).toBe("All networks");
+    expect(allNetworksContext.summary.counts.wires).toBeGreaterThan(state.wires.allIds.length);
+  });
 });

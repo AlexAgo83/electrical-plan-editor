@@ -70,7 +70,22 @@ function formatAiAgentOperationDetails(operation: AiAgentSupportedOperation): st
     return `${operation.technicalId} · ${operation.name} · ${operation.sectionMm2} mm2`;
   }
   if (operation.type === "delete_entity") {
-    return `${operation.entityKind} ${operation.entityId}`;
+    return `${operation.entityKind} ${operation.entityId}${operation.mode === "cascade" ? " · cascade" : ""}`;
+  }
+  if (operation.type === "create_catalog_item") {
+    return `${operation.manufacturerReference} · ${operation.connectionCount} connections`;
+  }
+  if (operation.type === "assign_catalog_item") {
+    return `${operation.entityKind} ${operation.entityId} -> ${operation.catalogItemId}`;
+  }
+  if (operation.type === "set_connector_terminal_material") {
+    return `${operation.connectorId} · way ${operation.cavityIndex}`;
+  }
+  if (operation.type === "lock_wire_route") {
+    return `${operation.wireId} · ${operation.segmentIds.join(", ")}`;
+  }
+  if (operation.type === "clarification_required") {
+    return operation.question;
   }
   return `${operation.wireIds.length} wire${operation.wireIds.length === 1 ? "" : "s"}`;
 }
@@ -205,9 +220,8 @@ export function ModelingAiAgentPanel({
             >
               <option value="activeNetwork">Active network</option>
               <option value="currentSelection">Current selection</option>
-              <option value="selectedHarness" disabled>
-                Selected harness (V2)
-              </option>
+              <option value="selectedHarness">Selected harness</option>
+              <option value="allNetworks">All networks</option>
             </select>
           </label>
           <label>

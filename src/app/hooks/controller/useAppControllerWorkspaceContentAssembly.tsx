@@ -480,7 +480,9 @@ export function useAppControllerWorkspaceContentAssembly({
       experimentalDirectExecutionEnabled={models.aiSettings.settings.experimentalDirectExecutionEnabled}
       contextSummaries={{
         activeNetwork: buildAiAgentContext(handlers.store.getState(), "activeNetwork").summary,
-        currentSelection: buildAiAgentContext(handlers.store.getState(), "currentSelection").summary
+        currentSelection: buildAiAgentContext(handlers.store.getState(), "currentSelection").summary,
+        selectedHarness: buildAiAgentContext(handlers.store.getState(), "selectedHarness").summary,
+        allNetworks: buildAiAgentContext(handlers.store.getState(), "allNetworks").summary
       }}
       onPrepareProposal={async (request) => {
         const currentState = handlers.store.getState();
