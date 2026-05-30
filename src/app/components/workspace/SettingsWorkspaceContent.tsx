@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import { ImportOverwriteDialog } from "../dialogs/ImportOverwriteDialog";
+import { SettingsSearchControl, useSettingsSearchDock } from "../settings/SettingsSearchDockContext";
 import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
 import { THEME_MODE_OPTIONS } from "../../lib/themeModes";
@@ -397,7 +398,7 @@ export function SettingsWorkspaceContent({
   aiSettings
 }: SettingsWorkspaceContentProps): ReactElement {
   const activeAiProviderConfig = aiSettings.settings.providers[aiSettings.settings.provider];
-  const [settingsSearchQuery, setSettingsSearchQuery] = useState("");
+  const { settingsSearchQuery, setSettingsSearchQuery } = useSettingsSearchDock();
   const normalizedSettingsSearch = normalizeSettingsSearch(settingsSearchQuery);
   const matchedSectionCounts = SETTINGS_SECTIONS.map((section) => ({
     id: section.id,
@@ -457,15 +458,7 @@ export function SettingsWorkspaceContent({
   return (
     <section className="settings-workspace" aria-label="Settings workspace">
       <div className="settings-search-toolbar">
-        <label className="settings-search-field">
-          <span>Search settings</span>
-          <input
-            type="search"
-            value={settingsSearchQuery}
-            onChange={(event) => setSettingsSearchQuery(event.target.value)}
-            placeholder="Search by setting label"
-          />
-        </label>
+        <SettingsSearchControl />
         {hasSearchQuery ? (
           <div className={totalMatchCount > 0 ? "settings-search-summary" : "settings-search-summary is-empty"} role="status">
             {totalMatchCount > 0 ? `${totalMatchCount} matching setting label${totalMatchCount === 1 ? "" : "s"}` : "No setting label matches this search."}

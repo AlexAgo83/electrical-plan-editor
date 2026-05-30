@@ -12,6 +12,7 @@ import { HomeWorkspaceContainer } from "../containers/HomeWorkspaceContainer";
 import { ModelingWorkspaceContainer } from "../containers/ModelingWorkspaceContainer";
 import { NetworkScopeWorkspaceContainer } from "../containers/NetworkScopeWorkspaceContainer";
 import { SettingsWorkspaceContainer } from "../containers/SettingsWorkspaceContainer";
+import { SettingsSearchControl, SettingsSearchDockProvider } from "../settings/SettingsSearchDockContext";
 import { ValidationWorkspaceContainer } from "../containers/ValidationWorkspaceContainer";
 import type { ScreenContainerComponent } from "../containers/screenContainer.shared";
 import { NetworkSummaryQuickEntityNavigation } from "../network-summary/NetworkSummaryQuickEntityNavigation";
@@ -204,9 +205,16 @@ export function AppShellLayout({
   const [isQuickEntityNavigationDocked, setIsQuickEntityNavigationDocked] = useState(false);
   const [isQuickEntityNavigationPresentationActive, setIsQuickEntityNavigationPresentationActive] = useState(false);
   const [quickEntityNavigationDockProgress, setQuickEntityNavigationDockProgress] = useState(0);
+  const [settingsSearchQuery, setSettingsSearchQuery] = useState("");
+  const [isSettingsSearchDocked, setIsSettingsSearchDocked] = useState(false);
+  const [isSettingsSearchPresentationActive, setIsSettingsSearchPresentationActive] = useState(false);
+  const [settingsSearchDockProgress, setSettingsSearchDockProgress] = useState(0);
   const isQuickEntityNavigationDockedRef = useRef(false);
   const isQuickEntityNavigationPresentationActiveRef = useRef(false);
   const quickEntityNavigationDockThresholdRef = useRef<number | null>(null);
+  const isSettingsSearchDockedRef = useRef(false);
+  const isSettingsSearchPresentationActiveRef = useRef(false);
+  const settingsSearchDockThresholdRef = useRef<number | null>(null);
   const shouldOfferDockedEntityNavigation =
     hasActiveNetwork &&
     (isModelingScreen || isAnalysisScreen || (isHarnessAssemblyScreen && headerHarnessAssemblyFunctionalScopeNavigation !== null));
@@ -218,6 +226,14 @@ export function AppShellLayout({
   useEffect(() => {
     isQuickEntityNavigationPresentationActiveRef.current = isQuickEntityNavigationPresentationActive;
   }, [isQuickEntityNavigationPresentationActive]);
+
+  useEffect(() => {
+    isSettingsSearchDockedRef.current = isSettingsSearchDocked;
+  }, [isSettingsSearchDocked]);
+
+  useEffect(() => {
+    isSettingsSearchPresentationActiveRef.current = isSettingsSearchPresentationActive;
+  }, [isSettingsSearchPresentationActive]);
 
   useEffect(() => {
     if (!shouldOfferDockedEntityNavigation) {
@@ -308,8 +324,93 @@ export function AppShellLayout({
     };
   }, [headerBlockRef, shouldOfferDockedEntityNavigation]);
 
+  useEffect(() => {
+    if (!isSettingsScreen) {
+      settingsSearchDockThresholdRef.current = null;
+      setIsSettingsSearchDocked(false);
+      setIsSettingsSearchPresentationActive(false);
+      setSettingsSearchDockProgress(0);
+      return undefined;
+    }
+
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    let animationFrameId = 0;
+    const updateDockedSettingsSearchState = () => {
+      animationFrameId = 0;
+      const sourceSearch = document.querySelector<HTMLElement>("[data-settings-search-source='true']");
+      const headerElement = headerBlockRef.current;
+
+      if (sourceSearch === null || headerElement === null) {
+        const fallbackThreshold = settingsSearchDockThresholdRef.current;
+        setIsSettingsSearchDocked((current) => (fallbackThreshold === null ? current : window.scrollY >= fallbackThreshold));
+        setIsSettingsSearchPresentationActive((current) => (fallbackThreshold === null ? current : window.scrollY >= fallbackThreshold));
+        setSettingsSearchDockProgress((current) => (fallbackThreshold === null ? current : window.scrollY >= fallbackThreshold ? 1 : 0));
+        return;
+      }
+
+      const searchRect = sourceSearch.getBoundingClientRect();
+      const headerRect = headerElement.getBoundingClientRect();
+      const headerHeight = Math.max(0, headerRect.height);
+      if (settingsSearchDockThresholdRef.current === null) {
+        settingsSearchDockThresholdRef.current = Math.max(
+          0,
+          searchRect.top + window.scrollY - headerHeight + QUICK_ENTITY_NAV_DOCK_DELAY_PX
+        );
+      }
+
+      const dockThreshold = settingsSearchDockThresholdRef.current;
+      const nextIsDocked = isSettingsSearchDockedRef.current
+        ? window.scrollY >= Math.max(0, dockThreshold - QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX)
+        : window.scrollY >= dockThreshold;
+      const presentationStart = Math.max(0, dockThreshold - QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX);
+      const nextPresentationActive = isSettingsSearchPresentationActiveRef.current
+        ? window.scrollY >= Math.max(0, presentationStart - QUICK_ENTITY_NAV_PRESENTATION_RELEASE_PX)
+        : window.scrollY >= presentationStart;
+      const nextDockProgress =
+        dockThreshold <= QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX
+          ? 1
+          : clampDockedNavigationProgress(
+              (window.scrollY - (dockThreshold - QUICK_ENTITY_NAV_DOCK_HYSTERESIS_PX)) /
+                QUICK_ENTITY_NAV_DOCK_BLEND_RANGE_PX
+            );
+      setIsSettingsSearchDocked((current) => (current === nextIsDocked ? current : nextIsDocked));
+      setIsSettingsSearchPresentationActive((current) =>
+        current === nextPresentationActive ? current : nextPresentationActive
+      );
+      setSettingsSearchDockProgress((current) =>
+        Math.abs(current - nextDockProgress) < 0.01 ? current : nextDockProgress
+      );
+    };
+
+    const scheduleDockedSettingsSearchStateUpdate = () => {
+      if (animationFrameId !== 0) {
+        return;
+      }
+
+      animationFrameId = window.requestAnimationFrame(updateDockedSettingsSearchState);
+    };
+
+    scheduleDockedSettingsSearchStateUpdate();
+    window.addEventListener("scroll", scheduleDockedSettingsSearchStateUpdate, { passive: true });
+    window.addEventListener("resize", scheduleDockedSettingsSearchStateUpdate);
+    document.addEventListener("scroll", scheduleDockedSettingsSearchStateUpdate, { passive: true, capture: true });
+    return () => {
+      if (animationFrameId !== 0) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+
+      window.removeEventListener("scroll", scheduleDockedSettingsSearchStateUpdate);
+      window.removeEventListener("resize", scheduleDockedSettingsSearchStateUpdate);
+      document.removeEventListener("scroll", scheduleDockedSettingsSearchStateUpdate, { capture: true });
+    };
+  }, [headerBlockRef, isSettingsScreen]);
+
   const shouldMountDockedEntityNavigation =
     shouldOfferDockedEntityNavigation && isQuickEntityNavigationPresentationActive;
+  const shouldMountDockedSettingsSearch = isSettingsScreen && isSettingsSearchPresentationActive;
   const headerCenterNavigation = isHarnessAssemblyScreen ? (
     headerHarnessAssemblyFunctionalScopeNavigation
   ) : (
@@ -325,7 +426,19 @@ export function AppShellLayout({
       onOpenAiAgent={onOpenAiAgent}
     />
   );
-  const headerCenterContent = shouldMountDockedEntityNavigation ? (
+  const headerCenterContent = shouldMountDockedSettingsSearch ? (
+    <div
+      className={
+        isSettingsSearchDocked || settingsSearchDockProgress > 0
+          ? "header-docked-nav-shell is-visible"
+          : "header-docked-nav-shell is-hidden"
+      }
+      style={{ "--header-docked-nav-progress": settingsSearchDockProgress } as CSSProperties}
+      aria-hidden={!isSettingsSearchDocked}
+    >
+      <SettingsSearchControl variant="header" />
+    </div>
+  ) : shouldMountDockedEntityNavigation ? (
     <div
       className={
         isQuickEntityNavigationDocked || quickEntityNavigationDockProgress > 0
@@ -416,6 +529,7 @@ export function AppShellLayout({
   }
 
   return (
+    <SettingsSearchDockProvider value={{ settingsSearchQuery, setSettingsSearchQuery }}>
     <main className={appShellClassName}>
       <AppHeaderAndStats
         headerBlockRef={headerBlockRef}
@@ -425,7 +539,7 @@ export function AppShellLayout({
         isSettingsActive={isSettingsActive}
         onOpenSettings={onOpenSettings}
         isInstallPromptAvailable={isInstallPromptAvailable}
-        isDockedNavigationVisible={shouldMountDockedEntityNavigation}
+        isDockedNavigationVisible={shouldMountDockedEntityNavigation || shouldMountDockedSettingsSearch}
         onInstallApp={onInstallApp}
         isPwaUpdateReady={isPwaUpdateReady}
         onApplyPwaUpdate={onApplyPwaUpdate}
@@ -544,5 +658,6 @@ export function AppShellLayout({
         </aside>
       ) : null}
     </main>
+    </SettingsSearchDockProvider>
   );
 }

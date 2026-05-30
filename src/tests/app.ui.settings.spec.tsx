@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { CatalogItemId, ConnectorId, NetworkId } from "../core/entities";
 import {
@@ -842,6 +842,40 @@ describe("App integration UI - settings", () => {
       expect(getPanelByHeading("AI provider")).toBeInTheDocument();
       expect(getPanelByHeading("Sample network controls")).toBeInTheDocument();
     });
+  });
+
+  it("docks settings search into the header after the source field scrolls under it", async () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+
+    const headerBlock = document.querySelector(".header-block");
+    const sourceSearchField = document.querySelector("[data-settings-search-source='true']");
+    expect(headerBlock).not.toBeNull();
+    expect(sourceSearchField).not.toBeNull();
+    expect(document.querySelector(".header-docked-nav-shell .settings-search-field--header")).toBeNull();
+
+    Object.defineProperty(headerBlock, "getBoundingClientRect", {
+      configurable: true,
+      value: () => ({ top: 0, right: 1200, bottom: 72, left: 0, width: 1200, height: 72, x: 0, y: 0 })
+    });
+    Object.defineProperty(sourceSearchField, "getBoundingClientRect", {
+      configurable: true,
+      value: () => ({ top: 48, right: 800, bottom: 96, left: 240, width: 560, height: 48, x: 240, y: 48 })
+    });
+
+    act(() => {
+      window.dispatchEvent(new Event("scroll"));
+    });
+
+    await waitFor(() => expect(document.querySelector(".header-docked-nav-shell")).toHaveClass("is-visible"));
+    const headerSearchField = document.querySelector(".header-docked-nav-shell .settings-search-field--header");
+    expect(headerSearchField).not.toBeNull();
+    const headerSearchInput = within(headerSearchField as HTMLElement).getByRole("searchbox");
+    fireEvent.change(headerSearchInput, { target: { value: "tax" } });
+
+    const sourceSearchInput = within(sourceSearchField as HTMLElement).getByRole("searchbox") as HTMLInputElement;
+    expect(sourceSearchInput.value).toBe("tax");
+    expect(screen.getByRole("status")).toHaveTextContent("matching setting labels");
   });
 
 });
