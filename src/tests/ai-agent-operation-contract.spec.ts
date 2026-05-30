@@ -939,6 +939,73 @@ describe("AI agent operation contract", () => {
     ]);
   });
 
+  it("rejects route locks that do not connect the wire endpoints", () => {
+    const state = createSampleNetworkState();
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "lock_wire_route",
+            wireId: "WIRE-FEED-J1",
+            segmentIds: ["SEG-002", "SEG-001"]
+          }
+        ]
+      }
+    });
+
+    expect(result.accepted).toHaveLength(0);
+    expect(result.rejected).toEqual([
+      expect.objectContaining({
+        operationType: "lock_wire_route",
+        message: "Route lock segments must form a continuous path between the wire endpoints."
+      })
+    ]);
+  });
+
+  it("rejects wire sizing updates below the computed recommendation", () => {
+    const initialState = createSampleNetworkState();
+    const networkId = initialState.activeNetworkId as NetworkId;
+    const state = appReducer(
+      initialState,
+      appActions.updateNetwork(networkId, "Main network (Sample)", "NET-SAMPLE-MAIN", "2026-05-30T08:00:00.000Z", undefined, {
+        voltageV: 12
+      })
+    );
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "update_entity",
+            entityKind: "wire",
+            entityId: "WIRE-FEED-J1",
+            fields: {
+              currentA: 600,
+              sectionMm2: 0.5
+            }
+          }
+        ]
+      }
+    });
+
+    expect(result.accepted).toHaveLength(0);
+    expect(result.rejected).toEqual([
+      expect.objectContaining({
+        operationType: "update_entity",
+        message: expect.stringContaining("is below recommended")
+      })
+    ]);
+  });
+
   it("validates delete impact and cascade mode for non-wire entities", () => {
     const state = appReducer(createSampleNetworkState(), appActions.upsertConnector({
       id: "C-AI-DELETE" as ConnectorId,

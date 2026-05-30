@@ -8,9 +8,11 @@ import type {
   SegmentId,
   SpliceId,
   WireEndpoint,
-  WireId
+  WireId,
+  WireMaterial
 } from "../../core/entities";
 import { normalizeConnectorLayout } from "../../core/connectorLayout";
+import { computeRecommendedWireSectionMm2 } from "../../core/wireSizing";
 import {
   analyzeCatalogDeleteImpact,
   analyzeConnectorDeleteImpact,
@@ -18,6 +20,7 @@ import {
   analyzeSegmentDeleteImpact,
   analyzeSpliceDeleteImpact
 } from "../../store/deleteImpact";
+import { computeForcedRouteLength, findNodeIdForEndpoint } from "../../store/reducer/helpers/wireTransitions";
 import { createNodePositionMap } from "./layout/generation";
 
 export const AI_AGENT_OPERATION_SCHEMA_VERSION = 1;
@@ -1605,6 +1608,54 @@ function deleteImpactMessage(state: AppState, operation: AiAgentDeleteEntityOper
   return impact.kind === "direct" ? null : impact.message;
 }
 
+function routeLockValidationMessage(state: AppState, operation: AiAgentLockWireRouteOperation): string | null {
+  const wire = state.wires.byId[operation.wireId];
+  if (wire === undefined) {
+    return null;
+  }
+  const startNodeId = findNodeIdForEndpoint(state, wire.endpointA);
+  const endNodeId = findNodeIdForEndpoint(state, wire.endpointB);
+  if (startNodeId === undefined || endNodeId === undefined) {
+    return "Route lock requires endpoints that can be resolved to canvas nodes.";
+  }
+  return computeForcedRouteLength(state, startNodeId, endNodeId, operation.segmentIds) === null
+    ? "Route lock segments must form a continuous path between the wire endpoints."
+    : null;
+}
+
+function wireSizingValidationMessage(state: AppState, operation: AiAgentSupportedOperation): string | null {
+  if (operation.type !== "update_entity" || operation.entityKind !== "wire") {
+    return null;
+  }
+  const wire = state.wires.byId[operation.entityId as WireId];
+  if (wire === undefined) {
+    return null;
+  }
+  const networkVoltageV = state.activeNetworkId === null ? undefined : state.networks.byId[state.activeNetworkId]?.voltageV;
+  const nextSectionMm2 =
+    typeof operation.fields.sectionMm2 === "number" && Number.isFinite(operation.fields.sectionMm2)
+      ? operation.fields.sectionMm2
+      : wire.sectionMm2;
+  const nextCurrentA =
+    typeof operation.fields.currentA === "number" && Number.isFinite(operation.fields.currentA)
+      ? operation.fields.currentA
+      : wire.currentA;
+  const nextMaterial =
+    operation.fields.material === "copper" || operation.fields.material === "aluminum"
+      ? (operation.fields.material as WireMaterial)
+      : wire.material;
+  const recommendedSectionMm2 = computeRecommendedWireSectionMm2({
+    currentA: nextCurrentA,
+    material: nextMaterial,
+    voltageV: networkVoltageV,
+    lengthMm: wire.lengthMm
+  });
+
+  return recommendedSectionMm2 !== null && nextSectionMm2 < recommendedSectionMm2
+    ? `Wire section ${nextSectionMm2} mm2 is below recommended ${recommendedSectionMm2} mm2 for the requested current.`
+    : null;
+}
+
 function entityReferenceExists(
   state: AppState,
   entityKind: AiAgentPlaceEntityRelativeToEntityOperation["referenceEntityKind"],
@@ -1761,6 +1812,18 @@ export function validateAiAgentOperations({
         result.rejected.push(reject(operationIndex, prospectiveNormalized.type, impactMessage));
         return;
       }
+    }
+    if (prospectiveNormalized.type === "lock_wire_route") {
+      const routeMessage = routeLockValidationMessage(state, prospectiveNormalized);
+      if (routeMessage !== null) {
+        result.rejected.push(reject(operationIndex, prospectiveNormalized.type, routeMessage));
+        return;
+      }
+    }
+    const wireSizingMessage = wireSizingValidationMessage(state, prospectiveNormalized);
+    if (wireSizingMessage !== null) {
+      result.rejected.push(reject(operationIndex, prospectiveNormalized.type, wireSizingMessage));
+      return;
     }
     if (prospectiveNormalized.type === "assign_catalog_item" && !prospectiveCatalogItems.has(prospectiveNormalized.catalogItemId) && state.catalogItems.byId[prospectiveNormalized.catalogItemId as CatalogItemId] === undefined) {
       result.rejected.push(reject(operationIndex, prospectiveNormalized.type, "Operation references unknown modeling entities."));
