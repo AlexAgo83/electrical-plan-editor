@@ -7,6 +7,7 @@ import type { ThemeMode } from "../../../store";
 import { THEME_MODE_OPTIONS } from "../../lib/themeModes";
 import { getAiProviderLabel, type AiProviderId } from "../../lib/aiSettings";
 import type { AiSettingsModel } from "../../hooks/useAiSettings";
+import type { WorkspaceFileStorageStatus } from "../../hooks/useWorkspaceFileStorage";
 import type {
   AppLocale,
   CanvasCalloutTextSize,
@@ -33,6 +34,11 @@ interface SettingsSectionDefinition {
 }
 
 const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
+  {
+    id: "settings-workspace-storage",
+    title: "Workspace storage",
+    labels: ["Persistence mode", "Linked file", "Permission", "Open workspace file", "Save workspace file as", "Unlink workspace file"]
+  },
   {
     id: "settings-ai-provider",
     title: "AI provider",
@@ -274,6 +280,15 @@ interface SettingsWorkspaceContentProps {
   handleExportGroupedBom?: (networkIds: NetworkId[]) => void;
   handleExportGroupedSvg?: (networkIds: NetworkId[]) => void;
   aiSettings: AiSettingsModel;
+  workspaceFileStatus: WorkspaceFileStorageStatus;
+  openWorkspaceFile: () => void;
+  resumeWorkspaceFile: () => void;
+  saveWorkspaceFileAs: () => void;
+  unlinkWorkspaceFile: () => void;
+  openLinkedWorkspaceFile: () => void;
+  openResumableWorkspaceFile: () => void;
+  loadLinkedFileVersion: () => void;
+  keepLocalWorkspaceVersion: () => void;
 }
 
 export function SettingsWorkspaceContent({
@@ -395,7 +410,16 @@ export function SettingsWorkspaceContent({
   importOverwriteDialog = null,
   handleExportGroupedBom,
   handleExportGroupedSvg,
-  aiSettings
+  aiSettings,
+  workspaceFileStatus,
+  openWorkspaceFile,
+  resumeWorkspaceFile,
+  saveWorkspaceFileAs,
+  unlinkWorkspaceFile,
+  openLinkedWorkspaceFile,
+  openResumableWorkspaceFile,
+  loadLinkedFileVersion,
+  keepLocalWorkspaceVersion
 }: SettingsWorkspaceContentProps): ReactElement {
   const activeAiProviderConfig = aiSettings.settings.providers[aiSettings.settings.provider];
   const { settingsSearchQuery, setSettingsSearchQuery } = useSettingsSearchDock();
@@ -408,10 +432,25 @@ export function SettingsWorkspaceContent({
   const hasSearchQuery = normalizedSettingsSearch.length > 0;
   const contentRef = useRef<HTMLElement | null>(null);
   const sectionVisibilityRatiosRef = useRef<Map<string, number>>(new Map());
-  const [activeSettingsSectionId, setActiveSettingsSectionId] = useState(SETTINGS_SECTIONS[0]?.id ?? "");
+  const [activeSettingsSectionId, setActiveSettingsSectionId] = useState("settings-ai-provider");
   const renderSettingLabel = (text: string): ReactNode => (
     <SettingsLabelText text={text} normalizedQuery={normalizedSettingsSearch} />
   );
+  const formatWorkspaceSavedAt = (iso: string | null): string => {
+    if (iso === null) {
+      return "Not saved to a workspace file yet";
+    }
+
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) {
+      return iso;
+    }
+
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short"
+    }).format(date);
+  };
   const scrollToSettingsSection = (sectionId: string): void => {
     setActiveSettingsSectionId(sectionId);
     const sectionElement = contentRef.current?.querySelector<HTMLElement>(`#${sectionId}`);
@@ -491,6 +530,98 @@ export function SettingsWorkspaceContent({
           })}
         </nav>
         <section ref={contentRef} className="panel settings-panel panel-grid settings-panel-grid settings-section-list" aria-label="Settings sections list">
+      <section id="settings-workspace-storage" className="panel settings-panel">
+        <header className="settings-panel-header">
+          <h2>Workspace storage</h2>
+          <span className="settings-panel-chip">Storage</span>
+        </header>
+        <p className="settings-panel-intro">
+          Link the workspace to a user-owned JSON file in a cloud drive folder. Local browser persistence remains active as a fallback.
+        </p>
+        <div className="settings-state-row" aria-label="Workspace storage status">
+          <span className={workspaceFileStatus.conflict ? "settings-state-chip is-warn" : "settings-state-chip is-ok"}>
+            {workspaceFileStatus.label}
+          </span>
+          <span className="settings-state-chip">
+            {workspaceFileStatus.mode === "linked" ? "Linked file" : "Local only"}
+          </span>
+          <span className="settings-state-chip">
+            Permission: {workspaceFileStatus.permission}
+          </span>
+        </div>
+        <dl className="settings-storage-details">
+          <div>
+            <dt>{renderSettingLabel("Persistence mode")}</dt>
+            <dd>{workspaceFileStatus.mode === "linked" ? "Linked file with local cache" : "Local browser storage only"}</dd>
+          </div>
+          <div>
+            <dt>{renderSettingLabel("Linked file")}</dt>
+            <dd>
+              {workspaceFileStatus.fileName === null ? (
+                "None"
+              ) : (
+                <button
+                  type="button"
+                  className="settings-storage-file-link"
+                  onClick={openLinkedWorkspaceFile}
+                  disabled={workspaceFileStatus.mode !== "linked"}
+                  title="Open the linked workspace file in a new browser tab"
+                >
+                  {workspaceFileStatus.fileName}
+                </button>
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt>Resumable file</dt>
+            <dd>
+              {workspaceFileStatus.resumeFileName === null ? (
+                "None"
+              ) : (
+                <button
+                  type="button"
+                  className="settings-storage-file-link"
+                  onClick={openResumableWorkspaceFile}
+                  disabled={!workspaceFileStatus.canResume}
+                  title="Open the resumable workspace file in a new browser tab"
+                >
+                  {workspaceFileStatus.resumeFileName}
+                </button>
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt>Last saved</dt>
+            <dd>{formatWorkspaceSavedAt(workspaceFileStatus.lastSavedAtIso)}</dd>
+          </div>
+        </dl>
+        {workspaceFileStatus.message !== null ? <p className="meta-line">{workspaceFileStatus.message}</p> : null}
+        <div className="row-actions settings-actions settings-workspace-storage-actions">
+          <button
+            type="button"
+            onClick={resumeWorkspaceFile}
+            disabled={!workspaceFileStatus.canResume || workspaceFileStatus.mode === "linked"}
+          >
+            Resume workspace file
+          </button>
+          <button type="button" onClick={openWorkspaceFile}>{renderSettingLabel("Open workspace file")}</button>
+          <button type="button" onClick={saveWorkspaceFileAs}>{renderSettingLabel("Save workspace file as")}</button>
+          <button type="button" onClick={unlinkWorkspaceFile} disabled={workspaceFileStatus.mode !== "linked"}>
+            {renderSettingLabel("Unlink workspace file")}
+          </button>
+        </div>
+        {workspaceFileStatus.conflict ? (
+          <div className="settings-conflict-panel" role="alert">
+            <p>The linked file changed outside this tab. Choose which workspace version to keep before autosave resumes.</p>
+            <div className="row-actions settings-actions">
+              <button type="button" onClick={loadLinkedFileVersion}>Load file version</button>
+              <button type="button" onClick={keepLocalWorkspaceVersion}>Keep local version</button>
+              <button type="button" onClick={saveWorkspaceFileAs}>Save local copy</button>
+            </div>
+          </div>
+        ) : null}
+      </section>
+
       <section id="settings-ai-provider" className="panel settings-panel" data-onboarding-panel="settings-ai-provider">
         <header className="settings-panel-header">
           <h2>AI provider</h2>

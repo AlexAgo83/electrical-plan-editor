@@ -29,6 +29,12 @@ interface BuildAppControllerShellLayoutPropsParams {
     | "onInstallApp"
     | "isPwaUpdateReady"
     | "onApplyPwaUpdate"
+    | "workspaceFileStatus"
+    | "onOpenWorkspaceFile"
+    | "onResumeWorkspaceFile"
+    | "onSaveWorkspaceFileAs"
+    | "workspaceFileInputRef"
+    | "onWorkspaceFileInputChange"
   >;
   health: Pick<
     AppShellLayoutProps,

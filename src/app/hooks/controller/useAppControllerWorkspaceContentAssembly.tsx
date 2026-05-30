@@ -12,6 +12,7 @@ import type { NetworkScopeFormStateModel } from "../useNetworkScopeFormState";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
 import type { ValidationModel } from "../useValidationModel";
 import type { AiSettingsModel } from "../useAiSettings";
+import type { UseWorkspaceFileStorageModel } from "../useWorkspaceFileStorage";
 import { ModelingAiAgentPanel } from "../../components/workspace/ModelingAiAgentPanel";
 import { applyAiAgentAcceptedOperations, createAiAgentSessionSnapshot, rollbackAiAgentSession, type AiAgentSessionSnapshot } from "../../lib/aiAgentApply";
 import { buildAiAgentContext } from "../../lib/aiAgentContext";
@@ -134,6 +135,7 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     networkScopeFormState: NetworkScopeFormStateModel;
     catalogHandlers: CatalogHandlersModel;
     aiSettings: AiSettingsModel;
+    workspaceFileStorage: UseWorkspaceFileStorageModel;
   };
   domains: {
     workspaceNetworkDomain: AppControllerWorkspaceNetworkDomainAssemblyModel;
@@ -469,7 +471,8 @@ export function useAppControllerWorkspaceContentAssembly({
         configuredResetZoomPercent: state.configuredResetZoomPercent,
         handleZoomAction: domains.canvasInteractionDomain.handleZoomAction,
         resetWorkspacePreferencesToDefaults: domains.workspaceNetworkDomain.resetWorkspacePreferencesToDefaults,
-        aiSettings: models.aiSettings
+        aiSettings: models.aiSettings,
+        workspaceFileStorage: models.workspaceFileStorage
       },
       includeNetworkScopeContent: state.isNetworkScopeScreen,
       includeValidationContent: state.hasActiveNetwork && state.isValidationScreen,

@@ -1,4 +1,5 @@
-import type { ReactElement } from "react";
+import type { ChangeEvent, ReactElement, RefObject } from "react";
+import type { WorkspaceFileStorageStatus } from "../../hooks/useWorkspaceFileStorage";
 import type { ValidationIssue } from "../../types/app-controller";
 
 interface OperationsHealthPanelProps {
@@ -8,6 +9,12 @@ interface OperationsHealthPanelProps {
   isRedoAvailable: boolean;
   showShortcutHints: boolean;
   saveStatus: "saved" | "unsaved" | "error";
+  workspaceFileStatus: WorkspaceFileStorageStatus;
+  onOpenWorkspaceFile: () => void;
+  onResumeWorkspaceFile: () => void;
+  onSaveWorkspaceFileAs: () => void;
+  workspaceFileInputRef: RefObject<HTMLInputElement | null>;
+  onWorkspaceFileInputChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   validationIssuesCount: number;
   validationErrorCount: number;
   validationWarningCount: number;
@@ -26,6 +33,12 @@ export function OperationsHealthPanel({
   isRedoAvailable,
   showShortcutHints,
   saveStatus,
+  workspaceFileStatus,
+  onOpenWorkspaceFile,
+  onResumeWorkspaceFile,
+  onSaveWorkspaceFileAs,
+  workspaceFileInputRef,
+  onWorkspaceFileInputChange,
   validationIssuesCount,
   validationErrorCount,
   validationWarningCount,
@@ -58,6 +71,49 @@ export function OperationsHealthPanel({
       <p className={`save-status is-${saveStatus}`}>
         State: {saveStatus === "saved" ? "Saved" : saveStatus === "unsaved" ? "Unsaved" : "Error"}
       </p>
+      <section className="workspace-health workspace-storage-ops" aria-label="Workspace storage">
+        <h2>Workspace storage</h2>
+        <p className="meta-line">
+          File state: <strong>{workspaceFileStatus.label}</strong>
+        </p>
+        <p className="meta-line">
+          Mode: {workspaceFileStatus.mode === "linked" ? "Linked file" : "Local only"}
+        </p>
+        {workspaceFileStatus.fileName !== null ? <p className="meta-line">File: {workspaceFileStatus.fileName}</p> : null}
+        {workspaceFileStatus.mode !== "linked" && workspaceFileStatus.resumeFileName !== null ? (
+          <p className="meta-line">Resume: {workspaceFileStatus.resumeFileName}</p>
+        ) : null}
+        {workspaceFileStatus.message !== null ? <p className="meta-line">{workspaceFileStatus.message}</p> : null}
+        <div className="row-actions compact workspace-storage-actions">
+          <button
+            type="button"
+            className="button-with-icon"
+            onClick={onResumeWorkspaceFile}
+            disabled={!workspaceFileStatus.canResume || workspaceFileStatus.mode === "linked"}
+          >
+            <span className="action-button-icon is-redo" aria-hidden="true" />
+            Resume
+          </button>
+          <button type="button" className="button-with-icon" onClick={onOpenWorkspaceFile}>
+            <span className="action-button-icon is-open" aria-hidden="true" />
+            Open
+          </button>
+          <button type="button" className="button-with-icon" onClick={onSaveWorkspaceFileAs}>
+            <span className="action-button-icon is-save" aria-hidden="true" />
+            Save as
+          </button>
+          <input
+            ref={workspaceFileInputRef}
+            className="visually-hidden"
+            type="file"
+            accept=".epe.json,.json,application/json"
+            onChange={(event) => {
+              void onWorkspaceFileInputChange(event);
+            }}
+            aria-label="Open workspace file"
+          />
+        </div>
+      </section>
       <section className="workspace-health" aria-label="Model health">
         <h2>Model health</h2>
         <p className="meta-line">

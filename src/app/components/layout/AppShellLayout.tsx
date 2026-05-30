@@ -56,6 +56,12 @@ interface AppShellLayoutProps {
   onInstallApp: AppHeaderAndStatsProps["onInstallApp"];
   isPwaUpdateReady: AppHeaderAndStatsProps["isPwaUpdateReady"];
   onApplyPwaUpdate: AppHeaderAndStatsProps["onApplyPwaUpdate"];
+  workspaceFileStatus: OperationsHealthPanelProps["workspaceFileStatus"];
+  onOpenWorkspaceFile: OperationsHealthPanelProps["onOpenWorkspaceFile"];
+  onResumeWorkspaceFile: OperationsHealthPanelProps["onResumeWorkspaceFile"];
+  onSaveWorkspaceFileAs: OperationsHealthPanelProps["onSaveWorkspaceFileAs"];
+  workspaceFileInputRef: OperationsHealthPanelProps["workspaceFileInputRef"];
+  onWorkspaceFileInputChange: OperationsHealthPanelProps["onWorkspaceFileInputChange"];
   validationIssuesCount: number;
   validationErrorCount: number;
   validationWarningCount: number;
@@ -145,6 +151,12 @@ export function AppShellLayout({
   onInstallApp,
   isPwaUpdateReady,
   onApplyPwaUpdate,
+  workspaceFileStatus,
+  onOpenWorkspaceFile,
+  onResumeWorkspaceFile,
+  onSaveWorkspaceFileAs,
+  workspaceFileInputRef,
+  onWorkspaceFileInputChange,
   validationIssuesCount,
   validationErrorCount,
   validationWarningCount,
@@ -623,6 +635,12 @@ export function AppShellLayout({
             isRedoAvailable={isRedoAvailable}
             showShortcutHints={showShortcutHints}
             saveStatus={saveStatus}
+            workspaceFileStatus={workspaceFileStatus}
+            onOpenWorkspaceFile={onOpenWorkspaceFile}
+            onResumeWorkspaceFile={onResumeWorkspaceFile}
+            onSaveWorkspaceFileAs={onSaveWorkspaceFileAs}
+            workspaceFileInputRef={workspaceFileInputRef}
+            onWorkspaceFileInputChange={onWorkspaceFileInputChange}
             validationIssuesCount={validationIssuesCount}
             validationErrorCount={validationErrorCount}
             validationWarningCount={validationWarningCount}

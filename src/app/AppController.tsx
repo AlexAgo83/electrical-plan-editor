@@ -101,6 +101,7 @@ import { useAppLocaleDomTranslation } from "./hooks/useAppLocaleDomTranslation";
 import { useHoverDescriptionTitles } from "./hooks/useHoverDescriptionTitles";
 import { useToastNotifications } from "./hooks/useToastNotifications";
 import { useAiSettings } from "./hooks/useAiSettings";
+import { useWorkspaceFileStorage } from "./hooks/useWorkspaceFileStorage";
 import { useAppControllerUiPreferencesBindings } from "./hooks/controller/useAppControllerUiPreferencesBindings";
 import { buildAppControllerNamespacedCanvasState } from "./hooks/useAppControllerNamespacedCanvasState";
 import { buildAppControllerNamespacedFormsState } from "./hooks/useAppControllerNamespacedFormsState";
@@ -469,6 +470,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   } = useAppControllerPersistenceHealth({
     state,
     dispatchAction
+  });
+  const workspaceFileStorage = useWorkspaceFileStorage({
+    store,
+    replaceStateWithHistory,
+    requestConfirmation,
+    notifyToast
   });
 
   const catalogHandlers = useCatalogHandlers({
@@ -973,7 +980,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       validationModel,
       networkScopeFormState,
       catalogHandlers,
-      aiSettings
+      aiSettings,
+      workspaceFileStorage
     },
     domains: {
       workspaceNetworkDomain,
@@ -1030,7 +1038,13 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isInstallPromptAvailable,
       onInstallApp: handleInstallApp,
       isPwaUpdateReady,
-      onApplyPwaUpdate: handleApplyPwaUpdate
+      onApplyPwaUpdate: handleApplyPwaUpdate,
+      workspaceFileStatus: workspaceFileStorage.workspaceFileStatus,
+      onOpenWorkspaceFile: workspaceFileStorage.openWorkspaceFile,
+      onResumeWorkspaceFile: workspaceFileStorage.resumeWorkspaceFile,
+      onSaveWorkspaceFileAs: workspaceFileStorage.saveWorkspaceFileAs,
+      workspaceFileInputRef: workspaceFileStorage.workspaceFileInputRef,
+      onWorkspaceFileInputChange: workspaceFileStorage.handleWorkspaceFileInputChange
     },
     health: {
       validationIssuesCount: validationIssues.length,

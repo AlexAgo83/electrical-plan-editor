@@ -4,6 +4,7 @@ import type { NetworkImportExportModel } from "../useNetworkImportExport";
 import type { NetworkScopeFormStateModel } from "../useNetworkScopeFormState";
 import type { ValidationModel } from "../useValidationModel";
 import type { AiSettingsModel } from "../useAiSettings";
+import type { UseWorkspaceFileStorageModel } from "../useWorkspaceFileStorage";
 import {
   buildNetworkScopeScreenContentSlice,
   buildSettingsScreenContentSlice,
@@ -64,6 +65,7 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     handleZoomAction: SettingsSliceParams["handleZoomAction"];
     resetWorkspacePreferencesToDefaults: SettingsSliceParams["resetWorkspacePreferencesToDefaults"];
     aiSettings: AiSettingsModel;
+    workspaceFileStorage: UseWorkspaceFileStorageModel;
   };
   includeNetworkScopeContent: boolean;
   includeValidationContent: boolean;
@@ -274,7 +276,16 @@ export function useAppControllerAuxScreenContentDomains({
     workspaceWideScreen: settings.prefs.workspaceWideScreen,
     setWorkspaceWideScreen: settings.prefs.setWorkspaceWideScreen,
     resetWorkspacePreferencesToDefaults: settings.resetWorkspacePreferencesToDefaults,
-    aiSettings: settings.aiSettings
+    aiSettings: settings.aiSettings,
+    workspaceFileStatus: settings.workspaceFileStorage.workspaceFileStatus,
+    openWorkspaceFile: settings.workspaceFileStorage.openWorkspaceFile,
+    resumeWorkspaceFile: settings.workspaceFileStorage.resumeWorkspaceFile,
+    saveWorkspaceFileAs: settings.workspaceFileStorage.saveWorkspaceFileAs,
+    unlinkWorkspaceFile: settings.workspaceFileStorage.unlinkWorkspaceFile,
+    openLinkedWorkspaceFile: settings.workspaceFileStorage.openLinkedWorkspaceFile,
+    openResumableWorkspaceFile: settings.workspaceFileStorage.openResumableWorkspaceFile,
+    loadLinkedFileVersion: settings.workspaceFileStorage.loadLinkedFileVersion,
+    keepLocalWorkspaceVersion: settings.workspaceFileStorage.keepLocalWorkspaceVersion
       })
     : null;
 

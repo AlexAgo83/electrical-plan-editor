@@ -701,6 +701,72 @@
   color: #624512;
 }
 
+.settings-storage-details {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.settings-storage-details > div {
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.42fr) minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: baseline;
+}
+
+.settings-storage-details dt {
+  color: color-mix(in srgb, currentColor 72%, var(--theme-primary, currentColor) 28%);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.settings-storage-details dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.settings-storage-file-link {
+  max-width: 100%;
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 42%, transparent);
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 10%, transparent);
+  color: color-mix(in srgb, currentColor 78%, var(--theme-primary, currentColor) 22%);
+  padding: 0.2rem 0.48rem;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.settings-storage-file-link:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent);
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 58%, transparent);
+}
+
+.settings-storage-file-link:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.settings-conflict-panel {
+  border: 1px solid color-mix(in srgb, #d7a82f 58%, currentColor 42%);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, #d7a82f 16%, transparent),
+      color-mix(in srgb, var(--theme-primary, currentColor) 7%, transparent)
+    );
+  color: currentColor;
+  padding: 0.75rem;
+}
+
+.settings-workspace-storage-actions {
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+}
+
 .settings-export-fieldset {
   background: rgba(246, 251, 255, 0.8);
   border-color: #b8cedf;

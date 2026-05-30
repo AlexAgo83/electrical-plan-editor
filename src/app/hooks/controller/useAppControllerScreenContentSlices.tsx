@@ -965,7 +965,16 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     importOverwriteDialog: params.importOverwriteDialog,
     handleExportGroupedBom: params.handleExportGroupedBom,
     handleExportGroupedSvg: params.handleExportGroupedSvg,
-    aiSettings: params.aiSettings
+    aiSettings: params.aiSettings,
+    workspaceFileStatus: params.workspaceFileStatus,
+    openWorkspaceFile: params.openWorkspaceFile,
+    resumeWorkspaceFile: params.resumeWorkspaceFile,
+    saveWorkspaceFileAs: params.saveWorkspaceFileAs,
+    unlinkWorkspaceFile: params.unlinkWorkspaceFile,
+    openLinkedWorkspaceFile: params.openLinkedWorkspaceFile,
+    openResumableWorkspaceFile: params.openResumableWorkspaceFile,
+    loadLinkedFileVersion: params.loadLinkedFileVersion,
+    keepLocalWorkspaceVersion: params.keepLocalWorkspaceVersion
   } satisfies SettingsWorkspaceContentProps;
 
   return {
