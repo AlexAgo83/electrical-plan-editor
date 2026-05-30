@@ -76,14 +76,11 @@ describe("AI agent apply", () => {
     const applied = applyAiAgentAcceptedOperations(state, validation);
 
     expect(applied.nextState.nodes.byId["AI-NODE-001" as NodeId]).toBeDefined();
-    expect(snapshot).toEqual(
-      expect.objectContaining({
-        id: "ai-session-2026-05-30T08:00:00.000Z",
-        createdAtIso: "2026-05-30T08:00:00.000Z",
-        label: "proposal 1",
-        impactPreview: expect.objectContaining({ acceptedCount: 1, addCount: 1 })
-      })
-    );
+    expect(snapshot.id).toBe("ai-session-2026-05-30T08:00:00.000Z");
+    expect(snapshot.createdAtIso).toBe("2026-05-30T08:00:00.000Z");
+    expect(snapshot.label).toBe("proposal 1");
+    expect(snapshot.impactPreview.acceptedCount).toBe(1);
+    expect(snapshot.impactPreview.addCount).toBe(1);
     expect(rollbackAiAgentSession(snapshot)).toEqual(state);
     expect(rollbackAiAgentSession(snapshot)).not.toBe(snapshot.state);
   });
@@ -540,12 +537,9 @@ describe("AI agent apply", () => {
     const result = applyAiAgentAcceptedOperations(state, validation);
 
     expect(result.appliedCount).toBe(1);
-    expect(result.nextState.catalogItems.byId["CAT-SAMPLE-SRC-12W" as CatalogItemId]?.connectorLayout).toEqual(
-      expect.objectContaining({
-        width: 6,
-        height: 2,
-        ways: expect.arrayContaining([expect.objectContaining({ cavityIndex: 2, shape: "square" })])
-      })
-    );
+    const connectorLayout = result.nextState.catalogItems.byId["CAT-SAMPLE-SRC-12W" as CatalogItemId]?.connectorLayout;
+    expect(connectorLayout?.width).toBe(6);
+    expect(connectorLayout?.height).toBe(2);
+    expect(connectorLayout?.ways).toContainEqual(expect.objectContaining({ cavityIndex: 2, shape: "square" }));
   });
 });

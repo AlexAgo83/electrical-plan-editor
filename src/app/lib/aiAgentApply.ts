@@ -87,13 +87,13 @@ export function createAiAgentSessionSnapshot(
     id: `ai-session-${now.toISOString()}`,
     createdAtIso: now.toISOString(),
     ...(label === undefined || label.trim().length === 0 ? {} : { label: label.trim() }),
-    state: structuredClone(state) as AppState,
+    state: structuredClone(state),
     impactPreview: buildAiAgentImpactPreview(validation)
   };
 }
 
 export function rollbackAiAgentSession(snapshot: AiAgentSessionSnapshot): AppState {
-  return structuredClone(snapshot.state) as AppState;
+  return structuredClone(snapshot.state);
 }
 
 function buildNextAiNodeId(state: AppState): NodeId {

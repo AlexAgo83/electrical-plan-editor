@@ -872,17 +872,16 @@ describe("AI agent operation contract", () => {
     });
 
     expect(result.rejected).toHaveLength(0);
-    expect(result.accepted).toEqual([
-      expect.objectContaining({
-        type: "update_catalog_connector_layout",
-        catalogItemId: "CAT-SAMPLE-SRC-12W",
-        connectorLayout: expect.objectContaining({
-          width: 6,
-          height: 2,
-          ways: expect.arrayContaining([expect.objectContaining({ cavityIndex: 2, shape: "square" })])
-        })
-      })
-    ]);
+    const [operation] = result.accepted;
+    expect(operation).toMatchObject({
+      type: "update_catalog_connector_layout",
+      catalogItemId: "CAT-SAMPLE-SRC-12W"
+    });
+    expect(operation?.type === "update_catalog_connector_layout" ? operation.connectorLayout.width : null).toBe(6);
+    expect(operation?.type === "update_catalog_connector_layout" ? operation.connectorLayout.height : null).toBe(2);
+    expect(operation?.type === "update_catalog_connector_layout" ? operation.connectorLayout.ways : []).toContainEqual(
+      expect.objectContaining({ cavityIndex: 2, shape: "square" })
+    );
   });
 
   it("accepts batch canvas moves and resolves relative positions", () => {
@@ -998,12 +997,8 @@ describe("AI agent operation contract", () => {
     });
 
     expect(result.accepted).toHaveLength(0);
-    expect(result.rejected).toEqual([
-      expect.objectContaining({
-        operationType: "update_entity",
-        message: expect.stringContaining("is below recommended")
-      })
-    ]);
+    expect(result.rejected[0]?.operationType).toBe("update_entity");
+    expect(result.rejected[0]?.message).toContain("is below recommended");
   });
 
   it("validates delete impact and cascade mode for non-wire entities", () => {
