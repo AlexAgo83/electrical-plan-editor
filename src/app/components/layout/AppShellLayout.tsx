@@ -61,6 +61,7 @@ interface AppShellLayoutProps {
   onOpenWorkspaceFile: OperationsHealthPanelProps["onOpenWorkspaceFile"];
   onRelinkWorkspaceFile: OperationsHealthPanelProps["onRelinkWorkspaceFile"];
   onResumeWorkspaceFile: OperationsHealthPanelProps["onResumeWorkspaceFile"];
+  onSaveWorkspaceFileNow: OperationsHealthPanelProps["onSaveWorkspaceFileNow"];
   onSaveWorkspaceFileAs: OperationsHealthPanelProps["onSaveWorkspaceFileAs"];
   workspaceFileInputRef: OperationsHealthPanelProps["workspaceFileInputRef"];
   onWorkspaceFileInputChange: OperationsHealthPanelProps["onWorkspaceFileInputChange"];
@@ -158,6 +159,7 @@ export function AppShellLayout({
   onOpenWorkspaceFile,
   onRelinkWorkspaceFile,
   onResumeWorkspaceFile,
+  onSaveWorkspaceFileNow,
   onSaveWorkspaceFileAs,
   workspaceFileInputRef,
   onWorkspaceFileInputChange,
@@ -644,6 +646,7 @@ export function AppShellLayout({
             onOpenWorkspaceFile={onOpenWorkspaceFile}
             onRelinkWorkspaceFile={onRelinkWorkspaceFile}
             onResumeWorkspaceFile={onResumeWorkspaceFile}
+            onSaveWorkspaceFileNow={onSaveWorkspaceFileNow}
             onSaveWorkspaceFileAs={onSaveWorkspaceFileAs}
             workspaceFileInputRef={workspaceFileInputRef}
             onWorkspaceFileInputChange={onWorkspaceFileInputChange}

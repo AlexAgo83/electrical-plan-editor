@@ -284,6 +284,7 @@ interface SettingsWorkspaceContentProps {
   openWorkspaceFile: () => void;
   relinkWorkspaceFile: () => void;
   resumeWorkspaceFile: () => void;
+  saveWorkspaceFileNow: () => void;
   saveWorkspaceFileAs: () => void;
   unlinkWorkspaceFile: () => void;
   openLinkedWorkspaceFile: () => void;
@@ -416,6 +417,7 @@ export function SettingsWorkspaceContent({
   openWorkspaceFile,
   relinkWorkspaceFile,
   resumeWorkspaceFile,
+  saveWorkspaceFileNow,
   saveWorkspaceFileAs,
   unlinkWorkspaceFile,
   openLinkedWorkspaceFile,
@@ -622,6 +624,7 @@ export function SettingsWorkspaceContent({
           </button>
           <button type="button" onClick={openWorkspaceFile}>{renderSettingLabel("Open workspace file")}</button>
           <button type="button" onClick={relinkWorkspaceFile}>Relink workspace file</button>
+          <button type="button" onClick={saveWorkspaceFileNow}>Save workspace file now</button>
           <button type="button" onClick={saveWorkspaceFileAs}>{renderSettingLabel("Save workspace file as")}</button>
           <button type="button" onClick={unlinkWorkspaceFile} disabled={workspaceFileStatus.mode !== "linked"}>
             {renderSettingLabel("Unlink workspace file")}

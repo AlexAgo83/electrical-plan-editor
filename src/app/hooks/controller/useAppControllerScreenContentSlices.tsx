@@ -970,6 +970,7 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     openWorkspaceFile: params.openWorkspaceFile,
     relinkWorkspaceFile: params.relinkWorkspaceFile,
     resumeWorkspaceFile: params.resumeWorkspaceFile,
+    saveWorkspaceFileNow: params.saveWorkspaceFileNow,
     saveWorkspaceFileAs: params.saveWorkspaceFileAs,
     unlinkWorkspaceFile: params.unlinkWorkspaceFile,
     openLinkedWorkspaceFile: params.openLinkedWorkspaceFile,

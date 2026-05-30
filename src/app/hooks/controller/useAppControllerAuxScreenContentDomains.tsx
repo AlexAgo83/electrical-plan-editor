@@ -281,6 +281,7 @@ export function useAppControllerAuxScreenContentDomains({
     openWorkspaceFile: settings.workspaceFileStorage.openWorkspaceFile,
     relinkWorkspaceFile: settings.workspaceFileStorage.relinkWorkspaceFile,
     resumeWorkspaceFile: settings.workspaceFileStorage.resumeWorkspaceFile,
+    saveWorkspaceFileNow: settings.workspaceFileStorage.saveWorkspaceFileNow,
     saveWorkspaceFileAs: settings.workspaceFileStorage.saveWorkspaceFileAs,
     unlinkWorkspaceFile: settings.workspaceFileStorage.unlinkWorkspaceFile,
     openLinkedWorkspaceFile: settings.workspaceFileStorage.openLinkedWorkspaceFile,

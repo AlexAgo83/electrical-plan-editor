@@ -75,6 +75,7 @@ interface UseWorkspaceFileStorageResult {
   openWorkspaceFile: () => void;
   relinkWorkspaceFile: () => void;
   resumeWorkspaceFile: () => void;
+  saveWorkspaceFileNow: () => void;
   saveWorkspaceFileAs: () => void;
   unlinkWorkspaceFile: () => void;
   openLinkedWorkspaceFile: () => void;
@@ -571,6 +572,35 @@ export function useWorkspaceFileStorage({
     })();
   }, [notifyToast, store]);
 
+  const saveWorkspaceFileNow = useCallback((): void => {
+    const handle = linkedHandleRef.current;
+    if (handle !== null) {
+      void (async () => {
+        setStatusBase((current) => ({ ...current, isSaving: true, message: "Saving linked workspace file now." }));
+        const result = await writeCurrentStateToHandle(handle, { ignoreConflict: false });
+        if (result === "saved") {
+          notifyToast("Workspace file saved", {
+            message: handle.name,
+            variant: "success"
+          });
+        } else if (result === "conflict") {
+          notifyToast("Workspace file conflict", {
+            message: "The linked file changed outside this tab.",
+            variant: "warning"
+          });
+        } else {
+          notifyToast("Workspace file not saved", {
+            message: "The linked file could not be written.",
+            variant: "error"
+          });
+        }
+      })();
+      return;
+    }
+
+    saveWorkspaceFileAs();
+  }, [notifyToast, saveWorkspaceFileAs, writeCurrentStateToHandle]);
+
   const unlinkWorkspaceFile = useCallback((): void => {
     linkedHandleRef.current = null;
     void clearStoredWorkspaceFileHandle();
@@ -763,6 +793,7 @@ export function useWorkspaceFileStorage({
     openWorkspaceFile,
     relinkWorkspaceFile,
     resumeWorkspaceFile,
+    saveWorkspaceFileNow,
     saveWorkspaceFileAs,
     unlinkWorkspaceFile,
     openLinkedWorkspaceFile,

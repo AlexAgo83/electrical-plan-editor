@@ -13,6 +13,7 @@ interface OperationsHealthPanelProps {
   onOpenWorkspaceFile: () => void;
   onRelinkWorkspaceFile: () => void;
   onResumeWorkspaceFile: () => void;
+  onSaveWorkspaceFileNow: () => void;
   onSaveWorkspaceFileAs: () => void;
   workspaceFileInputRef: RefObject<HTMLInputElement | null>;
   onWorkspaceFileInputChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
@@ -38,6 +39,7 @@ export function OperationsHealthPanel({
   onOpenWorkspaceFile,
   onRelinkWorkspaceFile,
   onResumeWorkspaceFile,
+  onSaveWorkspaceFileNow,
   onSaveWorkspaceFileAs,
   workspaceFileInputRef,
   onWorkspaceFileInputChange,
@@ -115,6 +117,10 @@ export function OperationsHealthPanel({
           <button type="button" className="button-with-icon" onClick={onRelinkWorkspaceFile}>
             <span className="action-button-icon is-swap" aria-hidden="true" />
             Relink
+          </button>
+          <button type="button" className="button-with-icon" onClick={onSaveWorkspaceFileNow}>
+            <span className="action-button-icon is-save" aria-hidden="true" />
+            Save now
           </button>
           <button type="button" className="button-with-icon" onClick={onSaveWorkspaceFileAs}>
             <span className="action-button-icon is-save" aria-hidden="true" />
