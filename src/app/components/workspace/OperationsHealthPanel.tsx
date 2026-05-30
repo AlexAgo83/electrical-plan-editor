@@ -11,6 +11,7 @@ interface OperationsHealthPanelProps {
   saveStatus: "saved" | "unsaved" | "error";
   workspaceFileStatus: WorkspaceFileStorageStatus;
   onOpenWorkspaceFile: () => void;
+  onRelinkWorkspaceFile: () => void;
   onResumeWorkspaceFile: () => void;
   onSaveWorkspaceFileAs: () => void;
   workspaceFileInputRef: RefObject<HTMLInputElement | null>;
@@ -35,6 +36,7 @@ export function OperationsHealthPanel({
   saveStatus,
   workspaceFileStatus,
   onOpenWorkspaceFile,
+  onRelinkWorkspaceFile,
   onResumeWorkspaceFile,
   onSaveWorkspaceFileAs,
   workspaceFileInputRef,
@@ -106,6 +108,10 @@ export function OperationsHealthPanel({
           <button type="button" className="button-with-icon" onClick={onOpenWorkspaceFile}>
             <span className="action-button-icon is-open" aria-hidden="true" />
             Open
+          </button>
+          <button type="button" className="button-with-icon" onClick={onRelinkWorkspaceFile}>
+            <span className="action-button-icon is-swap" aria-hidden="true" />
+            Relink
           </button>
           <button type="button" className="button-with-icon" onClick={onSaveWorkspaceFileAs}>
             <span className="action-button-icon is-save" aria-hidden="true" />

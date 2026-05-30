@@ -282,6 +282,7 @@ interface SettingsWorkspaceContentProps {
   aiSettings: AiSettingsModel;
   workspaceFileStatus: WorkspaceFileStorageStatus;
   openWorkspaceFile: () => void;
+  relinkWorkspaceFile: () => void;
   resumeWorkspaceFile: () => void;
   saveWorkspaceFileAs: () => void;
   unlinkWorkspaceFile: () => void;
@@ -413,6 +414,7 @@ export function SettingsWorkspaceContent({
   aiSettings,
   workspaceFileStatus,
   openWorkspaceFile,
+  relinkWorkspaceFile,
   resumeWorkspaceFile,
   saveWorkspaceFileAs,
   unlinkWorkspaceFile,
@@ -616,6 +618,7 @@ export function SettingsWorkspaceContent({
             Resume workspace file
           </button>
           <button type="button" onClick={openWorkspaceFile}>{renderSettingLabel("Open workspace file")}</button>
+          <button type="button" onClick={relinkWorkspaceFile}>Relink workspace file</button>
           <button type="button" onClick={saveWorkspaceFileAs}>{renderSettingLabel("Save workspace file as")}</button>
           <button type="button" onClick={unlinkWorkspaceFile} disabled={workspaceFileStatus.mode !== "linked"}>
             {renderSettingLabel("Unlink workspace file")}

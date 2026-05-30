@@ -72,6 +72,7 @@ interface UseWorkspaceFileStorageResult {
   workspaceFileInputRef: MutableRefObject<HTMLInputElement | null>;
   workspaceFileStatus: WorkspaceFileStorageStatus;
   openWorkspaceFile: () => void;
+  relinkWorkspaceFile: () => void;
   resumeWorkspaceFile: () => void;
   saveWorkspaceFileAs: () => void;
   unlinkWorkspaceFile: () => void;
@@ -421,6 +422,10 @@ export function useWorkspaceFileStorage({
     workspaceFileInputRef.current?.click();
   }, [applyWorkspaceFile, notifyToast]);
 
+  const relinkWorkspaceFile = useCallback((): void => {
+    openWorkspaceFile();
+  }, [openWorkspaceFile]);
+
   const handleWorkspaceFileInputChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
       const file = event.target.files?.[0] ?? null;
@@ -735,6 +740,7 @@ export function useWorkspaceFileStorage({
     workspaceFileInputRef,
     workspaceFileStatus: status,
     openWorkspaceFile,
+    relinkWorkspaceFile,
     resumeWorkspaceFile,
     saveWorkspaceFileAs,
     unlinkWorkspaceFile,

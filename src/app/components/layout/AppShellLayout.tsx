@@ -59,6 +59,7 @@ interface AppShellLayoutProps {
   onApplyPwaUpdate: AppHeaderAndStatsProps["onApplyPwaUpdate"];
   workspaceFileStatus: OperationsHealthPanelProps["workspaceFileStatus"];
   onOpenWorkspaceFile: OperationsHealthPanelProps["onOpenWorkspaceFile"];
+  onRelinkWorkspaceFile: OperationsHealthPanelProps["onRelinkWorkspaceFile"];
   onResumeWorkspaceFile: OperationsHealthPanelProps["onResumeWorkspaceFile"];
   onSaveWorkspaceFileAs: OperationsHealthPanelProps["onSaveWorkspaceFileAs"];
   workspaceFileInputRef: OperationsHealthPanelProps["workspaceFileInputRef"];
@@ -155,6 +156,7 @@ export function AppShellLayout({
   onApplyPwaUpdate,
   workspaceFileStatus,
   onOpenWorkspaceFile,
+  onRelinkWorkspaceFile,
   onResumeWorkspaceFile,
   onSaveWorkspaceFileAs,
   workspaceFileInputRef,
@@ -640,6 +642,7 @@ export function AppShellLayout({
             saveStatus={saveStatus}
             workspaceFileStatus={workspaceFileStatus}
             onOpenWorkspaceFile={onOpenWorkspaceFile}
+            onRelinkWorkspaceFile={onRelinkWorkspaceFile}
             onResumeWorkspaceFile={onResumeWorkspaceFile}
             onSaveWorkspaceFileAs={onSaveWorkspaceFileAs}
             workspaceFileInputRef={workspaceFileInputRef}
