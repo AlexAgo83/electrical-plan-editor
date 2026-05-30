@@ -196,6 +196,7 @@ describe("recent change labels", () => {
       "2026-03-27T12:00:00.000Z"
     );
     expect(routeEntry.label).toBe("Wire 'W-1' route locked");
+    expect(routeEntry.detailLabel).toBe("2 segment route");
 
     const deleteEntry = buildUndoHistoryEntry(
       appActions.removeWire(asWireId("W1")),
@@ -205,6 +206,34 @@ describe("recent change labels", () => {
       "2026-03-27T12:01:00.000Z"
     );
     expect(deleteEntry.label).toBe("Wire 'W-1' deleted");
+  });
+
+  it("adds wire save sub-reasons for recent change logs", () => {
+    const previousState = createUiIntegrationState();
+    const action = appActions.saveWire({
+      id: asWireId("W1"),
+      name: "Wire 1",
+      technicalId: "W-1",
+      twistGroupLabel: "TW-A",
+      functionalDomainTag: "door",
+      sectionMm2: 1.5,
+      currentA: 8,
+      material: "copper",
+      colorMode: "catalog",
+      primaryColorId: "RD",
+      secondaryColorId: "BU",
+      endpointAConnectionReference: "TERM-A",
+      endpointAConnectionName: "Terminal A",
+      endpointBConnectionReference: "TERM-B",
+      endpointBConnectionName: "Terminal B",
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 0 },
+      endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+      protection: { kind: "fuse", catalogItemId: asCatalogItemId("FUSE-CAT") }
+    });
+    const entry = buildUndoHistoryEntry(action, previousState, appReducer(previousState, action), 1, "2026-03-27T12:00:00.000Z");
+
+    expect(entry.detailLabel).toBe("Endpoints / Electrical spec / Color");
+    expect(entry.label).toBe("Wire 'W-1' endpoints / electrical spec / color updated");
   });
 
   it("keeps layout history labels human-readable via node references", () => {

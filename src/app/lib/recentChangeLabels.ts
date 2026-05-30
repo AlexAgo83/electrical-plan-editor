@@ -580,6 +580,64 @@ function describeSpliceChange(action: Extract<AppAction, { type: "splice/upsert"
   return joinChangeDetails(details) ?? "No field delta";
 }
 
+function describeWireChange(
+  action: Extract<AppAction, { type: "wire/save" }> | Extract<AppAction, { type: "wire/upsert" }>,
+  previousState: AppState
+): string | null {
+  const previousWire = previousState.wires.byId[action.payload.id];
+  if (previousWire === undefined) {
+    const endpointA = resolveEndpointDisplayRef(previousState, action.payload.endpointA);
+    const endpointB = resolveEndpointDisplayRef(previousState, action.payload.endpointB);
+    return endpointA !== null && endpointB !== null ? `${endpointA} -> ${endpointB}` : "New wire";
+  }
+
+  const details: string[] = [];
+  if (previousWire.technicalId !== action.payload.technicalId || previousWire.name !== action.payload.name) {
+    details.push("Identity");
+  }
+  if (valuesDiffer(previousWire.endpointA, action.payload.endpointA) || valuesDiffer(previousWire.endpointB, action.payload.endpointB)) {
+    details.push("Endpoints");
+  }
+  if (
+    previousWire.sectionMm2 !== action.payload.sectionMm2 ||
+    previousWire.currentA !== action.payload.currentA ||
+    previousWire.material !== action.payload.material
+  ) {
+    details.push("Electrical spec");
+  }
+  if (
+    previousWire.colorMode !== action.payload.colorMode ||
+    previousWire.primaryColorId !== action.payload.primaryColorId ||
+    previousWire.secondaryColorId !== action.payload.secondaryColorId ||
+    previousWire.freeColorLabel !== action.payload.freeColorLabel
+  ) {
+    details.push("Color");
+  }
+  if (
+    previousWire.endpointAConnectionReference !== action.payload.endpointAConnectionReference ||
+    previousWire.endpointAConnectionName !== action.payload.endpointAConnectionName ||
+    previousWire.endpointASealReference !== action.payload.endpointASealReference ||
+    previousWire.endpointASealName !== action.payload.endpointASealName ||
+    previousWire.endpointBConnectionReference !== action.payload.endpointBConnectionReference ||
+    previousWire.endpointBConnectionName !== action.payload.endpointBConnectionName ||
+    previousWire.endpointBSealReference !== action.payload.endpointBSealReference ||
+    previousWire.endpointBSealName !== action.payload.endpointBSealName
+  ) {
+    details.push("Terminations");
+  }
+  if (previousWire.twistGroupLabel !== action.payload.twistGroupLabel || previousWire.functionalDomainTag !== action.payload.functionalDomainTag) {
+    details.push("Tags");
+  }
+  if (valuesDiffer(previousWire.protection, action.payload.protection)) {
+    details.push("Protection");
+  }
+  if ("routeSegmentIds" in action.payload && valuesDiffer(previousWire.routeSegmentIds, action.payload.routeSegmentIds)) {
+    details.push("Route");
+  }
+
+  return joinChangeDetails(details) ?? "No field delta";
+}
+
 function describeRecentChangeDetail(action: AppAction, previousState: AppState): string | null {
   switch (action.type) {
     case "catalog/upsert":
@@ -588,6 +646,9 @@ function describeRecentChangeDetail(action: AppAction, previousState: AppState):
       return describeConnectorChange(action, previousState);
     case "splice/upsert":
       return describeSpliceChange(action, previousState);
+    case "wire/save":
+    case "wire/upsert":
+      return describeWireChange(action, previousState);
     case "network/importMany":
       return action.payload.overwriteNetworkIds !== undefined && action.payload.overwriteNetworkIds.length > 0
         ? "Import with overwrite"
