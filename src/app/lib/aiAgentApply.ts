@@ -8,6 +8,67 @@ export interface AiAgentApplyResult {
   skippedCount: number;
 }
 
+export interface AiAgentImpactPreview {
+  acceptedCount: number;
+  rejectedCount: number;
+  unsupportedCount: number;
+  warningsCount: number;
+  addCount: number;
+  updateCount: number;
+  moveCount: number;
+  routeCount: number;
+  deleteCount: number;
+  byOperationType: Record<string, number>;
+}
+
+function classifyImpactOperation(operation: AiAgentSupportedOperation): keyof Pick<
+  AiAgentImpactPreview,
+  "addCount" | "updateCount" | "moveCount" | "routeCount" | "deleteCount"
+> {
+  if (
+    operation.type === "add_connector" ||
+    operation.type === "add_splice" ||
+    operation.type === "add_node" ||
+    operation.type === "add_segment" ||
+    operation.type === "add_wire" ||
+    operation.type === "create_catalog_item"
+  ) {
+    return "addCount";
+  }
+  if (operation.type === "move_entity" || operation.type === "place_entity_relative_to_entity" || operation.type === "batch_move_entities") {
+    return "moveCount";
+  }
+  if (operation.type === "regenerate_route" || operation.type === "lock_wire_route") {
+    return "routeCount";
+  }
+  if (operation.type === "delete_entity") {
+    return "deleteCount";
+  }
+  return "updateCount";
+}
+
+export function buildAiAgentImpactPreview(validation: AiAgentOperationValidationResult): AiAgentImpactPreview {
+  const preview: AiAgentImpactPreview = {
+    acceptedCount: validation.accepted.length,
+    rejectedCount: validation.rejected.length,
+    unsupportedCount: validation.unsupported.length,
+    warningsCount: validation.warnings.length,
+    addCount: 0,
+    updateCount: 0,
+    moveCount: 0,
+    routeCount: 0,
+    deleteCount: 0,
+    byOperationType: {}
+  };
+
+  for (const operation of validation.accepted) {
+    preview[classifyImpactOperation(operation)] += 1;
+    preview.byOperationType[operation.type] = (preview.byOperationType[operation.type] ?? 0) + 1;
+  }
+
+  return preview;
+}
+
 function buildNextAiNodeId(state: AppState): NodeId {
   let index = 1;
   while (state.nodes.byId[`AI-NODE-${String(index).padStart(3, "0")}` as NodeId] !== undefined) {

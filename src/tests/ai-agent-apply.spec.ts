@@ -1,10 +1,58 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogItemId, ConnectorId, NetworkId, NodeId, SegmentId, WireId } from "../core/entities";
 import { appActions, appReducer, createSampleNetworkState } from "../store";
-import { applyAiAgentAcceptedOperations } from "../app/lib/aiAgentApply";
+import { applyAiAgentAcceptedOperations, buildAiAgentImpactPreview } from "../app/lib/aiAgentApply";
 import type { AiAgentOperationValidationResult } from "../app/lib/aiAgentOperationContract";
 
 describe("AI agent apply", () => {
+  it("builds an impact preview from validated operations before apply", () => {
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "add_node",
+          label: "AI proposed routing node",
+          position: { x: 80, y: 90 }
+        },
+        {
+          type: "batch_move_entities",
+          moves: [
+            {
+              entityKind: "node",
+              entityId: "N-MID-A",
+              position: { x: 260, y: 180 }
+            }
+          ]
+        },
+        {
+          type: "delete_entity",
+          entityKind: "wire",
+          entityId: "W-001",
+          mode: "direct"
+        }
+      ],
+      rejected: [{ status: "rejected", operationIndex: 3, operationType: "add_wire", message: "bad endpoint" }],
+      unsupported: [{ status: "unsupported", operationIndex: 4, operationType: "assign_endpoint", message: "unsupported" }],
+      warnings: []
+    };
+
+    expect(buildAiAgentImpactPreview(validation)).toEqual({
+      acceptedCount: 3,
+      rejectedCount: 1,
+      unsupportedCount: 1,
+      warningsCount: 0,
+      addCount: 1,
+      updateCount: 0,
+      moveCount: 1,
+      routeCount: 0,
+      deleteCount: 1,
+      byOperationType: {
+        add_node: 1,
+        batch_move_entities: 1,
+        delete_entity: 1
+      }
+    });
+  });
+
   it("applies accepted add_node operations without mutating the input state", () => {
     const state = createSampleNetworkState();
     const validation: AiAgentOperationValidationResult = {
