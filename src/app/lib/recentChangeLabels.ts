@@ -538,6 +538,29 @@ function describeNetworkChange(action: Extract<AppAction, { type: "network/updat
   return joinChangeDetails(details) ?? "No field delta";
 }
 
+function describeHarnessAssemblyChange(action: Extract<AppAction, { type: "harnessAssembly/upsert" }>, previousState: AppState): string | null {
+  const previousAssembly = previousState.harnessAssemblies.byId[action.payload.id];
+  if (previousAssembly === undefined) {
+    return `${action.payload.members.length} member network(s)`;
+  }
+
+  const details: string[] = [];
+  if (previousAssembly.technicalId !== action.payload.technicalId || previousAssembly.name !== action.payload.name) {
+    details.push("Identity");
+  }
+  if (valuesDiffer(previousAssembly.members, action.payload.members)) {
+    details.push("Members");
+  }
+  if (valuesDiffer(previousAssembly.masterConnectorRefs, action.payload.masterConnectorRefs)) {
+    details.push("Master connectors");
+  }
+  if (valuesDiffer(previousAssembly.connectorLinks, action.payload.connectorLinks)) {
+    details.push("Connector links");
+  }
+
+  return joinChangeDetails(details) ?? "No field delta";
+}
+
 function describeConnectorChange(action: Extract<AppAction, { type: "connector/upsert" }>, previousState: AppState): string | null {
   const previousConnector = previousState.connectors.byId[action.payload.id];
   if (previousConnector === undefined) {
@@ -668,6 +691,8 @@ function describeRecentChangeDetail(action: AppAction, previousState: AppState):
   switch (action.type) {
     case "network/update":
       return describeNetworkChange(action, previousState);
+    case "harnessAssembly/upsert":
+      return describeHarnessAssemblyChange(action, previousState);
     case "catalog/upsert":
       return describeCatalogChange(action, previousState);
     case "connector/upsert":

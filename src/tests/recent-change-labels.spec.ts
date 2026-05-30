@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildUndoHistoryEntry, resolveNodeDisplayRefForTest, resolveSegmentDisplayRefForTest } from "../app/lib/recentChangeLabels";
+import type { HarnessAssemblyId } from "../core/entities";
 import {
   appActions,
   appReducer,
@@ -14,6 +15,10 @@ import {
   asWireId,
   createUiIntegrationState
 } from "./helpers/app-ui-test-utils";
+
+function asHarnessAssemblyId(value: string): HarnessAssemblyId {
+  return value as HarnessAssemblyId;
+}
 
 describe("recent change labels", () => {
   it("uses technical IDs for connector deletes from previous state", () => {
@@ -109,6 +114,47 @@ describe("recent change labels", () => {
 
     expect(entry.detailLabel).toBe("Identity / Metadata / Export cartouche");
     expect(entry.label).toBe("Network 'NET-REV' identity / metadata / export cartouche updated");
+  });
+
+  it("adds harness assembly update sub-reasons for recent change logs", () => {
+    const networkState = createUiIntegrationState();
+    const assemblyId = asHarnessAssemblyId("ASM-HIST");
+    const previousState = appReducer(
+      networkState,
+      appActions.upsertHarnessAssembly({
+        id: assemblyId,
+        name: "Main assembly",
+        technicalId: "ASM-HIST",
+        members: [{ networkId: networkState.activeNetworkId!, color: "#2563eb" }],
+        masterConnectorRefs: [],
+        connectorLinks: [],
+        createdAt: "2026-03-27T11:00:00.000Z",
+        updatedAt: "2026-03-27T11:00:00.000Z"
+      })
+    );
+    const action = appActions.upsertHarnessAssembly({
+      id: assemblyId,
+      name: "Main assembly rev",
+      technicalId: "ASM-HIST-REV",
+      members: [{ networkId: networkState.activeNetworkId!, color: "#16a34a" }],
+      masterConnectorRefs: [{ networkId: networkState.activeNetworkId!, connectorId: asConnectorId("C1") }],
+      connectorLinks: [
+        {
+          id: "LINK-HIST" as never,
+          name: "Door link",
+          sourceNetworkId: networkState.activeNetworkId!,
+          sourceConnectorId: asConnectorId("C1"),
+          targetNetworkId: networkState.activeNetworkId!,
+          targetConnectorId: asConnectorId("C1")
+        }
+      ],
+      createdAt: "2026-03-27T11:00:00.000Z",
+      updatedAt: "2026-03-27T12:00:00.000Z"
+    });
+    const entry = buildUndoHistoryEntry(action, previousState, appReducer(previousState, action), 1, "2026-03-27T12:00:00.000Z");
+
+    expect(entry.detailLabel).toBe("Identity / Members / Master connectors");
+    expect(entry.label).toBe("Workspace 'ASM-HIST-REV' identity / members / master connectors updated");
   });
 
   it("adds catalog update sub-reasons for recent change logs", () => {
