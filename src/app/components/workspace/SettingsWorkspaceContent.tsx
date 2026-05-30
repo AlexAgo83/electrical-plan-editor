@@ -577,7 +577,7 @@ export function SettingsWorkspaceContent({
             {renderSettingLabel("Enable experimental direct execution")}
           </label>
         </div>
-        <div className="row-actions settings-actions">
+        <div className="row-actions settings-actions settings-ai-provider-actions">
           <button
             type="button"
             onClick={() => {
@@ -734,7 +734,7 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
         </div>
-        <div className="row-actions settings-actions">
+        <div className="row-actions settings-actions settings-canvas-render-actions">
           <button type="button" onClick={() => handleZoomAction("reset")}>Reset current view</button>
         </div>
       </section>
@@ -1038,7 +1038,7 @@ export function SettingsWorkspaceContent({
             <span className="settings-locale-hint">Apply language across all app screens (except changelog).</span>
           </label>
         </div>
-        <div className="row-actions settings-actions">
+        <div className="row-actions settings-actions settings-global-preferences-actions">
           <button type="button" className="settings-primary-action" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
         </div>
       </section>

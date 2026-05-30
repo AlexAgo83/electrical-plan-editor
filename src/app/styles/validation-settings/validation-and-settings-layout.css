@@ -222,7 +222,7 @@
   grid-template-columns: auto minmax(10rem, 1fr);
   align-items: center;
   gap: 0.45rem;
-  width: min(100%, 30rem);
+  width: min(100%, 42rem);
 }
 
 .settings-search-field--header .settings-search-label-text {
@@ -580,6 +580,13 @@
   min-width: 0;
 }
 
+.settings-ai-provider-actions,
+.settings-canvas-render-actions,
+.settings-global-preferences-actions {
+  padding-top: 0;
+  border-top: 0;
+}
+
 .settings-meta-compact {
   margin-bottom: 0;
 }
@@ -716,6 +723,10 @@
   margin-top: 0;
   padding-top: 0;
   border-top: 0;
+}
+
+.settings-import-export-actions-column .row-actions.settings-actions {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .settings-import-export-selection-column {

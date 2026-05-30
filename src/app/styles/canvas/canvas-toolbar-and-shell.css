@@ -616,6 +616,10 @@
   width: min(100%, 44rem);
 }
 
+.header-center-content:has(.settings-search-field--header) {
+  width: min(100%, 54rem);
+}
+
 .header-title-full {
   display: inline;
 }
@@ -637,6 +641,12 @@
     transform 80ms linear,
     visibility 0ms linear 80ms;
   will-change: opacity, transform;
+}
+
+.header-docked-nav-shell:has(.settings-search-field--header) {
+  display: flex;
+  justify-content: center;
+  width: 100%;
 }
 
 .header-docked-nav-shell.is-hidden {
