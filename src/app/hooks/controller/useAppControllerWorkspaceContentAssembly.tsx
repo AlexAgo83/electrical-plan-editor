@@ -16,6 +16,11 @@ import { applyAiAgentAcceptedOperations } from "../../lib/aiAgentApply";
 import { buildAiAgentContext } from "../../lib/aiAgentContext";
 import { prepareAiAgentProposalDraft } from "../../lib/aiAgentProposal";
 import { requestAiAgentProviderProposal } from "../../lib/aiAgentProviderClient";
+import {
+  buildAiAgentEditablePlan,
+  buildAiAgentOperationsFromPlanDiff,
+  extractAiAgentModifiedPlan
+} from "../../lib/aiAgentPlanDiff";
 import type { AiProviderReadiness } from "../../lib/aiSettings";
 import { validateAiAgentOperations } from "../../lib/aiAgentOperationContract";
 import type { AppControllerModelingHandlersAssemblyModel } from "./useAppControllerModelingHandlersAssembly";
@@ -486,14 +491,23 @@ export function useAppControllerWorkspaceContentAssembly({
             context,
             instruction: request.instruction
           });
+          const modifiedPlan = extractAiAgentModifiedPlan(providerResponse.payload);
+          const payload =
+            modifiedPlan === null
+              ? providerResponse.payload
+              : {
+                  schemaVersion: 1,
+                  operations: buildAiAgentOperationsFromPlanDiff(buildAiAgentEditablePlan(context), modifiedPlan)
+                };
           return {
             summary: `Provider draft generated from ${providerResponse.rawText.length} response characters.`,
             validation: validateAiAgentOperations({
               state: currentState,
-              payload: providerResponse.payload,
+              payload,
               scope: request.scope,
               selection: currentState.ui.selected,
-              permissions: request.permissions
+              permissions: request.permissions,
+              instruction: request.instruction
             })
           };
         } catch (error) {

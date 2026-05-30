@@ -12,6 +12,8 @@ import {
   switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 import { appActions, appReducer, createInitialState, createSampleNetworkState } from "../store";
+import { buildAiAgentContext } from "../app/lib/aiAgentContext";
+import { buildAiAgentEditablePlan } from "../app/lib/aiAgentPlanDiff";
 
 describe("App integration UI - settings", () => {
   beforeEach(() => {
@@ -273,6 +275,57 @@ describe("App integration UI - settings", () => {
     fireEvent.keyDown(document, { key: "z", metaKey: true });
     expect(screen.getByRole("region", { name: "AI context summary" })).toHaveTextContent("3 nodes");
     expect(screen.queryByLabelText("Use configured provider for proposal generation")).not.toBeInTheDocument();
+  });
+
+  it("applies provider modified plans to visible connector fields", async () => {
+    const state = createUiIntegrationState();
+    const editablePlan = buildAiAgentEditablePlan(buildAiAgentContext(state, "activeNetwork"));
+    const modifiedPlan = {
+      ...editablePlan,
+      connectors: editablePlan.connectors.map((connector) =>
+        connector.id === asConnectorId("C1") ? { ...connector, name: "Connector 1 (2 pins)" } : connector
+      )
+    };
+
+    renderAppWithState(state);
+    switchScreenDrawerAware("settings");
+    const aiProviderPanel = getPanelByHeading("AI provider");
+    fireEvent.change(within(aiProviderPanel).getByLabelText("API key"), {
+      target: { value: "sk-local-test" }
+    });
+    const fetchMock = vi.fn<typeof fetch>(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            output_text: JSON.stringify({
+              schemaVersion: 1,
+              modifiedPlan
+            })
+          }),
+          { status: 200 }
+        )
+      )
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    switchScreenDrawerAware("modeling");
+    fireEvent.click(within(screen.getByRole("region", { name: "Quick entity navigation" })).getByRole("button", { name: "AI Agent" }));
+    fireEvent.change(screen.getByLabelText("Instruction"), {
+      target: { value: "Add the pin count in parentheses to connector names." }
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Prepare proposal" }));
+
+    expect(await screen.findByText(/Provider draft generated/)).toBeInTheDocument();
+    const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
+    expect(within(proposalSummary).getByText("update_entity")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Apply proposal" }));
+    expect(screen.getByText("Applied 1 accepted operation. 0 accepted operations skipped.")).toBeInTheDocument();
+
+    switchSubScreenDrawerAware("connector");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    expect(within(connectorsPanel).getByText("Connector 1 (2 pins)")).toBeInTheDocument();
+    expect(within(connectorsPanel).queryByText("Connector 1")).not.toBeInTheDocument();
   });
 
   it("keeps settings and import/export controls operable on mobile baseline viewports", async () => {

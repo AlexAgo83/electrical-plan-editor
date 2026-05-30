@@ -45,7 +45,8 @@ Use a provider-independent, operation-based architecture:
 - Build scoped context from the current selection or active network in V1.
 - Defer selected-harness mutation scope to V2 because a selected harness is a saved multi-network harness assembly with a broader mutation surface than the active network.
 - Send structured context and user instructions to the configured provider through an `AIProviderService` boundary.
-- Require provider output to be parsed into a known operation vocabulary.
+- Prefer provider output as an edited scoped plan JSON, then derive app-owned operations from a local before/after diff.
+- Keep direct provider operation output as a compatibility path only.
 - Validate every operation locally before any mutation.
 - Execute operations only through app-owned operation handlers.
 - Group each AI run into one history transaction or pre-run snapshot.
@@ -53,13 +54,29 @@ Use a provider-independent, operation-based architecture:
 - Gate experimental direct execution behind settings and per-run UI affordances.
 
 # Operation contract
-The first operation vocabulary should be narrow and explicit.
+The first provider contract should expose an editable scoped plan rather than forcing the model to author low-level operations.
+The app builds a `modifiedPlan` request payload from the active-network or current-selection context.
+The provider returns the full modified plan.
+The app then derives a narrow operation vocabulary from the diff and validates those operations locally.
+
+The derived operation vocabulary should remain narrow and explicit.
 
 V1 families:
 - `add_connector`, `add_splice`, `add_node`, `add_segment`, and tightly validated `add_wire`;
 - `move_entity`: connector, splice, node, or selected supported canvas entities;
+- `place_entity_relative_to_entity`: place a connector, splice, or node relative to another connector, splice, or node with explicit placement (`leftOf`, `rightOf`, `above`, `below`) and gap;
 - `update_entity`: label, technical ID, section, material, color, protection, route lock, display metadata;
 - `regenerate_route`: route recalculation within the current selection or active network.
+
+V1 also accepts bounded identity resolution for provider output:
+- exact internal IDs remain preferred;
+- connector, splice, and wire technical IDs are accepted as aliases;
+- unique partial aliases may be accepted when they match exactly one entity after generic words such as `connector` or `connecteur` are removed;
+- unresolved or ambiguous aliases are rejected rather than guessed.
+
+For movement, `move_entity` is appropriate for absolute positions or simple directional offsets.
+Instructions such as "move SVC left of OBC" should use `place_entity_relative_to_entity` because they name both a target and an anchor.
+When no persisted manual canvas position exists, validation may use the generated canvas layout as the read-only position source before creating the accepted proposal.
 
 Deferred families:
 - `assign_endpoint`: connector cavity or splice port assignment;

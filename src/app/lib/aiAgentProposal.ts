@@ -83,7 +83,8 @@ export function prepareAiAgentProposalDraft({
     payload,
     scope,
     selection: state.ui.selected,
-    permissions
+    permissions,
+    instruction
   });
   return {
     summary: `Local draft generated from ${instruction.trim().length} instruction characters.`,

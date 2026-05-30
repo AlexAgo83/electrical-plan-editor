@@ -54,14 +54,25 @@ flowchart TD
 - AC10: Unit tests cover context scoping and operation validation without requiring a live AI provider.
 
 # V1 operation vocabulary
+Providers should receive a scoped editable plan JSON and return a full `modifiedPlan`.
+The application derives the following operation vocabulary from the before/after diff, then validates permissions, scope, identity, and positions locally.
+
 - `add_connector`: Create one connector in the active network with name, technical ID, cavity count, optional catalog item ID, and canvas position.
 - `add_splice`: Create one splice in the active network with name, technical ID, port count or directional mode defaults, and canvas position.
 - `add_node`: Create one routing node in the active network with name and canvas position.
 - `add_segment`: Create one segment between existing nodes in the active network.
 - `add_wire`: Create one wire with supported endpoint references only when both endpoints are already valid and unambiguous; otherwise reject with a validation message.
 - `move_entity`: Move a connector, splice, node, or selected supported canvas entity to a validated coordinate.
+- `place_entity_relative_to_entity`: Place a connector, splice, or node relative to another validated connector, splice, or node (`leftOf`, `rightOf`, `above`, `below`) for instructions that name both a target and an anchor.
 - `update_entity`: Update safe scalar fields only: name, technical ID, wire section, material, color, protection, route lock, and display metadata.
 - `regenerate_route`: Regenerate routes for selected wires or all active-network wires when route permission is enabled.
+
+# Identity and Position Resolution
+- The editable plan includes generated canvas positions when no persisted manual node position exists, so providers can reason over visible layout.
+- Provider output should use exact internal IDs from the context when possible.
+- Technical IDs are accepted as aliases for connectors, splices, and wires.
+- Unique partial aliases may be resolved after removing generic words like `connector`; ambiguous aliases must be rejected.
+- Relative placement and relative movement may use generated canvas layout positions when no persisted manual node position exists.
 
 # Deferred operation vocabulary
 - `assign_endpoint`: Deferred to V2 because connector cavity and splice port assignment can invalidate occupancy rules.

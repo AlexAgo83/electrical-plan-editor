@@ -26,14 +26,23 @@ describe("AI agent provider client", () => {
     vi.restoreAllMocks();
   });
 
-  it("requests and parses an OpenAI operation payload", async () => {
+  it("requests and parses an OpenAI modified plan payload", async () => {
+    const context = buildAiAgentContext(createSampleNetworkState(), "activeNetwork");
+    const modifiedPlan = {
+      schemaVersion: 1,
+      connectors: context.entities.connectors,
+      splices: context.entities.splices,
+      nodes: context.entities.nodes,
+      segments: context.entities.segments,
+      wires: context.entities.wires
+    };
     const fetchMock = vi.fn<typeof fetch>(() => {
       return Promise.resolve(
         new Response(
           JSON.stringify({
             output_text: JSON.stringify({
               schemaVersion: 1,
-              operations: [{ type: "add_node", label: "Provider node", position: { x: 1, y: 2 } }]
+              modifiedPlan
             })
           }),
           { status: 200 }
@@ -44,7 +53,7 @@ describe("AI agent provider client", () => {
 
     const result = await requestAiAgentProviderProposal({
       settings: buildSettings("openai"),
-      context: buildAiAgentContext(createSampleNetworkState(), "activeNetwork"),
+      context,
       instruction: "Add a node."
     });
 
@@ -58,11 +67,12 @@ describe("AI agent provider client", () => {
       truncation?: string;
     };
     expect(openAiBody.text?.format?.type).toBe("json_schema");
-    expect(openAiBody.text?.format?.name).toBe("ai_agent_operation_proposal");
+    expect(openAiBody.text?.format?.name).toBe("ai_agent_modified_plan");
     expect(openAiBody.truncation).toBe("auto");
+    expect(openAiRequestInit?.body).toContain("editablePlan");
     expect(result.payload).toEqual({
       schemaVersion: 1,
-      operations: [{ type: "add_node", label: "Provider node", position: { x: 1, y: 2 } }]
+      modifiedPlan
     });
   });
 

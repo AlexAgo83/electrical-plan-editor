@@ -1,6 +1,7 @@
 import type { AiSettings } from "./aiSettings";
 import type { AiAgentContext } from "./aiAgentContext";
 import { AI_AGENT_OPERATION_SCHEMA_VERSION } from "./aiAgentOperationContract";
+import { buildAiAgentEditablePlan } from "./aiAgentPlanDiff";
 
 export interface AiAgentProviderRequest {
   settings: AiSettings;
@@ -14,28 +15,26 @@ export interface AiAgentProviderResponse {
 }
 
 function buildProviderPrompt(context: AiAgentContext, instruction: string): string {
+  const editablePlan = buildAiAgentEditablePlan(context);
   return JSON.stringify({
     role: "electrical-plan-modeling-agent",
     instruction,
+    workflow:
+      "Edit the provided editablePlan JSON to satisfy the instruction. Return the full modifiedPlan. Do not return prose.",
     contract: {
       schemaVersion: AI_AGENT_OPERATION_SCHEMA_VERSION,
       requiredResponseShape: {
         schemaVersion: AI_AGENT_OPERATION_SCHEMA_VERSION,
-        operations: []
+        modifiedPlan: editablePlan
       },
-      supportedOperationTypes: [
-        "add_connector",
-        "add_splice",
-        "add_node",
-        "add_segment",
-        "add_wire",
-        "move_entity",
-        "update_entity",
-        "regenerate_route"
-      ],
-      deferredOperationTypes: ["assign_endpoint", "assign_catalog_reference", "delete_entity"]
+      editableFields:
+        "Only change existing scoped entities needed by the instruction. For rename requests, edit name or technicalId on the target entity. For movement, edit node.position on the connector/splice/intermediate node. Preserve ids and references.",
+      deferredChanges: ["assign_endpoint", "assign_catalog_reference", "delete_entity"],
+      compatibility:
+        "If you cannot return modifiedPlan, you may return the legacy {schemaVersion, operations} contract, but modifiedPlan is preferred."
     },
-    context
+    context,
+    editablePlan
   });
 }
 
@@ -59,11 +58,15 @@ function buildOperationResponseJsonSchema() {
   return {
     type: "object",
     additionalProperties: false,
-    required: ["schemaVersion", "operations"],
+    required: ["schemaVersion"],
     properties: {
       schemaVersion: {
         type: "number",
         enum: [AI_AGENT_OPERATION_SCHEMA_VERSION]
+      },
+      modifiedPlan: {
+        type: "object",
+        additionalProperties: true
       },
       operations: {
         type: "array",
@@ -77,6 +80,10 @@ function buildOperationResponseJsonSchema() {
             }
           }
         }
+      },
+      plan: {
+        type: "object",
+        additionalProperties: true
       }
     }
   };
@@ -184,12 +191,12 @@ export async function requestAiAgentProviderProposal({
       body: JSON.stringify({
         model: providerConfig.model,
         instructions:
-          "Return only valid JSON matching the requested operation contract. Do not include markdown or explanatory text.",
+          "Return only valid JSON with schemaVersion and modifiedPlan. Do not include markdown or explanatory text.",
         input: prompt,
         text: {
           format: {
             type: "json_schema",
-            name: "ai_agent_operation_proposal",
+            name: "ai_agent_modified_plan",
             schema: buildOperationResponseJsonSchema(),
             strict: false
           }
@@ -228,7 +235,7 @@ export async function requestAiAgentProviderProposal({
         systemInstruction: {
           parts: [
             {
-              text: "Return only valid JSON matching the requested operation contract. Do not include markdown or explanatory text."
+              text: "Return only valid JSON with schemaVersion and modifiedPlan. Do not include markdown or explanatory text."
             }
           ]
         }

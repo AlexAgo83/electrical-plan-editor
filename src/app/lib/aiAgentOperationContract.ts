@@ -1,5 +1,6 @@
 import type { AppState, LayoutNodePosition, SelectionState } from "../../store/types";
 import type { ConnectorId, NodeId, SegmentId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
+import { createNodePositionMap } from "./layout/generation";
 
 export const AI_AGENT_OPERATION_SCHEMA_VERSION = 1;
 
@@ -41,6 +42,7 @@ export type AiAgentSupportedOperation =
   | AiAgentAddSegmentOperation
   | AiAgentAddWireOperation
   | AiAgentMoveEntityOperation
+  | AiAgentPlaceEntityRelativeToEntityOperation
   | AiAgentUpdateEntityOperation
   | AiAgentRegenerateRouteOperation;
 
@@ -86,7 +88,22 @@ export interface AiAgentMoveEntityOperation {
   type: "move_entity";
   entityKind: "connector" | "splice" | "node";
   entityId: string;
-  position: LayoutNodePosition;
+  position?: LayoutNodePosition;
+  relativeMove?: {
+    dx: number;
+    dy: number;
+  };
+}
+
+export interface AiAgentPlaceEntityRelativeToEntityOperation {
+  type: "place_entity_relative_to_entity";
+  entityKind: "connector" | "splice" | "node";
+  entityId: string;
+  referenceEntityKind: "connector" | "splice" | "node";
+  referenceEntityId: string;
+  placement: "leftOf" | "rightOf" | "above" | "below";
+  gap: number;
+  position?: LayoutNodePosition;
 }
 
 export interface AiAgentUpdateEntityOperation {
@@ -107,6 +124,7 @@ interface ValidateAiAgentOperationsParams {
   scope: AiAgentScope;
   selection: SelectionState | null;
   permissions: AiAgentOperationPermissions;
+  instruction?: string;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -135,6 +153,184 @@ function readPosition(value: unknown): LayoutNodePosition | null {
 
 function readStringArray(value: unknown): string[] | null {
   return Array.isArray(value) && value.every((entry) => typeof entry === "string") ? value : null;
+}
+
+function normalizeEntityReference(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "");
+}
+
+const GENERIC_ENTITY_REFERENCE_TOKENS = new Set([
+  "connector",
+  "connecteur",
+  "splice",
+  "node",
+  "noeud",
+  "wire",
+  "segment",
+  "the",
+  "le",
+  "la",
+  "les",
+  "du",
+  "de",
+  "des",
+  "à",
+  "a"
+]);
+
+function tokenizeEntityReference(value: string): string[] {
+  return value
+    .toLowerCase()
+    .split(/[^a-z0-9à]+/i)
+    .map((token) => normalizeEntityReference(token))
+    .filter((token) => token.length > 0 && !GENERIC_ENTITY_REFERENCE_TOKENS.has(token));
+}
+
+function resolveUniqueEntityReference<Id extends string>(
+  ids: Id[],
+  entityId: string,
+  getReferences: (id: Id) => string[]
+): Id | null {
+  const normalizedEntityId = normalizeEntityReference(entityId);
+  const entityTokens = tokenizeEntityReference(entityId);
+  const exactMatch = ids.find((candidateId) =>
+    getReferences(candidateId).some((reference) => normalizeEntityReference(reference) === normalizedEntityId)
+  );
+  if (exactMatch !== undefined) {
+    return exactMatch;
+  }
+
+  const partialMatches = ids.filter((candidateId) =>
+    getReferences(candidateId).some((reference) => normalizeEntityReference(reference).includes(normalizedEntityId))
+  );
+  if (partialMatches.length === 1) {
+    return partialMatches[0] ?? null;
+  }
+
+  if (entityTokens.length === 0) {
+    return null;
+  }
+  const tokenMatches = ids.filter((candidateId) => {
+    const referenceTokens = getReferences(candidateId).flatMap(tokenizeEntityReference);
+    return entityTokens.every((token) => referenceTokens.some((referenceToken) => referenceToken.includes(token)));
+  });
+  return tokenMatches.length === 1 ? tokenMatches[0] ?? null : null;
+}
+
+function readRelativeMove(operation: Record<string, unknown>): AiAgentMoveEntityOperation["relativeMove"] | null {
+  const directDx = typeof operation.deltaX === "number" && Number.isFinite(operation.deltaX) ? operation.deltaX : null;
+  const directDy = typeof operation.deltaY === "number" && Number.isFinite(operation.deltaY) ? operation.deltaY : null;
+  if (directDx !== null || directDy !== null) {
+    return {
+      dx: directDx ?? 0,
+      dy: directDy ?? 0
+    };
+  }
+
+  const offsetDx = typeof operation.offsetX === "number" && Number.isFinite(operation.offsetX) ? operation.offsetX : null;
+  const offsetDy = typeof operation.offsetY === "number" && Number.isFinite(operation.offsetY) ? operation.offsetY : null;
+  if (offsetDx !== null || offsetDy !== null) {
+    return {
+      dx: offsetDx ?? 0,
+      dy: offsetDy ?? 0
+    };
+  }
+
+  const positionDirection = isRecord(operation.position) ? readString(operation.position.direction) : null;
+  const direction = readString(operation.direction) ?? positionDirection;
+  const distance =
+    typeof operation.distance === "number" && Number.isFinite(operation.distance) && operation.distance > 0
+      ? operation.distance
+      : 80;
+
+  if (direction === "left") {
+    return { dx: -distance, dy: 0 };
+  }
+  if (direction === "right") {
+    return { dx: distance, dy: 0 };
+  }
+  if (direction === "up") {
+    return { dx: 0, dy: -distance };
+  }
+  if (direction === "down") {
+    return { dx: 0, dy: distance };
+  }
+
+  return null;
+}
+
+function readRelativeMoveFromInstruction(instruction: string | undefined): AiAgentMoveEntityOperation["relativeMove"] | null {
+  if (instruction === undefined) {
+    return null;
+  }
+  const normalized = instruction.toLowerCase();
+  if (/\bleft\b/.test(normalized) || /\bà gauche\b/.test(normalized) || /\bgauche\b/.test(normalized)) {
+    return { dx: -80, dy: 0 };
+  }
+  if (/\bright\b/.test(normalized) || /\bà droite\b/.test(normalized) || /\bdroite\b/.test(normalized)) {
+    return { dx: 80, dy: 0 };
+  }
+  if (/\bup\b/.test(normalized) || /\bhaut\b/.test(normalized)) {
+    return { dx: 0, dy: -80 };
+  }
+  if (/\bdown\b/.test(normalized) || /\bbas\b/.test(normalized)) {
+    return { dx: 0, dy: 80 };
+  }
+  return null;
+}
+
+function readPlacement(value: unknown): AiAgentPlaceEntityRelativeToEntityOperation["placement"] | null {
+  if (value === "leftOf" || value === "left") {
+    return "leftOf";
+  }
+  if (value === "rightOf" || value === "right") {
+    return "rightOf";
+  }
+  if (value === "above" || value === "up") {
+    return "above";
+  }
+  if (value === "below" || value === "down") {
+    return "below";
+  }
+  return null;
+}
+
+function readGap(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value) && value > 0 ? value : 80;
+}
+
+function readSafeUpdateFields(entityKind: AiAgentUpdateEntityOperation["entityKind"], value: unknown): Record<string, unknown> | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const fields: Record<string, unknown> = {};
+  if (
+    (entityKind === "connector" || entityKind === "splice" || entityKind === "wire") &&
+    typeof value.name === "string" &&
+    value.name.trim().length > 0
+  ) {
+    fields.name = value.name.trim();
+  }
+  if (
+    (entityKind === "connector" || entityKind === "splice" || entityKind === "wire") &&
+    typeof value.technicalId === "string" &&
+    value.technicalId.trim().length > 0
+  ) {
+    fields.technicalId = value.technicalId.trim();
+  }
+  if (entityKind === "node" && typeof value.label === "string" && value.label.trim().length > 0) {
+    fields.label = value.label.trim();
+  }
+  if (entityKind === "segment" && typeof value.lengthMm === "number" && Number.isFinite(value.lengthMm) && value.lengthMm > 0) {
+    fields.lengthMm = value.lengthMm;
+  }
+  if (entityKind === "segment" && typeof value.subNetworkTag === "string") {
+    const subNetworkTag = value.subNetworkTag.trim();
+    fields.subNetworkTag = subNetworkTag.length > 0 ? subNetworkTag : undefined;
+  }
+
+  return Object.keys(fields).length > 0 ? fields : null;
 }
 
 function reject(operationIndex: number, operationType: string, message: string): AiAgentOperationValidationIssue {
@@ -200,7 +396,23 @@ function parseEndpoint(value: unknown): WireEndpoint | null {
   return null;
 }
 
-function parseOperation(operation: unknown, operationIndex: number): AiAgentSupportedOperation | AiAgentOperationValidationIssue {
+function getMoveSelectionFallback(
+  selection: SelectionState | null
+): { entityKind: AiAgentMoveEntityOperation["entityKind"]; entityId: string } | null {
+  return selection !== null && (selection.kind === "connector" || selection.kind === "splice" || selection.kind === "node")
+    ? {
+        entityKind: selection.kind,
+        entityId: selection.id
+      }
+    : null;
+}
+
+function parseOperation(
+  operation: unknown,
+  operationIndex: number,
+  selection: SelectionState | null,
+  instruction?: string
+): AiAgentSupportedOperation | AiAgentOperationValidationIssue {
   if (!isRecord(operation)) {
     return reject(operationIndex, "unknown", "Operation must be an object.");
   }
@@ -262,28 +474,52 @@ function parseOperation(operation: unknown, operationIndex: number): AiAgentSupp
   }
 
   if (type === "move_entity") {
-    const entityKind = readString(operation.entityKind);
-    const entityId = readString(operation.entityId);
+    const selectionFallback = getMoveSelectionFallback(selection);
+    const entityKind = readString(operation.entityKind) ?? selectionFallback?.entityKind ?? null;
+    const entityId = readString(operation.entityId) ?? selectionFallback?.entityId ?? null;
     const position = readPosition(operation.position);
+    const relativeMove = readRelativeMove(operation) ?? readRelativeMoveFromInstruction(instruction);
     return (entityKind === "connector" || entityKind === "splice" || entityKind === "node") &&
       entityId !== null &&
-      position !== null
-      ? { type, entityKind, entityId, position }
-      : reject(operationIndex, type, "Move operation requires supported entityKind, entityId, and position.");
+      (position !== null || relativeMove !== null)
+      ? { type, entityKind, entityId, ...(position === null ? {} : { position }), ...(relativeMove === null ? {} : { relativeMove }) }
+      : reject(operationIndex, type, "Move operation requires supported entityKind, entityId, and position or relative direction.");
+  }
+
+  if (type === "place_entity_relative_to_entity") {
+    const selectionFallback = getMoveSelectionFallback(selection);
+    const entityKind = readString(operation.entityKind) ?? selectionFallback?.entityKind ?? null;
+    const entityId = readString(operation.entityId) ?? selectionFallback?.entityId ?? null;
+    const referenceEntityKind = readString(operation.referenceEntityKind);
+    const referenceEntityId = readString(operation.referenceEntityId);
+    const placement = readPlacement(operation.placement);
+    const gap = readGap(operation.gap);
+    return (entityKind === "connector" || entityKind === "splice" || entityKind === "node") &&
+      (referenceEntityKind === "connector" || referenceEntityKind === "splice" || referenceEntityKind === "node") &&
+      entityId !== null &&
+      referenceEntityId !== null &&
+      placement !== null
+      ? { type, entityKind, entityId, referenceEntityKind, referenceEntityId, placement, gap }
+      : reject(
+          operationIndex,
+          type,
+          "Relative placement requires supported entityKind, entityId, referenceEntityKind, referenceEntityId, and placement."
+        );
   }
 
   if (type === "update_entity") {
     const entityKind = readString(operation.entityKind);
     const entityId = readString(operation.entityId);
-    return (entityKind === "connector" ||
+    const supportedEntityKind =
+      entityKind === "connector" ||
       entityKind === "splice" ||
       entityKind === "node" ||
       entityKind === "segment" ||
-      entityKind === "wire") &&
-      entityId !== null &&
-      isRecord(operation.fields)
-      ? { type, entityKind, entityId, fields: operation.fields }
-      : reject(operationIndex, type, "Update operation requires supported entityKind, entityId, and fields.");
+      entityKind === "wire";
+    const fields = supportedEntityKind ? readSafeUpdateFields(entityKind, operation.fields) : null;
+    return supportedEntityKind && entityId !== null && fields !== null
+      ? { type, entityKind, entityId, fields }
+      : reject(operationIndex, type, "Update operation requires supported entityKind, entityId, and safe scalar fields.");
   }
 
   if (type === "regenerate_route") {
@@ -294,6 +530,160 @@ function parseOperation(operation: unknown, operationIndex: number): AiAgentSupp
   }
 
   return unsupported(operationIndex, type, `${type} is not supported in the V1 AI operation contract.`);
+}
+
+function resolveEntityId(
+  state: AppState,
+  entityKind: AiAgentUpdateEntityOperation["entityKind"] | AiAgentPlaceEntityRelativeToEntityOperation["referenceEntityKind"],
+  entityId: string
+): string {
+  if (entityKind === "connector") {
+    return (
+      resolveUniqueEntityReference(state.connectors.allIds, entityId, (candidateId) => {
+        const connector = state.connectors.byId[candidateId];
+        return connector === undefined ? [] : [connector.id, connector.technicalId, connector.name];
+      }) ?? entityId
+    );
+  }
+  if (entityKind === "splice") {
+    return (
+      resolveUniqueEntityReference(state.splices.allIds, entityId, (candidateId) => {
+        const splice = state.splices.byId[candidateId];
+        return splice === undefined ? [] : [splice.id, splice.technicalId, splice.name];
+      }) ?? entityId
+    );
+  }
+  if (entityKind === "node") {
+    return (
+      resolveUniqueEntityReference(state.nodes.allIds, entityId, (candidateId) => {
+        const node = state.nodes.byId[candidateId];
+        const connector = node?.kind === "connector" ? state.connectors.byId[node.connectorId] : undefined;
+        const splice = node?.kind === "splice" ? state.splices.byId[node.spliceId] : undefined;
+        return [
+          node?.id,
+          node?.kind === "intermediate" ? node.label : undefined,
+          connector?.id,
+          connector?.technicalId,
+          connector?.name,
+          splice?.id,
+          splice?.technicalId,
+          splice?.name
+        ].filter((reference): reference is string => reference !== undefined);
+      }) ?? entityId
+    );
+  }
+  if (entityKind === "segment") {
+    return entityId;
+  }
+  return (
+    resolveUniqueEntityReference(state.wires.allIds, entityId, (candidateId) => {
+      const wire = state.wires.byId[candidateId];
+      return wire === undefined ? [] : [wire.id, wire.technicalId, wire.name];
+    }) ?? entityId
+  );
+}
+
+function getEntityNodeId(
+  state: AppState,
+  entityKind: AiAgentMoveEntityOperation["entityKind"],
+  entityId: string
+): NodeId | undefined {
+  return entityKind === "node"
+    ? (entityId as NodeId)
+    : state.nodes.allIds.find((candidateNodeId) => {
+        const node = state.nodes.byId[candidateNodeId];
+        if (entityKind === "connector") {
+          return node?.kind === "connector" && node.connectorId === entityId;
+        }
+        return node?.kind === "splice" && node.spliceId === entityId;
+      });
+}
+
+function getEntityPosition(
+  state: AppState,
+  entityKind: AiAgentMoveEntityOperation["entityKind"],
+  entityId: string
+): LayoutNodePosition | null {
+  const nodeId = getEntityNodeId(state, entityKind, entityId);
+
+  if (nodeId === undefined) {
+    return null;
+  }
+  const generatedPositions = createNodePositionMap(
+    state.nodes.allIds.map((candidateNodeId) => state.nodes.byId[candidateNodeId]).filter((node) => node !== undefined),
+    state.segments.allIds.map((segmentId) => state.segments.byId[segmentId]).filter((segment) => segment !== undefined)
+  );
+  return state.nodePositions[nodeId] ?? generatedPositions[nodeId] ?? null;
+}
+
+function buildRelativePlacementPosition(
+  referencePosition: LayoutNodePosition,
+  placement: AiAgentPlaceEntityRelativeToEntityOperation["placement"],
+  gap: number
+): LayoutNodePosition {
+  if (placement === "leftOf") {
+    return { x: referencePosition.x - gap, y: referencePosition.y };
+  }
+  if (placement === "rightOf") {
+    return { x: referencePosition.x + gap, y: referencePosition.y };
+  }
+  if (placement === "above") {
+    return { x: referencePosition.x, y: referencePosition.y - gap };
+  }
+  return { x: referencePosition.x, y: referencePosition.y + gap };
+}
+
+function normalizeOperationEntityReferences(state: AppState, operation: AiAgentSupportedOperation): AiAgentSupportedOperation {
+  if (operation.type === "move_entity") {
+    const entityId = resolveEntityId(state, operation.entityKind, operation.entityId);
+    const normalizedOperation = {
+      ...operation,
+      entityId
+    };
+    if (operation.position !== undefined || operation.relativeMove === undefined) {
+      return normalizedOperation;
+    }
+    const currentPosition = getEntityPosition(state, normalizedOperation.entityKind, normalizedOperation.entityId);
+    if (currentPosition === null) {
+      return normalizedOperation;
+    }
+    return {
+      ...normalizedOperation,
+      position: {
+        x: currentPosition.x + operation.relativeMove.dx,
+        y: currentPosition.y + operation.relativeMove.dy
+      }
+    };
+  }
+  if (operation.type === "place_entity_relative_to_entity") {
+    const entityId = resolveEntityId(state, operation.entityKind, operation.entityId);
+    const referenceEntityId = resolveEntityId(state, operation.referenceEntityKind, operation.referenceEntityId);
+    const normalizedOperation = {
+      ...operation,
+      entityId,
+      referenceEntityId
+    };
+    const referencePosition = getEntityPosition(state, normalizedOperation.referenceEntityKind, referenceEntityId);
+    return referencePosition === null
+      ? normalizedOperation
+      : {
+          ...normalizedOperation,
+          position: buildRelativePlacementPosition(referencePosition, normalizedOperation.placement, normalizedOperation.gap)
+        };
+  }
+  if (operation.type === "update_entity") {
+    return {
+      ...operation,
+      entityId: resolveEntityId(state, operation.entityKind, operation.entityId)
+    };
+  }
+  if (operation.type === "regenerate_route") {
+    return {
+      ...operation,
+      wireIds: operation.wireIds.map((wireId) => resolveEntityId(state, "wire", wireId) as WireId)
+    };
+  }
+  return operation;
 }
 
 function permissionForOperation(operation: AiAgentSupportedOperation): keyof AiAgentOperationPermissions {
@@ -309,6 +699,9 @@ function permissionForOperation(operation: AiAgentSupportedOperation): keyof AiA
   if (operation.type === "move_entity") {
     return "move";
   }
+  if (operation.type === "place_entity_relative_to_entity") {
+    return "move";
+  }
   if (operation.type === "update_entity") {
     return "update";
   }
@@ -322,7 +715,7 @@ function entityExists(state: AppState, operation: AiAgentSupportedOperation): bo
   if (operation.type === "regenerate_route") {
     return operation.wireIds.every((wireId) => state.wires.byId[wireId] !== undefined);
   }
-  if (operation.type === "move_entity" || operation.type === "update_entity") {
+  if (operation.type === "move_entity" || operation.type === "place_entity_relative_to_entity" || operation.type === "update_entity") {
     if (operation.entityKind === "connector") {
       return state.connectors.byId[operation.entityId as ConnectorId] !== undefined;
     }
@@ -340,11 +733,25 @@ function entityExists(state: AppState, operation: AiAgentSupportedOperation): bo
   return true;
 }
 
+function entityReferenceExists(
+  state: AppState,
+  entityKind: AiAgentPlaceEntityRelativeToEntityOperation["referenceEntityKind"],
+  entityId: string
+): boolean {
+  if (entityKind === "connector") {
+    return state.connectors.byId[entityId as ConnectorId] !== undefined;
+  }
+  if (entityKind === "splice") {
+    return state.splices.byId[entityId as SpliceId] !== undefined;
+  }
+  return state.nodes.byId[entityId as NodeId] !== undefined;
+}
+
 function isWithinSelectionScope(operation: AiAgentSupportedOperation, selection: SelectionState | null): boolean {
   if (selection === null) {
     return false;
   }
-  if (operation.type === "move_entity" || operation.type === "update_entity") {
+  if (operation.type === "move_entity" || operation.type === "place_entity_relative_to_entity" || operation.type === "update_entity") {
     return operation.entityKind === selection.kind && operation.entityId === selection.id;
   }
   if (operation.type === "regenerate_route") {
@@ -358,7 +765,8 @@ export function validateAiAgentOperations({
   payload,
   scope,
   selection,
-  permissions
+  permissions,
+  instruction
 }: ValidateAiAgentOperationsParams): AiAgentOperationValidationResult {
   const result: AiAgentOperationValidationResult = {
     accepted: [],
@@ -373,7 +781,7 @@ export function validateAiAgentOperations({
   }
 
   envelope.operations.forEach((operation, operationIndex) => {
-    const parsed = parseOperation(operation, operationIndex);
+    const parsed = parseOperation(operation, operationIndex, selection, instruction);
     if ("status" in parsed) {
       if (parsed.status === "unsupported") {
         result.unsupported.push(parsed);
@@ -383,21 +791,36 @@ export function validateAiAgentOperations({
       return;
     }
 
-    const permission = permissionForOperation(parsed);
+    const normalized = normalizeOperationEntityReferences(state, parsed);
+    const permission = permissionForOperation(normalized);
     if (!permissions[permission]) {
-      result.rejected.push(reject(operationIndex, parsed.type, `${permission} permission is disabled.`));
+      result.rejected.push(reject(operationIndex, normalized.type, `${permission} permission is disabled.`));
       return;
     }
-    if (!entityExists(state, parsed)) {
-      result.rejected.push(reject(operationIndex, parsed.type, "Operation references unknown modeling entities."));
+    if (!entityExists(state, normalized)) {
+      result.rejected.push(reject(operationIndex, normalized.type, "Operation references unknown modeling entities."));
       return;
     }
-    if (scope === "currentSelection" && !isWithinSelectionScope(parsed, selection)) {
-      result.rejected.push(reject(operationIndex, parsed.type, "Operation is outside the current selection scope."));
+    if (
+      normalized.type === "place_entity_relative_to_entity" &&
+      !entityReferenceExists(state, normalized.referenceEntityKind, normalized.referenceEntityId)
+    ) {
+      result.rejected.push(reject(operationIndex, normalized.type, "Relative placement references an unknown anchor entity."));
+      return;
+    }
+    if (
+      (normalized.type === "move_entity" || normalized.type === "place_entity_relative_to_entity") &&
+      normalized.position === undefined
+    ) {
+      result.rejected.push(reject(operationIndex, normalized.type, "Move operation could not resolve a canvas position."));
+      return;
+    }
+    if (scope === "currentSelection" && !isWithinSelectionScope(normalized, selection)) {
+      result.rejected.push(reject(operationIndex, normalized.type, "Operation is outside the current selection scope."));
       return;
     }
 
-    result.accepted.push(parsed);
+    result.accepted.push(normalized);
   });
 
   return result;

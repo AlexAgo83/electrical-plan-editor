@@ -52,7 +52,7 @@ flowchart LR
 - AC7: The user can review operation permissions before running the agent.
 - AC8: Delete permission is disabled by default.
 - AC9: Running the agent produces a proposal summary with operation counts by status and type.
-- AC10: The proposal detail view lists accepted, rejected, warning, and unsupported operations.
+- AC10: The proposal detail view lists accepted, rejected, warning, and unsupported operations, including rejected operation messages.
 - AC11: Rejecting a proposal leaves modeling state unchanged.
 - AC12: Applying a proposal mutates only accepted operations.
 - AC13: Applying a proposal creates one grouped history transaction.
@@ -94,10 +94,14 @@ flowchart LR
 - A chat-like UI would obscure the operational workflow.
 - Proposal summaries must be specific enough that users trust apply/reject decisions.
 - Applying accepted operations while hiding rejected ones could confuse users unless the result is explicit.
+- Spatial instructions that name a target and anchor, such as moving SVC left of OBC, must be represented as validated relative placement rather than guessed free-form movement.
+- Provider plan edits must still be diffed and validated locally before any assisted apply action mutates modeling state.
 
 # Validation plan
 - Add UI tests with mocked provider output.
 - Add UI tests for the disabled `AI Agent` entry when provider readiness is invalid.
+- Add plan-diff tests for provider `modifiedPlan` output.
+- Add operation contract tests for rejected messages and relative placement operations.
 - Add reducer/history tests for grouped transaction application.
 - Run targeted Modeling UI tests, `npm run -s typecheck`, and `npm run -s lint`.
 

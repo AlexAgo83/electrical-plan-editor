@@ -254,6 +254,11 @@ export function ModelingAiAgentPanel({
               <span>Accepted operation</span> <strong>{operation.type}</strong>
             </p>
           ))}
+          {proposalValidation.rejected.map((issue) => (
+            <p className="meta-line" key={`rejected-${issue.operationType}-${issue.operationIndex}`}>
+              <span>Rejected operation</span> <strong>{issue.message}</strong>
+            </p>
+          ))}
           {proposalValidation.unsupported.map((issue) => (
             <p className="meta-line" key={`${issue.operationType}-${issue.operationIndex}`}>
               <span>Unsupported operation</span> <strong>{issue.operationType}</strong>

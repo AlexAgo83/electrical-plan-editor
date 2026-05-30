@@ -180,11 +180,14 @@ User instruction
 ```
 
 # Operation Model
-The agent should act through a small operation vocabulary, not through direct state writes.
+The agent should receive a scoped editable plan JSON, modify that plan, and return the full modified plan.
+The application computes the before/after diff and turns it into a small operation vocabulary.
+This lets the AI reason naturally over the electrical plan while keeping mutation, validation, and history ownership inside the app.
 
 Recommended V1 operation families:
 - `add_entity`: connector, splice, node, segment, or wire with required network scope and explicit fields;
 - `move_entity`: connector, splice, node, or selected canvas entity movement within the active network;
+- `place_entity_relative_to_entity`: explicit relative placement such as moving SVC left of OBC, using validated target and anchor entities;
 - `update_entity`: safe scalar fields such as name, technical ID, section, material, color, protection, route lock, and display metadata;
 - `regenerate_route`: route recalculation for selected or active-network wires within the permitted scope.
 
@@ -196,6 +199,7 @@ Recommended V2 operation families:
 
 Each operation should include:
 - stable target IDs;
+- user-facing aliases only as fallback inputs, resolved locally to stable IDs before apply;
 - target network or harness scope;
 - before/after values when applicable;
 - rationale from the agent;
