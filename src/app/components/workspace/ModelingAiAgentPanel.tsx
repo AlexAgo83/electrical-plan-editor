@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactElement } from "react";
 import type { AiAgentContextSummary } from "../../lib/aiAgentContext";
-import type { AiAgentScope } from "../../lib/aiAgentOperationContract";
+import type { AiAgentOperationPermissions, AiAgentOperationValidationResult, AiAgentScope } from "../../lib/aiAgentOperationContract";
 import type { AiProviderReadiness } from "../../lib/aiSettings";
 
 interface ModelingAiAgentPanelProps {
@@ -8,28 +8,26 @@ interface ModelingAiAgentPanelProps {
   experimentalDirectExecutionEnabled: boolean;
   contextSummaries: Record<AiAgentScope, AiAgentContextSummary>;
   onOpenSettings: () => void;
+  onPrepareProposal: (request: {
+    scope: AiAgentScope;
+    instruction: string;
+    permissions: AiAgentOperationPermissions;
+  }) => { summary: string; validation: AiAgentOperationValidationResult };
 }
 
 type AgentMode = "assisted" | "direct";
-
-interface AgentPermissions {
-  add: boolean;
-  move: boolean;
-  update: boolean;
-  route: boolean;
-  delete: boolean;
-}
 
 export function ModelingAiAgentPanel({
   providerReadiness,
   experimentalDirectExecutionEnabled,
   contextSummaries,
-  onOpenSettings
+  onOpenSettings,
+  onPrepareProposal
 }: ModelingAiAgentPanelProps): ReactElement {
   const [instruction, setInstruction] = useState("");
   const [targetScope, setTargetScope] = useState<AiAgentScope>("activeNetwork");
   const [agentMode, setAgentMode] = useState<AgentMode>("assisted");
-  const [permissions, setPermissions] = useState<AgentPermissions>({
+  const [permissions, setPermissions] = useState<AiAgentOperationPermissions>({
     add: true,
     move: true,
     update: true,
@@ -37,6 +35,7 @@ export function ModelingAiAgentPanel({
     delete: false
   });
   const [draftStatus, setDraftStatus] = useState<string | null>(null);
+  const [proposalValidation, setProposalValidation] = useState<AiAgentOperationValidationResult | null>(null);
   const selectedMode = agentMode === "direct" && !experimentalDirectExecutionEnabled ? "assisted" : agentMode;
   const selectedContextSummary = contextSummaries[targetScope];
   const canPrepareProposal = providerReadiness.isReady && selectedContextSummary.isAvailable && instruction.trim().length > 0;
@@ -44,11 +43,13 @@ export function ModelingAiAgentPanel({
     () => Object.values(permissions).filter(Boolean).length,
     [permissions]
   );
-  const updatePermission = (key: keyof AgentPermissions, value: boolean) => {
+  const updatePermission = (key: keyof AiAgentOperationPermissions, value: boolean) => {
     setPermissions((current) => ({
       ...current,
       [key]: value
     }));
+    setProposalValidation(null);
+    setDraftStatus(null);
   };
 
   return (
@@ -112,6 +113,7 @@ export function ModelingAiAgentPanel({
             onChange={(event) => {
               setInstruction(event.target.value);
               setDraftStatus(null);
+              setProposalValidation(null);
             }}
             placeholder="Add a routing node near the dashboard connector and prepare route updates for selected wires."
           />
@@ -119,7 +121,14 @@ export function ModelingAiAgentPanel({
         <div className="form-split">
           <label>
             Target scope
-            <select value={targetScope} onChange={(event) => setTargetScope(event.target.value as AiAgentScope)}>
+            <select
+              value={targetScope}
+              onChange={(event) => {
+                setTargetScope(event.target.value as AiAgentScope);
+                setProposalValidation(null);
+                setDraftStatus(null);
+              }}
+            >
               <option value="activeNetwork">Active network</option>
               <option value="currentSelection">Current selection</option>
               <option value="selectedHarness" disabled>
@@ -129,7 +138,14 @@ export function ModelingAiAgentPanel({
           </label>
           <label>
             Agent mode
-            <select value={selectedMode} onChange={(event) => setAgentMode(event.target.value as AgentMode)}>
+            <select
+              value={selectedMode}
+              onChange={(event) => {
+                setAgentMode(event.target.value as AgentMode);
+                setProposalValidation(null);
+                setDraftStatus(null);
+              }}
+            >
               <option value="assisted">Assisted proposal</option>
               <option value="direct" disabled={!experimentalDirectExecutionEnabled}>
                 Experimental direct execution
@@ -185,8 +201,14 @@ export function ModelingAiAgentPanel({
             type="button"
             disabled={!canPrepareProposal}
             onClick={() => {
+              const draft = onPrepareProposal({
+                scope: targetScope,
+                instruction,
+                permissions
+              });
+              setProposalValidation(draft.validation);
               setDraftStatus(
-                `Draft ready for ${selectedContextSummary.scopeLabel.toLowerCase()} scope with ${enabledPermissionCount} enabled permission groups. Provider execution will be connected with the operation contract.`
+                `${draft.summary} ${selectedContextSummary.scopeLabel} scope, ${enabledPermissionCount} enabled permission groups.`
               );
             }}
           >
@@ -197,11 +219,44 @@ export function ModelingAiAgentPanel({
           </button>
         </div>
       </form>
+      {proposalValidation !== null ? (
+        <div className="settings-import-summary" role="region" aria-label="AI proposal summary">
+          <p className="meta-line">
+            <span>Accepted</span> <strong>{proposalValidation.accepted.length}</strong>
+          </p>
+          <p className="meta-line">
+            <span>Rejected</span> <strong>{proposalValidation.rejected.length}</strong>
+          </p>
+          <p className="meta-line">
+            <span>Unsupported</span> <strong>{proposalValidation.unsupported.length}</strong>
+          </p>
+          <p className="meta-line">
+            <span>Warnings</span> <strong>{proposalValidation.warnings.length}</strong>
+          </p>
+          {proposalValidation.accepted.map((operation, index) => (
+            <p className="meta-line" key={`${operation.type}-${index}`}>
+              <span>Accepted operation</span> <strong>{operation.type}</strong>
+            </p>
+          ))}
+          {proposalValidation.unsupported.map((issue) => (
+            <p className="meta-line" key={`${issue.operationType}-${issue.operationIndex}`}>
+              <span>Unsupported operation</span> <strong>{issue.operationType}</strong>
+            </p>
+          ))}
+        </div>
+      ) : null}
       <div className="row-actions settings-actions">
         <button type="button" disabled>
           Apply proposal
         </button>
-        <button type="button" disabled>
+        <button
+          type="button"
+          disabled={proposalValidation === null}
+          onClick={() => {
+            setProposalValidation(null);
+            setDraftStatus("Proposal rejected. Modeling state was not changed.");
+          }}
+        >
           Reject proposal
         </button>
       </div>

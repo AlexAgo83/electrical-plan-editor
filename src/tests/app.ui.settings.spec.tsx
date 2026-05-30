@@ -237,8 +237,14 @@ describe("App integration UI - settings", () => {
     const prepareProposalButton = screen.getByRole("button", { name: "Prepare proposal" });
     expect(prepareProposalButton).toBeEnabled();
     fireEvent.click(prepareProposalButton);
-    expect(screen.getByText(/Draft ready for active network scope/)).toBeInTheDocument();
+    expect(screen.getByText(/Local draft generated/)).toBeInTheDocument();
+    const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
+    expect(within(proposalSummary).getByText("Accepted")).toBeInTheDocument();
+    expect(within(proposalSummary).getByText("Unsupported")).toBeInTheDocument();
+    expect(within(proposalSummary).getByText("add_node")).toBeInTheDocument();
+    expect(within(proposalSummary).getByText("assign_endpoint")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Apply proposal" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Reject proposal" })).toBeEnabled();
   });
 
   it("keeps settings and import/export controls operable on mobile baseline viewports", async () => {

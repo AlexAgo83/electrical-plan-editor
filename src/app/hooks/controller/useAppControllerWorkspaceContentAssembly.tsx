@@ -13,6 +13,7 @@ import type { ValidationModel } from "../useValidationModel";
 import type { AiSettingsModel } from "../useAiSettings";
 import { ModelingAiAgentPanel } from "../../components/workspace/ModelingAiAgentPanel";
 import { buildAiAgentContext } from "../../lib/aiAgentContext";
+import { prepareAiAgentProposalDraft } from "../../lib/aiAgentProposal";
 import type { AiProviderReadiness } from "../../lib/aiSettings";
 import type { AppControllerModelingHandlersAssemblyModel } from "./useAppControllerModelingHandlersAssembly";
 import type { AppControllerWorkspaceNetworkDomainAssemblyModel } from "./useAppControllerWorkspaceNetworkDomainAssembly";
@@ -473,6 +474,14 @@ export function useAppControllerWorkspaceContentAssembly({
         activeNetwork: buildAiAgentContext(handlers.store.getState(), "activeNetwork").summary,
         currentSelection: buildAiAgentContext(handlers.store.getState(), "currentSelection").summary
       }}
+      onPrepareProposal={(request) =>
+        prepareAiAgentProposalDraft({
+          state: handlers.store.getState(),
+          scope: request.scope,
+          instruction: request.instruction,
+          permissions: request.permissions
+        })
+      }
       onOpenSettings={handlers.handleOpenSettingsScreen}
     />
   ) : null;
