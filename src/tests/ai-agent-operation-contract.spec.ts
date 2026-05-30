@@ -100,8 +100,8 @@ describe("AI agent operation contract", () => {
     });
 
     expect(result.accepted).toHaveLength(0);
-    expect(result.rejected).toHaveLength(0);
-    expect(result.unsupported.map((issue) => issue.operationType)).toEqual(["delete_entity", "unknown_operation"]);
+    expect(result.rejected).toEqual([expect.objectContaining({ operationType: "delete_entity" })]);
+    expect(result.unsupported.map((issue) => issue.operationType)).toEqual(["unknown_operation"]);
   });
 
   it("accepts wire deletion when delete permission is enabled", () => {
@@ -135,7 +135,8 @@ describe("AI agent operation contract", () => {
       {
         type: "delete_entity",
         entityKind: "wire",
-        entityId: "W-001"
+        entityId: "W-001",
+        mode: "direct"
       }
     ]);
   });
@@ -787,6 +788,134 @@ describe("AI agent operation contract", () => {
           x: obcPosition.x - 96,
           y: obcPosition.y
         }
+      })
+    ]);
+  });
+
+  it("accepts dedicated catalog material and route lock operations", () => {
+    const state = createSampleNetworkState();
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "create_catalog_item",
+            id: "CAT-AI-FUSE",
+            manufacturerReference: "AI-FUSE-10A",
+            name: "AI fuse 10A",
+            connectionCount: 12
+          },
+          {
+            type: "assign_catalog_item",
+            entityKind: "connector",
+            entityId: "CONN-SRC-01",
+            catalogItemId: "CAT-AI-FUSE"
+          },
+          {
+            type: "set_connector_terminal_material",
+            connectorId: "CONN-SRC-01",
+            cavityIndex: 4,
+            material: {
+              terminalReference: "TERM-AI",
+              sealReference: "SEAL-AI"
+            }
+          },
+          {
+            type: "lock_wire_route",
+            wireId: "WIRE-FEED-J1",
+            segmentIds: ["SEG-001", "SEG-002"]
+          }
+        ]
+      }
+    });
+
+    expect(result.rejected).toHaveLength(0);
+    expect(result.accepted.map((operation) => operation.type)).toEqual([
+      "create_catalog_item",
+      "assign_catalog_item",
+      "set_connector_terminal_material",
+      "lock_wire_route"
+    ]);
+  });
+
+  it("validates delete impact and cascade mode for non-wire entities", () => {
+    const state = appReducer(createSampleNetworkState(), appActions.upsertConnector({
+      id: "C-AI-DELETE" as ConnectorId,
+      name: "AI delete connector",
+      technicalId: "AI-DELETE",
+      cavityCount: 1
+    }));
+    const withNode = appReducer(state, appActions.upsertNode({
+      id: "N-AI-DELETE" as NodeId,
+      kind: "connector",
+      connectorId: "C-AI-DELETE" as ConnectorId
+    }));
+    const result = validateAiAgentOperations({
+      state: withNode,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: {
+        ...DEFAULT_PERMISSIONS,
+        delete: true
+      },
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "delete_entity",
+            entityKind: "connector",
+            entityId: "C-AI-DELETE"
+          },
+          {
+            type: "delete_entity",
+            entityKind: "connector",
+            entityId: "C-AI-DELETE",
+            mode: "cascade"
+          },
+          {
+            type: "delete_entity",
+            entityKind: "segment",
+            entityId: "SEG-001"
+          }
+        ]
+      }
+    });
+
+    expect(result.accepted).toEqual([expect.objectContaining({ type: "delete_entity", mode: "cascade" })]);
+    expect(result.rejected).toEqual([
+      expect.objectContaining({ operationIndex: 0, operationType: "delete_entity" }),
+      expect.objectContaining({ operationIndex: 2, operationType: "delete_entity" })
+    ]);
+  });
+
+  it("turns clarification requests into rejected proposals with the provider question", () => {
+    const state = createSampleNetworkState();
+    const result = validateAiAgentOperations({
+      state,
+      scope: "activeNetwork",
+      selection: null,
+      permissions: DEFAULT_PERMISSIONS,
+      payload: {
+        schemaVersion: 1,
+        operations: [
+          {
+            type: "clarification_required",
+            question: "Which connector should be modified?",
+            reasons: ["Multiple connectors match the instruction."]
+          }
+        ]
+      }
+    });
+
+    expect(result.accepted).toHaveLength(0);
+    expect(result.rejected).toEqual([
+      expect.objectContaining({
+        operationType: "clarification_required",
+        message: "Clarification required: Which connector should be modified? (Multiple connectors match the instruction.)"
       })
     ]);
   });

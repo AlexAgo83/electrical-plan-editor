@@ -340,4 +340,59 @@ describe("AI agent apply", () => {
       })
     );
   });
+
+  it("applies dedicated catalog material and route lock operations", () => {
+    const state = createSampleNetworkState();
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "create_catalog_item",
+          id: "CAT-AI-FUSE" as CatalogItemId,
+          manufacturerReference: "AI-FUSE-10A",
+          name: "AI fuse 10A",
+          connectionCount: 12
+        },
+        {
+          type: "assign_catalog_item",
+          entityKind: "connector",
+          entityId: "C-SRC",
+          catalogItemId: "CAT-AI-FUSE"
+        },
+        {
+          type: "set_connector_terminal_material",
+          connectorId: "C-SRC",
+          cavityIndex: 4,
+          material: {
+            terminalReference: "TERM-AI",
+            sealReference: "SEAL-AI"
+          }
+        },
+        {
+          type: "lock_wire_route",
+          wireId: "W-001" as WireId,
+          segmentIds: ["SEG-001" as SegmentId, "SEG-002" as SegmentId]
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+
+    const result = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(result.appliedCount).toBe(4);
+    expect(result.nextState.catalogItems.byId["CAT-AI-FUSE" as CatalogItemId]).toEqual(
+      expect.objectContaining({
+        manufacturerReference: "AI-FUSE-10A",
+        connectionCount: 12
+      })
+    );
+    expect(result.nextState.connectors.byId["C-SRC" as ConnectorId]?.catalogItemId).toBe("CAT-AI-FUSE");
+    expect(result.nextState.connectors.byId["C-SRC" as ConnectorId]?.terminalOverrides?.[4]).toEqual({
+      terminalReference: "TERM-AI",
+      sealReference: "SEAL-AI"
+    });
+    expect(result.nextState.wires.byId["W-001" as WireId]?.isRouteLocked).toBe(true);
+    expect(result.nextState.wires.byId["W-001" as WireId]?.routeSegmentIds).toEqual(["SEG-001", "SEG-002"]);
+  });
 });
