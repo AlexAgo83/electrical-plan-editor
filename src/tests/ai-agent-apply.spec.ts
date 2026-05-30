@@ -53,4 +53,26 @@ describe("AI agent apply", () => {
     expect(result.appliedCount).toBe(0);
     expect(result.skippedCount).toBe(1);
   });
+
+  it("applies move_entity operations to the selected canvas node position", () => {
+    const state = createSampleNetworkState();
+    const validation: AiAgentOperationValidationResult = {
+      accepted: [
+        {
+          type: "move_entity",
+          entityKind: "connector",
+          entityId: "C-SRC",
+          position: { x: 160, y: 220 }
+        }
+      ],
+      rejected: [],
+      unsupported: [],
+      warnings: []
+    };
+
+    const result = applyAiAgentAcceptedOperations(state, validation);
+
+    expect(result.appliedCount).toBe(1);
+    expect(result.nextState.nodePositions["N-C-SRC" as NodeId]).toEqual({ x: 160, y: 220 });
+  });
 });

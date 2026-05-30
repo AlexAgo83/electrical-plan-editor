@@ -29,6 +29,19 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
     );
     return appReducer(withNode, appActions.setNodePosition(nodeId, operation.position));
   }
+  if (operation.type === "move_entity") {
+    const nodeId =
+      operation.entityKind === "node"
+        ? (operation.entityId as NodeId)
+        : state.nodes.allIds.find((candidateNodeId) => {
+            const node = state.nodes.byId[candidateNodeId];
+            if (operation.entityKind === "connector") {
+              return node?.kind === "connector" && node.connectorId === operation.entityId;
+            }
+            return node?.kind === "splice" && node.spliceId === operation.entityId;
+          });
+    return nodeId === undefined ? state : appReducer(state, appActions.setNodePosition(nodeId, operation.position));
+  }
   return state;
 }
 
