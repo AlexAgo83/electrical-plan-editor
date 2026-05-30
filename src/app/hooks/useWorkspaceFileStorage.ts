@@ -220,6 +220,23 @@ function buildStatusLabel(status: Omit<WorkspaceFileStorageStatus, "label">): st
   return "Local only";
 }
 
+function buildWorkspaceFileSummary(payload: WorkspaceFilePayloadV1): string {
+  const networkCount = payload.state.networks.allIds.length;
+  const activeNetworkName =
+    payload.state.activeNetworkId === null
+      ? "None"
+      : payload.state.networks.byId[payload.state.activeNetworkId]?.name ?? payload.state.activeNetworkId;
+
+  return [
+    `Updated: ${payload.updatedAtIso}`,
+    `Networks: ${networkCount}`,
+    `Active network: ${activeNetworkName}`,
+    `Workspace ID: ${payload.workspaceId}`,
+    `Revision: ${payload.revisionId}`,
+    `App/schema: ${payload.appVersion} / ${payload.appSchemaVersion}`
+  ].join("\n");
+}
+
 async function readHandleText(handle: WorkspaceFileHandle): Promise<string> {
   const file = await handle.getFile();
   return file.text();
@@ -299,7 +316,7 @@ export function useWorkspaceFileStorage({
       const shouldReplace = await requestConfirmation({
         title: "Open workspace file",
         message: "Replace the current workspace with the selected file?",
-        details: sourceLabel,
+        details: `${sourceLabel}\n\n${buildWorkspaceFileSummary(parsed.payload)}`,
         confirmLabel: "Open file",
         intent: "neutral"
       });
