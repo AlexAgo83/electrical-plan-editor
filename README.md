@@ -108,6 +108,37 @@ flowchart TD
 
 Delivered operation families include add, move, update, route regeneration, delete gating, catalog assignment, connector layout edits, terminal material changes, batch movement, and route locks. Multi-network proposals must include an explicit or locally inferable `networkId`; ambiguous cross-network mutations are rejected instead of falling back to the active network.
 
+```mermaid
+flowchart LR
+    Agent[AI Agent instruction] --> Permission{Permission enabled?}
+    Permission -- add --> Add[Add entities]
+    Add --> AddConnector[Connector]
+    Add --> AddSplice[Splice]
+    Add --> AddNode[Routing node]
+    Add --> AddSegment[Segment]
+    Add --> AddWire[Wire]
+    Permission -- move --> Move[Move layout]
+    Move --> MoveSingle[Move one entity]
+    Move --> MoveRelative[Place relative to another entity]
+    Move --> MoveBatch[Batch move selected entities]
+    Permission -- update --> Update[Update data]
+    Update --> Labels[Names and technical IDs]
+    Update --> WireFields[Wire section, material, color, protection]
+    Update --> Catalog[Catalog assignment and connector layout]
+    Update --> Terminals[Connector terminal material]
+    Permission -- route --> Route[Route operations]
+    Route --> Regenerate[Regenerate wire routes]
+    Route --> Lock[Lock forced route segments]
+    Permission -- delete --> Delete[Delete entities]
+    Delete --> DeleteGate[Blocked by default unless explicitly enabled]
+    Add --> Validate[Local validation]
+    Move --> Validate
+    Update --> Validate
+    Route --> Validate
+    Delete --> Validate
+    Validate --> Result[Accepted, rejected, unsupported, warnings]
+```
+
 ## Getting Started
 
 ### Prerequisites
