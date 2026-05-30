@@ -56,6 +56,7 @@ export function BomExportPreviewDialog({
   const dialogRef = useRef<HTMLElement | null>(null);
   const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
   const previousFocusedElementRef = useRef<HTMLElement | null>(null);
+  const previousPreviewRef = useRef(preview);
   const [activeSheetIndex, setActiveSheetIndex] = useState(0);
   const titleId = "bom-export-preview-title";
   const descriptionId = "bom-export-preview-description";
@@ -69,7 +70,10 @@ export function BomExportPreviewDialog({
   const formatLabel = preview.format.toUpperCase();
 
   useEffect(() => {
-    setActiveSheetIndex(0);
+    if (previousPreviewRef.current !== preview) {
+      previousPreviewRef.current = preview;
+      setActiveSheetIndex(0);
+    }
   }, [preview]);
 
   useEffect(() => {

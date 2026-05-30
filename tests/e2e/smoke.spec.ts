@@ -35,6 +35,15 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
         return candidate;
       }
     }
+    const labeledButtons = page.locator(`${selector} button[aria-label]`);
+    const labeledButtonCount = await labeledButtons.count();
+    for (let index = 0; index < labeledButtonCount; index += 1) {
+      const candidate = labeledButtons.nth(index);
+      const accessibleLabel = (await candidate.getAttribute("aria-label")) ?? "";
+      if (accessibleLabel.includes(text) && (await candidate.isVisible())) {
+        return candidate;
+      }
+    }
     return null;
   };
   const ensureNavigationDrawerOpen = async () => {
@@ -108,6 +117,15 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     for (let index = 0; index < buttonCount; index += 1) {
       const candidate = buttons.nth(index);
       if (await candidate.isVisible()) {
+        return candidate;
+      }
+    }
+    const labeledButtons = page.locator(`${selector} button[aria-label]`);
+    const labeledButtonCount = await labeledButtons.count();
+    for (let index = 0; index < labeledButtonCount; index += 1) {
+      const candidate = labeledButtons.nth(index);
+      const accessibleLabel = (await candidate.getAttribute("aria-label")) ?? "";
+      if (accessibleLabel.includes(text) && (await candidate.isVisible())) {
         return candidate;
       }
     }
