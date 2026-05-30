@@ -19,6 +19,7 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 - [Live Demo & Status](#live-demo--status)
 - [Product](#product)
 - [Technical Overview](#technical-overview)
+- [AI Agent Workspace](#ai-agent-workspace)
 - [Getting Started](#getting-started)
 - [Available Scripts](#available-scripts)
 - [Deployment](#deployment)
@@ -78,6 +79,34 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 - Delivery workflow:
   - Logics-backed request/backlog/task tracking under `logics/`
   - CI runs the same blocking validation pipeline locally and in GitHub Actions
+
+## AI Agent Workspace
+
+Version `1.11.0` introduces a Modeling `AI Agent` workspace for controlled, reversible AI-assisted plan edits. The agent is not allowed to patch raw application state. It receives scoped electrical-plan context, asks the configured provider for a structured plan change, then lets the app derive, validate, preview, and apply bounded operations through the same domain rules as manual Modeling.
+
+The first shipped workflow focuses on assisted proposals: users choose a target scope, write an instruction, select permissions, review accepted/rejected operations, then apply or reject the proposal. Applied AI sessions create a rollbackable snapshot and keep delete operations disabled unless explicitly permitted. Settings expose OpenAI/Gemini provider configuration, editable model names, local API-key storage, connection testing, strict mode, and an opt-in experimental mode gate.
+
+```mermaid
+flowchart TD
+    Settings[Settings AI provider] --> Readiness{Provider ready?}
+    Readiness -- no --> Disabled[AI Agent entry stays disabled]
+    Readiness -- yes --> Agent[Modeling AI Agent]
+    Agent --> Scope[Choose scope: selection, active network, selected harness, all networks]
+    Scope --> Instruction[Instruction and permission gates]
+    Instruction --> Context[Build scoped plan context]
+    Context --> Provider[OpenAI or Gemini provider adapter]
+    Provider --> Draft[Modified plan or operation draft]
+    Draft --> Diff[App-owned plan diff]
+    Diff --> Validate[Local operation validation]
+    Validate --> Review[Proposal summary and operation details]
+    Review --> Reject[Reject without mutation]
+    Review --> Apply[Apply accepted operations]
+    Apply --> History[Grouped history update]
+    Apply --> Snapshot[AI session snapshot]
+    Snapshot --> Rollback[Rollback last AI session]
+```
+
+Delivered operation families include add, move, update, route regeneration, delete gating, catalog assignment, connector layout edits, terminal material changes, batch movement, and route locks. Multi-network proposals must include an explicit or locally inferable `networkId`; ambiguous cross-network mutations are rejected instead of falling back to the active network.
 
 ## Getting Started
 
