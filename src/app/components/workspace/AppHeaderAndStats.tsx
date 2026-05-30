@@ -5,6 +5,7 @@ interface AppHeaderAndStatsProps {
   isNavigationDrawerOpen: boolean;
   onToggleNavigationDrawer: () => void;
   navigationToggleButtonRef: RefObject<HTMLButtonElement | null>;
+  onOpenHome: () => void;
   isSettingsActive: boolean;
   onOpenSettings: () => void;
   isInstallPromptAvailable: boolean;
@@ -29,6 +30,7 @@ export function AppHeaderAndStats({
   isNavigationDrawerOpen,
   onToggleNavigationDrawer,
   navigationToggleButtonRef,
+  onOpenHome,
   isSettingsActive,
   onOpenSettings,
   isInstallPromptAvailable,
@@ -78,7 +80,9 @@ export function AppHeaderAndStats({
             <span className="header-nav-icon" aria-hidden="true" />
           </button>
           <h1 className="header-title">
-            <span className="header-title-accent">e</span>-Plan<span className="header-title-full"> Editor</span>
+            <button type="button" className="header-title-button" onClick={onOpenHome}>
+              <span className="header-title-accent">e</span>-Plan<span className="header-title-full"> Editor</span>
+            </button>
           </h1>
         </div>
         {centerContent !== null ? <div className="header-center-content">{centerContent}</div> : null}

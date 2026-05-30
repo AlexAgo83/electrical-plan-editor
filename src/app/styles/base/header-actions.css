@@ -40,6 +40,26 @@
   gap: 0.45rem;
 }
 
+.header-title-button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.header-title-button:hover {
+  color: var(--theme-primary, currentColor);
+}
+
+.header-title-button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--theme-primary, currentColor) 58%, transparent);
+  outline-offset: 0.18rem;
+  border-radius: 0.2rem;
+}
+
 .header-ops-toggle {
   border: 1px solid #7a99b3;
   background: #e8f1f8;

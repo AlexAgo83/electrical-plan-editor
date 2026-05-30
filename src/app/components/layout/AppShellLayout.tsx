@@ -50,6 +50,7 @@ interface AppShellLayoutProps {
   closeOperationsPanel: () => void;
   onToggleNavigationDrawer: AppHeaderAndStatsProps["onToggleNavigationDrawer"];
   onToggleOperationsPanel: AppHeaderAndStatsProps["onToggleOperationsPanel"];
+  onOpenHome: AppHeaderAndStatsProps["onOpenHome"];
   isSettingsActive: boolean;
   onOpenSettings: AppHeaderAndStatsProps["onOpenSettings"];
   isInstallPromptAvailable: AppHeaderAndStatsProps["isInstallPromptAvailable"];
@@ -145,6 +146,7 @@ export function AppShellLayout({
   closeOperationsPanel,
   onToggleNavigationDrawer,
   onToggleOperationsPanel,
+  onOpenHome,
   isSettingsActive,
   onOpenSettings,
   isInstallPromptAvailable,
@@ -548,6 +550,7 @@ export function AppShellLayout({
         isNavigationDrawerOpen={isNavigationDrawerOpen}
         onToggleNavigationDrawer={onToggleNavigationDrawer}
         navigationToggleButtonRef={navigationToggleButtonRef}
+        onOpenHome={onOpenHome}
         isSettingsActive={isSettingsActive}
         onOpenSettings={onOpenSettings}
         isInstallPromptAvailable={isInstallPromptAvailable}

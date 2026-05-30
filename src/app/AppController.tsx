@@ -1033,6 +1033,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       closeOperationsPanel,
       onToggleNavigationDrawer: handleToggleNavigationDrawer,
       onToggleOperationsPanel: handleToggleOperationsPanel,
+      onOpenHome: () => setActiveScreen("home"),
       isSettingsActive: isSettingsScreen,
       onOpenSettings: handleOpenSettingsScreen,
       isInstallPromptAvailable,

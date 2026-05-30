@@ -23,6 +23,7 @@ interface BuildAppControllerShellLayoutPropsParams {
     | "closeOperationsPanel"
     | "onToggleNavigationDrawer"
     | "onToggleOperationsPanel"
+    | "onOpenHome"
     | "isSettingsActive"
     | "onOpenSettings"
     | "isInstallPromptAvailable"
