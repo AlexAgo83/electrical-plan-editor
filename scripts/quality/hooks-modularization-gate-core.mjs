@@ -25,9 +25,7 @@ export const ALLOWED_HOOKS_OVERSIZE = {
   "src/app/hooks/validation/buildValidationIssues.ts":
     "Validation issue builder consolidates rule evaluation across connectors, splices, segments, wires, catalog and harness contexts on a single iteration pass for determinism; split planned after rule-set extraction.",
   "src/app/hooks/useSpliceHandlers.ts":
-    "Splice handlers span create, edit, port-mode, occupancy, and directional flows on shared form/selection bindings; split deferred until splice-form helpers are extracted.",
-  "src/app/hooks/useCanvasInteractionHandlers.ts":
-    "Canvas interaction handlers share pan, zoom, drag-select, and grouped-drag bindings; split deferred until canvas pointer helpers are factored.",
+    "Splice handlers span create, edit, port-mode, occupancy, and directional flows on shared form/selection bindings; split deferred until splice-form helpers are extracted."
 };
 
 function normalizeRelativePath(relativePath) {

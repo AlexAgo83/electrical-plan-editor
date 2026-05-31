@@ -1,81 +1,14 @@
-import {
-  useRef,
-  useState,
-  type Dispatch,
-  type MouseEvent as ReactMouseEvent,
-  type MutableRefObject,
-  type SetStateAction,
-  type WheelEvent as ReactWheelEvent
-} from "react";
+import { useRef, useState, type MouseEvent as ReactMouseEvent, type WheelEvent as ReactWheelEvent } from "react";
 import { unstable_batchedUpdates } from "react-dom";
-import type { Connector, NetworkNode, NodeId, Segment, SegmentId, Splice } from "../../core/entities";
-import type { AppStore } from "../../store";
+import type { NodeId, SegmentId } from "../../core/entities";
 import { appActions } from "../../store";
-import { NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE, clamp, snapToGrid } from "../lib/app-utils-shared";
-import type { InteractionMode, NodePosition, SubScreenId } from "../types/app-controller";
-
-type DispatchAction = (
-  action: Parameters<AppStore["dispatch"]>[0],
-  options?: {
-    trackHistory?: boolean;
-  }
-) => void;
+import { NETWORK_MAX_SCALE, NETWORK_MIN_SCALE, clamp } from "../lib/app-utils-shared";
+import { applyGroupDragDelta, getSvgCoordinates } from "../lib/canvasInteractionGeometry";
+import type { NodePosition } from "../types/app-controller";
+import type { DraggingNodeGroupState, UseCanvasInteractionHandlersParams } from "../types/canvas-interactions";
 
 const NODE_DRAG_START_THRESHOLD_PX = 4;
 const PAN_CLICK_SUPPRESSION_THRESHOLD_PX = 4;
-
-interface UseCanvasInteractionHandlersParams {
-  state: ReturnType<AppStore["getState"]>;
-  nodesCount: number;
-  interactionMode: InteractionMode;
-  isModelingScreen: boolean;
-  isModelingAnalysisFocused: boolean;
-  activeSubScreen: SubScreenId;
-  setActiveScreen: (screen: "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings") => void;
-  setActiveSubScreen: (screen: SubScreenId) => void;
-  setNodeFormMode: (mode: "create" | "edit") => void;
-  setEditingNodeId: (id: NodeId | null) => void;
-  setNodeKind: (kind: NetworkNode["kind"]) => void;
-  setNodeIdInput: (value: string) => void;
-  setNodeConnectorId: (value: string) => void;
-  setNodeSpliceId: (value: string) => void;
-  setNodeLabel: (value: string) => void;
-  setNodeFormError: (value: string | null) => void;
-  setPendingNewNodePosition: (value: NodePosition | null) => void;
-  networkViewWidth: number;
-  networkViewHeight: number;
-  networkNodePositions: Record<NodeId, NodePosition>;
-  snapNodesToGrid: boolean;
-  lockEntityMovement: boolean;
-  networkOffset: NodePosition;
-  networkScale: number;
-  networkRenderScale: number;
-  setNetworkScale: Dispatch<SetStateAction<number>>;
-  setNetworkOffset: Dispatch<SetStateAction<NodePosition>>;
-  draggingNodeId: NodeId | null;
-  setDraggingNodeId: (value: NodeId | null) => void;
-  manualNodePositions: Record<NodeId, NodePosition>;
-  setManualNodePositions: Dispatch<SetStateAction<Record<NodeId, NodePosition>>>;
-  setIsPanningNetwork: (value: boolean) => void;
-  panStartRef: MutableRefObject<
-    | {
-        clientX: number;
-        clientY: number;
-        offsetX: number;
-        offsetY: number;
-      }
-    | null
-  >;
-  dispatchAction: DispatchAction;
-  persistNodePosition: (nodeId: NodeId, position: NodePosition) => void;
-  persistNodePositions: (positions: Record<NodeId, NodePosition>) => void;
-  resetNetworkViewToConfiguredScale: () => void;
-  startConnectorEdit: (connector: Connector) => void;
-  startSpliceEdit: (splice: Splice) => void;
-  startNodeEdit: (node: NetworkNode) => void;
-  startSegmentEdit: (segment: Segment) => void;
-  onExternalSelectionInteraction?: () => void;
-}
 
 export function useCanvasInteractionHandlers({
   state,
@@ -121,15 +54,7 @@ export function useCanvasInteractionHandlers({
   onExternalSelectionInteraction
 }: UseCanvasInteractionHandlersParams) {
   const [selectedCanvasNodeIds, setSelectedCanvasNodeIds] = useState<Set<NodeId>>(new Set());
-  const draggingNodeGroupRef = useRef<{
-    anchorNodeId: NodeId;
-    anchorStartPosition: NodePosition;
-    nodeIds: NodeId[];
-    originPositions: Record<NodeId, NodePosition>;
-    startClientX: number;
-    startClientY: number;
-    hasStartedDrag: boolean;
-  } | null>(null);
+  const draggingNodeGroupRef = useRef<DraggingNodeGroupState | null>(null);
   const shouldSuppressNextCanvasClickRef = useRef(false);
 
   function clearSelectedCanvasNodes(): void {
@@ -146,19 +71,6 @@ export function useCanvasInteractionHandlers({
       x: position.x,
       y: position.y
     };
-  }
-
-  function applyGroupDragDelta(originPositions: Record<NodeId, NodePosition>, deltaX: number, deltaY: number) {
-    const nextPositions = {} as Record<NodeId, NodePosition>;
-    for (const [nodeId, origin] of Object.entries(originPositions) as Array<[NodeId, NodePosition]>) {
-      const nextX = origin.x + deltaX;
-      const nextY = origin.y + deltaY;
-      nextPositions[nodeId] = {
-        x: snapNodesToGrid ? snapToGrid(nextX, NETWORK_GRID_STEP) : nextX,
-        y: snapNodesToGrid ? snapToGrid(nextY, NETWORK_GRID_STEP) : nextY
-      };
-    }
-    return nextPositions;
   }
 
   function handleNetworkSegmentClick(segmentId: SegmentId): void {
@@ -280,7 +192,7 @@ export function useCanvasInteractionHandlers({
       return;
     }
 
-    const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
+    const coordinates = getCanvasSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
     if (coordinates === null) {
       return;
     }
@@ -298,36 +210,15 @@ export function useCanvasInteractionHandlers({
     setPendingNewNodePosition(coordinates);
   }
 
-  function getLocalSvgPoint(svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null {
-    const bounds = svgElement.getBoundingClientRect();
-    if (bounds.width <= 0 || bounds.height <= 0) {
-      return null;
-    }
-
-    return {
-      x: ((clientX - bounds.left) / bounds.width) * networkViewWidth,
-      y: ((clientY - bounds.top) / bounds.height) * networkViewHeight
-    };
-  }
-
-  function getSvgCoordinates(svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null {
-    const localPoint = getLocalSvgPoint(svgElement, clientX, clientY);
-    if (localPoint === null) {
-      return null;
-    }
-
-    const localX = localPoint.x;
-    const localY = localPoint.y;
-    const effectiveScale = networkScale * networkRenderScale;
-    const modelX = (localX - networkOffset.x) / effectiveScale;
-    const modelY = (localY - networkOffset.y) / effectiveScale;
-    const snappedX = snapNodesToGrid ? snapToGrid(modelX, NETWORK_GRID_STEP) : modelX;
-    const snappedY = snapNodesToGrid ? snapToGrid(modelY, NETWORK_GRID_STEP) : modelY;
-
-    return {
-      x: snappedX,
-      y: snappedY
-    };
+  function getCanvasSvgCoordinates(svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null {
+    return getSvgCoordinates(svgElement, clientX, clientY, {
+      networkViewWidth,
+      networkViewHeight,
+      networkOffset,
+      networkScale,
+      networkRenderScale,
+      snapNodesToGrid
+    });
   }
 
   function handleNetworkNodeMouseDown(event: ReactMouseEvent<SVGGElement>, nodeId: NodeId): void {
@@ -451,14 +342,14 @@ export function useCanvasInteractionHandlers({
         setDraggingNodeId(draggingNodeGroup.anchorNodeId);
       }
 
-      const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
+      const coordinates = getCanvasSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
       if (coordinates === null) {
         return;
       }
 
       const deltaX = coordinates.x - draggingNodeGroup.anchorStartPosition.x;
       const deltaY = coordinates.y - draggingNodeGroup.anchorStartPosition.y;
-      const nextPositions = applyGroupDragDelta(draggingNodeGroup.originPositions, deltaX, deltaY);
+      const nextPositions = applyGroupDragDelta(draggingNodeGroup.originPositions, deltaX, deltaY, snapNodesToGrid);
       setManualNodePositions((previous) => {
         let changed = false;
         for (const [nodeId, nextPosition] of Object.entries(nextPositions) as Array<[NodeId, NodePosition]>) {
@@ -517,7 +408,7 @@ export function useCanvasInteractionHandlers({
       return;
     }
 
-    const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
+    const coordinates = getCanvasSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
     if (coordinates === null) {
       return;
     }
