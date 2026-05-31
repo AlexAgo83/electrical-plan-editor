@@ -28,8 +28,6 @@ export const FORBIDDEN_LEGACY_FILES = ["src/tests/app.ui.spec.tsx"];
 export const ALLOWED_OVERSIZE = {
   "src/tests/app.ui.navigation-canvas.spec.tsx":
     "Canvas integration coverage remains intentionally centralized because selection, pan, zoom, and grouped-drag scenarios share the same fixtures and helper wiring.",
-  "src/tests/app.ui.creation-flow-ergonomics.spec.tsx":
-    "Create-flow integration coverage stays consolidated so repeated-create, endpoint-prefill, and edit-transition scenarios keep one shared modeling fixture surface.",
   "src/app/styles/canvas/canvas-diagram-and-overlays.css":
     "Network summary and functional schematic diagram overlays share SVG layering and hover semantics; split deferred until canvas diagram style tokens are extracted.",
   "src/tests/app.ui.network-summary-bom-export.spec.tsx":
