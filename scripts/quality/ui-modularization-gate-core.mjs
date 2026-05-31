@@ -30,8 +30,6 @@ export const ALLOWED_OVERSIZE = {
     "Canvas integration coverage remains intentionally centralized because selection, pan, zoom, and grouped-drag scenarios share the same fixtures and helper wiring.",
   "src/tests/app.ui.creation-flow-ergonomics.spec.tsx":
     "Create-flow integration coverage stays consolidated so repeated-create, endpoint-prefill, and edit-transition scenarios keep one shared modeling fixture surface.",
-  "src/tests/app.ui.settings.spec.tsx":
-    "Settings integration coverage still spans persisted app-wide preferences, AI provider readiness, and local storage reload behavior on one shared app fixture; split deferred until settings fixture extraction is complete.",
   "src/app/styles/canvas/canvas-diagram-and-overlays.css":
     "Network summary and functional schematic diagram overlays share SVG layering and hover semantics; split deferred until canvas diagram style tokens are extracted.",
   "src/tests/app.ui.network-summary-bom-export.spec.tsx":
