@@ -60,6 +60,8 @@ const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.workspace-shell-regression.spec.tsx"
 ];
 
+const UI_CHUNK_SIZE = 8;
+
 const lane = process.argv[2] ?? "";
 const userArgs = process.argv.slice(3);
 
@@ -193,7 +195,7 @@ if (lane === "check") {
 }
 
 if (lane === "ui") {
-  process.exit(runVitestInChunks(userArgs, UI_LANE_TEST_FILES, 6));
+  process.exit(runVitestInChunks(userArgs, UI_LANE_TEST_FILES, UI_CHUNK_SIZE));
 }
 
 if (lane === "fast") {
