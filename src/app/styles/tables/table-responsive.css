@@ -1,0 +1,211 @@
+@media (max-width: 860px) {
+  .modeling-list-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .catalog-modeling-list-actions {
+    grid-template-columns: repeat(4, minmax(max-content, 1fr));
+    overflow-x: auto;
+    align-items: stretch;
+  }
+
+  .list-panel-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .list-panel-filters {
+    justify-content: flex-start;
+  }
+
+  .list-panel-header-tools {
+    justify-content: flex-start;
+  }
+
+  .list-panel-header-tools-row {
+    justify-content: flex-start;
+  }
+
+  .list-inline-number-filter {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .list-inline-number-filter > input {
+    min-width: min(18rem, 100%);
+  }
+
+  .list-inline-table-filter-input {
+    min-width: min(18rem, 100%);
+  }
+
+  .list-panel-header.list-panel-header-mobile-inline-tools {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .list-panel-header.list-panel-header-mobile-inline-tools > h2 {
+    margin-right: auto;
+  }
+
+  .list-panel-header.list-panel-header-mobile-inline-tools .list-panel-header-tools {
+    display: contents;
+  }
+
+  .list-panel-header.list-panel-header-mobile-inline-tools .list-panel-header-tools-row.is-title-actions {
+    width: auto;
+    margin-left: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+
+  .list-panel-header.list-panel-header-mobile-inline-tools .list-panel-header-tools-row.is-filter-row {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 670px) {
+  .list-panel-header-tools,
+  .list-panel-header-tools-row {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .list-inline-table-filter {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0.35rem;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .list-inline-table-filter > span {
+    white-space: normal;
+  }
+
+  .list-inline-table-filter-select,
+  .list-inline-table-filter-input,
+  .list-inline-number-filter > input {
+    width: 100%;
+    min-width: 0 !important;
+    max-width: 100%;
+  }
+
+  .list-panel-header.list-panel-header-mobile-inline-tools .list-panel-header-tools-row.is-title-actions {
+    width: auto;
+    margin-left: auto;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+
+  .table-export-button {
+    white-space: normal;
+  }
+
+  .data-table {
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  .data-table th,
+  .data-table td {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .catalog-usage-table .validation-actions-cell {
+    width: 2.65rem;
+  }
+
+  .catalog-usage-table .validation-row-go-to-button {
+    min-width: 0;
+    width: 2.15rem;
+    padding-inline: 0.32rem;
+  }
+
+  .catalog-usage-table .validation-row-go-to-button .action-button-icon {
+    flex: 0 0 0.85rem;
+  }
+
+  .catalog-usage-go-to-label {
+    display: none;
+  }
+
+  .catalog-reference-table th:nth-child(3),
+  .catalog-reference-table td:nth-child(3) {
+    width: 2.6rem;
+  }
+
+  .catalog-reference-table .validation-actions-cell {
+    width: 2.65rem;
+  }
+
+  .catalog-reference-table .validation-row-go-to-button {
+    min-width: 0;
+    width: 2.15rem;
+    padding-inline: 0.32rem;
+  }
+
+  .catalog-reference-table .validation-row-go-to-button .action-button-icon {
+    flex: 0 0 0.85rem;
+  }
+
+  .catalog-reference-save-label {
+    display: none;
+  }
+
+  .analysis-node-segments-table .validation-actions-cell,
+  .analysis-segment-wires-table .validation-actions-cell {
+    width: 2.65rem;
+  }
+
+  .analysis-node-segments-table .validation-row-go-to-button,
+  .analysis-segment-wires-table .validation-row-go-to-button {
+    min-width: 0;
+    width: 2.15rem;
+    padding-inline: 0.32rem;
+  }
+
+  .analysis-node-segments-table .validation-row-go-to-button .action-button-icon,
+  .analysis-segment-wires-table .validation-row-go-to-button .action-button-icon {
+    flex: 0 0 0.85rem;
+  }
+
+  .analysis-table-go-to-label {
+    display: none;
+  }
+
+  .analysis-nodes-table th:nth-child(2),
+  .analysis-nodes-table td:nth-child(2) {
+    width: 5rem;
+  }
+
+  .analysis-nodes-table th:nth-child(4),
+  .analysis-nodes-table td:nth-child(4) {
+    width: 3.1rem;
+  }
+
+  .analysis-node-segments-table th:nth-child(3),
+  .analysis-node-segments-table td:nth-child(3),
+  .analysis-node-segments-table th:nth-child(5),
+  .analysis-node-segments-table td:nth-child(5),
+  .analysis-segments-table th:nth-child(5),
+  .analysis-segments-table td:nth-child(5),
+  .analysis-segment-wires-table th:nth-child(6),
+  .analysis-segment-wires-table td:nth-child(6),
+  .analysis-segment-wires-table th:nth-child(7),
+  .analysis-segment-wires-table td:nth-child(7) {
+    width: 2.8rem;
+  }
+
+  .analysis-segment-wires-table th:nth-child(3),
+  .analysis-segment-wires-table td:nth-child(3) {
+    width: 3.1rem;
+  }
+}
