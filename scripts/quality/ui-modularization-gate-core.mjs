@@ -30,8 +30,6 @@ export const ALLOWED_OVERSIZE = {
     "Canvas integration coverage remains intentionally centralized because selection, pan, zoom, and grouped-drag scenarios share the same fixtures and helper wiring.",
   "src/tests/app.ui.creation-flow-ergonomics.spec.tsx":
     "Create-flow integration coverage stays consolidated so repeated-create, endpoint-prefill, and edit-transition scenarios keep one shared modeling fixture surface.",
-  "src/tests/app.ui.delete-confirmations.spec.tsx":
-    "Delete confirmation coverage spans direct, blocked, cascade, and batch-delete contracts on the same shared setup; split deferred until delete-flow fixtures are extracted.",
   "src/tests/app.ui.catalog.spec.tsx":
     "Catalog integration coverage spans navigation, create/edit, and scroll behavior on one shared fixture surface; split deferred until catalog form fixtures are extracted.",
   "src/tests/app.ui.list-ergonomics.spec.tsx":
