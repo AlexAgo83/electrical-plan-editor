@@ -30,8 +30,6 @@ export const ALLOWED_OVERSIZE = {
     "Canvas integration coverage remains intentionally centralized because selection, pan, zoom, and grouped-drag scenarios share the same fixtures and helper wiring.",
   "src/app/styles/canvas/canvas-diagram-and-overlays.css":
     "Network summary and functional schematic diagram overlays share SVG layering and hover semantics; split deferred until canvas diagram style tokens are extracted.",
-  "src/tests/app.ui.network-summary-bom-export.spec.tsx":
-    "High-scope export integration regression suite spanning BOM, SVG, and cartouche scenarios; split deferred until export fixture/setup extraction is complete.",
   "src/tests/app.ui.network-summary-workflow-polish.spec.tsx":
     "High-scope integration regression suite for network-summary workflows; split planned once fixture/setup extraction is complete.",
   "src/app/styles/validation-settings/validation-and-settings-layout.css":
