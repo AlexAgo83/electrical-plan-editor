@@ -9,7 +9,8 @@ import { THEME_MODE_OPTIONS } from "../../lib/themeModes";
 import { getAiProviderLabel, type AiProviderId } from "../../lib/aiSettings";
 import type { AiSettingsModel } from "../../hooks/useAiSettings";
 import type { WorkspaceFileStorageStatus } from "../../hooks/useWorkspaceFileStorage";
-import { SETTINGS_SECTIONS, SettingsLabelText, normalizeSettingsSearch, sectionMatches } from "../settings/settingsSearchModel";
+import { SettingsLabelText } from "../settings/SettingsLabelText";
+import { SETTINGS_SECTIONS, normalizeSettingsSearch, sectionMatches } from "../settings/settingsSearchModel";
 import type {
   AppLocale,
   CanvasCalloutTextSize,

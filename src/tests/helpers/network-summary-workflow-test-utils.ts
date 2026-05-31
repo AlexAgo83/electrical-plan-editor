@@ -1,7 +1,7 @@
 import { fireEvent, within } from "@testing-library/react";
 import { expect, vi } from "vitest";
 import type { HarnessAssemblyId, InterHarnessConnectorLinkId, NetworkId } from "../../core/entities";
-import { appActions, appReducer } from "../../store";
+import { appActions, appReducer, type NetworkSummaryViewState } from "../../store";
 import { asConnectorId, createUiIntegrationState, getPanelByHeading } from "./app-ui-test-utils";
 
 export function asNetworkId(value: string): NetworkId {
@@ -54,6 +54,26 @@ export function getNetworkSummaryViewBoxSize(panel: HTMLElement): { width: numbe
     throw new Error("Unable to parse network summary viewBox.");
   }
   return { width, height };
+}
+
+export function createUiIntegrationStateWithNetworkSummaryViewState(viewState: NetworkSummaryViewState) {
+  const baseState = createUiIntegrationState();
+  const activeNetworkId = baseState.activeNetworkId;
+  if (activeNetworkId === null) {
+    throw new Error("Expected active network.");
+  }
+  const scoped = baseState.networkStates[activeNetworkId];
+  if (scoped === undefined) {
+    throw new Error("Expected active scoped network.");
+  }
+
+  return {
+    ...baseState,
+    networkStates: {
+      ...baseState.networkStates,
+      [activeNetworkId]: { ...scoped, networkSummaryViewState: viewState }
+    }
+  };
 }
 
 export function openViewMenu(panel: HTMLElement): void {

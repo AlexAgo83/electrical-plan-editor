@@ -18,6 +18,7 @@ import {
   asAssemblyId,
   asNetworkId,
   createHarnessAssemblyFunctionalSelectionState,
+  createUiIntegrationStateWithNetworkSummaryViewState,
   getCurrentNetworkFunctionalPanel,
   getNetworkSummaryViewBoxSize,
   getNetworkSummaryViewportTransform,
@@ -404,38 +405,19 @@ describe("App integration UI - network summary workflow polish", () => {
   });
 
   it("supports deeper zoom-out floor and allows dragging nodes to negative coordinates", () => {
-    const baseState = createUiIntegrationState();
-    const activeNetworkId = baseState.activeNetworkId;
-    expect(activeNetworkId).not.toBeNull();
-    if (activeNetworkId === null) {
-      throw new Error("Expected active network.");
-    }
-    const scoped = baseState.networkStates[activeNetworkId];
-    expect(scoped).toBeDefined();
-    if (scoped === undefined) {
-      throw new Error("Expected active scoped network.");
-    }
-
-    renderAppWithState({
-      ...baseState,
-      networkStates: {
-        ...baseState.networkStates,
-        [activeNetworkId]: {
-          ...scoped,
-          networkSummaryViewState: {
-            scale: 0.04,
-            offset: { x: 220, y: 180 },
-            showNetworkInfoPanels: true,
-            showSegmentNames: false,
-            showSegmentLengths: true,
-            showCableCallouts: false,
-            showNetworkGrid: true,
-            snapNodesToGrid: true,
-            lockEntityMovement: false
-          }
-        }
-      }
-    });
+    renderAppWithState(
+      createUiIntegrationStateWithNetworkSummaryViewState({
+        scale: 0.04,
+        offset: { x: 220, y: 180 },
+        showNetworkInfoPanels: true,
+        showSegmentNames: false,
+        showSegmentLengths: true,
+        showCableCallouts: false,
+        showNetworkGrid: true,
+        snapNodesToGrid: true,
+        lockEntityMovement: false
+      })
+    );
     switchScreenDrawerAware("modeling");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
