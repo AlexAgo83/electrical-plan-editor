@@ -26,6 +26,7 @@ const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.list-ergonomics.spec.tsx",
   "src/tests/app.ui.list-ergonomics-wire-colors.spec.tsx",
   "src/tests/app.ui.modeling-dropdown-ordering.spec.tsx",
+  "src/tests/app.ui.navigation-canvas-interactions.spec.tsx",
   "src/tests/app.ui.navigation-canvas-selection-gating.spec.tsx",
   "src/tests/app.ui.navigation-canvas-validation-bridge.spec.tsx",
   "src/tests/app.ui.navigation-canvas.spec.tsx",
