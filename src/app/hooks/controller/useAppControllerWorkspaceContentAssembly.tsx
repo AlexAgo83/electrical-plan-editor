@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import type { AppAction } from "../../../store/actions";
 import type { AppStore } from "../../../store";
 import type { ScreenId, SubScreenId, UndoHistoryEntry } from "../../types/app-controller";
@@ -13,18 +12,8 @@ import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSel
 import type { ValidationModel } from "../useValidationModel";
 import type { AiSettingsModel } from "../useAiSettings";
 import type { UseWorkspaceFileStorageModel } from "../useWorkspaceFileStorage";
-import { ModelingAiAgentPanel } from "../../components/workspace/ModelingAiAgentPanel";
-import { applyAiAgentAcceptedOperations, createAiAgentSessionSnapshot, rollbackAiAgentSession, type AiAgentSessionSnapshot } from "../../lib/aiAgentApply";
-import { buildAiAgentContext } from "../../lib/aiAgentContext";
-import { prepareAiAgentProposalDraft } from "../../lib/aiAgentProposal";
-import { requestAiAgentProviderProposal } from "../../lib/aiAgentProviderClient";
-import {
-  buildAiAgentEditablePlan,
-  buildAiAgentOperationsFromPlanDiff,
-  extractAiAgentModifiedPlan
-} from "../../lib/aiAgentPlanDiff";
 import type { AiProviderReadiness } from "../../lib/aiSettings";
-import { validateAiAgentOperations } from "../../lib/aiAgentOperationContract";
+import { buildWorkspaceLayoutContent } from "../../lib/appControllerWorkspaceLayoutContent";
 import type { AppControllerModelingHandlersAssemblyModel } from "./useAppControllerModelingHandlersAssembly";
 import type { AppControllerWorkspaceNetworkDomainAssemblyModel } from "./useAppControllerWorkspaceNetworkDomainAssembly";
 import type { AppControllerCatalogAnalysisActionsModel } from "./useAppControllerCatalogAnalysisActions";
@@ -35,6 +24,7 @@ import { useAppControllerNetworkSummaryPanelDomain } from "./useAppControllerNet
 import { useAppControllerModelingAnalysisDomainAssembly } from "./useAppControllerModelingAnalysisDomainAssembly";
 import { useAppControllerCatalogScreenDomains } from "./useAppControllerCatalogScreenDomains";
 import { useAppControllerAuxDomainAssembly } from "./useAppControllerAuxDomainAssembly";
+import { useAppControllerAiAgentWorkspaceContent } from "./useAppControllerAiAgentWorkspaceContent";
 
 type HomeWorkspaceParams = Parameters<typeof useAppControllerHomeWorkspaceContent>[0];
 type NetworkSummaryParams = Parameters<typeof useAppControllerNetworkSummaryPanelDomain>[0];
@@ -67,7 +57,6 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     isAnalysisScreen: boolean;
     isModelingAnalysisFocused: boolean;
     isNetworkScopeScreen: boolean;
-    isHarnessAssemblyScreen: boolean;
     isValidationScreen: boolean;
     isSettingsScreen: boolean;
     isCatalogSubScreen: boolean;
@@ -79,7 +68,6 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     selectedCatalogItemId: CatalogDomainsParams["selectedCatalogItemId"];
     hasTableSelectionForActiveSubScreen: boolean;
     hasActiveEntityForm: boolean;
-    hasCatalogSelectionForActiveSubScreen: boolean;
     hasInspectableSelectionForActiveSubScreen: boolean;
     networkScalePercent: number;
     isCurrentWorkspaceEmpty: boolean;
@@ -185,7 +173,6 @@ export function useAppControllerWorkspaceContentAssembly({
   domains,
   handlers
 }: AppControllerWorkspaceContentAssemblyParams) {
-  const lastAiAgentSessionSnapshotRef = useRef<AiAgentSessionSnapshot | null>(null);
   const { homeWorkspaceContent } = useAppControllerHomeWorkspaceContent({
     HomeWorkspaceContentComponent: components.HomeWorkspaceContentComponent,
     hasActiveNetwork: state.hasActiveNetwork,
@@ -210,8 +197,7 @@ export function useAppControllerWorkspaceContentAssembly({
     handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange
   });
 
-  const { networkSummaryPanel, networkFunctionalSchematicPanel, headerHarnessAssemblyFunctionalScopeNavigation, selectedHarnessAssemblyId } =
-    useAppControllerNetworkSummaryPanelDomain({
+  const { networkSummaryPanel, networkFunctionalSchematicPanel, headerHarnessAssemblyFunctionalScopeNavigation, selectedHarnessAssemblyId } = useAppControllerNetworkSummaryPanelDomain({
     NetworkSummaryPanelComponent: components.NetworkSummaryPanelComponent,
     networkSummaryPanelRef: domains.workspaceNetworkDomain.networkSummaryPanelRef,
     hasActiveNetwork: state.hasActiveNetwork,
@@ -479,105 +465,23 @@ export function useAppControllerWorkspaceContentAssembly({
       includeSettingsContent: state.isSettingsScreen
     });
 
-  const aiAgentWorkspaceContent = state.isAiAgentModelingOpen ? (
-    <ModelingAiAgentPanel
-      providerReadiness={state.aiProviderReadiness}
-      experimentalDirectExecutionEnabled={models.aiSettings.settings.experimentalDirectExecutionEnabled}
-      contextSummaries={{
-        activeNetwork: buildAiAgentContext(handlers.store.getState(), "activeNetwork").summary,
-        currentSelection: buildAiAgentContext(handlers.store.getState(), "currentSelection").summary,
-        selectedHarness: buildAiAgentContext(handlers.store.getState(), "selectedHarness", { selectedHarnessAssemblyId }).summary,
-        allNetworks: buildAiAgentContext(handlers.store.getState(), "allNetworks").summary
-      }}
-      onPrepareProposal={async (request) => {
-        const currentState = handlers.store.getState();
-        const context = buildAiAgentContext(currentState, request.scope, { selectedHarnessAssemblyId });
-        try {
-          const providerResponse = await requestAiAgentProviderProposal({
-            settings: models.aiSettings.settings,
-            context,
-            instruction: request.instruction
-          });
-          const modifiedPlan = extractAiAgentModifiedPlan(providerResponse.payload);
-          const payload =
-            modifiedPlan === null
-              ? providerResponse.payload
-              : {
-                  schemaVersion: 1,
-                  operations: buildAiAgentOperationsFromPlanDiff(buildAiAgentEditablePlan(context), modifiedPlan)
-                };
-          return {
-            summary: `Provider draft generated from ${providerResponse.rawText.length} response characters.`,
-            rawResponse: providerResponse.rawText,
-            validation: validateAiAgentOperations({
-              state: currentState,
-              payload,
-              scope: request.scope,
-              selection: currentState.ui.selected,
-              permissions: request.permissions,
-              instruction: request.instruction,
-              selectedHarnessAssemblyId
-            })
-          };
-        } catch (error) {
-          const fallback = prepareAiAgentProposalDraft({
-            state: currentState,
-            scope: request.scope,
-            instruction: request.instruction,
-            permissions: request.permissions,
-            selectedHarnessAssemblyId
-          });
-          return {
-            ...fallback,
-            summary: `${error instanceof Error ? error.message : "Provider proposal failed."} Local draft generated instead.`
-          };
-        }
-      }}
-      onApplyProposal={(validation) => {
-        const currentState = handlers.store.getState();
-        const snapshot = createAiAgentSessionSnapshot(currentState, validation, "AI modeling proposal");
-        const result = applyAiAgentAcceptedOperations(currentState, validation);
-        if (result.nextState !== currentState) {
-          lastAiAgentSessionSnapshotRef.current = snapshot;
-          handlers.replaceStateWithHistory(result.nextState);
-        }
-        return {
-          appliedCount: result.appliedCount,
-          skippedCount: result.skippedCount,
-          impactPreview: snapshot.impactPreview,
-          canRollback: result.nextState !== currentState
-        };
-      }}
-      onRollbackLastSession={() => {
-        const snapshot = lastAiAgentSessionSnapshotRef.current;
-        if (snapshot === null) {
-          return false;
-        }
-        handlers.replaceStateWithHistory(rollbackAiAgentSession(snapshot));
-        lastAiAgentSessionSnapshotRef.current = null;
-        return true;
-      }}
-    />
-  ) : null;
+  const aiAgentWorkspaceContent = useAppControllerAiAgentWorkspaceContent({
+    isOpen: state.isAiAgentModelingOpen,
+    providerReadiness: state.aiProviderReadiness,
+    aiSettings: models.aiSettings,
+    selectedHarnessAssemblyId,
+    store: handlers.store,
+    replaceStateWithHistory: handlers.replaceStateWithHistory
+  });
 
-  const modelingLeftColumnContentForActiveMode = state.isAiAgentModelingOpen
-    ? aiAgentWorkspaceContent
-    : modelingLeftColumnContentForSubScreen;
-
-  const modelingFormsColumnContentForLayout =
-    !state.isAiAgentModelingOpen &&
-    (isModelingBatchModeActive || state.hasTableSelectionForActiveSubScreen || state.hasActiveEntityForm || state.isCatalogSubScreen)
-      ? modelingFormsColumnContentForSubScreen
-      : null;
-
-  const analysisWorkspaceContentForLayout = state.isAiAgentModelingOpen
-    ? null
-    : state.isCatalogSubScreen
-    ? analysisWorkspaceContentForSubScreen
-    : state.hasTableSelectionForActiveSubScreen ||
-        (state.isModelingScreen && state.hasInspectableSelectionForActiveSubScreen)
-      ? analysisWorkspaceContentForSubScreen
-      : null;
+  const { modelingLeftColumnContentForActiveMode, modelingFormsColumnContentForLayout, analysisWorkspaceContentForLayout } = buildWorkspaceLayoutContent({
+    state,
+    isModelingBatchModeActive,
+    aiAgentWorkspaceContent,
+    modelingLeftColumnContentForSubScreen,
+    modelingFormsColumnContentForSubScreen,
+    analysisWorkspaceContentForSubScreen
+  });
 
   return {
     homeWorkspaceContent,
