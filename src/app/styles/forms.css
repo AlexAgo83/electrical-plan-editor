@@ -1,4 +1,5 @@
 @import "./forms/connector-layout.css";
+@import "./forms/connector-physical-layout.css";
 
 .stack-form {
   display: grid;

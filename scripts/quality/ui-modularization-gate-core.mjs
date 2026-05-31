@@ -52,8 +52,6 @@ export const ALLOWED_OVERSIZE = {
     "Validation/settings layout shares tightly coupled responsive rules; split deferred to avoid regressions during mobile pass.",
   "src/app/styles/workspace/workspace-shell-and-nav/navigation-and-analysis-route.css":
     "Navigation and analysis-route layout rules share tightly coupled responsive selectors for workspace switching, analysis panels, and route transitions; split deferred until nav-shell token extraction is complete.",
-  "src/app/styles/forms/connector-layout.css":
-    "Connector layout editor styles share form-control, drag-target, and responsive-panel selectors in one surface; split deferred until connector-form token extraction is complete."
 };
 
 function normalizeRelativePath(relativePath) {

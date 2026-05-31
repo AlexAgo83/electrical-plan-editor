@@ -1,0 +1,44 @@
+.connector-physical-way-shape.is-occupied {
+  fill: color-mix(in srgb, var(--theme-primary, currentColor) 26%, transparent);
+  stroke: var(--theme-primary, currentColor);
+}
+
+.connector-physical-way-shape.is-wire-highlighted {
+  fill: color-mix(in srgb, var(--network-wire-highlight-color, var(--theme-primary, currentColor)) 34%, transparent);
+  stroke: var(--network-wire-highlight-color, var(--theme-primary, currentColor));
+  stroke-width: 0.14;
+}
+
+.connector-physical-wire-technical-id {
+  fill: currentColor;
+  font-weight: 700;
+  pointer-events: none;
+  text-anchor: middle;
+  dominant-baseline: central;
+  alignment-baseline: central;
+}
+
+.connector-physical-wire-technical-id-badge {
+  pointer-events: none;
+}
+
+.connector-physical-wire-technical-id-bg {
+  fill: color-mix(in srgb, var(--theme-surface, Canvas) 62%, transparent);
+  stroke: color-mix(in srgb, currentColor 28%, transparent);
+  stroke-width: 0.025;
+}
+
+.connector-physical-wire-color-dot {
+  stroke: color-mix(in srgb, var(--theme-surface, Canvas) 76%, currentColor 24%);
+  stroke-width: 0.012;
+}
+
+.connector-physical-way-list {
+  margin-top: 0;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
+.connector-physical-way-list .cavity.is-wire-highlighted {
+  border-color: color-mix(in srgb, var(--network-wire-highlight-color, var(--theme-primary, currentColor)) 55%, var(--panel-border));
+  background: color-mix(in srgb, var(--network-wire-highlight-color, var(--theme-primary, currentColor)) 14%, var(--panel-bg));
+}
