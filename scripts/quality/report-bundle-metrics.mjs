@@ -4,6 +4,7 @@ import { gzipSync } from "node:zlib";
 
 const MAIN_CHUNK_WARN_BYTES = Number(process.env.BUNDLE_MAIN_WARN_BYTES ?? 500 * 1024);
 const TOTAL_GZIP_WARN_BYTES = Number(process.env.BUNDLE_TOTAL_GZIP_WARN_BYTES ?? 220 * 1024);
+const TOP_CHUNK_COUNT = Number(process.env.BUNDLE_TOP_CHUNK_COUNT ?? 8);
 
 function formatKiB(bytes) {
   return `${(bytes / 1024).toFixed(2)} KiB`;
@@ -31,15 +32,59 @@ const jsAssets = jsFileNames.map((fileName) => {
   };
 });
 
+function readIfExists(filePath) {
+  return fs.existsSync(filePath) ? fs.readFileSync(filePath, "utf8") : "";
+}
+
+function collectIndexHtmlJsAssets() {
+  const indexHtml = readIfExists(path.resolve(process.cwd(), "dist/index.html"));
+  return new Set(
+    [...indexHtml.matchAll(/(?:src|href)="\/?(assets\/[^"]+\.js)"/g)].map((match) => path.basename(match[1]))
+  );
+}
+
+function collectPrecachedAssets() {
+  const swSource = readIfExists(path.resolve(process.cwd(), "dist/sw.js"));
+  return new Set([...swSource.matchAll(/url:"(assets\/[^"]+)"/g)].map((match) => path.basename(match[1])));
+}
+
 const mainChunk =
   jsAssets.find((asset) => /^index-[A-Za-z0-9_-]+\.js$/.test(asset.fileName)) ??
   [...jsAssets].sort((left, right) => right.rawBytes - left.rawBytes)[0];
 
 const totalJsGzipBytes = jsAssets.reduce((total, asset) => total + asset.gzipBytes, 0);
+const initialJsAssets = collectIndexHtmlJsAssets();
+const precachedAssets = collectPrecachedAssets();
+const initialJsGzipBytes = jsAssets
+  .filter((asset) => initialJsAssets.has(asset.fileName))
+  .reduce((total, asset) => total + asset.gzipBytes, 0);
+const precachedJsGzipBytes = jsAssets
+  .filter((asset) => precachedAssets.has(asset.fileName))
+  .reduce((total, asset) => total + asset.gzipBytes, 0);
+const topChunks = [...jsAssets].sort((left, right) => right.rawBytes - left.rawBytes).slice(0, TOP_CHUNK_COUNT);
+
+function classifyAsset(asset) {
+  const tags = [];
+  if (initialJsAssets.has(asset.fileName)) {
+    tags.push("initial");
+  }
+  if (precachedAssets.has(asset.fileName)) {
+    tags.push("precache");
+  } else {
+    tags.push("lazy-only");
+  }
+  return tags.join(", ");
+}
 
 console.log("[bundle:metrics] informational non-blocking budget report");
 console.log(
   `[bundle:metrics] main JS chunk: ${mainChunk.fileName} (${formatKiB(mainChunk.rawBytes)} raw / ${formatKiB(mainChunk.gzipBytes)} gzip)`
+);
+console.log(
+  `[bundle:metrics] initial JS gzip: ${formatKiB(initialJsGzipBytes)} across ${initialJsAssets.size} index.html module chunk(s)`
+);
+console.log(
+  `[bundle:metrics] precached JS gzip: ${formatKiB(precachedJsGzipBytes)} across ${[...precachedAssets].filter((name) => name.endsWith(".js")).length} chunk(s)`
 );
 console.log(
   `[bundle:metrics] total JS gzip: ${formatKiB(totalJsGzipBytes)} across ${jsAssets.length} chunks`
@@ -47,6 +92,12 @@ console.log(
 console.log(
   `[bundle:metrics] warning budgets: main <= ${formatKiB(MAIN_CHUNK_WARN_BYTES)} raw, total JS gzip <= ${formatKiB(TOTAL_GZIP_WARN_BYTES)}`
 );
+console.log(`[bundle:metrics] top ${topChunks.length} JS chunks:`);
+for (const asset of topChunks) {
+  console.log(
+    `  - ${asset.fileName}: ${formatKiB(asset.rawBytes)} raw / ${formatKiB(asset.gzipBytes)} gzip (${classifyAsset(asset)})`
+  );
+}
 
 if (mainChunk.rawBytes > MAIN_CHUNK_WARN_BYTES) {
   console.warn(
