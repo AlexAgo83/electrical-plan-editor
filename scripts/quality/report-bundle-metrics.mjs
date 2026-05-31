@@ -43,18 +43,29 @@ function collectIndexHtmlJsAssets() {
   );
 }
 
+function collectIndexHtmlEntryScript() {
+  const indexHtml = readIfExists(path.resolve(process.cwd(), "dist/index.html"));
+  const match = indexHtml.match(/<script[^>]+type="module"[^>]+src="\/?(assets\/[^"]+\.js)"/);
+  return match === null ? null : path.basename(match[1]);
+}
+
 function collectPrecachedAssets() {
   const swSource = readIfExists(path.resolve(process.cwd(), "dist/sw.js"));
   return new Set([...swSource.matchAll(/url:"(assets\/[^"]+)"/g)].map((match) => path.basename(match[1])));
 }
 
-const mainChunk =
-  jsAssets.find((asset) => /^index-[A-Za-z0-9_-]+\.js$/.test(asset.fileName)) ??
-  [...jsAssets].sort((left, right) => right.rawBytes - left.rawBytes)[0];
-
 const totalJsGzipBytes = jsAssets.reduce((total, asset) => total + asset.gzipBytes, 0);
 const initialJsAssets = collectIndexHtmlJsAssets();
+const entryScriptFileName = collectIndexHtmlEntryScript();
 const precachedAssets = collectPrecachedAssets();
+const entryScriptChunk =
+  jsAssets.find((asset) => asset.fileName === entryScriptFileName) ??
+  jsAssets.find((asset) => /^index-[A-Za-z0-9_-]+\.js$/.test(asset.fileName)) ??
+  [...jsAssets].sort((left, right) => right.rawBytes - left.rawBytes)[0];
+const largestInitialChunk =
+  jsAssets
+    .filter((asset) => initialJsAssets.has(asset.fileName))
+    .sort((left, right) => right.rawBytes - left.rawBytes)[0] ?? entryScriptChunk;
 const initialJsGzipBytes = jsAssets
   .filter((asset) => initialJsAssets.has(asset.fileName))
   .reduce((total, asset) => total + asset.gzipBytes, 0);
@@ -78,7 +89,10 @@ function classifyAsset(asset) {
 
 console.log("[bundle:metrics] informational non-blocking budget report");
 console.log(
-  `[bundle:metrics] main JS chunk: ${mainChunk.fileName} (${formatKiB(mainChunk.rawBytes)} raw / ${formatKiB(mainChunk.gzipBytes)} gzip)`
+  `[bundle:metrics] entry JS chunk: ${entryScriptChunk.fileName} (${formatKiB(entryScriptChunk.rawBytes)} raw / ${formatKiB(entryScriptChunk.gzipBytes)} gzip)`
+);
+console.log(
+  `[bundle:metrics] largest initial JS chunk: ${largestInitialChunk.fileName} (${formatKiB(largestInitialChunk.rawBytes)} raw / ${formatKiB(largestInitialChunk.gzipBytes)} gzip)`
 );
 console.log(
   `[bundle:metrics] initial JS gzip: ${formatKiB(initialJsGzipBytes)} across ${initialJsAssets.size} index.html module chunk(s)`
@@ -90,7 +104,7 @@ console.log(
   `[bundle:metrics] total JS gzip: ${formatKiB(totalJsGzipBytes)} across ${jsAssets.length} chunks`
 );
 console.log(
-  `[bundle:metrics] warning budgets: main <= ${formatKiB(MAIN_CHUNK_WARN_BYTES)} raw, total JS gzip <= ${formatKiB(TOTAL_GZIP_WARN_BYTES)}`
+  `[bundle:metrics] warning budgets: largest initial chunk <= ${formatKiB(MAIN_CHUNK_WARN_BYTES)} raw, total JS gzip <= ${formatKiB(TOTAL_GZIP_WARN_BYTES)}`
 );
 console.log(`[bundle:metrics] top ${topChunks.length} JS chunks:`);
 for (const asset of topChunks) {
@@ -99,9 +113,9 @@ for (const asset of topChunks) {
   );
 }
 
-if (mainChunk.rawBytes > MAIN_CHUNK_WARN_BYTES) {
+if (largestInitialChunk.rawBytes > MAIN_CHUNK_WARN_BYTES) {
   console.warn(
-    `[bundle:metrics] warning: main chunk exceeds budget by ${formatKiB(mainChunk.rawBytes - MAIN_CHUNK_WARN_BYTES)}`
+    `[bundle:metrics] warning: largest initial chunk exceeds budget by ${formatKiB(largestInitialChunk.rawBytes - MAIN_CHUNK_WARN_BYTES)}`
   );
 }
 if (totalJsGzipBytes > TOTAL_GZIP_WARN_BYTES) {
