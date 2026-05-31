@@ -1,21 +1,11 @@
-import { type ChangeEvent, type MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { AppState, AppStore } from "../../store";
-import type { ConfirmDialogRequest } from "../types/confirm-dialog";
+import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { downloadJsonFile } from "./useNetworkImportExport";
-import {
-  buildWorkspaceFileName,
-  buildWorkspaceFilePayload,
-  parseWorkspaceFilePayload,
-  serializeWorkspaceFilePayload,
-  type WorkspaceFilePayloadV1
-} from "../lib/workspaceFile";
+import { buildWorkspaceFileName, buildWorkspaceFilePayload, parseWorkspaceFilePayload, serializeWorkspaceFilePayload, type WorkspaceFilePayloadV1 } from "../lib/workspaceFile";
 import {
   WORKSPACE_FILE_TYPES,
   buildStatusLabel,
   buildWorkspaceFileSummary,
   clearStoredWorkspaceFileHandle,
-  isDirectFileAccessSupported,
-  openWorkspaceFileHandleInNewTab,
   readHandleText,
   readStoredWorkspaceFileHandle,
   resolveWorkspaceFileWindow,
@@ -25,35 +15,12 @@ import {
   type WorkspaceFileHandle,
   type WorkspaceFileStorageStatus
 } from "../lib/workspaceFileAccess";
+import { openWorkspaceHandleWithFeedback } from "../lib/workspaceFileOpenActions";
+import { AUTOSAVE_DELAY_MS, createDownloadedWorkspaceFileStatus, createLinkedWorkspaceFileStatus, createLocalWorkspaceFileStatus, createOpenedWorkspaceFileStatus, type WorkspaceFileStatusBase } from "../lib/workspaceFileStorageStatus";
+import type { UseWorkspaceFileStorageParams, UseWorkspaceFileStorageResult } from "./workspaceFileStorageTypes";
 
 export type { WorkspaceFileStorageStatus } from "../lib/workspaceFileAccess";
-
-interface UseWorkspaceFileStorageParams {
-  store: AppStore;
-  replaceStateWithHistory: (state: AppState) => void;
-  requestConfirmation: (request: ConfirmDialogRequest) => Promise<boolean>;
-  notifyToast: (title: string, options?: { message?: string; variant?: "success" | "info" | "warning" | "error" }) => void;
-}
-
-interface UseWorkspaceFileStorageResult {
-  workspaceFileInputRef: MutableRefObject<HTMLInputElement | null>;
-  workspaceFileStatus: WorkspaceFileStorageStatus;
-  openWorkspaceFile: () => void;
-  relinkWorkspaceFile: () => void;
-  resumeWorkspaceFile: () => void;
-  saveWorkspaceFileNow: () => void;
-  saveWorkspaceFileAs: () => void;
-  unlinkWorkspaceFile: () => void;
-  openLinkedWorkspaceFile: () => void;
-  openResumableWorkspaceFile: () => void;
-  loadLinkedFileVersion: () => void;
-  keepLocalWorkspaceVersion: () => void;
-  handleWorkspaceFileInputChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
-}
-
-export type UseWorkspaceFileStorageModel = UseWorkspaceFileStorageResult;
-
-const AUTOSAVE_DELAY_MS = 700;
+export type { UseWorkspaceFileStorageModel } from "./workspaceFileStorageTypes";
 
 export function useWorkspaceFileStorage({
   store,
@@ -66,21 +33,7 @@ export function useWorkspaceFileStorage({
   const lastLoadedPayloadRef = useRef<WorkspaceFilePayloadV1 | null>(null);
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isWritingRef = useRef(false);
-  const [statusBase, setStatusBase] = useState<Omit<WorkspaceFileStorageStatus, "label">>({
-    mode: "local",
-    fileName: null,
-    resumeFileName: null,
-    canResume: false,
-    resumeStatus: "none",
-    fileAvailability: "unknown",
-    directFileAccessSupported: isDirectFileAccessSupported(),
-    saveTarget: "local-cache",
-    lastSavedAtIso: null,
-    permission: "unavailable",
-    message: "Workspace changes are saved in this browser only.",
-    conflict: false,
-    isSaving: false
-  });
+  const [statusBase, setStatusBase] = useState<WorkspaceFileStatusBase>(createLocalWorkspaceFileStatus);
   const status = useMemo<WorkspaceFileStorageStatus>(
     () => ({
       ...statusBase,
@@ -124,24 +77,7 @@ export function useWorkspaceFileStorage({
       if (handle !== null) {
         void writeStoredWorkspaceFileHandle(handle);
       }
-      setStatusBase({
-        mode: handle === null ? "local" : "linked",
-        fileName: sourceLabel,
-        resumeFileName: handle === null ? null : sourceLabel,
-        canResume: handle !== null,
-        resumeStatus: handle === null ? "none" : nextPermission === "granted" || nextPermission === "unknown" ? "available" : "permission-required",
-        fileAvailability: "available",
-        directFileAccessSupported: isDirectFileAccessSupported(),
-        saveTarget: handle === null ? "local-cache" : "linked-file",
-        lastSavedAtIso: parsed.payload.updatedAtIso,
-        permission: nextPermission,
-        message:
-          handle === null
-            ? "Workspace file imported. This browser cannot autosave to that uploaded file."
-            : "Workspace file linked. Future changes autosave to this file while permission remains available.",
-        conflict: false,
-        isSaving: false
-      });
+      setStatusBase(createOpenedWorkspaceFileStatus(sourceLabel, handle, parsed.payload, nextPermission));
       notifyToast("Workspace file opened", {
         message: sourceLabel,
         variant: "success"
@@ -163,7 +99,6 @@ export function useWorkspaceFileStorage({
         canResume: true,
         resumeStatus: "available",
         fileAvailability: "unknown",
-        directFileAccessSupported: isDirectFileAccessSupported(),
         message:
           current.mode === "linked"
             ? current.message
@@ -329,21 +264,7 @@ export function useWorkspaceFileStorage({
           lastLoadedPayloadRef.current = payload;
           void writeStoredWorkspaceFileHandle(handle);
           const permission = await resolveWritePermission(handle);
-          setStatusBase({
-            mode: "linked",
-            fileName: handle.name,
-            resumeFileName: handle.name,
-            canResume: true,
-            resumeStatus: permission === "granted" || permission === "unknown" ? "available" : "permission-required",
-            fileAvailability: "available",
-            directFileAccessSupported: isDirectFileAccessSupported(),
-            saveTarget: "linked-file",
-            lastSavedAtIso: payload.updatedAtIso,
-            permission,
-            conflict: false,
-            isSaving: false,
-            message: "Workspace file linked. Future changes autosave to this file while permission remains available."
-          });
+          setStatusBase(createLinkedWorkspaceFileStatus(handle.name, payload, permission));
           notifyToast("Workspace file saved", {
             message: handle.name,
             variant: "success"
@@ -367,22 +288,7 @@ export function useWorkspaceFileStorage({
 
       linkedHandleRef.current = null;
       lastLoadedPayloadRef.current = payload;
-      setStatusBase((current) => ({
-        ...current,
-        mode: "local",
-        fileName,
-        resumeFileName: current.resumeFileName,
-        canResume: current.canResume,
-        resumeStatus: current.resumeStatus,
-        fileAvailability: current.fileAvailability,
-        directFileAccessSupported: isDirectFileAccessSupported(),
-        saveTarget: "download",
-        lastSavedAtIso: payload.updatedAtIso,
-        permission: "unavailable",
-        conflict: false,
-        isSaving: false,
-        message: "Workspace file downloaded. This browser did not grant direct file autosave access."
-      }));
+      setStatusBase((current) => createDownloadedWorkspaceFileStatus(current, fileName, payload));
       notifyToast("Workspace file downloaded", {
         message: fileName,
         variant: "success"
@@ -422,21 +328,7 @@ export function useWorkspaceFileStorage({
   const unlinkWorkspaceFile = useCallback((): void => {
     linkedHandleRef.current = null;
     void clearStoredWorkspaceFileHandle();
-    setStatusBase({
-      mode: "local",
-      fileName: null,
-      resumeFileName: null,
-      canResume: false,
-      resumeStatus: "none",
-      fileAvailability: "unknown",
-      directFileAccessSupported: isDirectFileAccessSupported(),
-      saveTarget: "local-cache",
-      lastSavedAtIso: null,
-      permission: "unavailable",
-      message: "Workspace changes are saved in this browser only.",
-      conflict: false,
-      isSaving: false
-    });
+    setStatusBase(createLocalWorkspaceFileStatus());
     notifyToast("Workspace file unlinked", {
       message: "Local browser persistence remains active.",
       variant: "info"
@@ -453,26 +345,19 @@ export function useWorkspaceFileStorage({
       return;
     }
 
-    void (async () => {
-      try {
-        if (await openWorkspaceFileHandleInNewTab(handle) === "blocked") {
-          notifyToast("Workspace file blocked", {
-            message: "The browser blocked opening the linked file in a new tab.",
-            variant: "warning"
-          });
-        }
-      } catch {
-        notifyToast("Workspace file cannot be opened", {
-          message: "The linked file could not be read. It may have been moved or deleted; relink it from Workspace storage.",
-          variant: "error"
-        });
+    void openWorkspaceHandleWithFeedback({
+      handle,
+      blockedMessage: "The browser blocked opening the linked file in a new tab.",
+      unavailableMessage: "The linked file could not be read. It may have been moved or deleted; relink it from Workspace storage.",
+      notifyToast,
+      onUnavailable: () => {
         setStatusBase((current) => ({
           ...current,
           fileAvailability: "unavailable",
           message: "The linked file could not be read. It may have been moved or deleted; relink it from Workspace storage."
         }));
       }
-    })();
+    });
   }, [notifyToast]);
 
   const openResumableWorkspaceFile = useCallback((): void => {
@@ -486,25 +371,20 @@ export function useWorkspaceFileStorage({
         return;
       }
 
-      try {
-        if (await openWorkspaceFileHandleInNewTab(handle) === "blocked") {
-          notifyToast("Workspace file blocked", {
-            message: "The browser blocked opening the workspace file in a new tab.",
-            variant: "warning"
-          });
+      await openWorkspaceHandleWithFeedback({
+        handle,
+        blockedMessage: "The browser blocked opening the workspace file in a new tab.",
+        unavailableMessage: "The resumable file could not be read. It may have been moved or deleted; relink it from Workspace storage.",
+        notifyToast,
+        onUnavailable: () => {
+          setStatusBase((current) => ({
+            ...current,
+            fileAvailability: "unavailable",
+            resumeStatus: "unavailable",
+            message: "The resumable file could not be read. It may have been moved or deleted; relink it from Workspace storage."
+          }));
         }
-      } catch {
-        notifyToast("Workspace file cannot be opened", {
-          message: "The resumable file could not be read. It may have been moved or deleted; relink it from Workspace storage.",
-          variant: "error"
-        });
-        setStatusBase((current) => ({
-          ...current,
-          fileAvailability: "unavailable",
-          resumeStatus: "unavailable",
-          message: "The resumable file could not be read. It may have been moved or deleted; relink it from Workspace storage."
-        }));
-      }
+      });
     })();
   }, [notifyToast]);
 
