@@ -1,0 +1,147 @@
+.validation-toolbar {
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 0.7rem;
+}
+
+.validation-panel-stack {
+  grid-template-columns: 1fr;
+}
+
+.validation-center-header {
+  margin-bottom: 0.55rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.validation-center-header h2 {
+  margin: 0;
+}
+
+.validation-center-header-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+}
+
+.validation-toolbar > span {
+  font-size: 0.84rem;
+  color: inherit;
+  opacity: 0.88;
+}
+
+.validation-toolbar .filter-chip:disabled {
+  opacity: 0.58;
+  -webkit-text-fill-color: currentColor;
+}
+
+.validation-groups {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.validation-group {
+  border: 1px solid #d4e0ea;
+  border-radius: 0.6rem;
+  background: #f9fcff;
+  padding: 0.55rem;
+}
+
+.validation-group h3 {
+  margin: 0 0 0.45rem;
+  font-size: 0.9rem;
+  color: inherit;
+}
+
+.validation-active-filter {
+  margin-top: 0.65rem;
+}
+
+.validation-summary-panel {
+  align-self: start;
+}
+
+.validation-summary-panel .summary-grid {
+  gap: 0.45rem;
+}
+
+.validation-summary-panel .summary-grid article {
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.55rem;
+  min-height: 0;
+}
+
+.validation-summary-panel .summary-grid h3 {
+  margin: 0 0 0.08rem;
+  font-size: 0.78rem;
+  line-height: 1.15;
+}
+
+.validation-summary-panel .summary-grid p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.05;
+}
+
+.validation-summary-panel .validation-active-filter {
+  margin-top: 0.45rem;
+}
+
+.validation-row-go-to-button {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.55rem;
+  min-width: 4.1rem;
+  line-height: 1.1;
+}
+
+.validation-row-go-to-button.button-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.validation-row-go-to-button:hover:not(:disabled) {
+  filter: brightness(0.98);
+}
+
+.validation-issues-table {
+  table-layout: fixed;
+}
+
+.validation-issues-table th,
+.validation-issues-table td {
+  vertical-align: middle;
+}
+
+.validation-col-severity {
+  width: 8.25rem;
+}
+
+.validation-col-actions {
+  width: 7.25rem;
+}
+
+.validation-actions-cell {
+  text-align: right;
+  width: 1%;
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  .validation-center-header {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .validation-center-header-actions {
+    justify-content: flex-end;
+    margin-left: auto;
+  }
+}

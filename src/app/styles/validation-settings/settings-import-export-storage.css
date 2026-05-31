@@ -1,0 +1,221 @@
+.settings-export-selection-grid {
+  gap: 0.2rem;
+}
+
+.settings-export-network-option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.35rem;
+  padding: 0.1rem 0.2rem;
+  border-radius: 0.45rem;
+}
+
+.settings-export-network-option input {
+  margin-top: 0.1rem;
+}
+
+.settings-export-network-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.02rem;
+}
+
+.settings-export-network-name {
+  line-height: 1.12;
+}
+
+.settings-export-network-technical-id {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.12rem;
+  min-width: 0;
+  font-size: 0.82rem;
+  line-height: 1.08;
+}
+
+.settings-export-network-technical-id .technical-id {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.settings-state-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.settings-state-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #9eb9cc;
+  background: #e7f1f8;
+  color: #22445d;
+  padding: 0.16rem 0.56rem;
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+.settings-state-chip.is-ok {
+  border-color: #8fbda1;
+  background: #e1f2e8;
+  color: #1f5438;
+}
+
+.settings-state-chip.is-warn {
+  border-color: #d1b579;
+  background: #f7eed9;
+  color: #624512;
+}
+
+.settings-storage-details {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.settings-storage-details > div {
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.42fr) minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: baseline;
+}
+
+.settings-storage-details dt {
+  color: color-mix(in srgb, currentColor 72%, var(--theme-primary, currentColor) 28%);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.settings-storage-details dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.settings-storage-file-link {
+  max-width: 100%;
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 42%, transparent);
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 10%, transparent);
+  color: color-mix(in srgb, currentColor 78%, var(--theme-primary, currentColor) 22%);
+  padding: 0.2rem 0.48rem;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.settings-storage-file-link:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent);
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 58%, transparent);
+}
+
+.settings-storage-file-link:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.settings-conflict-panel {
+  border: 1px solid color-mix(in srgb, #d7a82f 58%, currentColor 42%);
+  border-radius: 0.5rem;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, #d7a82f 16%, transparent),
+      color-mix(in srgb, var(--theme-primary, currentColor) 7%, transparent)
+    );
+  color: currentColor;
+  padding: 0.75rem;
+}
+
+.row-actions.settings-actions.settings-workspace-storage-actions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding-top: 0;
+  border-top: 0;
+}
+
+@media (max-width: 760px) {
+  .row-actions.settings-actions.settings-workspace-storage-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .row-actions.settings-actions.settings-workspace-storage-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+.settings-export-fieldset {
+  background: rgba(246, 251, 255, 0.8);
+  border-color: #b8cedf;
+}
+
+.settings-import-export-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: start;
+}
+
+.settings-import-export-actions-column {
+  display: grid;
+  gap: 0.65rem;
+  align-content: start;
+}
+
+.settings-import-export-actions-column .settings-actions {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.settings-import-export-actions-column .row-actions.settings-actions {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.settings-import-export-selection-column {
+  margin: 0;
+  overflow-y: auto;
+  max-height: 14rem;
+}
+
+@container settings-import-export-panel (min-width: 656px) {
+  .settings-import-export-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.settings-import-summary {
+  margin-top: 0.1rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.settings-import-summary .meta-line {
+  margin: 0;
+  border: 1px solid #c7d8e6;
+  border-radius: 0.5rem;
+  background: rgba(245, 250, 255, 0.72);
+  padding: 0.35rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+}
+
+.settings-import-summary .meta-line strong {
+  color: #20435f;
+}
+
+@media (max-width: 620px) {
+  .settings-import-summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,0 +1,251 @@
+.settings-panel {
+  display: grid;
+  align-content: start;
+  gap: 0.65rem;
+  border-color: #b8cfe0;
+  background:
+    linear-gradient(168deg, rgba(250, 254, 255, 0.96) 0%, rgba(239, 247, 253, 0.84) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.settings-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+}
+
+.settings-panel-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #9ebacf;
+  background: #e5f0f8;
+  color: #1f445f;
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.14rem 0.52rem;
+  white-space: nowrap;
+}
+
+.settings-panel h2 {
+  margin-bottom: 0.1rem;
+}
+
+.settings-panel-intro {
+  margin: 0;
+  color: #4f6a7f;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.settings-panel .settings-grid {
+  margin-bottom: 0.2rem;
+  gap: 0.55rem;
+}
+
+.settings-panel .settings-grid > label:not(.settings-checkbox) {
+  display: grid;
+  gap: 0.32rem;
+  align-content: start;
+  min-width: 0;
+  font-size: 0.92rem;
+  color: #25475f;
+}
+
+.settings-field {
+  margin: 0;
+}
+
+.settings-panel .settings-grid > label.settings-locale-field {
+  gap: 0.38rem;
+  border: 1px solid color-mix(in srgb, currentColor 26%, transparent);
+  border-radius: 0.6rem;
+  padding: 0.5rem 0.58rem;
+  background: linear-gradient(180deg, color-mix(in srgb, currentColor 8%, transparent), color-mix(in srgb, currentColor 14%, transparent));
+}
+
+.settings-panel .settings-grid > label.settings-locale-field:hover {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 48%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--theme-primary, currentColor) 14%, transparent),
+    color-mix(in srgb, var(--theme-primary, currentColor) 20%, transparent)
+  );
+}
+
+.settings-locale-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  font-weight: 600;
+}
+
+.settings-locale-icon {
+  width: 0.86rem;
+  height: 0.86rem;
+  flex: 0 0 0.86rem;
+}
+
+.settings-locale-hint {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: color-mix(in srgb, currentColor 78%, transparent);
+}
+
+.settings-panel .settings-grid > label:not(.settings-checkbox) input,
+.settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  width: min(100%, 19rem);
+  border-radius: 0.5rem;
+  border: 1px solid #bacada;
+  padding: 0.45rem 0.6rem;
+  background: #fff;
+  min-width: 0;
+  max-width: 100%;
+  color: #153048;
+  font: inherit;
+}
+
+.settings-panel .settings-grid > label:not(.settings-checkbox) input {
+  width: 100%;
+}
+
+.settings-panel .settings-grid > label:not(.settings-checkbox) select {
+  width: 100%;
+}
+
+.settings-locale-select {
+  font-weight: 600;
+}
+
+.settings-range-field {
+  gap: 0.38rem;
+}
+
+.settings-range-control {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.settings-panel .settings-grid > label:not(.settings-checkbox) .settings-range-input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.settings-range-value {
+  min-width: 3.8rem;
+  text-align: right;
+  font-size: 0.82rem;
+  color: #355975;
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-panel .settings-checkbox {
+  align-items: flex-start;
+  gap: 0.5rem;
+  line-height: 1.25;
+  padding: 0.15rem 0.2rem;
+  border-radius: 0.45rem;
+  color: #25475f;
+}
+
+.settings-panel .settings-checkbox:hover {
+  background: rgba(239, 247, 253, 0.75);
+}
+
+.settings-panel .settings-checkbox input {
+  margin-top: 0.12rem;
+  transition: box-shadow 140ms ease, outline-color 140ms ease, border-color 140ms ease;
+}
+
+.settings-panel .settings-checkbox:hover input:not(:disabled),
+.settings-panel .settings-checkbox:focus-within input:not(:disabled) {
+  outline: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 48%, transparent);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 0.12rem color-mix(in srgb, var(--theme-primary, currentColor) 22%, transparent);
+}
+
+.settings-actions {
+  margin-top: 0.05rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(153, 181, 203, 0.55);
+}
+
+.row-actions.settings-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 0.5rem;
+}
+
+.row-actions.settings-actions > button {
+  width: 100%;
+  min-width: 0;
+}
+
+.settings-ai-provider-actions,
+.settings-canvas-render-actions,
+.settings-global-preferences-actions {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.settings-meta-compact {
+  margin-bottom: 0;
+}
+
+.settings-shortcut-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.16rem;
+}
+
+.settings-shortcut-list li {
+  display: grid;
+  grid-template-columns: minmax(8.75rem, max-content) minmax(0, 1fr);
+  align-items: start;
+  column-gap: 0.34rem;
+  color: #2f4d63;
+  line-height: 1.12;
+  padding: 0.14rem 0.22rem;
+}
+
+.settings-shortcut-list li > span:last-child {
+  font-size: 0.78em;
+  line-height: 1.05;
+  justify-self: stretch;
+  text-align: right;
+}
+
+.settings-shortcut-key {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 0.38rem;
+  border: 1px solid #b6ccdd;
+  background: #eaf3fa;
+  padding: 0.03rem 0.2rem;
+  line-height: 1.05;
+  font-size: 0.82em;
+}
+
+@media (max-width: 860px) {
+  .settings-shortcut-list li {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.04rem;
+  }
+
+  .settings-panel .settings-grid > label:not(.settings-checkbox) input,
+  .settings-panel .settings-grid > label:not(.settings-checkbox) select {
+    width: 100%;
+  }
+}
