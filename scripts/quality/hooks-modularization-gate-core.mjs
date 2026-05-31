@@ -3,20 +3,7 @@ import path from "node:path";
 
 export const HOOKS_MODULARIZATION_MAX_LINES = 500;
 
-export const ALLOWED_HOOKS_OVERSIZE = {
-  "src/app/hooks/controller/useAppControllerScreenContentSlices.tsx":
-    "Screen-content slice assembly currently centralizes Home/Modeling/Analysis/NetworkScope/Settings/Validation slices on shared selection and handler wiring; split deferred until per-screen slice extractions are landed (see logics/architecture/app-controller-decomposition-plan.md).",
-  "src/app/hooks/useWireHandlers.ts":
-    "Wire handlers span create, edit, forced-route, occupancy, endpoint, and reference flows that share form/selection bindings; split deferred until wire-form fixtures and forced-route helpers are extracted.",
-  "src/app/hooks/controller/useAppControllerModelingAnalysisScreenDomains.tsx":
-    "Modeling + Analysis screen domain assembly shares selection, navigation, and entity-snapshot bindings; split deferred until per-screen domain extraction is complete.",
-  "src/app/hooks/useUiPreferences.ts":
-    "UI preferences hub centralizes locale, theme, table density, currency/tax, BOM column toggles, and validation labels; split planned alongside preference-slice extraction.",
-  "src/app/hooks/controller/useAppControllerNetworkSummaryPanelDomain.tsx":
-    "Network-summary panel domain assembly centralizes canvas-display, callout, viewport, and BOM-preview bindings; split deferred until per-domain panel slices land (see logics/architecture/app-controller-decomposition-plan.md).",
-  "src/app/hooks/validation/buildValidationIssues.ts":
-    "Validation issue builder consolidates rule evaluation across connectors, splices, segments, wires, catalog and harness contexts on a single iteration pass for determinism; split planned after rule-set extraction."
-};
+export const ALLOWED_HOOKS_OVERSIZE = {};
 
 function normalizeRelativePath(relativePath) {
   return relativePath.split(path.sep).join("/");
