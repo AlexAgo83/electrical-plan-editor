@@ -1,2 +1,4 @@
 @import "./canvas/canvas-toolbar-and-shell.css";
+@import "./canvas/canvas-floating-controls.css";
+@import "./canvas/canvas-quick-nav.css";
 @import "./canvas/canvas-diagram-and-overlays.css";

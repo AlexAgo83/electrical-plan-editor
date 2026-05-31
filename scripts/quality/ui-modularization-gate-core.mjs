@@ -32,8 +32,6 @@ export const ALLOWED_OVERSIZE = {
     "Create-flow integration coverage stays consolidated so repeated-create, endpoint-prefill, and edit-transition scenarios keep one shared modeling fixture surface.",
   "src/tests/app.ui.settings.spec.tsx":
     "Settings integration coverage still spans persisted app-wide preferences, AI provider readiness, and local storage reload behavior on one shared app fixture; split deferred until settings fixture extraction is complete.",
-  "src/app/styles/canvas/canvas-toolbar-and-shell.css":
-    "Canvas toolbar and shell rules stay centralized while responsive canvas controls and shell tokens still share tightly coupled selectors.",
   "src/app/styles/canvas/canvas-diagram-and-overlays.css":
     "Network summary and functional schematic diagram overlays share SVG layering and hover semantics; split deferred until canvas diagram style tokens are extracted.",
   "src/tests/app.ui.network-summary-bom-export.spec.tsx":

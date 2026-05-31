@@ -1,0 +1,205 @@
+.network-summary-quick-entity-nav-panel {
+  padding: 0.45rem 0.55rem;
+}
+
+.network-summary-quick-entity-nav {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.35rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.network-summary-quick-entity-nav .filter-chip {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  min-height: 1.95rem;
+}
+
+.network-summary-quick-entity-screen-switch {
+  margin-left: auto;
+}
+
+.network-summary-quick-entity-nav-icon {
+  width: 0.72rem;
+  height: 0.72rem;
+  flex: 0 0 0.72rem;
+}
+
+.network-summary-quick-entity-nav-label {
+  font-weight: 600;
+}
+
+.harness-assembly-functional-scope-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, max-content));
+  justify-content: start;
+}
+
+.header-quick-entity-nav.harness-assembly-functional-scope-nav {
+  display: flex;
+  justify-content: center;
+  max-width: calc(100% - 0.7rem);
+  overflow: visible;
+  padding-inline: 0.35rem;
+  box-sizing: border-box;
+}
+
+.header-quick-entity-nav-panel {
+  min-width: 0;
+  padding: 0;
+}
+
+.header-center-content {
+  min-width: 0;
+  justify-self: center;
+  width: min(100%, 44rem);
+}
+
+.header-center-content:has(.settings-search-field--header) {
+  width: min(100%, 54rem);
+}
+
+.header-title-full {
+  display: inline;
+}
+
+.header-block.has-center-content .header-settings-label,
+.header-block.has-center-content .header-install-label,
+.header-block.has-center-content .header-update-label,
+.header-block.has-center-content .header-ops-label {
+  display: none;
+}
+
+.header-docked-nav-shell {
+  min-width: 0;
+  opacity: var(--header-docked-nav-progress, 0);
+  pointer-events: none;
+  transform: translateY(calc((1 - var(--header-docked-nav-progress, 0)) * -0.45rem));
+  transition:
+    opacity 80ms linear,
+    transform 80ms linear,
+    visibility 0ms linear 80ms;
+  will-change: opacity, transform;
+}
+
+.header-docked-nav-shell:has(.settings-search-field--header) {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.header-docked-nav-shell.is-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.header-docked-nav-shell.is-visible {
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 80ms linear,
+    transform 80ms linear;
+}
+
+.header-quick-entity-nav {
+  max-width: 100%;
+  justify-content: center;
+  padding: 0;
+}
+
+.header-quick-entity-nav .filter-chip {
+  min-height: 1.85rem;
+  padding: 0.22rem 0.55rem;
+  min-width: 0;
+}
+
+@media (max-width: 1040px) {
+  .header-settings-label,
+  .header-install-label,
+  .header-update-label,
+  .header-ops-label,
+  .header-center-content .network-summary-quick-entity-nav-label {
+    display: none;
+  }
+
+  .header-center-content .harness-assembly-functional-scope-nav .network-summary-quick-entity-nav-label {
+    display: inline;
+  }
+
+  .header-block.has-center-content .header-title-full {
+    display: none;
+  }
+
+  .header-center-content {
+    width: min(100%, 24rem);
+  }
+
+  .header-center-content:has(.harness-assembly-functional-scope-nav) {
+    width: min(100%, 32rem);
+  }
+}
+
+@media (max-width: 760px) {
+  .header-center-content {
+    width: 100%;
+  }
+
+  .header-center-content .harness-assembly-functional-scope-nav .network-summary-quick-entity-nav-label {
+    display: none;
+  }
+}
+
+@media (max-width: 670px) {
+  .header-block:has(.header-center-content) .header-title {
+    display: none;
+  }
+
+  .header-block:has(.header-center-content) .header-brand {
+    gap: 0.35rem;
+  }
+
+  .header-center-content {
+    width: 100%;
+  }
+
+  .header-center-content .filter-chip-count {
+    display: none;
+  }
+
+  .network-summary-quick-entity-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    overflow-x: visible;
+  }
+  .harness-assembly-functional-scope-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .network-summary-quick-entity-nav .filter-chip {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+  }
+  .header-quick-entity-nav {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    overflow-x: visible;
+  }
+  .header-quick-entity-nav .filter-chip {
+    flex: 0 1 auto;
+    width: auto;
+    min-width: 0;
+    padding-inline: 0.45rem;
+  }
+}
+@media (max-width: 520px) {
+  .network-summary-quick-entity-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .header-quick-entity-nav {
+    display: flex;
+  }
+}
