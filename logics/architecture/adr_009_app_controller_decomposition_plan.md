@@ -149,3 +149,5 @@ Add to the PR description:
 `useSpliceHandlers.ts` moved placement suggestion construction, type contracts, capacity guards, and canvas scroll behavior into focused helper modules, shrinking from 633 to 499 lines and retiring its hooks modularization exception.
 
 `useWorkspaceHandlers.ts` moved its parameter contract, network viewport actions, and network form draft validation into focused modules, shrinking from 755 to 486 lines and retiring its hooks modularization exception.
+
+`useNetworkImportExport.ts` moved JSON file export helpers, legacy numeric splice conversion, import/export type contracts, and grouped SVG progress overlay rendering into focused modules, shrinking from 764 to 472 lines and retiring its hooks modularization exception.
