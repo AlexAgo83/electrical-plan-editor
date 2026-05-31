@@ -276,7 +276,7 @@ export function ModelingAiAgentPanel({
           </label>
         </div>
 
-        <fieldset className="inline-fieldset">
+        <fieldset className="inline-fieldset ai-agent-permissions-fieldset">
           <legend>Operation permissions</legend>
           <label className="settings-checkbox">
             <input

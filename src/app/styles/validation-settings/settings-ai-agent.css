@@ -198,3 +198,25 @@
   padding: 0.55rem 0.6rem;
   gap: 0.45rem;
 }
+
+.app-shell .ai-agent-panel .ai-agent-permissions-fieldset {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 14%);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--theme-primary, currentColor) 8%, transparent),
+      color-mix(in srgb, currentColor 4%, transparent)
+    ),
+    color-mix(in srgb, var(--panel-bg, transparent) 72%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, currentColor 10%, transparent);
+  color: inherit;
+}
+
+.app-shell .ai-agent-panel .ai-agent-permissions-fieldset legend {
+  color: color-mix(in srgb, var(--theme-primary, currentColor) 68%, currentColor);
+  font-weight: 700;
+}
+
+.app-shell .ai-agent-panel .ai-agent-permissions-fieldset .settings-checkbox {
+  color: inherit;
+}
