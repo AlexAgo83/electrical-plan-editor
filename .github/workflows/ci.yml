@@ -38,12 +38,18 @@ jobs:
         continue-on-error: true
 
       - name: Workflow audit strict AC (informational, non-blocking)
-        run: python3 -m logics_manager audit --legacy-cutoff-version 1.1.0 --group-by-doc
-        continue-on-error: true
+        run: |
+          python3 -m logics_manager audit --legacy-cutoff-version 1.1.0 --group-by-doc || {
+            status=$?
+            echo "::notice::Workflow audit strict AC reported findings and exited with ${status}; keeping this informational check non-blocking."
+          }
 
       - name: Workflow audit JSON (informational, non-blocking)
-        run: python3 -m logics_manager audit --format json
-        continue-on-error: true
+        run: |
+          python3 -m logics_manager audit --format json || {
+            status=$?
+            echo "::notice::Workflow audit JSON reported findings and exited with ${status}; keeping this informational check non-blocking."
+          }
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
