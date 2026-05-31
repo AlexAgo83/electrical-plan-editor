@@ -147,3 +147,5 @@ Add to the PR description:
 `useWorkspaceFileStorage.ts` moved its public model types, status builders, and file-open feedback helper into dedicated modules, shrinking from 611 to 491 lines and retiring its hooks modularization exception.
 
 `useSpliceHandlers.ts` moved placement suggestion construction, type contracts, capacity guards, and canvas scroll behavior into focused helper modules, shrinking from 633 to 499 lines and retiring its hooks modularization exception.
+
+`useWorkspaceHandlers.ts` moved its parameter contract, network viewport actions, and network form draft validation into focused modules, shrinking from 755 to 486 lines and retiring its hooks modularization exception.

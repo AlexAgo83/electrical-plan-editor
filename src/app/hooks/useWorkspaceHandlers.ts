@@ -1,165 +1,21 @@
 import type { FormEvent } from "react";
-import type { Connector, ConnectorId, Network, NetworkId, NetworkNode, NodeId, Splice, SpliceId } from "../../core/entities";
-import {
-  formatIsoToLocalDateInput,
-  isNetworkLogoUrlValid,
-  isNetworkProjectCodeValid,
-  normalizeNetworkLogoUrl,
-  normalizeNetworkProjectCode,
-  parseLocalDateInputToIso
-} from "../../core/networkMetadata";
-import { normalizeNetworkVoltageV } from "../../core/wireSizing";
-import type { AppState, AppStore, ThemeMode } from "../../store";
-import type { ConfirmDialogRequest } from "../types/confirm-dialog";
+import type { NetworkId } from "../../core/entities";
+import { formatIsoToLocalDateInput } from "../../core/networkMetadata";
+import type { AppState } from "../../store";
 import {
   appActions,
   appReducer,
   createSampleNetworkState,
   selectNetworkTechnicalIdTaken
 } from "../../store";
+import { buildUniqueNetworkTechnicalId, createEntityId } from "../lib/app-utils-shared";
+import { buildNetworkFormDraft } from "../lib/networkFormDraft";
 import {
-  NETWORK_MAX_SCALE,
-  NETWORK_MIN_SCALE,
-  buildUniqueNetworkTechnicalId,
-  createEntityId
-} from "../lib/app-utils-shared";
-import { computeNetworkFitViewportForBounds } from "../lib/networkSummaryViewport";
-import type {
-  AppLocale,
-  CanvasCalloutTextSize,
-  CanvasLabelRotationDegrees,
-  CanvasLabelSizeMode,
-  CanvasLabelStrokeMode,
-  ConnectorDrawingDisplayMode,
-  NetworkCalloutContentMode,
-  NodePosition,
-  SortDirection,
-  SortField,
-  SortState,
-  TableDensity,
-  TableFontSize,
-  WorkspaceCurrencyCode,
-  WorkspacePanelsLayoutMode
-} from "../types/app-controller";
-
-type DispatchAction = (
-  action: Parameters<AppStore["dispatch"]>[0],
-  options?: {
-    trackHistory?: boolean;
-  }
-) => void;
-
-interface UseWorkspaceHandlersParams {
-  store: AppStore;
-  networks: Network[];
-  newNetworkName: string;
-  setNewNetworkName: (value: string) => void;
-  newNetworkTechnicalId: string;
-  setNewNetworkTechnicalId: (value: string) => void;
-  newNetworkCreatedAtDate: string;
-  setNewNetworkCreatedAtDate: (value: string) => void;
-  newNetworkDescription: string;
-  setNewNetworkDescription: (value: string) => void;
-  newNetworkAuthor: string;
-  setNewNetworkAuthor: (value: string) => void;
-  newNetworkVoltageV: string;
-  setNewNetworkVoltageV: (value: string) => void;
-  newNetworkProjectCode: string;
-  setNewNetworkProjectCode: (value: string) => void;
-  newNetworkLogoUrl: string;
-  setNewNetworkLogoUrl: (value: string) => void;
-  newNetworkExportNotes: string;
-  setNewNetworkExportNotes: (value: string) => void;
-  setNetworkFormError: (value: string | null) => void;
-  isCurrentWorkspaceEmpty: boolean;
-  hasBuiltInSampleState: boolean;
-  dispatchAction: DispatchAction;
-  replaceStateWithHistory: (nextState: ReturnType<typeof createSampleNetworkState>) => void;
-  nodes: NetworkNode[];
-  networkNodePositions: Record<NodeId, NodePosition>;
-  connectorMap: Map<ConnectorId, Connector>;
-  spliceMap: Map<SpliceId, Splice>;
-  configuredResetScale: number;
-  networkViewWidth: number;
-  networkViewHeight: number;
-  setNetworkScale: (value: number) => void;
-  setNetworkOffset: (value: NodePosition) => void;
-  showCableCallouts: boolean;
-  networkCalloutTextSize: CanvasCalloutTextSize;
-  setShowNetworkGrid: (value: boolean | ((current: boolean) => boolean)) => void;
-  setSnapNodesToGrid: (value: boolean | ((current: boolean) => boolean)) => void;
-  setLockEntityMovement: (value: boolean | ((current: boolean) => boolean)) => void;
-  setShowNetworkInfoPanels: (value: boolean | ((current: boolean) => boolean)) => void;
-  setShowSegmentNames: (value: boolean | ((current: boolean) => boolean)) => void;
-  setShowSegmentLengths: (value: boolean | ((current: boolean) => boolean)) => void;
-  setShowCableCallouts: (value: boolean | ((current: boolean) => boolean)) => void;
-  setNetworkCalloutContentMode: (
-    value: NetworkCalloutContentMode | ((current: NetworkCalloutContentMode) => NetworkCalloutContentMode)
-  ) => void;
-  setShowSelectedCalloutOnly: (value: boolean | ((current: boolean) => boolean)) => void;
-  setNetworkLabelStrokeMode: (value: CanvasLabelStrokeMode | ((current: CanvasLabelStrokeMode) => CanvasLabelStrokeMode)) => void;
-  setNetworkLabelSizeMode: (value: CanvasLabelSizeMode | ((current: CanvasLabelSizeMode) => CanvasLabelSizeMode)) => void;
-  setNetworkCalloutTextSize: (value: CanvasCalloutTextSize | ((current: CanvasCalloutTextSize) => CanvasCalloutTextSize)) => void;
-  setNetworkLabelRotationDegrees: (
-    value: CanvasLabelRotationDegrees | ((current: CanvasLabelRotationDegrees) => CanvasLabelRotationDegrees)
-  ) => void;
-  setNetworkAutoSegmentLabelRotation: (value: boolean | ((current: boolean) => boolean)) => void;
-  setConnectorSort: (value: SortState) => void;
-  setSpliceSort: (value: SortState) => void;
-  setWireSort: (value: SortState) => void;
-  setConnectorSynthesisSort: (value: SortState) => void;
-  setSpliceSynthesisSort: (value: SortState) => void;
-  setNetworkSort: (value: SortState) => void;
-  setNodeIdSortDirection: (value: SortDirection) => void;
-  setSegmentIdSortDirection: (value: SortDirection) => void;
-  setThemeMode: (value: ThemeMode | ((current: ThemeMode) => ThemeMode)) => void;
-  setLocale: (value: AppLocale) => void;
-  setTableDensity: (value: TableDensity) => void;
-  setTableFontSize: (value: TableFontSize) => void;
-  setWorkspaceCurrencyCode: (value: WorkspaceCurrencyCode) => void;
-  setWorkspaceTaxEnabled: (value: boolean) => void;
-  setWorkspaceTaxRatePercent: (value: number) => void;
-  setBomTraceabilityLabelsHidden: (value: boolean) => void;
-  setDefaultWireSectionMm2: (value: number) => void;
-  setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
-  setDefaultSortField: (value: SortField) => void;
-  setDefaultSortDirection: (value: SortDirection) => void;
-  setDefaultIdSortDirection: (value: SortDirection) => void;
-  setCanvasDefaultShowGrid: (value: boolean) => void;
-  setCanvasDefaultSnapToGrid: (value: boolean) => void;
-  setCanvasDefaultLockEntityMovement: (value: boolean) => void;
-  setCanvasDefaultShowInfoPanels: (value: boolean) => void;
-  setCanvasDefaultShowSegmentNames: (value: boolean) => void;
-  setCanvasDefaultShowSegmentLengths: (value: boolean) => void;
-  setCanvasDefaultShowCableCallouts: (value: boolean) => void;
-  setCanvasDefaultCalloutContentMode: (value: NetworkCalloutContentMode) => void;
-  setCanvasDefaultShowSelectedCalloutOnly: (value: boolean) => void;
-  setCanvasDefaultLabelStrokeMode: (value: CanvasLabelStrokeMode) => void;
-  setCanvasDefaultLabelSizeMode: (value: CanvasLabelSizeMode) => void;
-  setCanvasDefaultCalloutTextSize: (value: CanvasCalloutTextSize) => void;
-  setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
-  setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
-  setCanvasShowCalloutWireNames: (value: boolean) => void;
-  setCanvasConnectorDrawingDisplayMode: (value: ConnectorDrawingDisplayMode) => void;
-  setCanvasGlobalRenderScalePercent: (value: number) => void;
-  setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
-  setCanvasNodeShapeSizePercent: (value: number) => void;
-  setCanvasExportFormat: (value: "svg" | "png") => void;
-  setCanvasPngExportIncludeBackground: (value: boolean) => void;
-  setCanvasExportIncludeFrame: (value: boolean) => void;
-  setCanvasExportIncludeCartouche: (value: boolean) => void;
-  setCanvasResizeBehaviorMode: (value: "responsiveContentScale" | "visibleAreaOnly") => void;
-  setCanvasResetZoomPercentInput: (value: string) => void;
-  setShowShortcutHints: (value: boolean) => void;
-  setKeyboardShortcutsEnabled: (value: boolean) => void;
-  setRestoreViewportOnUndo: (value: boolean) => void;
-  setShowFloatingInspectorPanel: (value: boolean) => void;
-  setShowRoutePreviewPanel: (value: boolean) => void;
-  setHideWireAnalysisRoutePanel: (value: boolean) => void;
-  setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutMode) => void;
-  setWorkspaceWideScreen: (value: boolean) => void;
-  confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;
-}
+  fitNetworkToContent as fitNetworkToContentViewport,
+  resetNetworkViewToConfiguredScale as resetNetworkViewToConfiguredScaleViewport
+} from "../lib/workspaceNetworkViewportActions";
+import type { SortState } from "../types/app-controller";
+import type { UseWorkspaceHandlersParams } from "./workspaceHandlerTypes";
 
 export function useWorkspaceHandlers({
   store,
@@ -302,41 +158,25 @@ export function useWorkspaceHandlers({
   function handleCreateNetwork(event: FormEvent<HTMLFormElement>): void {
     event.preventDefault();
 
-    const trimmedName = newNetworkName.trim();
-    const trimmedTechnicalId = newNetworkTechnicalId.trim();
-    if (trimmedName.length === 0 || trimmedTechnicalId.length === 0) {
-      setNetworkFormError("Network name and technical ID are required.");
+    const draftResult = buildNetworkFormDraft({
+      name: newNetworkName,
+      technicalId: newNetworkTechnicalId,
+      createdAtDate: newNetworkCreatedAtDate,
+      description: newNetworkDescription,
+      author: newNetworkAuthor,
+      voltageV: newNetworkVoltageV,
+      projectCode: newNetworkProjectCode,
+      logoUrl: newNetworkLogoUrl,
+      exportNotes: newNetworkExportNotes
+    });
+    if (draftResult.kind === "error") {
+      setNetworkFormError(draftResult.message);
       return;
     }
+    const { draft } = draftResult;
 
-    if (selectNetworkTechnicalIdTaken(store.getState(), trimmedTechnicalId)) {
-      setNetworkFormError(`Network technical ID '${trimmedTechnicalId}' is already used.`);
-      return;
-    }
-
-    const normalizedProjectCode = normalizeNetworkProjectCode(newNetworkProjectCode);
-    if (normalizedProjectCode !== undefined && !isNetworkProjectCodeValid(normalizedProjectCode)) {
-      setNetworkFormError("Project code supports letters, numbers, spaces, and _ . / - characters only.");
-      return;
-    }
-
-    const normalizedLogoUrl = normalizeNetworkLogoUrl(newNetworkLogoUrl);
-    if (normalizedLogoUrl !== undefined && !isNetworkLogoUrlValid(normalizedLogoUrl)) {
-      setNetworkFormError("Logo URL must use http, https, or data:image/*.");
-      return;
-    }
-
-    const createdAtIso = parseLocalDateInputToIso(newNetworkCreatedAtDate);
-    if (createdAtIso === null) {
-      setNetworkFormError("Creation date is invalid.");
-      return;
-    }
-
-    const rawVoltage = newNetworkVoltageV.trim();
-    const parsedVoltage = rawVoltage.length === 0 ? undefined : Number(rawVoltage);
-    const normalizedVoltageV = rawVoltage.length === 0 ? undefined : normalizeNetworkVoltageV(parsedVoltage);
-    if (rawVoltage.length > 0 && normalizedVoltageV === undefined) {
-      setNetworkFormError("Network voltage must be a positive value in V.");
+    if (selectNetworkTechnicalIdTaken(store.getState(), draft.technicalId)) {
+      setNetworkFormError(`Network technical ID '${draft.technicalId}' is already used.`);
       return;
     }
 
@@ -345,15 +185,15 @@ export function useWorkspaceHandlers({
     dispatchAction(
       appActions.createNetwork({
         id: networkId,
-        name: trimmedName,
-        technicalId: trimmedTechnicalId,
-        createdAt: createdAtIso,
-        author: newNetworkAuthor,
-        voltageV: normalizedVoltageV,
-        projectCode: newNetworkProjectCode,
-        logoUrl: newNetworkLogoUrl,
-        exportNotes: newNetworkExportNotes,
-        description: newNetworkDescription.trim().length === 0 ? undefined : newNetworkDescription.trim(),
+        name: draft.name,
+        technicalId: draft.technicalId,
+        createdAt: draft.createdAtIso,
+        author: draft.author,
+        voltageV: draft.voltageV,
+        projectCode: draft.projectCode,
+        logoUrl: draft.logoUrl,
+        exportNotes: draft.exportNotes,
+        description: draft.description,
         updatedAt: nowIso
       })
     );
@@ -393,58 +233,42 @@ export function useWorkspaceHandlers({
       return;
     }
 
-    const trimmedName = newNetworkName.trim();
-    const trimmedTechnicalId = newNetworkTechnicalId.trim();
-    if (trimmedName.length === 0 || trimmedTechnicalId.length === 0) {
-      setNetworkFormError("Network name and technical ID are required.");
+    const draftResult = buildNetworkFormDraft({
+      name: newNetworkName,
+      technicalId: newNetworkTechnicalId,
+      createdAtDate: newNetworkCreatedAtDate,
+      description: newNetworkDescription,
+      author: newNetworkAuthor,
+      voltageV: newNetworkVoltageV,
+      projectCode: newNetworkProjectCode,
+      logoUrl: newNetworkLogoUrl,
+      exportNotes: newNetworkExportNotes
+    });
+    if (draftResult.kind === "error") {
+      setNetworkFormError(draftResult.message);
       return;
     }
+    const { draft } = draftResult;
 
-    if (selectNetworkTechnicalIdTaken(store.getState(), trimmedTechnicalId, targetNetworkId)) {
-      setNetworkFormError(`Network technical ID '${trimmedTechnicalId}' is already used.`);
-      return;
-    }
-
-    const normalizedProjectCode = normalizeNetworkProjectCode(newNetworkProjectCode);
-    if (normalizedProjectCode !== undefined && !isNetworkProjectCodeValid(normalizedProjectCode)) {
-      setNetworkFormError("Project code supports letters, numbers, spaces, and _ . / - characters only.");
-      return;
-    }
-
-    const normalizedLogoUrl = normalizeNetworkLogoUrl(newNetworkLogoUrl);
-    if (normalizedLogoUrl !== undefined && !isNetworkLogoUrlValid(normalizedLogoUrl)) {
-      setNetworkFormError("Logo URL must use http, https, or data:image/*.");
-      return;
-    }
-
-    const createdAtIso = parseLocalDateInputToIso(newNetworkCreatedAtDate);
-    if (createdAtIso === null) {
-      setNetworkFormError("Creation date is invalid.");
-      return;
-    }
-
-    const rawVoltage = newNetworkVoltageV.trim();
-    const parsedVoltage = rawVoltage.length === 0 ? undefined : Number(rawVoltage);
-    const normalizedVoltageV = rawVoltage.length === 0 ? undefined : normalizeNetworkVoltageV(parsedVoltage);
-    if (rawVoltage.length > 0 && normalizedVoltageV === undefined) {
-      setNetworkFormError("Network voltage must be a positive value in V.");
+    if (selectNetworkTechnicalIdTaken(store.getState(), draft.technicalId, targetNetworkId)) {
+      setNetworkFormError(`Network technical ID '${draft.technicalId}' is already used.`);
       return;
     }
 
     dispatchAction(
       appActions.updateNetwork(
         targetNetworkId,
-        trimmedName,
-        trimmedTechnicalId,
+        draft.name,
+        draft.technicalId,
         new Date().toISOString(),
-        newNetworkDescription.trim().length === 0 ? undefined : newNetworkDescription.trim(),
+        draft.description,
         {
-          createdAt: createdAtIso,
-          author: newNetworkAuthor,
-          voltageV: normalizedVoltageV,
-          projectCode: newNetworkProjectCode,
-          logoUrl: newNetworkLogoUrl,
-          exportNotes: newNetworkExportNotes
+          createdAt: draft.createdAtIso,
+          author: draft.author,
+          voltageV: draft.voltageV,
+          projectCode: draft.projectCode,
+          logoUrl: draft.logoUrl,
+          exportNotes: draft.exportNotes
         }
       )
     );
@@ -540,130 +364,37 @@ export function useWorkspaceHandlers({
   }
 
   function resetNetworkViewToConfiguredScale(): void {
-    const positions = nodes
-      .map((node) => networkNodePositions[node.id])
-      .filter((position): position is NodePosition => position !== undefined);
-    const firstPosition = positions[0];
-    if (firstPosition === undefined) {
-      setCanvasGlobalRenderScalePercent(0);
-      setNetworkScale(configuredResetScale);
-      setNetworkOffset({ x: 0, y: 0 });
-      return;
-    }
-
-    let minX = firstPosition.x;
-    let maxX = firstPosition.x;
-    let minY = firstPosition.y;
-    let maxY = firstPosition.y;
-    for (const position of positions.slice(1)) {
-      minX = Math.min(minX, position.x);
-      maxX = Math.max(maxX, position.x);
-      minY = Math.min(minY, position.y);
-      maxY = Math.max(maxY, position.y);
-    }
-
-    const scale = configuredResetScale > 0 ? configuredResetScale : 1;
-    const centerX = (minX + maxX) / 2;
-    const centerY = (minY + maxY) / 2;
-    setCanvasGlobalRenderScalePercent(0);
-    setNetworkScale(scale);
-    setNetworkOffset({
-      x: networkViewWidth / 2 - centerX * scale,
-      y: networkViewHeight / 2 - centerY * scale
+    resetNetworkViewToConfiguredScaleViewport({
+      nodes,
+      networkNodePositions,
+      connectorMap,
+      spliceMap,
+      configuredResetScale,
+      networkViewWidth,
+      networkViewHeight,
+      showCableCallouts,
+      networkCalloutTextSize,
+      setCanvasGlobalRenderScalePercent,
+      setNetworkScale,
+      setNetworkOffset
     });
   }
 
   function fitNetworkToContent(): void {
-    resetNetworkViewToConfiguredScale();
-
-    if (nodes.length === 0) {
-      return;
-    }
-
-    const positions = nodes
-      .map((node) => networkNodePositions[node.id])
-      .filter((position): position is NodePosition => position !== undefined);
-    if (positions.length === 0) {
-      return;
-    }
-
-    const firstPosition = positions[0];
-    if (firstPosition === undefined) {
-      return;
-    }
-
-    let minX = firstPosition.x;
-    let maxX = firstPosition.x;
-    let minY = firstPosition.y;
-    let maxY = firstPosition.y;
-    for (const position of positions.slice(1)) {
-      if (position.x < minX) {
-        minX = position.x;
-      }
-      if (position.x > maxX) {
-        maxX = position.x;
-      }
-      if (position.y < minY) {
-        minY = position.y;
-      }
-      if (position.y > maxY) {
-        maxY = position.y;
-      }
-    }
-
-    if (showCableCallouts) {
-      const initialFit = computeNetworkFitViewportForBounds({
-        bounds: { minX, maxX, minY, maxY },
-        networkViewWidth,
-        networkViewHeight,
-        networkMinScale: NETWORK_MIN_SCALE,
-        networkMaxScale: NETWORK_MAX_SCALE
-      });
-      const safeScale = Math.max(0.05, initialFit.scale);
-      const inverseLabelScale = 1 / safeScale;
-      const estimatedCalloutHalfWidthBySize: Record<CanvasCalloutTextSize, number> = {
-        small: 130,
-        normal: 155,
-        large: 180,
-        extraLarge: 180
-      };
-      const estimatedCalloutHalfHeightBySize: Record<CanvasCalloutTextSize, number> = {
-        small: 52,
-        normal: 64,
-        large: 74,
-        extraLarge: 74
-      };
-      const calloutHalfWidth = estimatedCalloutHalfWidthBySize[networkCalloutTextSize] * inverseLabelScale;
-      const calloutHalfHeight = estimatedCalloutHalfHeightBySize[networkCalloutTextSize] * inverseLabelScale;
-
-      for (const node of nodes) {
-        if (node.kind !== "connector" && node.kind !== "splice") {
-          continue;
-        }
-        const persistedPosition =
-          node.kind === "connector"
-            ? connectorMap.get(node.connectorId)?.cableCalloutPosition
-            : spliceMap.get(node.spliceId)?.cableCalloutPosition;
-        if (persistedPosition === undefined) {
-          continue;
-        }
-
-        minX = Math.min(minX, persistedPosition.x - calloutHalfWidth);
-        maxX = Math.max(maxX, persistedPosition.x + calloutHalfWidth);
-        minY = Math.min(minY, persistedPosition.y - calloutHalfHeight);
-        maxY = Math.max(maxY, persistedPosition.y + calloutHalfHeight);
-      }
-    }
-    const fittedViewport = computeNetworkFitViewportForBounds({
-      bounds: { minX, maxX, minY, maxY },
+    fitNetworkToContentViewport({
+      nodes,
+      networkNodePositions,
+      connectorMap,
+      spliceMap,
+      configuredResetScale,
       networkViewWidth,
       networkViewHeight,
-      networkMinScale: NETWORK_MIN_SCALE,
-      networkMaxScale: NETWORK_MAX_SCALE
+      showCableCallouts,
+      networkCalloutTextSize,
+      setCanvasGlobalRenderScalePercent,
+      setNetworkScale,
+      setNetworkOffset
     });
-
-    setNetworkScale(fittedViewport.scale);
-    setNetworkOffset(fittedViewport.offset);
   }
 
   function resetWorkspacePreferencesToDefaults(): void {
