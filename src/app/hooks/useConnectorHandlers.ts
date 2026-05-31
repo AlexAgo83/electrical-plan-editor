@@ -1,11 +1,12 @@
 import type { FormEvent } from "react";
-import type { CatalogItemId, Connector, ConnectorId, Wire } from "../../core/entities";
+import type { CatalogItemId, Connector, ConnectorId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { analyzeConnectorDeleteImpact } from "../../store/deleteImpact";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestAutoConnectorNodeId, suggestNextConnectorTechnicalId } from "../lib/technical-id-suggestions";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
+import { clearConnectorEndpointReferences, hasConnectorEndpointReferenceFields } from "./connectorEndpointReferences";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -77,42 +78,6 @@ function hasConnectorWireEndpointIndexAboveLimit(store: AppStore, connectorId: C
       (wire.endpointB.kind === "connectorCavity" && wire.endpointB.connectorId === connectorId && wire.endpointB.cavityIndex > maxCavityCount)
     );
   });
-}
-
-function isWireEndpointOnConnector(wire: Wire, endpointSide: "A" | "B", connectorId: ConnectorId): boolean {
-  const endpoint = endpointSide === "A" ? wire.endpointA : wire.endpointB;
-  return endpoint.kind === "connectorCavity" && endpoint.connectorId === connectorId;
-}
-
-function clearConnectorEndpointReferences(wire: Wire, connectorId: ConnectorId): Wire {
-  const clearEndpointA = isWireEndpointOnConnector(wire, "A", connectorId);
-  const clearEndpointB = isWireEndpointOnConnector(wire, "B", connectorId);
-  return {
-    ...wire,
-    endpointAConnectionReference: clearEndpointA ? undefined : wire.endpointAConnectionReference,
-    endpointAConnectionName: clearEndpointA ? undefined : wire.endpointAConnectionName,
-    endpointASealReference: clearEndpointA ? undefined : wire.endpointASealReference,
-    endpointASealName: clearEndpointA ? undefined : wire.endpointASealName,
-    endpointBConnectionReference: clearEndpointB ? undefined : wire.endpointBConnectionReference,
-    endpointBConnectionName: clearEndpointB ? undefined : wire.endpointBConnectionName,
-    endpointBSealReference: clearEndpointB ? undefined : wire.endpointBSealReference,
-    endpointBSealName: clearEndpointB ? undefined : wire.endpointBSealName
-  };
-}
-
-function hasConnectorEndpointReferenceFields(wire: Wire, connectorId: ConnectorId): boolean {
-  return (
-    (isWireEndpointOnConnector(wire, "A", connectorId) &&
-      (wire.endpointAConnectionReference !== undefined ||
-        wire.endpointAConnectionName !== undefined ||
-        wire.endpointASealReference !== undefined ||
-        wire.endpointASealName !== undefined)) ||
-    (isWireEndpointOnConnector(wire, "B", connectorId) &&
-      (wire.endpointBConnectionReference !== undefined ||
-        wire.endpointBConnectionName !== undefined ||
-        wire.endpointBSealReference !== undefined ||
-        wire.endpointBSealName !== undefined))
-  );
 }
 
 export function useConnectorHandlers({

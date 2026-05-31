@@ -28,10 +28,6 @@ export const ALLOWED_HOOKS_OVERSIZE = {
     "Splice handlers span create, edit, port-mode, occupancy, and directional flows on shared form/selection bindings; split deferred until splice-form helpers are extracted.",
   "src/app/hooks/useCanvasInteractionHandlers.ts":
     "Canvas interaction handlers share pan, zoom, drag-select, and grouped-drag bindings; split deferred until canvas pointer helpers are factored.",
-  "src/app/hooks/controller/useAppControllerModelingHandlersOrchestrator.ts":
-    "Modeling handlers orchestrator wires create/edit/delete handlers across connectors, splices, nodes, segments, and wires on shared dispatch/selection bindings; split deferred until per-entity orchestrator extraction lands.",
-  "src/app/hooks/useConnectorHandlers.ts":
-    "Connector handlers span create, edit, catalog-link, occupancy, and override flows on shared form/selection bindings; split deferred until connector-form helpers are extracted."
 };
 
 function normalizeRelativePath(relativePath) {

@@ -13,7 +13,7 @@
 >   - `src/app/hooks/controller/useAppControllerScreenContentSlices.tsx` (978 lines)
 >   - `src/app/hooks/controller/useAppControllerModelingAnalysisScreenDomains.tsx` (875 lines)
 >   - `src/app/hooks/controller/useAppControllerNetworkSummaryPanelDomain.tsx` (744 lines)
->   - `src/app/hooks/controller/useAppControllerModelingHandlersOrchestrator.ts` (601 lines)
+>   - `src/app/hooks/controller/useAppControllerModelingHandlersOrchestrator.ts` (417 lines after parameter-contract compaction)
 
 # Overview
 
@@ -49,7 +49,7 @@ flowchart LR
   - `useAppControllerScreenContentSlices.tsx` (978 lines): centralizes Home/Modeling/Analysis/NetworkScope/Settings/Validation screen content slice composition,
   - `useAppControllerModelingAnalysisScreenDomains.tsx` (875 lines): shared selection, navigation, and entity-snapshot bindings for Modeling + Analysis,
   - `useAppControllerNetworkSummaryPanelDomain.tsx` (744 lines): canvas-display, callout, viewport, and BOM-preview bindings for NetworkSummary,
-  - `useAppControllerModelingHandlersOrchestrator.ts` (601 lines): per-entity create/edit/delete handler wiring for Modeling.
+  - `useAppControllerModelingHandlersOrchestrator.ts` is now under the 500-line hook budget after replacing its duplicated parameter list with composed handler contracts.
 - Existing `*ScreenController`, `*DomainAssembly`, `*HandlersOrchestrator`, and `*Slices` hooks already split the surface horizontally, but the **vertical** composition still lives entirely inside `AppController.tsx`.
 
 # Decision
@@ -131,3 +131,11 @@ Add to the PR description:
 
 - Once Wave 1 ships, write a short ADR amendment (or a `logics/specs/` doc) capturing the actual line-count deltas and any deviations from the plan.
 - After Wave 4, consider lowering `LOCKED_LINE_BUDGETS["src/app/AppController.tsx"]` further and locking it as a permanent budget rather than a moving ceiling.
+
+# Amendments
+
+## 2026-05-31 - Modeling handler orchestrator contract compaction
+
+`useAppControllerModelingHandlersOrchestrator.ts` shrank from 601 to 417 lines by composing its parameter type from `useConnectorHandlers`, `useSpliceHandlers`, `useNodeHandlers`, `useSegmentHandlers`, and `useWireHandlers` instead of duplicating each field. The hook remains a shared Modeling handler orchestrator, but it no longer needs an `quality:hooks-modularization` oversize exception.
+
+`useConnectorHandlers.ts` also moved connector endpoint-reference cleanup helpers into `connectorEndpointReferences.ts`, shrinking from 519 to 484 lines and retiring its hooks modularization exception.
