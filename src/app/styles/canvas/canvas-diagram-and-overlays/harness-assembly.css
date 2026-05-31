@@ -1,0 +1,243 @@
+.harness-assembly-manager-panel {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.harness-assembly-functional-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.harness-assembly-grid,
+.harness-assembly-link-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.harness-assembly-manager-panel select,
+.harness-assembly-link-form input,
+.harness-assembly-links input {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  padding: 0.45rem 0.6rem;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  color: inherit;
+}
+
+.harness-assembly-manager-panel select:focus-visible,
+.harness-assembly-link-form input:focus-visible,
+.harness-assembly-links input:focus-visible {
+  outline: 2px solid color-mix(in srgb, currentColor 36%, transparent);
+  outline-offset: 2px;
+}
+
+.harness-assembly-picker-dialog {
+  display: grid;
+  gap: 0.75rem;
+  width: min(34rem, calc(100vw - 2rem));
+}
+
+.harness-assembly-picker-list {
+  display: grid;
+  gap: 0.45rem;
+  max-height: min(52vh, 24rem);
+  overflow: auto;
+}
+
+.harness-assembly-picker-option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, currentColor 5%, transparent);
+  color: inherit;
+  padding: 0.55rem 0.65rem;
+  text-align: left;
+}
+
+.harness-assembly-picker-option.is-selected {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 48%, currentColor 12%);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 13%, transparent);
+}
+
+.harness-assembly-picker-option.is-new {
+  border-style: dashed;
+  border-width: 2px;
+}
+
+.harness-assembly-link-form button,
+.harness-assembly-links button {
+  border: 1px solid #7a99b3;
+  background: #e8f1f8;
+  color: #153048;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.6rem;
+}
+
+.harness-assembly-link-form button:disabled,
+.harness-assembly-links button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.harness-assembly-link-form button.button-with-icon,
+.harness-assembly-links button.button-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.harness-assembly-list {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 0.35rem;
+}
+
+.harness-assembly-row,
+.harness-assembly-links li {
+  display: grid;
+  grid-template-columns: auto minmax(8rem, 1fr) minmax(8rem, 0.9fr) auto;
+  gap: 0.55rem;
+  align-items: center;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, currentColor 5%, transparent);
+  color: inherit;
+}
+
+.harness-assembly-row input[type="color"] {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-sizing: border-box;
+  overflow: hidden;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.harness-assembly-row input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.harness-assembly-row input[type="color"]::-webkit-color-swatch,
+.harness-assembly-row input[type="color"]::-moz-color-swatch {
+  border: 0;
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+}
+
+.harness-assembly-row input[type="color"]:disabled {
+  opacity: 0.32;
+  cursor: not-allowed;
+  filter: saturate(0.45);
+}
+
+.harness-assembly-row input[type="checkbox"] {
+  accent-color: currentColor;
+}
+
+.harness-assembly-subpanel {
+  display: grid;
+  gap: 0.55rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.harness-assembly-subpanel h3 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.harness-assembly-link-form {
+  grid-template-columns: minmax(8rem, 1fr) repeat(4, minmax(8rem, 1fr)) auto;
+}
+
+.harness-assembly-links {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.harness-assembly-links li {
+  grid-template-columns: minmax(8rem, 0.8fr) minmax(12rem, 1fr) auto;
+}
+
+.harness-assembly-row .technical-id,
+.harness-assembly-links .technical-id {
+  font-family: inherit;
+  color: color-mix(in srgb, currentColor 68%, transparent);
+}
+
+@media (max-width: 900px) {
+  .harness-assembly-functional-tabs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .harness-assembly-functional-tabs .network-summary-header-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .harness-assembly-grid,
+  .harness-assembly-link-form {
+    grid-template-columns: 1fr;
+  }
+  .harness-assembly-row,
+  .harness-assembly-links li {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .harness-assembly-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+  }
+  .harness-assembly-row > input[type="checkbox"] {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+  .harness-assembly-row > span:not(.technical-id) {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .harness-assembly-row > .technical-id {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .harness-assembly-row > input[type="color"] {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+}
+@media (max-width: 670px) {
+  .harness-assembly-functional-tabs .network-summary-header-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .harness-assembly-functional-tabs .workspace-tab {
+    white-space: normal;
+    min-height: 2.25rem;
+    line-height: 1.15;
+  }
+}
