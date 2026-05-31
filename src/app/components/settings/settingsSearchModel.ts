@@ -84,12 +84,28 @@ export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
   {
     id: "settings-ai-provider",
     title: "AI provider",
-    labels: ["Provider", "Model", "API key", "Endpoint", "Timeout (ms)", "Strict structured output mode", "Enable experimental direct execution"]
+    labels: ["Provider", "Model", "API key", "Endpoint", "Timeout (ms)", "Strict structured output mode", "Enable experimental direct execution", "Test connection"]
   },
   {
     id: "settings-workspace-storage",
     title: "Workspace storage",
-    labels: ["Persistence mode", "Linked file", "Permission", "Open", "Save as", "Unlink"]
+    labels: [
+      "Persistence mode",
+      "Linked file",
+      "Permission",
+      "Open workspace file",
+      "Save as file",
+      "Save as copy",
+      "Use a file for autosave",
+      "Resume last file",
+      "Save now",
+      "Stop autosave link",
+      "Resolve conflict",
+      "Restore file access",
+      "Load file version",
+      "Keep local version",
+      "Save local copy"
+    ]
   }
 ];
 

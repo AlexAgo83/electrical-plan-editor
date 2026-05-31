@@ -213,7 +213,7 @@ describe("App integration UI - settings", () => {
     expect(within(workspaceStoragePanel).getByText("No resumable file")).toBeInTheDocument();
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file as" })).toBeEnabled();
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Open workspace file" })).toBeEnabled();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Link workspace file" })).toBeEnabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Use a file for autosave" })).toBeEnabled();
     expect(within(workspaceStoragePanel).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
       "Save as file",
       "Open workspace file",

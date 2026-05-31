@@ -496,7 +496,7 @@ export function SettingsWorkspaceContent({
               title={workspaceStoragePrimaryAction.title}
             >
               <span className={workspaceStoragePrimaryAction.iconClassName} aria-hidden="true" />
-              {workspaceStoragePrimaryAction.label}
+              {renderSettingLabel(workspaceStoragePrimaryAction.label)}
             </button>
           </div>
         </div>
@@ -510,7 +510,7 @@ export function SettingsWorkspaceContent({
             title="Open a workspace file and replace the current workspace"
           >
             <span className="action-button-icon is-open" aria-hidden="true" />
-            Open workspace file
+            {renderSettingLabel("Open workspace file")}
           </button>
           {workspaceStoragePrimaryAction.ariaLabel !== "Save workspace file as" ? (
             <button
@@ -521,7 +521,7 @@ export function SettingsWorkspaceContent({
               title="Save a new workspace file copy"
             >
               <span className="action-button-icon is-save" aria-hidden="true" />
-              Save as copy
+              {renderSettingLabel("Save as copy")}
             </button>
           ) : null}
           {workspaceFileStatus.canResume && workspaceFileStatus.mode !== "linked" && workspaceStoragePrimaryAction.ariaLabel !== "Resume workspace file" ? (
@@ -533,18 +533,18 @@ export function SettingsWorkspaceContent({
               title="Resume the last workspace file remembered by this browser"
             >
               <span className="action-button-icon is-redo" aria-hidden="true" />
-              Resume last file
+              {renderSettingLabel("Resume last file")}
             </button>
           ) : null}
           <button
             type="button"
             className="button-with-icon"
             onClick={relinkWorkspaceFile}
-            aria-label={relinkWorkspaceAriaLabel}
+            aria-label="Use a file for autosave"
             title={`${relinkWorkspaceLabel} a workspace file for direct file autosave when supported`}
           >
             <span className="action-button-icon is-swap" aria-hidden="true" />
-            Use a file for autosave
+            {renderSettingLabel("Use a file for autosave")}
           </button>
           {workspaceFileStatus.mode === "linked" ? (
             <>
@@ -557,7 +557,7 @@ export function SettingsWorkspaceContent({
                 title="Save the current workspace to the linked file now"
               >
                 <span className="action-button-icon is-save" aria-hidden="true" />
-                Save now
+                {renderSettingLabel("Save now")}
               </button>
               <button
                 type="button"
@@ -567,7 +567,7 @@ export function SettingsWorkspaceContent({
                 title="Stop autosaving to the linked file and keep browser-local persistence"
               >
                 <span className="action-button-icon is-swap" aria-hidden="true" />
-                Stop autosave link
+                {renderSettingLabel("Stop autosave link")}
               </button>
             </>
           ) : null}
@@ -576,9 +576,9 @@ export function SettingsWorkspaceContent({
           <div className="settings-conflict-panel" role="alert">
             <p>The linked file changed outside this tab. Choose which workspace version to keep before autosave resumes.</p>
             <div className="row-actions settings-actions">
-              <button type="button" onClick={loadLinkedFileVersion}>Load file version</button>
-              <button type="button" onClick={keepLocalWorkspaceVersion}>Keep local version</button>
-              <button type="button" onClick={saveWorkspaceFileAs}>Save local copy</button>
+              <button type="button" onClick={loadLinkedFileVersion}>{renderSettingLabel("Load file version")}</button>
+              <button type="button" onClick={keepLocalWorkspaceVersion}>{renderSettingLabel("Keep local version")}</button>
+              <button type="button" onClick={saveWorkspaceFileAs}>{renderSettingLabel("Save local copy")}</button>
             </div>
           </div>
         ) : null}
@@ -752,7 +752,7 @@ export function SettingsWorkspaceContent({
             }}
             disabled={!aiSettings.readiness.isReady || aiSettings.connectionTest.status === "testing"}
           >
-            Test connection
+            {renderSettingLabel("Test connection")}
           </button>
         </div>
         <p className="meta-line">{aiSettings.connectionTest.message}</p>
@@ -1206,7 +1206,7 @@ export function SettingsWorkspaceContent({
           </label>
         </div>
         <div className="row-actions settings-actions settings-global-preferences-actions">
-          <button type="button" className="settings-primary-action" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
+          <button type="button" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
         </div>
       </section>
 

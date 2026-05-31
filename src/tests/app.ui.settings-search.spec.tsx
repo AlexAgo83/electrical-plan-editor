@@ -75,6 +75,20 @@ describe("App integration UI - settings search", () => {
     }
   });
 
+  it("searches and highlights settings action buttons", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+
+    fireEvent.change(screen.getByLabelText("Search settings"), { target: { value: "autosave" } });
+
+    const settingsNavigation = screen.getByRole("navigation", { name: "Settings sections" });
+    expect(within(settingsNavigation).getByRole("button", { name: "Workspace storage2" })).toBeInTheDocument();
+
+    const workspaceStoragePanel = getPanelByHeading("Workspace storage");
+    expect(within(workspaceStoragePanel).getByText("autosave", { selector: "mark.settings-search-highlight" })).toBeInTheDocument();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Use a file for autosave" })).toBeEnabled();
+  });
+
   it("keeps settings section navigation reachable on narrow viewports", () => {
     withViewportSize({ width: 390, height: 760 }, () => {
       renderAppWithState(createUiIntegrationState());
