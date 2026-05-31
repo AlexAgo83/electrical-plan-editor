@@ -32,8 +32,6 @@ export const ALLOWED_OVERSIZE = {
     "Create-flow integration coverage stays consolidated so repeated-create, endpoint-prefill, and edit-transition scenarios keep one shared modeling fixture surface.",
   "src/tests/app.ui.catalog.spec.tsx":
     "Catalog integration coverage spans navigation, create/edit, and scroll behavior on one shared fixture surface; split deferred until catalog form fixtures are extracted.",
-  "src/tests/app.ui.list-ergonomics.spec.tsx":
-    "List ergonomics coverage stays consolidated around shared table filtering, sorting, and selection fixtures; split deferred until list helper extraction is complete.",
   "src/tests/app.ui.settings.spec.tsx":
     "Settings integration coverage still spans persisted app-wide preferences, AI provider readiness, and local storage reload behavior on one shared app fixture; split deferred until settings fixture extraction is complete.",
   "src/app/styles/canvas/canvas-toolbar-and-shell.css":
