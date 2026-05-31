@@ -4,6 +4,9 @@ import path from "node:path";
 
 const parsedTimeoutMs = Number.parseInt(process.env.FULL_COVERAGE_TEST_TIMEOUT_MS ?? "", 10);
 const timeoutMs = Number.isInteger(parsedTimeoutMs) && parsedTimeoutMs > 0 ? parsedTimeoutMs : 15000;
+const parsedLayoutBudgetMs = Number.parseInt(process.env.FULL_COVERAGE_LAYOUT_RESPONSIVENESS_BUDGET_MS ?? "", 10);
+const layoutResponsivenessBudgetMs =
+  Number.isInteger(parsedLayoutBudgetMs) && parsedLayoutBudgetMs > 0 ? parsedLayoutBudgetMs : 35000;
 
 const runnerArgs = [
   "vitest",
@@ -25,10 +28,17 @@ const runnerArgs = [
 
 console.log("[coverage:full:report] informational signal only (non-blocking threshold).");
 console.log(
-  `[coverage:full:report] running full suite with src/core + src/store + src/app coverage scope, timeout=${timeoutMs}ms.`
+  `[coverage:full:report] running full suite with src/core + src/store + src/app coverage scope, timeout=${timeoutMs}ms, layoutBudget=${layoutResponsivenessBudgetMs}ms.`
 );
 
-const result = spawnSync("npx", runnerArgs, { stdio: "inherit", shell: false });
+const result = spawnSync("npx", runnerArgs, {
+  stdio: "inherit",
+  shell: false,
+  env: {
+    ...process.env,
+    LAYOUT_RESPONSIVENESS_BUDGET_MS: String(layoutResponsivenessBudgetMs)
+  }
+});
 
 if (result.error) {
   console.error("[coverage:full:report] failed to execute vitest:", result.error.message);
