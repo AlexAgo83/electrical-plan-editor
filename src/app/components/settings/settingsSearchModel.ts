@@ -6,16 +6,6 @@ export interface SettingsSectionDefinition {
 
 export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
   {
-    id: "settings-workspace-storage",
-    title: "Workspace storage",
-    labels: ["Persistence mode", "Linked file", "Permission", "Open", "Save as", "Unlink"]
-  },
-  {
-    id: "settings-ai-provider",
-    title: "AI provider",
-    labels: ["Provider", "Model", "API key", "Endpoint", "Timeout (ms)", "Strict structured output mode", "Enable experimental direct execution"]
-  },
-  {
     id: "settings-canvas-render",
     title: "Canvas render preferences",
     labels: [
@@ -90,6 +80,16 @@ export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
     id: "settings-sample-network",
     title: "Sample network controls",
     labels: ["Recreate sample network", "Reset sample network to baseline"]
+  },
+  {
+    id: "settings-ai-provider",
+    title: "AI provider",
+    labels: ["Provider", "Model", "API key", "Endpoint", "Timeout (ms)", "Strict structured output mode", "Enable experimental direct execution"]
+  },
+  {
+    id: "settings-workspace-storage",
+    title: "Workspace storage",
+    labels: ["Persistence mode", "Linked file", "Permission", "Open", "Save as", "Unlink"]
   }
 ];
 

@@ -308,10 +308,73 @@ export function SettingsWorkspaceContent({
   const hasSearchQuery = normalizedSettingsSearch.length > 0;
   const contentRef = useRef<HTMLElement | null>(null);
   const sectionVisibilityRatiosRef = useRef<Map<string, number>>(new Map());
-  const [activeSettingsSectionId, setActiveSettingsSectionId] = useState("settings-ai-provider");
+  const [activeSettingsSectionId, setActiveSettingsSectionId] = useState("settings-canvas-render");
   const relinkWorkspaceLabel = workspaceFileStatus.mode === "linked" || workspaceFileStatus.resumeFileName !== null ? "Relink" : "Link";
   const relinkWorkspaceAriaLabel =
     relinkWorkspaceLabel === "Relink" ? "Relink workspace file" : "Link workspace file";
+  const workspaceStorageStatusTone = workspaceFileStatus.conflict
+    ? "is-warn"
+    : workspaceFileStatus.mode === "linked" && workspaceFileStatus.fileAvailability !== "unavailable"
+      ? "is-ok"
+      : "";
+  const workspaceStorageTitle = workspaceFileStatus.conflict
+    ? "Action needed: linked file changed"
+    : workspaceFileStatus.mode === "linked"
+      ? `Linked to ${workspaceFileStatus.fileName ?? "a workspace file"}`
+      : workspaceFileStatus.resumeFileName !== null
+        ? "Saved locally, with a resumable file"
+        : "Saved in this browser only";
+  const workspaceStorageDescription = workspaceFileStatus.conflict
+    ? "The linked file was edited outside this tab. Pick the version to keep before autosave continues."
+    : workspaceFileStatus.mode === "linked"
+      ? "Changes autosave to the linked file while the browser keeps file permission. Local browser storage remains a fallback."
+      : workspaceFileStatus.resumeFileName !== null
+        ? "Your work is safe in this browser. You can resume the last file link or save a fresh portable copy."
+        : "Your work is safe in this browser. Save a workspace file when you want a portable copy or cloud-folder sync.";
+  const workspaceStoragePrimaryAction = workspaceFileStatus.conflict
+    ? {
+        label: "Resolve conflict",
+        ariaLabel: "Resolve workspace file conflict",
+        title: "Review the linked file conflict options",
+        onClick: loadLinkedFileVersion,
+        disabled: false,
+        iconClassName: "action-button-icon is-open"
+      }
+    : workspaceFileStatus.mode === "linked"
+      ? workspaceFileStatus.permission === "denied" || workspaceFileStatus.fileAvailability === "unavailable"
+        ? {
+            label: "Restore file access",
+            ariaLabel: relinkWorkspaceAriaLabel,
+            title: "Choose the workspace file again to restore browser permission",
+            onClick: relinkWorkspaceFile,
+            disabled: false,
+            iconClassName: "action-button-icon is-swap"
+          }
+        : {
+            label: workspaceFileStatus.isSaving ? "Saving..." : "Save now",
+            ariaLabel: "Save workspace file now",
+            title: "Save the current workspace to the linked file now",
+            onClick: saveWorkspaceFileNow,
+            disabled: workspaceFileStatus.isSaving,
+            iconClassName: "action-button-icon is-save"
+          }
+      : workspaceFileStatus.canResume
+        ? {
+            label: "Resume last file",
+            ariaLabel: "Resume workspace file",
+            title: "Resume the last workspace file remembered by this browser",
+            onClick: resumeWorkspaceFile,
+            disabled: false,
+            iconClassName: "action-button-icon is-redo"
+          }
+        : {
+            label: "Save as file",
+            ariaLabel: "Save workspace file as",
+            title: "Save a new workspace file copy",
+            onClick: saveWorkspaceFileAs,
+            disabled: false,
+            iconClassName: "action-button-icon is-save"
+          };
   const renderSettingLabel = (text: string): ReactNode => (
     <SettingsLabelText text={text} normalizedQuery={normalizedSettingsSearch} />
   );
@@ -415,92 +478,30 @@ export function SettingsWorkspaceContent({
           <span className="settings-panel-chip">Storage</span>
         </header>
         <p className="settings-panel-intro">
-          Link the workspace to a user-owned JSON file in a cloud drive folder. Local browser persistence remains active as a fallback.
+          Choose where this workspace lives. The browser always keeps a local fallback; file actions are for portable copies and cloud-folder sync.
         </p>
-        <div className="settings-state-row" aria-label="Workspace storage status">
-          <span className={workspaceFileStatus.conflict ? "settings-state-chip is-warn" : "settings-state-chip is-ok"}>
-            {workspaceFileStatus.label}
-          </span>
-          <span className="settings-state-chip">
-            {workspaceFileStatus.mode === "linked" ? "Linked file" : "Local only"}
-          </span>
-          <span className="settings-state-chip">
-            Permission: {workspaceFileStatus.permission}
-          </span>
-          <span className="settings-state-chip">
-            {workspaceFileStatus.directFileAccessSupported ? "Direct file access" : "Fallback download"}
-          </span>
-          <span className={workspaceFileStatus.fileAvailability === "unavailable" ? "settings-state-chip is-warn" : "settings-state-chip"}>
-            File: {workspaceFileStatus.fileAvailability === "available" ? "Available" : workspaceFileStatus.fileAvailability === "unavailable" ? "Unavailable" : "Unknown"}
-          </span>
+        <div className={`settings-storage-current ${workspaceStorageStatusTone}`} aria-label="Workspace storage status">
+          <div className="settings-storage-current-copy">
+            <span className="settings-storage-current-kicker">Current save location</span>
+            <strong>{workspaceStorageTitle}</strong>
+            <p>{workspaceStorageDescription}</p>
+          </div>
+          <div className="row-actions settings-storage-primary-action-row">
+            <button
+              type="button"
+              className="button-with-icon settings-storage-primary-action"
+              onClick={workspaceStoragePrimaryAction.onClick}
+              disabled={workspaceStoragePrimaryAction.disabled}
+              aria-label={workspaceStoragePrimaryAction.ariaLabel}
+              title={workspaceStoragePrimaryAction.title}
+            >
+              <span className={workspaceStoragePrimaryAction.iconClassName} aria-hidden="true" />
+              {workspaceStoragePrimaryAction.label}
+            </button>
+          </div>
         </div>
-        <dl className="settings-storage-details">
-          <div>
-            <dt>{renderSettingLabel("Persistence mode")}</dt>
-            <dd>{workspaceFileStatus.mode === "linked" ? "Linked file with local cache" : "Local browser storage only"}</dd>
-          </div>
-          <div>
-            <dt>Autosave target</dt>
-            <dd>{workspaceFileStatus.saveTarget === "linked-file" ? "Linked workspace file" : workspaceFileStatus.saveTarget === "download" ? "Downloaded workspace copy" : "Local browser cache"}</dd>
-          </div>
-          <div>
-            <dt>{renderSettingLabel("Linked file")}</dt>
-            <dd>
-              {workspaceFileStatus.fileName === null ? (
-                "None"
-              ) : (
-                <button
-                  type="button"
-                  className="settings-storage-file-link"
-                  onClick={openLinkedWorkspaceFile}
-                  disabled={workspaceFileStatus.mode !== "linked"}
-                  title="Open the linked workspace file in a new browser tab"
-                >
-                  {workspaceFileStatus.fileName}
-                </button>
-              )}
-            </dd>
-          </div>
-          <div>
-            <dt>Resumable file</dt>
-            <dd>
-              {workspaceFileStatus.resumeFileName === null ? (
-                "None"
-              ) : (
-                <button
-                  type="button"
-                  className="settings-storage-file-link"
-                  onClick={openResumableWorkspaceFile}
-                  disabled={!workspaceFileStatus.canResume}
-                  title="Open the resumable workspace file in a new browser tab"
-                >
-                  {workspaceFileStatus.resumeFileName}
-                </button>
-              )}
-            </dd>
-          </div>
-          <div>
-            <dt>Resume status</dt>
-            <dd>{workspaceFileStatus.resumeStatus === "available" ? "Resume available" : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Resume unavailable" : "No resumable file"}</dd>
-          </div>
-          <div>
-            <dt>Last saved</dt>
-            <dd>{formatWorkspaceSavedAt(workspaceFileStatus.lastSavedAtIso)}</dd>
-          </div>
-        </dl>
-        {workspaceFileStatus.message !== null ? <p className="meta-line">{workspaceFileStatus.message}</p> : null}
-        <div className="row-actions settings-actions settings-workspace-storage-actions">
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={resumeWorkspaceFile}
-            disabled={!workspaceFileStatus.canResume || workspaceFileStatus.mode === "linked"}
-            aria-label="Resume workspace file"
-            title="Resume the last workspace file remembered by this browser"
-          >
-            <span className="action-button-icon is-redo" aria-hidden="true" />
-            Resume
-          </button>
+        {workspaceFileStatus.message !== null ? <p className="meta-line settings-storage-message">{workspaceFileStatus.message}</p> : null}
+        <div className="row-actions settings-actions settings-storage-secondary-actions" aria-label="More workspace file actions">
           <button
             type="button"
             className="button-with-icon"
@@ -509,8 +510,32 @@ export function SettingsWorkspaceContent({
             title="Open a workspace file and replace the current workspace"
           >
             <span className="action-button-icon is-open" aria-hidden="true" />
-            {renderSettingLabel("Open")}
+            Open workspace file
           </button>
+          {workspaceStoragePrimaryAction.ariaLabel !== "Save workspace file as" ? (
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={saveWorkspaceFileAs}
+              aria-label="Save workspace file as"
+              title="Save a new workspace file copy"
+            >
+              <span className="action-button-icon is-save" aria-hidden="true" />
+              Save as copy
+            </button>
+          ) : null}
+          {workspaceFileStatus.canResume && workspaceFileStatus.mode !== "linked" && workspaceStoragePrimaryAction.ariaLabel !== "Resume workspace file" ? (
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={resumeWorkspaceFile}
+              aria-label="Resume workspace file"
+              title="Resume the last workspace file remembered by this browser"
+            >
+              <span className="action-button-icon is-redo" aria-hidden="true" />
+              Resume last file
+            </button>
+          ) : null}
           <button
             type="button"
             className="button-with-icon"
@@ -519,39 +544,33 @@ export function SettingsWorkspaceContent({
             title={`${relinkWorkspaceLabel} a workspace file for direct file autosave when supported`}
           >
             <span className="action-button-icon is-swap" aria-hidden="true" />
-            {relinkWorkspaceLabel}
+            Use a file for autosave
           </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={saveWorkspaceFileNow}
-            aria-label="Save workspace file now"
-            title="Save the current workspace to the linked file or choose a save target"
-          >
-            <span className="action-button-icon is-save" aria-hidden="true" />
-            Save now
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={saveWorkspaceFileAs}
-            aria-label="Save workspace file as"
-            title="Save a new workspace file copy"
-          >
-            <span className="action-button-icon is-save" aria-hidden="true" />
-            {renderSettingLabel("Save as")}
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={unlinkWorkspaceFile}
-            disabled={workspaceFileStatus.mode !== "linked"}
-            aria-label="Unlink workspace file"
-            title="Stop autosaving to the linked file and keep browser-local persistence"
-          >
-            <span className="action-button-icon is-swap" aria-hidden="true" />
-            {renderSettingLabel("Unlink")}
-          </button>
+          {workspaceFileStatus.mode === "linked" ? (
+            <>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={saveWorkspaceFileNow}
+                disabled={workspaceFileStatus.isSaving}
+                aria-label="Save workspace file now"
+                title="Save the current workspace to the linked file now"
+              >
+                <span className="action-button-icon is-save" aria-hidden="true" />
+                Save now
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={unlinkWorkspaceFile}
+                aria-label="Unlink workspace file"
+                title="Stop autosaving to the linked file and keep browser-local persistence"
+              >
+                <span className="action-button-icon is-swap" aria-hidden="true" />
+                Stop autosave link
+              </button>
+            </>
+          ) : null}
         </div>
         {workspaceFileStatus.conflict ? (
           <div className="settings-conflict-panel" role="alert">
@@ -563,6 +582,80 @@ export function SettingsWorkspaceContent({
             </div>
           </div>
         ) : null}
+        <details className="settings-storage-technical-details">
+          <summary>Storage details</summary>
+          <div className="settings-state-row" aria-label="Workspace technical storage status">
+            <span className={workspaceFileStatus.conflict ? "settings-state-chip is-warn" : "settings-state-chip is-ok"}>
+              {workspaceFileStatus.label}
+            </span>
+            <span className="settings-state-chip">
+              {workspaceFileStatus.mode === "linked" ? "Linked file" : "Local only"}
+            </span>
+            <span className="settings-state-chip">
+              Permission: {workspaceFileStatus.permission}
+            </span>
+            <span className="settings-state-chip">
+              {workspaceFileStatus.directFileAccessSupported ? "Direct file access" : "Fallback download"}
+            </span>
+            <span className={workspaceFileStatus.fileAvailability === "unavailable" ? "settings-state-chip is-warn" : "settings-state-chip"}>
+              File: {workspaceFileStatus.fileAvailability === "available" ? "Available" : workspaceFileStatus.fileAvailability === "unavailable" ? "Unavailable" : "Unknown"}
+            </span>
+          </div>
+          <dl className="settings-storage-details">
+            <div>
+              <dt>{renderSettingLabel("Persistence mode")}</dt>
+              <dd>{workspaceFileStatus.mode === "linked" ? "Linked file with local cache" : "Local browser storage only"}</dd>
+            </div>
+            <div>
+              <dt>Autosave target</dt>
+              <dd>{workspaceFileStatus.saveTarget === "linked-file" ? "Linked workspace file" : workspaceFileStatus.saveTarget === "download" ? "Downloaded workspace copy" : "Local browser cache"}</dd>
+            </div>
+            <div>
+              <dt>{renderSettingLabel("Linked file")}</dt>
+              <dd>
+                {workspaceFileStatus.fileName === null ? (
+                  "None"
+                ) : (
+                  <button
+                    type="button"
+                    className="settings-storage-file-link"
+                    onClick={openLinkedWorkspaceFile}
+                    disabled={workspaceFileStatus.mode !== "linked"}
+                    title="Open the linked workspace file in a new browser tab"
+                  >
+                    {workspaceFileStatus.fileName}
+                  </button>
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>Resumable file</dt>
+              <dd>
+                {workspaceFileStatus.resumeFileName === null ? (
+                  "None"
+                ) : (
+                  <button
+                    type="button"
+                    className="settings-storage-file-link"
+                    onClick={openResumableWorkspaceFile}
+                    disabled={!workspaceFileStatus.canResume}
+                    title="Open the resumable workspace file in a new browser tab"
+                  >
+                    {workspaceFileStatus.resumeFileName}
+                  </button>
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>Resume status</dt>
+              <dd>{workspaceFileStatus.resumeStatus === "available" ? "Resume available" : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Resume unavailable" : "No resumable file"}</dd>
+            </div>
+            <div>
+              <dt>Last saved</dt>
+              <dd>{formatWorkspaceSavedAt(workspaceFileStatus.lastSavedAtIso)}</dd>
+            </div>
+          </dl>
+        </details>
       </section>
 
       <section id="settings-ai-provider" className="panel settings-panel" data-onboarding-panel="settings-ai-provider">

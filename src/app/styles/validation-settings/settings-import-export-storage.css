@@ -77,6 +77,113 @@
   margin: 0;
 }
 
+.settings-storage-current {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(11rem, auto);
+  gap: 0.85rem;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 30%, transparent);
+  border-radius: 0.65rem;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--theme-primary, currentColor) 11%, transparent),
+      color-mix(in srgb, currentColor 3%, transparent)
+    );
+  box-shadow: inset 0 1px 0 color-mix(in srgb, currentColor 10%, transparent);
+  padding: 0.9rem;
+}
+
+.settings-storage-current.is-ok {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 44%, currentColor 16%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--theme-primary, currentColor) 14%, transparent),
+    color-mix(in srgb, currentColor 3%, transparent)
+  );
+}
+
+.settings-storage-current.is-warn {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 34%, currentColor 32%);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--theme-primary, currentColor) 10%, transparent),
+    color-mix(in srgb, currentColor 6%, transparent)
+  );
+}
+
+.settings-storage-current-copy {
+  min-width: 0;
+  display: grid;
+  gap: 0.24rem;
+}
+
+.settings-storage-current-kicker {
+  color: color-mix(in srgb, currentColor 64%, var(--theme-primary, currentColor) 36%);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.settings-storage-current-copy strong {
+  font-size: 1rem;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.settings-storage-current-copy p,
+.settings-storage-message {
+  margin: 0;
+  color: color-mix(in srgb, currentColor 76%, transparent);
+  line-height: 1.38;
+}
+
+.settings-storage-primary-action-row {
+  margin: 0;
+}
+
+.settings-storage-primary-action-row .settings-storage-primary-action {
+  width: 100%;
+  min-height: 2.65rem;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.settings-storage-secondary-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.settings-storage-secondary-actions button {
+  min-width: 0;
+  justify-content: center;
+}
+
+.settings-storage-technical-details {
+  margin-top: 0.2rem;
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  padding: 0.58rem 0.7rem;
+}
+
+.settings-storage-technical-details summary {
+  cursor: pointer;
+  color: color-mix(in srgb, currentColor 76%, var(--theme-primary, currentColor) 24%);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.settings-storage-technical-details[open] {
+  display: grid;
+  gap: 0.7rem;
+}
+
 .settings-storage-details > div {
   display: grid;
   grid-template-columns: minmax(9rem, 0.42fr) minmax(0, 1fr);
@@ -121,12 +228,12 @@
 }
 
 .settings-conflict-panel {
-  border: 1px solid color-mix(in srgb, #d7a82f 58%, currentColor 42%);
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 34%, currentColor 36%);
   border-radius: 0.5rem;
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, #d7a82f 16%, transparent),
+      color-mix(in srgb, var(--theme-primary, currentColor) 10%, transparent),
       color-mix(in srgb, var(--theme-primary, currentColor) 7%, transparent)
     );
   color: currentColor;
@@ -140,12 +247,24 @@
 }
 
 @media (max-width: 760px) {
+  .settings-storage-current {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-storage-secondary-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .row-actions.settings-actions.settings-workspace-storage-actions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 520px) {
+  .settings-storage-secondary-actions {
+    grid-template-columns: 1fr;
+  }
+
   .row-actions.settings-actions.settings-workspace-storage-actions {
     grid-template-columns: 1fr;
   }

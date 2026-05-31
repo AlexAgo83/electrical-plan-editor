@@ -207,23 +207,19 @@ describe("App integration UI - settings", () => {
     switchScreenDrawerAware("settings");
     const workspaceStoragePanel = getPanelByHeading("Workspace storage");
 
-    expect(within(workspaceStoragePanel).getAllByText("Local only").length).toBeGreaterThan(0);
+    expect(within(workspaceStoragePanel).getByText("Saved in this browser only")).toBeInTheDocument();
+    expect(within(workspaceStoragePanel).getByText(/Save a workspace file when you want a portable copy/)).toBeInTheDocument();
     expect(within(workspaceStoragePanel).getByText("Local browser cache")).toBeInTheDocument();
     expect(within(workspaceStoragePanel).getByText("No resumable file")).toBeInTheDocument();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Resume workspace file" })).toBeDisabled();
+    expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file as" })).toBeEnabled();
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Open workspace file" })).toBeEnabled();
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Link workspace file" })).toBeEnabled();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file now" })).toBeEnabled();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file as" })).toBeEnabled();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Unlink workspace file" })).toBeDisabled();
     expect(within(workspaceStoragePanel).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
-      "Resume",
-      "Open",
-      "Link",
-      "Save now",
-      "Save as",
-      "Unlink"
+      "Save as file",
+      "Open workspace file",
+      "Use a file for autosave"
     ]);
+    expect(within(workspaceStoragePanel).getByText("Storage details")).toBeInTheDocument();
   });
 
   it("keeps settings and import/export controls operable on mobile baseline viewports", async () => {

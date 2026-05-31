@@ -18,6 +18,50 @@
   padding-top: 0;
 }
 
+.settings-workspace .settings-section-list > #settings-canvas-render {
+  order: 1;
+  border-top: 0;
+  padding-top: 0;
+}
+
+.settings-workspace .settings-section-list > #settings-canvas-tools {
+  order: 2;
+}
+
+.settings-workspace .settings-section-list > #settings-appearance {
+  order: 3;
+}
+
+.settings-workspace .settings-section-list > #settings-global-preferences {
+  order: 4;
+}
+
+.settings-workspace .settings-section-list > #settings-shortcuts {
+  order: 5;
+}
+
+.settings-workspace .settings-section-list > #settings-catalog-bom {
+  order: 6;
+}
+
+.settings-workspace .settings-section-list > #settings-import-export {
+  order: 7;
+}
+
+.settings-workspace .settings-section-list > #settings-sample-network {
+  order: 8;
+}
+
+.settings-workspace .settings-section-list > #settings-ai-provider {
+  order: 9;
+}
+
+.settings-workspace .settings-section-list > #settings-workspace-storage {
+  order: 10;
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  padding-top: 1rem;
+}
+
 .settings-workspace .settings-section-list > .settings-panel > .settings-panel-header {
   padding: 0 0.15rem;
 }
