@@ -19,9 +19,7 @@ export const ALLOWED_HOOKS_OVERSIZE = {
   "src/app/hooks/controller/useAppControllerNetworkSummaryPanelDomain.tsx":
     "Network-summary panel domain assembly centralizes canvas-display, callout, viewport, and BOM-preview bindings; split deferred until per-domain panel slices land (see logics/architecture/app-controller-decomposition-plan.md).",
   "src/app/hooks/validation/buildValidationIssues.ts":
-    "Validation issue builder consolidates rule evaluation across connectors, splices, segments, wires, catalog and harness contexts on a single iteration pass for determinism; split planned after rule-set extraction.",
-  "src/app/hooks/useSpliceHandlers.ts":
-    "Splice handlers span create, edit, port-mode, occupancy, and directional flows on shared form/selection bindings; split deferred until splice-form helpers are extracted."
+    "Validation issue builder consolidates rule evaluation across connectors, splices, segments, wires, catalog and harness contexts on a single iteration pass for determinism; split planned after rule-set extraction."
 };
 
 function normalizeRelativePath(relativePath) {

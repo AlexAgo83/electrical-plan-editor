@@ -145,3 +145,5 @@ Add to the PR description:
 `useAppControllerWorkspaceContentAssembly.tsx` moved AI Agent panel/session orchestration into `useAppControllerAiAgentWorkspaceContent.tsx` and layout content selection into `appControllerWorkspaceLayoutContent.tsx`, shrinking from 596 to 500 lines and retiring its hooks modularization exception.
 
 `useWorkspaceFileStorage.ts` moved its public model types, status builders, and file-open feedback helper into dedicated modules, shrinking from 611 to 491 lines and retiring its hooks modularization exception.
+
+`useSpliceHandlers.ts` moved placement suggestion construction, type contracts, capacity guards, and canvas scroll behavior into focused helper modules, shrinking from 633 to 499 lines and retiring its hooks modularization exception.
