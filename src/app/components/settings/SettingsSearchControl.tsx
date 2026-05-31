@@ -1,28 +1,5 @@
-import { createContext, useContext, type ChangeEvent, type ReactElement, type ReactNode } from "react";
-
-interface SettingsSearchDockContextValue {
-  settingsSearchQuery: string;
-  setSettingsSearchQuery: (value: string) => void;
-}
-
-const SettingsSearchDockContext = createContext<SettingsSearchDockContextValue>({
-  settingsSearchQuery: "",
-  setSettingsSearchQuery: () => undefined
-});
-
-export function SettingsSearchDockProvider({
-  value,
-  children
-}: {
-  value: SettingsSearchDockContextValue;
-  children: ReactNode;
-}): ReactElement {
-  return <SettingsSearchDockContext.Provider value={value}>{children}</SettingsSearchDockContext.Provider>;
-}
-
-export function useSettingsSearchDock(): SettingsSearchDockContextValue {
-  return useContext(SettingsSearchDockContext);
-}
+import { type ChangeEvent, type ReactElement } from "react";
+import { useSettingsSearchDock } from "./SettingsSearchDock";
 
 export function SettingsSearchControl({ variant = "panel" }: { variant?: "panel" | "header" }): ReactElement {
   const { settingsSearchQuery, setSettingsSearchQuery } = useSettingsSearchDock();

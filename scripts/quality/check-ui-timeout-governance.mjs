@@ -37,13 +37,13 @@ const ALLOWED_TIMEOUT_OVERRIDES = [
   },
   {
     key:
-      "src/tests/app.ui.catalog.spec.tsx::scrolls to the edit catalog item panel when clicking Edit",
+      "src/tests/app.ui.catalog-scroll.spec.tsx::scrolls to the edit catalog item panel when clicking Edit",
     rationale:
       "Catalog scroll behavior test involves async DOM mutations and scroll spy coordination; temporary override retained pending test decomposition."
   },
   {
     key:
-      "src/tests/app.ui.catalog.spec.tsx::does not scroll to the catalog form when selecting a row directly",
+      "src/tests/app.ui.catalog-scroll.spec.tsx::does not scroll to the catalog form when selecting a row directly",
     rationale:
       "Catalog scroll guard test involves async DOM mutations and scroll spy coordination; temporary override retained pending test decomposition."
   },
@@ -67,13 +67,13 @@ const ALLOWED_TIMEOUT_OVERRIDES = [
   },
   {
     key:
-      "src/tests/app.ui.catalog.spec.tsx::scrolls to the connector physical layout panel when enabling it",
+      "src/tests/app.ui.catalog-scroll.spec.tsx::scrolls to the connector physical layout panel when enabling it",
     rationale:
       "Catalog scroll behavior test involves async DOM mutations and scroll spy coordination for panel enable; temporary override retained pending test decomposition."
   },
   {
     key:
-      "src/tests/app.ui.catalog.spec.tsx::scrolls to the connector material defaults panel when enabling it",
+      "src/tests/app.ui.catalog-scroll.spec.tsx::scrolls to the connector material defaults panel when enabling it",
     rationale:
       "Catalog scroll behavior test involves async DOM mutations and scroll spy coordination for panel enable; temporary override retained pending test decomposition."
   }

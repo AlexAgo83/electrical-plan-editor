@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import { ImportOverwriteDialog } from "../dialogs/ImportOverwriteDialog";
-import { SettingsSearchControl, useSettingsSearchDock } from "../settings/SettingsSearchDockContext";
+import { SettingsSearchControl } from "../settings/SettingsSearchControl";
+import { useSettingsSearchDock } from "../settings/SettingsSearchDock";
 import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
 import { THEME_MODE_OPTIONS } from "../../lib/themeModes";
