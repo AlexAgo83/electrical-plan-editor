@@ -52,6 +52,7 @@ export default defineConfig(({ mode }) => {
         workbox: {
           cleanupOutdatedCaches: true,
           clientsClaim: true,
+          globIgnores: ["**/exceljs*.js"],
           skipWaiting: false,
           navigateFallback: "/index.html",
           runtimeCaching: [

@@ -23,6 +23,7 @@ if (workboxFile === undefined) {
 }
 
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+const serviceWorkerSource = readFileSync(serviceWorkerPath, "utf8");
 if (manifest.name !== "e-Plan Editor") {
   throw new Error(`Unexpected manifest name: ${String(manifest.name)}`);
 }
@@ -46,5 +47,9 @@ if (!has192 || !has512) {
   throw new Error("Manifest icons do not include expected 192x192 and 512x512 entries.");
 }
 
+if (/assets\/exceljs[^"]+\.js/.test(serviceWorkerSource)) {
+  throw new Error("The ExcelJS export chunk must stay out of the PWA precache.");
+}
+
 console.log("PWA artifact quality gate passed.");
-console.log(`Checked manifest, sw.js, and ${workboxFile}.`);
+console.log(`Checked manifest, sw.js, ${workboxFile}, and ExcelJS precache exclusion.`);
