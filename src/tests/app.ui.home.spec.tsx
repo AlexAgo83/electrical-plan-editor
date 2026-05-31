@@ -58,17 +58,11 @@ describe("home workspace screen", () => {
 
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Resume workspace file" })).toBeDisabled();
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Open workspace file" })).toBeEnabled();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Link workspace file" })).toBeEnabled();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file now" })).toBeEnabled();
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file as" })).toBeEnabled();
-    expect(within(workspaceStoragePanel).getByRole("button", { name: "Unlink workspace file" })).toBeDisabled();
     expect(within(workspaceStoragePanel).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
       "Resume",
       "Open",
-      "Link",
-      "Save now",
-      "Save as",
-      "Unlink"
+      "Save as"
     ]);
   });
 

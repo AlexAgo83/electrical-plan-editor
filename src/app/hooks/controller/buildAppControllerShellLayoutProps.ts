@@ -32,11 +32,8 @@ interface BuildAppControllerShellLayoutPropsParams {
     | "onApplyPwaUpdate"
     | "workspaceFileStatus"
     | "onOpenWorkspaceFile"
-    | "onRelinkWorkspaceFile"
     | "onResumeWorkspaceFile"
-    | "onSaveWorkspaceFileNow"
     | "onSaveWorkspaceFileAs"
-    | "onUnlinkWorkspaceFile"
     | "workspaceFileInputRef"
     | "onWorkspaceFileInputChange"
   >;

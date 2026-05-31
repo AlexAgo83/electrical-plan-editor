@@ -60,11 +60,8 @@ interface AppShellLayoutProps {
   onApplyPwaUpdate: AppHeaderAndStatsProps["onApplyPwaUpdate"];
   workspaceFileStatus: OperationsHealthPanelProps["workspaceFileStatus"];
   onOpenWorkspaceFile: OperationsHealthPanelProps["onOpenWorkspaceFile"];
-  onRelinkWorkspaceFile: OperationsHealthPanelProps["onRelinkWorkspaceFile"];
   onResumeWorkspaceFile: OperationsHealthPanelProps["onResumeWorkspaceFile"];
-  onSaveWorkspaceFileNow: OperationsHealthPanelProps["onSaveWorkspaceFileNow"];
   onSaveWorkspaceFileAs: OperationsHealthPanelProps["onSaveWorkspaceFileAs"];
-  onUnlinkWorkspaceFile: OperationsHealthPanelProps["onUnlinkWorkspaceFile"];
   workspaceFileInputRef: OperationsHealthPanelProps["workspaceFileInputRef"];
   onWorkspaceFileInputChange: OperationsHealthPanelProps["onWorkspaceFileInputChange"];
   validationIssuesCount: number;
@@ -159,11 +156,8 @@ export function AppShellLayout({
   onApplyPwaUpdate,
   workspaceFileStatus,
   onOpenWorkspaceFile,
-  onRelinkWorkspaceFile,
   onResumeWorkspaceFile,
-  onSaveWorkspaceFileNow,
   onSaveWorkspaceFileAs,
-  onUnlinkWorkspaceFile,
   workspaceFileInputRef,
   onWorkspaceFileInputChange,
   validationIssuesCount,
@@ -647,11 +641,8 @@ export function AppShellLayout({
             saveStatus={saveStatus}
             workspaceFileStatus={workspaceFileStatus}
             onOpenWorkspaceFile={onOpenWorkspaceFile}
-            onRelinkWorkspaceFile={onRelinkWorkspaceFile}
             onResumeWorkspaceFile={onResumeWorkspaceFile}
-            onSaveWorkspaceFileNow={onSaveWorkspaceFileNow}
             onSaveWorkspaceFileAs={onSaveWorkspaceFileAs}
-            onUnlinkWorkspaceFile={onUnlinkWorkspaceFile}
             workspaceFileInputRef={workspaceFileInputRef}
             onWorkspaceFileInputChange={onWorkspaceFileInputChange}
             validationIssuesCount={validationIssuesCount}

@@ -1000,11 +1000,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       onApplyPwaUpdate: handleApplyPwaUpdate,
       workspaceFileStatus: workspaceFileStorage.workspaceFileStatus,
       onOpenWorkspaceFile: workspaceFileStorage.openWorkspaceFile,
-      onRelinkWorkspaceFile: workspaceFileStorage.relinkWorkspaceFile,
       onResumeWorkspaceFile: workspaceFileStorage.resumeWorkspaceFile,
-      onSaveWorkspaceFileNow: workspaceFileStorage.saveWorkspaceFileNow,
       onSaveWorkspaceFileAs: workspaceFileStorage.saveWorkspaceFileAs,
-      onUnlinkWorkspaceFile: workspaceFileStorage.unlinkWorkspaceFile,
       workspaceFileInputRef: workspaceFileStorage.workspaceFileInputRef,
       onWorkspaceFileInputChange: workspaceFileStorage.handleWorkspaceFileInputChange
     },
