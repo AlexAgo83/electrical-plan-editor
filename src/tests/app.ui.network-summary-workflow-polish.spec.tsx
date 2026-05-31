@@ -404,23 +404,46 @@ describe("App integration UI - network summary workflow polish", () => {
   });
 
   it("supports deeper zoom-out floor and allows dragging nodes to negative coordinates", () => {
-    renderAppWithState(createUiIntegrationState());
+    const baseState = createUiIntegrationState();
+    const activeNetworkId = baseState.activeNetworkId;
+    expect(activeNetworkId).not.toBeNull();
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network.");
+    }
+    const scoped = baseState.networkStates[activeNetworkId];
+    expect(scoped).toBeDefined();
+    if (scoped === undefined) {
+      throw new Error("Expected active scoped network.");
+    }
+
+    renderAppWithState({
+      ...baseState,
+      networkStates: {
+        ...baseState.networkStates,
+        [activeNetworkId]: {
+          ...scoped,
+          networkSummaryViewState: {
+            scale: 0.04,
+            offset: { x: 220, y: 180 },
+            showNetworkInfoPanels: true,
+            showSegmentNames: false,
+            showSegmentLengths: true,
+            showCableCallouts: false,
+            showNetworkGrid: true,
+            snapNodesToGrid: true,
+            lockEntityMovement: false
+          }
+        }
+      }
+    });
     switchScreenDrawerAware("modeling");
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
     const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
     const zoomOutButton = within(networkSummaryPanel).getByRole("button", { name: "Scale Down" });
 
-    let previousViewportTransform = "";
-    let viewportTransform = "";
-    for (let index = 0; index < 48; index += 1) {
-      fireEvent.click(zoomOutButton);
-      viewportTransform = getNetworkSummaryViewportTransform(networkSummaryPanel);
-      if (viewportTransform === previousViewportTransform) {
-        break;
-      }
-      previousViewportTransform = viewportTransform;
-    }
+    fireEvent.click(zoomOutButton);
+    const viewportTransform = getNetworkSummaryViewportTransform(networkSummaryPanel);
     const zoomScaleMatch = viewportTransform.match(/scale\(([^)]+)\)/);
     const zoomScale = Number(zoomScaleMatch?.[1] ?? Number.NaN);
     expect(Number.isFinite(zoomScale)).toBe(true);
