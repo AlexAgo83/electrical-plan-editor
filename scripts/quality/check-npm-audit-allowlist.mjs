@@ -44,6 +44,41 @@ const ALLOWED_VULNERABILITIES = [
         vulnerability.via.some((entry) => entry?.url === "https://github.com/advisories/GHSA-w5hq-g745-h8pq")
       );
     }
+  },
+  {
+    name: "vitest",
+    severity: "critical",
+    reason: "GHSA-5xrq-8626-4rwp affects vitest <4.1.0 (UI server arbitrary file read/exec). The only available fix is an upgrade to vitest@4.x (isSemVerMajor). Migration deferred; vitest UI is not used in CI or production.",
+    matches(vulnerability) {
+      return (
+        vulnerability.name === "vitest" &&
+        vulnerability.severity === "critical" &&
+        vulnerability.isDirect === true &&
+        isNoViableFix(vulnerability.fixAvailable) &&
+        Array.isArray(vulnerability.via) &&
+        vulnerability.via.some((entry) => entry?.url === "https://github.com/advisories/GHSA-5xrq-8626-4rwp") &&
+        Array.isArray(vulnerability.effects) &&
+        vulnerability.effects.includes("@vitest/coverage-v8")
+      );
+    }
+  },
+  {
+    name: "@vitest/coverage-v8",
+    severity: "critical",
+    reason: "Transitively vulnerable via vitest <4.1.0 (GHSA-5xrq-8626-4rwp). Fix requires upgrading to vitest@4.x (isSemVerMajor). Migration deferred; see vitest entry.",
+    matches(vulnerability) {
+      return (
+        vulnerability.name === "@vitest/coverage-v8" &&
+        vulnerability.severity === "critical" &&
+        vulnerability.isDirect === true &&
+        isNoViableFix(vulnerability.fixAvailable) &&
+        Array.isArray(vulnerability.via) &&
+        vulnerability.via.length === 1 &&
+        vulnerability.via[0] === "vitest" &&
+        Array.isArray(vulnerability.effects) &&
+        vulnerability.effects.length === 0
+      );
+    }
   }
 ];
 
