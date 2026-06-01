@@ -39,6 +39,7 @@ export interface Connector {
   applyCatalogPlugs?: boolean;
   applyCatalogSeals?: boolean;
   terminalOverrides?: Record<number, ConnectorTerminalMaterial>;
+  fusePairRatings?: Record<number, number>;
   cableCalloutPosition?: {
     x: number;
     y: number;
@@ -98,6 +99,7 @@ export interface CatalogItem {
   additionalAccessories?: CatalogAdditionalAccessory[];
   connectorDefaults?: ConnectorCatalogDefaults;
   connectorLayout?: ConnectorLayout;
+  fuseBoxConfig?: FuseBoxConfig;
 }
 
 export interface CatalogAdditionalAccessory {
@@ -159,6 +161,16 @@ export interface ConnectorPlugDefinition {
   plugReference: string;
   plugName?: string;
   quantity: number;
+}
+
+export interface FuseBoxPair {
+  pairIndex: number;  // 0-based
+  pinA: number;       // 1-based cavity index
+  pinB: number;       // 1-based cavity index
+}
+
+export interface FuseBoxConfig {
+  pairs: FuseBoxPair[];
 }
 
 export interface ConnectorCatalogDefaults {

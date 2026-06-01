@@ -34,6 +34,7 @@ export function useEntityFormsState() {
   const [catalogPlugDefinitionsText, setCatalogPlugDefinitionsText] = useState("");
   const [catalogConnectorLayout, setCatalogConnectorLayout] = useState<ConnectorLayout | undefined>(undefined);
   const [catalogShowConnectorPhysicalLayout, setCatalogShowConnectorPhysicalLayout] = useState(false);
+  const [catalogIsFuseBox, setCatalogIsFuseBox] = useState(false);
   const [catalogFormError, setCatalogFormError] = useState<string | null>(null);
 
   const [connectorFormMode, setConnectorFormMode] = useState<"idle" | "create" | "edit">("idle");
@@ -47,6 +48,7 @@ export function useEntityFormsState() {
   const [connectorApplyCatalogPlugs, setConnectorApplyCatalogPlugs] = useState(true);
   const [connectorApplyCatalogSeals, setConnectorApplyCatalogSeals] = useState(true);
   const [connectorTerminalOverridesText, setConnectorTerminalOverridesText] = useState("");
+  const [connectorFusePairRatings, setConnectorFusePairRatings] = useState("");
   const [connectorAutoCreateLinkedNode, setConnectorAutoCreateLinkedNode] = useState(true);
   const [cavityCount, setCavityCount] = useState("4");
   const [cavityIndexInput, setCavityIndexInput] = useState("1");
@@ -167,6 +169,8 @@ export function useEntityFormsState() {
     setCatalogConnectorLayout,
     catalogShowConnectorPhysicalLayout,
     setCatalogShowConnectorPhysicalLayout,
+    catalogIsFuseBox,
+    setCatalogIsFuseBox,
     catalogFormError,
     setCatalogFormError,
     connectorFormMode,
@@ -191,6 +195,8 @@ export function useEntityFormsState() {
     setConnectorApplyCatalogSeals,
     connectorTerminalOverridesText,
     setConnectorTerminalOverridesText,
+    connectorFusePairRatings,
+    setConnectorFusePairRatings,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     cavityCount,

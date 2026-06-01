@@ -130,9 +130,9 @@ export interface AnalysisWorkspaceContentProps {
   onOpenSegmentOnboardingHelp?: () => void;
   wireRouteFilter: "all" | "auto" | "locked";
   setWireRouteFilter: (value: "all" | "auto" | "locked") => void;
-  wireTwistGroupFilter: string;
-  setWireTwistGroupFilter: (value: string) => void;
-  wireTwistGroupOptions: string[];
+  wireFunctionalTagFilter: string;
+  setWireFunctionalTagFilter: (value: string) => void;
+  wireFunctionalTagOptions: string[];
   wireFilterField: "endpoints" | "name" | "technicalId" | "any";
   setWireFilterField: (value: "endpoints" | "name" | "technicalId" | "any") => void;
   wireEndpointFilterQuery: string;

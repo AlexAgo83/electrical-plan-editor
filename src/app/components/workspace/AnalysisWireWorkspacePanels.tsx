@@ -15,9 +15,9 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
   const {
     isWireSubScreen,
     wireRouteFilter,
-    wireTwistGroupFilter,
-    setWireTwistGroupFilter,
-    wireTwistGroupOptions,
+    wireFunctionalTagFilter,
+    setWireFunctionalTagFilter,
+    wireFunctionalTagOptions,
     wireFilterField,
     setWireFilterField,
     wireEndpointFilterQuery,
@@ -277,11 +277,11 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           <select
             className="list-inline-table-filter-select"
             aria-label="Wire tag filter"
-            value={wireTwistGroupFilter}
-            onChange={(event) => setWireTwistGroupFilter(event.target.value)}
+            value={wireFunctionalTagFilter}
+            onChange={(event) => setWireFunctionalTagFilter(event.target.value)}
           >
             <option value="all">Any</option>
-            {wireTwistGroupOptions.map((label) => (
+            {wireFunctionalTagOptions.map((label) => (
               <option key={label} value={label}>
                 {label}
               </option>
@@ -346,6 +346,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 {isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{wireListSortIndicator("technicalId")}</span>
               </button>
             </th>
+            <th>{isMobileViewport ? "Func tag" : "Functional tag"}</th>
             <th>{isMobileViewport ? "Twist" : "Twist group"}</th>
             <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "color")}>
               <button
@@ -417,22 +418,6 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 {isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{wireListSortIndicator("lengthMm")}</span>
               </button>
             </th>
-            {showWireRouteModeColumn ? (
-              <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "routeMode")}>
-                <button
-                  type="button"
-                  className="sort-header-button"
-                  onClick={() =>
-                    setWireAnalysisTableSort((current) => ({
-                      field: "routeMode",
-                      direction: current.field === "routeMode" && current.direction === "asc" ? "desc" : "asc"
-                    }))
-                  }
-                >
-                  Route mode <span className="sort-indicator">{wireListSortIndicator("routeMode")}</span>
-                </button>
-              </th>
-            ) : null}
           </tr>
         </thead>
         <tbody>
@@ -475,13 +460,13 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   ) : null}
                 </td>
                 <td className="technical-id">{wire.technicalId}</td>
+                <td>{wire.functionalDomainTag ?? "Auto"}</td>
                 <td>{wire.twistGroupLabel ?? ""}</td>
                 <td>{renderWireColorCellValue(wire)}</td>
                 <td>{renderWireEndpointReference(wire.endpointA)}</td>
                 <td>{renderWireEndpointReference(wire.endpointB)}</td>
                 <td>{wire.sectionMm2}</td>
                 <td>{wire.lengthMm}</td>
-                {showWireRouteModeColumn ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}
               </tr>
             );
           })}

@@ -70,6 +70,8 @@ export function useAppControllerModelingHandlersAssembly({
     setConnectorApplyCatalogSeals: formsState.setConnectorApplyCatalogSeals,
     connectorTerminalOverridesText: formsState.connectorTerminalOverridesText,
     setConnectorTerminalOverridesText: formsState.setConnectorTerminalOverridesText,
+    connectorFusePairRatings: formsState.connectorFusePairRatings,
+    setConnectorFusePairRatings: formsState.setConnectorFusePairRatings,
     connectorAutoCreateLinkedNode: formsState.connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode: formsState.setConnectorAutoCreateLinkedNode,
     cavityCount: formsState.cavityCount,

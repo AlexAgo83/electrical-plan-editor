@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import type { CatalogAdditionalAccessory, CatalogItem, CatalogItemId, ConnectorLayout } from "../../core/entities";
+import type { CatalogAdditionalAccessory, CatalogItem, CatalogItemId, ConnectorLayout, FuseBoxConfig } from "../../core/entities";
 import { normalizeConnectorLayout } from "../../core/connectorLayout";
 import type { AppStore } from "../../store";
 import { appActions, isValidCatalogUrlInput } from "../../store";
@@ -54,6 +54,8 @@ interface UseCatalogHandlersParams {
   setCatalogConnectorLayout?: (value: ConnectorLayout | undefined) => void;
   catalogShowConnectorPhysicalLayout?: boolean;
   setCatalogShowConnectorPhysicalLayout?: (value: boolean) => void;
+  catalogIsFuseBox?: boolean;
+  setCatalogIsFuseBox?: (value: boolean) => void;
   setCatalogFormError: (value: string | null) => void;
 }
 
@@ -109,6 +111,8 @@ export function useCatalogHandlers({
   setCatalogConnectorLayout = () => {},
   catalogShowConnectorPhysicalLayout = false,
   setCatalogShowConnectorPhysicalLayout = () => {},
+  catalogIsFuseBox = false,
+  setCatalogIsFuseBox = () => {},
   setCatalogFormError
 }: UseCatalogHandlersParams) {
   function clearCatalogMaterialDefaults(): void {
@@ -121,6 +125,7 @@ export function useCatalogHandlers({
     setCatalogShowConnectorMaterialDefaults(false);
     setCatalogConnectorLayout(undefined);
     setCatalogShowConnectorPhysicalLayout(false);
+    setCatalogIsFuseBox(false);
   }
 
   function clearCatalogForm(): void {
@@ -179,6 +184,7 @@ export function useCatalogHandlers({
     );
     setCatalogConnectorLayout(item.connectorLayout);
     setCatalogShowConnectorPhysicalLayout(item.connectorLayout !== undefined);
+    setCatalogIsFuseBox(item.fuseBoxConfig !== undefined);
     setCatalogFormError(null);
     dispatchAction(appActions.select({ kind: "catalog", id: item.id }), { trackHistory: false });
   }
@@ -254,6 +260,15 @@ export function useCatalogHandlers({
     const normalizedConnectorLayout = catalogShowConnectorPhysicalLayout
       ? normalizeConnectorLayout(catalogConnectorLayout, connectionCount)
       : undefined;
+    const fuseBoxConfig: FuseBoxConfig | undefined = catalogIsFuseBox
+      ? {
+          pairs: Array.from({ length: Math.floor(connectionCount / 2) }, (_, i) => ({
+            pairIndex: i,
+            pinA: i * 2 + 1,
+            pinB: i * 2 + 2
+          }))
+        }
+      : undefined;
     setCatalogFormError(null);
 
     const existing =
@@ -286,7 +301,8 @@ export function useCatalogHandlers({
               plugs: plugDefinitions.length > 0 ? plugDefinitions : undefined
             }
           : undefined,
-        connectorLayout: normalizedConnectorLayout
+        connectorLayout: normalizedConnectorLayout,
+        fuseBoxConfig
       })
     );
 

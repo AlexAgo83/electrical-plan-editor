@@ -569,7 +569,105 @@ export function buildFunctionalSchematicGraph({
   const nodes = new Map<string, FunctionalSchematicNode>();
   const edges = new Map<string, FunctionalSchematicEdge>();
 
+  // Build fuse box cavity lookup: connectorId → Map<cavityIndex, {pairIndex, isA}>
+  const fuseBoxCavityInfo = new Map<ConnectorId, Map<number, { pairIndex: number; isA: boolean }>>();
+  for (const [connectorId, connector] of connectorMap) {
+    if (connector.catalogItemId === undefined) continue;
+    const catalogItem = catalogItemMap.get(connector.catalogItemId);
+    if (catalogItem?.fuseBoxConfig === undefined) continue;
+    const cavityMap = new Map<number, { pairIndex: number; isA: boolean }>();
+    for (const pair of catalogItem.fuseBoxConfig.pairs) {
+      cavityMap.set(pair.pinA, { pairIndex: pair.pairIndex, isA: true });
+      cavityMap.set(pair.pinB, { pairIndex: pair.pairIndex, isA: false });
+    }
+    fuseBoxCavityInfo.set(connectorId, cavityMap);
+  }
+
+  function getFuseBoxNodeId(connectorId: ConnectorId, pairIndex: number): string {
+    return `fuse-box:${connectorId}:pair${pairIndex}`;
+  }
+
+  function getFuseBoxNode(
+    connectorId: ConnectorId,
+    pairIndex: number
+  ): FunctionalSchematicNode | null {
+    const connector = connectorMap.get(connectorId);
+    if (!connector) return null;
+    const rating = connector.fusePairRatings?.[pairIndex];
+    const ratingLabel = rating !== undefined ? `${rating}A` : "?A";
+    const label = `${connector.technicalId} / ${ratingLabel}`;
+    return {
+      id: getFuseBoxNodeId(connectorId, pairIndex),
+      kind: "fuse",
+      label,
+      detail: connector.name,
+      sourceIds: [String(connectorId), String(pairIndex)],
+      role: "power"
+    };
+  }
+
+  void getFuseBoxNodeId;
+
   for (const wire of includedWires) {
+    const domainTags = wireDomainTagsById.get(wire.id) ?? [];
+
+    // Check if each endpoint is a fuse box cavity
+    const endpointAFuseInfo = wire.endpointA.kind === "connectorCavity"
+      ? fuseBoxCavityInfo.get(wire.endpointA.connectorId)?.get(wire.endpointA.cavityIndex)
+      : undefined;
+    const endpointBFuseInfo = wire.endpointB.kind === "connectorCavity"
+      ? fuseBoxCavityInfo.get(wire.endpointB.connectorId)?.get(wire.endpointB.cavityIndex)
+      : undefined;
+
+    if (endpointAFuseInfo !== undefined && wire.endpointA.kind === "connectorCavity") {
+      // endpointA is a fuse box pin
+      const fuseNode = getFuseBoxNode(wire.endpointA.connectorId, endpointAFuseInfo.pairIndex);
+      if (fuseNode !== null) {
+        mergeNode(nodes, fuseNode);
+        if (endpointBFuseInfo === undefined) {
+          // endpointB is a normal endpoint
+          const endpointBNode = getEndpointNode(wire.endpointB, connectorMap, spliceMap, warnings, wire.id);
+          if (endpointBNode !== null) {
+            mergeNode(nodes, endpointBNode);
+            addEdge(edges, {
+              id: `${wire.id}:fuse-normal`,
+              fromNodeId: fuseNode.id,
+              toNodeId: endpointBNode.id,
+              label: wire.technicalId,
+              ...getWireEdgeDisplayFields(wire),
+              sourceWireIds: [wire.id],
+              domainTags
+            });
+          }
+        }
+        // If endpointB is also a fuse box pin on the same pair (unusual), skip
+      }
+      continue;
+    }
+
+    if (endpointBFuseInfo !== undefined && wire.endpointB.kind === "connectorCavity") {
+      // endpointB is a fuse box pin
+      const fuseNode = getFuseBoxNode(wire.endpointB.connectorId, endpointBFuseInfo.pairIndex);
+      if (fuseNode !== null) {
+        mergeNode(nodes, fuseNode);
+        const endpointANode = getEndpointNode(wire.endpointA, connectorMap, spliceMap, warnings, wire.id);
+        if (endpointANode !== null) {
+          mergeNode(nodes, endpointANode);
+          addEdge(edges, {
+            id: `${wire.id}:normal-fuse`,
+            fromNodeId: endpointANode.id,
+            toNodeId: fuseNode.id,
+            label: wire.technicalId,
+            ...getWireEdgeDisplayFields(wire),
+            sourceWireIds: [wire.id],
+            domainTags
+          });
+        }
+      }
+      continue;
+    }
+
+    // Normal wire (no fuse box endpoints)
     const endpointANode = getEndpointNode(wire.endpointA, connectorMap, spliceMap, warnings, wire.id);
     const endpointBNode = getEndpointNode(wire.endpointB, connectorMap, spliceMap, warnings, wire.id);
     if (endpointANode === null || endpointBNode === null) {
@@ -579,7 +677,6 @@ export function buildFunctionalSchematicGraph({
     mergeNode(nodes, endpointANode);
     mergeNode(nodes, endpointBNode);
 
-    const domainTags = wireDomainTagsById.get(wire.id) ?? [];
     if (wire.protection?.kind === "fuse") {
       const catalogItem = catalogItemMap.get(wire.protection.catalogItemId);
       const fuseReference = normalizeText(catalogItem?.manufacturerReference);

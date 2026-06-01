@@ -31,6 +31,8 @@ export interface ModelingFormsColumnProps {
   setConnectorApplyCatalogSeals: (value: boolean) => void;
   connectorTerminalOverridesText: string;
   setConnectorTerminalOverridesText: (value: string) => void;
+  connectorFusePairRatings: string;
+  setConnectorFusePairRatings: (value: string) => void;
   connectorAutoCreateLinkedNode: boolean;
   setConnectorAutoCreateLinkedNode: (value: boolean) => void;
   connectorTechnicalIdAlreadyUsed: boolean;

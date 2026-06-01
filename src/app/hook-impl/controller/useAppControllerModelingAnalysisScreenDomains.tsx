@@ -87,9 +87,9 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
     | "setSegmentIdSortDirection"
     | "wireRouteFilter"
     | "setWireRouteFilter"
-    | "wireTwistGroupFilter"
-    | "setWireTwistGroupFilter"
-    | "wireTwistGroupOptions"
+    | "wireFunctionalTagFilter"
+    | "setWireFunctionalTagFilter"
+    | "wireFunctionalTagOptions"
     | "wireFilterField"
     | "setWireFilterField"
     | "wireEndpointFilterQuery"
@@ -538,9 +538,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
     wireEditAfterCreate: formsState.wireEditAfterCreate,
     resetWireForm: modelingHandlers.wire.resetWireForm,
     wireRouteFilter: listModel.wireRouteFilter,
-    wireTwistGroupFilter: listModel.wireTwistGroupFilter,
-    setWireTwistGroupFilter: listModel.setWireTwistGroupFilter,
-    wireTwistGroupOptions: listModel.wireTwistGroupOptions,
+    wireFunctionalTagFilter: listModel.wireFunctionalTagFilter,
+    setWireFunctionalTagFilter: listModel.setWireFunctionalTagFilter,
+    wireFunctionalTagOptions: listModel.wireFunctionalTagOptions,
     wireFilterField: listModel.wireFilterField,
     setWireFilterField: listModel.setWireFilterField,
     wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,
@@ -581,6 +581,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setConnectorApplyCatalogSeals: formsState.setConnectorApplyCatalogSeals,
     connectorTerminalOverridesText: formsState.connectorTerminalOverridesText,
     setConnectorTerminalOverridesText: formsState.setConnectorTerminalOverridesText,
+    connectorFusePairRatings: formsState.connectorFusePairRatings,
+    setConnectorFusePairRatings: formsState.setConnectorFusePairRatings,
     connectorAutoCreateLinkedNode: formsState.connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode: formsState.setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,
@@ -832,9 +834,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
     onOpenSegmentOnboardingHelp: onboardingHelp?.openSegmentStep,
     wireRouteFilter: listModel.wireRouteFilter,
     setWireRouteFilter: listModel.setWireRouteFilter,
-    wireTwistGroupFilter: listModel.wireTwistGroupFilter,
-    setWireTwistGroupFilter: listModel.setWireTwistGroupFilter,
-    wireTwistGroupOptions: listModel.wireTwistGroupOptions,
+    wireFunctionalTagFilter: listModel.wireFunctionalTagFilter,
+    setWireFunctionalTagFilter: listModel.setWireFunctionalTagFilter,
+    wireFunctionalTagOptions: listModel.wireFunctionalTagOptions,
     wireFilterField: listModel.wireFilterField,
     setWireFilterField: listModel.setWireFilterField,
     wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,

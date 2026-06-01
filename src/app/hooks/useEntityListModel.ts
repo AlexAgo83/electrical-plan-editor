@@ -61,7 +61,7 @@ export function useEntityListModel({
   const [nodeKindFilter, setNodeKindFilter] = useState<"all" | NetworkNode["kind"]>("all");
   const [segmentSubNetworkFilter, setSegmentSubNetworkFilter] = useState<SegmentSubNetworkFilter>("all");
   const [wireRouteFilter, setWireRouteFilter] = useState<"all" | "auto" | "locked">("all");
-  const [wireTwistGroupFilter, setWireTwistGroupFilter] = useState<WireTwistGroupFilter>("all");
+  const [wireFunctionalTagFilter, setWireFunctionalTagFilter] = useState<string>("all");
   const [wireFilterField, setWireFilterField] = useState<WireFilterField>("any");
   const [connectorSort, setConnectorSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSort, setSpliceSort] = useState<SortState>({ field: "name", direction: "asc" });
@@ -154,13 +154,13 @@ export function useEntityListModel({
       return left.technicalId.localeCompare(right.technicalId) * factor;
     });
   }, [wires, wireSort]);
-  const wireTwistGroupOptions = useMemo(
+  const wireFunctionalTagOptions = useMemo(
     () =>
       Array.from(
         new Set(
           wires
-            .map((wire) => wire.twistGroupLabel?.trim() ?? "")
-            .filter((label) => label.length > 0)
+            .map((wire) => wire.functionalDomainTag?.trim() ?? "")
+            .filter((tag) => tag.length > 0)
         )
       ).sort((left, right) => left.localeCompare(right, undefined, { numeric: true, sensitivity: "base" })),
     [wires]
@@ -313,7 +313,7 @@ export function useEntityListModel({
     if (wireRouteFilter === "auto" && wire.isRouteLocked) {
       return false;
     }
-    if (wireTwistGroupFilter !== "all" && (wire.twistGroupLabel?.trim() ?? "") !== wireTwistGroupFilter) {
+    if (wireFunctionalTagFilter !== "all" && (wire.functionalDomainTag?.trim() ?? "") !== wireFunctionalTagFilter) {
       return false;
     }
     if (normalizedWireFilterQuery.length > 0) {
@@ -346,7 +346,7 @@ export function useEntityListModel({
     sortedWires,
     wireFilterField,
     wireRouteFilter,
-    wireTwistGroupFilter
+    wireFunctionalTagFilter
   ]);
 
   const segmentsCountByNodeId = useMemo(() => {
@@ -397,9 +397,9 @@ export function useEntityListModel({
     setSegmentSubNetworkFilter,
     wireRouteFilter,
     setWireRouteFilter,
-    wireTwistGroupFilter,
-    setWireTwistGroupFilter,
-    wireTwistGroupOptions,
+    wireFunctionalTagFilter,
+    setWireFunctionalTagFilter,
+    wireFunctionalTagOptions,
     wireFilterField,
     setWireFilterField,
     wireEndpointFilterQuery,

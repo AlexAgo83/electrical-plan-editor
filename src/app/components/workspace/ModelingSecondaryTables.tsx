@@ -58,9 +58,9 @@ interface ModelingSecondaryTablesProps {
   wireFormMode: "idle" | "create" | "edit";
   onOpenCreateWire: () => void;
   wireRouteFilter: "all" | "auto" | "locked";
-  wireTwistGroupFilter: string;
-  setWireTwistGroupFilter: (value: string) => void;
-  wireTwistGroupOptions: string[];
+  wireFunctionalTagFilter: string;
+  setWireFunctionalTagFilter: (value: string) => void;
+  wireFunctionalTagOptions: string[];
   wireFilterField: "endpoints" | "name" | "technicalId" | "any";
   setWireFilterField: (value: "endpoints" | "name" | "technicalId" | "any") => void;
   wireEndpointFilterQuery: string;
@@ -116,9 +116,9 @@ export function ModelingSecondaryTables({
   wireFormMode,
   onOpenCreateWire,
   wireRouteFilter,
-  wireTwistGroupFilter,
-  setWireTwistGroupFilter,
-  wireTwistGroupOptions,
+  wireFunctionalTagFilter,
+  setWireFunctionalTagFilter,
+  wireFunctionalTagOptions,
   wireFilterField,
   setWireFilterField,
   wireEndpointFilterQuery,
@@ -701,11 +701,11 @@ export function ModelingSecondaryTables({
                   <select
                     className="list-inline-table-filter-select"
                     aria-label="Wire tag filter"
-                    value={wireTwistGroupFilter}
-                    onChange={(event) => setWireTwistGroupFilter(event.target.value)}
+                    value={wireFunctionalTagFilter}
+                    onChange={(event) => setWireFunctionalTagFilter(event.target.value)}
                   >
                     <option value="all">Any</option>
-                    {wireTwistGroupOptions.map((label) => (
+                    {wireFunctionalTagOptions.map((label) => (
                       <option key={label} value={label}>
                         {label}
                       </option>
@@ -754,13 +754,13 @@ export function ModelingSecondaryTables({
                   ) : null}
                   <th aria-sort={getTableAriaSort(wireTableSort, "name")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{wireSortIndicator("name")}</span></button></th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{wireSortIndicator("technicalId")}</span></button></th>
+                  <th>{isMobileViewport ? "Func tag" : "Functional tag"}</th>
                   <th>{isMobileViewport ? "Twist" : "Twist group"}</th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "color")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "color", direction: current.field === "color" && current.direction === "asc" ? "desc" : "asc" }))}>Color <span className="sort-indicator">{wireSortIndicator("color")}</span></button></th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "endpointA")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "endpointA", direction: current.field === "endpointA" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "End A" : "Endpoint A"} <span className="sort-indicator">{wireSortIndicator("endpointA")}</span></button></th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "endpointB")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "endpointB", direction: current.field === "endpointB" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "End B" : "Endpoint B"} <span className="sort-indicator">{wireSortIndicator("endpointB")}</span></button></th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "sectionMm2")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "sectionMm2", direction: current.field === "sectionMm2" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Sec" : "Section (mm²)"} <span className="sort-indicator">{wireSortIndicator("sectionMm2")}</span></button></th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{wireSortIndicator("lengthMm")}</span></button></th>
-                  {showWireRouteModeColumn ? <th aria-sort={getTableAriaSort(wireTableSort, "routeMode")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "routeMode", direction: current.field === "routeMode" && current.direction === "asc" ? "desc" : "asc" }))}>Route mode <span className="sort-indicator">{wireSortIndicator("routeMode")}</span></button></th> : null}
                 </tr>
               </thead>
               <tbody>
@@ -822,13 +822,13 @@ export function ModelingSecondaryTables({
                         ) : null}
                       </td>
                       <td className="technical-id">{wire.technicalId}</td>
+                      <td>{wire.functionalDomainTag ?? "Auto"}</td>
                       <td>{wire.twistGroupLabel ?? ""}</td>
                       <td>{renderWireColorCellValue(wire)}</td>
                       <td>{renderWireEndpointReference(wire.endpointA)}</td>
                       <td>{renderWireEndpointReference(wire.endpointB)}</td>
                       <td>{wire.sectionMm2}</td>
                       <td>{wire.lengthMm}</td>
-                      {showWireRouteModeColumn ? <td>{wire.isRouteLocked ? "Locked" : "Auto"}</td> : null}
                     </tr>
                   );
                 })}

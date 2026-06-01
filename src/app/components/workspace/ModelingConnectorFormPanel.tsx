@@ -29,6 +29,8 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     setConnectorApplyCatalogSeals,
     connectorTerminalOverridesText,
     setConnectorTerminalOverridesText,
+    connectorFusePairRatings,
+    setConnectorFusePairRatings,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,
@@ -38,6 +40,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
   const connectorHandlers = useConnectorHandlersContext();
   const hasCatalogItems = catalogItems.length > 0;
   const selectedCatalogItem = catalogItems.find((item) => item.id === connectorCatalogItemId);
+  const connectorCatalogFuseBoxPairs = selectedCatalogItem?.fuseBoxConfig?.pairs;
   const catalogItemOptions = buildModelingDynamicSelectOptions({
     options: catalogItems.map((item) => ({
       value: item.id,
@@ -146,6 +149,20 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         />
       </label>
     </fieldset>
+    {connectorCatalogFuseBoxPairs !== undefined && connectorCatalogFuseBoxPairs.length > 0 ? (
+      <fieldset className="inline-fieldset">
+        <legend>Fuse ratings</legend>
+        <label>
+          Fuse ratings (one per line: pairIndex,amps)
+          <textarea
+            value={connectorFusePairRatings}
+            onChange={(event) => setConnectorFusePairRatings(event.target.value)}
+            placeholder={"0,10\n1,20"}
+            rows={connectorCatalogFuseBoxPairs.length}
+          />
+        </label>
+      </fieldset>
+    ) : null}
     <label className="settings-checkbox">
       <input
         type="checkbox"

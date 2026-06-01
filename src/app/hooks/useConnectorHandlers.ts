@@ -41,6 +41,8 @@ interface UseConnectorHandlersParams {
   setConnectorApplyCatalogSeals: (value: boolean) => void;
   connectorTerminalOverridesText: string;
   setConnectorTerminalOverridesText: (value: string) => void;
+  connectorFusePairRatings: string;
+  setConnectorFusePairRatings: (value: string) => void;
   connectorAutoCreateLinkedNode: boolean;
   setConnectorAutoCreateLinkedNode: (value: boolean) => void;
   defaultAutoCreateLinkedNodes: boolean;
@@ -106,6 +108,8 @@ export function useConnectorHandlers({
   setConnectorApplyCatalogSeals,
   connectorTerminalOverridesText,
   setConnectorTerminalOverridesText,
+  connectorFusePairRatings,
+  setConnectorFusePairRatings,
   connectorAutoCreateLinkedNode,
   setConnectorAutoCreateLinkedNode,
   defaultAutoCreateLinkedNodes,
@@ -164,6 +168,7 @@ export function useConnectorHandlers({
       setConnectorApplyCatalogPlugs(true);
       setConnectorApplyCatalogSeals(true);
       setConnectorTerminalOverridesText("");
+      setConnectorFusePairRatings("");
       setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
       setCavityCount("4");
       setConnectorFormError("Create a catalog item first to define manufacturer reference and connection count.");
@@ -182,6 +187,7 @@ export function useConnectorHandlers({
     setConnectorApplyCatalogPlugs(true);
     setConnectorApplyCatalogSeals(true);
     setConnectorTerminalOverridesText("");
+    setConnectorFusePairRatings("");
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setConnectorFormError(null);
   }
@@ -198,6 +204,7 @@ export function useConnectorHandlers({
     setConnectorApplyCatalogPlugs(true);
     setConnectorApplyCatalogSeals(true);
     setConnectorTerminalOverridesText("");
+    setConnectorFusePairRatings("");
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setCavityCount("4");
     setConnectorFormError(null);
@@ -237,6 +244,14 @@ export function useConnectorHandlers({
             .map(([cavityIndex, material]) =>
               [cavityIndex, material.terminalReference ?? "", material.sealReference ?? "", material.terminalName ?? "", material.sealName ?? ""].join(",")
             )
+            .join("\n")
+    );
+    setConnectorFusePairRatings(
+      connector.fusePairRatings === undefined
+        ? ""
+        : Object.entries(connector.fusePairRatings)
+            .sort(([left], [right]) => Number(left) - Number(right))
+            .map(([pairIndex, amps]) => `${pairIndex},${amps}`)
             .join("\n")
     );
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
@@ -294,6 +309,23 @@ export function useConnectorHandlers({
       setConnectorFormError("Terminal overrides must use one line per override: cavity,terminal,seal,terminal name,seal name.");
       return;
     }
+    const fusePairRatingEntries = connectorFusePairRatings
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .map((line) => {
+        const [pairIndexText = "", ampsText = ""] = line.split(",").map((part) => part.trim());
+        return { pairIndex: Number(pairIndexText), amps: Number(ampsText) };
+      })
+      .filter((entry) => Number.isFinite(entry.pairIndex) && Number.isFinite(entry.amps));
+    const fusePairRatings =
+      fusePairRatingEntries.length === 0
+        ? undefined
+        : fusePairRatingEntries.reduce<NonNullable<Connector["fusePairRatings"]>>((acc, entry) => {
+            acc[entry.pairIndex] = entry.amps;
+            return acc;
+          }, {});
+
     setConnectorFormError(null);
 
     const wasCreateMode = connectorFormMode === "create";
@@ -322,6 +354,7 @@ export function useConnectorHandlers({
                 overrides[override.cavityIndex] = override.material;
                 return overrides;
               }, {}),
+        fusePairRatings,
         cavityCount: normalizedCavityCount
       })
     );

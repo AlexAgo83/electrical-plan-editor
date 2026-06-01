@@ -157,6 +157,8 @@ export function useAppControllerCatalogScreenDomains({
         setCatalogShowConnectorPhysicalLayout={formsState.setCatalogShowConnectorPhysicalLayout}
         catalogManufacturerReferenceAlreadyUsed={catalogManufacturerReferenceAlreadyUsed}
         cancelCatalogEdit={catalogHandlers.cancelCatalogEdit}
+        catalogIsFuseBox={formsState.catalogIsFuseBox}
+        setCatalogIsFuseBox={formsState.setCatalogIsFuseBox}
         catalogFormError={formsState.catalogFormError}
       />
     </section>

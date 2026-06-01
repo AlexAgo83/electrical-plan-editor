@@ -47,6 +47,8 @@ interface ModelingCatalogFormPanelProps {
   setCatalogShowConnectorPhysicalLayout: (value: boolean) => void;
   catalogManufacturerReferenceAlreadyUsed: boolean;
   cancelCatalogEdit: () => void;
+  catalogIsFuseBox: boolean;
+  setCatalogIsFuseBox: (v: boolean) => void;
   catalogFormError: string | null;
 }
 
@@ -90,6 +92,8 @@ export function ModelingCatalogFormPanel({
   setCatalogShowConnectorPhysicalLayout,
   catalogManufacturerReferenceAlreadyUsed,
   cancelCatalogEdit,
+  catalogIsFuseBox,
+  setCatalogIsFuseBox,
   catalogFormError
 }: ModelingCatalogFormPanelProps): ReactElement | null {
   void _openCreateCatalogForm;
@@ -164,6 +168,22 @@ export function ModelingCatalogFormPanel({
             required
           />
         </label>
+        <label className="settings-checkbox">
+          <input
+            type="checkbox"
+            checked={catalogIsFuseBox}
+            onChange={(event) => setCatalogIsFuseBox(event.target.checked)}
+          />
+          Fuse box
+        </label>
+        {catalogIsFuseBox ? (
+          <small className="meta-line">
+            Auto pairs:{" "}
+            {Array.from({ length: Math.floor(Number(catalogConnectionCount) / 2) || 0 }, (_, i) =>
+              `(${i * 2 + 1}↔${i * 2 + 2})`
+            ).join(", ") || "(none)"}
+          </small>
+        ) : null}
         <label>
           Name
           <input value={catalogName} onChange={(event) => setCatalogName(event.target.value)} placeholder="Optional display name" />
