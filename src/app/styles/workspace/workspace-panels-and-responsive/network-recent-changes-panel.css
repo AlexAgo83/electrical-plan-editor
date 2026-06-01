@@ -1,10 +1,8 @@
 .network-recent-changes-list-shell {
   min-height: 0;
-  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
   border-radius: 0.5rem;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--theme-primary, currentColor) 7%, transparent), transparent 68%),
-    color-mix(in srgb, var(--panel-bg, #fff) 88%, transparent);
+  background: color-mix(in srgb, var(--panel-bg, #fff) 72%, transparent);
   padding: 0.28rem;
   overflow: auto;
 }
@@ -30,11 +28,11 @@
   gap: 0.68rem;
   align-items: center;
   padding: 0.8rem 3.15rem 0.82rem 0.72rem;
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  border-left-width: 0.24rem;
+  border: 1px solid color-mix(in srgb, currentColor 11%, transparent);
+  border-left-width: 0.2rem;
   border-radius: 0.45rem;
-  background: color-mix(in srgb, var(--panel-bg, #fff) 92%, transparent);
-  box-shadow: 0 0.3rem 1rem color-mix(in srgb, #000 5%, transparent);
+  background: color-mix(in srgb, var(--panel-bg, #fff) 86%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 28%, transparent);
 }
 
 .network-recent-changes-item.is-create {
@@ -59,10 +57,8 @@
   width: 1.75rem;
   height: 1.75rem;
   border-radius: 0.45rem;
-  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent), transparent),
-    color-mix(in srgb, currentColor 6%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 6%, var(--panel-bg, #fff));
   position: relative;
 }
 
@@ -201,22 +197,20 @@
   width: 1.86rem;
   height: 1.86rem;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 34%, transparent);
-  background:
-    radial-gradient(circle at 35% 30%, color-mix(in srgb, white 55%, transparent), transparent 42%),
-    color-mix(in srgb, var(--theme-primary, currentColor) 15%, var(--panel-bg, #fff));
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  background: color-mix(in srgb, currentColor 7%, var(--panel-bg, #fff));
   color: inherit;
   display: inline-grid;
   place-items: center;
   padding: 0;
   cursor: pointer;
-  box-shadow: 0 0.22rem 0.7rem color-mix(in srgb, #000 9%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 30%, transparent);
 }
 
 .network-recent-changes-open-button:hover,
 .network-recent-changes-open-button:focus-visible {
-  border-color: var(--theme-primary, currentColor);
-  background: color-mix(in srgb, var(--theme-primary, currentColor) 24%, var(--panel-bg, #fff));
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 46%, currentColor 20%);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 12%, var(--panel-bg, #fff));
 }
 
 .network-recent-changes-open-icon {
