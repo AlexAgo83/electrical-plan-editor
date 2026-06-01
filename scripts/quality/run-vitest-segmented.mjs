@@ -55,6 +55,7 @@ const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.theme.spec.tsx",
   "src/tests/app.ui.undo-redo-global.spec.tsx",
   "src/tests/app.ui.validation.spec.tsx",
+  "src/tests/app.ui.wire-export-preview.spec.tsx",
   "src/tests/app.ui.wire-free-color-mode.spec.tsx",
   "src/tests/app.ui.wire-sizing-recommendation.spec.tsx",
   "src/tests/app.ui.workspace-shell-regression.spec.tsx"
