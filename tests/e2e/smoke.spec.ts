@@ -325,8 +325,17 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
 
   await openModelingWorkspace();
   await switchSubScreen("wire");
-  const routeControlPanel = page.locator("section.panel").filter({ has: page.getByRole("heading", { name: "Wire analysis" }) });
-  const routeInputValue = await routeControlPanel.getByLabel("Forced route segment IDs (comma-separated)").inputValue();
+  const visibleWiresPanel = page.locator("article.panel:not([hidden])").filter({ has: page.getByRole("heading", { name: "Wires" }) });
+  const selectedWireRow = visibleWiresPanel.locator("tbody tr").filter({ hasText: "Wire 1" }).first();
+  await expect(selectedWireRow).toBeVisible();
+  await selectedWireRow.click();
+
+  const routeControlPanel = page
+    .locator("section.panel:not([hidden])")
+    .filter({ has: page.getByRole("heading", { name: "Wire analysis" }) });
+  const forcedRouteInput = routeControlPanel.getByLabel("Forced route segment IDs (comma-separated)");
+  await expect(forcedRouteInput).toBeVisible();
+  const routeInputValue = await forcedRouteInput.inputValue();
   const [routeSegmentToEdit] = routeInputValue
     .split(",")
     .map((token) => token.trim())
