@@ -212,6 +212,10 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
     });
     await ensureNavigationDrawerClosed();
   };
+  const openAnalysisWorkspace = async () => {
+    await ensureNavigationDrawerClosed();
+    await page.keyboard.press("Alt+5");
+  };
   const openCreateFormIfIdle = async (
     idleHeading: "Connector form" | "Splice form" | "Node form" | "Segment form" | "Wire form"
   ) => {
@@ -323,7 +327,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await wireRow.click();
   const initialWireLength = Number(initialWireLengthRaw ?? "0");
 
-  await openModelingWorkspace();
+  await openAnalysisWorkspace();
   await switchSubScreen("wire");
   const visibleWiresPanel = page.locator("article.panel:not([hidden])").filter({ has: page.getByRole("heading", { name: "Wires" }) });
   const selectedWireRow = visibleWiresPanel.locator("tbody tr").filter({ hasText: "Wire 1" }).first();
