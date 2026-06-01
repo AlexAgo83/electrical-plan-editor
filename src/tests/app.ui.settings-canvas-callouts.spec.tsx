@@ -278,13 +278,13 @@ describe("App integration UI - settings canvas callouts", () => {
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(1);
   });
 
-  it("cleans up hidden callout measurement nodes on unmount", () => {
+  it("does not create hidden SVG callout measurement nodes", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("modeling");
     const networkSummaryPanel = getPanelByHeading("Network summary");
     openViewMenu(networkSummaryPanel);
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
-    expect(document.querySelectorAll("svg[data-callout-measure-root='true']").length).toBeGreaterThan(0);
+    expect(document.querySelectorAll("svg[data-callout-measure-root='true']")).toHaveLength(0);
 
     firstRender.unmount();
     expect(document.querySelectorAll("svg[data-callout-measure-root='true']")).toHaveLength(0);

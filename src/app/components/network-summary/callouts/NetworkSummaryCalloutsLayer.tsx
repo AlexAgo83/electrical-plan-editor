@@ -389,6 +389,10 @@ export function NetworkSummaryCalloutsLayer({
       transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
     >
       {renderedCableCallouts.map(({ callout, layout, calloutClassName, isVisibleInViewport }) => {
+        if (!isVisibleInViewport) {
+          return null;
+        }
+
         const contentLeftX = -layout.width / 2 + 4;
         const headerY = -layout.height / 2 + layout.headerY;
         const rowsStartY = -layout.height / 2 + layout.rowsStartY;
@@ -409,11 +413,9 @@ export function NetworkSummaryCalloutsLayer({
               className="network-callout-anchor"
               transform={`translate(${callout.position.x} ${callout.position.y}) scale(${inverseLabelScale})`}
               role="button"
-              tabIndex={isVisibleInViewport ? 0 : -1}
-              focusable={isVisibleInViewport ? "true" : "false"}
-              aria-hidden={isVisibleInViewport ? undefined : true}
+              tabIndex={0}
+              focusable="true"
               aria-label={`Select ${callout.kind} ${callout.title}`}
-              style={isVisibleInViewport ? undefined : { pointerEvents: "none" }}
               onMouseDown={(event) => onCalloutMouseDown(event, callout)}
               onClick={(event) => {
                 event.preventDefault();

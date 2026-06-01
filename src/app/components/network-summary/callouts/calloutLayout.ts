@@ -131,16 +131,9 @@ export interface CalloutLayoutMetrics {
 }
 
 let calloutMeasureCanvas: HTMLCanvasElement | null = null;
-let calloutMeasureSvgText: SVGTextElement | null = null;
-let calloutMeasureSvgRoot: SVGSVGElement | null = null;
 const calloutLayoutCache = new Map<string, CalloutLayoutMetrics>();
 
 export function disposeCalloutMeasurementResources(): void {
-  if (calloutMeasureSvgRoot !== null) {
-    calloutMeasureSvgRoot.remove();
-  }
-  calloutMeasureSvgText = null;
-  calloutMeasureSvgRoot = null;
   calloutMeasureCanvas = null;
   calloutLayoutCache.clear();
 }
@@ -285,38 +278,6 @@ function measureCalloutRowTextWidth(text: string, fontSizePx: number): number {
   if (typeof document === "undefined") {
     return fallback;
   }
-  if (!calloutMeasureSvgText || !calloutMeasureSvgRoot) {
-    const ns = "http://www.w3.org/2000/svg";
-    const svg = document.createElementNS(ns, "svg");
-    svg.setAttribute("width", "0");
-    svg.setAttribute("height", "0");
-    svg.setAttribute("aria-hidden", "true");
-    svg.setAttribute("data-callout-measure-root", "true");
-    svg.style.position = "absolute";
-    svg.style.left = "-9999px";
-    svg.style.top = "-9999px";
-    svg.style.pointerEvents = "none";
-    svg.style.opacity = "0";
-    const textNode = document.createElementNS(ns, "text");
-    svg.appendChild(textNode);
-    document.body.appendChild(svg);
-    calloutMeasureSvgRoot = svg;
-    calloutMeasureSvgText = textNode;
-  }
-  if (calloutMeasureSvgText) {
-    calloutMeasureSvgText.textContent = text;
-    calloutMeasureSvgText.setAttribute("font-size", String(fontSizePx));
-    calloutMeasureSvgText.setAttribute("font-family", '"IBM Plex Sans", "Segoe UI", sans-serif');
-    calloutMeasureSvgText.setAttribute("font-weight", "400");
-    try {
-      const measured = calloutMeasureSvgText.getComputedTextLength();
-      if (Number.isFinite(measured) && measured > 0) {
-        return measured;
-      }
-    } catch {
-      // Fall through to canvas/fallback.
-    }
-  }
   if (!calloutMeasureCanvas) {
     calloutMeasureCanvas = document.createElement("canvas");
   }
@@ -329,32 +290,7 @@ function measureCalloutRowTextWidth(text: string, fontSizePx: number): number {
 }
 
 function measureCalloutRowTextMetrics(fontSizePx: number): { topOffset: number; height: number } {
-  const fallback = { topOffset: 0, height: fontSizePx };
-  if (typeof document === "undefined") {
-    return fallback;
-  }
-  if (!calloutMeasureSvgText || !calloutMeasureSvgRoot) {
-    measureCalloutRowTextWidth("Ag", fontSizePx);
-  }
-  if (!calloutMeasureSvgText) {
-    return fallback;
-  }
-  calloutMeasureSvgText.textContent = "Ag";
-  calloutMeasureSvgText.setAttribute("x", "0");
-  calloutMeasureSvgText.setAttribute("y", "0");
-  calloutMeasureSvgText.setAttribute("font-size", String(fontSizePx));
-  calloutMeasureSvgText.setAttribute("font-family", '"IBM Plex Sans", "Segoe UI", sans-serif');
-  calloutMeasureSvgText.setAttribute("font-weight", "400");
-  calloutMeasureSvgText.setAttribute("dominant-baseline", "hanging");
-  try {
-    const bbox = calloutMeasureSvgText.getBBox();
-    if (Number.isFinite(bbox.height) && bbox.height > 0) {
-      return { topOffset: bbox.y, height: bbox.height };
-    }
-  } catch {
-    return fallback;
-  }
-  return fallback;
+  return { topOffset: 0, height: fontSizePx };
 }
 
 export function getCalloutRowCellValue(row: CalloutTableRow, key: CalloutTableColumnKey): string {

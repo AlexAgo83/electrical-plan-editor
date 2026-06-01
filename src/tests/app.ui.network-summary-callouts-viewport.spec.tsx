@@ -240,7 +240,7 @@ describe("App integration UI - network summary callouts and viewport persistence
     expect(networkSummaryPanel.querySelectorAll(".network-callout-color-dot").length).toBeGreaterThanOrEqual(2);
   });
 
-  it("keeps offscreen callouts non-interactive in the callout layer", () => {
+  it("keeps offscreen callouts out of the interactive callout layer", () => {
     const baseState = createUiIntegrationState();
     const connector = baseState.connectors.byId[asConnectorId("C1")];
     if (connector === undefined) {
@@ -262,12 +262,8 @@ describe("App integration UI - network summary callouts and viewport persistence
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
 
     const calloutAnchors = Array.from(networkSummaryPanel.querySelectorAll(".network-callout-anchor"));
-    expect(calloutAnchors.length).toBeGreaterThanOrEqual(2);
-    const offscreenAnchor = calloutAnchors.find((anchor) => (anchor.getAttribute("transform") ?? "").includes("10000"));
-    expect(offscreenAnchor).toBeDefined();
-    expect(offscreenAnchor?.getAttribute("tabindex")).toBe("-1");
-    expect(offscreenAnchor).toHaveAttribute("aria-hidden", "true");
-    expect(offscreenAnchor?.getAttribute("style") ?? "").toContain("pointer-events: none");
+    expect(calloutAnchors.length).toBeGreaterThanOrEqual(1);
+    expect(calloutAnchors.some((anchor) => (anchor.getAttribute("transform") ?? "").includes("10000"))).toBe(false);
 
     const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
     expect(connectorNode).not.toBeNull();
