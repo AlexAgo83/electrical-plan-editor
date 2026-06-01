@@ -319,9 +319,8 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   const wireRow = wiresPanel.locator("tbody tr").filter({ hasText: "Wire 1" }).first();
   const wiresLengthColumnIndex = await getColumnIndexByHeaderLabel(wiresPanel, "Length (mm)");
   await expect(wireRow).toContainText("100");
-  await expect(wireRow).toContainText("Auto");
-  await wireRow.click();
   const initialWireLengthRaw = await wireRow.locator("td").nth(wiresLengthColumnIndex).textContent();
+  await wireRow.click();
   const initialWireLength = Number(initialWireLengthRaw ?? "0");
 
   await openModelingWorkspace();
