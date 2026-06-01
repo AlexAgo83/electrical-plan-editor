@@ -160,7 +160,7 @@ describe("App integration UI - list ergonomics", () => {
     expect(within(wiresPanel).queryByText("Feed Main Junction")).not.toBeInTheDocument();
   });
 
-  it("filters wires by twist group tag before the text filter", () => {
+  it("filters wires by functional tag before the text filter", () => {
     const baseState = createSampleNetworkState();
     const feedWire = baseState.wires.byId[asWireId("W-001")];
     const secondaryWire = baseState.wires.byId[asWireId("W-004")];
@@ -168,8 +168,8 @@ describe("App integration UI - list ergonomics", () => {
       throw new Error("Expected sample wires to exist.");
     }
     const taggedState = appReducer(
-      appReducer(baseState, appActions.saveWire({ ...feedWire, twistGroupLabel: "CAN" })),
-      appActions.saveWire({ ...secondaryWire, twistGroupLabel: "LIN" })
+      appReducer(baseState, appActions.saveWire({ ...feedWire, functionalDomainTag: "CAN" })),
+      appActions.saveWire({ ...secondaryWire, functionalDomainTag: "Signal" })
     );
 
     renderAppWithState(taggedState);
@@ -180,7 +180,7 @@ describe("App integration UI - list ergonomics", () => {
     const tagFilterOptions = Array.from((tagFilterSelect as HTMLSelectElement).options).map((option) => option.textContent);
 
     expect(tagFilterSelect).toHaveValue("all");
-    expect(tagFilterOptions).toEqual(["Any", "CAN", "LIN"]);
+    expect(tagFilterOptions).toEqual(["Any", "CAN", "Signal"]);
 
     fireEvent.change(tagFilterSelect, { target: { value: "CAN" } });
     expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();
