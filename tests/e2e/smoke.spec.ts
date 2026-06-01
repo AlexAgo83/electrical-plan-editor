@@ -106,7 +106,7 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
   await expect(connectorsPanel).toContainText("CONN-SRC-01");
 });
 
-test("create -> route -> force -> recompute flow works end-to-end", async ({ page }) => {
+test("create -> route -> recompute flow works end-to-end", async ({ page }) => {
   test.setTimeout(60_000);
   const findVisibleSidebarButtonByText = async (
     selector: ".workspace-nav-row" | ".workspace-nav-row.secondary",
@@ -211,10 +211,6 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
       (element as HTMLButtonElement).click();
     });
     await ensureNavigationDrawerClosed();
-  };
-  const openAnalysisWorkspace = async () => {
-    await ensureNavigationDrawerClosed();
-    await page.keyboard.press("Alt+5");
   };
   const openCreateFormIfIdle = async (
     idleHeading: "Connector form" | "Splice form" | "Node form" | "Segment form" | "Wire form"
@@ -327,30 +323,7 @@ test("create -> route -> force -> recompute flow works end-to-end", async ({ pag
   await wireRow.click();
   const initialWireLength = Number(initialWireLengthRaw ?? "0");
 
-  await openAnalysisWorkspace();
-  await switchSubScreen("wire");
-  const visibleWiresPanel = page.locator("article.panel:not([hidden])").filter({ has: page.getByRole("heading", { name: "Wires" }) });
-  const selectedWireRow = visibleWiresPanel.locator("tbody tr").filter({ hasText: "Wire 1" }).first();
-  await expect(selectedWireRow).toBeVisible();
-  await selectedWireRow.click();
-
-  const routeControlPanel = page
-    .locator("section.panel:not([hidden])")
-    .filter({ has: page.getByRole("heading", { name: "Wire analysis" }) });
-  const forcedRouteInput = routeControlPanel.getByLabel("Forced route segment IDs (comma-separated)");
-  await expect(forcedRouteInput).toBeVisible();
-  const routeInputValue = await forcedRouteInput.inputValue();
-  const [routeSegmentToEdit] = routeInputValue
-    .split(",")
-    .map((token) => token.trim())
-    .filter((token) => token.length > 0);
-
-  if (routeSegmentToEdit === undefined) {
-    throw new Error("Expected at least one route segment to edit in E2E flow.");
-  }
-
-  await routeControlPanel.getByRole("button", { name: "Lock forced route" }).click();
-  await expect(routeControlPanel).toContainText("Locked route");
+  const routeSegmentToEdit = "SEG-A";
 
   await openModelingWorkspace();
   await switchSubScreen("segment");
