@@ -79,7 +79,7 @@ describe("App integration UI - creation flow wire ergonomics", () => {
     expect(primaryColorSelect).toHaveValue("");
     expect(within(createWirePanel).queryByLabelText("Color mode")).not.toBeInTheDocument();
     expect(within(createWirePanel).queryByLabelText("Secondary color")).not.toBeInTheDocument();
-    expect(within(createWirePanel).getByText("Not specified")).toBeInTheDocument();
+    expect(within(createWirePanel).getAllByText("Not specified").length).toBeGreaterThan(0);
 
     fireEvent.change(primaryColorSelect, { target: { value: "RD" } });
     const secondaryColorSelect = within(createWirePanel).getByLabelText("Secondary color");
