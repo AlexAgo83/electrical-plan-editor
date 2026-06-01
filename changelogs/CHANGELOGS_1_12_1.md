@@ -1,3 +1,8 @@
+## Major Highlights
+
+- Improved import/export UX: explicit failure popups for invalid network JSON and catalog CSV errors, harmonized filenames across all export types, and removed redundant save dialogs when the browser can handle them natively.
+- Added an XLSX wire-list export preview step in the modeling view, aligning with the existing preview-first export pattern.
+
 ## 1.12.1
 
 - Added explicit import-failure popups for invalid network JSON imports and blocking catalog CSV import errors, with actionable reason details.
