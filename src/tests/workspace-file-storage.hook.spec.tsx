@@ -128,10 +128,10 @@ describe("useWorkspaceFileStorage", () => {
         .fn()
         .mockResolvedValueOnce({
           text: () => Promise.resolve(serializeWorkspaceFilePayload(payload))
-        } as File)
+        })
         .mockResolvedValue({
           text: () => Promise.resolve("{")
-        } as File),
+        }),
       createWritable: linkedCreateWritable,
       queryPermission: vi.fn(() => Promise.resolve("granted" as const)),
       requestPermission: vi.fn(() => Promise.resolve("granted" as const))

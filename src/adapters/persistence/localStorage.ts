@@ -125,7 +125,7 @@ export function commitPendingPersistenceRecovery(
   if (storage !== null) {
     const snapshot = buildSnapshot(sampleState, storage, nowProvider());
     writeSnapshot(storage, snapshot);
-    createdAtIsoCache.set(storage as object, snapshot.createdAtIso);
+    createdAtIsoCache.set(storage, snapshot.createdAtIso);
   }
   clearPendingPersistenceRecovery();
   return sampleState;
@@ -246,7 +246,7 @@ function bootstrapSampleState(storage: Pick<Storage, "setItem" | "getItem">, now
 
   try {
     writeSnapshot(storage, snapshot);
-    createdAtIsoCache.set(storage as object, snapshot.createdAtIso);
+    createdAtIsoCache.set(storage, snapshot.createdAtIso);
   } catch {
     // Ignore write failures and keep deterministic bootstrap state.
   }
@@ -317,7 +317,7 @@ export function loadState(storage: StorageLike | null = getDefaultStorage(), now
     }
 
     clearPendingPersistenceRecovery();
-    createdAtIsoCache.set(storage as object, migration.snapshot.createdAtIso);
+    createdAtIsoCache.set(storage, migration.snapshot.createdAtIso);
     return migration.snapshot.state;
   } catch {
     const raw = rawFromInitialRead ?? readRawFromStorageSafe(storage);
@@ -356,14 +356,14 @@ function resolveCreatedAtIso(
   storage: Pick<Storage, "getItem">,
   updatedAtIso: string
 ): string {
-  const cached = createdAtIsoCache.get(storage as object);
+  const cached = createdAtIsoCache.get(storage);
   if (cached !== undefined) {
     return cached;
   }
 
   try {
     const resolved = resolveCreatedAtIsoFromRaw(readRawFromStorageSafe(storage), updatedAtIso);
-    createdAtIsoCache.set(storage as object, resolved);
+    createdAtIsoCache.set(storage, resolved);
     return resolved;
   } catch {
     return updatedAtIso;
@@ -386,7 +386,7 @@ export async function saveState(
 
   try {
     storage.setItem(STORAGE_KEY, serializedSnapshot);
-    createdAtIsoCache.set(storage as object, snapshot.createdAtIso);
+    createdAtIsoCache.set(storage, snapshot.createdAtIso);
     return warning === undefined ? { ok: true } : { ok: true, warning };
   } catch (error) {
     // Ignore storage write failures to keep reducer flow deterministic.

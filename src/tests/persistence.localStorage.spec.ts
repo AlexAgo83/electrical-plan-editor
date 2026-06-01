@@ -207,10 +207,10 @@ describe("localStorage persistence adapter", () => {
                     endpointASealReference: undefined,
                     endpointBConnectionReference: undefined,
                     endpointBSealReference: undefined
-                  } as unknown)
+                  })
             ];
           })
-        ) as AppState["wires"]["byId"]
+        ) as unknown as AppState["wires"]["byId"]
       },
       networkStates: Object.fromEntries(
         Object.entries(input.networkStates).map(([networkId, scoped]) => [
@@ -236,14 +236,14 @@ describe("localStorage persistence adapter", () => {
                           endpointASealReference: undefined,
                           endpointBConnectionReference: undefined,
                           endpointBSealReference: undefined
-                        } as unknown)
+                        })
                   ];
                 })
-              ) as typeof scoped.wires.byId
+              ) as unknown as typeof scoped.wires.byId
             }
           }
         ])
-      ) as AppState["networkStates"]
+      )
     });
     const legacyWithoutSections = stripWireSections(state);
     const storage = createMemoryStorage({

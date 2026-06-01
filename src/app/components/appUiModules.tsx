@@ -44,7 +44,7 @@ function loadLazyUiModule<TModule, TExport>(
     const module = await loader();
     return { default: pickDefault(module) };
   })();
-  lazyUiModulePromiseCache.set(cacheKey, lazyModulePromise as Promise<{ default: unknown }>);
+  lazyUiModulePromiseCache.set(cacheKey, lazyModulePromise);
   void lazyModulePromise.catch(() => {
     if (lazyUiModulePromiseCache.get(cacheKey) === lazyModulePromise) {
       lazyUiModulePromiseCache.delete(cacheKey);

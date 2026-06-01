@@ -12,7 +12,7 @@ describe("AI agent plan diff", () => {
   it("derives safe update and move operations from a modified editable plan", () => {
     const baseState = createSampleNetworkState();
     const chargingState = appReducer(baseState, appActions.selectNetwork("network-charging-service-demo" as NetworkId));
-    const state = appReducer(chargingState, appActions.select({ kind: "connector", id: "H-C-SERVICE" as ConnectorId }));
+    const state = appReducer(chargingState, appActions.select({ kind: "connector", id: "H-C-SERVICE" }));
     const beforePlan = buildAiAgentEditablePlan(buildAiAgentContext(state, "activeNetwork"));
     const serviceNode = beforePlan.nodes.find((node) => node.id === ("H-N-SERVICE" as NodeId));
     if (serviceNode?.position === undefined) {

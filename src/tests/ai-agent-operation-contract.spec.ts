@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { CatalogItemId, ConnectorId, NetworkId, NodeId, WireId } from "../core/entities";
+import type { ConnectorId, NetworkId, NodeId, WireId } from "../core/entities";
 import { appActions, appReducer, createSampleNetworkState } from "../store";
 import { validateAiAgentOperations, type AiAgentOperationPermissions } from "../app/lib/aiAgentOperationContract";
 import { createNodePositionMap } from "../app/lib/layout/generation";
@@ -171,7 +171,7 @@ describe("AI agent operation contract", () => {
       scope: "currentSelection",
       selection: {
         kind: "wire",
-        id: "W-001" as WireId
+        id: "W-001"
       },
       permissions: {
         ...DEFAULT_PERMISSIONS,
@@ -208,7 +208,7 @@ describe("AI agent operation contract", () => {
       scope: "currentSelection",
       selection: {
         kind: "connector",
-        id: "C-SRC" as ConnectorId
+        id: "C-SRC"
       },
       permissions: DEFAULT_PERMISSIONS,
       payload: {
@@ -246,7 +246,7 @@ describe("AI agent operation contract", () => {
       scope: "activeNetwork",
       selection: {
         kind: "connector",
-        id: "C-SRC" as ConnectorId
+        id: "C-SRC"
       },
       permissions: DEFAULT_PERMISSIONS,
       payload: {
@@ -284,7 +284,7 @@ describe("AI agent operation contract", () => {
       scope: "currentSelection",
       selection: {
         kind: "catalog",
-        id: "CAT-SAMPLE-SRC-12W" as CatalogItemId
+        id: "CAT-SAMPLE-SRC-12W"
       },
       permissions: DEFAULT_PERMISSIONS,
       payload: {
@@ -628,7 +628,7 @@ describe("AI agent operation contract", () => {
 
   it("accepts relative moves that reference connector technical IDs", () => {
     const baseState = createSampleNetworkState();
-    const state = appReducer(baseState, appActions.select({ kind: "connector", id: "C-SRC" as ConnectorId }));
+    const state = appReducer(baseState, appActions.select({ kind: "connector", id: "C-SRC" }));
     const generatedPositions = createNodePositionMap(
       state.nodes.allIds.map((nodeId) => state.nodes.byId[nodeId]).filter((node) => node !== undefined),
       state.segments.allIds.map((segmentId) => state.segments.byId[segmentId]).filter((segment) => segment !== undefined)
@@ -672,7 +672,7 @@ describe("AI agent operation contract", () => {
 
   it("uses the selected entity and instruction direction when provider move payload is sparse", () => {
     const baseState = createSampleNetworkState();
-    const state = appReducer(baseState, appActions.select({ kind: "connector", id: "C-SRC" as ConnectorId }));
+    const state = appReducer(baseState, appActions.select({ kind: "connector", id: "C-SRC" }));
     const generatedPositions = createNodePositionMap(
       state.nodes.allIds.map((nodeId) => state.nodes.byId[nodeId]).filter((node) => node !== undefined),
       state.segments.allIds.map((segmentId) => state.segments.byId[segmentId]).filter((segment) => segment !== undefined)
@@ -714,7 +714,7 @@ describe("AI agent operation contract", () => {
 
   it("resolves unique partial connector references from provider move payloads", () => {
     const baseState = createSampleNetworkState();
-    const state = appReducer(baseState, appActions.select({ kind: "connector", id: "C-SRC" as ConnectorId }));
+    const state = appReducer(baseState, appActions.select({ kind: "connector", id: "C-SRC" }));
     const generatedPositions = createNodePositionMap(
       state.nodes.allIds.map((nodeId) => state.nodes.byId[nodeId]).filter((node) => node !== undefined),
       state.segments.allIds.map((segmentId) => state.segments.byId[segmentId]).filter((segment) => segment !== undefined)
@@ -759,7 +759,7 @@ describe("AI agent operation contract", () => {
   it("resolves generic connector aliases on the charging demo network", () => {
     const sampleState = createSampleNetworkState();
     const chargingState = appReducer(sampleState, appActions.selectNetwork("network-charging-service-demo" as NetworkId));
-    const state = appReducer(chargingState, appActions.select({ kind: "connector", id: "H-C-SERVICE" as ConnectorId }));
+    const state = appReducer(chargingState, appActions.select({ kind: "connector", id: "H-C-SERVICE" }));
     const generatedPositions = createNodePositionMap(
       state.nodes.allIds.map((nodeId) => state.nodes.byId[nodeId]).filter((node) => node !== undefined),
       state.segments.allIds.map((segmentId) => state.segments.byId[segmentId]).filter((segment) => segment !== undefined)
@@ -804,7 +804,7 @@ describe("AI agent operation contract", () => {
   it("accepts explicit relative placement between charging demo connectors", () => {
     const sampleState = createSampleNetworkState();
     const chargingState = appReducer(sampleState, appActions.selectNetwork("network-charging-service-demo" as NetworkId));
-    const state = appReducer(chargingState, appActions.select({ kind: "connector", id: "H-C-SERVICE" as ConnectorId }));
+    const state = appReducer(chargingState, appActions.select({ kind: "connector", id: "H-C-SERVICE" }));
     const generatedPositions = createNodePositionMap(
       state.nodes.allIds.map((nodeId) => state.nodes.byId[nodeId]).filter((node) => node !== undefined),
       state.segments.allIds.map((segmentId) => state.segments.byId[segmentId]).filter((segment) => segment !== undefined)

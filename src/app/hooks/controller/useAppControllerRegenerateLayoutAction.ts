@@ -64,7 +64,7 @@ export function useAppControllerRegenerateLayoutAction({
         nextState = appReducer(nextState, appActions.upsertSplice(spliceWithoutCalloutPosition));
       }
 
-      setManualNodePositions({} as Record<NodeId, { x: number; y: number }>);
+      setManualNodePositions({});
       replaceStateWithHistory(nextState);
     })();
   }, [

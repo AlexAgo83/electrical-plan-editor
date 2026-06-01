@@ -58,7 +58,7 @@ function normalizeConnectorTerminalOverrides(
     if (!Number.isInteger(cavityIndex) || cavityIndex < 1 || cavityIndex > cavityCount) {
       continue;
     }
-    const material = normalizeConnectorTerminalMaterial(value as Parameters<typeof normalizeConnectorTerminalMaterial>[0]);
+    const material = normalizeConnectorTerminalMaterial(value);
     if (material !== undefined) {
       normalized[cavityIndex] = material;
     }

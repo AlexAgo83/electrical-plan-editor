@@ -216,13 +216,13 @@ function normalizeCatalogCollection(
   catalogItems: NetworkScopedState["catalogItems"]
 ): NetworkScopedState["catalogItems"] {
   const next = cloneEntityState(catalogItems);
-  next.byId = {} as NetworkScopedState["catalogItems"]["byId"];
+  next.byId = {};
   next.allIds = [];
 
   const seenIds = new Set<string>();
   for (const id of catalogItems.allIds) {
     const rawItem = catalogItems.byId[id];
-    const normalized = normalizeCatalogItem(rawItem === undefined ? {} : (rawItem as Partial<CatalogItem>));
+    const normalized = normalizeCatalogItem(rawItem === undefined ? {} : (rawItem));
     if (normalized === null) {
       continue;
     }

@@ -63,7 +63,7 @@ export function useAppControllerLayoutDerivedState({
         nodes.length > 0 &&
         nodes.every((node) => persistedNodePositions[node.id] !== undefined)
       ) {
-        return {} as Record<NodeId, NodePosition>;
+        return {};
       }
 
       return createNodePositionMap(nodes, segments, {

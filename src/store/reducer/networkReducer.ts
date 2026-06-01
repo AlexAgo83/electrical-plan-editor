@@ -432,7 +432,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
           return withError(state, "Cannot import network with empty name or technical ID.");
         }
-        const isOverwrite = overwriteSet.has(network.id as string);
+        const isOverwrite = overwriteSet.has(network.id);
         if (!isOverwrite && nextNetworks.byId[network.id] !== undefined) {
           return withError(state, `Cannot import network '${network.id}': ID already exists.`);
         }
@@ -470,7 +470,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         nextNetworkStates[network.id] = cloneScopedState(scoped);
       }
       for (const assembly of action.payload.harnessAssemblies ?? []) {
-        if (nextHarnessAssemblies.byId[assembly.id] !== undefined && !overwriteHarnessAssemblySet.has(assembly.id as string)) {
+        if (nextHarnessAssemblies.byId[assembly.id] !== undefined && !overwriteHarnessAssemblySet.has(assembly.id)) {
           return withError(state, `Cannot import harness assembly '${assembly.id}': ID already exists.`);
         }
         nextHarnessAssemblies = upsertEntity(nextHarnessAssemblies, assembly);

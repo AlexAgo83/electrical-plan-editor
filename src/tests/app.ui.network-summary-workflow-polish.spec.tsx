@@ -443,7 +443,7 @@ describe("App integration UI - network summary workflow polish", () => {
           right: 800,
           bottom: 520,
           toJSON: () => ({})
-        }) as DOMRect
+        })
     );
 
     const intermediateNode = networkSummaryPanel.querySelector(".network-node.intermediate");
