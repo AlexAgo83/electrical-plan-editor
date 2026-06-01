@@ -74,22 +74,16 @@ describe("App integration UI - creation flow wire ergonomics", () => {
 
     clickNewFromPanel("Wires");
     const createWirePanel = getPanelByHeading("Create Wire");
-    const colorModeSelect = within(createWirePanel).getByLabelText("Color mode");
 
-    expect(colorModeSelect).toHaveValue("none");
-    expect(within(createWirePanel).getByLabelText("Primary color")).toBeDisabled();
-    expect(within(createWirePanel).getAllByText("No color").length).toBeGreaterThan(0);
-
-    fireEvent.change(colorModeSelect, { target: { value: "catalog" } });
     const primaryColorSelect = within(createWirePanel).getByLabelText("Primary color");
-    const secondaryColorSelect = within(createWirePanel).getByLabelText("Secondary color");
-
     expect(primaryColorSelect).toHaveValue("");
-    expect(secondaryColorSelect).toBeDisabled();
-    expect(within(createWirePanel).getAllByText("No color").length).toBeGreaterThan(0);
+    expect(within(createWirePanel).queryByLabelText("Color mode")).not.toBeInTheDocument();
+    expect(within(createWirePanel).queryByLabelText("Secondary color")).not.toBeInTheDocument();
+    expect(within(createWirePanel).getByText("Not specified")).toBeInTheDocument();
 
     fireEvent.change(primaryColorSelect, { target: { value: "RD" } });
-    expect(secondaryColorSelect).toBeEnabled();
+    const secondaryColorSelect = within(createWirePanel).getByLabelText("Secondary color");
+    expect(secondaryColorSelect).toHaveValue("");
     fireEvent.change(secondaryColorSelect, { target: { value: "RD" } });
 
     const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });

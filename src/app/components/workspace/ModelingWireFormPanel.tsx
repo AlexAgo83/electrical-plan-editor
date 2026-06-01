@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG, MAX_FREE_WIRE_COLOR_LABEL_LENGTH } from "../../../core/cableColors";
+import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG } from "../../../core/cableColors";
 import {
   FUNCTIONAL_FILTER_12V_POWER,
   FUNCTIONAL_FILTER_48V,
@@ -101,14 +101,11 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireMaterial,
     recommendedWireSectionMm2,
     handleApplyRecommendedWireSection,
-    wireColorMode,
     setWireColorMode,
     wirePrimaryColorId,
     setWirePrimaryColorId,
     wireSecondaryColorId,
     setWireSecondaryColorId,
-    wireFreeColorLabel,
-    setWireFreeColorLabel,
     wireFuseEnabled,
     setWireFuseEnabled,
     wireFuseCatalogItemId,
@@ -181,8 +178,6 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     FUNCTIONAL_FILTER_48V,
     FUNCTIONAL_FILTER_CAN
   ];
-  const isCatalogColorMode = wireColorMode === "catalog";
-  const isFreeColorMode = wireColorMode === "free";
   const selectedFuseCatalogItemMissing =
     wireFuseCatalogItemId.trim().length > 0 &&
     !catalogItems.some((item) => item.id === wireFuseCatalogItemId);
@@ -379,49 +374,19 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       </>
     ) : null}
     <label>
-      Color mode
-      <select
-        value={wireColorMode}
-        onChange={(event) => {
-          const nextMode = event.target.value as "none" | "catalog" | "free";
-          setWireColorMode(nextMode);
-        }}
-      >
-        <option value="none">No color</option>
-        <option value="catalog">Catalog color</option>
-        <option value="free">Free color</option>
-      </select>
-    </label>
-    {isFreeColorMode ? (
-      <>
-        <label>
-          Free color label
-          <input
-            value={wireFreeColorLabel}
-            onChange={(event) => setWireFreeColorLabel(event.target.value)}
-            maxLength={MAX_FREE_WIRE_COLOR_LABEL_LENGTH}
-            placeholder="Optional (e.g. Beige/Brown mix)"
-          />
-        </label>
-        <small className="inline-help">Leave empty to keep the cable color free (unspecified) for plan execution.</small>
-      </>
-    ) : null}
-    {!isFreeColorMode ? (
-      <>
-    <label>
       Primary color
       <select
         value={wirePrimaryColorId}
         onChange={(event) => {
           const nextPrimary = event.target.value;
           setWirePrimaryColorId(nextPrimary);
+          setWireColorMode(nextPrimary.length === 0 ? "none" : "catalog");
           if (nextPrimary.length === 0) {
             setWireSecondaryColorId("");
           }
         }}
-        disabled={!isCatalogColorMode}
       >
-        <option value="">None</option>
+        <option value="">Not specified</option>
         {CABLE_COLOR_CATALOG.map((color) => (
           <option key={color.id} value={color.id}>
             {color.id} - {color.label}
@@ -429,44 +394,25 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         ))}
       </select>
     </label>
-    <label>
-      Secondary color
-      <select
-        value={wireSecondaryColorId}
-        onChange={(event) => setWireSecondaryColorId(event.target.value)}
-        disabled={!isCatalogColorMode || wirePrimaryColorId.length === 0}
-      >
-        <option value="">None</option>
-        {CABLE_COLOR_CATALOG.map((color) => (
-          <option key={color.id} value={color.id}>
-            {color.id} - {color.label}
-          </option>
-        ))}
-      </select>
-    </label>
-      </>
+    {wirePrimaryColorId.length > 0 ? (
+      <label>
+        Secondary color
+        <select
+          value={wireSecondaryColorId}
+          onChange={(event) => setWireSecondaryColorId(event.target.value)}
+        >
+          <option value="">None</option>
+          {CABLE_COLOR_CATALOG.map((color) => (
+            <option key={color.id} value={color.id}>
+              {color.id} - {color.label}
+            </option>
+          ))}
+        </select>
+      </label>
     ) : null}
     <small className="inline-help">
-      {isFreeColorMode ? (
-        <>
-          <span
-            aria-hidden="true"
-            style={{
-              display: "inline-block",
-              minWidth: "2.2rem",
-              padding: "0.05rem 0.35rem",
-              borderRadius: "999px",
-              border: "1px solid var(--panel-border, rgba(255,255,255,0.2))",
-              marginRight: "0.35rem",
-              textAlign: "center"
-            }}
-          >
-            Free
-          </span>
-          {wireFreeColorLabel.trim().length === 0 ? "Free color left unspecified" : wireFreeColorLabel.trim()}
-        </>
-      ) : primaryColor === undefined ? (
-        <>No color</>
+      {primaryColor === undefined ? (
+        <>Not specified</>
       ) : (
         <>
           {swatch(primaryColor.hex, primaryColor.label)}
