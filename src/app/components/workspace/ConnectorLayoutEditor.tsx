@@ -876,6 +876,22 @@ export function ConnectorLayoutEditor({
                               )
                             }
                           />
+                          <button
+                            type="button"
+                            className="connector-layout-keying-color-reset-button"
+                            aria-label="Use default keying color"
+                            title="Use default keying color"
+                            disabled={selectedKeying.color === undefined}
+                            onClick={() =>
+                              commitLayout(
+                                updateConnectorLayoutKeyingAt(layout, selectedKeyingControlIndex, {
+                                  color: undefined
+                                })
+                              )
+                            }
+                          >
+                            x
+                          </button>
                         </div>
                       </div>
                       {selectedKeyingPlacement.mode === "guided" ? (

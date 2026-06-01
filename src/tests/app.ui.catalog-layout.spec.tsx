@@ -169,7 +169,7 @@ describe("App integration UI - catalog layout", () => {
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Keying features" }));
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Add keying" }));
     expect(catalogLayoutPanel.querySelector(".connector-layout-keying")?.getAttribute("style")).toBeNull();
-    const { placementSelect, shapeSelect, positionSlider, scaleInput } = getConnectorLayoutKeyingControls(
+    const { placementSelect, shapeSelect, colorInput, positionSlider, scaleInput } = getConnectorLayoutKeyingControls(
       getConnectorLayoutKeyingRow(catalogLayoutPanel)
     );
     expect(placementSelect).toHaveValue("guided");
@@ -177,6 +177,12 @@ describe("App integration UI - catalog layout", () => {
     expect(positionSlider).toHaveValue("0.375");
     expect(scaleInput).toHaveValue("1");
     expect(within(getConnectorLayoutKeyingRow(catalogLayoutPanel)).getByLabelText("Snap")).toBeChecked();
+    fireEvent.change(colorInput, {
+      target: { value: "#123456" }
+    });
+    expect(catalogLayoutPanel.querySelector(".connector-layout-keying")?.getAttribute("style")).toMatch(/fill: (#123456|rgb\(18, 52, 86\))/);
+    fireEvent.click(within(getConnectorLayoutKeyingRow(catalogLayoutPanel)).getByRole("button", { name: "Use default keying color" }));
+    expect(catalogLayoutPanel.querySelector(".connector-layout-keying")?.getAttribute("style") ?? "").toBe("");
     fireEvent.change(shapeSelect, {
       target: { value: "square" }
     });

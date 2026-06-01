@@ -1,5 +1,5 @@
 .connector-physical-way-shape.is-occupied {
-  fill: color-mix(in srgb, var(--theme-primary, currentColor) 26%, transparent);
+  fill: color-mix(in srgb, var(--theme-primary, currentColor) 30%, var(--network-label-stroke-color, var(--theme-surface, Canvas)));
   stroke: var(--theme-primary, currentColor);
 }
 

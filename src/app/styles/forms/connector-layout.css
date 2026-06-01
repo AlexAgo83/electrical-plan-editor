@@ -143,8 +143,8 @@
 
 .connector-layout-shell,
 .connector-physical-shell {
-  fill: color-mix(in srgb, var(--theme-surface, Canvas) 82%, var(--theme-primary, currentColor) 18%);
-  stroke: color-mix(in srgb, var(--theme-primary, currentColor) 46%, currentColor 54%);
+  fill: color-mix(in srgb, var(--network-node-connector-fill, var(--theme-surface, Canvas)) 86%, var(--theme-primary, currentColor) 14%);
+  stroke: color-mix(in srgb, var(--network-node-stroke-color, var(--theme-primary, currentColor)) 72%, currentColor 28%);
   stroke-width: 0.08;
 }
 
@@ -174,7 +174,9 @@
 .connector-layout-keying,
 .connector-physical-keying {
   fill: color-mix(in srgb, var(--theme-primary, currentColor) 68%, currentColor 32%);
-  stroke: none;
+  stroke: color-mix(in srgb, var(--theme-surface, Canvas) 78%, currentColor 22%);
+  stroke-width: 0.018;
+  paint-order: stroke fill;
 }
 
 .connector-layout-keying-handle {
@@ -201,23 +203,27 @@
 
 .connector-layout-way-shape,
 .connector-physical-way-shape {
-  fill: color-mix(in srgb, currentColor 9%, transparent);
-  stroke: color-mix(in srgb, currentColor 54%, transparent);
+  fill: color-mix(in srgb, var(--network-label-stroke-color, var(--theme-surface, Canvas)) 88%, currentColor 12%);
+  stroke: color-mix(in srgb, var(--network-node-stroke-color, currentColor) 72%, currentColor 28%);
   stroke-width: 0.08;
 }
 
 .connector-layout-way-shape.is-selected {
-  fill: color-mix(in srgb, var(--theme-primary, currentColor) 22%, transparent);
+  fill: color-mix(in srgb, var(--theme-primary, currentColor) 28%, var(--network-label-stroke-color, var(--theme-surface, Canvas)));
   stroke: var(--theme-primary, currentColor);
   stroke-width: 0.12;
 }
 
 .connector-layout-way-label,
 .connector-physical-way-label {
-  fill: currentColor;
+  fill: var(--network-node-label-color, currentColor);
   font-size: 0.32px;
   font-weight: 700;
+  paint-order: stroke fill;
   pointer-events: none;
+  stroke: var(--network-label-stroke-color, color-mix(in srgb, var(--theme-surface, Canvas) 92%, transparent));
+  stroke-linejoin: round;
+  stroke-width: 0.045px;
   text-anchor: middle;
   dominant-baseline: central;
   alignment-baseline: central;
@@ -403,11 +409,21 @@
 
 .connector-layout-keying-color-control > div {
   min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.4rem;
 }
 
 .connector-layout-keying-color-control input[type="color"] {
   width: 100%;
   padding: 0.18rem;
+}
+
+.connector-layout-keying-color-reset-button {
+  width: 2.05rem;
+  padding-inline: 0;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .connector-layout-keying-list-header button,
