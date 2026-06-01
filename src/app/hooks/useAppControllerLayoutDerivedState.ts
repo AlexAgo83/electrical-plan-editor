@@ -58,12 +58,20 @@ export function useAppControllerLayoutDerivedState({
 
   const persistedNodePositions = selectNodePositions(state);
   const autoNodePositions = useMemo(
-    () =>
-      createNodePositionMap(nodes, segments, {
+    () => {
+      if (
+        nodes.length > 0 &&
+        nodes.every((node) => persistedNodePositions[node.id] !== undefined)
+      ) {
+        return {} as Record<NodeId, NodePosition>;
+      }
+
+      return createNodePositionMap(nodes, segments, {
         snapToGrid: snapNodesToGrid,
         gridStep: NETWORK_GRID_STEP
-      }),
-    [nodes, segments, snapNodesToGrid]
+      });
+    },
+    [nodes, persistedNodePositions, segments, snapNodesToGrid]
   );
 
   const networkNodePositions = useMemo(() => {
