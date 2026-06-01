@@ -274,45 +274,74 @@ export function ModelingCatalogFormPanel({
       {catalogShowAdditionalAccessories ? (
         <article className="panel catalog-accessories-panel" data-form-panel={FORM_PANEL_IDS.catalogAdditionalAccessories}>
           {renderFormHeader("Additional accessories", catalogFormMode)}
+          <div className="catalog-accessory-panel-toolbar">
+            <span className="catalog-accessory-count">
+              {catalogAdditionalAccessories.length === 0
+                ? "No accessory"
+                : `${catalogAdditionalAccessories.length} ${catalogAdditionalAccessories.length === 1 ? "accessory" : "accessories"}`}
+            </span>
+            <button
+              type="button"
+              className="button-with-icon catalog-accessory-action-button"
+              onClick={() =>
+                setCatalogAdditionalAccessories([
+                  ...catalogAdditionalAccessories,
+                  { accessoryReference: "", accessoryName: "" }
+                ])
+              }
+            >
+              <span className="action-button-icon is-new" aria-hidden="true" />
+              Add additional accessory
+            </button>
+          </div>
           <div className="catalog-accessory-list">
-            <div className="row-actions compact">
-              <button
-                type="button"
-                className="button-with-icon catalog-accessory-action-button"
-                onClick={() =>
-                  setCatalogAdditionalAccessories([
-                    ...catalogAdditionalAccessories,
-                    { accessoryReference: "", accessoryName: "" }
-                  ])
-                }
-              >
-                <span className="action-button-icon is-new" aria-hidden="true" />
-                Add additional accessory
-              </button>
-            </div>
-            {catalogAdditionalAccessories.length === 0 ? <small className="meta-line">No additional accessory.</small> : null}
+            {catalogAdditionalAccessories.length > 0 ? (
+              <div className="catalog-accessory-row catalog-accessory-row-header" aria-hidden="true">
+                <span />
+                <span>Reference</span>
+                <span>Name</span>
+                <span />
+              </div>
+            ) : null}
+            {catalogAdditionalAccessories.length === 0 ? (
+              <div className="catalog-accessory-empty-state">
+                <span className="action-button-icon is-catalog" aria-hidden="true" />
+                <small className="meta-line">No additional accessory.</small>
+              </div>
+            ) : null}
             {catalogAdditionalAccessories.map((accessory, index) => (
               <div className="catalog-accessory-row" key={index}>
-                <label>
+                <span className="catalog-accessory-index" aria-hidden="true">
+                  {index + 1}
+                </span>
+                <label className="catalog-accessory-field">
+                  <span className="visually-hidden">
                   Accessory reference
+                  </span>
                   <input
+                    aria-label="Accessory reference"
                     value={accessory.accessoryReference}
                     onChange={(event) => updateAdditionalAccessory(index, { accessoryReference: event.target.value })}
-                    placeholder="Optional accessory ref"
+                    placeholder="Reference"
                     maxLength={120}
                   />
                 </label>
-                <label>
+                <label className="catalog-accessory-field">
+                  <span className="visually-hidden">
                   Accessory name
+                  </span>
                   <input
+                    aria-label="Accessory name"
                     value={accessory.accessoryName ?? ""}
                     onChange={(event) => updateAdditionalAccessory(index, { accessoryName: event.target.value })}
-                    placeholder="Optional accessory name"
+                    placeholder="Name"
                   />
                 </label>
                 <button
                   type="button"
                   className="button-with-icon catalog-accessory-action-button catalog-accessory-remove-button"
+                  aria-label={`Remove accessory ${index + 1}`}
+                  title={`Remove accessory ${index + 1}`}
                   onClick={() =>
                     setCatalogAdditionalAccessories(
                       catalogAdditionalAccessories.filter((_accessory, accessoryIndex) => accessoryIndex !== index)
@@ -320,7 +349,6 @@ export function ModelingCatalogFormPanel({
                   }
                 >
                   <span className="action-button-icon is-delete" aria-hidden="true" />
-                  Remove
                 </button>
               </div>
             ))}
