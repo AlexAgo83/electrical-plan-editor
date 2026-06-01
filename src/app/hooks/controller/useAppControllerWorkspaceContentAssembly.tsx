@@ -214,6 +214,8 @@ export function useAppControllerWorkspaceContentAssembly({
     aiAgentDisabledReason: state.aiAgentDisabledReason,
     onOpenAiAgent: handlers.handleOpenAiAgent,
     activeNetwork: state.activeNetwork,
+    networks: entities.networks,
+    onSelectActiveNetwork: domains.workspaceNetworkDomain.handleSelectNetwork,
     nodes: entities.nodes,
     segments: entities.segments,
     wires: entities.wires,

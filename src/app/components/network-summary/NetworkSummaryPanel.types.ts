@@ -143,6 +143,8 @@ export interface NetworkSummaryPanelProps {
   onRegenerateLayout: () => void;
   onOpenCurrentNetworkFunctional?: () => void;
   activeNetwork: Network | null;
+  networks: Array<Pick<Network, "id" | "name" | "technicalId">>;
+  onSelectActiveNetwork: (networkId: Network["id"]) => void;
   catalogItems: CatalogItem[];
   showFunctionalSchematic?: boolean;
   imperativeRef?: Ref<NetworkSummaryPanelHandle>;

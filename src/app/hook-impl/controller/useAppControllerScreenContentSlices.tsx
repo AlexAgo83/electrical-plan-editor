@@ -225,6 +225,8 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     wires: params.wires,
     catalogItems: params.catalogItems,
     activeNetwork: params.activeNetwork,
+    networks: params.networks,
+    onSelectActiveNetwork: params.onSelectActiveNetwork,
     showFunctionalSchematic: params.showFunctionalSchematic,
     isPanningNetwork: params.isPanningNetwork,
     networkViewWidth: params.networkViewWidth,

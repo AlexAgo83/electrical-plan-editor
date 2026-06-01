@@ -6,10 +6,11 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type ChangeEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactElement
 } from "react";
-import type { ConnectorId, NodeId, Segment, SegmentId, SpliceId } from "../../core/entities";
+import type { ConnectorId, NetworkId, NodeId, Segment, SegmentId, SpliceId } from "../../core/entities";
 import type { NodePosition } from "../types/app-controller";
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
 import { NetworkSummaryEditMenu } from "./network-summary/NetworkSummaryEditMenu";
@@ -156,6 +157,8 @@ export function NetworkSummaryPanel({
   onRegenerateLayout,
   onOpenCurrentNetworkFunctional,
   activeNetwork,
+  networks,
+  onSelectActiveNetwork,
   catalogItems,
   showFunctionalSchematic = true,
   imperativeRef
@@ -170,6 +173,17 @@ export function NetworkSummaryPanel({
   ];
   const dialogThemeHostClassName = ["app-shell", ...getThemeClassNames(themeMode)].join(" ");
   const activeNetworkName = activeNetwork?.name.trim() ?? "";
+  const activeNetworkSelectorLabel =
+    activeNetworkName.length > 0
+      ? `Active plan: ${activeNetworkName}. Change active plan`
+      : "Change active plan";
+  const handleActiveNetworkChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    const nextNetworkId = event.target.value as NetworkId;
+    if (activeNetwork?.id === nextNetworkId || !networks.some((network) => network.id === nextNetworkId)) {
+      return;
+    }
+    onSelectActiveNetwork(nextNetworkId);
+  };
   const globalRenderScale = 1 + clampNumber(globalRenderScalePercent, 0, 300) / 100;
   const effectiveScale = networkScale > 0 ? networkScale : 1;
   const effectiveRenderScale = effectiveScale * globalRenderScale;
@@ -848,9 +862,24 @@ export function NetworkSummaryPanel({
                 <span className="network-summary-title-separator" aria-hidden="true">
                   :
                 </span>
-                <span className="network-summary-active-network" aria-hidden="true">
-                  {activeNetworkName}
-                </span>
+                <label className="network-summary-active-network-selector">
+                  <span className="network-summary-active-network-icon" aria-hidden="true" />
+                  <span className="network-summary-active-network" aria-hidden="true">
+                    {activeNetworkName}
+                  </span>
+                  <select
+                    aria-label={activeNetworkSelectorLabel}
+                    value={activeNetwork?.id ?? ""}
+                    onChange={handleActiveNetworkChange}
+                    disabled={networks.length < 2}
+                  >
+                    {networks.map((network) => (
+                      <option key={network.id} value={network.id}>
+                        {network.name} ({network.technicalId})
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </>
             ) : null}
           </div>

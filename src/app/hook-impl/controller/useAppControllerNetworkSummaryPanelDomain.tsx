@@ -74,6 +74,8 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   aiAgentDisabledReason?: string;
   onOpenAiAgent?: () => void;
   activeNetwork: Network | null;
+  networks: NetworkSummaryPanelSliceParams["networks"];
+  onSelectActiveNetwork: NetworkSummaryPanelSliceParams["onSelectActiveNetwork"];
   nodes: NetworkSummaryPanelSliceParams["nodes"];
   segments: Segment[];
   wires: Wire[];
@@ -198,6 +200,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
   aiAgentDisabledReason,
   onOpenAiAgent,
   activeNetwork,
+  networks,
+  onSelectActiveNetwork,
   nodes,
   segments,
   wires,
@@ -382,6 +386,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
         wires,
         catalogItems,
         activeNetwork,
+        networks,
+        onSelectActiveNetwork,
         isPanningNetwork: canvasState.isPanningNetwork,
         networkViewWidth: effectiveNetworkViewWidth,
         networkViewHeight: effectiveNetworkViewHeight,

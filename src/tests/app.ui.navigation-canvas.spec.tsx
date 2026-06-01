@@ -12,6 +12,7 @@ import {
   switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 import { appActions, appReducer, createInitialState } from "../store";
+import type { NetworkId } from "../core/entities";
 import { getNetworkSummaryViewportTransform } from "./helpers/navigation-canvas-test-utils";
 
 describe("App integration UI - navigation and canvas", () => {
@@ -52,7 +53,35 @@ describe("App integration UI - navigation and canvas", () => {
 
     const networkSummaryPanel = getPanelByHeading("Network summary");
     expect(within(networkSummaryPanel).getByText(":")).toHaveClass("network-summary-title-separator");
-    expect(within(networkSummaryPanel).getByText("Main network (Sample)")).toHaveClass("network-summary-active-network");
+    expect(within(networkSummaryPanel).getByText("Main network (Sample)", { selector: ".network-summary-active-network" })).toBeInTheDocument();
+    expect(within(networkSummaryPanel).getByRole("combobox", { name: /Change active plan/ })).toBeDisabled();
+  });
+
+  it("switches the active network from the network summary title selector", () => {
+    const base = createUiIntegrationState();
+    const defaultNetworkId = base.activeNetworkId as NetworkId;
+    const networkBId = "net-title-switch" as NetworkId;
+    const seeded = [
+      appActions.createNetwork({
+        id: networkBId,
+        name: "Network title switch",
+        technicalId: "NET-TITLE-SWITCH",
+        createdAt: "2026-02-27T10:00:00.000Z",
+        updatedAt: "2026-02-27T10:00:00.000Z"
+      }),
+      appActions.selectNetwork(defaultNetworkId)
+    ].reduce(appReducer, base);
+    const { store } = renderAppWithState(seeded);
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const selector = within(networkSummaryPanel).getByRole("combobox", { name: /Change active plan/ });
+    expect(selector).toBeEnabled();
+
+    fireEvent.change(selector, { target: { value: networkBId } });
+
+    expect(store.getState().activeNetworkId).toBe(networkBId);
+    expect(within(networkSummaryPanel).getByText("Network title switch", { selector: ".network-summary-active-network" })).toBeInTheDocument();
   });
 
   it("toggles the navigation drawer from the header and closes on backdrop click", () => {
