@@ -29,10 +29,7 @@ import { useAppControllerAiAgentWorkspaceContent } from "./useAppControllerAiAge
 type HomeWorkspaceParams = Parameters<typeof useAppControllerHomeWorkspaceContent>[0];
 type NetworkSummaryParams = Parameters<typeof useAppControllerNetworkSummaryPanelDomain>[0];
 type ModelingAnalysisParams = Parameters<typeof useAppControllerModelingAnalysisDomainAssembly>[0];
-type CatalogDomainsParams = Omit<
-  Parameters<typeof useAppControllerCatalogScreenDomains>[0],
-  "modelingLeftColumnContent" | "modelingFormsColumnContent" | "analysisWorkspaceContent"
->;
+type CatalogDomainsParams = Omit<Parameters<typeof useAppControllerCatalogScreenDomains>[0], "modelingLeftColumnContent" | "modelingFormsColumnContent" | "analysisWorkspaceContent">;
 type AuxDomainsParams = Parameters<typeof useAppControllerAuxDomainAssembly>[0];
 
 export interface AppControllerWorkspaceContentAssemblyParams {

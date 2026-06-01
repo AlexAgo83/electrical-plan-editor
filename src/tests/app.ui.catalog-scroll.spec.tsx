@@ -47,7 +47,7 @@ describe("App integration UI - catalog scroll behavior", () => {
     } finally {
       scrollSpy.restore();
     }
-  }, 15000);
+  });
 
   it("scrolls to the connector physical layout panel when enabling it", async () => {
     const scrollSpy = installScrollIntoViewSpy();
@@ -74,7 +74,7 @@ describe("App integration UI - catalog scroll behavior", () => {
     } finally {
       scrollSpy.restore();
     }
-  }, 15000);
+  });
 
   it("scrolls to the connector material defaults panel when enabling it", async () => {
     const scrollSpy = installScrollIntoViewSpy();
@@ -128,7 +128,7 @@ describe("App integration UI - catalog scroll behavior", () => {
     } finally {
       scrollSpy.restore();
     }
-  }, 15000);
+  });
 
   it("does not scroll to the catalog form when selecting a row directly", async () => {
     const scrollSpy = installScrollIntoViewSpy();

@@ -6,16 +6,13 @@ import {
   useRef,
   useState,
   type CSSProperties,
-  type ChangeEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactElement
 } from "react";
-import type { ConnectorId, NetworkId, NodeId, Segment, SegmentId, SpliceId } from "../../core/entities";
+import type { ConnectorId, NodeId, Segment, SegmentId, SpliceId } from "../../core/entities";
 import type { NodePosition } from "../types/app-controller";
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
-import { NetworkSummaryEditMenu } from "./network-summary/NetworkSummaryEditMenu";
-import { NetworkSummaryViewMenu } from "./network-summary/NetworkSummaryViewMenu";
-import { NetworkSummaryExportMenu } from "./network-summary/NetworkSummaryExportMenu";
+import { NetworkSummaryHeader } from "./network-summary/NetworkSummaryHeader";
 import { NetworkSummaryQuickEntityNavigation } from "./network-summary/NetworkSummaryQuickEntityNavigation";
 import { NetworkSummaryCanvasPanel } from "./network-summary/NetworkSummaryCanvasPanel";
 import { useActiveSubNetworkTags } from "./network-summary/useActiveSubNetworkTags";
@@ -172,18 +169,6 @@ export function NetworkSummaryPanel({
     { label: "Adjacency entries", value: totalEdgeEntries }
   ];
   const dialogThemeHostClassName = ["app-shell", ...getThemeClassNames(themeMode)].join(" ");
-  const activeNetworkName = activeNetwork?.name.trim() ?? "";
-  const activeNetworkSelectorLabel =
-    activeNetworkName.length > 0
-      ? `Active plan: ${activeNetworkName}. Change active plan`
-      : "Change active plan";
-  const handleActiveNetworkChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const nextNetworkId = event.target.value as NetworkId;
-    if (activeNetwork?.id === nextNetworkId || !networks.some((network) => network.id === nextNetworkId)) {
-      return;
-    }
-    onSelectActiveNetwork(nextNetworkId);
-  };
   const globalRenderScale = 1 + clampNumber(globalRenderScalePercent, 0, 300) / 100;
   const effectiveScale = networkScale > 0 ? networkScale : 1;
   const effectiveRenderScale = effectiveScale * globalRenderScale;
@@ -854,81 +839,39 @@ export function NetworkSummaryPanel({
         onOpenAiAgent={onOpenAiAgent}
       />
       <section className="panel">
-        <header className="network-summary-header">
-          <div className="network-summary-title">
-            <h2>Network summary</h2>
-            {activeNetworkName.length > 0 ? (
-              <>
-                <span className="network-summary-title-separator" aria-hidden="true">
-                  :
-                </span>
-                <label className="network-summary-active-network-selector">
-                  <span className="network-summary-active-network-icon" aria-hidden="true" />
-                  <span className="network-summary-active-network" aria-hidden="true">
-                    {activeNetworkName}
-                  </span>
-                  <select
-                    aria-label={activeNetworkSelectorLabel}
-                    value={activeNetwork?.id ?? ""}
-                    onChange={handleActiveNetworkChange}
-                    disabled={networks.length < 2}
-                  >
-                    {networks.map((network) => (
-                      <option key={network.id} value={network.id}>
-                        {network.name} ({network.technicalId})
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </>
-            ) : null}
-          </div>
-          <div className="network-summary-header-actions" role="group" aria-label="Network summary display options">
-            <NetworkSummaryEditMenu
-              showNetworkGrid={showNetworkGrid}
-              snapNodesToGrid={snapNodesToGrid}
-              lockEntityMovement={lockEntityMovement}
-              toggleShowNetworkGrid={toggleShowNetworkGrid}
-              toggleSnapNodesToGrid={toggleSnapNodesToGrid}
-              toggleLockEntityMovement={toggleLockEntityMovement}
-              onRegenerateLayout={onRegenerateLayout}
-            />
-            <NetworkSummaryViewMenu
-              showFloatingInspectorPanel={showFloatingInspectorPanel}
-              showNetworkInfoPanels={showNetworkInfoPanels}
-              showSegmentLengths={showSegmentLengths}
-              showCableCallouts={showCableCallouts}
-              toggleShowFloatingInspectorPanel={toggleShowFloatingInspectorPanel}
-              toggleShowNetworkInfoPanels={toggleShowNetworkInfoPanels}
-              toggleShowSegmentLengths={toggleShowSegmentLengths}
-              toggleShowCableCallouts={toggleShowCableCallouts}
-            />
-            {onOpenCurrentNetworkFunctional === undefined ? null : (
-              <button
-                type="button"
-                className="workspace-tab"
-                onClick={onOpenCurrentNetworkFunctional}
-              >
-                <span className="action-button-icon is-harness-assembly" aria-hidden="true" />
-                Functional
-              </button>
-            )}
-            <NetworkSummaryExportMenu
-              canExportSvg={nodes.length > 0}
-              canExportPng={nodes.length > 0}
-              canExportNetwork={activeNetwork !== null}
-              canExportBomCsv={canExportBomCsv}
-              onExportSvg={() => {
-                void handleExportPlanAsSvg();
-              }}
-              onExportPng={() => {
-                void handleExportPlanAsPng();
-              }}
-              onExportNetwork={onExportNetwork}
-              onExportBomCsv={onExportBomCsv}
-            />
-          </div>
-        </header>
+        <NetworkSummaryHeader
+          activeNetwork={activeNetwork}
+          networks={networks}
+          showNetworkGrid={showNetworkGrid}
+          snapNodesToGrid={snapNodesToGrid}
+          lockEntityMovement={lockEntityMovement}
+          showFloatingInspectorPanel={showFloatingInspectorPanel}
+          showNetworkInfoPanels={showNetworkInfoPanels}
+          showSegmentLengths={showSegmentLengths}
+          showCableCallouts={showCableCallouts}
+          canExportSvg={nodes.length > 0}
+          canExportPng={nodes.length > 0}
+          canExportNetwork={activeNetwork !== null}
+          canExportBomCsv={canExportBomCsv}
+          onSelectActiveNetwork={onSelectActiveNetwork}
+          toggleShowNetworkGrid={toggleShowNetworkGrid}
+          toggleSnapNodesToGrid={toggleSnapNodesToGrid}
+          toggleLockEntityMovement={toggleLockEntityMovement}
+          toggleShowFloatingInspectorPanel={toggleShowFloatingInspectorPanel}
+          toggleShowNetworkInfoPanels={toggleShowNetworkInfoPanels}
+          toggleShowSegmentLengths={toggleShowSegmentLengths}
+          toggleShowCableCallouts={toggleShowCableCallouts}
+          onRegenerateLayout={onRegenerateLayout}
+          onOpenCurrentNetworkFunctional={onOpenCurrentNetworkFunctional}
+          onExportSvg={() => {
+            void handleExportPlanAsSvg();
+          }}
+          onExportPng={() => {
+            void handleExportPlanAsPng();
+          }}
+          onExportNetwork={onExportNetwork}
+          onExportBomCsv={onExportBomCsv}
+        />
         <NetworkSummaryCanvasPanel
           nodes={nodes}
           networkCanvasShellRef={networkCanvasShellRef}
