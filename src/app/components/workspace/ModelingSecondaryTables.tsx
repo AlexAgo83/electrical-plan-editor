@@ -4,9 +4,11 @@ import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
-import { downloadTabularCsvOrXlsxFile } from "../../lib/tabularExport";
+import { normalizeFileNamePart } from "../../lib/exportFileName";
+import { downloadTabularCsvOrXlsxFile, downloadTabularWorkbookFile, type TabularWorksheetExport } from "../../lib/tabularExport";
 import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireColorPresentation";
+import { TabularExportPreviewDialog } from "../dialogs/TabularExportPreviewDialog";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 import type {
@@ -186,6 +188,10 @@ export function ModelingSecondaryTables({
     field: "name",
     direction: "asc"
   });
+  const [wireExportPreview, setWireExportPreview] = useState<{
+    filenameBase: string;
+    sheets: TabularWorksheetExport[];
+  } | null>(null);
   const openCreateSegmentAndScroll = () => {
     onOpenCreateSegment();
     scrollToFormPanel(FORM_PANEL_IDS.segment);
@@ -672,12 +678,16 @@ export function ModelingSecondaryTables({
                       wire.lengthMm
                     ];
                   });
-                  void downloadTabularCsvOrXlsxFile(
-                    "modeling-wires",
-                    tabularExportFormat,
-                    { name: "Modeling Wires", headers, rows, freezeHeaderRow: true, autoFilter: true },
-                    { includeUtf8Bom: true }
-                  );
+                  const sheet = { name: "Modeling Wires", headers, rows, freezeHeaderRow: true, autoFilter: true } satisfies TabularWorksheetExport;
+                  const filenameBase = `wire-list-${normalizeFileNamePart(focusedWire?.technicalId) ?? "modeling"}`;
+                  if (tabularExportFormat === "xlsx") {
+                    setWireExportPreview({
+                      filenameBase,
+                      sheets: [sheet]
+                    });
+                    return;
+                  }
+                  void downloadTabularCsvOrXlsxFile(filenameBase, tabularExportFormat, sheet, { includeUtf8Bom: true });
                 }}
                 disabled={sortedVisibleWires.length === 0}
               >
@@ -890,6 +900,20 @@ export function ModelingSecondaryTables({
           )}
         </div>
       </article>
+      {wireExportPreview !== null ? (
+        <TabularExportPreviewDialog
+          isOpen={wireExportPreview !== null}
+          title="Wire export preview"
+          summaryLabel="Modeling wires"
+          filenameLabel={`${wireExportPreview.filenameBase}.xlsx`}
+          sheets={wireExportPreview.sheets}
+          onConfirm={() => {
+            void downloadTabularWorkbookFile(wireExportPreview.filenameBase, wireExportPreview.sheets);
+            setWireExportPreview(null);
+          }}
+          onCancel={() => setWireExportPreview(null)}
+        />
+      ) : null}
     </>
   );
 }

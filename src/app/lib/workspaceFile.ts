@@ -183,23 +183,35 @@ export function parseWorkspaceFilePayload(rawJson: string, nowIso: string = new 
   };
 }
 
-function pad2(value: number): string {
-  return value.toString().padStart(2, "0");
-}
-
-function toFilesystemSafeTimestamp(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) {
-    return iso.replace(/\.\d{3}(?=Z$)/, "").replace(/[:.]/g, "-").replace("T", "_").replace(/Z$/i, "");
-  }
-
-  return [
-    date.getUTCFullYear(),
-    pad2(date.getUTCMonth() + 1),
-    pad2(date.getUTCDate())
-  ].join("-") + "_" + [pad2(date.getUTCHours()), pad2(date.getUTCMinutes()), pad2(date.getUTCSeconds())].join("-");
-}
-
-export function buildWorkspaceFileName(exportedAtIso: string = new Date().toISOString()): string {
-  return `electrical-workspace-${toFilesystemSafeTimestamp(exportedAtIso)}.epe.json`;
+export function buildWorkspaceFileName(
+  exportedAtIso: string = new Date().toISOString(),
+  options?: { activeNetworkName?: string | null; activeNetworkTechnicalId?: string | null }
+): string {
+  const date = new Date(exportedAtIso);
+  const safeTimestamp = Number.isNaN(date.getTime())
+    ? exportedAtIso.replace(/\.\d{3}(?=Z$)/, "").replace(/[:.]/g, "-").replace("T", "_").replace(/Z$/i, "")
+    : [
+        date.getUTCFullYear(),
+        String(date.getUTCMonth() + 1).padStart(2, "0"),
+        String(date.getUTCDate()).padStart(2, "0")
+      ].join("-") +
+      "_" +
+      [
+        String(date.getUTCHours()).padStart(2, "0"),
+        String(date.getUTCMinutes()).padStart(2, "0"),
+        String(date.getUTCSeconds()).padStart(2, "0")
+      ].join("-");
+  const normalizedActiveName =
+    typeof options?.activeNetworkName === "string"
+      ? options.activeNetworkName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
+      : "";
+  const normalizedActiveTechnicalId =
+    typeof options?.activeNetworkTechnicalId === "string"
+      ? options.activeNetworkTechnicalId.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
+      : "";
+  const suffix =
+    normalizedActiveName.length > 0 || normalizedActiveTechnicalId.length > 0
+      ? `-${[normalizedActiveName, normalizedActiveTechnicalId].filter((value) => value.length > 0).join("-")}`
+      : "";
+  return `electrical-workspace${suffix}-${safeTimestamp}.epe.json`;
 }

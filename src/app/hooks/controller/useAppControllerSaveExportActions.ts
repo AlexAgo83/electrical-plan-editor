@@ -1,10 +1,14 @@
 import { useCallback } from "react";
 import type { NetworkId } from "../../../core/entities";
 import { buildNetworkExportFilename } from "../useNetworkImportExport";
+import { supportsNativeSaveFilePicker } from "../../lib/jsonFileExport";
 import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
 
 interface UseAppControllerSaveExportActionsArgs {
   activeNetworkId: NetworkId | null;
+  activeNetworkName?: string | null;
+  activeNetworkTechnicalId?: string | null;
+  getNetworkExportMetadata?: (networkId: NetworkId) => { name?: string | null; technicalId?: string | null };
   handleExportNetworks: (scope: "active" | "selected" | "all", exportedAtIso?: string) => void;
   handleExportNetwork: (networkId: NetworkId, exportedAtIso?: string) => void;
   requestConfirmation: (request: ConfirmDialogRequest) => Promise<boolean>;
@@ -12,6 +16,9 @@ interface UseAppControllerSaveExportActionsArgs {
 
 export function useAppControllerSaveExportActions({
   activeNetworkId,
+  activeNetworkName,
+  activeNetworkTechnicalId,
+  getNetworkExportMetadata,
   handleExportNetworks,
   handleExportNetwork,
   requestConfirmation
@@ -24,7 +31,16 @@ export function useAppControllerSaveExportActions({
 
     void (async () => {
       const exportedAtIso = new Date().toISOString();
-      const fileName = buildNetworkExportFilename("active", exportedAtIso);
+      if (supportsNativeSaveFilePicker()) {
+        handleExportNetworks("active", exportedAtIso);
+        return;
+      }
+
+      const fileName = buildNetworkExportFilename("active", exportedAtIso, {
+        networkName: activeNetworkName ?? undefined,
+        networkTechnicalId: activeNetworkTechnicalId ?? undefined,
+        networkCount: 1
+      });
       const shouldSave = await requestConfirmation({
         title: "Save active network",
         message: "Export the active network now?",
@@ -36,9 +52,9 @@ export function useAppControllerSaveExportActions({
         return;
       }
 
-      handleExportNetworks("active", exportedAtIso);
-    })();
-  }, [activeNetworkId, handleExportNetworks, requestConfirmation]);
+        handleExportNetworks("active", exportedAtIso);
+      })();
+  }, [activeNetworkId, activeNetworkName, activeNetworkTechnicalId, handleExportNetworks, requestConfirmation]);
 
   const handleExportNetworksWithActiveSaveConfirmation = useCallback(
     (scope: "active" | "selected" | "all") => {
@@ -56,7 +72,17 @@ export function useAppControllerSaveExportActions({
     (networkId: NetworkId) => {
       void (async () => {
         const exportedAtIso = new Date().toISOString();
-        const fileName = buildNetworkExportFilename("selected", exportedAtIso);
+        if (supportsNativeSaveFilePicker()) {
+          handleExportNetwork(networkId, exportedAtIso);
+          return;
+        }
+
+        const selectedNetworkMetadata = getNetworkExportMetadata?.(networkId);
+        const fileName = buildNetworkExportFilename("selected", exportedAtIso, {
+          networkName: selectedNetworkMetadata?.name ?? activeNetworkName ?? undefined,
+          networkTechnicalId: selectedNetworkMetadata?.technicalId ?? activeNetworkTechnicalId ?? undefined,
+          networkCount: 1
+        });
         const shouldSave = await requestConfirmation({
           title: "Save selected network",
           message: "Export the selected network now?",
@@ -71,7 +97,7 @@ export function useAppControllerSaveExportActions({
         handleExportNetwork(networkId, exportedAtIso);
       })();
     },
-    [handleExportNetwork, requestConfirmation]
+    [activeNetworkName, activeNetworkTechnicalId, getNetworkExportMetadata, handleExportNetwork, requestConfirmation]
   );
 
   return {

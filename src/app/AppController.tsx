@@ -144,6 +144,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     workspaceCurrencyCode,
     workspaceTaxEnabled,
     workspaceTaxRatePercent,
+    activeNetworkName: state.activeNetworkId === null ? null : state.networks.byId[state.activeNetworkId]?.name ?? null,
+    activeNetworkTechnicalId: state.activeNetworkId === null ? null : state.networks.byId[state.activeNetworkId]?.technicalId ?? null,
     tabularExportFormat,
     bomExportCompactColumns,
     bomTraceabilityLabelsHidden,

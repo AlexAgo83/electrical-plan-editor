@@ -73,6 +73,11 @@ describe("App integration UI - import/export", () => {
       target: { files: [invalidFile] }
     });
 
+    const feedbackDialog = await screen.findByRole("dialog", { name: "Network import failed" });
+    expect(within(feedbackDialog).getByText("The selected file is not a valid network export.")).toBeInTheDocument();
+    expect(within(feedbackDialog).getByText("Invalid JSON file.")).toBeInTheDocument();
+    fireEvent.click(within(feedbackDialog).getByRole("button", { name: "Close" }));
+
     await waitFor(() => {
       expect(
         within(panel).queryByText("Invalid JSON file.") ?? within(panel).getByText("Unable to read selected file.")

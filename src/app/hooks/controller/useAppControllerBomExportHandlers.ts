@@ -3,6 +3,7 @@ import type { CatalogItem, CatalogItemId, Connector, Splice, Wire } from "../../
 import type { ConnectorCavityOccupancyMap } from "../../../core/connectorCatalogMaterials";
 import { buildNetworkSummaryBomCsvExport, buildNetworkSummaryBomWorkbookSheets } from "../../lib/networkSummaryBomCsv";
 import type { CsvCellValue } from "../../lib/csv";
+import { normalizeFileNamePart } from "../../lib/exportFileName";
 import { downloadTabularCsvOrXlsxFile, downloadTabularWorkbookFile, type TabularExportFormat, type TabularWorksheetExport } from "../../lib/tabularExport";
 import type { WorkspaceCurrencyCode } from "../../types/app-controller";
 
@@ -14,6 +15,8 @@ interface UseAppControllerBomExportHandlersParams {
   workspaceCurrencyCode: WorkspaceCurrencyCode | undefined;
   workspaceTaxEnabled: boolean;
   workspaceTaxRatePercent: number;
+  activeNetworkName?: string | null;
+  activeNetworkTechnicalId?: string | null;
   tabularExportFormat: TabularExportFormat;
   bomExportCompactColumns: boolean;
   bomTraceabilityLabelsHidden: boolean;
@@ -43,6 +46,8 @@ export function useAppControllerBomExportHandlers({
   workspaceCurrencyCode,
   workspaceTaxEnabled,
   workspaceTaxRatePercent,
+  activeNetworkName,
+  activeNetworkTechnicalId,
   tabularExportFormat,
   bomExportCompactColumns,
   bomTraceabilityLabelsHidden,
@@ -83,6 +88,8 @@ export function useAppControllerBomExportHandlers({
   );
 
   const canExportBomCsv = networkSummaryBomCsvExport.itemRowCount > 0;
+  const bomExportBaseName =
+    normalizeFileNamePart(activeNetworkName) ?? normalizeFileNamePart(activeNetworkTechnicalId) ?? "network-bom";
 
   const handleExportBomCsv = useCallback(() => {
     if (!canExportBomCsv) {
@@ -185,12 +192,12 @@ export function useAppControllerBomExportHandlers({
     setActiveBomPreview(null);
     setIsBomPreviewLoading(false);
     if (preview.format === "xlsx") {
-      void downloadTabularWorkbookFile("network-bom", preview.workbookSheets);
+      void downloadTabularWorkbookFile(`bom-${bomExportBaseName}`, preview.workbookSheets);
       return;
     }
 
     void downloadTabularCsvOrXlsxFile(
-      "network-bom",
+      `bom-${bomExportBaseName}`,
       preview.format,
       {
         name: "Network BOM",
@@ -201,7 +208,7 @@ export function useAppControllerBomExportHandlers({
       },
       { includeUtf8Bom: true }
     );
-  }, [activeBomPreview]);
+  }, [activeBomPreview, bomExportBaseName]);
 
   useEffect(() => {
     return () => {

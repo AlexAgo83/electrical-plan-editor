@@ -63,7 +63,7 @@ function formatImportSummaryMessage(summary: NetworkImportSummary): string {
 }
 
 export { buildNetworkExportFilename, downloadJsonFile, exportJsonFile } from "../lib/jsonFileExport";
-export type { ImportOverwriteDialogModel } from "./networkImportExportTypes";
+export type { FileFeedbackDialogModel, ImportOverwriteDialogModel } from "./networkImportExportTypes";
 
 export function useNetworkImportExport({
   store,
@@ -79,6 +79,7 @@ export function useNetworkImportExport({
   const [selectedExportNetworkIds, setSelectedExportNetworkIds] = useState<NetworkId[]>([]);
   const [importExportStatus, setImportExportStatus] = useState<ImportExportStatus | null>(null);
   const [groupedSvgExportProgress, setGroupedSvgExportProgress] = useState<GroupedSvgExportProgress | null>(null);
+  const [importFailureDialog, setImportFailureDialog] = useState<UseNetworkImportExportResult["importFailureDialog"]>(null);
 
   useEffect(() => {
     if (groupedSvgExportProgress === null) {
@@ -133,7 +134,15 @@ export function useNetworkImportExport({
       }
 
       const serialized = serializeNetworkFilePayload(payload);
-      const exportResult = await exportJsonFile(buildNetworkExportFilename(scope, exportedAtIso), serialized);
+      const singleNetwork = payload.networks.length === 1 ? payload.networks[0]?.network : null;
+      const exportResult = await exportJsonFile(
+        buildNetworkExportFilename(scope, exportedAtIso, {
+          networkName: singleNetwork?.name,
+          networkTechnicalId: singleNetwork?.technicalId,
+          networkCount: payload.networks.length
+        }),
+        serialized
+      );
       if (exportResult === "cancelled") {
         return;
       }
@@ -165,7 +174,15 @@ export function useNetworkImportExport({
       }
 
       const serialized = serializeNetworkFilePayload(payload);
-      const exportResult = await exportJsonFile(buildNetworkExportFilename("selected", exportedAtIso), serialized);
+      const exportedNetwork = payload.networks[0]?.network;
+      const exportResult = await exportJsonFile(
+        buildNetworkExportFilename("selected", exportedAtIso, {
+          networkName: exportedNetwork?.name,
+          networkTechnicalId: exportedNetwork?.technicalId,
+          networkCount: payload.networks.length
+        }),
+        serialized
+      );
       if (exportResult === "cancelled") {
         return;
       }
@@ -196,6 +213,12 @@ export function useNetworkImportExport({
 
       if (resolved.networks.length === 0) {
         const message = "No network was imported. Check file errors.";
+        setImportFailureDialog({
+          title: "Network import failed",
+          message: "The selected file did not produce any importable network.",
+          items: [...resolved.summary.errors, ...resolved.summary.warnings],
+          onClose: () => setImportFailureDialog(null)
+        });
         setImportExportStatus({ kind: "failed", message });
         notifyToast?.("Import failed", {
           message: formatImportSummaryMessage(resolved.summary),
@@ -320,8 +343,12 @@ export function useNetworkImportExport({
         return;
       }
 
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").replace("T", "_").replace(/Z$/i, "");
-      await downloadTabularWorkbookFile(`grouped-bom-${timestamp}`, allSheets);
+      const namedNetworks = networkIds
+        .map((networkId) => state.networks.byId[networkId]?.name || state.networks.byId[networkId]?.technicalId)
+        .filter((value): value is string => typeof value === "string" && value.trim().length > 0);
+      const exportBaseName =
+        namedNetworks.length === 1 ? `bom-${namedNetworks[0]}` : `bom-grouped-${networkIds.length}-networks`;
+      await downloadTabularWorkbookFile(exportBaseName, allSheets);
       setImportExportStatus({ kind: "success", message: `Exported grouped BOM for ${networkIds.length} network(s).` });
     })();
   }
@@ -390,6 +417,12 @@ export function useNetworkImportExport({
       rawJson = await file.text();
     } catch {
       const message = "Unable to read selected file.";
+      setImportFailureDialog({
+        title: "Network import failed",
+        message: "The selected file could not be read.",
+        items: [file.name],
+        onClose: () => setImportFailureDialog(null)
+      });
       setImportExportStatus({
         kind: "failed",
         message
@@ -405,6 +438,12 @@ export function useNetworkImportExport({
     const parsed = parseNetworkFilePayload(rawJson);
     if (parsed.payload === null) {
       const message = parsed.error ?? "Invalid import file.";
+      setImportFailureDialog({
+        title: "Network import failed",
+        message: "The selected file is not a valid network export.",
+        items: [message],
+        onClose: () => setImportFailureDialog(null)
+      });
       setImportExportStatus({
         kind: "failed",
         message
@@ -458,6 +497,7 @@ export function useNetworkImportExport({
     importExportStatus,
     lastImportSummary,
     importOverwriteDialog,
+    importFailureDialog,
     toggleSelectedExportNetwork,
     handleExportNetworks,
     handleExportNetwork,

@@ -10,6 +10,13 @@ import type { ToastNotificationVariant } from "./useToastNotifications";
 
 export type NotifyToast = (title: string, options?: { message?: string; variant?: ToastNotificationVariant }) => void;
 
+export interface FileFeedbackDialogModel {
+  title: string;
+  message: string;
+  items: string[];
+  onClose: () => void;
+}
+
 export interface PendingOverwriteImport {
   payload: NetworkFilePayloadV1;
   candidates: OverwriteCandidate[];
@@ -47,6 +54,7 @@ export interface UseNetworkImportExportResult {
   importExportStatus: ImportExportStatus | null;
   lastImportSummary: NetworkImportSummary | null;
   importOverwriteDialog: ImportOverwriteDialogModel | null;
+  importFailureDialog: FileFeedbackDialogModel | null;
   toggleSelectedExportNetwork: (networkId: NetworkId) => void;
   handleExportNetworks: (scope: "active" | "selected" | "all", exportedAtIsoOverride?: string) => void;
   handleExportNetwork: (networkId: NetworkId, exportedAtIsoOverride?: string) => void;

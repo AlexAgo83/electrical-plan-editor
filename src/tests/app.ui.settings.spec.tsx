@@ -335,7 +335,7 @@ describe("App integration UI - settings", () => {
     expect(shortcutEvent.defaultPrevented).toBe(true);
     const confirmDialog = await screen.findByRole("dialog", { name: "Save active network" });
     expect(within(confirmDialog).getByText(/Filename/i)).toBeInTheDocument();
-    expect(within(confirmDialog).getByText(/electrical-network-active-.*\.json/i)).toBeInTheDocument();
+    expect(within(confirmDialog).getByText(/electrical-network-.*sample-net-main-sample-.*\.json/i)).toBeInTheDocument();
     fireEvent.click(within(confirmDialog).getByRole("button", { name: "Save" }));
 
     const importExportPanel = getPanelByHeading("Import / Export networks");

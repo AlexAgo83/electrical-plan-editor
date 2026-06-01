@@ -14,6 +14,7 @@ import { ModelingCatalogListPanel, type CatalogTableView } from "../../component
 import type { CatalogHandlersModel } from "../useCatalogHandlers";
 import type { EntityFormsStateModel } from "../useEntityFormsState";
 import type { ImportExportStatus, WorkspaceCurrencyCode } from "../../types/app-controller";
+import type { FileFeedbackDialogModel } from "../networkImportExportTypes";
 
 interface UseAppControllerCatalogScreenDomainsParams {
   isCatalogSubScreen: boolean;
@@ -32,6 +33,7 @@ interface UseAppControllerCatalogScreenDomainsParams {
   handleCatalogCsvImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   catalogCsvImportExportStatus: ImportExportStatus | null;
   catalogCsvLastImportSummaryLine: string | null;
+  catalogCsvImportFailureDialog: FileFeedbackDialogModel | null;
   onOpenCatalogOnboardingHelp: () => void;
   onCreateConnectorFromCatalog: (catalogItemId: CatalogItemId) => void;
   onCreateSpliceFromCatalog: (catalogItemId: CatalogItemId) => void;
@@ -71,6 +73,7 @@ export function useAppControllerCatalogScreenDomains({
   handleCatalogCsvImportFileChange,
   catalogCsvImportExportStatus,
   catalogCsvLastImportSummaryLine,
+  catalogCsvImportFailureDialog,
   onOpenCatalogOnboardingHelp,
   onCreateConnectorFromCatalog,
   onCreateSpliceFromCatalog,
@@ -111,6 +114,7 @@ export function useAppControllerCatalogScreenDomains({
       onCatalogCsvImportFileChange={handleCatalogCsvImportFileChange}
       catalogCsvImportExportStatus={catalogCsvImportExportStatus}
       catalogCsvLastImportSummaryLine={catalogCsvLastImportSummaryLine}
+      catalogCsvImportFailureDialog={catalogCsvImportFailureDialog}
       onOpenCatalogOnboardingHelp={onOpenCatalogOnboardingHelp}
     />
   );

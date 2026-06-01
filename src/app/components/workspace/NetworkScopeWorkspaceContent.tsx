@@ -10,8 +10,9 @@ import {
   type RefObject
 } from "react";
 import type { NetworkId } from "../../../core/entities";
-import type { ImportOverwriteDialogModel } from "../../hooks/useNetworkImportExport";
+import type { FileFeedbackDialogModel, ImportOverwriteDialogModel } from "../../hooks/useNetworkImportExport";
 import { ImportOverwriteDialog } from "../dialogs/ImportOverwriteDialog";
+import { FileFeedbackDialog } from "../dialogs/FileFeedbackDialog";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { focusElementWithoutScroll, nextSortState, sortByTableColumns } from "../../lib/app-utils-shared";
@@ -77,6 +78,7 @@ interface NetworkScopeWorkspaceContentProps {
   onOpenOnboardingHelp?: () => void;
   functionalSchematicPanel?: ReactNode;
   importOverwriteDialog?: ImportOverwriteDialogModel | null;
+  importFailureDialog?: FileFeedbackDialogModel | null;
 }
 
 export function NetworkScopeWorkspaceContent({
@@ -122,7 +124,8 @@ export function NetworkScopeWorkspaceContent({
   focusRequestedNetworkToken,
   onOpenOnboardingHelp,
   functionalSchematicPanel,
-  importOverwriteDialog = null
+  importOverwriteDialog = null,
+  importFailureDialog = null
 }: NetworkScopeWorkspaceContentProps): ReactElement {
   type NetworkScopeFilterField = "name" | "technicalId" | "any";
   type NetworkScopeTableSortField = "name" | "technicalId" | "status";
@@ -269,6 +272,7 @@ export function NetworkScopeWorkspaceContent({
   ];
 
   return (
+    <>
     <section className="panel-grid network-scope-grid">
       <section className="panel network-scope-panel" data-onboarding-panel="network-scope">
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
@@ -694,5 +698,15 @@ export function NetworkScopeWorkspaceContent({
       </section>
 
     </section>
+    {importFailureDialog !== null ? (
+      <FileFeedbackDialog
+        isOpen={importFailureDialog !== null}
+        title={importFailureDialog.title}
+        message={importFailureDialog.message}
+        items={importFailureDialog.items}
+        onClose={importFailureDialog.onClose}
+      />
+    ) : null}
+    </>
   );
 }

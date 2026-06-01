@@ -31,7 +31,7 @@ describe("network import/export helpers", () => {
 
     expect(activeFilename).toMatch(/^electrical-network-active-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json$/);
     expect(selectedFilename).toMatch(/^electrical-network-selected-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json$/);
-    expect(allFilename).toMatch(/^electrical-network-all-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json$/);
+    expect(allFilename).toMatch(/^electrical-networks-all-\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}\.json$/);
     expect(activeFilename).not.toContain(".789");
   });
 

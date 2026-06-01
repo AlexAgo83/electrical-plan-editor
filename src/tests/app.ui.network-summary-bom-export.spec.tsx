@@ -205,7 +205,7 @@ describe("App integration UI - network summary BOM export", () => {
         name: "Save active network",
       });
       expect(
-        within(confirmDialog).getByText(/electrical-network-active-.*\.json/i),
+        within(confirmDialog).getByText(/electrical-network-.*sample-net-main-sample-.*\.json/i),
       ).toBeInTheDocument();
       fireEvent.click(
         within(confirmDialog).getByRole("button", { name: "Save" }),

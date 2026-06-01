@@ -1,14 +1,6 @@
 import { useCallback, useRef, useState, type RefObject } from "react";
-
-function buildSvgExportFilename(networkName: string, format: "svg" | "png"): string {
-  const normalized = networkName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-  const base = normalized.length > 0 ? normalized : "network-plan";
-  const now = new Date();
-  const pad2 = (n: number) => String(n).padStart(2, "0");
-  const timestamp = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}_${pad2(now.getHours())}-${pad2(now.getMinutes())}-${pad2(now.getSeconds())}`;
-  return `${base}-${timestamp}.${format}`;
-}
 import type { ThemeMode } from "../../../../store";
+import { buildTimestampedFileName } from "../../../lib/exportFileName";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
 import { getThemeClassNames } from "../../../lib/themeModes";
 import {
@@ -232,7 +224,7 @@ export function useNetworkSummaryExportActions({
     const blobUrl = URL.createObjectURL(blob);
     const downloadLink = document.createElement("a");
     downloadLink.href = blobUrl;
-    downloadLink.download = buildSvgExportFilename(exportCartoucheNetworkName, "svg");
+    downloadLink.download = buildTimestampedFileName(["network-plan", exportCartoucheNetworkName], "svg");
     downloadLink.style.display = "none";
     document.body.appendChild(downloadLink);
     downloadLink.click();
@@ -427,7 +419,7 @@ export function useNetworkSummaryExportActions({
       }
       const downloadLink = document.createElement("a");
       downloadLink.href = activeSvgPreview.pngDataUrl;
-      downloadLink.download = buildSvgExportFilename(exportCartoucheNetworkName, "png");
+      downloadLink.download = buildTimestampedFileName(["network-plan", exportCartoucheNetworkName], "png");
       downloadLink.style.display = "none";
       document.body.appendChild(downloadLink);
       downloadLink.click();

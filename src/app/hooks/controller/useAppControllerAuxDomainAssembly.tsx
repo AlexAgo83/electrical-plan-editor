@@ -29,6 +29,7 @@ interface UseAppControllerAuxDomainAssemblyParams {
     importFileInputRef: AuxDomainsParams["networkScope"]["importFileInputRef"];
     handleImportFileChange: AuxDomainsParams["networkScope"]["handleImportFileChange"];
     importOverwriteDialog: AuxDomainsParams["networkScope"]["importOverwriteDialog"];
+    importFailureDialog: AuxDomainsParams["networkScope"]["importFailureDialog"];
     handleDeleteNetwork: AuxDomainsParams["networkScope"]["handleDeleteNetwork"];
     handleOpenCreateNetworkForm: () => void;
     handleOpenEditNetworkForm: AuxDomainsParams["networkScope"]["handleOpenEditNetworkForm"];
@@ -93,6 +94,7 @@ export function useAppControllerAuxDomainAssembly({
       importFileInputRef: networkScope.importFileInputRef,
       handleImportFileChange: networkScope.handleImportFileChange,
       importOverwriteDialog: networkScope.importOverwriteDialog,
+      importFailureDialog: networkScope.importFailureDialog,
       handleDeleteNetwork: networkScope.handleDeleteNetwork,
       handleOpenCreateNetworkForm: networkScope.handleOpenCreateNetworkForm,
       handleOpenEditNetworkForm: networkScope.handleOpenEditNetworkForm,

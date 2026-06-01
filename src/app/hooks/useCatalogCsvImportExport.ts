@@ -7,6 +7,7 @@ import { buildCatalogCsvExport, parseCatalogCsvImportText } from "../lib/catalog
 import { downloadCsvFile } from "../lib/csv";
 import type { ImportExportStatus, SubScreenId } from "../types/app-controller";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
+import type { FileFeedbackDialogModel } from "./networkImportExportTypes";
 
 type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
 
@@ -23,6 +24,7 @@ interface UseCatalogCsvImportExportResult {
   catalogCsvImportFileInputRef: RefObject<HTMLInputElement | null>;
   catalogCsvImportExportStatus: ImportExportStatus | null;
   catalogCsvLastImportSummaryLine: string | null;
+  catalogCsvImportFailureDialog: FileFeedbackDialogModel | null;
   handleExportCatalogCsv: () => void;
   handleOpenCatalogCsvImportPicker: () => void;
   handleCatalogCsvImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
@@ -39,6 +41,16 @@ export function useCatalogCsvImportExport({
   const catalogCsvImportFileInputRef = useRef<HTMLInputElement | null>(null);
   const [catalogCsvImportExportStatus, setCatalogCsvImportExportStatus] = useState<ImportExportStatus | null>(null);
   const [catalogCsvLastImportSummaryLine, setCatalogCsvLastImportSummaryLine] = useState<string | null>(null);
+  const [catalogCsvImportFailureDialog, setCatalogCsvImportFailureDialog] = useState<FileFeedbackDialogModel | null>(null);
+
+  function openImportFailureDialog(title: string, message: string, items: string[] = []): void {
+    setCatalogCsvImportFailureDialog({
+      title,
+      message,
+      items,
+      onClose: () => setCatalogCsvImportFailureDialog(null)
+    });
+  }
 
   function handleExportCatalogCsv(): void {
     if (catalogItems.length === 0) {
@@ -50,7 +62,7 @@ export function useCatalogCsvImportExport({
     }
 
     const { headers, rows } = buildCatalogCsvExport(catalogItems);
-    downloadCsvFile("Catalog Export", headers, rows);
+    downloadCsvFile("catalog", headers, rows);
     setCatalogCsvImportExportStatus({
       kind: "success",
       message: `Exported ${rows.length} catalog item(s).`
@@ -75,6 +87,7 @@ export function useCatalogCsvImportExport({
     try {
       text = await file.text();
     } catch {
+      openImportFailureDialog("Catalog CSV import failed", "Unable to read the selected CSV file.", [file.name]);
       setCatalogCsvImportExportStatus({
         kind: "failed",
         message: "Unable to read selected catalog CSV file."
@@ -88,6 +101,11 @@ export function useCatalogCsvImportExport({
     const errorIssues = parsed.issues.filter((issue) => issue.kind === "error");
     if (errorIssues.length > 0) {
       const firstError = errorIssues[0];
+      openImportFailureDialog(
+        "Catalog CSV import failed",
+        "The selected CSV file contains blocking validation errors.",
+        errorIssues.map((issue) => `Row ${issue.rowNumber}: ${issue.message}`)
+      );
       setCatalogCsvImportExportStatus({
         kind: "failed",
           message:
@@ -146,6 +164,11 @@ export function useCatalogCsvImportExport({
       }
       const existing = existingByManufacturerReference.get(normalizedReferenceKey);
       if (existing !== undefined && existing.id !== item.id) {
+        openImportFailureDialog(
+          "Catalog CSV import blocked",
+          "The current catalog contains duplicate manufacturer references.",
+          [`Resolve duplicate reference '${item.manufacturerReference}' before importing.`]
+        );
         setCatalogCsvImportExportStatus({
           kind: "failed",
           message: `Catalog import blocked: existing catalog has duplicate manufacturer reference '${item.manufacturerReference}'.`
@@ -173,6 +196,11 @@ export function useCatalogCsvImportExport({
     for (const row of parsed.rows) {
       const normalizedReferenceKey = normalizeManufacturerReferenceKey(row.manufacturerReference);
       if (normalizedReferenceKey === undefined) {
+        openImportFailureDialog(
+          "Catalog CSV import failed",
+          "A row contains an invalid manufacturer reference.",
+          [`Processed rows before failure: ${createdCount + updatedCount}`]
+        );
         setCatalogCsvImportExportStatus({
           kind: "failed",
           message: "Catalog import failed: invalid manufacturer reference."
@@ -206,6 +234,11 @@ export function useCatalogCsvImportExport({
       );
 
       if (candidateState.ui.lastError !== null) {
+        openImportFailureDialog(
+          "Catalog CSV import failed",
+          `The row '${row.manufacturerReference}' could not be imported.`,
+          [getAppErrorMessage(candidateState.ui.lastError) ?? "Unknown catalog import error."]
+        );
         setCatalogCsvImportExportStatus({
           kind: "failed",
           message: `Catalog import failed on '${row.manufacturerReference}': ${getAppErrorMessage(candidateState.ui.lastError)}`
@@ -246,6 +279,7 @@ export function useCatalogCsvImportExport({
     catalogCsvImportFileInputRef,
     catalogCsvImportExportStatus,
     catalogCsvLastImportSummaryLine,
+    catalogCsvImportFailureDialog,
     handleExportCatalogCsv,
     handleOpenCatalogCsvImportPicker,
     handleCatalogCsvImportFileChange

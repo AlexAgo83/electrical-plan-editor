@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import { ImportOverwriteDialog } from "../dialogs/ImportOverwriteDialog";
+import { FileFeedbackDialog } from "../dialogs/FileFeedbackDialog";
 import { SettingsSearchControl } from "../settings/SettingsSearchControl";
 import { useSettingsSearchDock } from "../settings/SettingsSearchDock";
 import type { NetworkId } from "../../../core/entities";
@@ -149,6 +150,7 @@ interface SettingsWorkspaceContentProps {
   setWorkspaceWideScreen: (value: boolean) => void;
   resetWorkspacePreferencesToDefaults: () => void;
   importOverwriteDialog?: import("../../hooks/useNetworkImportExport").ImportOverwriteDialogModel | null;
+  importFailureDialog?: import("../../hooks/useNetworkImportExport").FileFeedbackDialogModel | null;
   handleExportGroupedBom?: (networkIds: NetworkId[]) => void;
   handleExportGroupedSvg?: (networkIds: NetworkId[]) => void;
   aiSettings: AiSettingsModel;
@@ -282,6 +284,7 @@ export function SettingsWorkspaceContent({
   setWorkspaceWideScreen,
   resetWorkspacePreferencesToDefaults,
   importOverwriteDialog = null,
+  importFailureDialog = null,
   handleExportGroupedBom,
   handleExportGroupedSvg,
   aiSettings,
@@ -1378,6 +1381,15 @@ export function SettingsWorkspaceContent({
                   candidates={importOverwriteDialog.candidates}
                   onConfirm={importOverwriteDialog.onConfirm}
                   onCancel={importOverwriteDialog.onCancel}
+                />
+              ) : null}
+              {importFailureDialog !== null ? (
+                <FileFeedbackDialog
+                  isOpen={importFailureDialog !== null}
+                  title={importFailureDialog.title}
+                  message={importFailureDialog.message}
+                  items={importFailureDialog.items}
+                  onClose={importFailureDialog.onClose}
                 />
               ) : null}
             </div>

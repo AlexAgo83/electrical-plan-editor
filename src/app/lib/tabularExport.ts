@@ -1,5 +1,6 @@
 import { buildCsvContent, type CsvCellValue } from "./csv";
 import type { Workbook, Worksheet } from "exceljs";
+import { buildTimestampedFileName, normalizeFileNamePart } from "./exportFileName";
 
 export type TabularExportFormat = "csv" | "xlsx";
 
@@ -10,11 +11,6 @@ export interface TabularWorksheetExport {
   freezeHeaderRow?: boolean;
   autoFilter?: boolean;
   configureWorksheet?: (worksheet: Worksheet) => void;
-}
-
-function normalizeFileName(value: string): string {
-  const normalized = value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-  return normalized.length > 0 ? normalized : "export";
 }
 
 function measureCellWidth(value: CsvCellValue): number {
@@ -88,10 +84,9 @@ function downloadBlob(blob: Blob, filenameBase: string, extension: "csv" | "xlsx
   }
 
   const blobUrl = URL.createObjectURL(blob);
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const link = document.createElement("a");
   link.href = blobUrl;
-  link.download = `${normalizeFileName(filenameBase)}-${timestamp}.${extension}`;
+  link.download = buildTimestampedFileName([normalizeFileNamePart(filenameBase) ?? "export"], extension);
   link.style.display = "none";
   document.body.appendChild(link);
   link.click();

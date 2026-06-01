@@ -1,3 +1,5 @@
+import { buildTimestampedFileName, normalizeFileNamePart } from "./exportFileName";
+
 export type CsvCellValue = string | number | boolean | null | undefined;
 export interface DownloadCsvFileOptions {
   includeUtf8Bom?: boolean;
@@ -21,11 +23,6 @@ function formatCsvCell(value: CsvCellValue): string {
   return `"${text.replace(/"/g, "\"\"")}"`;
 }
 
-function normalizeFileName(value: string): string {
-  const normalized = value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-  return normalized.length > 0 ? normalized : "export";
-}
-
 export function buildCsvContent(headers: string[], rows: CsvCellValue[][]): string {
   const lines = [headers, ...rows].map((row) => row.map((cell) => formatCsvCell(cell)).join(","));
   return lines.join("\r\n");
@@ -45,10 +42,9 @@ export function downloadCsvFile(
   const payload = options?.includeUtf8Bom ? `\uFEFF${csvContent}` : csvContent;
   const blob = new Blob([payload], { type: "text/csv;charset=utf-8" });
   const blobUrl = URL.createObjectURL(blob);
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const link = document.createElement("a");
   link.href = blobUrl;
-  link.download = `${normalizeFileName(filenameBase)}-${timestamp}.csv`;
+  link.download = buildTimestampedFileName([normalizeFileNamePart(filenameBase) ?? "export"], "csv");
   link.style.display = "none";
   document.body.appendChild(link);
   link.click();

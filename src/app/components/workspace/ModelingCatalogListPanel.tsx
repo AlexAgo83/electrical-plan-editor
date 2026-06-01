@@ -7,6 +7,8 @@ import { compareSortableValues } from "../../lib/app-utils-shared";
 import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import { formatPriceWithCurrencySymbol } from "../../lib/pricing";
 import type { ImportExportStatus, WorkspaceCurrencyCode } from "../../types/app-controller";
+import type { FileFeedbackDialogModel } from "../../hooks/networkImportExportTypes";
+import { FileFeedbackDialog } from "../dialogs/FileFeedbackDialog";
 import { EntityReferenceButton } from "./EntityReferenceButton";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
@@ -42,6 +44,7 @@ interface ModelingCatalogListPanelProps {
   onCatalogCsvImportFileChange?: (event: ChangeEvent<HTMLInputElement>) => Promise<void> | void;
   catalogCsvImportExportStatus?: ImportExportStatus | null;
   catalogCsvLastImportSummaryLine?: string | null;
+  catalogCsvImportFailureDialog?: FileFeedbackDialogModel | null;
   onOpenCatalogOnboardingHelp?: () => void;
 }
 
@@ -66,6 +69,7 @@ export function ModelingCatalogListPanel({
   onCatalogCsvImportFileChange,
   catalogCsvImportExportStatus = null,
   catalogCsvLastImportSummaryLine = null,
+  catalogCsvImportFailureDialog = null,
   onOpenCatalogOnboardingHelp
 }: ModelingCatalogListPanelProps): ReactElement {
   void isSelectedCatalogItemReferenced;
@@ -129,7 +133,8 @@ export function ModelingCatalogListPanel({
   const isItemsView = activeView === "items";
 
   return (
-    <article className="panel" hidden={!isCatalogSubScreen} data-onboarding-panel="modeling-catalog">
+    <>
+      <article className="panel" hidden={!isCatalogSubScreen} data-onboarding-panel="modeling-catalog">
       <header className="list-panel-header list-panel-header-mobile-inline-tools">
         <h2>Catalog</h2>
         <div className="list-panel-header-tools">
@@ -359,7 +364,17 @@ export function ModelingCatalogListPanel({
         <p className={`meta-line import-status is-${catalogCsvImportExportStatus.kind}`}>{catalogCsvImportExportStatus.message}</p>
       ) : null}
       {isItemsView && catalogCsvLastImportSummaryLine !== null ? <p className="meta-line">{catalogCsvLastImportSummaryLine}</p> : null}
-    </article>
+      </article>
+      {catalogCsvImportFailureDialog !== null ? (
+        <FileFeedbackDialog
+          isOpen={catalogCsvImportFailureDialog !== null}
+          title={catalogCsvImportFailureDialog.title}
+          message={catalogCsvImportFailureDialog.message}
+          items={catalogCsvImportFailureDialog.items}
+          onClose={catalogCsvImportFailureDialog.onClose}
+        />
+      ) : null}
+    </>
   );
 }
 

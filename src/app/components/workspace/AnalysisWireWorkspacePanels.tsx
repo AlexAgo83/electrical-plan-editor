@@ -4,9 +4,11 @@ import type { SegmentId, WireEndpoint } from "../../../core/entities";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
-import { downloadTabularCsvOrXlsxFile } from "../../lib/tabularExport";
+import { normalizeFileNamePart } from "../../lib/exportFileName";
+import { downloadTabularCsvOrXlsxFile, downloadTabularWorkbookFile, type TabularWorksheetExport } from "../../lib/tabularExport";
 import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireColorPresentation";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { TabularExportPreviewDialog } from "../dialogs/TabularExportPreviewDialog";
 import { EntityReferenceButton } from "./EntityReferenceButton";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
@@ -63,6 +65,10 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     field: "name",
     direction: "asc"
   });
+  const [wireExportPreview, setWireExportPreview] = useState<{
+    filenameBase: string;
+    sheets: TabularWorksheetExport[];
+  } | null>(null);
   const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   const showWireRouteModeColumn = wireRouteFilter === "all" && !isMobileViewport;
   const sortedVisibleWires = useMemo(
@@ -252,12 +258,16 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 wire.lengthMm
               ];
             });
-            void downloadTabularCsvOrXlsxFile(
-              "analysis-wires",
-              tabularExportFormat,
-              { name: "Analysis Wires", headers, rows, freezeHeaderRow: true, autoFilter: true },
-              { includeUtf8Bom: true }
-            );
+            const sheet = { name: "Analysis Wires", headers, rows, freezeHeaderRow: true, autoFilter: true } satisfies TabularWorksheetExport;
+            const filenameBase = `wire-list-${normalizeFileNamePart(selectedWire?.technicalId) ?? "analysis"}`;
+            if (tabularExportFormat === "xlsx") {
+              setWireExportPreview({
+                filenameBase,
+                sheets: [sheet]
+              });
+              return;
+            }
+            void downloadTabularCsvOrXlsxFile(filenameBase, tabularExportFormat, sheet, { includeUtf8Bom: true });
           }}
           disabled={sortedVisibleWires.length === 0}
         >
@@ -475,6 +485,20 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
       <TableEntryCountFooter count={sortedVisibleWires.length} />
     </>
   )}
+  {wireExportPreview !== null ? (
+    <TabularExportPreviewDialog
+      isOpen={wireExportPreview !== null}
+      title="Wire export preview"
+      summaryLabel="Analysis wires"
+      filenameLabel={`${wireExportPreview.filenameBase}.xlsx`}
+      sheets={wireExportPreview.sheets}
+      onConfirm={() => {
+        void downloadTabularWorkbookFile(wireExportPreview.filenameBase, wireExportPreview.sheets);
+        setWireExportPreview(null);
+      }}
+      onCancel={() => setWireExportPreview(null)}
+    />
+  ) : null}
 </section>
 
 <section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen || hideWireAnalysisRoutePanel}>

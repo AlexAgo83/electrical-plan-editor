@@ -125,6 +125,13 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     handleExportNetworksWithActiveSaveConfirmation
   } = useAppControllerSaveExportActions({
     activeNetworkId: core.activeNetworkId,
+    activeNetworkName: core.state.activeNetworkId !== null ? core.state.networks.byId[core.state.activeNetworkId]?.name ?? null : null,
+    activeNetworkTechnicalId:
+      core.state.activeNetworkId !== null ? core.state.networks.byId[core.state.activeNetworkId]?.technicalId ?? null : null,
+    getNetworkExportMetadata: (networkId) => ({
+      name: core.state.networks.byId[networkId]?.name ?? null,
+      technicalId: core.state.networks.byId[networkId]?.technicalId ?? null
+    }),
     handleExportNetworks: networkImportExportModel.handleExportNetworks,
     handleExportNetwork: networkImportExportModel.handleExportNetwork,
     requestConfirmation
@@ -134,6 +141,7 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     catalogCsvImportFileInputRef,
     catalogCsvImportExportStatus,
     catalogCsvLastImportSummaryLine,
+    catalogCsvImportFailureDialog,
     handleExportCatalogCsv,
     handleOpenCatalogCsvImportPicker,
     handleCatalogCsvImportFileChange
@@ -224,6 +232,7 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     catalogCsvImportFileInputRef,
     catalogCsvImportExportStatus,
     catalogCsvLastImportSummaryLine,
+    catalogCsvImportFailureDialog,
     handleExportCatalogCsv,
     handleOpenCatalogCsvImportPicker,
     handleCatalogCsvImportFileChange,
@@ -247,6 +256,7 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     handleOpenImportPicker: networkImportExportModel.handleOpenImportPicker,
     handleImportFileChange: networkImportExportModel.handleImportFileChange,
     importOverwriteDialog: networkImportExportModel.importOverwriteDialog,
+    importFailureDialog: networkImportExportModel.importFailureDialog,
     networkSummaryPanelRef
   };
 }
