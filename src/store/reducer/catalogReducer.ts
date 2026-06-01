@@ -164,7 +164,8 @@ export function handleCatalogActions(state: AppState, action: AppAction): AppSta
         url: normalizeCatalogUrl(action.payload.url),
         additionalAccessories: normalizeCatalogAdditionalAccessories(action.payload.additionalAccessories),
         connectorDefaults: normalizeConnectorCatalogDefaults(action.payload.connectorDefaults, normalizedConnectionCount),
-        connectorLayout: normalizeConnectorLayout(action.payload.connectorLayout, normalizedConnectionCount)
+        connectorLayout: normalizeConnectorLayout(action.payload.connectorLayout, normalizedConnectionCount),
+        fuseBoxConfig: action.payload.fuseBoxConfig
       };
 
       let nextConnectors = state.connectors;

@@ -187,6 +187,43 @@ describe("store reducer - catalog", () => {
     expect(afterReductionAttempt.ui.lastError?.message).toContain("Catalog connection count cannot be reduced");
   });
 
+  it("persists fuseBoxConfig on catalog upsert and clears it when omitted", () => {
+    const catalogId = asCatalogItemId("CAT-FUSEBOX");
+
+    const withFuseBox = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: catalogId,
+        manufacturerReference: "FUSEBOX-REF",
+        connectionCount: 4,
+        fuseBoxConfig: {
+          pairs: [
+            { pairIndex: 0, pinA: 1, pinB: 2 },
+            { pairIndex: 1, pinA: 3, pinB: 4 }
+          ]
+        }
+      })
+    );
+
+    expect(withFuseBox.catalogItems.byId[catalogId]?.fuseBoxConfig?.pairs).toHaveLength(2);
+    expect(withFuseBox.catalogItems.byId[catalogId]?.fuseBoxConfig?.pairs[0]).toEqual({
+      pairIndex: 0,
+      pinA: 1,
+      pinB: 2
+    });
+
+    const withoutFuseBox = appReducer(
+      withFuseBox,
+      appActions.upsertCatalogItem({
+        id: catalogId,
+        manufacturerReference: "FUSEBOX-REF",
+        connectionCount: 4
+      })
+    );
+
+    expect(withoutFuseBox.catalogItems.byId[catalogId]?.fuseBoxConfig).toBeUndefined();
+  });
+
   it("blocks removing a catalog item referenced by a fuse-mode wire", () => {
     const catalogId = asCatalogItemId("CAT-FUSE-LOCKED");
     const connectorId = asConnectorId("C-FUSE");
