@@ -55,7 +55,7 @@
 }
 
 .connector-physical-canvas {
-  overflow: auto;
+  overflow: hidden;
 }
 
 .connector-layout-resize-button {

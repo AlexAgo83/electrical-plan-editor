@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { Connector, Wire } from "../core/entities";
@@ -6,6 +8,13 @@ import { parseWireOccupantRef } from "../app/lib/app-utils-networking";
 import { asConnectorId, asWireId } from "./helpers/app-ui-test-utils";
 
 describe("ConnectorPhysicalView", () => {
+  it("keeps the physical layout canvas non-scrollable", () => {
+    const styles = readFileSync(resolve(process.cwd(), "src/app/styles/forms/connector-layout.css"), "utf8");
+    expect(styles).toContain(".connector-physical-canvas");
+    expect(styles).toContain("overflow: hidden");
+    expect(styles).not.toContain(".connector-physical-canvas {\n  overflow: auto;");
+  });
+
   it("highlights the physical way and detail card linked to the selected wire", () => {
     const connector: Connector = {
       id: asConnectorId("C1"),
