@@ -7,6 +7,7 @@ import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-s
 import { suggestAutoConnectorNodeId, suggestNextConnectorTechnicalId } from "../lib/technical-id-suggestions";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 import { clearConnectorEndpointReferences, hasConnectorEndpointReferenceFields } from "./connectorEndpointReferences";
+import { formatFusePairRatings, parseFusePairRatings } from "./connectorFusePairRatings";
 
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
@@ -246,14 +247,7 @@ export function useConnectorHandlers({
             )
             .join("\n")
     );
-    setConnectorFusePairRatings(
-      connector.fusePairRatings === undefined
-        ? ""
-        : Object.entries(connector.fusePairRatings)
-            .sort(([left], [right]) => Number(left) - Number(right))
-            .map(([pairIndex, amps]) => `${pairIndex},${amps}`)
-            .join("\n")
-    );
+    setConnectorFusePairRatings(formatFusePairRatings(connector.fusePairRatings));
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setConnectorFormError(null);
     dispatchAction(appActions.select({ kind: "connector", id: connector.id }));
@@ -309,22 +303,7 @@ export function useConnectorHandlers({
       setConnectorFormError("Terminal overrides must use one line per override: cavity,terminal,seal,terminal name,seal name.");
       return;
     }
-    const fusePairRatingEntries = connectorFusePairRatings
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0)
-      .map((line) => {
-        const [pairIndexText = "", ampsText = ""] = line.split(",").map((part) => part.trim());
-        return { pairIndex: Number(pairIndexText), amps: Number(ampsText) };
-      })
-      .filter((entry) => Number.isFinite(entry.pairIndex) && Number.isFinite(entry.amps));
-    const fusePairRatings =
-      fusePairRatingEntries.length === 0
-        ? undefined
-        : fusePairRatingEntries.reduce<NonNullable<Connector["fusePairRatings"]>>((acc, entry) => {
-            acc[entry.pairIndex] = entry.amps;
-            return acc;
-          }, {});
+    const fusePairRatings = parseFusePairRatings(connectorFusePairRatings);
 
     setConnectorFormError(null);
 
