@@ -77,7 +77,7 @@ function createComponentLayout(componentNodeIds: NodeId[], adjacency: Map<NodeId
 
   if (componentNodeIds.length === 0) {
     return {
-      positions: {} as Record<NodeId, NodePosition>,
+      positions: {},
       width: 0,
       height: 0
     };
@@ -88,7 +88,7 @@ function createComponentLayout(componentNodeIds: NodeId[], adjacency: Map<NodeId
     return {
       positions: {
         [nodeId]: { x: nodePadding, y: nodePadding }
-      } as Record<NodeId, NodePosition>,
+      },
       width: nodePadding * 2,
       height: nodePadding * 2
     };
@@ -105,7 +105,7 @@ function createComponentLayout(componentNodeIds: NodeId[], adjacency: Map<NodeId
   })[0];
   if (root === undefined) {
     return {
-      positions: {} as Record<NodeId, NodePosition>,
+      positions: {},
       width: 0,
       height: 0
     };

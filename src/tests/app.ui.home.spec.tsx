@@ -110,7 +110,7 @@ describe("home workspace screen", () => {
       }
     }
 
-    globalThis.IntersectionObserver = MockIntersectionObserver as unknown as typeof IntersectionObserver;
+    globalThis.IntersectionObserver = MockIntersectionObserver;
     try {
       renderAppWithState(createUiIntegrationState());
       switchScreenDrawerAware("home");

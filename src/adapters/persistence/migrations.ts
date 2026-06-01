@@ -76,7 +76,7 @@ function isEntityState(candidate: unknown): candidate is EntityState<unknown, st
 
 function normalizeNodePositions(candidate: unknown): Record<NodeId, LayoutNodePosition> {
   if (!isRecord(candidate)) {
-    return {} as Record<NodeId, LayoutNodePosition>;
+    return {};
   }
 
   const normalized = {} as Record<NodeId, LayoutNodePosition>;
@@ -367,7 +367,7 @@ function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | n
     catalogItems:
       candidate.catalogItems !== undefined
         ? normalizeCatalogEntityState(candidate.catalogItems as EntityState<CatalogItem, CatalogItemId>)
-        : ({ byId: {}, allIds: [] } as NetworkScopedState["catalogItems"]),
+        : ({ byId: {}, allIds: [] }),
     connectors: normalizeConnectorEntityState(candidate.connectors as EntityState<Connector, ConnectorId>),
     splices: normalizeSpliceEntityState(candidate.splices as EntityState<Splice, SpliceId>),
     nodes: candidate.nodes as NetworkScopedState["nodes"],
@@ -453,7 +453,7 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     catalogItems:
       candidate.catalogItems !== undefined
         ? normalizeCatalogEntityState(candidate.catalogItems as EntityState<CatalogItem, CatalogItemId>)
-        : ({ byId: {}, allIds: [] } as AppState["catalogItems"]),
+        : ({ byId: {}, allIds: [] }),
     connectors: normalizeConnectorEntityState(candidate.connectors as EntityState<Connector, ConnectorId>),
     splices: normalizeSpliceEntityState(candidate.splices as EntityState<Splice, SpliceId>),
     wires: normalizeWireEntityState(candidate.wires as EntityState<Wire, WireId>),
@@ -492,7 +492,7 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     nextState.splicePortOccupancy = activeScoped.splicePortOccupancy;
   }
   if (nextActiveNetworkId === null && candidate.catalogItems === undefined) {
-    nextState.catalogItems = { byId: {}, allIds: [] } as AppState["catalogItems"];
+    nextState.catalogItems = { byId: {}, allIds: [] };
   }
 
   return nextState;
@@ -674,13 +674,13 @@ function migrateLegacySingleNetworkStateToCurrent(
 ): AppState {
   const seeded = createInitialState();
   const scoped: NetworkScopedState = {
-    catalogItems: { byId: {} as Record<CatalogItemId, CatalogItem>, allIds: [] },
+    catalogItems: { byId: {}, allIds: [] },
     connectors: normalizeConnectorEntityState(legacy.connectors),
     splices: normalizeSpliceEntityState(legacy.splices),
     nodes: legacy.nodes,
     segments: legacy.segments,
     wires: normalizeWireEntityState(legacy.wires),
-    nodePositions: {} as Record<NodeId, LayoutNodePosition>,
+    nodePositions: {},
     connectorCavityOccupancy: legacy.connectorCavityOccupancy,
     splicePortOccupancy: legacy.splicePortOccupancy
   };
@@ -723,14 +723,14 @@ function migrateLegacySingleNetworkStateToCurrent(
     networks: {
       byId: {
         [network.id]: network
-      } as AppState["networks"]["byId"],
+      },
       allIds: [network.id]
     },
     harnessAssemblies,
     activeNetworkId: network.id,
     networkStates: {
       [network.id]: catalogBootstrappedScoped
-    } as AppState["networkStates"],
+    },
     catalogItems: catalogBootstrappedScoped.catalogItems,
     connectors: catalogBootstrappedScoped.connectors,
     splices: catalogBootstrappedScoped.splices,

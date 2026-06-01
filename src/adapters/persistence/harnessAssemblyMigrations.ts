@@ -33,7 +33,7 @@ export function normalizeHarnessAssemblyEntityState(
   networks: EntityState<Network, NetworkId>
 ): EntityState<HarnessAssembly, HarnessAssemblyId> {
   if (!isEntityState(candidate)) {
-    return { byId: {} as Record<HarnessAssemblyId, HarnessAssembly>, allIds: [] };
+    return { byId: {}, allIds: [] };
   }
 
   const knownNetworkIds = new Set(networks.allIds);

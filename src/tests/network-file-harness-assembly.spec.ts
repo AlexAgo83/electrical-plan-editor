@@ -117,7 +117,7 @@ describe("network file harness assemblies", () => {
     );
     const payload = buildNetworkFilePayload(withAssembly, "all", [], "2026-05-11T12:00:00.000Z");
     const parsed = parseNetworkFilePayload(JSON.stringify(payload));
-    const overwriteMap = new Map<string, NetworkId>([[defaultNetworkId as string, defaultNetworkId]]);
+    const overwriteMap = new Map<string, NetworkId>([[defaultNetworkId, defaultNetworkId]]);
     const resolved = resolveImportConflicts(parsed.payload!, withAssembly, overwriteMap);
     const imported = appReducer(
       withAssembly,

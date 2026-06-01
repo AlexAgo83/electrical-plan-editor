@@ -74,15 +74,15 @@ export function loadNetworkIntoActiveScope(state: AppState, networkId: NetworkId
 export function clearActiveScope(state: AppState): AppState {
   return {
     ...state,
-    catalogItems: { byId: {} as AppState["catalogItems"]["byId"], allIds: [] },
-    connectors: { byId: {} as AppState["connectors"]["byId"], allIds: [] },
-    splices: { byId: {} as AppState["splices"]["byId"], allIds: [] },
-    nodes: { byId: {} as AppState["nodes"]["byId"], allIds: [] },
-    segments: { byId: {} as AppState["segments"]["byId"], allIds: [] },
-    wires: { byId: {} as AppState["wires"]["byId"], allIds: [] },
-    nodePositions: {} as AppState["nodePositions"],
-    connectorCavityOccupancy: {} as AppState["connectorCavityOccupancy"],
-    splicePortOccupancy: {} as AppState["splicePortOccupancy"]
+    catalogItems: { byId: {}, allIds: [] },
+    connectors: { byId: {}, allIds: [] },
+    splices: { byId: {}, allIds: [] },
+    nodes: { byId: {}, allIds: [] },
+    segments: { byId: {}, allIds: [] },
+    wires: { byId: {}, allIds: [] },
+    nodePositions: {},
+    connectorCavityOccupancy: {},
+    splicePortOccupancy: {}
   };
 }
 

@@ -4,6 +4,9 @@ import path from "node:path";
 const segmentedRunnerEntrypoint = path.resolve(process.cwd(), "scripts/quality/run-vitest-segmented.mjs");
 const parsedTimeoutMs = Number.parseInt(process.env.UI_COVERAGE_TEST_TIMEOUT_MS ?? "", 10);
 const timeoutMs = Number.isInteger(parsedTimeoutMs) && parsedTimeoutMs > 0 ? parsedTimeoutMs : 15000;
+const parsedReportTimeoutMs = Number.parseInt(process.env.UI_COVERAGE_REPORT_TIMEOUT_MS ?? "", 10);
+const reportTimeoutMs =
+  Number.isInteger(parsedReportTimeoutMs) && parsedReportTimeoutMs > 0 ? parsedReportTimeoutMs : 180000;
 const runnerArgs = [
   segmentedRunnerEntrypoint,
   "ui",
@@ -20,7 +23,8 @@ const runnerArgs = [
 
 console.log("[coverage:ui:report] informational signal only (non-blocking threshold).");
 console.log(`[coverage:ui:report] using UI lane with timeout=${timeoutMs}ms for stability.`);
-const result = spawnSync(process.execPath, runnerArgs, { stdio: "inherit" });
+console.log(`[coverage:ui:report] using report timeout=${reportTimeoutMs}ms.`);
+const result = spawnSync(process.execPath, runnerArgs, { stdio: "inherit", timeout: reportTimeoutMs });
 
 if (result.error) {
   console.error("[coverage:ui:report] failed to execute vitest:", result.error.message);

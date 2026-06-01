@@ -39,7 +39,7 @@ describe("App integration UI - network summary viewport persistence", () => {
           right: 800,
           bottom: 520,
           toJSON: () => ({})
-        }) as DOMRect
+        })
     );
 
     const initialToggleState = {

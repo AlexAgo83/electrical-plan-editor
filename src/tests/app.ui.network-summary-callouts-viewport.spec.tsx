@@ -56,7 +56,7 @@ describe("App integration UI - network summary callouts and viewport persistence
           right: 800,
           bottom: 520,
           toJSON: () => ({})
-        }) as DOMRect
+        })
     );
 
     fireEvent.mouseDown(firstCalloutAnchor as Element, { button: 0, clientX: 220, clientY: 140 });
@@ -128,7 +128,7 @@ describe("App integration UI - network summary callouts and viewport persistence
           right: 800,
           bottom: 520,
           toJSON: () => ({})
-        }) as DOMRect
+        })
     );
     fireEvent.mouseMove(networkSvg, { clientX: 700, clientY: 420 });
     fireEvent.mouseUp(networkSvg);

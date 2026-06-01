@@ -12,7 +12,6 @@ import {
   selectWireById,
   type AppState
 } from "../../store";
-import type { SubScreenId } from "../types/app-controller";
 
 interface UseAppControllerSelectionEntitiesParams {
   state: AppState;
@@ -36,7 +35,7 @@ export function useAppControllerSelectionEntities({ state }: UseAppControllerSel
   const selectedSegment = selectedSegmentId === null ? null : (selectSegmentById(state, selectedSegmentId) ?? null);
   const selectedWire = selectedWireId === null ? null : (selectWireById(state, selectedWireId) ?? null);
   const selectedWireRouteInputValue = selectedWire === null ? "" : selectedWire.routeSegmentIds.join(", ");
-  const selectedSubScreen = selected?.kind === undefined ? null : (selected.kind as SubScreenId);
+  const selectedSubScreen = selected?.kind === undefined ? null : (selected.kind);
 
   const connectorCavityStatuses = useMemo(() => {
     if (selectedConnectorId === null) {

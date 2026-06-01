@@ -65,7 +65,7 @@ const WORKSPACE_FILE_STORE_NAME = "linked-workspace-file";
 const WORKSPACE_FILE_HANDLE_KEY = "last-linked-handle";
 
 export function resolveWorkspaceFileWindow(): WorkspaceFileWindow | null {
-  return typeof window === "undefined" ? null : (window as WorkspaceFileWindow);
+  return typeof window === "undefined" ? null : (window);
 }
 
 export function isDirectFileAccessSupported(): boolean {

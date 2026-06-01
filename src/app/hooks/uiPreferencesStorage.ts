@@ -274,7 +274,7 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
   }
 
   migrated.schemaVersion = UI_PREFERENCES_SCHEMA_VERSION;
-  return migrated as Partial<UiPreferencesPayload>;
+  return migrated;
 }
 
 export function readUiPreferences(): Partial<UiPreferencesPayload> | null {

@@ -235,7 +235,7 @@ describe("App integration UI - settings AI Agent", () => {
     const chargingState = appReducer(baseState, appActions.selectNetwork("network-charging-service-demo" as NetworkId));
     const state = appReducer(
       chargingState,
-      appActions.select({ kind: "catalog", id: "CAT-CHG-SERVICE-4W" as CatalogItemId })
+      appActions.select({ kind: "catalog", id: "CAT-CHG-SERVICE-4W" })
     );
     const editablePlan = buildAiAgentEditablePlan(buildAiAgentContext(state, "currentSelection"));
     const modifiedPlan = {

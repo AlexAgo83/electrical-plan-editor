@@ -12,7 +12,7 @@ export function parseFusePairRatings(text: string): NonNullable<Connector["fuseP
         : [];
     });
   if (entries.length === 0) return undefined;
-  return Object.fromEntries(entries) as NonNullable<Connector["fusePairRatings"]>;
+  return Object.fromEntries(entries);
 }
 
 export function formatFusePairRatings(ratings: Connector["fusePairRatings"]): string {

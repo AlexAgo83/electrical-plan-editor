@@ -115,7 +115,7 @@ function mockNetworkSvgRect(networkSvg: SVGSVGElement) {
         right: 800,
         bottom: 520,
         toJSON: () => ({})
-      }) as DOMRect
+      })
   );
 }
 

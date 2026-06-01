@@ -328,7 +328,7 @@ function applyAcceptedOperation(state: AppState, operation: AiAgentSupportedOper
                 : catalogItem.additionalAccessories,
               connectorDefaults:
                 typeof operation.fields.connectorDefaults === "object" && operation.fields.connectorDefaults !== null
-                  ? (operation.fields.connectorDefaults as typeof catalogItem.connectorDefaults)
+                  ? (operation.fields.connectorDefaults)
                   : catalogItem.connectorDefaults,
               connectorLayout:
                 typeof operation.fields.connectorLayout === "object" && operation.fields.connectorLayout !== null

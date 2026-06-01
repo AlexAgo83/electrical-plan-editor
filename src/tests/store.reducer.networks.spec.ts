@@ -325,15 +325,15 @@ describe("appReducer network lifecycle", () => {
         ],
         {
           [importedNetworkId]: {
-            catalogItems: { byId: {} as ReturnType<typeof createInitialState>["catalogItems"]["byId"], allIds: [] },
-            connectors: { byId: {} as ReturnType<typeof createInitialState>["connectors"]["byId"], allIds: [] },
-            splices: { byId: {} as ReturnType<typeof createInitialState>["splices"]["byId"], allIds: [] },
-            nodes: { byId: {} as ReturnType<typeof createInitialState>["nodes"]["byId"], allIds: [] },
-            segments: { byId: {} as ReturnType<typeof createInitialState>["segments"]["byId"], allIds: [] },
-            wires: { byId: {} as ReturnType<typeof createInitialState>["wires"]["byId"], allIds: [] },
-            nodePositions: {} as ReturnType<typeof createInitialState>["nodePositions"],
-            connectorCavityOccupancy: {} as ReturnType<typeof createInitialState>["connectorCavityOccupancy"],
-            splicePortOccupancy: {} as ReturnType<typeof createInitialState>["splicePortOccupancy"]
+            catalogItems: { byId: {}, allIds: [] },
+            connectors: { byId: {}, allIds: [] },
+            splices: { byId: {}, allIds: [] },
+            nodes: { byId: {}, allIds: [] },
+            segments: { byId: {}, allIds: [] },
+            wires: { byId: {}, allIds: [] },
+            nodePositions: {},
+            connectorCavityOccupancy: {},
+            splicePortOccupancy: {}
           }
         },
         true

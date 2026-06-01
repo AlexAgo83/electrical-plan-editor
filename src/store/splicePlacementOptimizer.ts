@@ -248,7 +248,7 @@ function buildCandidateState(
       segments: {
         [leftSegment.id]: leftSegmentValue,
         [rightSegment.id]: rightSegmentValue
-      } as Record<SegmentId, Segment>,
+      },
       removedSegmentIds: []
     };
   }
@@ -282,7 +282,7 @@ function computeSpliceNodePosition(
 }
 
 function getSegmentLengths(segments: Record<SegmentId, Segment>): Record<SegmentId, number> {
-  const lengths: Record<SegmentId, number> = {} as Record<SegmentId, number>;
+  const lengths: Record<SegmentId, number> = {};
   for (const [segmentId, segment] of Object.entries(segments)) {
     lengths[segmentId as SegmentId] = segment.lengthMm;
   }

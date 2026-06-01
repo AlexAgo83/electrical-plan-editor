@@ -10,8 +10,7 @@ import type {
   SegmentId,
   SpliceId,
   WireEndpoint,
-  WireId,
-  WireMaterial
+  WireId
 } from "../../core/entities";
 import { normalizeConnectorLayout } from "../../core/connectorLayout";
 import { computeRecommendedWireSectionMm2 } from "../../core/wireSizing";
@@ -1648,7 +1647,7 @@ function wireSizingValidationMessage(state: AppState, operation: AiAgentSupporte
       : wire.currentA;
   const nextMaterial =
     operation.fields.material === "copper" || operation.fields.material === "aluminum"
-      ? (operation.fields.material as WireMaterial)
+      ? (operation.fields.material)
       : wire.material;
   const recommendedSectionMm2 = computeRecommendedWireSectionMm2({
     currentA: nextCurrentA,

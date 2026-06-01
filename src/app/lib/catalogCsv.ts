@@ -388,7 +388,7 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
       unitPriceExclTax,
       url,
       additionalAccessories: additionalAccessories.value as CatalogItem["additionalAccessories"],
-      connectorDefaults: connectorDefaults.value as CatalogItem["connectorDefaults"],
+      connectorDefaults: connectorDefaults.value,
       connectorLayout: connectorLayout.value as CatalogItem["connectorLayout"]
     });
   }

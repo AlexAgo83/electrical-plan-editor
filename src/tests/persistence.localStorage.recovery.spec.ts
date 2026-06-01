@@ -116,10 +116,10 @@ describe("localStorage persistence adapter - migration recovery and sidecars", (
               }
             }
           },
-          catalogItems: { byId: {} as typeof scoped.catalogItems.byId, allIds: [] }
+          catalogItems: { byId: {}, allIds: [] }
         }
       },
-      catalogItems: { byId: {} as typeof state.catalogItems.byId, allIds: [] }
+      catalogItems: { byId: {}, allIds: [] }
     };
 
     const storage = createMemoryStorage({

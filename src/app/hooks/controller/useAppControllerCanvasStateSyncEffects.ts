@@ -46,7 +46,7 @@ export function useAppControllerCanvasStateSyncEffects({
   setNetworkAutoSegmentLabelRotation
 }: UseAppControllerCanvasStateSyncEffectsParams) {
   useEffect(() => {
-    setManualNodePositions({} as Record<NodeId, NodePosition>);
+    setManualNodePositions({});
   }, [activeNetworkId, setManualNodePositions]);
 
   useEffect(() => {

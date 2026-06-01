@@ -185,9 +185,9 @@ export function createEmptyNetworkScopedState(): NetworkScopedState {
     nodes: createEmptyEntityState<NetworkNode, NodeId>(),
     segments: createEmptyEntityState<Segment, SegmentId>(),
     wires: createEmptyEntityState<Wire, WireId>(),
-    nodePositions: {} as Record<NodeId, LayoutNodePosition>,
-    connectorCavityOccupancy: {} as Record<ConnectorId, Record<number, string>>,
-    splicePortOccupancy: {} as Record<SpliceId, Record<number, string>>
+    nodePositions: {},
+    connectorCavityOccupancy: {},
+    splicePortOccupancy: {}
   };
 }
 
@@ -210,16 +210,16 @@ export function createEmptyWorkspaceState(themeMode: ThemeMode = "warmBrown"): A
     networks: createEmptyEntityState<Network, NetworkId>(),
     harnessAssemblies: createEmptyEntityState<HarnessAssembly, HarnessAssemblyId>(),
     activeNetworkId: null,
-    networkStates: {} as Record<NetworkId, NetworkScopedState>,
+    networkStates: {},
     catalogItems: createEmptyEntityState<CatalogItem, CatalogItemId>(),
     connectors: createEmptyEntityState<Connector, ConnectorId>(),
     splices: createEmptyEntityState<Splice, SpliceId>(),
     nodes: createEmptyEntityState<NetworkNode, NodeId>(),
     segments: createEmptyEntityState<Segment, SegmentId>(),
     wires: createEmptyEntityState<Wire, WireId>(),
-    nodePositions: {} as Record<NodeId, LayoutNodePosition>,
-    connectorCavityOccupancy: {} as Record<ConnectorId, Record<number, string>>,
-    splicePortOccupancy: {} as Record<SpliceId, Record<number, string>>,
+    nodePositions: {},
+    connectorCavityOccupancy: {},
+    splicePortOccupancy: {},
     ui: {
       selected: null,
       lastError: null,
@@ -246,14 +246,14 @@ export function createInitialState(): AppState {
     networks: {
       byId: {
         [defaultNetwork.id]: defaultNetwork
-      } as Record<NetworkId, Network>,
+      },
       allIds: [defaultNetwork.id]
     },
     harnessAssemblies: createEmptyEntityState<HarnessAssembly, HarnessAssemblyId>(),
     activeNetworkId: defaultNetwork.id,
     networkStates: {
       [defaultNetwork.id]: defaultScopedState
-    } as Record<NetworkId, NetworkScopedState>,
+    },
     catalogItems: defaultScopedState.catalogItems,
     connectors: defaultScopedState.connectors,
     splices: defaultScopedState.splices,
