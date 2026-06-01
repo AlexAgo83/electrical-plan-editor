@@ -692,7 +692,7 @@ export function SettingsWorkspaceContent({
               type="text"
               value={activeAiProviderConfig.model}
               onChange={(event) => aiSettings.updateProviderConfig(aiSettings.settings.provider, { model: event.target.value })}
-              placeholder={aiSettings.settings.provider === "openai" ? "gpt-4.1-mini" : "gemini-2.0-flash"}
+              placeholder={aiSettings.settings.provider === "openai" ? "gpt-5.5" : "gemini-2.0-flash"}
             />
           </label>
           <label className="settings-field">

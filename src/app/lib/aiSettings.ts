@@ -28,7 +28,7 @@ export const DEFAULT_AI_SETTINGS: AiSettings = {
   providers: {
     openai: {
       apiKey: "",
-      model: "gpt-4.1-mini",
+      model: "gpt-5.5",
       endpoint: "https://api.openai.com/v1"
     },
     gemini: {
