@@ -34,6 +34,8 @@ interface UseCatalogHandlersParams {
   setCatalogUrl: (value: string) => void;
   catalogAdditionalAccessories?: CatalogAdditionalAccessory[];
   setCatalogAdditionalAccessories?: (value: CatalogAdditionalAccessory[]) => void;
+  catalogShowAdditionalAccessories?: boolean;
+  setCatalogShowAdditionalAccessories?: (value: boolean) => void;
   catalogShowConnectorMaterialDefaults?: boolean;
   setCatalogShowConnectorMaterialDefaults?: (value: boolean) => void;
   catalogAllSameTerminals?: boolean;
@@ -87,6 +89,8 @@ export function useCatalogHandlers({
   setCatalogUrl,
   catalogAdditionalAccessories = [],
   setCatalogAdditionalAccessories = () => {},
+  catalogShowAdditionalAccessories = false,
+  setCatalogShowAdditionalAccessories = () => {},
   catalogShowConnectorMaterialDefaults = false,
   setCatalogShowConnectorMaterialDefaults = () => {},
   catalogAllSameTerminals = false,
@@ -128,6 +132,7 @@ export function useCatalogHandlers({
     setCatalogUnitPriceExclTax("");
     setCatalogUrl("");
     setCatalogAdditionalAccessories([]);
+    setCatalogShowAdditionalAccessories(false);
     clearCatalogMaterialDefaults();
     setCatalogFormError(null);
   }
@@ -141,6 +146,7 @@ export function useCatalogHandlers({
     setCatalogUnitPriceExclTax("");
     setCatalogUrl("");
     setCatalogAdditionalAccessories([]);
+    setCatalogShowAdditionalAccessories(false);
     clearCatalogMaterialDefaults();
     setCatalogFormError(null);
   }
@@ -159,6 +165,7 @@ export function useCatalogHandlers({
     setCatalogUnitPriceExclTax(item.unitPriceExclTax === undefined ? "" : String(item.unitPriceExclTax));
     setCatalogUrl(item.url ?? "");
     setCatalogAdditionalAccessories(item.additionalAccessories ?? []);
+    setCatalogShowAdditionalAccessories((item.additionalAccessories?.length ?? 0) > 0);
     setCatalogShowConnectorMaterialDefaults(item.connectorDefaults !== undefined);
     setCatalogAllSameTerminals(item.connectorDefaults?.allSameTerminals === true);
     setCatalogDefaultTerminalReference(item.connectorDefaults?.defaultTerminal?.terminalReference ?? "");
@@ -232,11 +239,11 @@ export function useCatalogHandlers({
       setCatalogFormError("URL must be empty or a valid absolute http/https URL.");
       return;
     }
-    if (additionalAccessories.some((accessory) => accessory.accessoryReference.length === 0)) {
+    if (catalogShowAdditionalAccessories && additionalAccessories.some((accessory) => accessory.accessoryReference.length === 0)) {
       setCatalogFormError("Accessory reference is required when an accessory name is filled.");
       return;
     }
-    if (additionalAccessories.some((accessory) => accessory.accessoryReference.length > 120)) {
+    if (catalogShowAdditionalAccessories && additionalAccessories.some((accessory) => accessory.accessoryReference.length > 120)) {
       setCatalogFormError("Accessory reference must be 120 characters or fewer.");
       return;
     }
@@ -266,7 +273,7 @@ export function useCatalogHandlers({
         name: catalogName.trim().length === 0 ? undefined : catalogName.trim(),
         unitPriceExclTax,
         url: url.length === 0 ? undefined : url,
-        additionalAccessories: additionalAccessories.length > 0 ? additionalAccessories : undefined,
+        additionalAccessories: catalogShowAdditionalAccessories && additionalAccessories.length > 0 ? additionalAccessories : undefined,
         connectorDefaults: catalogShowConnectorMaterialDefaults
           ? {
               allSameTerminals: catalogAllSameTerminals ? true : undefined,

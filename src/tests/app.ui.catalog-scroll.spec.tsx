@@ -103,6 +103,33 @@ describe("App integration UI - catalog scroll behavior", () => {
     }
   }, 15000);
 
+  it("scrolls to the additional accessories panel when enabling it", async () => {
+    const scrollSpy = installScrollIntoViewSpy();
+
+    try {
+      renderAppWithState(createUiIntegrationState());
+      fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+      switchScreenDrawerAware("modeling");
+
+      const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+      expect(secondaryNavRow).not.toBeNull();
+      fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
+
+      const catalogPanel = getPanelByHeading("Catalog");
+      fireEvent.click(within(catalogPanel).getByRole("button", { name: "Create catalog item" }));
+      const catalogFormPanel = getPanelByHeading("Create catalog item");
+      fireEvent.click(within(catalogFormPanel).getByLabelText("Additional accessories"));
+
+      const catalogAccessoriesPanel = getPanelByHeading("Additional accessories");
+      await waitFor(() => {
+        expect(scrollSpy.scrollTargets).toContain(catalogAccessoriesPanel);
+      });
+      expect(catalogAccessoriesPanel).toHaveAttribute("data-form-panel", "catalog-additional-accessories-form");
+    } finally {
+      scrollSpy.restore();
+    }
+  }, 15000);
+
   it("does not scroll to the catalog form when selecting a row directly", async () => {
     const scrollSpy = installScrollIntoViewSpy();
 

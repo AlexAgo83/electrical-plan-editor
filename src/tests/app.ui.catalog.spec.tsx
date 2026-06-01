@@ -50,6 +50,11 @@ describe("App integration UI - catalog", () => {
     });
     expect(screen.queryByRole("heading", { name: "Connector material defaults" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Connector physical layout" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Additional accessories" })).not.toBeInTheDocument();
+    fireEvent.click(within(catalogFormPanel).getByLabelText("Additional accessories"));
+    const catalogAccessoriesPanel = getPanelByHeading("Additional accessories");
+    expect(catalogAccessoriesPanel).toHaveClass("catalog-accessories-panel");
+    expect(within(catalogAccessoriesPanel).getByRole("button", { name: "Create" })).toBeDisabled();
     fireEvent.click(within(catalogFormPanel).getByLabelText("Connector material defaults"));
     const catalogMaterialPanel = getPanelByHeading("Connector material defaults");
     expect(catalogMaterialPanel).toHaveClass("catalog-material-defaults-panel");
@@ -266,19 +271,26 @@ describe("App integration UI - catalog", () => {
     fireEvent.change(within(catalogFormPanel).getByLabelText("Connection count"), {
       target: { value: "2" }
     });
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Add additional accessory" }));
-    fireEvent.change(within(catalogFormPanel).getByLabelText("Accessory reference"), {
+    expect(screen.queryByRole("heading", { name: "Additional accessories" })).not.toBeInTheDocument();
+    fireEvent.click(within(catalogFormPanel).getByLabelText("Additional accessories"));
+    const catalogAccessoriesPanel = getPanelByHeading("Additional accessories");
+    fireEvent.click(within(catalogAccessoriesPanel).getByRole("button", { name: "Add additional accessory" }));
+    fireEvent.change(within(catalogAccessoriesPanel).getByLabelText("Accessory reference"), {
       target: { value: "LOCK-1" }
     });
-    fireEvent.change(within(catalogFormPanel).getByLabelText("Accessory name"), {
+    fireEvent.change(within(catalogAccessoriesPanel).getByLabelText("Accessory name"), {
       target: { value: "Secondary lock" }
     });
-    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Create" }));
+    fireEvent.click(within(catalogAccessoriesPanel).getByRole("button", { name: "Create" }));
 
     const saved = Object.values(store.getState().catalogItems.byId).find(
       (item) => item?.manufacturerReference === "CAT-ACCESSORY"
     );
     expect(saved?.additionalAccessories).toEqual([{ accessoryReference: "LOCK-1", accessoryName: "Secondary lock" }]);
+
+    fireEvent.click(within(catalogFormPanel).getByLabelText("Additional accessories"));
+    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Save" }));
+    expect(store.getState().catalogItems.byId[saved!.id]?.additionalAccessories).toBeUndefined();
   });
 
   it("preserves the selected catalog table view when returning to catalog", () => {

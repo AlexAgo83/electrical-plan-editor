@@ -459,6 +459,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCatalogUrl: formsState.setCatalogUrl,
     catalogAdditionalAccessories: formsState.catalogAdditionalAccessories,
     setCatalogAdditionalAccessories: formsState.setCatalogAdditionalAccessories,
+    catalogShowAdditionalAccessories: formsState.catalogShowAdditionalAccessories,
+    setCatalogShowAdditionalAccessories: formsState.setCatalogShowAdditionalAccessories,
     catalogShowConnectorMaterialDefaults: formsState.catalogShowConnectorMaterialDefaults,
     setCatalogShowConnectorMaterialDefaults: formsState.setCatalogShowConnectorMaterialDefaults,
     catalogAllSameTerminals: formsState.catalogAllSameTerminals,

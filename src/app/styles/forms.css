@@ -56,20 +56,6 @@
   font-weight: 700;
 }
 
-.app-shell .inline-fieldset.catalog-accessories-fieldset {
-  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--theme-primary, currentColor) 8%, transparent),
-    color-mix(in srgb, currentColor 3.5%, transparent)
-  );
-  box-shadow: inset 0 1px 0 color-mix(in srgb, currentColor 12%, transparent);
-}
-
-.app-shell .catalog-accessories-fieldset .inline-fieldset-header > span {
-  color: color-mix(in srgb, var(--theme-primary, currentColor) 68%, currentColor);
-}
-
 .catalog-accessory-list {
   display: grid;
   gap: 0.55rem;
