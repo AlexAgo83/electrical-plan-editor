@@ -6,6 +6,7 @@ import { analyzeConnectorDeleteImpact } from "../../store/deleteImpact";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestAutoConnectorNodeId, suggestNextConnectorTechnicalId } from "../lib/technical-id-suggestions";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
+import { hasConnectorOccupancyIndexAboveLimit, hasConnectorWireEndpointIndexAboveLimit } from "./connectorCavityGuards";
 import { clearConnectorEndpointReferences, hasConnectorEndpointReferenceFields } from "./connectorEndpointReferences";
 import {
   formatFusePairOverrideDrafts,
@@ -65,37 +66,12 @@ function toCatalogItemId(raw: string): CatalogItemId | null {
   return raw.trim().length === 0 ? null : (raw as CatalogItemId);
 }
 
-function hasConnectorOccupancyIndexAboveLimit(store: AppStore, connectorId: ConnectorId, maxCavityCount: number): boolean {
-  const occupancy = store.getState().connectorCavityOccupancy[connectorId];
-  if (occupancy === undefined) {
-    return false;
-  }
-  return Object.keys(occupancy)
-    .map((key) => Number(key))
-    .some((index) => Number.isFinite(index) && index > maxCavityCount);
-}
-
-function hasConnectorWireEndpointIndexAboveLimit(store: AppStore, connectorId: ConnectorId, maxCavityCount: number): boolean {
-  const state = store.getState();
-  return state.wires.allIds.some((wireId) => {
-    const wire = state.wires.byId[wireId];
-    if (wire === undefined) {
-      return false;
-    }
-    return (
-      (wire.endpointA.kind === "connectorCavity" && wire.endpointA.connectorId === connectorId && wire.endpointA.cavityIndex > maxCavityCount) ||
-      (wire.endpointB.kind === "connectorCavity" && wire.endpointB.connectorId === connectorId && wire.endpointB.cavityIndex > maxCavityCount)
-    );
-  });
-}
-
 export function useConnectorHandlers({
   store,
   dispatchAction,
   confirmAction,
   connectorFormMode,
   setConnectorFormMode,
-  connectorEditAfterCreate: _connectorEditAfterCreate,
   setConnectorEditAfterCreate,
   editingConnectorId,
   setEditingConnectorId,
@@ -105,7 +81,6 @@ export function useConnectorHandlers({
   setConnectorTechnicalId,
   connectorCatalogItemId,
   setConnectorCatalogItemId,
-  connectorManufacturerReference: _connectorManufacturerReference,
   setConnectorManufacturerReference,
   connectorIsMainHarnessConnector,
   setConnectorIsMainHarnessConnector,
@@ -122,17 +97,12 @@ export function useConnectorHandlers({
   connectorAutoCreateLinkedNode,
   setConnectorAutoCreateLinkedNode,
   defaultAutoCreateLinkedNodes,
-  cavityCount: _cavityCount,
   setCavityCount,
   setConnectorFormError,
   selectedConnectorId,
   cavityIndexInput,
   connectorOccupantRefInput
 }: UseConnectorHandlersParams) {
-  void _connectorManufacturerReference;
-  void _cavityCount;
-  void _connectorEditAfterCreate;
-
   function syncDerivedConnectorCatalogFields(nextCatalogItemId: string): void {
     const catalogItem = store.getState().catalogItems.byId[nextCatalogItemId as CatalogItemId];
     if (catalogItem === undefined) {

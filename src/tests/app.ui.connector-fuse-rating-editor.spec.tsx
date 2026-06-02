@@ -73,21 +73,31 @@ describe("App integration UI - connector fuse rating editor", () => {
     expect(pairTwoInput).toHaveValue(null);
 
     expect(within(connectorFormPanel).queryByRole("toolbar", { name: /Quick ratings for fuse pair/i })).not.toBeInTheDocument();
-    const pairTwoPresetSelect = within(connectorFormPanel).getByRole("combobox", { name: "Quick rating for fuse pair 2" });
-    fireEvent.change(pairTwoPresetSelect, { target: { value: "7.5" } });
-    expect(pairTwoInput).toHaveValue(7.5);
-    expect(pairTwoPresetSelect).toHaveValue("7.5");
+    expect(within(connectorFormPanel).queryByRole("combobox", { name: /Quick rating for fuse pair/i })).not.toBeInTheDocument();
+    const pairTwoPresetButton = within(connectorFormPanel).getByRole("button", {
+      name: "Choose preset rating for fuse pair 2"
+    });
+    fireEvent.click(pairTwoPresetButton);
+    expect(pairTwoPresetButton).toHaveAttribute("aria-expanded", "true");
+    fireEvent.blur(pairTwoPresetButton, { relatedTarget: pairTwoInput });
+    expect(pairTwoPresetButton).toHaveAttribute("aria-expanded", "false");
+    expect(within(connectorFormPanel).queryByRole("menuitem", { name: "7.5 A" })).not.toBeInTheDocument();
 
-    fireEvent.click(within(connectorFormPanel).getByLabelText("Apply same rating to all pairs"));
+    fireEvent.click(pairTwoPresetButton);
+    fireEvent.click(within(connectorFormPanel).getByRole("menuitem", { name: "7.5 A" }));
+    expect(pairTwoInput).toHaveValue(7.5);
+    expect(pairTwoPresetButton).toHaveAttribute("aria-expanded", "false");
+
+    expect(within(connectorFormPanel).queryByLabelText("Apply same rating to all pairs")).not.toBeInTheDocument();
     fireEvent.change(pairTwoInput, { target: { value: "40" } });
-    expect(pairOneInput).toHaveValue(40);
+    expect(pairOneInput).toHaveValue(10);
     expect(pairTwoInput).toHaveValue(40);
 
     fireEvent.change(pairOnePinB, { target: { value: "3" } });
     fireEvent.change(pairTwoPinA, { target: { value: "2" } });
 
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Save" }));
-    expect(store.getState().connectors.byId[connectorId]?.fusePairRatings).toEqual({ 0: 40, 1: 40 });
+    expect(store.getState().connectors.byId[connectorId]?.fusePairRatings).toEqual({ 0: 10, 1: 40 });
     expect(store.getState().connectors.byId[connectorId]?.fusePairOverrides).toEqual([
       { pairIndex: 0, pinA: 1, pinB: 3 },
       { pairIndex: 1, pinA: 2, pinB: 4 }

@@ -27,6 +27,7 @@
   --fuse-rating-pin-color: color-mix(in srgb, var(--theme-muted, currentColor) 76%, currentColor);
   --fuse-rating-preset-border: color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%);
   --fuse-rating-preset-bg: color-mix(in srgb, currentColor 5%, transparent);
+  --fuse-rating-preset-menu-bg: #f8fbfd;
   --fuse-rating-preset-color: inherit;
   border-color: var(--fuse-rating-panel-border);
   background: linear-gradient(
@@ -71,7 +72,12 @@
   --fuse-rating-pin-color: var(--custom-muted-text);
   --fuse-rating-preset-border: color-mix(in srgb, var(--custom-button-border) 72%, var(--custom-panel-border));
   --fuse-rating-preset-bg: color-mix(in srgb, var(--custom-button-bg) 84%, var(--custom-panel-bg));
+  --fuse-rating-preset-menu-bg: color-mix(in srgb, var(--custom-panel-bg) 96%, var(--custom-shell-bg-bottom));
   --fuse-rating-preset-color: var(--custom-shell-text);
+}
+
+.app-shell.theme-dark .inline-fieldset.fuse-rating-editor {
+  --fuse-rating-preset-menu-bg: #172b40;
 }
 
 .fuse-rating-clear-action {
@@ -88,6 +94,7 @@
 
 .fuse-rating-table {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.4rem;
 }
 
@@ -111,6 +118,7 @@
 
 .fuse-rating-row--header {
   display: none;
+  grid-column: 1 / -1;
 }
 
 .fuse-rating-row.has-error {
@@ -138,7 +146,8 @@
   gap: 0.25rem;
 }
 
-.fuse-rating-pin-prefix {
+.fuse-rating-pin-prefix,
+.fuse-rating-unit-prefix {
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -165,7 +174,7 @@
 .fuse-rating-value-cell {
   display: inline-flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-end;
   gap: 0.4rem;
   min-width: 0;
   flex: 1 1 auto;
@@ -179,37 +188,90 @@
 
 .stack-form .fuse-rating-input-label input {
   width: 3.4rem;
+  height: 1.85rem;
   min-height: 1.85rem;
   padding-inline: 0.3rem;
 }
 
-.fuse-rating-unit {
-  font-size: 0.82rem;
-  font-weight: 800;
+.fuse-rating-unit-prefix {
+  min-width: 2rem;
 }
 
-.fuse-rating-quick-pick-label {
-  min-width: 6.2rem;
+.fuse-rating-preset-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
-.stack-form .fuse-rating-quick-pick-select {
+.fuse-rating-preset-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
   min-height: 1.85rem;
-  width: 6.2rem;
-  border-color: var(--fuse-rating-preset-border, color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%));
+  border: 1px solid var(--fuse-rating-preset-border, color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%));
+  border-radius: 0.4rem;
   background: var(--fuse-rating-preset-bg, color-mix(in srgb, currentColor 5%, transparent));
   color: var(--fuse-rating-preset-color, inherit);
+  padding: 0;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.fuse-rating-preset-button .action-button-icon {
+  width: 0.86rem;
+  height: 0.86rem;
+  flex-basis: 0.86rem;
+}
+
+.fuse-rating-preset-options {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 0.25rem);
+  right: 0;
+  display: grid;
+  min-width: 5.4rem;
+  max-height: 12rem;
+  overflow-y: auto;
+  border: 1px solid var(--fuse-rating-preset-border, color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%));
+  border-radius: 0.45rem;
+  background: var(--fuse-rating-preset-menu-bg, #f8fbfd);
+  box-shadow: 0 0.55rem 1.1rem color-mix(in srgb, black 18%, transparent);
+}
+
+.fuse-rating-preset-option {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
   padding-block: 0.18rem;
-  padding-inline: 0.36rem;
+  padding-inline: 0.6rem;
+  font: inherit;
   font-size: 0.78rem;
   font-weight: 700;
+  text-align: left;
+}
+
+.fuse-rating-preset-option:hover,
+.fuse-rating-preset-option:focus-visible {
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent);
 }
 
 .fuse-rating-row-error {
   margin-top: 0.05rem;
 }
 
+.fuse-rating-row-messages {
+  flex: 1 0 100%;
+  display: grid;
+  gap: 0.12rem;
+  padding-left: calc(2.4rem + 0.55rem);
+}
+
 .fuse-rating-row-warning {
-  flex-basis: 100%;
   margin-top: 0.05rem;
   color: color-mix(in srgb, #b54708 78%, currentColor);
   font-size: 0.74rem;
@@ -217,8 +279,16 @@
 }
 
 @media (max-width: 720px) {
+  .fuse-rating-table {
+    grid-template-columns: 1fr;
+  }
+
   .fuse-rating-row {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .fuse-rating-row-messages {
+    padding-left: 0;
   }
 }

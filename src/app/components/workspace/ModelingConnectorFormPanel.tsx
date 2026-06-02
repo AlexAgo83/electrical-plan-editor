@@ -44,7 +44,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     connectorFormError
   } = props;
   const connectorHandlers = useConnectorHandlersContext();
-  const [applySameFuseRatingToAll, setApplySameFuseRatingToAll] = useState(false);
+  const [openFuseRatingPresetPairIndex, setOpenFuseRatingPresetPairIndex] = useState<number | null>(null);
   const hasCatalogItems = catalogItems.length > 0;
   const selectedCatalogItem = catalogItems.find((item) => item.id === connectorCatalogItemId);
   const connectorCatalogFuseBoxPairs = selectedCatalogItem?.fuseBoxConfig?.pairs;
@@ -61,13 +61,6 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
   });
 
   const updateConnectorFusePairRating = (pairIndex: number, value: string): void => {
-    if (applySameFuseRatingToAll && connectorCatalogFuseBoxPairs !== undefined) {
-      setConnectorFusePairRatings(
-        Object.fromEntries(connectorCatalogFuseBoxPairs.map((pair) => [pair.pairIndex, value]))
-      );
-      return;
-    }
-
     setConnectorFusePairRatings({
       ...connectorFusePairRatings,
       [pairIndex]: value
@@ -254,6 +247,12 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
               pinB: String(pair.pinB)
             };
             const pinError = getFusePairOverrideDraftError(pinDraft, cavityCountForValidation);
+            const presetMenuId = `fuse-rating-preset-menu-${pair.pairIndex}`;
+            const isPresetMenuOpen = openFuseRatingPresetPairIndex === pair.pairIndex;
+            const conflictA = describeDuplicatePinConflict(pair.pairIndex, pinDraft.pinA);
+            const conflictB = describeDuplicatePinConflict(pair.pairIndex, pinDraft.pinB);
+            const pinConflict = conflictA ?? conflictB;
+            const hasRowMessages = pinError !== null || pinConflict !== null || draftError !== null;
             return (
               <div
                 className={`fuse-rating-row${draftError === null && pinError === null ? "" : " has-error"}`}
@@ -297,65 +296,78 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
                       }
                     />
                   </label>
-                  {pinError === null ? null : <small className="inline-error fuse-rating-row-error">{pinError}</small>}
-                  {(() => {
-                    const conflictA = describeDuplicatePinConflict(pair.pairIndex, pinDraft.pinA);
-                    const conflictB = describeDuplicatePinConflict(pair.pairIndex, pinDraft.pinB);
-                    const conflict = conflictA ?? conflictB;
-                    if (conflict === null) {
-                      return null;
-                    }
-                    return <small className="fuse-rating-row-warning" role="status">{conflict}</small>;
-                  })()}
                 </span>
                 <span className="fuse-rating-value-cell" role="cell">
                   <label className="fuse-rating-input-label">
                     <span className="sr-only">
                       Rating for fuse pair {pair.pairIndex + 1}, pins {pair.pinA} and {pair.pinB}, in amperes
                     </span>
+                    <span className="fuse-rating-unit-prefix" aria-hidden="true">Amp</span>
                     <input
                       type="number"
                       min={0}
                       step={0.5}
                       value={draft}
                       aria-invalid={draftError === null ? undefined : true}
-                      onChange={(event) => updateConnectorFusePairRating(pair.pairIndex, event.target.value)}
+                      onChange={(event) => {
+                        updateConnectorFusePairRating(pair.pairIndex, event.target.value);
+                        setOpenFuseRatingPresetPairIndex(null);
+                      }}
                     />
                   </label>
-                  <span className="fuse-rating-unit" aria-hidden="true">Amp</span>
-                  <label className="fuse-rating-quick-pick-label">
-                    <span className="sr-only">Quick rating for fuse pair {pair.pairIndex + 1}</span>
-                    <select
-                      className="fuse-rating-quick-pick-select"
-                      value={FUSE_RATING_QUICK_PICKS.includes(draft as (typeof FUSE_RATING_QUICK_PICKS)[number]) ? draft : ""}
-                      onChange={(event) => {
-                        if (event.target.value.trim().length > 0) {
-                          updateConnectorFusePairRating(pair.pairIndex, event.target.value);
-                        }
-                      }}
+                  <span
+                    className="fuse-rating-preset-menu"
+                    onBlur={(event) => {
+                      if (!event.currentTarget.contains(event.relatedTarget)) {
+                        setOpenFuseRatingPresetPairIndex(null);
+                      }
+                    }}
+                  >
+                    <button
+                      type="button"
+                      className="fuse-rating-preset-button"
+                      aria-label={`Choose preset rating for fuse pair ${pair.pairIndex + 1}`}
+                      aria-haspopup="menu"
+                      aria-expanded={isPresetMenuOpen}
+                      aria-controls={presetMenuId}
+                      title={`Choose preset rating for fuse pair ${pair.pairIndex + 1}`}
+                      onClick={() =>
+                        setOpenFuseRatingPresetPairIndex(isPresetMenuOpen ? null : pair.pairIndex)
+                      }
                     >
-                      <option value="">Preset</option>
-                      {FUSE_RATING_QUICK_PICKS.map((rating) => (
-                        <option key={rating} value={rating}>
-                          {rating} A
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  {draftError === null ? null : <small className="inline-error fuse-rating-row-error">{draftError}</small>}
+                      <span className="action-button-icon is-edit" aria-hidden="true" />
+                    </button>
+                    {isPresetMenuOpen ? (
+                      <span className="fuse-rating-preset-options" id={presetMenuId} role="menu">
+                        {FUSE_RATING_QUICK_PICKS.map((rating) => (
+                          <button
+                            key={rating}
+                            type="button"
+                            className="fuse-rating-preset-option"
+                            role="menuitem"
+                            onClick={() => {
+                              updateConnectorFusePairRating(pair.pairIndex, rating);
+                              setOpenFuseRatingPresetPairIndex(null);
+                            }}
+                          >
+                            {rating} A
+                          </button>
+                        ))}
+                      </span>
+                    ) : null}
+                  </span>
                 </span>
+                {hasRowMessages ? (
+                  <span className="fuse-rating-row-messages">
+                    {pinError === null ? null : <small className="inline-error fuse-rating-row-error">{pinError}</small>}
+                    {pinConflict === null ? null : <small className="fuse-rating-row-warning" role="status">{pinConflict}</small>}
+                    {draftError === null ? null : <small className="inline-error fuse-rating-row-error">{draftError}</small>}
+                  </span>
+                ) : null}
               </div>
             );
           })}
         </div>
-        <label className="settings-checkbox">
-          <input
-            type="checkbox"
-            checked={applySameFuseRatingToAll}
-            onChange={(event) => setApplySameFuseRatingToAll(event.target.checked)}
-          />
-          Apply same rating to all pairs
-        </label>
       </fieldset>
     ) : null}
     <label className="settings-checkbox">
