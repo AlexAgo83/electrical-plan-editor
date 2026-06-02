@@ -7,7 +7,16 @@ import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-s
 import { suggestAutoConnectorNodeId, suggestNextConnectorTechnicalId } from "../lib/technical-id-suggestions";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 import { clearConnectorEndpointReferences, hasConnectorEndpointReferenceFields } from "./connectorEndpointReferences";
-import { formatFusePairRatingDrafts, hasInvalidFusePairRatingDraft, serializeFusePairRatings, type ConnectorFusePairRatingDrafts } from "./connectorFusePairRatings";
+import {
+  formatFusePairOverrideDrafts,
+  formatFusePairRatingDrafts,
+  hasInvalidFusePairOverrideDraft,
+  hasInvalidFusePairRatingDraft,
+  serializeFusePairOverrides,
+  serializeFusePairRatings,
+  type ConnectorFusePairOverrideDrafts,
+  type ConnectorFusePairRatingDrafts
+} from "./connectorFusePairRatings";
 
 type DispatchAction = (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean }) => void;
 
@@ -39,6 +48,8 @@ interface UseConnectorHandlersParams {
   setConnectorTerminalOverridesText: (value: string) => void;
   connectorFusePairRatings: ConnectorFusePairRatingDrafts;
   setConnectorFusePairRatings: (value: ConnectorFusePairRatingDrafts) => void;
+  connectorFusePairOverrides: ConnectorFusePairOverrideDrafts;
+  setConnectorFusePairOverrides: (value: ConnectorFusePairOverrideDrafts) => void;
   connectorAutoCreateLinkedNode: boolean;
   setConnectorAutoCreateLinkedNode: (value: boolean) => void;
   defaultAutoCreateLinkedNodes: boolean;
@@ -106,6 +117,8 @@ export function useConnectorHandlers({
   setConnectorTerminalOverridesText,
   connectorFusePairRatings,
   setConnectorFusePairRatings,
+  connectorFusePairOverrides,
+  setConnectorFusePairOverrides,
   connectorAutoCreateLinkedNode,
   setConnectorAutoCreateLinkedNode,
   defaultAutoCreateLinkedNodes,
@@ -184,6 +197,7 @@ export function useConnectorHandlers({
     setConnectorApplyCatalogSeals(true);
     setConnectorTerminalOverridesText("");
     setConnectorFusePairRatings({});
+    setConnectorFusePairOverrides({});
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setConnectorFormError(null);
   }
@@ -201,6 +215,7 @@ export function useConnectorHandlers({
     setConnectorApplyCatalogSeals(true);
     setConnectorTerminalOverridesText("");
     setConnectorFusePairRatings({});
+    setConnectorFusePairOverrides({});
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setCavityCount("4");
     setConnectorFormError(null);
@@ -243,6 +258,8 @@ export function useConnectorHandlers({
             .join("\n")
     );
     setConnectorFusePairRatings(formatFusePairRatingDrafts(connector.fusePairRatings));
+    const effectiveOverrides = connector.fusePairOverrides ?? catalogItem?.fuseBoxConfig?.pairs;
+    setConnectorFusePairOverrides(formatFusePairOverrideDrafts(effectiveOverrides));
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setConnectorFormError(null);
     dispatchAction(appActions.select({ kind: "connector", id: connector.id }));
@@ -304,8 +321,20 @@ export function useConnectorHandlers({
       firstInvalidInput?.focus();
       return;
     }
-    const fusePairIndexes = new Set(selectedCatalogItem.fuseBoxConfig?.pairs.map((pair) => pair.pairIndex) ?? []);
+    const catalogFuseBoxPairs = selectedCatalogItem.fuseBoxConfig?.pairs;
+    if (
+      catalogFuseBoxPairs !== undefined &&
+      catalogFuseBoxPairs.length > 0 &&
+      hasInvalidFusePairOverrideDraft(connectorFusePairOverrides, normalizedCavityCount)
+    ) {
+      setConnectorFormError(`Fuse pair pins must be distinct integers between 1 and ${normalizedCavityCount}.`);
+      const firstInvalidPinInput = event.currentTarget.querySelector<HTMLInputElement>("[data-fuse-pair-invalid='true'] input");
+      firstInvalidPinInput?.focus();
+      return;
+    }
+    const fusePairIndexes = new Set(catalogFuseBoxPairs?.map((pair) => pair.pairIndex) ?? []);
     const fusePairRatings = serializeFusePairRatings(connectorFusePairRatings, fusePairIndexes.size === 0 ? undefined : fusePairIndexes);
+    const fusePairOverrides = serializeFusePairOverrides(connectorFusePairOverrides, catalogFuseBoxPairs);
 
     setConnectorFormError(null);
 
@@ -336,6 +365,7 @@ export function useConnectorHandlers({
                 return overrides;
               }, {}),
         fusePairRatings,
+        fusePairOverrides,
         cavityCount: normalizedCavityCount
       })
     );

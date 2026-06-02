@@ -40,6 +40,7 @@ export interface Connector {
   applyCatalogSeals?: boolean;
   terminalOverrides?: Record<number, ConnectorTerminalMaterial>;
   fusePairRatings?: Record<number, number>;
+  fusePairOverrides?: FuseBoxPair[];
   cableCalloutPosition?: {
     x: number;
     y: number;

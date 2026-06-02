@@ -131,16 +131,16 @@
 }
 
 .functional-node--fuse .functional-fuse-body {
-  fill: var(--network-node-fuse-fill, #ffd6a8);
-  stroke: var(--network-node-fuse-stroke, #c2410c);
-  stroke-width: 2.5;
+  fill: var(--network-node-connector-fill, #dff0ff);
+  stroke: var(--network-node-stroke-color, #55748d);
+  stroke-width: 2;
 }
 
 .functional-node--fuse .functional-fuse-terminal,
 .functional-node--fuse .functional-fuse-element {
   fill: none;
-  stroke: var(--network-node-fuse-element, #7c2d12);
-  stroke-width: 2.5;
+  stroke: var(--network-node-stroke-color, #55748d);
+  stroke-width: 2;
   stroke-linecap: round;
 }
 
@@ -149,8 +149,8 @@
 }
 
 .functional-fuse-rating-bg {
-  fill: var(--network-node-fuse-rating-bg, #fed7aa);
-  stroke: var(--network-node-fuse-stroke, #c2410c);
+  fill: color-mix(in srgb, var(--network-node-connector-fill, #dff0ff) 72%, transparent);
+  stroke: var(--network-node-stroke-color, #55748d);
   stroke-width: 1;
 }
 
@@ -160,7 +160,7 @@
 }
 
 .functional-fuse-rating-text {
-  fill: var(--network-node-fuse-rating-fg, #7c2d12);
+  fill: var(--network-node-label-color, #183549);
   font-size: 9px;
   font-weight: 900;
   pointer-events: none;

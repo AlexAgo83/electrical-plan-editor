@@ -583,6 +583,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setConnectorTerminalOverridesText: formsState.setConnectorTerminalOverridesText,
     connectorFusePairRatings: formsState.connectorFusePairRatings,
     setConnectorFusePairRatings: formsState.setConnectorFusePairRatings,
+    connectorFusePairOverrides: formsState.connectorFusePairOverrides,
+    setConnectorFusePairOverrides: formsState.setConnectorFusePairOverrides,
     connectorAutoCreateLinkedNode: formsState.connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode: formsState.setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,

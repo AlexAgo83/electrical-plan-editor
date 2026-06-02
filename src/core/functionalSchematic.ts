@@ -405,8 +405,9 @@ function buildFuseBoxCavityInfo(
     if (catalogItem?.fuseBoxConfig === undefined) {
       continue;
     }
+    const effectivePairs = connector.fusePairOverrides ?? catalogItem.fuseBoxConfig.pairs;
     const cavityMap = new Map<number, { pairIndex: number; isA: boolean }>();
-    for (const pair of catalogItem.fuseBoxConfig.pairs) {
+    for (const pair of effectivePairs) {
       cavityMap.set(pair.pinA, { pairIndex: pair.pairIndex, isA: true });
       cavityMap.set(pair.pinB, { pairIndex: pair.pairIndex, isA: false });
     }

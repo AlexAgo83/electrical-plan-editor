@@ -497,6 +497,8 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     setConnectorTerminalOverridesText: params.setConnectorTerminalOverridesText,
     connectorFusePairRatings: params.connectorFusePairRatings,
     setConnectorFusePairRatings: params.setConnectorFusePairRatings,
+    connectorFusePairOverrides: params.connectorFusePairOverrides,
+    setConnectorFusePairOverrides: params.setConnectorFusePairOverrides,
     connectorAutoCreateLinkedNode: params.connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode: params.setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed: params.connectorTechnicalIdAlreadyUsed,

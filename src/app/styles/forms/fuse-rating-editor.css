@@ -34,24 +34,25 @@
 }
 
 .fuse-rating-row {
-  display: grid;
-  grid-template-columns: 3.2rem 5.6rem minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: 0.55rem;
-  align-items: start;
-  padding: 0.45rem;
+  padding: 0.4rem 0.5rem;
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   border-radius: 0.5rem;
   background: color-mix(in srgb, currentColor 3%, transparent);
 }
 
+.fuse-rating-row > .fuse-rating-pair {
+  flex: 0 0 2.4rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.85rem;
+}
+
 .fuse-rating-row--header {
-  border: 0;
-  background: transparent;
-  color: color-mix(in srgb, var(--theme-primary, currentColor) 62%, currentColor);
-  font-size: 0.72rem;
-  font-weight: 800;
-  padding-block: 0 0.1rem;
-  text-transform: uppercase;
+  display: none;
 }
 
 .fuse-rating-row.has-error {
@@ -61,31 +62,67 @@
 
 .fuse-rating-pair,
 .fuse-rating-pins {
-  padding-top: 0.48rem;
   font-size: 0.84rem;
   font-weight: 700;
 }
 
 .fuse-rating-pins {
   color: color-mix(in srgb, currentColor 74%, transparent);
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.fuse-rating-pin-input-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.fuse-rating-pin-prefix {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  opacity: 0.78;
+}
+
+.fuse-rating-pin-separator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.85rem;
+  padding-inline: 0.1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stack-form .fuse-rating-pin-input-label input {
+  width: 2.8rem;
+  min-height: 1.85rem;
+  padding-inline: 0.3rem;
 }
 
 .fuse-rating-value-cell {
-  display: grid;
-  gap: 0.35rem;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .fuse-rating-input-label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  max-width: 8rem;
+  gap: 0.3rem;
 }
 
 .stack-form .fuse-rating-input-label input {
-  width: 5.2rem;
-  min-height: 2rem;
+  width: 3.4rem;
+  min-height: 1.85rem;
+  padding-inline: 0.3rem;
 }
 
 .fuse-rating-unit {
@@ -122,18 +159,17 @@
   margin-top: 0.05rem;
 }
 
+.fuse-rating-row-warning {
+  flex-basis: 100%;
+  margin-top: 0.05rem;
+  color: color-mix(in srgb, #b54708 78%, currentColor);
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
 @media (max-width: 720px) {
-  .fuse-rating-row,
-  .fuse-rating-row--header {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .fuse-rating-row--header {
-    display: none;
-  }
-
-  .fuse-rating-pair,
-  .fuse-rating-pins {
-    padding-top: 0;
+  .fuse-rating-row {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

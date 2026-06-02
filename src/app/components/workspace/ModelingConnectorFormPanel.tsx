@@ -6,7 +6,7 @@ import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptio
 import { EntityReferenceButton } from "./EntityReferenceButton";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
-import { getFusePairRatingDraftError } from "../../hooks/connectorFusePairRatings";
+import { getFusePairOverrideDraftError, getFusePairRatingDraftError } from "../../hooks/connectorFusePairRatings";
 
 const FUSE_RATING_QUICK_PICKS = ["3", "4", "5", "7.5", "10", "15", "20", "25", "30", "40"] as const;
 
@@ -35,6 +35,8 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     setConnectorTerminalOverridesText,
     connectorFusePairRatings,
     setConnectorFusePairRatings,
+    connectorFusePairOverrides,
+    setConnectorFusePairOverrides,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,
@@ -74,6 +76,61 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
 
   const clearConnectorFusePairRatings = (): void => {
     setConnectorFusePairRatings({});
+  };
+
+  const updateConnectorFusePairOverride = (pairIndex: number, axis: "pinA" | "pinB", value: string): void => {
+    const previous = connectorFusePairOverrides[pairIndex] ?? { pinA: "", pinB: "" };
+    setConnectorFusePairOverrides({
+      ...connectorFusePairOverrides,
+      [pairIndex]: { ...previous, [axis]: value }
+    });
+  };
+
+  const resetConnectorFusePairOverridesToCatalog = (): void => {
+    if (connectorCatalogFuseBoxPairs === undefined) {
+      setConnectorFusePairOverrides({});
+      return;
+    }
+    setConnectorFusePairOverrides(
+      Object.fromEntries(
+        connectorCatalogFuseBoxPairs.map((pair) => [
+          pair.pairIndex,
+          { pinA: String(pair.pinA), pinB: String(pair.pinB) }
+        ])
+      )
+    );
+  };
+
+  const cavityCountNumber = Number(cavityCount);
+  const cavityCountForValidation = Number.isFinite(cavityCountNumber) && cavityCountNumber > 0 ? cavityCountNumber : 1;
+
+  const fusePairPinOwners = new Map<number, number[]>();
+  if (connectorCatalogFuseBoxPairs !== undefined) {
+    for (const pair of connectorCatalogFuseBoxPairs) {
+      const draft = connectorFusePairOverrides[pair.pairIndex];
+      const pinA = Number((draft?.pinA ?? String(pair.pinA)).trim());
+      const pinB = Number((draft?.pinB ?? String(pair.pinB)).trim());
+      for (const pin of [pinA, pinB]) {
+        if (!Number.isInteger(pin) || pin < 1) {
+          continue;
+        }
+        const owners = fusePairPinOwners.get(pin) ?? [];
+        owners.push(pair.pairIndex);
+        fusePairPinOwners.set(pin, owners);
+      }
+    }
+  }
+  const describeDuplicatePinConflict = (pairIndex: number, pinValueRaw: string): string | null => {
+    const pin = Number(pinValueRaw.trim());
+    if (!Number.isInteger(pin)) {
+      return null;
+    }
+    const owners = (fusePairPinOwners.get(pin) ?? []).filter((owner) => owner !== pairIndex);
+    if (owners.length === 0) {
+      return null;
+    }
+    const otherPairs = Array.from(new Set(owners)).map((index) => `#${index + 1}`).join(", ");
+    return `Pin ${pin} is already used by pair ${otherPairs}.`;
   };
 
   return (
@@ -179,6 +236,9 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
           <button type="button" className="link-button fuse-rating-clear-action" onClick={clearConnectorFusePairRatings}>
             Clear all
           </button>
+          <button type="button" className="link-button fuse-rating-clear-action" onClick={resetConnectorFusePairOverridesToCatalog}>
+            Reset pairs to catalog
+          </button>
         </legend>
         <div className="fuse-rating-table" role="table" aria-label="Fuse ratings">
           <div className="fuse-rating-row fuse-rating-row--header" role="row">
@@ -189,18 +249,64 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
           {connectorCatalogFuseBoxPairs.map((pair) => {
             const draft = connectorFusePairRatings[pair.pairIndex] ?? "";
             const draftError = getFusePairRatingDraftError(draft);
+            const pinDraft = connectorFusePairOverrides[pair.pairIndex] ?? {
+              pinA: String(pair.pinA),
+              pinB: String(pair.pinB)
+            };
+            const pinError = getFusePairOverrideDraftError(pinDraft, cavityCountForValidation);
             return (
               <div
-                className={`fuse-rating-row${draftError === null ? "" : " has-error"}`}
+                className={`fuse-rating-row${draftError === null && pinError === null ? "" : " has-error"}`}
                 key={pair.pairIndex}
                 role="row"
                 data-fuse-rating-invalid={draftError === null ? undefined : "true"}
+                data-fuse-pair-invalid={pinError === null ? undefined : "true"}
               >
                 <span className="fuse-rating-pair" role="cell">
                   #{pair.pairIndex + 1}
                 </span>
                 <span className="fuse-rating-pins" role="cell">
-                  pin {pair.pinA} - {pair.pinB}
+                  <label className="fuse-rating-pin-input-label">
+                    <span className="sr-only">{`Pin A for fuse pair ${pair.pairIndex + 1}`}</span>
+                    <span className="fuse-rating-pin-prefix" aria-hidden="true">PIN</span>
+                    <input
+                      type="number"
+                      min={1}
+                      step={1}
+                      max={cavityCountForValidation}
+                      value={pinDraft.pinA}
+                      aria-invalid={pinError === null ? undefined : true}
+                      onChange={(event) =>
+                        updateConnectorFusePairOverride(pair.pairIndex, "pinA", event.target.value)
+                      }
+                    />
+                  </label>
+                  <span className="fuse-rating-pin-separator" aria-hidden="true">-</span>
+                  <label className="fuse-rating-pin-input-label">
+                    <span className="sr-only">{`Pin B for fuse pair ${pair.pairIndex + 1}`}</span>
+                    <span className="fuse-rating-pin-prefix" aria-hidden="true">PIN</span>
+                    <input
+                      type="number"
+                      min={1}
+                      step={1}
+                      max={cavityCountForValidation}
+                      value={pinDraft.pinB}
+                      aria-invalid={pinError === null ? undefined : true}
+                      onChange={(event) =>
+                        updateConnectorFusePairOverride(pair.pairIndex, "pinB", event.target.value)
+                      }
+                    />
+                  </label>
+                  {pinError === null ? null : <small className="inline-error fuse-rating-row-error">{pinError}</small>}
+                  {(() => {
+                    const conflictA = describeDuplicatePinConflict(pair.pairIndex, pinDraft.pinA);
+                    const conflictB = describeDuplicatePinConflict(pair.pairIndex, pinDraft.pinB);
+                    const conflict = conflictA ?? conflictB;
+                    if (conflict === null) {
+                      return null;
+                    }
+                    return <small className="fuse-rating-row-warning" role="status">{conflict}</small>;
+                  })()}
                 </span>
                 <span className="fuse-rating-value-cell" role="cell">
                   <label className="fuse-rating-input-label">
@@ -215,8 +321,8 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
                       aria-invalid={draftError === null ? undefined : true}
                       onChange={(event) => updateConnectorFusePairRating(pair.pairIndex, event.target.value)}
                     />
-                    <span className="fuse-rating-unit" aria-hidden="true">A</span>
                   </label>
+                  <span className="fuse-rating-unit" aria-hidden="true">Amp</span>
                   <span className="fuse-rating-quick-picks" role="toolbar" aria-label={`Quick ratings for fuse pair ${pair.pairIndex + 1}`}>
                     {FUSE_RATING_QUICK_PICKS.map((rating) => (
                       <button

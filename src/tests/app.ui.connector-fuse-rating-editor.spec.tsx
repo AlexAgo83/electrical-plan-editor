@@ -54,8 +54,14 @@ describe("App integration UI - connector fuse rating editor", () => {
 
     const connectorFormPanel = getPanelByHeading("Edit Connector");
     expect(within(connectorFormPanel).queryByLabelText(/one per line: pairIndex,amps/i)).not.toBeInTheDocument();
-    expect(within(connectorFormPanel).getByText("pin 1 - 2")).toBeInTheDocument();
-    expect(within(connectorFormPanel).getByText("pin 3 - 4")).toBeInTheDocument();
+    const pairOnePinA = within(connectorFormPanel).getByRole("spinbutton", { name: "Pin A for fuse pair 1" });
+    const pairOnePinB = within(connectorFormPanel).getByRole("spinbutton", { name: "Pin B for fuse pair 1" });
+    const pairTwoPinA = within(connectorFormPanel).getByRole("spinbutton", { name: "Pin A for fuse pair 2" });
+    const pairTwoPinB = within(connectorFormPanel).getByRole("spinbutton", { name: "Pin B for fuse pair 2" });
+    expect(pairOnePinA).toHaveValue(1);
+    expect(pairOnePinB).toHaveValue(2);
+    expect(pairTwoPinA).toHaveValue(3);
+    expect(pairTwoPinB).toHaveValue(4);
 
     const pairOneInput = within(connectorFormPanel).getByRole("spinbutton", {
       name: "Rating for fuse pair 1, pins 1 and 2, in amperes"
@@ -76,7 +82,14 @@ describe("App integration UI - connector fuse rating editor", () => {
     expect(pairOneInput).toHaveValue(40);
     expect(pairTwoInput).toHaveValue(40);
 
+    fireEvent.change(pairOnePinB, { target: { value: "3" } });
+    fireEvent.change(pairTwoPinA, { target: { value: "2" } });
+
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Save" }));
     expect(store.getState().connectors.byId[connectorId]?.fusePairRatings).toEqual({ 0: 40, 1: 40 });
+    expect(store.getState().connectors.byId[connectorId]?.fusePairOverrides).toEqual([
+      { pairIndex: 0, pinA: 1, pinB: 3 },
+      { pairIndex: 1, pinA: 2, pinB: 4 }
+    ]);
   });
 });

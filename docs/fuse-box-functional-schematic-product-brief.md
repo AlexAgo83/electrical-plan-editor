@@ -43,3 +43,24 @@ The current fuse symbol also looks too similar to a splice, and fuse ratings are
 - Empty pair rating omits the pair from `Connector.fusePairRatings`.
 - Quick-pick buttons update the targeted pair and expose matching pressed state.
 - Applying the same rating to all pairs propagates subsequent edits to every row.
+
+## Iteration: vertical fuse symbol, side-mounted labels, Amp unit, editable pairs
+
+### Visual
+
+- The fuse cartridge in the functional schematic is rendered vertically: terminals enter at the top and exit at the bottom along the same vertical fuse element line.
+- The cartridge body uses sharp right-angle corners (no rounded radius) and is taller than wide.
+- The connector technical ID label and the rating chip are rendered to the side of the cartridge instead of above and below, taking advantage of the space freed by the vertical orientation.
+- The functional schematic layout tolerates the taller fuse node by allowing the vertical overflow into adjacent rows; no schematic-wide row sizing change is required for this iteration.
+
+### Fuse rating editor
+
+- The fuse rating row order is: free-text amperage input, then the unit suffix `Amp`, then the quick-pick rating chips.
+- The unit suffix is rendered as `Amp` (replacing the previous `A`).
+- Fuse pairs can be edited directly inside the connector form. Each pair row exposes editable `pin A` and `pin B` inputs so the user can override the catalog-derived defaults locally for that connector.
+- Pair overrides persist on the connector itself as an optional override and never mutate the catalog item. When no override is present, the catalog `fuseBoxConfig.pairs` continue to drive the editor and the functional schematic.
+- Functional trace expansion and fuse-node generation respect the per-connector pair override when present and fall back to the catalog pairs otherwise.
+
+### Persistence Note
+
+- The connector entity gains an optional `fusePairOverrides` field. Absence preserves prior behavior, so legacy stored connectors continue to work without migration.
