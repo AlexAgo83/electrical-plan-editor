@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactElement } from "react";
 import type { OverwriteCandidate } from "../../../adapters/portability";
 
-export type OverwriteDecision = "overwrite" | "import-as-new";
+export type OverwriteDecision = "overwrite" | "skip" | "keep-both";
 
 interface ImportOverwriteDialogProps {
   isOpen: boolean;
@@ -20,10 +20,19 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
 }
 
 const MATCH_REASON_LABELS: Record<OverwriteCandidate["matchReason"], string> = {
+  id: "same network ID",
   technicalId: "same technical ID",
   name: "same name",
   nameVariant: "similar name"
 };
+
+const DECISION_LABELS: Record<OverwriteDecision, string> = {
+  overwrite: "Overwrite existing",
+  skip: "Skip",
+  "keep-both": "Keep both (rename incoming)"
+};
+
+const DECISION_ORDER: OverwriteDecision[] = ["overwrite", "skip", "keep-both"];
 
 export function ImportOverwriteDialog({
   isOpen,
@@ -43,6 +52,7 @@ export function ImportOverwriteDialog({
     }
     return initial;
   });
+  const [manuallyDecided, setManuallyDecided] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
     if (!isOpen) {
@@ -53,6 +63,7 @@ export function ImportOverwriteDialog({
       next.set(candidate.importedNetworkId, "overwrite");
     }
     setDecisions(next);
+    setManuallyDecided(new Set());
     previousFocusedElementRef.current =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
     cancelButtonRef.current?.focus();
@@ -77,6 +88,26 @@ export function ImportOverwriteDialog({
     setDecisions((previous) => {
       const next = new Map(previous);
       next.set(importedNetworkId, decision);
+      return next;
+    });
+    setManuallyDecided((previous) => {
+      if (previous.has(importedNetworkId)) {
+        return previous;
+      }
+      const next = new Set(previous);
+      next.add(importedNetworkId);
+      return next;
+    });
+  };
+
+  const handleBulkDecision = (decision: OverwriteDecision): void => {
+    setDecisions((previous) => {
+      const next = new Map(previous);
+      for (const candidate of candidates) {
+        if (!manuallyDecided.has(candidate.importedNetworkId)) {
+          next.set(candidate.importedNetworkId, decision);
+        }
+      }
       return next;
     });
   };
@@ -163,6 +194,25 @@ export function ImportOverwriteDialog({
             : `${candidates.length} imported networks match existing ones.`}{" "}
           Choose how to handle each conflict.
         </p>
+        {candidates.length > 1 ? (
+          <div
+            className="import-overwrite-bulk-row"
+            role="group"
+            aria-label="Apply to all remaining candidates"
+          >
+            <span className="import-overwrite-bulk-label">Apply to all remaining:</span>
+            {DECISION_ORDER.map((decision) => (
+              <button
+                key={decision}
+                type="button"
+                className="import-overwrite-bulk-action"
+                onClick={() => { handleBulkDecision(decision); }}
+              >
+                {DECISION_LABELS[decision]}
+              </button>
+            ))}
+          </div>
+        ) : null}
         <ul className="import-overwrite-candidates">
           {candidates.map((candidate) => {
             const decision = decisions.get(candidate.importedNetworkId) ?? "overwrite";
@@ -181,26 +231,18 @@ export function ImportOverwriteDialog({
                   <code className="import-overwrite-tech-id">{candidate.importedTechnicalId}</code>
                 </div>
                 <div className="import-overwrite-choices" role="group" aria-label={`Decision for ${candidate.existingName}`}>
-                  <label className="import-overwrite-choice">
-                    <input
-                      type="radio"
-                      name={`decision-${candidate.importedNetworkId}`}
-                      value="overwrite"
-                      checked={decision === "overwrite"}
-                      onChange={() => { handleDecisionChange(candidate.importedNetworkId, "overwrite"); }}
-                    />
-                    <span>Overwrite existing</span>
-                  </label>
-                  <label className="import-overwrite-choice">
-                    <input
-                      type="radio"
-                      name={`decision-${candidate.importedNetworkId}`}
-                      value="import-as-new"
-                      checked={decision === "import-as-new"}
-                      onChange={() => { handleDecisionChange(candidate.importedNetworkId, "import-as-new"); }}
-                    />
-                    <span>Import as new copy</span>
-                  </label>
+                  {DECISION_ORDER.map((option) => (
+                    <label key={option} className="import-overwrite-choice">
+                      <input
+                        type="radio"
+                        name={`decision-${candidate.importedNetworkId}`}
+                        value={option}
+                        checked={decision === option}
+                        onChange={() => { handleDecisionChange(candidate.importedNetworkId, option); }}
+                      />
+                      <span>{DECISION_LABELS[option]}</span>
+                    </label>
+                  ))}
                 </div>
               </li>
             );

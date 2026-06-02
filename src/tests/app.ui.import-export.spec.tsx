@@ -131,7 +131,7 @@ describe("App integration UI - import/export", () => {
     });
 
     const overwriteDialog = await screen.findByRole("dialog", { name: "Similar networks detected" });
-    fireEvent.click(within(overwriteDialog).getByRole("radio", { name: "Import as new copy" }));
+    fireEvent.click(within(overwriteDialog).getByRole("radio", { name: "Keep both (rename incoming)" }));
     fireEvent.click(within(overwriteDialog).getByRole("button", { name: "Confirm" }));
 
     const warningDetails = await screen.findByRole("status", { name: "Import warning details" });

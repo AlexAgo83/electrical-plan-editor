@@ -9,6 +9,8 @@ import {
   parseNetworkFilePayload,
   resolveImportConflicts,
   serializeNetworkFilePayload,
+  type ImportDecisionEntry,
+  type ImportDecisionMap,
   type NetworkImportSummary
 } from "../../adapters/portability";
 import { appActions } from "../../store";
@@ -204,11 +206,16 @@ export function useNetworkImportExport({
   const proceedWithImport = useCallback(
     (
       payload: NetworkFilePayloadV1,
-      overwriteMap: ReadonlyMap<string, NetworkId>,
+      decisions: ImportDecisionMap,
       resetInput: () => void
     ): void => {
-      const overwriteNetworkIds = [...overwriteMap.values()];
-      const resolved = resolveImportConflicts(payload, store.getState(), overwriteMap);
+      const overwriteNetworkIds: NetworkId[] = [];
+      for (const entry of decisions.values()) {
+        if (entry.decision === "overwrite") {
+          overwriteNetworkIds.push(entry.existingNetworkId);
+        }
+      }
+      const resolved = resolveImportConflicts(payload, store.getState(), decisions);
       setLastImportSummary(resolved.summary);
 
       if (resolved.networks.length === 0) {
@@ -248,6 +255,32 @@ export function useNetworkImportExport({
           resolved.overwriteHarnessAssemblyIds.length > 0 ? resolved.overwriteHarnessAssemblyIds : undefined
         )
       );
+
+      const reducerRejections = store.getState().ui.lastImportRejections ?? [];
+      if (reducerRejections.length > 0) {
+        const items = reducerRejections.map(
+          (r) => `'${r.name || r.technicalId || r.networkId}': ${r.reason}`
+        );
+        setImportFailureDialog({
+          title: "Network import rejected",
+          message:
+            reducerRejections.length === 1
+              ? "The import was rejected by the workspace."
+              : `${reducerRejections.length} networks were rejected by the workspace.`,
+          items: [...items, ...resolved.summary.errors, ...resolved.summary.warnings],
+          onClose: () => setImportFailureDialog(null)
+        });
+        setImportExportStatus({
+          kind: "failed",
+          message: `Import rejected: ${reducerRejections.length} network(s).`
+        });
+        notifyToast?.("Import rejected", {
+          message: `${reducerRejections.length} network(s) rejected. See details.`,
+          variant: "warning"
+        });
+        resetInput();
+        return;
+      }
 
       const importStatusKind: ImportExportStatus["kind"] =
         resolved.summary.errors.length > 0 || resolved.summary.warnings.length > 0 ? "partial" : "success";
@@ -474,19 +507,32 @@ export function useNetworkImportExport({
     pendingOverwriteImport !== null
       ? {
           candidates: pendingOverwriteImport.candidates,
-          onConfirm: (decisions) => {
-            const overwriteMap = new Map<string, NetworkId>();
+          onConfirm: (dialogDecisions) => {
+            const decisions = new Map<string, ImportDecisionEntry>();
             for (const candidate of pendingOverwriteImport.candidates) {
-              if ((decisions.get(candidate.importedNetworkId) ?? "overwrite") === "overwrite") {
-                overwriteMap.set(candidate.importedNetworkId, candidate.existingNetworkId);
+              const choice = dialogDecisions.get(candidate.importedNetworkId) ?? "overwrite";
+              if (choice === "overwrite") {
+                decisions.set(candidate.importedNetworkId, {
+                  decision: "overwrite",
+                  existingNetworkId: candidate.existingNetworkId
+                });
+              } else if (choice === "skip") {
+                decisions.set(candidate.importedNetworkId, { decision: "skip" });
+              } else {
+                decisions.set(candidate.importedNetworkId, { decision: "keep-both" });
               }
             }
             setPendingOverwriteImport(null);
-            void proceedWithImport(pendingOverwriteImport.payload, overwriteMap, pendingOverwriteImport.resetInput);
+            void proceedWithImport(pendingOverwriteImport.payload, decisions, pendingOverwriteImport.resetInput);
           },
           onCancel: () => {
             pendingOverwriteImport.resetInput();
             setPendingOverwriteImport(null);
+            setImportExportStatus(null);
+            notifyToast?.("Import cancelled", {
+              message: "No changes were applied.",
+              variant: "info"
+            });
           }
         }
       : null;

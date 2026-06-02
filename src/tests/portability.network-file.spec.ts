@@ -3,6 +3,7 @@ import type { CatalogItemId, ConnectorId, NetworkId, SpliceId, WireId } from "..
 import { APP_RELEASE_VERSION } from "../core/schema";
 import {
   buildNetworkFilePayload,
+  detectOverwriteCandidates,
   NETWORK_FILE_PAYLOAD_KIND,
   parseNetworkFilePayload,
   resolveImportConflicts,
@@ -398,11 +399,145 @@ describe("network file portability", () => {
       ]
     };
 
-    const resolved = resolveImportConflicts(payload, existing);
+    const decisions = new Map([
+      [existing.activeNetworkId as string, { decision: "keep-both" as const }]
+    ]);
+    const resolved = resolveImportConflicts(payload, existing, decisions);
     expect(resolved.networks).toHaveLength(1);
     expect(resolved.networks[0]?.id).toBe(asNetworkId("network-main-import"));
     expect(resolved.networks[0]?.technicalId).toBe("NET-MAIN-SAMPLE-IMP");
     expect(resolved.summary.warnings.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("rejects an imported network that collides without an explicit decision", () => {
+    const existing = createInitialState();
+    const payload = {
+      schemaVersion: 2 as const,
+      exportedAt: "2026-02-21T10:20:00.000Z",
+      source: {
+        app: "electrical-plan-editor" as const,
+        appVersion: APP_RELEASE_VERSION,
+        appSchemaVersion: 2
+      },
+      networks: [
+        {
+          network: {
+            id: existing.activeNetworkId as NetworkId,
+            name: "Imported Main",
+            technicalId: "NET-MAIN-SAMPLE",
+            createdAt: "2026-02-20T10:00:00.000Z",
+            updatedAt: "2026-02-20T10:00:00.000Z"
+          },
+          state: createEmptyNetworkScopedState()
+        }
+      ]
+    };
+
+    const resolved = resolveImportConflicts(payload, existing);
+    expect(resolved.networks).toHaveLength(0);
+    expect(resolved.summary.skippedNetworkIds).toContain(existing.activeNetworkId as string);
+    expect(resolved.summary.errors.length).toBeGreaterThanOrEqual(1);
+    expect(resolved.summary.errors[0]).toMatch(/no import decision was provided/);
+  });
+
+  it("detects an id collision with matchReason 'id' even when name and technical ID differ", () => {
+    const existing = createInitialState();
+    const existingId = existing.activeNetworkId as NetworkId;
+    const existingNetworks = [existing.networks.byId[existingId]!];
+    const payload = {
+      schemaVersion: 3 as const,
+      exportedAt: "2026-02-21T10:20:00.000Z",
+      source: {
+        app: "electrical-plan-editor" as const,
+        appVersion: APP_RELEASE_VERSION,
+        appSchemaVersion: 2
+      },
+      networks: [
+        {
+          network: {
+            id: existingId,
+            name: "Renamed by user",
+            technicalId: "RENAMED-TECH",
+            createdAt: "2026-02-20T10:00:00.000Z",
+            updatedAt: "2026-02-20T10:00:00.000Z"
+          },
+          state: createEmptyNetworkScopedState()
+        }
+      ]
+    };
+
+    const candidates = detectOverwriteCandidates(payload, existingNetworks);
+    expect(candidates).toHaveLength(1);
+    expect(candidates[0]?.matchReason).toBe("id");
+    expect(candidates[0]?.importedNetworkId).toBe(existingId);
+    expect(candidates[0]?.existingNetworkId).toBe(existingId);
+  });
+
+  it("skips an imported network when its decision is 'skip'", () => {
+    const existing = createInitialState();
+    const existingId = existing.activeNetworkId as NetworkId;
+    const payload = {
+      schemaVersion: 3 as const,
+      exportedAt: "2026-02-21T10:20:00.000Z",
+      source: {
+        app: "electrical-plan-editor" as const,
+        appVersion: APP_RELEASE_VERSION,
+        appSchemaVersion: 2
+      },
+      networks: [
+        {
+          network: {
+            id: existingId,
+            name: "Imported Main",
+            technicalId: "NET-MAIN-SAMPLE",
+            createdAt: "2026-02-20T10:00:00.000Z",
+            updatedAt: "2026-02-20T10:00:00.000Z"
+          },
+          state: createEmptyNetworkScopedState()
+        }
+      ]
+    };
+
+    const decisions = new Map([[existingId as string, { decision: "skip" as const }]]);
+    const resolved = resolveImportConflicts(payload, existing, decisions);
+    expect(resolved.networks).toHaveLength(0);
+    expect(resolved.summary.skippedNetworkIds).toContain(existingId as string);
+    expect(resolved.summary.errors).toHaveLength(0);
+  });
+
+  it("reuses the existing network id when the decision is 'overwrite'", () => {
+    const existing = createInitialState();
+    const existingId = existing.activeNetworkId as NetworkId;
+    const payload = {
+      schemaVersion: 3 as const,
+      exportedAt: "2026-02-21T10:20:00.000Z",
+      source: {
+        app: "electrical-plan-editor" as const,
+        appVersion: APP_RELEASE_VERSION,
+        appSchemaVersion: 2
+      },
+      networks: [
+        {
+          network: {
+            id: existingId,
+            name: "Imported Main",
+            technicalId: "NET-MAIN-SAMPLE",
+            createdAt: "2026-02-20T10:00:00.000Z",
+            updatedAt: "2026-02-20T10:00:00.000Z"
+          },
+          state: createEmptyNetworkScopedState()
+        }
+      ]
+    };
+
+    const decisions = new Map([
+      [existingId as string, { decision: "overwrite" as const, existingNetworkId: existingId }]
+    ]);
+    const resolved = resolveImportConflicts(payload, existing, decisions);
+    expect(resolved.networks).toHaveLength(1);
+    expect(resolved.networks[0]?.id).toBe(existingId);
+    expect(resolved.summary.skippedNetworkIds).toHaveLength(0);
+    expect(resolved.summary.errors).toHaveLength(0);
   });
 
   it("normalizes malformed imported network timestamps with deterministic fallbacks", () => {

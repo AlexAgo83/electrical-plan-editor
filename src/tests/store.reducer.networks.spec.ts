@@ -343,4 +343,43 @@ describe("appReducer network lifecycle", () => {
     expect(result.activeNetworkId).toBe(importedNetworkId);
     expect(result.catalogItems.allIds).toEqual([]);
   });
+
+  it("collects reducer-level import rejections in ui.lastImportRejections with per-network reason", () => {
+    const importedNetworkId = asNetworkId("net-import-rejected");
+    const result = appReducer(
+      createInitialState(),
+      appActions.importNetworks(
+        [
+          {
+            id: importedNetworkId,
+            name: "   ",
+            technicalId: "   ",
+            createdAt: "2026-03-02T10:00:00.000Z",
+            updatedAt: "2026-03-02T10:00:00.000Z"
+          }
+        ],
+        {
+          [importedNetworkId]: {
+            catalogItems: { byId: {}, allIds: [] },
+            connectors: { byId: {}, allIds: [] },
+            splices: { byId: {}, allIds: [] },
+            nodes: { byId: {}, allIds: [] },
+            segments: { byId: {}, allIds: [] },
+            wires: { byId: {}, allIds: [] },
+            nodePositions: {},
+            connectorCavityOccupancy: {},
+            splicePortOccupancy: {}
+          }
+        },
+        true
+      )
+    );
+
+    expect(result.networks.byId[importedNetworkId]).toBeUndefined();
+    expect(result.ui.lastError).not.toBeNull();
+    expect(result.ui.lastImportRejections).toBeDefined();
+    expect(result.ui.lastImportRejections).toHaveLength(1);
+    expect(result.ui.lastImportRejections?.[0]?.networkId).toBe(importedNetworkId);
+    expect(result.ui.lastImportRejections?.[0]?.reason).toMatch(/name and technical ID/i);
+  });
 });

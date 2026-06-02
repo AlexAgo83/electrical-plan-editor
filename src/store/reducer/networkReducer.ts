@@ -1,13 +1,4 @@
-import type { Network, NetworkId } from "../../core/entities";
-import {
-  isNetworkLogoUrlValid,
-  isNetworkProjectCodeValid,
-  normalizeNetworkAuthor,
-  normalizeNetworkExportNotes,
-  normalizeNetworkIsoTimestamp,
-  normalizeNetworkLogoUrl,
-  normalizeNetworkProjectCode
-} from "../../core/networkMetadata";
+import { normalizeNetworkIsoTimestamp } from "../../core/networkMetadata";
 import { normalizeNetworkVoltageV } from "../../core/wireSizing";
 import type { AppAction } from "../actions";
 import {
@@ -17,6 +8,13 @@ import {
   type NetworkScopedState
 } from "../types";
 import {
+  cloneScopedState,
+  hasDuplicateNetworkTechnicalId,
+  normalizeNetworkMetadata,
+  normalizeOptionalText
+} from "./helpers/networkClone";
+import { collectNetworkImportRejections } from "./helpers/networkImport";
+import {
   buildNetworkDeletionFallback,
   clearActiveScope,
   loadNetworkIntoActiveScope,
@@ -24,51 +22,6 @@ import {
 } from "../networking";
 import { bumpRevision, clearLastError, removeEntity, upsertEntity, withError } from "./shared";
 import { cleanupHarnessAssembliesForDeletedNetwork } from "./harnessAssemblyReducer";
-function hasDuplicateNetworkTechnicalId(
-  state: AppState,
-  technicalId: string,
-  excludedNetworkId?: NetworkId
-): boolean {
-  return state.networks.allIds.some((networkId) => {
-    if (excludedNetworkId !== undefined && networkId === excludedNetworkId) {
-      return false;
-    }
-    const network = state.networks.byId[networkId];
-    return network?.technicalId === technicalId;
-  });
-}
-function cloneScopedState(scoped: NetworkScopedState): NetworkScopedState {
-  return {
-    catalogItems: {
-      byId: { ...scoped.catalogItems.byId },
-      allIds: [...scoped.catalogItems.allIds]
-    },
-    connectors: {
-      byId: { ...scoped.connectors.byId },
-      allIds: [...scoped.connectors.allIds]
-    },
-    splices: {
-      byId: { ...scoped.splices.byId },
-      allIds: [...scoped.splices.allIds]
-    },
-    nodes: {
-      byId: { ...scoped.nodes.byId },
-      allIds: [...scoped.nodes.allIds]
-    },
-    segments: {
-      byId: { ...scoped.segments.byId },
-      allIds: [...scoped.segments.allIds]
-    },
-    wires: {
-      byId: { ...scoped.wires.byId },
-      allIds: [...scoped.wires.allIds]
-    },
-    nodePositions: { ...scoped.nodePositions },
-    connectorCavityOccupancy: { ...scoped.connectorCavityOccupancy },
-    splicePortOccupancy: { ...scoped.splicePortOccupancy },
-    networkSummaryViewState: cloneNetworkSummaryViewState(scoped.networkSummaryViewState)
-  };
-}
 function isSameNetworkSummaryViewState(
   left: NetworkScopedState["networkSummaryViewState"],
   right: NetworkScopedState["networkSummaryViewState"]
@@ -101,47 +54,6 @@ function withUiResetSelection(state: AppState): AppState {
       selected: null,
       lastError: null
     }
-  };
-}
-function normalizeOptionalText(value: string | undefined): string | undefined {
-  if (value === undefined) {
-    return undefined;
-  }
-  const normalized = value.trim();
-  return normalized.length === 0 ? undefined : normalized;
-}
-interface NormalizeNetworkMetadataResult {
-  metadata: Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes">;
-  error: string | null;
-}
-function normalizeNetworkMetadata(
-  source: Partial<Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes">>,
-  fallback: Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes">
-): NormalizeNetworkMetadataResult {
-  const rawProjectCode = source.projectCode === undefined ? fallback.projectCode : source.projectCode;
-  const rawLogoUrl = source.logoUrl === undefined ? fallback.logoUrl : source.logoUrl;
-  const normalizedProjectCode = normalizeNetworkProjectCode(rawProjectCode);
-  const normalizedLogoUrl = normalizeNetworkLogoUrl(rawLogoUrl);
-  if (normalizedProjectCode !== undefined && !isNetworkProjectCodeValid(normalizedProjectCode)) {
-    return {
-      metadata: fallback,
-      error: "Project code supports letters, numbers, spaces, and _ . / - characters only."
-    };
-  }
-  if (normalizedLogoUrl !== undefined && !isNetworkLogoUrlValid(normalizedLogoUrl)) {
-    return {
-      metadata: fallback,
-      error: "Logo URL must use http, https, or data:image/*."
-    };
-  }
-  return {
-    metadata: {
-      author: normalizeNetworkAuthor(source.author === undefined ? fallback.author : source.author),
-      projectCode: normalizedProjectCode,
-      logoUrl: normalizedLogoUrl,
-      exportNotes: normalizeNetworkExportNotes(source.exportNotes === undefined ? fallback.exportNotes : source.exportNotes)
-    },
-    error: null
   };
 }
 export function handleNetworkActions(state: AppState, action: AppAction): AppState | null {
@@ -415,63 +327,50 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
     }
     case "network/importMany": {
       if (action.payload.networks.length === 0) {
-        return clearLastError(state);
+        const cleared = clearLastError(state);
+        return { ...cleared, ui: { ...cleared.ui, lastImportRejections: null } };
       }
       const persisted = persistActiveNetworkSnapshot(clearLastError(state));
-      let nextNetworks = persisted.networks;
       let nextHarnessAssemblies = persisted.harnessAssemblies;
-      const nextNetworkStates = { ...persisted.networkStates };
-      const nowIso = new Date().toISOString();
       const overwriteSet = new Set<string>((action.payload.overwriteNetworkIds ?? []).map((id) => id as string));
       const overwriteHarnessAssemblySet = new Set<string>(
         (action.payload.overwriteHarnessAssemblyIds ?? []).map((id) => id as string)
       );
-      for (const network of action.payload.networks) {
-        const normalizedName = network.name.trim();
-        const normalizedTechnicalId = network.technicalId.trim();
-        if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
-          return withError(state, "Cannot import network with empty name or technical ID.");
-        }
-        const isOverwrite = overwriteSet.has(network.id);
-        if (!isOverwrite && nextNetworks.byId[network.id] !== undefined) {
-          return withError(state, `Cannot import network '${network.id}': ID already exists.`);
-        }
-        if (hasDuplicateNetworkTechnicalId(
-          { ...persisted, networks: nextNetworks },
-          normalizedTechnicalId,
-          isOverwrite ? network.id : undefined
-        )) {
-          return withError(state, `Cannot import network '${normalizedTechnicalId}': technical ID already exists.`);
-        }
-        const scoped = action.payload.networkStates[network.id];
-        if (scoped === undefined) {
-          return withError(state, `Cannot import network '${network.id}': network payload is incomplete.`);
-        }
-        const normalizedMetadata = normalizeNetworkMetadata(network, {
-          author: undefined,
-          projectCode: undefined,
-          logoUrl: undefined,
-          exportNotes: undefined
-        });
-        if (normalizedMetadata.error !== null) {
-          return withError(state, normalizedMetadata.error);
-        }
-        const normalizedCreatedAt = normalizeNetworkIsoTimestamp(network.createdAt, nowIso);
-        const normalizedUpdatedAt = normalizeNetworkIsoTimestamp(network.updatedAt, normalizedCreatedAt);
-        nextNetworks = upsertEntity(nextNetworks, {
-          ...network,
-          name: normalizedName,
-          technicalId: normalizedTechnicalId,
-          description: normalizeOptionalText(network.description),
-          createdAt: normalizedCreatedAt,
-          updatedAt: normalizedUpdatedAt,
-          ...normalizedMetadata.metadata
-        });
-        nextNetworkStates[network.id] = cloneScopedState(scoped);
+      const { nextNetworks, nextNetworkStates, rejections } = collectNetworkImportRejections({
+        networks: action.payload.networks,
+        networkStates: action.payload.networkStates,
+        persisted,
+        overwriteSet,
+        nowIso: new Date().toISOString()
+      });
+      if (rejections.length > 0) {
+        const firstReason = rejections[0]!.reason;
+        const errored = withError(
+          state,
+          rejections.length === 1
+            ? `Cannot import network: ${firstReason}.`
+            : `Cannot import networks: ${rejections.length} network(s) rejected.`
+        );
+        return {
+          ...errored,
+          ui: { ...errored.ui, lastImportRejections: rejections }
+        };
       }
       for (const assembly of action.payload.harnessAssemblies ?? []) {
         if (nextHarnessAssemblies.byId[assembly.id] !== undefined && !overwriteHarnessAssemblySet.has(assembly.id)) {
-          return withError(state, `Cannot import harness assembly '${assembly.id}': ID already exists.`);
+          const errored = withError(state, `Cannot import harness assembly '${assembly.id}': ID already exists.`);
+          return {
+            ...errored,
+            ui: {
+              ...errored.ui,
+              lastImportRejections: [{
+                networkId: assembly.id as string,
+                name: assembly.name,
+                technicalId: assembly.technicalId,
+                reason: `harness assembly ID '${assembly.id}' already exists`
+              }]
+            }
+          };
         }
         nextHarnessAssemblies = upsertEntity(nextHarnessAssemblies, assembly);
       }
@@ -479,7 +378,8 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         ...persisted,
         networks: nextNetworks,
         harnessAssemblies: nextHarnessAssemblies,
-        networkStates: nextNetworkStates
+        networkStates: nextNetworkStates,
+        ui: { ...persisted.ui, lastImportRejections: null }
       };
       const desiredActiveId =
         action.payload.activateFirst && action.payload.networks[0] !== undefined

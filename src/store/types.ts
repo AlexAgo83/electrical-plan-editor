@@ -141,6 +141,13 @@ export interface NetworkScopedState {
   networkSummaryViewState?: NetworkSummaryViewState;
 }
 
+export interface ImportRejection {
+  networkId: string;
+  name: string;
+  technicalId: string;
+  reason: string;
+}
+
 export interface AppState {
   schemaVersion: AppSchemaVersion;
   networks: EntityState<Network, NetworkId>;
@@ -160,6 +167,7 @@ export interface AppState {
     selected: SelectionState | null;
     lastError: AppError | null;
     themeMode: ThemeMode;
+    lastImportRejections?: ImportRejection[] | null;
   };
   meta: {
     revision: number;

@@ -61,7 +61,11 @@ describe("network file harness assemblies", () => {
     const parsed = parseNetworkFilePayload(JSON.stringify(payload));
     expect(parsed.payload?.harnessAssemblies).toHaveLength(1);
 
-    const resolved = resolveImportConflicts(parsed.payload!, withAssembly);
+    const keepBothDecisions = new Map([
+      [defaultNetworkId as string, { decision: "keep-both" as const }],
+      ["net-b", { decision: "keep-both" as const }]
+    ]);
+    const resolved = resolveImportConflicts(parsed.payload!, withAssembly, keepBothDecisions);
     expect(resolved.harnessAssemblies).toHaveLength(1);
     expect(resolved.harnessAssemblies[0]?.members.map((member) => member.networkId)).toEqual([
       `${defaultNetworkId}-import`,
@@ -89,7 +93,10 @@ describe("network file harness assemblies", () => {
 
     const payload = buildNetworkFilePayload(withAssembly, "all", [], "2026-05-11T12:00:00.000Z");
     const parsed = parseNetworkFilePayload(JSON.stringify(payload));
-    const resolved = resolveImportConflicts(parsed.payload!, withAssembly);
+    const keepBothDecisions = new Map([
+      [defaultNetworkId as string, { decision: "keep-both" as const }]
+    ]);
+    const resolved = resolveImportConflicts(parsed.payload!, withAssembly, keepBothDecisions);
 
     expect(resolved.harnessAssemblies[0]?.id).toBe("asm-main-import");
     expect(resolved.harnessAssemblies[0]?.technicalId).toBe("ASM-MAIN-IMP");
@@ -117,8 +124,10 @@ describe("network file harness assemblies", () => {
     );
     const payload = buildNetworkFilePayload(withAssembly, "all", [], "2026-05-11T12:00:00.000Z");
     const parsed = parseNetworkFilePayload(JSON.stringify(payload));
-    const overwriteMap = new Map<string, NetworkId>([[defaultNetworkId, defaultNetworkId]]);
-    const resolved = resolveImportConflicts(parsed.payload!, withAssembly, overwriteMap);
+    const decisions = new Map([
+      [defaultNetworkId as string, { decision: "overwrite" as const, existingNetworkId: defaultNetworkId }]
+    ]);
+    const resolved = resolveImportConflicts(parsed.payload!, withAssembly, decisions);
     const imported = appReducer(
       withAssembly,
       appActions.importNetworks(
@@ -126,7 +135,7 @@ describe("network file harness assemblies", () => {
         resolved.networkStates,
         resolved.harnessAssemblies,
         false,
-        [...overwriteMap.values()],
+        [defaultNetworkId],
         resolved.overwriteHarnessAssemblyIds
       )
     );

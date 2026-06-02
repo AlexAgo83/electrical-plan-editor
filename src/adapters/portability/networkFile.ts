@@ -771,8 +771,17 @@ export interface OverwriteCandidate {
   existingNetworkId: NetworkId;
   existingName: string;
   existingTechnicalId: string;
-  matchReason: "technicalId" | "name" | "nameVariant";
+  matchReason: "id" | "technicalId" | "name" | "nameVariant";
 }
+
+export type ImportDecision = "overwrite" | "skip" | "keep-both";
+
+export type ImportDecisionEntry =
+  | { decision: "overwrite"; existingNetworkId: NetworkId }
+  | { decision: "skip" }
+  | { decision: "keep-both" };
+
+export type ImportDecisionMap = ReadonlyMap<string, ImportDecisionEntry>;
 
 export function detectOverwriteCandidates(
   payload: NetworkFilePayloadV1,
@@ -798,7 +807,9 @@ export function detectOverwriteCandidates(
 
       let matchReason: OverwriteCandidate["matchReason"] | null = null;
 
-      if (normalizedImportedTechId === normalizedExistingTechId) {
+      if (importedId === existing.id) {
+        matchReason = "id";
+      } else if (normalizedImportedTechId === normalizedExistingTechId) {
         matchReason = "technicalId";
       } else if (normalizedImportedName === normalizedExistingName) {
         matchReason = "name";
@@ -831,12 +842,28 @@ export function detectOverwriteCandidates(
 export function resolveImportConflicts(
   payload: NetworkFilePayloadV1,
   existingState: AppState,
-  overwriteMap: ReadonlyMap<string, NetworkId> = new Map()
+  decisions: ImportDecisionMap = new Map()
 ): NetworkImportResult {
   const importBaseIso = new Date().toISOString();
-  const existingTechnicalIds = new Set(existingState.networks.allIds.map((id) => existingState.networks.byId[id]?.technicalId ?? ""));
 
-  for (const existingId of overwriteMap.values()) {
+  const existingNetworksList = existingState.networks.allIds
+    .map((id) => existingState.networks.byId[id])
+    .filter((n): n is Network => n !== undefined);
+  const candidates = detectOverwriteCandidates(payload, existingNetworksList);
+  const candidateByImportedId = new Map<string, OverwriteCandidate>();
+  for (const candidate of candidates) {
+    candidateByImportedId.set(candidate.importedNetworkId, candidate);
+  }
+
+  const overwriteTargets: NetworkId[] = [];
+  for (const entry of decisions.values()) {
+    if (entry.decision === "overwrite") {
+      overwriteTargets.push(entry.existingNetworkId);
+    }
+  }
+
+  const existingTechnicalIds = new Set(existingState.networks.allIds.map((id) => existingState.networks.byId[id]?.technicalId ?? ""));
+  for (const existingId of overwriteTargets) {
     const overwrittenNetwork = existingState.networks.byId[existingId];
     if (overwrittenNetwork !== undefined) {
       existingTechnicalIds.delete(overwrittenNetwork.technicalId);
@@ -848,7 +875,7 @@ export function resolveImportConflicts(
   const existingHarnessAssemblyTechnicalIds = new Set(
     existingState.harnessAssemblies.allIds.map((id) => existingState.harnessAssemblies.byId[id]?.technicalId ?? "")
   );
-  const overwrittenNetworkIds = new Set<string>([...overwriteMap.values()].map((id) => id as string));
+  const overwrittenNetworkIds = new Set<string>(overwriteTargets.map((id) => id as string));
   const harnessAssemblyByTechnicalId = new Map<string, HarnessAssembly>();
   const harnessAssemblyByMemberKey = new Map<string, HarnessAssembly>();
   for (const assemblyId of existingState.harnessAssemblies.allIds) {
@@ -881,14 +908,35 @@ export function resolveImportConflicts(
       continue;
     }
 
-    let importedId = sourceNetwork.id as string;
-    const targetExistingId = overwriteMap.get(importedId);
+    const sourceId = sourceNetwork.id as string;
+    const candidate = candidateByImportedId.get(sourceId);
+    const decision = decisions.get(sourceId);
 
-    if (targetExistingId !== undefined) {
-      importedId = targetExistingId;
+    if (candidate !== undefined && decision === undefined) {
+      summary.errors.push(
+        `Skipped network '${sourceId}': collides with existing network '${candidate.existingName || candidate.existingTechnicalId}' (matchReason=${candidate.matchReason}) but no import decision was provided.`
+      );
+      summary.skippedNetworkIds.push(sourceId);
+      continue;
+    }
+    if (candidate !== undefined && decision?.decision === "skip") {
+      summary.skippedNetworkIds.push(sourceId);
+      continue;
+    }
+
+    let importedId = sourceId;
+    if (candidate !== undefined && decision?.decision === "overwrite") {
+      importedId = decision.existingNetworkId as string;
+    } else if (candidate !== undefined && decision?.decision === "keep-both") {
+      if (existingIds.has(importedId)) {
+        const dedupedId = dedupeWithSuffix(importedId, existingIds, "-import");
+        summary.warnings.push(`Network ID '${sourceId}' was renamed to '${dedupedId}' during import.`);
+        importedId = dedupedId;
+      }
+      existingIds.add(importedId);
     } else if (existingIds.has(importedId)) {
       const dedupedId = dedupeWithSuffix(importedId, existingIds, "-import");
-      summary.warnings.push(`Network ID '${sourceNetwork.id}' was renamed to '${dedupedId}' during import.`);
+      summary.warnings.push(`Network ID '${sourceId}' was renamed to '${dedupedId}' during import.`);
       importedId = dedupedId;
       existingIds.add(importedId);
     } else {

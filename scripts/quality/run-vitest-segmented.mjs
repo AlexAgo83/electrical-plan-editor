@@ -22,6 +22,7 @@ const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.hover-descriptions.spec.tsx",
   "src/tests/app.ui.home.spec.tsx",
   "src/tests/app.ui.import-export.spec.tsx",
+  "src/tests/app.ui.import-overwrite-dialog.spec.tsx",
   "src/tests/app.ui.inspector-shell.spec.tsx",
   "src/tests/app.ui.lazy-loading-regression.spec.tsx",
   "src/tests/app.ui.list-ergonomics.spec.tsx",
