@@ -33,7 +33,7 @@ export function collectNetworkImportRejections(
 
   const pushRejection = (network: Network, reason: string): void => {
     rejections.push({
-      networkId: network.id as string,
+      networkId: network.id,
       name: network.name,
       technicalId: network.technicalId,
       reason

@@ -364,7 +364,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
             ui: {
               ...errored.ui,
               lastImportRejections: [{
-                networkId: assembly.id as string,
+                networkId: assembly.id,
                 name: assembly.name,
                 technicalId: assembly.technicalId,
                 reason: `harness assembly ID '${assembly.id}' already exists`

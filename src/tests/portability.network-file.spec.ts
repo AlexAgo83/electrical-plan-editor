@@ -498,10 +498,10 @@ describe("network file portability", () => {
       ]
     };
 
-    const decisions = new Map([[existingId as string, { decision: "skip" as const }]]);
+    const decisions = new Map([[existingId, { decision: "skip" as const }]]);
     const resolved = resolveImportConflicts(payload, existing, decisions);
     expect(resolved.networks).toHaveLength(0);
-    expect(resolved.summary.skippedNetworkIds).toContain(existingId as string);
+    expect(resolved.summary.skippedNetworkIds).toContain(existingId);
     expect(resolved.summary.errors).toHaveLength(0);
   });
 
@@ -531,7 +531,7 @@ describe("network file portability", () => {
     };
 
     const decisions = new Map([
-      [existingId as string, { decision: "overwrite" as const, existingNetworkId: existingId }]
+      [existingId, { decision: "overwrite" as const, existingNetworkId: existingId }]
     ]);
     const resolved = resolveImportConflicts(payload, existing, decisions);
     expect(resolved.networks).toHaveLength(1);

@@ -926,7 +926,7 @@ export function resolveImportConflicts(
 
     let importedId = sourceId;
     if (candidate !== undefined && decision?.decision === "overwrite") {
-      importedId = decision.existingNetworkId as string;
+      importedId = decision.existingNetworkId;
     } else if (candidate !== undefined && decision?.decision === "keep-both") {
       if (existingIds.has(importedId)) {
         const dedupedId = dedupeWithSuffix(importedId, existingIds, "-import");
