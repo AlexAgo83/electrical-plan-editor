@@ -16,6 +16,70 @@
   gap: 0.65rem;
 }
 
+.app-shell .inline-fieldset.fuse-rating-editor {
+  --fuse-rating-panel-border: color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%);
+  --fuse-rating-panel-bg-start: color-mix(in srgb, var(--theme-primary, currentColor) 9%, transparent);
+  --fuse-rating-panel-bg-end: color-mix(in srgb, currentColor 4%, transparent);
+  --fuse-rating-panel-highlight: color-mix(in srgb, currentColor 12%, transparent);
+  --fuse-rating-legend-color: color-mix(in srgb, var(--theme-primary, currentColor) 68%, currentColor);
+  --fuse-rating-row-border: color-mix(in srgb, var(--theme-primary, currentColor) 18%, currentColor 12%);
+  --fuse-rating-row-bg: color-mix(in srgb, currentColor 3%, transparent);
+  --fuse-rating-pin-color: color-mix(in srgb, var(--theme-muted, currentColor) 76%, currentColor);
+  --fuse-rating-chip-border: color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%);
+  --fuse-rating-chip-bg: color-mix(in srgb, currentColor 5%, transparent);
+  --fuse-rating-chip-color: inherit;
+  --fuse-rating-chip-active-border: color-mix(in srgb, var(--theme-primary, currentColor) 72%, currentColor 10%);
+  --fuse-rating-chip-active-bg: color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent);
+  --fuse-rating-chip-active-color: color-mix(in srgb, var(--theme-primary, currentColor) 82%, currentColor);
+  border-color: var(--fuse-rating-panel-border);
+  background: linear-gradient(
+    180deg,
+    var(--fuse-rating-panel-bg-start),
+    var(--fuse-rating-panel-bg-end)
+  );
+  box-shadow: inset 0 1px 0 var(--fuse-rating-panel-highlight);
+}
+
+.app-shell .inline-fieldset.fuse-rating-editor legend {
+  color: var(--fuse-rating-legend-color);
+  font-weight: 700;
+}
+
+.app-shell:is(
+  .theme-mist-gray,
+  .theme-sage-paper,
+  .theme-sand-slate,
+  .theme-ice-blue,
+  .theme-soft-teal,
+  .theme-dusty-rose,
+  .theme-pale-olive,
+  .theme-cloud-lavender,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-circle-mobility-light,
+  .theme-circle-mobility-dark
+) .inline-fieldset.fuse-rating-editor {
+  --fuse-rating-panel-border: color-mix(in srgb, var(--custom-panel-border) 72%, var(--custom-shell-bg-bottom));
+  --fuse-rating-panel-bg-start: color-mix(in srgb, var(--custom-selection) 10%, var(--custom-panel-bg));
+  --fuse-rating-panel-bg-end: color-mix(in srgb, var(--custom-panel-bg) 82%, transparent);
+  --fuse-rating-legend-color: color-mix(in srgb, var(--custom-selection) 72%, var(--custom-strong-text));
+  --fuse-rating-row-border: color-mix(in srgb, var(--custom-panel-border) 74%, transparent);
+  --fuse-rating-row-bg: color-mix(in srgb, var(--custom-panel-bg) 84%, transparent);
+  --fuse-rating-pin-color: var(--custom-muted-text);
+  --fuse-rating-chip-border: color-mix(in srgb, var(--custom-button-border) 72%, var(--custom-panel-border));
+  --fuse-rating-chip-bg: color-mix(in srgb, var(--custom-button-bg) 84%, var(--custom-panel-bg));
+  --fuse-rating-chip-color: var(--custom-shell-text);
+  --fuse-rating-chip-active-border: color-mix(in srgb, var(--custom-selection) 72%, var(--custom-button-border));
+  --fuse-rating-chip-active-bg: color-mix(in srgb, var(--custom-selection) 20%, var(--custom-panel-bg));
+  --fuse-rating-chip-active-color: var(--custom-strong-text);
+}
+
 .fuse-rating-clear-action {
   border: 0;
   background: transparent;
@@ -39,9 +103,9 @@
   align-items: flex-start;
   gap: 0.55rem;
   padding: 0.4rem 0.5rem;
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border: 1px solid var(--fuse-rating-row-border, color-mix(in srgb, currentColor 12%, transparent));
   border-radius: 0.5rem;
-  background: color-mix(in srgb, currentColor 3%, transparent);
+  background: var(--fuse-rating-row-bg, color-mix(in srgb, currentColor 3%, transparent));
 }
 
 .fuse-rating-row > .fuse-rating-pair {
@@ -56,8 +120,8 @@
 }
 
 .fuse-rating-row.has-error {
-  border-color: color-mix(in srgb, #b42318 54%, currentColor 12%);
-  background: color-mix(in srgb, #b42318 7%, transparent);
+  border-color: color-mix(in srgb, #b42318 58%, currentColor 12%);
+  background: color-mix(in srgb, #b42318 10%, transparent);
 }
 
 .fuse-rating-pair,
@@ -67,7 +131,7 @@
 }
 
 .fuse-rating-pins {
-  color: color-mix(in srgb, currentColor 74%, transparent);
+  color: var(--fuse-rating-pin-color, color-mix(in srgb, currentColor 74%, transparent));
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
@@ -139,10 +203,10 @@
 .fuse-rating-chip {
   min-width: 2.2rem;
   min-height: 1.75rem;
-  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%);
+  border: 1px solid var(--fuse-rating-chip-border, color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%));
   border-radius: 0.4rem;
-  background: color-mix(in srgb, currentColor 5%, transparent);
-  color: inherit;
+  background: var(--fuse-rating-chip-bg, color-mix(in srgb, currentColor 5%, transparent));
+  color: var(--fuse-rating-chip-color, inherit);
   padding: 0.16rem 0.42rem;
   font: inherit;
   font-size: 0.78rem;
@@ -150,9 +214,9 @@
 }
 
 .fuse-rating-chip[aria-pressed="true"] {
-  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 72%, currentColor 10%);
-  background: color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent);
-  color: color-mix(in srgb, var(--theme-primary, currentColor) 82%, currentColor);
+  border-color: var(--fuse-rating-chip-active-border, color-mix(in srgb, var(--theme-primary, currentColor) 72%, currentColor 10%));
+  background: var(--fuse-rating-chip-active-bg, color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent));
+  color: var(--fuse-rating-chip-active-color, color-mix(in srgb, var(--theme-primary, currentColor) 82%, currentColor));
 }
 
 .fuse-rating-row-error {
