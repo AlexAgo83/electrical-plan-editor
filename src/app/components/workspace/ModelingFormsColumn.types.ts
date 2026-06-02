@@ -5,6 +5,7 @@ import type { DeleteDependencySummaryCategory } from "../../../store/deleteImpac
 import type { SplicePortMode } from "../../../core/splicePortMode";
 import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
 import type { WireEndpointSlotHint } from "../../hooks/wireEndpointFormHelpers";
+import type { ConnectorFusePairRatingDrafts } from "../../hooks/connectorFusePairRatings";
 
 export interface ModelingFormsColumnProps {
   catalogItems: CatalogItem[];
@@ -31,8 +32,8 @@ export interface ModelingFormsColumnProps {
   setConnectorApplyCatalogSeals: (value: boolean) => void;
   connectorTerminalOverridesText: string;
   setConnectorTerminalOverridesText: (value: string) => void;
-  connectorFusePairRatings: string;
-  setConnectorFusePairRatings: (value: string) => void;
+  connectorFusePairRatings: ConnectorFusePairRatingDrafts;
+  setConnectorFusePairRatings: (value: ConnectorFusePairRatingDrafts) => void;
   connectorAutoCreateLinkedNode: boolean;
   setConnectorAutoCreateLinkedNode: (value: boolean) => void;
   connectorTechnicalIdAlreadyUsed: boolean;

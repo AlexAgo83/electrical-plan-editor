@@ -1,24 +1,61 @@
 import type { Connector } from "../../core/entities";
 
-export function parseFusePairRatings(text: string): NonNullable<Connector["fusePairRatings"]> | undefined {
-  const entries = text
-    .split(/\r?\n/)
-    .flatMap((line) => {
-      const [pairStr = "", ampsStr = ""] = line.trim().split(",").map((p) => p.trim());
-      const pairIndex = Number(pairStr);
-      const amps = Number(ampsStr);
-      return pairStr.length > 0 && ampsStr.length > 0 && Number.isFinite(pairIndex) && Number.isFinite(amps)
-        ? [[pairIndex, amps] as const]
-        : [];
-    });
-  if (entries.length === 0) return undefined;
-  return Object.fromEntries(entries);
+export type ConnectorFusePairRatingDrafts = Record<number, string>;
+
+export function getFusePairRatingDraftError(value: string): string | null {
+  const normalized = value.trim();
+  if (normalized.length === 0) {
+    return null;
+  }
+
+  const rating = Number(normalized);
+  if (!Number.isFinite(rating)) {
+    return "Enter a numeric rating.";
+  }
+  if (rating < 0) {
+    return "Rating must be 0 A or greater.";
+  }
+  return null;
 }
 
-export function formatFusePairRatings(ratings: Connector["fusePairRatings"]): string {
-  if (ratings === undefined) return "";
-  return Object.entries(ratings)
-    .sort(([a], [b]) => Number(a) - Number(b))
-    .map(([pairIndex, amps]) => `${pairIndex},${amps}`)
-    .join("\n");
+export function serializeFusePairRatings(
+  drafts: ConnectorFusePairRatingDrafts,
+  allowedPairIndexes?: ReadonlySet<number>
+): NonNullable<Connector["fusePairRatings"]> | undefined {
+  const ratings: NonNullable<Connector["fusePairRatings"]> = {};
+
+  for (const [pairIndexText, draft] of Object.entries(drafts)) {
+    const pairIndex = Number(pairIndexText);
+    if (!Number.isInteger(pairIndex) || (allowedPairIndexes !== undefined && !allowedPairIndexes.has(pairIndex))) {
+      continue;
+    }
+
+    const normalized = draft.trim();
+    if (normalized.length === 0) {
+      continue;
+    }
+    if (getFusePairRatingDraftError(normalized) !== null) {
+      continue;
+    }
+
+    ratings[pairIndex] = Number(normalized);
+  }
+
+  return Object.keys(ratings).length === 0 ? undefined : ratings;
+}
+
+export function hasInvalidFusePairRatingDraft(drafts: ConnectorFusePairRatingDrafts): boolean {
+  return Object.values(drafts).some((draft) => getFusePairRatingDraftError(draft) !== null);
+}
+
+export function formatFusePairRatingDrafts(ratings: Connector["fusePairRatings"]): ConnectorFusePairRatingDrafts {
+  if (ratings === undefined) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(ratings)
+      .sort(([left], [right]) => Number(left) - Number(right))
+      .map(([pairIndex, amps]) => [Number(pairIndex), String(amps)])
+  );
 }

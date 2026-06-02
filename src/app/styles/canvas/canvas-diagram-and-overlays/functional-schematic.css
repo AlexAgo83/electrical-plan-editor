@@ -126,9 +126,48 @@
   fill: var(--network-node-splice-fill, #fdeecf);
 }
 
-.functional-node--fuse .functional-node-shape {
-  fill: var(--network-node-splice-fill, #fdeecf);
-  stroke: var(--network-node-stroke-color, #55748d);
+.functional-node-shape--fuse {
+  overflow: visible;
+}
+
+.functional-node--fuse .functional-fuse-body {
+  fill: var(--network-node-fuse-fill, #ffd6a8);
+  stroke: var(--network-node-fuse-stroke, #c2410c);
+  stroke-width: 2.5;
+}
+
+.functional-node--fuse .functional-fuse-terminal,
+.functional-node--fuse .functional-fuse-element {
+  fill: none;
+  stroke: var(--network-node-fuse-element, #7c2d12);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.functional-node-label--fuse {
+  font-size: 9px;
+}
+
+.functional-fuse-rating-bg {
+  fill: var(--network-node-fuse-rating-bg, #fed7aa);
+  stroke: var(--network-node-fuse-stroke, #c2410c);
+  stroke-width: 1;
+}
+
+.functional-fuse-rating-bg.is-missing-rating {
+  fill: var(--network-node-fuse-rating-missing-bg, #e5e7eb);
+  stroke: color-mix(in srgb, var(--network-node-fuse-rating-missing-fg, #374151) 72%, transparent);
+}
+
+.functional-fuse-rating-text {
+  fill: var(--network-node-fuse-rating-fg, #7c2d12);
+  font-size: 9px;
+  font-weight: 900;
+  pointer-events: none;
+}
+
+.functional-fuse-rating-bg.is-missing-rating + .functional-fuse-rating-text {
+  fill: var(--network-node-fuse-rating-missing-fg, #374151);
 }
 
 .functional-node--interconnector .functional-node-shape {

@@ -408,6 +408,13 @@ function buildFunctionalSchematicLayout(graph: FunctionalSchematicGraph): Functi
 }
 
 function buildFunctionalEdgePath(from: FunctionalNodePosition, to: FunctionalNodePosition): string {
+  if (from.x === to.x && from.y === to.y) {
+    const startY = from.y + FUNCTIONAL_NODE_HALF_HEIGHT * 0.72;
+    const endY = from.y - FUNCTIONAL_NODE_HALF_HEIGHT * 0.72;
+    const loopX = from.x + 82;
+    return `M ${from.x} ${startY} C ${loopX} ${from.y + 46} ${loopX} ${from.y - 46} ${from.x} ${endY}`;
+  }
+
   const startX = from.x;
   const startY = from.y + FUNCTIONAL_NODE_HALF_HEIGHT;
   const endX = to.x;
@@ -724,7 +731,8 @@ export function FunctionalSchematicPanel({
       if (from === undefined || to === undefined) {
         return [];
       }
-      const midX = (from.x + to.x) / 2;
+      const isLoop = from.x === to.x && from.y === to.y;
+      const midX = isLoop ? from.x + 76 : (from.x + to.x) / 2;
       const midY = (from.y + to.y) / 2;
       const wire = getFunctionalEdgeWire(edge, wireMap);
       const wireName = wire?.name.trim() || edge.wireName?.trim() || edge.label;
@@ -740,7 +748,13 @@ export function FunctionalSchematicPanel({
           midY,
           labelX: midX,
           labelY: midY,
-          labelCandidates: getFunctionalEdgeLabelCandidates(from, to),
+          labelCandidates: isLoop
+            ? [
+                { labelX: from.x + 76, labelY: from.y, distanceFromNominal: 0 },
+                { labelX: from.x + 92, labelY: from.y + 24, distanceFromNominal: 28.84 },
+                { labelX: from.x + 92, labelY: from.y - 24, distanceFromNominal: 28.84 }
+              ]
+            : getFunctionalEdgeLabelCandidates(from, to),
           labelCurveFrom: from,
           labelCurveTo: to,
           labelBoxWidth: estimateFunctionalEdgeLabelBoxWidth(wireName, wireTechnicalId),
@@ -946,7 +960,7 @@ export function FunctionalSchematicPanel({
                     key={node.id}
                   className={getFunctionalNodeClassName(node)}
                   >
-                    <title>{`${node.label} ${node.detail}`}</title>
+                    <title>{`${node.label} ${node.detail}${node.ratingLabel === undefined ? "" : ` ${node.ratingLabel}`}`}</title>
                   {renderFunctionalNodeShape(node, position)}
                   {renderFunctionalNodeText(node, position)}
                   </g>

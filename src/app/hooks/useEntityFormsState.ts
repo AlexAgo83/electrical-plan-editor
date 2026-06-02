@@ -14,6 +14,7 @@ import type {
 } from "../../core/entities";
 import { DEFAULT_NEW_SPLICE_PORT_MODE, type SplicePortMode } from "../../core/splicePortMode";
 import type { DirectionalSpliceSide } from "../../core/directionalSplice";
+import type { ConnectorFusePairRatingDrafts } from "./connectorFusePairRatings";
 
 export function useEntityFormsState() {
   const [catalogFormMode, setCatalogFormMode] = useState<"idle" | "create" | "edit">("idle");
@@ -48,7 +49,7 @@ export function useEntityFormsState() {
   const [connectorApplyCatalogPlugs, setConnectorApplyCatalogPlugs] = useState(true);
   const [connectorApplyCatalogSeals, setConnectorApplyCatalogSeals] = useState(true);
   const [connectorTerminalOverridesText, setConnectorTerminalOverridesText] = useState("");
-  const [connectorFusePairRatings, setConnectorFusePairRatings] = useState("");
+  const [connectorFusePairRatings, setConnectorFusePairRatings] = useState<ConnectorFusePairRatingDrafts>({});
   const [connectorAutoCreateLinkedNode, setConnectorAutoCreateLinkedNode] = useState(true);
   const [cavityCount, setCavityCount] = useState("4");
   const [cavityIndexInput, setCavityIndexInput] = useState("1");

@@ -25,7 +25,41 @@ export function renderFunctionalNodeShape(node: FunctionalSchematicNode, positio
     );
   }
   if (node.kind === "fuse") {
-    return <rect className="functional-node-shape" x={position.x - 32} y={position.y - 18} width={64} height={36} rx={6} />;
+    const halfWidth = 36;
+    const halfHeight = 11;
+    return (
+      <g className="functional-node-shape functional-node-shape--fuse" aria-hidden="true">
+        <line
+          className="functional-fuse-terminal"
+          x1={position.x - halfWidth - 8}
+          y1={position.y}
+          x2={position.x - halfWidth}
+          y2={position.y}
+        />
+        <line
+          className="functional-fuse-terminal"
+          x1={position.x + halfWidth}
+          y1={position.y}
+          x2={position.x + halfWidth + 8}
+          y2={position.y}
+        />
+        <rect
+          className="functional-fuse-body"
+          x={position.x - halfWidth}
+          y={position.y - halfHeight}
+          width={halfWidth * 2}
+          height={halfHeight * 2}
+          rx={halfHeight}
+        />
+        <line
+          className="functional-fuse-element"
+          x1={position.x - halfWidth + 5}
+          y1={position.y}
+          x2={position.x + halfWidth - 5}
+          y2={position.y}
+        />
+      </g>
+    );
   }
   if (node.kind === "interconnector") {
     return <rect className="functional-node-shape" x={position.x - 78} y={position.y - 33} width={156} height={66} rx={6} />;
@@ -67,6 +101,31 @@ export function renderFunctionalNodeText(node: FunctionalSchematicNode, position
         </text>
       </>
     );
+  }
+
+  if (node.kind === "fuse") {
+    const ratingLabel = node.ratingLabel ?? "";
+    if (ratingLabel.length > 0) {
+      const chipWidth = Math.max(30, ratingLabel.length * 6 + 12);
+      return (
+        <>
+          <text className="functional-node-label functional-node-label--fuse" x={position.x} y={position.y - 18} textAnchor="middle">
+            {node.label}
+          </text>
+          <rect
+            className={`functional-fuse-rating-bg${ratingLabel === "?A" ? " is-missing-rating" : ""}`}
+            x={position.x - chipWidth / 2}
+            y={position.y + 15}
+            width={chipWidth}
+            height={16}
+            rx={8}
+          />
+          <text className="functional-fuse-rating-text" x={position.x} y={position.y + 27} textAnchor="middle">
+            {ratingLabel}
+          </text>
+        </>
+      );
+    }
   }
 
   return (

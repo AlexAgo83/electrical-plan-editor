@@ -49,6 +49,7 @@ export interface FunctionalSchematicNode {
   kind: FunctionalNodeKind;
   label: string;
   detail: string;
+  ratingLabel?: string;
   detailTop?: string;
   detailBottom?: string;
   sourceIds: string[];
@@ -385,17 +386,61 @@ function isTerminalConnectorEndpointKey(
   return connector?.isTerminalConnector === true;
 }
 
-function expandTraceThroughSplices(seedWireIds: Set<WireId>, wires: readonly Wire[]): Set<WireId> {
+type FuseBoxCavityInfo = ReadonlyMap<ConnectorId, ReadonlyMap<number, { pairIndex: number; isA: boolean }>>;
+
+function makeFuseBoxPairKey(connectorId: ConnectorId, pairIndex: number): string {
+  return `${connectorId}:pair:${pairIndex}`;
+}
+
+function buildFuseBoxCavityInfo(
+  connectorMap: ReadonlyMap<ConnectorId, Connector>,
+  catalogItemMap: ReadonlyMap<CatalogItem["id"], CatalogItem>
+): Map<ConnectorId, Map<number, { pairIndex: number; isA: boolean }>> {
+  const fuseBoxCavityInfo = new Map<ConnectorId, Map<number, { pairIndex: number; isA: boolean }>>();
+  for (const [connectorId, connector] of connectorMap) {
+    if (connector.catalogItemId === undefined) {
+      continue;
+    }
+    const catalogItem = catalogItemMap.get(connector.catalogItemId);
+    if (catalogItem?.fuseBoxConfig === undefined) {
+      continue;
+    }
+    const cavityMap = new Map<number, { pairIndex: number; isA: boolean }>();
+    for (const pair of catalogItem.fuseBoxConfig.pairs) {
+      cavityMap.set(pair.pinA, { pairIndex: pair.pairIndex, isA: true });
+      cavityMap.set(pair.pinB, { pairIndex: pair.pairIndex, isA: false });
+    }
+    fuseBoxCavityInfo.set(connectorId, cavityMap);
+  }
+  return fuseBoxCavityInfo;
+}
+
+function expandTraceThroughElectricalLinks(
+  seedWireIds: Set<WireId>,
+  wires: readonly Wire[],
+  fuseBoxCavityInfo: FuseBoxCavityInfo
+): Set<WireId> {
   const included = new Set(seedWireIds);
   const spliceToWireIds = new Map<SpliceId, WireId[]>();
+  const fuseBoxPairToWireIds = new Map<string, WireId[]>();
   for (const wire of wires) {
-    for (const spliceId of [endpointTouchesSplice(wire.endpointA), endpointTouchesSplice(wire.endpointB)]) {
-      if (spliceId === null) {
-        continue;
+    for (const endpoint of [wire.endpointA, wire.endpointB]) {
+      const spliceId = endpointTouchesSplice(endpoint);
+      if (spliceId !== null) {
+        const current = spliceToWireIds.get(spliceId) ?? [];
+        current.push(wire.id);
+        spliceToWireIds.set(spliceId, current);
       }
-      const current = spliceToWireIds.get(spliceId) ?? [];
-      current.push(wire.id);
-      spliceToWireIds.set(spliceId, current);
+
+      if (endpoint.kind === "connectorCavity") {
+        const cavityInfo = fuseBoxCavityInfo.get(endpoint.connectorId)?.get(endpoint.cavityIndex);
+        if (cavityInfo !== undefined) {
+          const key = makeFuseBoxPairKey(endpoint.connectorId, cavityInfo.pairIndex);
+          const current = fuseBoxPairToWireIds.get(key) ?? [];
+          current.push(wire.id);
+          fuseBoxPairToWireIds.set(key, current);
+        }
+      }
     }
   }
 
@@ -406,11 +451,21 @@ function expandTraceThroughSplices(seedWireIds: Set<WireId>, wires: readonly Wir
       if (!included.has(wire.id)) {
         continue;
       }
-      for (const spliceId of [endpointTouchesSplice(wire.endpointA), endpointTouchesSplice(wire.endpointB)]) {
-        if (spliceId === null) {
-          continue;
+      for (const endpoint of [wire.endpointA, wire.endpointB]) {
+        const connectedWireIds: WireId[] = [];
+        const spliceId = endpointTouchesSplice(endpoint);
+        if (spliceId !== null) {
+          connectedWireIds.push(...(spliceToWireIds.get(spliceId) ?? []));
         }
-        for (const connectedWireId of spliceToWireIds.get(spliceId) ?? []) {
+
+        if (endpoint.kind === "connectorCavity") {
+          const cavityInfo = fuseBoxCavityInfo.get(endpoint.connectorId)?.get(endpoint.cavityIndex);
+          if (cavityInfo !== undefined) {
+            connectedWireIds.push(...(fuseBoxPairToWireIds.get(makeFuseBoxPairKey(endpoint.connectorId, cavityInfo.pairIndex)) ?? []));
+          }
+        }
+
+        for (const connectedWireId of connectedWireIds) {
           if (!included.has(connectedWireId)) {
             included.add(connectedWireId);
             changed = true;
@@ -529,6 +584,8 @@ export function buildFunctionalSchematicGraph({
     tags.forEach((tag) => allFilters.add(tag));
   }
 
+  const fuseBoxCavityInfo = buildFuseBoxCavityInfo(connectorMap, catalogItemMap);
+
   const normalizedRootConnectorIds = rootConnectorIds.filter((connectorId) => connectorMap.has(connectorId));
   const seedWireIds =
     normalizedRootConnectorIds.length > 0
@@ -544,7 +601,7 @@ export function buildFunctionalSchematicGraph({
     });
   }
 
-  const expandedWireIds = expandTraceThroughSplices(seedWireIds, wires);
+  const expandedWireIds = expandTraceThroughElectricalLinks(seedWireIds, wires, fuseBoxCavityInfo);
   for (const wire of wires) {
     if (expandedWireIds.has(wire.id) && (wireDomainTagsById.get(wire.id)?.length ?? 0) === 0) {
       warnings.push({
@@ -569,20 +626,6 @@ export function buildFunctionalSchematicGraph({
   const nodes = new Map<string, FunctionalSchematicNode>();
   const edges = new Map<string, FunctionalSchematicEdge>();
 
-  // Build fuse box cavity lookup: connectorId → Map<cavityIndex, {pairIndex, isA}>
-  const fuseBoxCavityInfo = new Map<ConnectorId, Map<number, { pairIndex: number; isA: boolean }>>();
-  for (const [connectorId, connector] of connectorMap) {
-    if (connector.catalogItemId === undefined) continue;
-    const catalogItem = catalogItemMap.get(connector.catalogItemId);
-    if (catalogItem?.fuseBoxConfig === undefined) continue;
-    const cavityMap = new Map<number, { pairIndex: number; isA: boolean }>();
-    for (const pair of catalogItem.fuseBoxConfig.pairs) {
-      cavityMap.set(pair.pinA, { pairIndex: pair.pairIndex, isA: true });
-      cavityMap.set(pair.pinB, { pairIndex: pair.pairIndex, isA: false });
-    }
-    fuseBoxCavityInfo.set(connectorId, cavityMap);
-  }
-
   function getFuseBoxNodeId(connectorId: ConnectorId, pairIndex: number): string {
     return `fuse-box:${connectorId}:pair${pairIndex}`;
   }
@@ -595,18 +638,16 @@ export function buildFunctionalSchematicGraph({
     if (!connector) return null;
     const rating = connector.fusePairRatings?.[pairIndex];
     const ratingLabel = rating !== undefined ? `${rating}A` : "?A";
-    const label = `${connector.technicalId} / ${ratingLabel}`;
     return {
       id: getFuseBoxNodeId(connectorId, pairIndex),
       kind: "fuse",
-      label,
+      label: connector.technicalId,
       detail: connector.name,
+      ratingLabel,
       sourceIds: [String(connectorId), String(pairIndex)],
       role: "power"
     };
   }
-
-  void getFuseBoxNodeId;
 
   for (const wire of includedWires) {
     const domainTags = wireDomainTagsById.get(wire.id) ?? [];
@@ -639,8 +680,21 @@ export function buildFunctionalSchematicGraph({
               domainTags
             });
           }
+        } else if (wire.endpointB.kind === "connectorCavity") {
+          const fuseNodeB = getFuseBoxNode(wire.endpointB.connectorId, endpointBFuseInfo.pairIndex);
+          if (fuseNodeB !== null) {
+            mergeNode(nodes, fuseNodeB);
+            addEdge(edges, {
+              id: `${wire.id}:fuse-fuse`,
+              fromNodeId: fuseNode.id,
+              toNodeId: fuseNodeB.id,
+              label: wire.technicalId,
+              ...getWireEdgeDisplayFields(wire),
+              sourceWireIds: [wire.id],
+              domainTags
+            });
+          }
         }
-        // If endpointB is also a fuse box pin on the same pair (unusual), skip
       }
       continue;
     }

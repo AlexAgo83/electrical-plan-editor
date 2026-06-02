@@ -90,6 +90,101 @@ const wires: Wire[] = [
   }
 ];
 
+function createFuseBoxCatalogItem(id = "FBOX-CAT"): CatalogItem {
+  return {
+    id: asCatalogItemId(id),
+    manufacturerReference: "FBOX-4",
+    connectionCount: 4,
+    name: "Four way fuse box",
+    fuseBoxConfig: {
+      pairs: [
+        { pairIndex: 0, pinA: 1, pinB: 2 },
+        { pairIndex: 1, pinA: 3, pinB: 4 }
+      ]
+    }
+  };
+}
+
+function createFuseBoxTraceFixture() {
+  const fuseBoxCatalogItem = createFuseBoxCatalogItem();
+  const traceConnectors: Connector[] = [
+    { id: asConnectorId("C-MAIN"), name: "Main", technicalId: "MAIN", cavityCount: 2 },
+    {
+      id: asConnectorId("C-FUSE"),
+      name: "Fuse box",
+      technicalId: "FUSEBOX",
+      cavityCount: 4,
+      catalogItemId: fuseBoxCatalogItem.id,
+      fusePairRatings: { 0: 10 }
+    },
+    { id: asConnectorId("C-LOAD"), name: "Load", technicalId: "LOAD", cavityCount: 2 },
+    { id: asConnectorId("C-AUX-A"), name: "Aux A", technicalId: "AUX-A", cavityCount: 2 },
+    { id: asConnectorId("C-AUX-B"), name: "Aux B", technicalId: "AUX-B", cavityCount: 2 }
+  ];
+  const traceWires: Wire[] = [
+    {
+      id: asWireId("W-IN"),
+      name: "Main feed",
+      technicalId: "W-IN",
+      sectionMm2: 1,
+      primaryColorId: null,
+      secondaryColorId: null,
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-MAIN"), cavityIndex: 1 },
+      endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE"), cavityIndex: 1 },
+      routeSegmentIds: [],
+      lengthMm: 100,
+      isRouteLocked: false
+    },
+    {
+      id: asWireId("W-OUT"),
+      name: "Protected load",
+      technicalId: "W-OUT",
+      sectionMm2: 1,
+      primaryColorId: null,
+      secondaryColorId: null,
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE"), cavityIndex: 2 },
+      endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-LOAD"), cavityIndex: 1 },
+      routeSegmentIds: [],
+      lengthMm: 100,
+      isRouteLocked: false
+    },
+    {
+      id: asWireId("W-AUX-IN"),
+      name: "Aux feed",
+      technicalId: "W-AUX-IN",
+      sectionMm2: 1,
+      primaryColorId: null,
+      secondaryColorId: null,
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-AUX-A"), cavityIndex: 1 },
+      endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE"), cavityIndex: 3 },
+      routeSegmentIds: [],
+      lengthMm: 100,
+      isRouteLocked: false
+    },
+    {
+      id: asWireId("W-AUX-OUT"),
+      name: "Aux protected",
+      technicalId: "W-AUX-OUT",
+      sectionMm2: 1,
+      primaryColorId: null,
+      secondaryColorId: null,
+      endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE"), cavityIndex: 4 },
+      endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-AUX-B"), cavityIndex: 1 },
+      routeSegmentIds: [],
+      lengthMm: 100,
+      isRouteLocked: false
+    }
+  ];
+
+  return {
+    catalogItems: [fuseBoxCatalogItem],
+    connectors: traceConnectors,
+    wires: traceWires,
+    connectorMap: new Map(traceConnectors.map((connector) => [connector.id, connector])),
+    catalogItemMap: new Map([[fuseBoxCatalogItem.id, fuseBoxCatalogItem]])
+  };
+}
+
 describe("buildFunctionalSchematicGraph", () => {
   it("expands a selected wire through connected splices and keeps significant electrical nodes", () => {
     const graph = buildFunctionalSchematicGraph({
@@ -170,6 +265,283 @@ describe("buildFunctionalSchematicGraph", () => {
     expect(graph.rootNodeIds).toContain("connector:C-BCM:pin:12");
     expect(graph.includedWireIds).toEqual([asWireId("W-001"), asWireId("W-002")]);
     expect(graph.edges[0]?.fromNodeId).toBe("connector:C-BCM:pin:12");
+  });
+
+  it("expands a trace across a fuse-box pair from the main connector side", () => {
+    const fixture = createFuseBoxTraceFixture();
+    const graph = buildFunctionalSchematicGraph({
+      network: { voltageV: 12 },
+      seed: { kind: "connector", connectorId: asConnectorId("C-MAIN") },
+      activeFilter: "all",
+      wires: fixture.wires,
+      segments: [],
+      connectorMap: fixture.connectorMap,
+      spliceMap: new Map(),
+      catalogItemMap: fixture.catalogItemMap
+    });
+
+    expect(graph.includedWireIds).toEqual([asWireId("W-IN"), asWireId("W-OUT")]);
+    expect(graph.nodes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "fuse-box:C-FUSE:pair0", kind: "fuse", label: "FUSEBOX", ratingLabel: "10A" })
+      ])
+    );
+    expect(graph.edges).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "W-IN",
+          fromNodeId: "connector:C-MAIN:pin:1",
+          toNodeId: "fuse-box:C-FUSE:pair0"
+        }),
+        expect.objectContaining({
+          label: "W-OUT",
+          fromNodeId: "fuse-box:C-FUSE:pair0",
+          toNodeId: "connector:C-LOAD:pin:1"
+        })
+      ])
+    );
+    expect(graph.edges).toHaveLength(2);
+  });
+
+  it("expands a trace across a fuse-box pair from the consumer side and from a selected wire", () => {
+    const fixture = createFuseBoxTraceFixture();
+    const fromConsumer = buildFunctionalSchematicGraph({
+      network: null,
+      seed: { kind: "connector", connectorId: asConnectorId("C-LOAD") },
+      activeFilter: "all",
+      wires: fixture.wires,
+      segments: [],
+      connectorMap: fixture.connectorMap,
+      spliceMap: new Map(),
+      catalogItemMap: fixture.catalogItemMap
+    });
+    const fromIncomingWire = buildFunctionalSchematicGraph({
+      network: null,
+      seed: { kind: "wire", wireId: asWireId("W-IN") },
+      activeFilter: "all",
+      wires: fixture.wires,
+      segments: [],
+      connectorMap: fixture.connectorMap,
+      spliceMap: new Map(),
+      catalogItemMap: fixture.catalogItemMap
+    });
+
+    expect(fromConsumer.includedWireIds).toEqual([asWireId("W-IN"), asWireId("W-OUT")]);
+    expect(fromIncomingWire.includedWireIds).toEqual([asWireId("W-IN"), asWireId("W-OUT")]);
+  });
+
+  it("does not bridge unrelated fuse-box pairs", () => {
+    const fixture = createFuseBoxTraceFixture();
+    const graph = buildFunctionalSchematicGraph({
+      network: null,
+      seed: { kind: "connector", connectorId: asConnectorId("C-MAIN") },
+      activeFilter: "all",
+      wires: fixture.wires,
+      segments: [],
+      connectorMap: fixture.connectorMap,
+      spliceMap: new Map(),
+      catalogItemMap: fixture.catalogItemMap
+    });
+
+    expect(graph.includedWireIds).toEqual([asWireId("W-IN"), asWireId("W-OUT")]);
+    expect(graph.includedWireIds).not.toContain(asWireId("W-AUX-IN"));
+    expect(graph.includedWireIds).not.toContain(asWireId("W-AUX-OUT"));
+  });
+
+  it("renders explicit fuse-to-fuse interconnection edges and same-pair loops", () => {
+    const fuseCatalogA = createFuseBoxCatalogItem("FBOX-A");
+    const fuseCatalogB = createFuseBoxCatalogItem("FBOX-B");
+    const fuseConnectors: Connector[] = [
+      { id: asConnectorId("C-MAIN"), name: "Main", technicalId: "MAIN", cavityCount: 2 },
+      {
+        id: asConnectorId("C-FUSE-A"),
+        name: "Fuse box A",
+        technicalId: "FUSE-A",
+        cavityCount: 4,
+        catalogItemId: fuseCatalogA.id
+      },
+      {
+        id: asConnectorId("C-FUSE-B"),
+        name: "Fuse box B",
+        technicalId: "FUSE-B",
+        cavityCount: 4,
+        catalogItemId: fuseCatalogB.id
+      },
+      { id: asConnectorId("C-LOAD"), name: "Load", technicalId: "LOAD", cavityCount: 2 }
+    ];
+    const fuseWires: Wire[] = [
+      {
+        id: asWireId("W-IN"),
+        name: "Main feed",
+        technicalId: "W-IN",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-MAIN"), cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE-A"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-CENTER"),
+        name: "Center link",
+        technicalId: "W-CENTER",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE-A"), cavityIndex: 2 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE-B"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-OUT"),
+        name: "Load feed",
+        technicalId: "W-OUT",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE-B"), cavityIndex: 2 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-LOAD"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-LOOP"),
+        name: "Loop debug",
+        technicalId: "W-LOOP",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE-A"), cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE-A"), cavityIndex: 2 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      }
+    ];
+
+    const chainGraph = buildFunctionalSchematicGraph({
+      network: null,
+      seed: { kind: "wire", wireId: asWireId("W-IN") },
+      activeFilter: "all",
+      wires: fuseWires.filter((wire) => wire.id !== asWireId("W-LOOP")),
+      segments: [],
+      connectorMap: new Map(fuseConnectors.map((connector) => [connector.id, connector])),
+      spliceMap: new Map(),
+      catalogItemMap: new Map([
+        [fuseCatalogA.id, fuseCatalogA],
+        [fuseCatalogB.id, fuseCatalogB]
+      ])
+    });
+    const loopGraph = buildFunctionalSchematicGraph({
+      network: null,
+      seed: { kind: "wire", wireId: asWireId("W-LOOP") },
+      activeFilter: "all",
+      wires: [fuseWires[3]!],
+      segments: [],
+      connectorMap: new Map(fuseConnectors.map((connector) => [connector.id, connector])),
+      spliceMap: new Map(),
+      catalogItemMap: new Map([
+        [fuseCatalogA.id, fuseCatalogA],
+        [fuseCatalogB.id, fuseCatalogB]
+      ])
+    });
+
+    expect(chainGraph.includedWireIds).toEqual([asWireId("W-IN"), asWireId("W-CENTER"), asWireId("W-OUT")]);
+    expect(chainGraph.edges).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "W-CENTER",
+          fromNodeId: "fuse-box:C-FUSE-A:pair0",
+          toNodeId: "fuse-box:C-FUSE-B:pair0"
+        })
+      ])
+    );
+    expect(loopGraph.edges).toEqual([
+      expect.objectContaining({
+        label: "W-LOOP",
+        fromNodeId: "fuse-box:C-FUSE-A:pair0",
+        toNodeId: "fuse-box:C-FUSE-A:pair0"
+      })
+    ]);
+  });
+
+  it("expands traces through mixed splices and fuse-box pairs", () => {
+    const fuseBoxCatalogItem = createFuseBoxCatalogItem();
+    const mixedSplice = { id: asSpliceId("S-MIX"), name: "Mixed splice", technicalId: "S-MIX", portCount: 3 };
+    const mixedConnectors: Connector[] = [
+      { id: asConnectorId("C-MAIN"), name: "Main", technicalId: "MAIN", cavityCount: 2 },
+      {
+        id: asConnectorId("C-FUSE"),
+        name: "Fuse box",
+        technicalId: "FUSEBOX",
+        cavityCount: 4,
+        catalogItemId: fuseBoxCatalogItem.id
+      },
+      { id: asConnectorId("C-LOAD"), name: "Load", technicalId: "LOAD", cavityCount: 2 }
+    ];
+    const mixedWires: Wire[] = [
+      {
+        id: asWireId("W-MAIN-SPLICE"),
+        name: "Main to splice",
+        technicalId: "W-MAIN-SPLICE",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-MAIN"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: mixedSplice.id, portIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-SPLICE-FUSE"),
+        name: "Splice to fuse",
+        technicalId: "W-SPLICE-FUSE",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "splicePort", spliceId: mixedSplice.id, portIndex: 2 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-FUSE-LOAD"),
+        name: "Fuse to load",
+        technicalId: "W-FUSE-LOAD",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE"), cavityIndex: 2 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-LOAD"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      }
+    ];
+
+    const graph = buildFunctionalSchematicGraph({
+      network: null,
+      seed: { kind: "connector", connectorId: asConnectorId("C-MAIN") },
+      activeFilter: "all",
+      wires: mixedWires,
+      segments: [],
+      connectorMap: new Map(mixedConnectors.map((connector) => [connector.id, connector])),
+      spliceMap: new Map([[mixedSplice.id, mixedSplice]]),
+      catalogItemMap: new Map([[fuseBoxCatalogItem.id, fuseBoxCatalogItem]])
+    });
+
+    expect(graph.includedWireIds).toEqual([
+      asWireId("W-MAIN-SPLICE"),
+      asWireId("W-SPLICE-FUSE"),
+      asWireId("W-FUSE-LOAD")
+    ]);
   });
 
   it("reports non-blocking warnings for missing data instead of failing generation", () => {

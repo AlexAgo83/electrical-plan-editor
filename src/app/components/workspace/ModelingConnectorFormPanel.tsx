@@ -1,10 +1,14 @@
 import type { ReactElement } from "react";
+import { useState } from "react";
 import { useConnectorHandlersContext } from "../controller/ModelingController.context";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
 import { EntityReferenceButton } from "./EntityReferenceButton";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
+import { getFusePairRatingDraftError } from "../../hooks/connectorFusePairRatings";
+
+const FUSE_RATING_QUICK_PICKS = ["3", "4", "5", "7.5", "10", "15", "20", "25", "30", "40"] as const;
 
 export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): ReactElement {
   const {
@@ -38,6 +42,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     connectorFormError
   } = props;
   const connectorHandlers = useConnectorHandlersContext();
+  const [applySameFuseRatingToAll, setApplySameFuseRatingToAll] = useState(false);
   const hasCatalogItems = catalogItems.length > 0;
   const selectedCatalogItem = catalogItems.find((item) => item.id === connectorCatalogItemId);
   const connectorCatalogFuseBoxPairs = selectedCatalogItem?.fuseBoxConfig?.pairs;
@@ -52,6 +57,24 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         ? null
         : { label: `Missing catalog item (${connectorCatalogItemId})` }
   });
+
+  const updateConnectorFusePairRating = (pairIndex: number, value: string): void => {
+    if (applySameFuseRatingToAll && connectorCatalogFuseBoxPairs !== undefined) {
+      setConnectorFusePairRatings(
+        Object.fromEntries(connectorCatalogFuseBoxPairs.map((pair) => [pair.pairIndex, value]))
+      );
+      return;
+    }
+
+    setConnectorFusePairRatings({
+      ...connectorFusePairRatings,
+      [pairIndex]: value
+    });
+  };
+
+  const clearConnectorFusePairRatings = (): void => {
+    setConnectorFusePairRatings({});
+  };
 
   return (
 <article className="panel" hidden={!isConnectorSubScreen} data-form-panel={FORM_PANEL_IDS.connector}>
@@ -150,16 +173,76 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
       </label>
     </fieldset>
     {connectorCatalogFuseBoxPairs !== undefined && connectorCatalogFuseBoxPairs.length > 0 ? (
-      <fieldset className="inline-fieldset">
-        <legend>Fuse ratings</legend>
-        <label>
-          Fuse ratings (one per line: pairIndex,amps)
-          <textarea
-            value={connectorFusePairRatings}
-            onChange={(event) => setConnectorFusePairRatings(event.target.value)}
-            placeholder={"0,10\n1,20"}
-            rows={connectorCatalogFuseBoxPairs.length}
+      <fieldset className="inline-fieldset fuse-rating-editor">
+        <legend>
+          Fuse ratings
+          <button type="button" className="link-button fuse-rating-clear-action" onClick={clearConnectorFusePairRatings}>
+            Clear all
+          </button>
+        </legend>
+        <div className="fuse-rating-table" role="table" aria-label="Fuse ratings">
+          <div className="fuse-rating-row fuse-rating-row--header" role="row">
+            <span role="columnheader">Pair</span>
+            <span role="columnheader">Pins</span>
+            <span role="columnheader">Rating</span>
+          </div>
+          {connectorCatalogFuseBoxPairs.map((pair) => {
+            const draft = connectorFusePairRatings[pair.pairIndex] ?? "";
+            const draftError = getFusePairRatingDraftError(draft);
+            return (
+              <div
+                className={`fuse-rating-row${draftError === null ? "" : " has-error"}`}
+                key={pair.pairIndex}
+                role="row"
+                data-fuse-rating-invalid={draftError === null ? undefined : "true"}
+              >
+                <span className="fuse-rating-pair" role="cell">
+                  #{pair.pairIndex + 1}
+                </span>
+                <span className="fuse-rating-pins" role="cell">
+                  pin {pair.pinA} - {pair.pinB}
+                </span>
+                <span className="fuse-rating-value-cell" role="cell">
+                  <label className="fuse-rating-input-label">
+                    <span className="sr-only">
+                      Rating for fuse pair {pair.pairIndex + 1}, pins {pair.pinA} and {pair.pinB}, in amperes
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      step={0.5}
+                      value={draft}
+                      aria-invalid={draftError === null ? undefined : true}
+                      onChange={(event) => updateConnectorFusePairRating(pair.pairIndex, event.target.value)}
+                    />
+                    <span className="fuse-rating-unit" aria-hidden="true">A</span>
+                  </label>
+                  <span className="fuse-rating-quick-picks" role="toolbar" aria-label={`Quick ratings for fuse pair ${pair.pairIndex + 1}`}>
+                    {FUSE_RATING_QUICK_PICKS.map((rating) => (
+                      <button
+                        key={rating}
+                        type="button"
+                        className="fuse-rating-chip"
+                        aria-pressed={draft === rating}
+                        onClick={() => updateConnectorFusePairRating(pair.pairIndex, rating)}
+                      >
+                        {rating}
+                      </button>
+                    ))}
+                  </span>
+                  {draftError === null ? null : <small className="inline-error fuse-rating-row-error">{draftError}</small>}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        <label className="settings-checkbox">
+          <input
+            type="checkbox"
+            checked={applySameFuseRatingToAll}
+            onChange={(event) => setApplySameFuseRatingToAll(event.target.checked)}
           />
+          Apply same rating to all pairs
         </label>
       </fieldset>
     ) : null}
