@@ -13,6 +13,8 @@ import {
   WORKSPACE_FILE_PAYLOAD_KIND,
   WORKSPACE_FILE_SCHEMA_VERSION
 } from "../app/lib/workspaceFile";
+import { appActions, appReducer } from "../store";
+import { asCatalogItemId, asConnectorId } from "./helpers/app-ui-test-utils";
 
 describe("workspace file format", () => {
   it("serializes and parses a full workspace snapshot", () => {
@@ -32,6 +34,42 @@ describe("workspace file format", () => {
     expect(parsed.payload?.workspaceId).toBe(payload.workspaceId);
     expect(parsed.payload?.revisionId).toBe(payload.revisionId);
     expect(parsed.state).toEqual(state);
+  });
+
+  it("preserves fuse-box catalog metadata and connector ratings through a workspace round-trip", () => {
+    let state = createSampleNetworkState();
+    state = appReducer(
+      state,
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("catalog-fusebox"),
+        manufacturerReference: "FUSEBOX-ROUNDTRIP",
+        connectionCount: 2,
+        fuseBoxConfig: {
+          pairs: [{ pairIndex: 0, pinA: 1, pinB: 2 }]
+        }
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: asConnectorId("connector-fusebox"),
+        name: "Fuse box connector",
+        technicalId: "C-FUSEBOX",
+        catalogItemId: asCatalogItemId("catalog-fusebox"),
+        manufacturerReference: "FUSEBOX-ROUNDTRIP",
+        cavityCount: 2,
+        fusePairRatings: { 0: 20 }
+      })
+    );
+
+    const payload = buildWorkspaceFilePayload(state, null, "2026-05-30T10:00:00.000Z");
+    const parsed = parseWorkspaceFilePayload(serializeWorkspaceFilePayload(payload), "2026-05-30T10:01:00.000Z");
+
+    expect(parsed.error).toBeNull();
+    expect(parsed.state?.catalogItems.byId[asCatalogItemId("catalog-fusebox")]?.fuseBoxConfig).toEqual({
+      pairs: [{ pairIndex: 0, pinA: 1, pinB: 2 }]
+    });
+    expect(parsed.state?.connectors.byId[asConnectorId("connector-fusebox")]?.fusePairRatings).toEqual({ 0: 20 });
   });
 
   it("keeps workspace identity while creating a new revision", () => {

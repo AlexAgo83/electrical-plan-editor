@@ -151,6 +151,44 @@ describe("network file portability", () => {
     });
   });
 
+  it("preserves fuse-box catalog metadata and connector ratings across export/import round-trip", () => {
+    let sample = createSampleNetworkState();
+    sample = appReducer(
+      sample,
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("catalog-fusebox"),
+        manufacturerReference: "FUSEBOX-PORTABLE",
+        connectionCount: 2,
+        fuseBoxConfig: {
+          pairs: [{ pairIndex: 0, pinA: 1, pinB: 2 }]
+        }
+      })
+    );
+    sample = appReducer(
+      sample,
+      appActions.upsertConnector({
+        id: asConnectorId("connector-fusebox"),
+        name: "Fuse box connector",
+        technicalId: "C-FUSEBOX",
+        catalogItemId: asCatalogItemId("catalog-fusebox"),
+        manufacturerReference: "FUSEBOX-PORTABLE",
+        cavityCount: 2,
+        fusePairRatings: { 0: 10 }
+      })
+    );
+
+    const payload = buildNetworkFilePayload(sample, "active", [], "2026-03-01T09:30:00.000Z");
+    const parsed = parseNetworkFilePayload(serializeNetworkFilePayload(payload));
+
+    expect(parsed.error).toBeNull();
+    expect(parsed.payload?.networks[0]?.state.catalogItems.byId[asCatalogItemId("catalog-fusebox")]?.fuseBoxConfig).toEqual({
+      pairs: [{ pairIndex: 0, pinA: 1, pinB: 2 }]
+    });
+    expect(parsed.payload?.networks[0]?.state.connectors.byId[asConnectorId("connector-fusebox")]?.fusePairRatings).toEqual({
+      0: 10
+    });
+  });
+
   it("preserves network voltage and wire sizing metadata across export/import round-trip", () => {
     const base = createSampleNetworkState();
     const activeNetworkId = base.activeNetworkId;

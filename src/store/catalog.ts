@@ -105,6 +105,57 @@ export function normalizeCatalogAdditionalAccessories(value: unknown): CatalogAd
   return normalized.length === 0 ? undefined : normalized;
 }
 
+function normalizeFuseBoxConfig(candidate: unknown, connectionCount: number): CatalogItem["fuseBoxConfig"] {
+  if (candidate === null || typeof candidate !== "object") {
+    return undefined;
+  }
+
+  const rawPairs = (candidate as Partial<CatalogItem["fuseBoxConfig"]>)?.pairs;
+  if (!Array.isArray(rawPairs)) {
+    return undefined;
+  }
+
+  const seenPairIndexes = new Set<number>();
+  const normalizedPairs = rawPairs
+    .map((rawPair) => {
+      if (rawPair === null || typeof rawPair !== "object") {
+        return null;
+      }
+      const pair = rawPair as Partial<NonNullable<CatalogItem["fuseBoxConfig"]>["pairs"][number]>;
+      if (
+        typeof pair.pairIndex !== "number" ||
+        typeof pair.pinA !== "number" ||
+        typeof pair.pinB !== "number"
+      ) {
+        return null;
+      }
+      const pairIndex = pair.pairIndex;
+      const pinA = pair.pinA;
+      const pinB = pair.pinB;
+      if (
+        !Number.isInteger(pairIndex) ||
+        !Number.isInteger(pinA) ||
+        !Number.isInteger(pinB) ||
+        pairIndex < 0 ||
+        pinA < 1 ||
+        pinB < 1 ||
+        pinA > connectionCount ||
+        pinB > connectionCount ||
+        pinA === pinB ||
+        seenPairIndexes.has(pairIndex)
+      ) {
+        return null;
+      }
+
+      seenPairIndexes.add(pairIndex);
+      return { pairIndex, pinA, pinB };
+    })
+    .filter((pair): pair is NonNullable<CatalogItem["fuseBoxConfig"]>["pairs"][number] => pair !== null)
+    .sort((left, right) => left.pairIndex - right.pairIndex);
+
+  return normalizedPairs.length === 0 ? undefined : { pairs: normalizedPairs };
+}
+
 export function normalizeCatalogItem(candidate: Partial<CatalogItem>): CatalogItem | null {
   if (typeof candidate.id !== "string" || candidate.id.trim().length === 0) {
     return null;
@@ -124,7 +175,8 @@ export function normalizeCatalogItem(candidate: Partial<CatalogItem>): CatalogIt
     url: normalizeCatalogUrl(candidate.url),
     additionalAccessories: normalizeCatalogAdditionalAccessories(candidate.additionalAccessories),
     connectorDefaults: normalizeConnectorCatalogDefaults(candidate.connectorDefaults, connectionCount),
-    connectorLayout: normalizeConnectorLayout(candidate.connectorLayout, connectionCount)
+    connectorLayout: normalizeConnectorLayout(candidate.connectorLayout, connectionCount),
+    fuseBoxConfig: normalizeFuseBoxConfig(candidate.fuseBoxConfig, connectionCount)
   };
 }
 

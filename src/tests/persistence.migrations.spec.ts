@@ -67,7 +67,10 @@ function createMigrationFixtureState(): AppState {
       id: asCatalogItemId("catalog-2w"),
       manufacturerReference: "CAT-2W",
       name: "2-way connector",
-      connectionCount: 2
+      connectionCount: 2,
+      fuseBoxConfig: {
+        pairs: [{ pairIndex: 0, pinA: 1, pinB: 2 }]
+      }
     }),
     appActions.upsertConnector({
       id: asConnectorId("C1"),
@@ -75,7 +78,9 @@ function createMigrationFixtureState(): AppState {
       technicalId: "C-1",
       catalogItemId: asCatalogItemId("catalog-2w"),
       manufacturerReference: "CAT-2W",
-      cavityCount: 2
+      cavityCount: 2,
+      fusePairRatings: { 0: 15 },
+      fusePairOverrides: [{ pairIndex: 0, pinA: 1, pinB: 2 }]
     }),
     appActions.upsertSplice({
       id: asSpliceId("S1"),
@@ -164,6 +169,13 @@ function expectPreservedUserFields(nextState: AppState): void {
   expect(nextState.networks.byId[activeNetworkId]?.projectCode).toBe("PRJ-42");
   expect(nextState.networks.byId[activeNetworkId]?.author).toBe("Alexandre");
   expect(nextState.connectors.allIds).toEqual([asConnectorId("C1")]);
+  expect(nextState.catalogItems.byId[asCatalogItemId("catalog-2w")]?.fuseBoxConfig).toEqual({
+    pairs: [{ pairIndex: 0, pinA: 1, pinB: 2 }]
+  });
+  expect(nextState.connectors.byId[asConnectorId("C1")]?.fusePairRatings).toEqual({ 0: 15 });
+  expect(nextState.connectors.byId[asConnectorId("C1")]?.fusePairOverrides).toEqual([
+    { pairIndex: 0, pinA: 1, pinB: 2 }
+  ]);
   expect(nextState.splices.allIds).toEqual([asSpliceId("S1")]);
   expect(nextState.nodes.allIds).toEqual([asNodeId("N-C1"), asNodeId("N-S1")]);
   expect(nextState.segments.allIds).toEqual([asSegmentId("SEG-1")]);
