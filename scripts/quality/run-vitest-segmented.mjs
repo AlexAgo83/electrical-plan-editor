@@ -10,6 +10,7 @@ const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.catalog-scroll.spec.tsx",
   "src/tests/app.ui.catalog-wire-endpoint-reference-renames.spec.tsx",
   "src/tests/app.ui.catalog.spec.tsx",
+  "src/tests/app.ui.connector-fuse-rating-editor.spec.tsx",
   "src/tests/app.ui.creation-flow-catalog-ergonomics.spec.tsx",
   "src/tests/app.ui.creation-flow-ergonomics.spec.tsx",
   "src/tests/app.ui.creation-flow-splice-ergonomics.spec.tsx",

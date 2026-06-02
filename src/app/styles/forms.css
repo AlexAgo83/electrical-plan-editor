@@ -1,5 +1,6 @@
 @import "./forms/connector-layout.css";
 @import "./forms/connector-physical-layout.css";
+@import "./forms/fuse-rating-editor.css";
 
 .stack-form {
   display: grid;
@@ -223,130 +224,6 @@
   color: inherit;
 }
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.fuse-rating-editor legend {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.fuse-rating-clear-action {
-  border: 0;
-  background: transparent;
-  color: color-mix(in srgb, var(--theme-primary, currentColor) 76%, currentColor);
-  padding: 0;
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.fuse-rating-table {
-  display: grid;
-  gap: 0.4rem;
-}
-
-.fuse-rating-row {
-  display: grid;
-  grid-template-columns: 3.2rem 5.6rem minmax(0, 1fr);
-  gap: 0.55rem;
-  align-items: start;
-  padding: 0.45rem;
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  border-radius: 0.5rem;
-  background: color-mix(in srgb, currentColor 3%, transparent);
-}
-
-.fuse-rating-row--header {
-  border: 0;
-  background: transparent;
-  color: color-mix(in srgb, var(--theme-primary, currentColor) 62%, currentColor);
-  font-size: 0.72rem;
-  font-weight: 800;
-  padding-block: 0 0.1rem;
-  text-transform: uppercase;
-}
-
-.fuse-rating-row.has-error {
-  border-color: color-mix(in srgb, #b42318 54%, currentColor 12%);
-  background: color-mix(in srgb, #b42318 7%, transparent);
-}
-
-.fuse-rating-pair,
-.fuse-rating-pins {
-  padding-top: 0.48rem;
-  font-size: 0.84rem;
-  font-weight: 700;
-}
-
-.fuse-rating-pins {
-  color: color-mix(in srgb, currentColor 74%, transparent);
-}
-
-.fuse-rating-value-cell {
-  display: grid;
-  gap: 0.35rem;
-  min-width: 0;
-}
-
-.fuse-rating-input-label {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  max-width: 8rem;
-}
-
-.stack-form .fuse-rating-input-label input {
-  width: 5.2rem;
-  min-height: 2rem;
-}
-
-.fuse-rating-unit {
-  font-size: 0.82rem;
-  font-weight: 800;
-}
-
-.fuse-rating-quick-picks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-}
-
-.fuse-rating-chip {
-  min-width: 2.2rem;
-  min-height: 1.75rem;
-  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%);
-  border-radius: 0.4rem;
-  background: color-mix(in srgb, currentColor 5%, transparent);
-  color: inherit;
-  padding: 0.16rem 0.42rem;
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-
-.fuse-rating-chip[aria-pressed="true"] {
-  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 72%, currentColor 10%);
-  background: color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent);
-  color: color-mix(in srgb, var(--theme-primary, currentColor) 82%, currentColor);
-}
-
-.fuse-rating-row-error {
-  margin-top: 0.05rem;
-}
-
 .stack-form label,
 .row-form label {
   display: grid;
@@ -555,21 +432,5 @@
 @media (max-width: 980px) {
   .wire-endpoints-grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 720px) {
-  .fuse-rating-row,
-  .fuse-rating-row--header {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .fuse-rating-row--header {
-    display: none;
-  }
-
-  .fuse-rating-pair,
-  .fuse-rating-pins {
-    padding-top: 0;
   }
 }

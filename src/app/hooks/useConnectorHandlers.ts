@@ -7,19 +7,9 @@ import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-s
 import { suggestAutoConnectorNodeId, suggestNextConnectorTechnicalId } from "../lib/technical-id-suggestions";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 import { clearConnectorEndpointReferences, hasConnectorEndpointReferenceFields } from "./connectorEndpointReferences";
-import {
-  formatFusePairRatingDrafts,
-  hasInvalidFusePairRatingDraft,
-  serializeFusePairRatings,
-  type ConnectorFusePairRatingDrafts
-} from "./connectorFusePairRatings";
+import { formatFusePairRatingDrafts, hasInvalidFusePairRatingDraft, serializeFusePairRatings, type ConnectorFusePairRatingDrafts } from "./connectorFusePairRatings";
 
-type DispatchAction = (
-  action: Parameters<AppStore["dispatch"]>[0],
-  options?: {
-    trackHistory?: boolean;
-  }
-) => void;
+type DispatchAction = (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean }) => void;
 
 interface UseConnectorHandlersParams {
   store: AppStore;
@@ -315,10 +305,7 @@ export function useConnectorHandlers({
       return;
     }
     const fusePairIndexes = new Set(selectedCatalogItem.fuseBoxConfig?.pairs.map((pair) => pair.pairIndex) ?? []);
-    const fusePairRatings = serializeFusePairRatings(
-      connectorFusePairRatings,
-      fusePairIndexes.size === 0 ? undefined : fusePairIndexes
-    );
+    const fusePairRatings = serializeFusePairRatings(connectorFusePairRatings, fusePairIndexes.size === 0 ? undefined : fusePairIndexes);
 
     setConnectorFormError(null);
 
