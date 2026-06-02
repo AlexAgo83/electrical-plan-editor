@@ -72,10 +72,11 @@ describe("App integration UI - connector fuse rating editor", () => {
     expect(pairOneInput).toHaveValue(10);
     expect(pairTwoInput).toHaveValue(null);
 
-    const pairTwoToolbar = within(connectorFormPanel).getByRole("toolbar", { name: "Quick ratings for fuse pair 2" });
-    fireEvent.click(within(pairTwoToolbar).getByRole("button", { name: "7.5" }));
+    expect(within(connectorFormPanel).queryByRole("toolbar", { name: /Quick ratings for fuse pair/i })).not.toBeInTheDocument();
+    const pairTwoPresetSelect = within(connectorFormPanel).getByRole("combobox", { name: "Quick rating for fuse pair 2" });
+    fireEvent.change(pairTwoPresetSelect, { target: { value: "7.5" } });
     expect(pairTwoInput).toHaveValue(7.5);
-    expect(within(pairTwoToolbar).getByRole("button", { name: "7.5" })).toHaveAttribute("aria-pressed", "true");
+    expect(pairTwoPresetSelect).toHaveValue("7.5");
 
     fireEvent.click(within(connectorFormPanel).getByLabelText("Apply same rating to all pairs"));
     fireEvent.change(pairTwoInput, { target: { value: "40" } });

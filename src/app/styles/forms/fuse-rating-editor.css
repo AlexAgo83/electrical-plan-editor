@@ -25,12 +25,9 @@
   --fuse-rating-row-border: color-mix(in srgb, var(--theme-primary, currentColor) 18%, currentColor 12%);
   --fuse-rating-row-bg: color-mix(in srgb, currentColor 3%, transparent);
   --fuse-rating-pin-color: color-mix(in srgb, var(--theme-muted, currentColor) 76%, currentColor);
-  --fuse-rating-chip-border: color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%);
-  --fuse-rating-chip-bg: color-mix(in srgb, currentColor 5%, transparent);
-  --fuse-rating-chip-color: inherit;
-  --fuse-rating-chip-active-border: color-mix(in srgb, var(--theme-primary, currentColor) 72%, currentColor 10%);
-  --fuse-rating-chip-active-bg: color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent);
-  --fuse-rating-chip-active-color: color-mix(in srgb, var(--theme-primary, currentColor) 82%, currentColor);
+  --fuse-rating-preset-border: color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%);
+  --fuse-rating-preset-bg: color-mix(in srgb, currentColor 5%, transparent);
+  --fuse-rating-preset-color: inherit;
   border-color: var(--fuse-rating-panel-border);
   background: linear-gradient(
     180deg,
@@ -72,12 +69,9 @@
   --fuse-rating-row-border: color-mix(in srgb, var(--custom-panel-border) 74%, transparent);
   --fuse-rating-row-bg: color-mix(in srgb, var(--custom-panel-bg) 84%, transparent);
   --fuse-rating-pin-color: var(--custom-muted-text);
-  --fuse-rating-chip-border: color-mix(in srgb, var(--custom-button-border) 72%, var(--custom-panel-border));
-  --fuse-rating-chip-bg: color-mix(in srgb, var(--custom-button-bg) 84%, var(--custom-panel-bg));
-  --fuse-rating-chip-color: var(--custom-shell-text);
-  --fuse-rating-chip-active-border: color-mix(in srgb, var(--custom-selection) 72%, var(--custom-button-border));
-  --fuse-rating-chip-active-bg: color-mix(in srgb, var(--custom-selection) 20%, var(--custom-panel-bg));
-  --fuse-rating-chip-active-color: var(--custom-strong-text);
+  --fuse-rating-preset-border: color-mix(in srgb, var(--custom-button-border) 72%, var(--custom-panel-border));
+  --fuse-rating-preset-bg: color-mix(in srgb, var(--custom-button-bg) 84%, var(--custom-panel-bg));
+  --fuse-rating-preset-color: var(--custom-shell-text);
 }
 
 .fuse-rating-clear-action {
@@ -194,29 +188,20 @@
   font-weight: 800;
 }
 
-.fuse-rating-quick-picks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
+.fuse-rating-quick-pick-label {
+  min-width: 6.2rem;
 }
 
-.fuse-rating-chip {
-  min-width: 2.2rem;
-  min-height: 1.75rem;
-  border: 1px solid var(--fuse-rating-chip-border, color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%));
-  border-radius: 0.4rem;
-  background: var(--fuse-rating-chip-bg, color-mix(in srgb, currentColor 5%, transparent));
-  color: var(--fuse-rating-chip-color, inherit);
-  padding: 0.16rem 0.42rem;
-  font: inherit;
+.stack-form .fuse-rating-quick-pick-select {
+  min-height: 1.85rem;
+  width: 6.2rem;
+  border-color: var(--fuse-rating-preset-border, color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 12%));
+  background: var(--fuse-rating-preset-bg, color-mix(in srgb, currentColor 5%, transparent));
+  color: var(--fuse-rating-preset-color, inherit);
+  padding-block: 0.18rem;
+  padding-inline: 0.36rem;
   font-size: 0.78rem;
   font-weight: 700;
-}
-
-.fuse-rating-chip[aria-pressed="true"] {
-  border-color: var(--fuse-rating-chip-active-border, color-mix(in srgb, var(--theme-primary, currentColor) 72%, currentColor 10%));
-  background: var(--fuse-rating-chip-active-bg, color-mix(in srgb, var(--theme-primary, currentColor) 18%, transparent));
-  color: var(--fuse-rating-chip-active-color, color-mix(in srgb, var(--theme-primary, currentColor) 82%, currentColor));
 }
 
 .fuse-rating-row-error {

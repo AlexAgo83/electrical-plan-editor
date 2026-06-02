@@ -323,19 +323,25 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
                     />
                   </label>
                   <span className="fuse-rating-unit" aria-hidden="true">Amp</span>
-                  <span className="fuse-rating-quick-picks" role="toolbar" aria-label={`Quick ratings for fuse pair ${pair.pairIndex + 1}`}>
-                    {FUSE_RATING_QUICK_PICKS.map((rating) => (
-                      <button
-                        key={rating}
-                        type="button"
-                        className="fuse-rating-chip"
-                        aria-pressed={draft === rating}
-                        onClick={() => updateConnectorFusePairRating(pair.pairIndex, rating)}
-                      >
-                        {rating}
-                      </button>
-                    ))}
-                  </span>
+                  <label className="fuse-rating-quick-pick-label">
+                    <span className="sr-only">Quick rating for fuse pair {pair.pairIndex + 1}</span>
+                    <select
+                      className="fuse-rating-quick-pick-select"
+                      value={FUSE_RATING_QUICK_PICKS.includes(draft as (typeof FUSE_RATING_QUICK_PICKS)[number]) ? draft : ""}
+                      onChange={(event) => {
+                        if (event.target.value.trim().length > 0) {
+                          updateConnectorFusePairRating(pair.pairIndex, event.target.value);
+                        }
+                      }}
+                    >
+                      <option value="">Preset</option>
+                      {FUSE_RATING_QUICK_PICKS.map((rating) => (
+                        <option key={rating} value={rating}>
+                          {rating} A
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                   {draftError === null ? null : <small className="inline-error fuse-rating-row-error">{draftError}</small>}
                 </span>
               </div>
