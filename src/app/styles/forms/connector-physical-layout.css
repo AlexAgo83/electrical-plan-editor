@@ -10,7 +10,7 @@
 }
 
 .connector-physical-wire-technical-id {
-  fill: currentColor;
+  fill: var(--connector-physical-wire-badge-text, #0f172a);
   font-weight: 700;
   pointer-events: none;
   text-anchor: middle;
@@ -19,12 +19,15 @@
 }
 
 .connector-physical-wire-technical-id-badge {
+  --connector-physical-wire-badge-bg: #ffffff;
+  --connector-physical-wire-badge-border: rgba(15, 23, 42, 0.28);
+  --connector-physical-wire-badge-text: #0f172a;
   pointer-events: none;
 }
 
 .connector-physical-wire-technical-id-bg {
-  fill: color-mix(in srgb, var(--theme-surface, Canvas) 62%, transparent);
-  stroke: color-mix(in srgb, currentColor 28%, transparent);
+  fill: var(--connector-physical-wire-badge-bg);
+  stroke: var(--connector-physical-wire-badge-border);
   stroke-width: 0.025;
 }
 
