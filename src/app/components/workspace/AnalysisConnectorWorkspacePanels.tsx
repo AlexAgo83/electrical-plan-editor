@@ -104,6 +104,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   const wireById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire] as const)), [wires]);
   const formatOccupantRef = (occupantRef: string | null): string =>
     occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
+  const formatConnectorOccupantRef = (occupantRef: string | null): string => formatOccupantRef(occupantRef).replace(/^Wire /, "");
   const parseOccupantWireId = (occupantRef: string | null) => {
     const parsed = occupantRef === null ? null : parseWireOccupantRef(occupantRef);
     return parsed !== null && wireById.has(parsed.wireId) ? parsed.wireId : null;
@@ -600,6 +601,39 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
             </>
           }
         />
+      </div>
+      <div className="cavity-grid" aria-label="Connector way details">
+        {connectorCavityStatuses.map((slot) => {
+          const occupantWireId = parseOccupantWireId(slot.occupantRef);
+          const wire = occupantWireId === null ? null : wireById.get(occupantWireId);
+          return (
+            <article key={slot.cavityIndex} className={`cavity${slot.isOccupied ? " is-occupied" : ""}`}>
+              <h3>C{slot.cavityIndex}</h3>
+              <p className="cavity-occupant-line">
+                {slot.isOccupied ? <span className="action-button-icon is-wires cavity-occupant-ref-icon" aria-hidden="true" /> : null}
+                {slot.isOccupied ? renderWireColorPrefixMarker(wire) : null}
+                {slot.isOccupied ? formatConnectorOccupantRef(slot.occupantRef) : "Free"}
+              </p>
+              {slot.isOccupied ? (
+                <div className="cavity-actions">
+                  {occupantWireId === null ? null : (
+                    <button
+                      type="button"
+                      className="validation-row-go-to-button button-with-icon"
+                      onClick={() => onOpenWireFromAnalysisTable(occupantWireId)}
+                    >
+                      <span className="action-button-icon is-open" aria-hidden="true" />
+                      Go to
+                    </button>
+                  )}
+                  <button type="button" className="button-with-icon" onClick={() => handleReleaseCavity(slot.cavityIndex)}>
+                    Release
+                  </button>
+                </div>
+              ) : null}
+            </article>
+          );
+        })}
       </div>
     </>
   ) : connectorAnalysisView === "physical" ? (

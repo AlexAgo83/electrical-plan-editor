@@ -1,5 +1,10 @@
 # Changelog (`1.14.0 -> 1.14.1`)
 
+## Major Highlights
+
+- Fixed harness assembly functional schematic filtering so unselected main connector boundaries stop traversal.
+- Added regression coverage for selected master connector trace scoping.
+
 ## Patch Notes
 
 - Fixed the harness assembly functional schematic so selected master connectors no longer leak unrelated connected branches through unselected main connectors.

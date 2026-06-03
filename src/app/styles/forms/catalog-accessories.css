@@ -1,0 +1,130 @@
+.catalog-accessory-list {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.catalog-accessory-panel-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.catalog-accessory-count {
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 5%, transparent);
+  color: color-mix(in srgb, currentColor 78%, transparent);
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.28rem 0.55rem;
+}
+
+.catalog-accessory-row {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 0.45rem;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, currentColor 13%, transparent);
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, currentColor 3%, transparent);
+  padding: 0.4rem;
+}
+
+.catalog-accessory-row-header {
+  border: 0;
+  background: transparent;
+  color: color-mix(in srgb, var(--theme-primary, currentColor) 56%, currentColor);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding-block: 0 0.1rem;
+  text-transform: uppercase;
+}
+
+.catalog-accessory-index {
+  display: inline-grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 26%, currentColor 12%);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 10%, transparent);
+  color: color-mix(in srgb, var(--theme-primary, currentColor) 70%, currentColor);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.catalog-accessory-field {
+  min-width: 0;
+}
+
+.catalog-accessory-empty-state {
+  display: grid;
+  grid-template-columns: 0.82rem minmax(0, max-content);
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px dashed color-mix(in srgb, currentColor 18%, transparent);
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, currentColor 3%, transparent);
+  padding: 0.75rem;
+}
+
+.catalog-accessory-empty-state .action-button-icon {
+  align-self: center;
+  justify-self: center;
+}
+
+.catalog-accessory-empty-state .meta-line {
+  align-self: center;
+  margin: 0;
+  line-height: 1;
+}
+
+.catalog-accessory-action-button {
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 34%, transparent);
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 9%, transparent);
+  color: inherit;
+  padding: 0.32rem 0.65rem;
+  min-height: 2.05rem;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.catalog-accessory-action-button.button-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.catalog-accessory-remove-button {
+  border-color: color-mix(in srgb, #b42318 36%, currentColor 18%);
+  background: color-mix(in srgb, #b42318 8%, transparent);
+  width: 2.05rem;
+  padding-inline: 0;
+}
+
+@media (max-width: 720px) {
+  .catalog-accessory-row-header {
+    display: none;
+  }
+
+  .catalog-accessory-row {
+    grid-template-columns: 2rem minmax(0, 1fr) auto;
+  }
+
+  .catalog-accessory-field {
+    grid-column: 2 / -1;
+  }
+
+  .catalog-accessory-remove-button {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
