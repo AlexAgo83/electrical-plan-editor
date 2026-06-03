@@ -102,7 +102,7 @@ describe("App integration UI - analysis go-to wire actions", () => {
 
     const refreshedConnectorAnalysisPanel = getPanelByHeading("Connector analysis");
     expect(within(refreshedConnectorAnalysisPanel).getByRole("button", { name: "Physical" })).toHaveAttribute("aria-pressed", "true");
-    expect(within(refreshedConnectorAnalysisPanel).getByRole("button", { name: "Ways" })).toHaveAttribute("aria-pressed", "false");
+    expect(within(refreshedConnectorAnalysisPanel).getByRole("button", { name: "Ways & roles" })).toHaveAttribute("aria-pressed", "false");
   });
 
   it("opens wire editing from connector synthesis Wire references", () => {

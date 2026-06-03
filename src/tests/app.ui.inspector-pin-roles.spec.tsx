@@ -6,7 +6,8 @@ import {
   asConnectorId,
   getPanelByHeading,
   renderAppWithState,
-  switchScreenDrawerAware
+  switchScreenDrawerAware,
+  switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 
 function openConnectorInspector(connectorName: string) {
@@ -104,6 +105,52 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     expect(row1.querySelector("[data-pin-role-source]")?.getAttribute("data-pin-role-source")).toBe("catalog");
     expect(row2.querySelector("[data-pin-role-source]")?.getAttribute("data-pin-role-source")).toBe("override");
     expect(row3.querySelector("[data-pin-role-source]")?.getAttribute("data-pin-role-source")).toBe("default");
+  });
+
+  it("shows pin roles in the connector analysis ways view", () => {
+    const catalogItemId = asCatalogItemId("CAT-ECU");
+    const connectorId = asConnectorId("C-ECU");
+    let state = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "ECU-4",
+        connectionCount: 4,
+        connectorDefaults: { pinElectricalRoles: { 1: { role: "consumer", currentA: 40, label: "BAT+" } } }
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: connectorId,
+        name: "ECU connector",
+        technicalId: "ECU-C1",
+        cavityCount: 4,
+        catalogItemId,
+        manufacturerReference: "ECU-4",
+        pinElectricalRoles: { 2: { role: "source", currentA: 2.5 } }
+      })
+    );
+
+    renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("connector");
+    fireEvent.click(within(getPanelByHeading("Connectors")).getByText("ECU connector"));
+
+    const panel = getPanelByHeading("Connector analysis");
+    expect(within(panel).getByRole("button", { name: "Ways & roles" })).toHaveAttribute("aria-pressed", "true");
+
+    const firstWay = within(panel).getByText("C1").closest("article") as HTMLElement;
+    const secondWay = within(panel).getByText("C2").closest("article") as HTMLElement;
+
+    expect(within(firstWay).getByText("Consumer")).toBeInTheDocument();
+    expect(within(firstWay).getByText("catalog")).toBeInTheDocument();
+    expect(within(firstWay).getByText("BAT+")).toBeInTheDocument();
+    expect(within(firstWay).getByText("40 A")).toBeInTheDocument();
+    expect(within(secondWay).getByText("Source")).toBeInTheDocument();
+    expect(within(secondWay).getByText("override")).toBeInTheDocument();
+    expect(within(secondWay).getByText("2.5 A")).toBeInTheDocument();
   });
 
   it("applies a bulk role to selected pins as a single save", () => {

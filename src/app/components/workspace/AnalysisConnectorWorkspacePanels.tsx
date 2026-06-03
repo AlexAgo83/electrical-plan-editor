@@ -1,4 +1,9 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
+import type { PinElectricalRoleKind } from "../../../core/entities";
+import {
+  resolvePinElectricalRoleDescriptor,
+  type PinElectricalRoleSource
+} from "../../../core/pinElectricalRole";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { formatOccupantRefForDisplay, parseWireOccupantRef } from "../../lib/app-utils-networking";
@@ -10,6 +15,23 @@ import { ConnectorPhysicalView } from "./ConnectorPhysicalView";
 import { EntityReferenceButton } from "./EntityReferenceButton";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
+
+const PIN_ROLE_LABELS: Record<PinElectricalRoleKind, string> = {
+  source: "Source",
+  consumer: "Consumer",
+  passive: "Passive",
+  bidirectional: "Bidirectional"
+};
+
+function describePinRoleSource(source: PinElectricalRoleSource): string {
+  if (source === "override") {
+    return "override";
+  }
+  if (source === "catalog") {
+    return "catalog";
+  }
+  return "default";
+}
 
 export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContentProps): ReactElement {
   const {
@@ -58,6 +80,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   const [connectorTableSort, setConnectorTableSort] = useState<{ field: ConnectorAnalysisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const [connectorSynthesisTableSort, setConnectorSynthesisTableSort] = useState<{ field: ConnectorSynthesisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
+  const selectedConnectorCatalogItem = selectedConnector?.catalogItemId === undefined ? undefined : catalogItemById.get(selectedConnector.catalogItemId);
   const connectorFilterPlaceholder =
     connectorFilterField === "name" ? "Connector name" : connectorFilterField === "technicalId" ? "Technical ID" : "Name or technical ID...";
   const sortedVisibleConnectors = useMemo(
@@ -391,7 +414,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           aria-pressed={connectorAnalysisView === "cavities"}
           onClick={() => setConnectorAnalysisView("cavities")}
         >
-          Ways
+          Ways & roles
         </button>
         <button
           type="button"
@@ -417,12 +440,19 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           if (connectorAnalysisView === "cavities" || connectorAnalysisView === "physical") {
             downloadCsvFile(
               `analysis-connector-ways-${selectedConnector?.technicalId ?? "selection"}`,
-              ["Way", "Status", "Occupant reference"],
-              connectorCavityStatuses.map((slot) => [
-                `C${slot.cavityIndex}`,
-                slot.isOccupied ? "Occupied" : "Free",
-                formatOccupantRef(slot.occupantRef)
-              ])
+              ["Way", "Status", "Occupant reference", "Role", "Max current (A)", "Label", "Role source"],
+              connectorCavityStatuses.map((slot) => {
+                const roleDescriptor = resolvePinElectricalRoleDescriptor(selectedConnector ?? undefined, selectedConnectorCatalogItem, slot.cavityIndex);
+                return [
+                  `C${slot.cavityIndex}`,
+                  slot.isOccupied ? "Occupied" : "Free",
+                  formatOccupantRef(slot.occupantRef),
+                  roleDescriptor.role.role,
+                  roleDescriptor.role.currentA ?? "",
+                  roleDescriptor.role.label ?? "",
+                  roleDescriptor.source
+                ];
+              })
             );
             return;
           }
@@ -505,6 +535,8 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
             const canGoToWire =
               parsedOccupantRef !== null &&
               wireById.has(parsedOccupantRef.wireId);
+            const roleDescriptor = resolvePinElectricalRoleDescriptor(selectedConnector, selectedConnectorCatalogItem, slot.cavityIndex);
+            const roleLabel = PIN_ROLE_LABELS[roleDescriptor.role.role];
 
             return (
               <article key={slot.cavityIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
@@ -514,6 +546,23 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
                   {slot.isOccupied ? renderWireColorPrefixMarker(parsedOccupantRef === null ? null : wireById.get(parsedOccupantRef.wireId)) : null}
                   {slot.isOccupied ? renderConnectorOccupantRef(slot.occupantRef) : <span>Free</span>}
                 </p>
+                <div
+                  className="connector-way-role-summary"
+                  aria-label={`C${slot.cavityIndex} electrical role ${roleLabel}, ${describePinRoleSource(roleDescriptor.source)}`}
+                >
+                  <span className={`connector-way-role-chip connector-way-role-chip--${roleDescriptor.role.role}`}>
+                    {roleLabel}
+                  </span>
+                  <small className={`pin-electrical-roles-source pin-electrical-roles-source--${roleDescriptor.source}`}>
+                    {describePinRoleSource(roleDescriptor.source)}
+                  </small>
+                </div>
+                {roleDescriptor.role.currentA !== undefined || roleDescriptor.role.label !== undefined ? (
+                  <p className="connector-way-role-details">
+                    {roleDescriptor.role.label !== undefined ? <span>{roleDescriptor.role.label}</span> : null}
+                    {roleDescriptor.role.currentA !== undefined ? <span>{roleDescriptor.role.currentA} A</span> : null}
+                  </p>
+                ) : null}
                 {slot.isOccupied ? (
                   <div className="cavity-actions">
                     <button
@@ -549,7 +598,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
       </p>
       <ConnectorPhysicalView
         connector={selectedConnector}
-        catalogItem={selectedConnector.catalogItemId === undefined ? undefined : catalogItemById.get(selectedConnector.catalogItemId)}
+        catalogItem={selectedConnectorCatalogItem}
         connectorCavityStatuses={connectorCavityStatuses}
         wireById={wireById}
         selectedWireId={selectedWireId}
