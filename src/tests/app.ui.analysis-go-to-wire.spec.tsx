@@ -50,6 +50,25 @@ describe("App integration UI - analysis go-to wire actions", () => {
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Splice$/, hidden: true })).toHaveClass("is-active");
   });
 
+  it("keeps wire occupancy details out of connector ways and roles", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("connector");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
+
+    const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    expect(within(connectorAnalysisPanel).getByRole("button", { name: "Ways & roles" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(connectorAnalysisPanel).getByText("Electrical roles")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).queryByLabelText("Connector way details")).not.toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).queryByText("W-1 / A")).not.toBeInTheDocument();
+
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
+    expect(within(connectorAnalysisPanel).getByText("W-1 / A")).toBeInTheDocument();
+  });
+
   it("shows wire color markers in connector physical view", () => {
     const baseState = createUiIntegrationState();
     const wire = baseState.wires.byId[asWireId("W1")];

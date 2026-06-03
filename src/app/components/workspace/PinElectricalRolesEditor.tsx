@@ -21,6 +21,7 @@ export interface PinElectricalRolesEditorProps {
   selection: number[];
   setSelection: (value: number[]) => void;
   catalogItem: CatalogItem | undefined;
+  allowInheritedRoles?: boolean;
   mode?: "fieldset" | "panel";
   title?: string;
   showPanelHeader?: boolean;
@@ -42,6 +43,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
     selection,
     setSelection,
     catalogItem,
+    allowInheritedRoles = true,
     mode = "fieldset",
     title = "Pin electrical roles",
     showPanelHeader = true,
@@ -53,6 +55,10 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
 
   function updateDraftField(cavityIndex: number, field: keyof PinElectricalRoleDraft, value: string): void {
     const current = drafts[cavityIndex] ?? createEmptyPinElectricalRoleDraft();
+    if (allowInheritedRoles && field === "role" && value === "") {
+      setDrafts({ ...drafts, [cavityIndex]: createEmptyPinElectricalRoleDraft() });
+      return;
+    }
     setDrafts({ ...drafts, [cavityIndex]: { ...current, [field]: value } });
   }
 
@@ -124,14 +130,16 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
         >
           Apply role to selected pins
         </button>
-        <button
-          type="button"
-          className="button-with-icon"
-          disabled={selection.length === 0}
-          onClick={resetSelectionToCatalog}
-        >
-          Reset to catalog default
-        </button>
+        {allowInheritedRoles ? (
+          <button
+            type="button"
+            className="button-with-icon"
+            disabled={selection.length === 0}
+            onClick={resetSelectionToCatalog}
+          >
+            Reset to catalog default
+          </button>
+        ) : null}
       </div>
       <div
         className="pin-electrical-roles-table"
@@ -153,6 +161,15 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
           const draftError = getPinElectricalRoleDraftError(draft);
           const resolved = resolvePinElectricalRoleDescriptor({ pinElectricalRoles: undefined }, catalogItem, cavityIndex);
           const isSelected = selection.includes(cavityIndex);
+          const hasSelectedRole = draft.role !== "";
+          const isInherited = allowInheritedRoles && !hasSelectedRole;
+          const hidesRoleDetails = !hasSelectedRole;
+          const emptyRoleOptionLabel =
+            allowInheritedRoles && resolved.source === "catalog"
+              ? `(inherit: ${ROLE_LABELS[resolved.role.role]})`
+              : allowInheritedRoles
+                ? "(inherit)"
+                : "";
           return (
             <div
               className={`pin-electrical-roles-row row-form${draftError === null ? "" : " has-error"}`}
@@ -186,7 +203,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                     updateDraftField(cavityIndex, "role", event.target.value)
                   }
                 >
-                  <option value="">(inherit)</option>
+                  <option value="">{emptyRoleOptionLabel}</option>
                   {PIN_ELECTRICAL_ROLE_KINDS.map((kind) => (
                     <option key={kind} value={kind}>
                       {ROLE_LABELS[kind]}
@@ -195,21 +212,25 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                 </select>
               </span>
               <span role="cell" data-label="Max current (A)">
-                <label className="sr-only" htmlFor={`pin-role-current-${cavityIndex}`}>
-                  Max current for pin {cavityIndex}
-                </label>
-                <input
-                  id={`pin-role-current-${cavityIndex}`}
-                  type="number"
-                  min={0}
-                  step={0.1}
-                  value={draft.currentA}
-                  aria-invalid={draftError === null ? undefined : true}
-                  onChange={(event) =>
-                    updateDraftField(cavityIndex, "currentA", event.target.value)
-                  }
-                />
-                {draft.role === "" && resolved.role.currentA !== undefined ? (
+                {hidesRoleDetails ? null : (
+                  <>
+                    <label className="sr-only" htmlFor={`pin-role-current-${cavityIndex}`}>
+                      Max current for pin {cavityIndex}
+                    </label>
+                    <input
+                      id={`pin-role-current-${cavityIndex}`}
+                      type="number"
+                      min={0}
+                      step={0.1}
+                      value={draft.currentA}
+                      aria-invalid={draftError === null ? undefined : true}
+                      onChange={(event) =>
+                        updateDraftField(cavityIndex, "currentA", event.target.value)
+                      }
+                    />
+                  </>
+                )}
+                {isInherited && resolved.role.currentA !== undefined ? (
                   <small className="pin-electrical-roles-effective">{resolved.role.currentA} A</small>
                 ) : null}
                 {draftError === null ? null : (
@@ -217,20 +238,24 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                 )}
               </span>
               <span role="cell" data-label="Label">
-                <label className="sr-only" htmlFor={`pin-role-label-${cavityIndex}`}>
-                  Label for pin {cavityIndex}
-                </label>
-                <input
-                  id={`pin-role-label-${cavityIndex}`}
-                  type="text"
-                  maxLength={80}
-                  value={draft.label}
-                  placeholder="BAT+, KL15, LS_OUT..."
-                  onChange={(event) =>
-                    updateDraftField(cavityIndex, "label", event.target.value)
-                  }
-                />
-                {draft.role === "" && resolved.role.label !== undefined ? (
+                {hidesRoleDetails ? null : (
+                  <>
+                    <label className="sr-only" htmlFor={`pin-role-label-${cavityIndex}`}>
+                      Label for pin {cavityIndex}
+                    </label>
+                    <input
+                      id={`pin-role-label-${cavityIndex}`}
+                      type="text"
+                      maxLength={80}
+                      value={draft.label}
+                      placeholder="BAT+, KL15, LS_OUT..."
+                      onChange={(event) =>
+                        updateDraftField(cavityIndex, "label", event.target.value)
+                      }
+                    />
+                  </>
+                )}
+                {isInherited && resolved.role.label !== undefined ? (
                   <small className="pin-electrical-roles-effective">{resolved.role.label}</small>
                 ) : null}
               </span>

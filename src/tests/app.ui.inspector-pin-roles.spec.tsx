@@ -51,10 +51,13 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     const panel = openConnectorAnalysis("ECU connector");
 
     const roleSelect = within(panel).getByLabelText("Role for pin 1");
-    const currentInput = within(panel).getByLabelText("Max current for pin 1");
-    const labelInput = within(panel).getByLabelText("Label for pin 1");
+    expect(roleSelect).toHaveDisplayValue("(inherit)");
+    expect(within(panel).queryByLabelText("Max current for pin 1")).not.toBeInTheDocument();
+    expect(within(panel).queryByLabelText("Label for pin 1")).not.toBeInTheDocument();
 
     fireEvent.change(roleSelect, { target: { value: "consumer" } });
+    const currentInput = within(panel).getByLabelText("Max current for pin 1");
+    const labelInput = within(panel).getByLabelText("Label for pin 1");
     fireEvent.change(currentInput, { target: { value: "40" } });
     fireEvent.change(labelInput, { target: { value: "BAT+" } });
 
@@ -100,6 +103,7 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
 
     expect(columnHeaders).toEqual(["Select", "Pin", "Role", "Max current (A)", "Label"]);
     expect(row1.querySelector("[data-pin-role-source]")).toBeNull();
+    expect(within(row1).getByLabelText("Role for pin 1")).toHaveDisplayValue("(inherit: Consumer)");
     expect(within(row1).getByText("40 A")).toBeInTheDocument();
     expect(within(row1).getByText("BAT+")).toBeInTheDocument();
   });
@@ -172,9 +176,58 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     expect(within(firstWay).getByText("Consumer")).toBeInTheDocument();
     expect(within(firstWay).getByText("BAT+")).toBeInTheDocument();
     expect(within(firstWay).getByText("40 A")).toBeInTheDocument();
+    expect(within(firstWay).queryByLabelText("Max current for pin 1")).not.toBeInTheDocument();
+    expect(within(firstWay).queryByLabelText("Label for pin 1")).not.toBeInTheDocument();
     expect(within(secondWay).getByText("Source")).toBeInTheDocument();
     expect(within(panel).queryByRole("columnheader", { name: "Source" })).not.toBeInTheDocument();
     expect(within(secondWay).getByDisplayValue("2.5")).toBeInTheDocument();
+    expect(within(secondWay).getByLabelText("Max current for pin 2")).toBeInTheDocument();
+    expect(within(secondWay).getByLabelText("Label for pin 2")).toBeInTheDocument();
+  });
+
+  it("hides current and label inputs when a pin role inherits", () => {
+    const catalogItemId = asCatalogItemId("CAT-ECU");
+    const connectorId = asConnectorId("C-ECU");
+    let state = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "ECU-4",
+        connectionCount: 4,
+        connectorDefaults: { pinElectricalRoles: { 1: { role: "consumer", currentA: 40, label: "BAT+" } } }
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: connectorId,
+        name: "ECU connector",
+        technicalId: "ECU-C1",
+        cavityCount: 4,
+        catalogItemId,
+        manufacturerReference: "ECU-4",
+        pinElectricalRoles: { 1: { role: "source", currentA: 2.5, label: "Override" } }
+      })
+    );
+
+    const { store } = renderAppWithState(state);
+    const panel = openConnectorAnalysis("ECU connector");
+    const firstWay = within(panel).getByLabelText("Select pin 1").closest('[role="row"]') as HTMLElement;
+
+    expect(within(firstWay).getByDisplayValue("2.5")).toBeInTheDocument();
+    expect(within(firstWay).getByDisplayValue("Override")).toBeInTheDocument();
+
+    fireEvent.change(within(firstWay).getByLabelText("Role for pin 1"), { target: { value: "" } });
+
+    expect(within(firstWay).queryByLabelText("Max current for pin 1")).not.toBeInTheDocument();
+    expect(within(firstWay).queryByLabelText("Label for pin 1")).not.toBeInTheDocument();
+    expect(within(firstWay).getByText("40 A")).toBeInTheDocument();
+    expect(within(firstWay).getByText("BAT+")).toBeInTheDocument();
+
+    fireEvent.click(within(panel).getByRole("button", { name: "Save roles" }));
+
+    const saved = store.getState().connectors.byId[connectorId];
+    expect(saved?.pinElectricalRoles).toBeUndefined();
   });
 
   it("edits catalog material application from connector analysis", () => {

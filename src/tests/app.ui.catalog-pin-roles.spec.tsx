@@ -41,9 +41,12 @@ describe("App integration UI - catalog connector defaults pin electrical roles",
     const pinRolesPanel = openCatalogEditor("ECU-4");
 
     const roleSelect = within(pinRolesPanel).getByLabelText("Role for pin 1");
+    expect(within(pinRolesPanel).queryByLabelText("Max current for pin 1")).not.toBeInTheDocument();
+    expect(within(pinRolesPanel).queryByLabelText("Label for pin 1")).not.toBeInTheDocument();
+
+    fireEvent.change(roleSelect, { target: { value: "consumer" } });
     const currentInput = within(pinRolesPanel).getByLabelText("Max current for pin 1");
     const labelInput = within(pinRolesPanel).getByLabelText("Label for pin 1");
-    fireEvent.change(roleSelect, { target: { value: "consumer" } });
     fireEvent.change(currentInput, { target: { value: "40" } });
     fireEvent.change(labelInput, { target: { value: "BAT+" } });
 
@@ -52,6 +55,38 @@ describe("App integration UI - catalog connector defaults pin electrical roles",
     const saved = store.getState().catalogItems.byId[catalogItemId];
     expect(saved?.connectorDefaults?.pinElectricalRoles).toEqual({
       1: { role: "consumer", currentA: 40, label: "BAT+" }
+    });
+  });
+
+  it("does not offer inherited mode in catalog defaults and keeps role empty until selected", () => {
+    const catalogItemId = asCatalogItemId("CAT-ECU");
+    const state = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "ECU-4",
+        connectionCount: 4,
+        connectorDefaults: { allSameTerminals: true }
+      })
+    );
+
+    const { store } = renderAppWithState(state);
+    const pinRolesPanel = openCatalogEditor("ECU-4");
+    const roleSelect = within(pinRolesPanel).getByLabelText("Role for pin 1");
+
+    expect(roleSelect).toHaveValue("");
+    expect(within(pinRolesPanel).queryByRole("option", { name: "(inherit)" })).not.toBeInTheDocument();
+    expect(within(pinRolesPanel).queryByRole("button", { name: "Reset to catalog default" })).not.toBeInTheDocument();
+    expect(within(pinRolesPanel).queryByLabelText("Max current for pin 1")).not.toBeInTheDocument();
+    expect(within(pinRolesPanel).queryByLabelText("Label for pin 1")).not.toBeInTheDocument();
+
+    fireEvent.change(roleSelect, { target: { value: "source" } });
+    fireEvent.change(within(pinRolesPanel).getByLabelText("Max current for pin 1"), { target: { value: "12" } });
+    fireEvent.click(within(pinRolesPanel).getByRole("button", { name: "Save" }));
+
+    const saved = store.getState().catalogItems.byId[catalogItemId];
+    expect(saved?.connectorDefaults?.pinElectricalRoles).toEqual({
+      1: { role: "source", currentA: 12 }
     });
   });
 });
