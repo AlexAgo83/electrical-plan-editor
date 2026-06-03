@@ -235,39 +235,149 @@
   transform-origin: left center;
 }
 
-.app-shell.theme-dark .home-network-recent-changes {
-  border-color: color-mix(in srgb, var(--theme-primary, #8bb9ff) 24%, rgba(255, 255, 255, 0.18));
-  background: color-mix(in srgb, #07111f 78%, var(--theme-primary, #8bb9ff) 8%);
-  color: #e6edf7;
-  scrollbar-color: color-mix(in srgb, var(--theme-primary, #8bb9ff) 42%, #334155) transparent;
+.app-shell:is(
+  .theme-dark,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-circle-mobility-dark
+) .home-network-recent-changes {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 28%, currentColor 14%);
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  color: inherit;
+  scrollbar-color: color-mix(in srgb, var(--theme-primary, currentColor) 42%, currentColor 20%) transparent;
 }
 
-.app-shell.theme-dark .home-network-recent-changes .network-recent-changes-item {
-  border-color: color-mix(in srgb, #ffffff 13%, transparent);
-  background: color-mix(in srgb, #0d1726 88%, var(--theme-primary, #8bb9ff) 6%);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 8%, transparent);
+.app-shell:is(
+  .theme-dark,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-circle-mobility-dark
+) .home-network-recent-changes .network-recent-changes-item {
+  border-color: color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, currentColor 5%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, currentColor 8%, transparent);
 }
 
-.app-shell.theme-dark .home-network-recent-changes .network-recent-changes-icon,
-.app-shell.theme-dark .home-network-recent-changes .network-recent-changes-open-button {
-  border-color: color-mix(in srgb, #ffffff 18%, transparent);
-  background: color-mix(in srgb, #111d2d 88%, var(--theme-primary, #8bb9ff) 10%);
+.app-shell:is(
+  .theme-dark,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-circle-mobility-dark
+) .home-network-recent-changes .network-recent-changes-icon,
+.app-shell:is(
+  .theme-dark,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-circle-mobility-dark
+) .home-network-recent-changes .network-recent-changes-open-button {
+  border-color: color-mix(in srgb, currentColor 18%, transparent);
+  background: color-mix(in srgb, currentColor 7%, transparent);
 }
 
-.app-shell.theme-dark .home-network-recent-changes .network-recent-changes-kind,
-.app-shell.theme-dark .home-network-recent-changes .network-recent-changes-time {
-  color: #b7c3d3;
+.app-shell:is(
+  .theme-dark,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-circle-mobility-dark
+) .home-network-recent-changes .network-recent-changes-kind,
+.app-shell:is(
+  .theme-dark,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-circle-mobility-dark
+) .home-network-recent-changes .network-recent-changes-time {
+  color: color-mix(in srgb, currentColor 72%, transparent);
 }
 
-.app-shell.theme-dark .home-network-recent-changes .network-recent-changes-action,
-.app-shell.theme-dark .home-network-recent-changes .network-recent-changes-detail,
-.app-shell.theme-dark .home-network-recent-changes .network-recent-changes-target {
-  color: #dce6f3;
-  background: color-mix(in srgb, var(--theme-primary, #8bb9ff) 14%, #0b1320);
+.app-shell:is(
+  .theme-dark,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-circle-mobility-dark
+) .home-network-recent-changes .network-recent-changes-action,
+.app-shell:is(
+  .theme-dark,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-circle-mobility-dark
+) .home-network-recent-changes .network-recent-changes-detail,
+.app-shell:is(
+  .theme-dark,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-circle-mobility-dark
+) .home-network-recent-changes .network-recent-changes-target {
+  color: color-mix(in srgb, currentColor 90%, transparent);
+  background: color-mix(in srgb, currentColor 8%, transparent);
 }
 
-.app-shell.theme-dark .home-network-recent-changes .network-recent-changes-detail {
-  border-color: color-mix(in srgb, var(--theme-primary, #8bb9ff) 34%, rgba(255, 255, 255, 0.16));
+.app-shell:is(
+  .theme-dark,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-circle-mobility-dark
+) .home-network-recent-changes .network-recent-changes-detail {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 34%, currentColor 12%);
 }
 
 @media (max-width: 640px) {

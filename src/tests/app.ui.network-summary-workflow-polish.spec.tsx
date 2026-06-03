@@ -52,9 +52,16 @@ describe("App integration UI - network summary workflow polish", () => {
 
   it("shows icons on the reset and fit canvas controls", () => {
     renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Appearance preferences" }).closest(".panel");
+    expect(settingsPanel).not.toBeNull();
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "dark" } });
     switchScreenDrawerAware("modeling");
 
     const panel = getPanelByHeading("Network summary");
+    const canvasControls = within(panel).getByLabelText("Canvas controls");
+    expect(canvasControls).toHaveClass("network-canvas-floating-controls");
+    expect(within(canvasControls).getByRole("slider", { name: /Zoom view/ })).toBeInTheDocument();
     const resetViewButton = within(panel).getByRole("button", { name: "Reset view" });
     const fitNetworkButton = within(panel).getByRole("button", { name: "Fit network" });
 

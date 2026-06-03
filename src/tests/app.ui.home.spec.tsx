@@ -210,7 +210,11 @@ describe("home workspace screen", () => {
     expect(within(resumePanel).queryByLabelText("Workspace summary")).not.toBeInTheDocument();
   });
 
-  it("keeps Home workspace activity readable in dark theme", async () => {
+  it.each([
+    ["dark", "theme-dark"],
+    ["deepGreen", "theme-deep-green"],
+    ["circleMobilityDark", "theme-circle-mobility-dark"]
+  ] as const)("keeps Home workspace activity readable in %s theme", async (themeMode, expectedThemeClass) => {
     renderAppWithState(createUiIntegrationState());
     const closeOnboardingButton = screen.queryByRole("button", { name: "Close onboarding" });
     if (closeOnboardingButton !== null) {
@@ -222,7 +226,7 @@ describe("home workspace screen", () => {
     switchScreenDrawerAware("settings");
     const settingsPanel = within(document.body).getByRole("heading", { name: "Appearance preferences" }).closest(".panel");
     expect(settingsPanel).not.toBeNull();
-    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "dark" } });
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: themeMode } });
     switchScreenDrawerAware("networkScope");
     const networkScopePanel = getPanelByHeading("Network Scope");
     fireEvent.click(within(networkScopePanel).getByText("Main network (Sample)").closest("tr") as HTMLElement);
@@ -231,7 +235,7 @@ describe("home workspace screen", () => {
     fireEvent.click(within(editFormPanel).getByRole("button", { name: "Save network" }));
     switchScreenDrawerAware("home");
 
-    expect(appShell).toHaveClass("theme-dark");
+    expect(appShell).toHaveClass(expectedThemeClass);
     const workspacePanel = getPanelByHeading("Workspace");
     await waitFor(() => {
       expect(within(workspacePanel).getByLabelText("Recent changes for active network")).toBeInTheDocument();
