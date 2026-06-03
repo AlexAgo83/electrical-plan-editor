@@ -64,8 +64,11 @@
   min-width: 0;
   border-radius: 0.55rem;
   border: 1px solid color-mix(in srgb, currentColor 26%, transparent);
+  border-color: color-mix(in srgb, var(--custom-input-border) 68%, var(--custom-panel-border));
   background: color-mix(in srgb, var(--theme-primary, currentColor) 3%, #fff);
+  background: color-mix(in srgb, var(--custom-input-bg) 76%, var(--custom-shell-bg-bottom));
   color: inherit;
+  color: var(--custom-input-text);
   font: inherit;
   padding: 0.5rem 0.65rem;
 }
@@ -110,8 +113,11 @@
 
 .settings-search-summary button {
   border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 42%, transparent);
+  border-color: color-mix(in srgb, var(--custom-button-border) 78%, var(--custom-panel-border));
   background: color-mix(in srgb, var(--theme-primary, currentColor) 12%, transparent);
+  background: color-mix(in srgb, var(--custom-button-bg) 88%, var(--custom-panel-bg));
   color: inherit;
+  color: var(--custom-button-text);
   border-radius: 0.5rem;
   padding: 0.32rem 0.62rem;
 }
