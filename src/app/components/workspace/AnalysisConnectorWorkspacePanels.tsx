@@ -1,4 +1,8 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
+import {
+  getConnectorLayoutWayDisplayLabel,
+  resolveConnectorLayout
+} from "../../../core/connectorLayout";
 import { resolvePinElectricalRoleDescriptor } from "../../../core/pinElectricalRole";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
@@ -102,8 +106,10 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   );
   const wireTechnicalIdById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire.technicalId] as const)), [wires]);
   const wireById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire] as const)), [wires]);
+  const selectedConnectorLayout = selectedConnector === null ? null : resolveConnectorLayout(selectedConnectorCatalogItem?.connectorLayout, selectedConnector.cavityCount);
   const formatOccupantRef = (occupantRef: string | null): string =>
     occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
+  const formatConnectorOccupantRef = (occupantRef: string | null): string => formatOccupantRef(occupantRef).replace(/^Wire /, "");
   const parseOccupantWireId = (occupantRef: string | null) => {
     const parsed = occupantRef === null ? null : parseWireOccupantRef(occupantRef);
     return parsed !== null && wireById.has(parsed.wireId) ? parsed.wireId : null;
@@ -214,6 +220,53 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
       return;
     }
     handleReserveCavity(event);
+  }
+
+  function renderConnectorWayDetails(): ReactElement | null {
+    if (selectedConnectorLayout === null) {
+      return null;
+    }
+    const statusByCavity = new Map(connectorCavityStatuses.map((status) => [status.cavityIndex, status] as const));
+    return (
+      <div className="cavity-grid connector-physical-way-list" aria-label="Connector way details">
+        {selectedConnectorLayout.ways.map((way) => {
+          const status = statusByCavity.get(way.cavityIndex);
+          const occupantRef = status?.occupantRef ?? null;
+          const occupantWireId = parseOccupantWireId(occupantRef);
+          const wire = occupantWireId === null ? null : wireById.get(occupantWireId);
+          const wayLabel = getConnectorLayoutWayDisplayLabel(way);
+          return (
+            <article key={way.cavityIndex} className={`cavity${status?.isOccupied === true ? " is-occupied" : ""}`}>
+              <h3>{wayLabel}</h3>
+              <p className="cavity-occupant-line">
+                {status?.isOccupied === true ? <span className="action-button-icon is-wires cavity-occupant-ref-icon" aria-hidden="true" /> : null}
+                {status?.isOccupied === true ? renderWireColorPrefixMarker(wire) : null}
+                {status?.isOccupied === true ? formatConnectorOccupantRef(occupantRef) : "Free"}
+              </p>
+              {status?.isOccupied === true ? (
+                <div className="cavity-actions">
+                  {occupantWireId === null ? null : (
+                    <button
+                      type="button"
+                      className="validation-row-go-to-button button-with-icon"
+                      onClick={() => onOpenWireFromAnalysisTable(occupantWireId)}
+                    >
+                      <span className="action-button-icon is-open" aria-hidden="true" />
+                      Go to
+                    </button>
+                  )}
+                  {occupantWireId === null ? (
+                    <button type="button" className="button-with-icon" onClick={() => handleReleaseCavity(way.cavityIndex)}>
+                      Release
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+            </article>
+          );
+        })}
+      </div>
+    );
   }
 
   function handleSavePinElectricalRoles(): void {
@@ -452,11 +505,19 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         </button>
         <button
           type="button"
-          className={connectorAnalysisView === "cavities" ? "filter-chip is-active" : "filter-chip"}
-          aria-pressed={connectorAnalysisView === "cavities"}
-          onClick={() => setConnectorAnalysisView("cavities")}
+          className={connectorAnalysisView === "ways" ? "filter-chip is-active" : "filter-chip"}
+          aria-pressed={connectorAnalysisView === "ways"}
+          onClick={() => setConnectorAnalysisView("ways")}
         >
-          Ways & roles
+          Ways
+        </button>
+        <button
+          type="button"
+          className={connectorAnalysisView === "roles" ? "filter-chip is-active" : "filter-chip"}
+          aria-pressed={connectorAnalysisView === "roles"}
+          onClick={() => setConnectorAnalysisView("roles")}
+        >
+          Roles
         </button>
         <button
           type="button"
@@ -479,7 +540,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         type="button"
         className="filter-chip table-export-button"
         onClick={() => {
-          if (connectorAnalysisView === "cavities" || connectorAnalysisView === "physical" || connectorAnalysisView === "catalogMaterial") {
+          if (connectorAnalysisView === "ways" || connectorAnalysisView === "roles" || connectorAnalysisView === "physical" || connectorAnalysisView === "catalogMaterial") {
             downloadCsvFile(
               `analysis-connector-ways-${selectedConnector?.technicalId ?? "selection"}`,
               ["Way", "Status", "Occupant reference", "Role", "Max current (A)", "Label", "Role source"],
@@ -512,7 +573,8 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         }}
         disabled={
           selectedConnector === null ||
-          (connectorAnalysisView === "cavities"
+          (connectorAnalysisView === "ways"
+            || connectorAnalysisView === "roles"
             || connectorAnalysisView === "physical"
             || connectorAnalysisView === "catalogMaterial"
             ? connectorCavityStatuses.length === 0
@@ -526,7 +588,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   </header>
   {selectedConnector === null ? (
     <p className="empty-copy">Select a connector to view ways and synthesis.</p>
-  ) : connectorAnalysisView === "cavities" ? (
+  ) : connectorAnalysisView === "ways" ? (
     <>
       <p className="meta-line">
         <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
@@ -571,9 +633,19 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
             <small className="inline-help">No available ways on this connector.</small>
           ) : null}
         </section>
+        {renderConnectorWayDetails()}
+      </div>
+    </>
+  ) : connectorAnalysisView === "roles" ? (
+    <>
+      <p className="meta-line">
+        <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
+      </p>
+      <div className="connector-roles-view">
         <PinElectricalRolesEditor
           mode="panel"
           title="Electrical roles"
+          showPanelHeader={false}
           cavityCount={selectedConnector.cavityCount}
           drafts={pinRoleDrafts}
           setDrafts={(nextDrafts) => {

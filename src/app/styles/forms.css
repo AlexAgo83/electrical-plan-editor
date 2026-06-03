@@ -257,6 +257,14 @@
   box-shadow: none;
 }
 
+.connector-roles-view .pin-electrical-roles-editor--panel {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
 .catalog-material-application-form + .row-actions {
   margin-top: 0.8rem;
 }
@@ -302,26 +310,60 @@
 }
 
 .pin-electrical-roles-bulk {
-  display: flex;
-  align-items: end;
-  flex-wrap: wrap;
+  display: grid;
+  align-content: start;
   gap: 0.45rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--theme-border, currentColor) 58%, transparent);
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--theme-panel, transparent) 88%, currentColor 3%);
+  padding: 0.55rem;
 }
 
 .pin-electrical-roles-bulk-role {
-  min-width: 9rem;
-  flex: 1 1 9rem;
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.pin-electrical-roles-bulk select,
+.pin-electrical-roles-bulk button {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.pin-electrical-roles-bulk button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.pin-electrical-roles-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 14rem);
+  align-items: start;
+  gap: 0.7rem;
 }
 
 .pin-electrical-roles-table {
   display: grid;
   gap: 0.38rem;
+  min-width: 0;
   overflow-x: auto;
 }
 
 .pin-electrical-roles-row {
   display: grid;
-  grid-template-columns: 1.8rem 2.75rem minmax(10rem, 0.7fr) minmax(5rem, 0.65fr) minmax(7rem, 1fr);
+  grid-template-columns: 1.8rem 2.75rem minmax(9rem, 0.5fr) minmax(4.5rem, 0.45fr) minmax(8rem, 1.35fr);
   align-items: center;
   gap: 0.4rem;
   min-width: 32rem;
@@ -406,6 +448,10 @@
 }
 
 @media (max-width: 720px) {
+  .pin-electrical-roles-main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .pin-electrical-roles-table {
     overflow-x: visible;
   }

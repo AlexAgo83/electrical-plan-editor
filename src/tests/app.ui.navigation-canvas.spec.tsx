@@ -139,7 +139,7 @@ describe("App integration UI - navigation and canvas", () => {
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
     fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
     expect(within(connectorAnalysisPanel).getByText("W-1 / A")).toBeInTheDocument();
-    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Ways & roles" }));
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Ways" }));
     const wayIndexInput = within(connectorAnalysisPanel).getByLabelText("Way index");
     expect(wayIndexInput).toHaveValue(2);
     fireEvent.change(wayIndexInput, { target: { value: "1" } });

@@ -35,7 +35,7 @@ export interface SplicePortStatus extends OccupancyStatus {
   portIndex: number;
 }
 
-export type ConnectorAnalysisView = "cavities" | "physical" | "catalogMaterial" | "synthesis";
+export type ConnectorAnalysisView = "ways" | "roles" | "physical" | "catalogMaterial" | "synthesis";
 export type SpliceAnalysisView = "ports" | "synthesis";
 
 export interface AnalysisWorkspaceContentProps {

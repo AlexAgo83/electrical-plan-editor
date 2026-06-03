@@ -89,7 +89,7 @@ describe("App integration UI - catalog connector defaults pin electrical roles",
 
     expect(roleSelect).toHaveValue("");
     expect(within(pinRolesPanel).queryByRole("option", { name: "(inherit)" })).not.toBeInTheDocument();
-    expect(within(pinRolesPanel).queryByRole("button", { name: "Reset to catalog default" })).not.toBeInTheDocument();
+    expect(within(pinRolesPanel).queryByRole("button", { name: "Use catalog default" })).not.toBeInTheDocument();
     expect(within(pinRolesPanel).getByText("C1")).toBeInTheDocument();
     expect(within(pinRolesPanel).queryByLabelText("Max current for pin C1")).not.toBeInTheDocument();
     expect(within(pinRolesPanel).queryByLabelText("Label for pin C1")).not.toBeInTheDocument();

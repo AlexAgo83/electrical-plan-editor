@@ -50,7 +50,7 @@ describe("App integration UI - analysis go-to wire actions", () => {
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Splice$/, hidden: true })).toHaveClass("is-active");
   });
 
-  it("keeps wire occupancy details out of connector ways and roles", () => {
+  it("keeps wire occupancy details out of connector roles", () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("analysis");
@@ -60,8 +60,12 @@ describe("App integration UI - analysis go-to wire actions", () => {
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
-    expect(within(connectorAnalysisPanel).getByRole("button", { name: "Ways & roles" })).toHaveAttribute("aria-pressed", "true");
-    expect(within(connectorAnalysisPanel).getByText("Electrical roles")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByRole("button", { name: "Ways" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(connectorAnalysisPanel).getByLabelText("Connector way details")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByText("W-1 / A")).toBeInTheDocument();
+
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Roles" }));
+    expect(within(connectorAnalysisPanel).getByRole("region", { name: "Electrical roles" })).toBeInTheDocument();
     expect(within(connectorAnalysisPanel).queryByLabelText("Connector way details")).not.toBeInTheDocument();
     expect(within(connectorAnalysisPanel).queryByText("W-1 / A")).not.toBeInTheDocument();
 
@@ -118,7 +122,7 @@ describe("App integration UI - analysis go-to wire actions", () => {
 
     const refreshedConnectorAnalysisPanel = getPanelByHeading("Connector analysis");
     expect(within(refreshedConnectorAnalysisPanel).getByRole("button", { name: "Physical" })).toHaveAttribute("aria-pressed", "true");
-    expect(within(refreshedConnectorAnalysisPanel).getByRole("button", { name: "Ways & roles" })).toHaveAttribute("aria-pressed", "false");
+    expect(within(refreshedConnectorAnalysisPanel).getByRole("button", { name: "Ways" })).toHaveAttribute("aria-pressed", "false");
   });
 
   it("opens wire editing from connector synthesis Wire references", () => {

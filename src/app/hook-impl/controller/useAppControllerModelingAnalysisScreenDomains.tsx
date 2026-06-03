@@ -200,7 +200,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   markSelectionPanelsFromTable,
   onboardingHelp
 }: UseAppControllerModelingAnalysisScreenDomainsParams) {
-  const [connectorAnalysisView, setConnectorAnalysisView] = useState<ConnectorAnalysisView>("cavities");
+  const [connectorAnalysisView, setConnectorAnalysisView] = useState<ConnectorAnalysisView>("ways");
   const [spliceAnalysisView, setSpliceAnalysisView] = useState<SpliceAnalysisView>("ports");
   const [activeBatchScope, setActiveBatchScope] = useState<ModelingBatchSelectionScope | null>(null);
   const [batchSelectionIds, setBatchSelectionIds] = useState<ReadonlySet<string>>(new Set());
