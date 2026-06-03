@@ -386,6 +386,17 @@ function isTerminalConnectorEndpointKey(
   return connector?.isTerminalConnector === true;
 }
 
+function isAssemblyRootConnectorEndpointKey(
+  key: string,
+  rootConnectorKeySet: ReadonlySet<string>
+): boolean {
+  const [networkIdRaw, kind, connectorIdRaw] = key.split(":");
+  if (kind !== "connector" || networkIdRaw === undefined || connectorIdRaw === undefined) {
+    return false;
+  }
+  return rootConnectorKeySet.has(`${networkIdRaw}:${connectorIdRaw}`);
+}
+
 type FuseBoxCavityInfo = ReadonlyMap<ConnectorId, ReadonlyMap<number, { pairIndex: number; isA: boolean }>>;
 
 function makeFuseBoxPairKey(connectorId: ConnectorId, pairIndex: number): string {
@@ -995,6 +1006,7 @@ export function buildHarnessAssemblyFunctionalSchematicGraph({
   }
 
   const seedWireIds = new Set<string>();
+  const rootConnectorKeySet = new Set(rootConnectorRefs.map((root) => `${root.networkId}:${root.connectorId}`));
   for (const root of rootConnectorRefs) {
     const bundle = networksById.get(root.networkId);
     if (bundle === undefined || bundle.connectorMap.get(root.connectorId) === undefined) {
@@ -1028,15 +1040,27 @@ export function buildHarnessAssemblyFunctionalSchematicGraph({
       if (visitedEndpointKeys.has(key)) {
         continue;
       }
+      if (isTerminalConnectorEndpointKey(key, networksById)) {
+        visitedEndpointKeys.add(key);
+        continue;
+      }
+      const [networkIdRaw, kind, connectorIdRaw] = key.split(":");
+      if (
+        kind === "connector" &&
+        networkIdRaw !== undefined &&
+        connectorIdRaw !== undefined &&
+        !isAssemblyRootConnectorEndpointKey(key, rootConnectorKeySet) &&
+        networksById.get(networkIdRaw as NetworkId)?.connectorMap.get(connectorIdRaw as ConnectorId)?.isMainHarnessConnector === true
+      ) {
+        visitedEndpointKeys.add(key);
+        continue;
+      }
       visitedEndpointKeys.add(key);
       for (const connectedWireId of endpointToWireIds.get(key) ?? []) {
         if (!includedQualifiedWireIds.has(connectedWireId)) {
           includedQualifiedWireIds.add(connectedWireId);
           queue.push(connectedWireId);
         }
-      }
-      if (isTerminalConnectorEndpointKey(key, networksById)) {
-        continue;
       }
       for (const interconnector of interconnectorByEndpointKey.get(key) ?? []) {
         for (const connectedWireId of endpointToWireIds.get(interconnector.otherKey) ?? []) {

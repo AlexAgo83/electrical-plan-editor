@@ -714,4 +714,90 @@ describe("buildFunctionalSchematicGraph", () => {
     expect(graph.edges).toHaveLength(2);
     expect(graph.rootNodeIds).toContain("network:net-a:connector:C-A-MASTER:pin:1");
   });
+
+  it("stops assembly expansion at unselected master connectors so unrelated downstream branches do not leak", () => {
+    const network: Network = {
+      id: asNetworkId("net-main"),
+      name: "Main harness",
+      technicalId: "H-MAIN",
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+    const assembly: HarnessAssembly = {
+      id: asHarnessAssemblyId("asm-boundary"),
+      name: "Boundary assembly",
+      technicalId: "ASM-BOUNDARY",
+      members: [{ networkId: network.id, color: "#2563eb" }],
+      masterConnectorRefs: [{ networkId: network.id, connectorId: asConnectorId("C-ROOT") }],
+      connectorLinks: [],
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+    const networkConnectors: Connector[] = [
+      { id: asConnectorId("C-ROOT"), name: "Root", technicalId: "ROOT", cavityCount: 2 },
+      {
+        id: asConnectorId("C-HUB"),
+        name: "Main hub",
+        technicalId: "HUB",
+        cavityCount: 2,
+        isMainHarnessConnector: true
+      },
+      { id: asConnectorId("C-LEAK"), name: "Leak branch", technicalId: "LEAK", cavityCount: 2 }
+    ];
+    const networkWires: Wire[] = [
+      {
+        id: asWireId("W-ROOT"),
+        name: "Root feed",
+        technicalId: "W-ROOT",
+        sectionMm2: 0.35,
+        colorMode: "catalog",
+        primaryColorId: "RD",
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-ROOT"), cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-HUB"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 50,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-LEAK"),
+        name: "Unexpected branch",
+        technicalId: "W-LEAK",
+        sectionMm2: 0.35,
+        colorMode: "catalog",
+        primaryColorId: "BU",
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-HUB"), cavityIndex: 2 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-LEAK"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 50,
+        isRouteLocked: false
+      }
+    ];
+
+    const graph = buildHarnessAssemblyFunctionalSchematicGraph({
+      assembly,
+      activeFilter: "all",
+      rootConnectorRefs: [{ networkId: network.id, connectorId: asConnectorId("C-ROOT") }],
+      networksById: new Map([
+        [
+          network.id,
+          {
+            network,
+            wires: networkWires,
+            segments: [],
+            connectorMap: new Map(networkConnectors.map((connector) => [connector.id, connector])),
+            spliceMap: new Map(),
+            catalogItemMap: new Map()
+          }
+        ]
+      ])
+    });
+
+    expect(graph.includedWireIds).toEqual([asWireId("W-ROOT")]);
+    expect(graph.edges).toHaveLength(1);
+    expect(graph.edges[0]?.label).toBe("W-ROOT");
+    expect(graph.edges.some((edge) => edge.label === "W-LEAK")).toBe(false);
+    expect(graph.nodes.some((node) => node.label.includes("HUB"))).toBe(true);
+  });
 });
