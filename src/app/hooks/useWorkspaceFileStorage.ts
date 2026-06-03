@@ -250,12 +250,7 @@ export function useWorkspaceFileStorage({
       const nowIso = new Date().toISOString();
       const payload = buildWorkspaceFilePayload(store.getState(), lastLoadedPayloadRef.current, nowIso);
       const serialized = serializeWorkspaceFilePayload(payload);
-      const activeNetworkId = store.getState().activeNetworkId;
-      const activeNetwork = activeNetworkId === null ? null : store.getState().networks.byId[activeNetworkId] ?? null;
-      const fileName = buildWorkspaceFileName(nowIso, {
-        activeNetworkName: activeNetwork?.name ?? null,
-        activeNetworkTechnicalId: activeNetwork?.technicalId ?? null
-      });
+      const fileName = buildWorkspaceFileName(nowIso);
       const fileWindow = resolveWorkspaceFileWindow();
 
       if (typeof fileWindow?.showSaveFilePicker === "function") {

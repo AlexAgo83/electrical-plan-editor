@@ -184,8 +184,7 @@ export function parseWorkspaceFilePayload(rawJson: string, nowIso: string = new 
 }
 
 export function buildWorkspaceFileName(
-  exportedAtIso: string = new Date().toISOString(),
-  options?: { activeNetworkName?: string | null; activeNetworkTechnicalId?: string | null }
+  exportedAtIso: string = new Date().toISOString()
 ): string {
   const date = new Date(exportedAtIso);
   const safeTimestamp = Number.isNaN(date.getTime())
@@ -201,17 +200,5 @@ export function buildWorkspaceFileName(
         String(date.getUTCMinutes()).padStart(2, "0"),
         String(date.getUTCSeconds()).padStart(2, "0")
       ].join("-");
-  const normalizedActiveName =
-    typeof options?.activeNetworkName === "string"
-      ? options.activeNetworkName.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
-      : "";
-  const normalizedActiveTechnicalId =
-    typeof options?.activeNetworkTechnicalId === "string"
-      ? options.activeNetworkTechnicalId.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
-      : "";
-  const suffix =
-    normalizedActiveName.length > 0 || normalizedActiveTechnicalId.length > 0
-      ? `-${[normalizedActiveName, normalizedActiveTechnicalId].filter((value) => value.length > 0).join("-")}`
-      : "";
-  return `electrical-workspace${suffix}-${safeTimestamp}.epe.json`;
+  return `electrical-workspace-${safeTimestamp}.epe.json`;
 }

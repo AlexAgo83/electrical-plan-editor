@@ -1,6 +1,11 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HOME_CHANGELOG_ENTRY_SUMMARIES } from "../app/lib/changelogFeed";
+import {
+  buildWorkspaceFilePayload,
+  serializeWorkspaceFilePayload,
+  WORKSPACE_FILE_PAYLOAD_KIND
+} from "../app/lib/workspaceFile";
 import {
   createUiIntegrationState,
   getPanelByHeading,
@@ -9,6 +14,9 @@ import {
 } from "./helpers/app-ui-test-utils";
 
 describe("home workspace screen", () => {
+  const originalShowOpenFilePicker = Object.getOwnPropertyDescriptor(window, "showOpenFilePicker");
+  const originalShowSaveFilePicker = Object.getOwnPropertyDescriptor(window, "showSaveFilePicker");
+
   function compareVersionsDescending(left: string, right: string): number {
     const leftParts = left.split(".").map((part) => Number.parseInt(part, 10));
     const rightParts = right.split(".").map((part) => Number.parseInt(part, 10));
@@ -25,6 +33,20 @@ describe("home workspace screen", () => {
 
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    if (originalShowOpenFilePicker !== undefined) {
+      Object.defineProperty(window, "showOpenFilePicker", originalShowOpenFilePicker);
+    } else {
+      Reflect.deleteProperty(window, "showOpenFilePicker");
+    }
+    if (originalShowSaveFilePicker !== undefined) {
+      Object.defineProperty(window, "showSaveFilePicker", originalShowSaveFilePicker);
+    } else {
+      Reflect.deleteProperty(window, "showSaveFilePicker");
+    }
   });
 
   it("exposes Home as a primary workspace entry and opens the home panels", () => {
@@ -64,6 +86,71 @@ describe("home workspace screen", () => {
       "Open",
       "Save as"
     ]);
+  });
+
+  it("uses the workspace file storage flow from Home save and import actions", async () => {
+    const savedWrites: string[] = [];
+    const saveHandle = {
+      name: "home-workspace.epe.json",
+      getFile: vi.fn(),
+      createWritable: vi.fn(() =>
+        Promise.resolve({
+          write: vi.fn((content: Blob) =>
+            content.text().then((serialized) => {
+              savedWrites.push(serialized);
+            })
+          ),
+          close: vi.fn()
+        })
+      ),
+      queryPermission: vi.fn(() => Promise.resolve("granted" as const)),
+      requestPermission: vi.fn(() => Promise.resolve("granted" as const))
+    };
+    const openedPayload = serializeWorkspaceFilePayload(
+      buildWorkspaceFilePayload(createUiIntegrationState(), null, "2026-05-30T10:00:00.000Z")
+    );
+    const openHandle = {
+      name: "opened-workspace.epe.json",
+      getFile: vi.fn(() =>
+        Promise.resolve({
+          text: () => Promise.resolve(openedPayload)
+        } as File)
+      ),
+      createWritable: vi.fn(),
+      queryPermission: vi.fn(() => Promise.resolve("granted" as const)),
+      requestPermission: vi.fn(() => Promise.resolve("granted" as const))
+    };
+    const showSaveFilePicker = vi.fn<(options?: { suggestedName: string }) => Promise<typeof saveHandle>>(() => Promise.resolve(saveHandle));
+    const showOpenFilePicker = vi.fn<
+      (options?: { multiple?: boolean; types?: Array<{ description?: string }> }) => Promise<Array<typeof openHandle>>
+    >(
+      () => Promise.resolve([openHandle])
+    );
+    Object.defineProperty(window, "showSaveFilePicker", {
+      configurable: true,
+      writable: true,
+      value: showSaveFilePicker
+    });
+    Object.defineProperty(window, "showOpenFilePicker", {
+      configurable: true,
+      writable: true,
+      value: showOpenFilePicker
+    });
+
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("home");
+    const quickStartPanel = getPanelByHeading("Quick start");
+
+    fireEvent.click(within(quickStartPanel).getByRole("button", { name: "Save workspace" }));
+    await waitFor(() => expect(savedWrites).toHaveLength(1));
+    const savedPayload = JSON.parse(savedWrites[0] ?? "{}") as { payloadKind?: unknown };
+    expect(savedPayload.payloadKind).toBe(WORKSPACE_FILE_PAYLOAD_KIND);
+
+    fireEvent.click(within(quickStartPanel).getByRole("button", { name: "Import workspace" }));
+    await waitFor(() => expect(showOpenFilePicker).toHaveBeenCalled());
+    const openPickerOptions = showOpenFilePicker.mock.calls[0]?.[0];
+    expect(openPickerOptions?.multiple).toBe(false);
+    expect(openPickerOptions?.types?.some((type) => type.description === "Electrical Plan Editor workspace")).toBe(true);
   });
 
   it("renders an auto-detected changelog feed in descending version order", () => {

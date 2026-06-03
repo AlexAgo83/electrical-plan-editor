@@ -306,7 +306,7 @@ export function HomeWorkspaceContent({
             </div>
           </header>
           <p className="settings-panel-intro home-start-intro">
-            Start a new workspace flow, import existing data, or open workspace management controls.
+            Start a new workspace flow, open a saved workspace file, or save a portable workspace copy.
           </p>
           <div className="row-actions home-primary-actions">
             <button type="button" className="button-with-icon" onClick={onOpenModeling} disabled={!hasActiveNetwork}>
