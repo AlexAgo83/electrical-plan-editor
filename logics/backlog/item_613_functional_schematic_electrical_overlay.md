@@ -1,0 +1,82 @@
+## item_613_functional_schematic_electrical_overlay - Functional schematic electrical overlay
+
+> From version: 1.13.1
+> Schema version: 1.0
+> Status: Ready
+> Understanding: 75%
+> Confidence: 75%
+> Progress: 0%
+> Complexity: Small
+> Theme: Electrical analysis / Diagnostics
+> Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
+
+# Problem
+The functional schematic already renders connectors, splices, fuse-box pairs, and wires, but does not show electrical direction or current values. Once pin roles and the aggregation engine are in place, the schematic gains a high-value overlay annotating declared pin currents (with direction) and propagated wire currents. This overlay is on by default to make the diagnostic surface immediately visible without an opt-in step.
+
+# Scope
+- In:
+  - New rendering overlay on the functional schematic that prints, per pin: a directional marker (`→` for source, `←` for consumer) and the declared `currentA` when set.
+  - Per wire: the engine-derived continuous current next to the wire label.
+  - Per fuse-box pair: the resolved protected-side downstream sum next to the fuse symbol.
+  - Canvas toggle "Show electrical roles" — **on by default** for new and existing workspaces (preference defaults to `true`; users can flip it off).
+  - The overlay uses the same `currentNetwork` scope as the validation center.
+  - Visual styling consistent with existing fuse / splice symbols (color and typography from the current theme tokens).
+  - Snapshot tests for the schematic with the overlay on, the overlay off, and on a network without pin roles (no overlay artifacts).
+- Out:
+  - 2D modeling canvas changes (none in this release).
+  - Multi-network analysis view (`item_614`).
+  - Editing affordances on the schematic.
+
+```mermaid
+%% logics-kind: backlog
+flowchart LR
+    Engine[computePinElectricalLoad currentNetwork] --> Overlay[Schematic overlay renderer]
+    Toggle[Canvas toggle — on by default] --> Overlay
+    Overlay --> Pins[Pin arrows + currentA]
+    Overlay --> Wires[Wire current label]
+    Overlay --> FuseBox[Protected-side sum]
+```
+
+# Acceptance criteria
+- AC1: The functional schematic prints `→ 2.5 A` next to each pin declared as `source` with a non-null `currentA`, and `← 40 A` next to each pin declared as `consumer` with a non-null `currentA`.
+- AC2: Wires with a non-null engine-derived current show the value next to the wire label; wires with a zero or undefined current show nothing extra.
+- AC3: Fuse-box pairs show the protected-side downstream sum next to the fuse symbol when non-zero.
+- AC4: The canvas toggle "Show electrical roles" defaults to **on** for new workspaces and for existing workspaces after the release lands. Toggling it off removes the overlay; toggling it on restores it.
+- AC5: A network without any declared pin roles renders the schematic without any overlay artifacts (no orphan arrows, no zero-A labels).
+- AC6: The overlay uses the current theme tokens for color and typography; no inline color literals.
+- AC7: Snapshot tests cover overlay on (with pin roles), overlay off, and no-pin-roles networks.
+- AC8: Toggling the overlay does not mutate the underlying network.
+
+# AC Traceability
+- request-AC13 -> This backlog slice. Proof: AC1, AC2, AC4 (overlay content + on-by-default).
+
+# Decision framing
+- Product framing: Captured in `docs/pin-level-source-consumer-currents-product-brief.md` (Editing surfaces section — overlay).
+- Product signals: Overlay on by default; minimal visual clutter when data is absent.
+- Architecture framing:
+  - Rendering lives next to the existing functional schematic renderer (`src/core/functionalSchematic.ts` for data, app-layer for SVG/Canvas painting).
+  - Preference stored next to existing canvas preferences (themes, sub-network filters).
+  - For migration: an existing workspace without the preference defaults to `true` on read.
+- Architecture follow-up: No ADR required.
+
+# Links
+- Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
+- Architecture decision(s): (none)
+- Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
+- Primary task(s): TBD on promotion
+
+# AI Context
+- Summary: Adds a functional schematic overlay showing pin directions, pin currents, wire-derived currents, and fuse-protected sums. On by default with a canvas toggle.
+- Keywords: functional schematic, overlay, pin direction, source arrow, consumer arrow, wire current, fuse protected load, canvas toggle
+- Use when: Implementing or reviewing the schematic overlay or its preference.
+- Skip when: The change targets aggregation logic, editing surfaces, or multi-network analysis.
+
+# Priority
+- Impact: Medium; high readability win, low blocking risk.
+- Urgency: Medium; downstream of `item_610`.
+
+# Notes
+- Created by hand; regenerate signatures with `python3 -m logics_manager lint --require-status` before commit when the tool becomes available.
+
+# Tasks
+- TBD on promotion.

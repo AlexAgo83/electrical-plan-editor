@@ -1,0 +1,188 @@
+import { fireEvent, screen, within } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
+import { appActions, appReducer, createInitialState } from "../store";
+import {
+  asCatalogItemId,
+  asConnectorId,
+  getPanelByHeading,
+  renderAppWithState,
+  switchScreenDrawerAware
+} from "./helpers/app-ui-test-utils";
+
+function openConnectorInspector(connectorName: string) {
+  fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+  switchScreenDrawerAware("modeling");
+  const connectorsPanel = getPanelByHeading("Connectors");
+  fireEvent.click(within(connectorsPanel).getByText(connectorName));
+  return getPanelByHeading("Edit Connector");
+}
+
+function openPinRolesSection(panel: HTMLElement): void {
+  const toggle = within(panel).getByRole("button", { name: /Pin electrical roles/i });
+  fireEvent.click(toggle);
+}
+
+describe("App integration UI - connector pin electrical roles inspector", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("edits a single pin role and persists the override on save", () => {
+    const catalogItemId = asCatalogItemId("CAT-ECU");
+    const connectorId = asConnectorId("C-ECU");
+    let state = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "ECU-4",
+        connectionCount: 4
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: connectorId,
+        name: "ECU connector",
+        technicalId: "ECU-C1",
+        cavityCount: 4,
+        catalogItemId,
+        manufacturerReference: "ECU-4"
+      })
+    );
+
+    const { store } = renderAppWithState(state);
+    const panel = openConnectorInspector("ECU connector");
+    openPinRolesSection(panel);
+
+    const roleSelect = within(panel).getByLabelText("Role for pin 1");
+    const currentInput = within(panel).getByLabelText("Max current for pin 1");
+    const labelInput = within(panel).getByLabelText("Label for pin 1");
+
+    fireEvent.change(roleSelect, { target: { value: "consumer" } });
+    fireEvent.change(currentInput, { target: { value: "40" } });
+    fireEvent.change(labelInput, { target: { value: "BAT+" } });
+
+    fireEvent.click(within(panel).getByRole("button", { name: "Save" }));
+
+    const saved = store.getState().connectors.byId[connectorId];
+    expect(saved?.pinElectricalRoles).toEqual({ 1: { role: "consumer", currentA: 40, label: "BAT+" } });
+  });
+
+  it("badges per-pin source as catalog when only a catalog default exists, and override when set by the connector", () => {
+    const catalogItemId = asCatalogItemId("CAT-ECU");
+    const connectorId = asConnectorId("C-ECU");
+    let state = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "ECU-4",
+        connectionCount: 4,
+        connectorDefaults: { pinElectricalRoles: { 1: { role: "consumer", currentA: 40, label: "BAT+" } } }
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: connectorId,
+        name: "ECU connector",
+        technicalId: "ECU-C1",
+        cavityCount: 4,
+        catalogItemId,
+        manufacturerReference: "ECU-4",
+        pinElectricalRoles: { 2: { role: "source", currentA: 2.5 } }
+      })
+    );
+
+    renderAppWithState(state);
+    const panel = openConnectorInspector("ECU connector");
+    openPinRolesSection(panel);
+
+    const row1 = within(panel).getByLabelText("Select pin 1").closest('[role="row"]') as HTMLElement;
+    const row2 = within(panel).getByLabelText("Select pin 2").closest('[role="row"]') as HTMLElement;
+    const row3 = within(panel).getByLabelText("Select pin 3").closest('[role="row"]') as HTMLElement;
+
+    expect(row1.querySelector("[data-pin-role-source]")?.getAttribute("data-pin-role-source")).toBe("catalog");
+    expect(row2.querySelector("[data-pin-role-source]")?.getAttribute("data-pin-role-source")).toBe("override");
+    expect(row3.querySelector("[data-pin-role-source]")?.getAttribute("data-pin-role-source")).toBe("default");
+  });
+
+  it("applies a bulk role to selected pins as a single save", () => {
+    const catalogItemId = asCatalogItemId("CAT-ECU");
+    const connectorId = asConnectorId("C-ECU");
+    let state = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "ECU-4",
+        connectionCount: 4
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: connectorId,
+        name: "ECU connector",
+        technicalId: "ECU-C1",
+        cavityCount: 4,
+        catalogItemId,
+        manufacturerReference: "ECU-4"
+      })
+    );
+
+    const { store } = renderAppWithState(state);
+    const panel = openConnectorInspector("ECU connector");
+    openPinRolesSection(panel);
+
+    fireEvent.click(within(panel).getByLabelText("Select pin 1"));
+    fireEvent.click(within(panel).getByLabelText("Select pin 3"));
+
+    const bulkRoleSelect = within(panel).getByLabelText(/Bulk role/i);
+    fireEvent.change(bulkRoleSelect, { target: { value: "source" } });
+    fireEvent.click(within(panel).getByRole("button", { name: "Apply role to selected pins" }));
+
+    fireEvent.click(within(panel).getByRole("button", { name: "Save" }));
+
+    const saved = store.getState().connectors.byId[connectorId];
+    expect(saved?.pinElectricalRoles).toEqual({
+      1: { role: "source" },
+      3: { role: "source" }
+    });
+  });
+
+  it("resets selected pins to catalog default by clearing the per-connector override", () => {
+    const catalogItemId = asCatalogItemId("CAT-ECU");
+    const connectorId = asConnectorId("C-ECU");
+    let state = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "ECU-4",
+        connectionCount: 4,
+        connectorDefaults: { pinElectricalRoles: { 1: { role: "consumer", currentA: 40 } } }
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: connectorId,
+        name: "ECU connector",
+        technicalId: "ECU-C1",
+        cavityCount: 4,
+        catalogItemId,
+        manufacturerReference: "ECU-4",
+        pinElectricalRoles: { 1: { role: "source", currentA: 2.5 } }
+      })
+    );
+
+    const { store } = renderAppWithState(state);
+    const panel = openConnectorInspector("ECU connector");
+    openPinRolesSection(panel);
+
+    fireEvent.click(within(panel).getByLabelText("Select pin 1"));
+    fireEvent.click(within(panel).getByRole("button", { name: "Reset to catalog default" }));
+    fireEvent.click(within(panel).getByRole("button", { name: "Save" }));
+
+    const saved = store.getState().connectors.byId[connectorId];
+    expect(saved?.pinElectricalRoles).toBeUndefined();
+  });
+});

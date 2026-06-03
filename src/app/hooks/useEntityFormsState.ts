@@ -15,6 +15,7 @@ import type {
 import { DEFAULT_NEW_SPLICE_PORT_MODE, type SplicePortMode } from "../../core/splicePortMode";
 import type { DirectionalSpliceSide } from "../../core/directionalSplice";
 import type { ConnectorFusePairOverrideDrafts, ConnectorFusePairRatingDrafts } from "./connectorFusePairRatings";
+import type { ConnectorPinElectricalRoleDrafts } from "./connectorPinElectricalRoles";
 
 export function useEntityFormsState() {
   const [catalogFormMode, setCatalogFormMode] = useState<"idle" | "create" | "edit">("idle");
@@ -36,6 +37,9 @@ export function useEntityFormsState() {
   const [catalogConnectorLayout, setCatalogConnectorLayout] = useState<ConnectorLayout | undefined>(undefined);
   const [catalogShowConnectorPhysicalLayout, setCatalogShowConnectorPhysicalLayout] = useState(false);
   const [catalogIsFuseBox, setCatalogIsFuseBox] = useState(false);
+  const [catalogPinElectricalRoleDrafts, setCatalogPinElectricalRoleDrafts] =
+    useState<ConnectorPinElectricalRoleDrafts>({});
+  const [catalogPinElectricalRoleSelection, setCatalogPinElectricalRoleSelection] = useState<number[]>([]);
   const [catalogFormError, setCatalogFormError] = useState<string | null>(null);
 
   const [connectorFormMode, setConnectorFormMode] = useState<"idle" | "create" | "edit">("idle");
@@ -51,6 +55,9 @@ export function useEntityFormsState() {
   const [connectorTerminalOverridesText, setConnectorTerminalOverridesText] = useState("");
   const [connectorFusePairRatings, setConnectorFusePairRatings] = useState<ConnectorFusePairRatingDrafts>({});
   const [connectorFusePairOverrides, setConnectorFusePairOverrides] = useState<ConnectorFusePairOverrideDrafts>({});
+  const [connectorPinElectricalRoleDrafts, setConnectorPinElectricalRoleDrafts] =
+    useState<ConnectorPinElectricalRoleDrafts>({});
+  const [connectorPinElectricalRoleSelection, setConnectorPinElectricalRoleSelection] = useState<number[]>([]);
   const [connectorAutoCreateLinkedNode, setConnectorAutoCreateLinkedNode] = useState(true);
   const [cavityCount, setCavityCount] = useState("4");
   const [cavityIndexInput, setCavityIndexInput] = useState("1");
@@ -172,6 +179,10 @@ export function useEntityFormsState() {
     catalogShowConnectorPhysicalLayout,
     setCatalogShowConnectorPhysicalLayout,
     catalogIsFuseBox,
+    catalogPinElectricalRoleDrafts,
+    setCatalogPinElectricalRoleDrafts,
+    catalogPinElectricalRoleSelection,
+    setCatalogPinElectricalRoleSelection,
     setCatalogIsFuseBox,
     catalogFormError,
     setCatalogFormError,
@@ -201,6 +212,10 @@ export function useEntityFormsState() {
     setConnectorFusePairRatings,
     connectorFusePairOverrides,
     setConnectorFusePairOverrides,
+    connectorPinElectricalRoleDrafts,
+    setConnectorPinElectricalRoleDrafts,
+    connectorPinElectricalRoleSelection,
+    setConnectorPinElectricalRoleSelection,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     cavityCount,

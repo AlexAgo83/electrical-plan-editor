@@ -6,6 +6,7 @@ import type { SplicePortMode } from "../../../core/splicePortMode";
 import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
 import type { WireEndpointSlotHint } from "../../hooks/wireEndpointFormHelpers";
 import type { ConnectorFusePairOverrideDrafts, ConnectorFusePairRatingDrafts } from "../../hooks/connectorFusePairRatings";
+import type { ConnectorPinElectricalRoleDrafts } from "../../hooks/connectorPinElectricalRoles";
 
 export interface ModelingFormsColumnProps {
   catalogItems: CatalogItem[];
@@ -36,6 +37,11 @@ export interface ModelingFormsColumnProps {
   setConnectorFusePairRatings: (value: ConnectorFusePairRatingDrafts) => void;
   connectorFusePairOverrides: ConnectorFusePairOverrideDrafts;
   setConnectorFusePairOverrides: (value: ConnectorFusePairOverrideDrafts) => void;
+  connectorPinElectricalRoleDrafts: ConnectorPinElectricalRoleDrafts;
+  setConnectorPinElectricalRoleDrafts: (value: ConnectorPinElectricalRoleDrafts) => void;
+  connectorPinElectricalRoleSelection: number[];
+  setConnectorPinElectricalRoleSelection: (value: number[]) => void;
+  connectorPinRoleCatalogItem: CatalogItem | undefined;
   connectorAutoCreateLinkedNode: boolean;
   setConnectorAutoCreateLinkedNode: (value: boolean) => void;
   connectorTechnicalIdAlreadyUsed: boolean;

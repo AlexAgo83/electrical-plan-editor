@@ -6,6 +6,7 @@ import type {
   ConnectorTerminalMaterial,
   Wire
 } from "./entities";
+import { normalizePinElectricalRolesMap } from "./pinElectricalRole";
 
 export type BomMaterialOrigin = "catalog default" | "instance override" | "manual";
 
@@ -113,8 +114,15 @@ export function normalizeConnectorCatalogDefaults(
       })
     : undefined;
   const allSameTerminals = value.allSameTerminals === true;
+  const pinElectricalRoles = normalizePinElectricalRolesCatalogDefaults(value.pinElectricalRoles, connectionCount);
 
-  if (!allSameTerminals && defaultTerminal === undefined && terminalOverrides === undefined && (plugs?.length ?? 0) === 0) {
+  if (
+    !allSameTerminals &&
+    defaultTerminal === undefined &&
+    terminalOverrides === undefined &&
+    (plugs?.length ?? 0) === 0 &&
+    pinElectricalRoles === undefined
+  ) {
     return undefined;
   }
 
@@ -122,8 +130,20 @@ export function normalizeConnectorCatalogDefaults(
     allSameTerminals: allSameTerminals ? true : undefined,
     defaultTerminal,
     terminalOverrides,
-    plugs: plugs !== undefined && plugs.length > 0 ? plugs : undefined
+    plugs: plugs !== undefined && plugs.length > 0 ? plugs : undefined,
+    pinElectricalRoles
   };
+}
+
+function normalizePinElectricalRolesCatalogDefaults(
+  value: unknown,
+  connectionCount: number
+): Record<number, import("./entities").PinElectricalRole> | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  const { value: normalized } = normalizePinElectricalRolesMap(value, { cavityCount: connectionCount });
+  return Object.keys(normalized).length === 0 ? undefined : normalized;
 }
 
 export function resolveConnectorTerminalMaterial(

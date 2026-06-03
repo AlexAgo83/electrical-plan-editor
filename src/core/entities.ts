@@ -25,6 +25,16 @@ export interface Network {
   exportNotes?: string;
   createdAt: string;
   updatedAt: string;
+  ampacityOverrides?: Record<number, number>;
+}
+
+export type PinElectricalRoleKind = "source" | "consumer" | "passive" | "bidirectional";
+
+export interface PinElectricalRole {
+  role: PinElectricalRoleKind;
+  currentA?: number;
+  label?: string;
+  notes?: string;
 }
 
 export interface Connector {
@@ -41,6 +51,7 @@ export interface Connector {
   terminalOverrides?: Record<number, ConnectorTerminalMaterial>;
   fusePairRatings?: Record<number, number>;
   fusePairOverrides?: FuseBoxPair[];
+  pinElectricalRoles?: Record<number, PinElectricalRole>;
   cableCalloutPosition?: {
     x: number;
     y: number;
@@ -179,6 +190,7 @@ export interface ConnectorCatalogDefaults {
   defaultTerminal?: ConnectorTerminalMaterial;
   terminalOverrides?: Record<number, ConnectorTerminalMaterial>;
   plugs?: ConnectorPlugDefinition[];
+  pinElectricalRoles?: Record<number, PinElectricalRole>;
 }
 
 export type NetworkNode =

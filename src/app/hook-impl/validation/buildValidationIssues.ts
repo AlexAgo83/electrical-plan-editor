@@ -24,6 +24,7 @@ import {
   toSpliceOccupancyKey
 } from "../../lib/app-utils-networking";
 import type { ValidationIssue } from "../../types/app-controller";
+import { appendElectricalDimensioningIssues } from "./appendElectricalDimensioningIssues";
 
 type AppState = ReturnType<AppStore["getState"]>;
 
@@ -714,6 +715,16 @@ export function buildValidationIssues({
       selectionId: spliceId
     });
   }
+
+  const activeNetworkId = state.activeNetworkId;
+  const activeNetwork = activeNetworkId !== null ? state.networks.byId[activeNetworkId] ?? null : null;
+  appendElectricalDimensioningIssues(issues, {
+    connectors,
+    splices,
+    wires,
+    catalogItems,
+    network: activeNetwork
+  });
 
   return issues;
 }

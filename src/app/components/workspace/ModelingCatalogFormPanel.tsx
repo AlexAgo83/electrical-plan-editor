@@ -6,6 +6,8 @@ import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import type { WorkspaceCurrencyCode } from "../../types/app-controller";
 import { ConnectorLayoutEditor } from "./ConnectorLayoutEditor";
 import { renderFormHeader } from "./ModelingFormsColumn.shared";
+import { PinElectricalRolesEditor } from "./PinElectricalRolesEditor";
+import type { ConnectorPinElectricalRoleDrafts } from "../../hooks/connectorPinElectricalRoles";
 
 interface ModelingCatalogFormPanelProps {
   isCatalogSubScreen: boolean;
@@ -49,6 +51,10 @@ interface ModelingCatalogFormPanelProps {
   cancelCatalogEdit: () => void;
   catalogIsFuseBox: boolean;
   setCatalogIsFuseBox: (v: boolean) => void;
+  catalogPinElectricalRoleDrafts: ConnectorPinElectricalRoleDrafts;
+  setCatalogPinElectricalRoleDrafts: (value: ConnectorPinElectricalRoleDrafts) => void;
+  catalogPinElectricalRoleSelection: number[];
+  setCatalogPinElectricalRoleSelection: (value: number[]) => void;
   catalogFormError: string | null;
 }
 
@@ -94,6 +100,10 @@ export function ModelingCatalogFormPanel({
   cancelCatalogEdit,
   catalogIsFuseBox,
   setCatalogIsFuseBox,
+  catalogPinElectricalRoleDrafts,
+  setCatalogPinElectricalRoleDrafts,
+  catalogPinElectricalRoleSelection,
+  setCatalogPinElectricalRoleSelection,
   catalogFormError
 }: ModelingCatalogFormPanelProps): ReactElement | null {
   void _openCreateCatalogForm;
@@ -432,6 +442,14 @@ export function ModelingCatalogFormPanel({
               rows={3}
             />
           </label>
+          <PinElectricalRolesEditor
+            cavityCount={Number(catalogConnectionCount)}
+            drafts={catalogPinElectricalRoleDrafts}
+            setDrafts={setCatalogPinElectricalRoleDrafts}
+            selection={catalogPinElectricalRoleSelection}
+            setSelection={setCatalogPinElectricalRoleSelection}
+            catalogItem={undefined}
+          />
           <div className="row-actions catalog-item-submit-actions">
             {renderCatalogSubmitButton()}
           </div>

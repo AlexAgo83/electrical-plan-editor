@@ -585,6 +585,14 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setConnectorFusePairRatings: formsState.setConnectorFusePairRatings,
     connectorFusePairOverrides: formsState.connectorFusePairOverrides,
     setConnectorFusePairOverrides: formsState.setConnectorFusePairOverrides,
+    connectorPinElectricalRoleDrafts: formsState.connectorPinElectricalRoleDrafts,
+    setConnectorPinElectricalRoleDrafts: formsState.setConnectorPinElectricalRoleDrafts,
+    connectorPinElectricalRoleSelection: formsState.connectorPinElectricalRoleSelection,
+    setConnectorPinElectricalRoleSelection: formsState.setConnectorPinElectricalRoleSelection,
+    connectorPinRoleCatalogItem:
+      formsState.connectorCatalogItemId.length === 0
+        ? undefined
+        : entities.catalogItems.find((item) => item.id === formsState.connectorCatalogItemId),
     connectorAutoCreateLinkedNode: formsState.connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode: formsState.setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,

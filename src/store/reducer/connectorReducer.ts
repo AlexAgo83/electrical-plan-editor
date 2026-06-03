@@ -1,6 +1,7 @@
 import type { AppAction } from "../actions";
 import { normalizeConnectorTerminalMaterial } from "../../core/connectorCatalogMaterials";
-import type { ConnectorTerminalMaterial } from "../../core/entities";
+import { normalizePinElectricalRolesMap } from "../../core/pinElectricalRole";
+import type { ConnectorTerminalMaterial, PinElectricalRole } from "../../core/entities";
 import { analyzeConnectorDeleteImpact } from "../deleteImpact";
 import type { AppState } from "../types";
 import {
@@ -64,6 +65,17 @@ function normalizeConnectorTerminalOverrides(
     }
   }
   return Object.keys(normalized).length === 0 ? undefined : normalized;
+}
+
+function normalizeConnectorPinElectricalRoles(
+  roles: Record<number, PinElectricalRole> | undefined,
+  cavityCount: number
+): Record<number, PinElectricalRole> | undefined {
+  if (roles === undefined) {
+    return undefined;
+  }
+  const { value } = normalizePinElectricalRolesMap(roles, { cavityCount });
+  return Object.keys(value).length === 0 ? undefined : value;
 }
 
 function hasWireEndpointIndexOutOfRange(state: AppState, connectorId: string, cavityCount: number): boolean {
@@ -157,6 +169,7 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
           applyCatalogPlugs: normalizeApplyCatalogFlag(action.payload.applyCatalogPlugs),
           applyCatalogSeals: normalizeApplyCatalogFlag(action.payload.applyCatalogSeals),
           terminalOverrides: normalizeConnectorTerminalOverrides(action.payload.terminalOverrides, cavityCount),
+          pinElectricalRoles: normalizeConnectorPinElectricalRoles(action.payload.pinElectricalRoles, cavityCount),
           manufacturerReference:
             linkedCatalogItem !== undefined
               ? linkedCatalogItem.manufacturerReference

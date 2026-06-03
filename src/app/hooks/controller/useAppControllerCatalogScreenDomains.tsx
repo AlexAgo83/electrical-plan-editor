@@ -163,6 +163,10 @@ export function useAppControllerCatalogScreenDomains({
         cancelCatalogEdit={catalogHandlers.cancelCatalogEdit}
         catalogIsFuseBox={formsState.catalogIsFuseBox}
         setCatalogIsFuseBox={formsState.setCatalogIsFuseBox}
+        catalogPinElectricalRoleDrafts={formsState.catalogPinElectricalRoleDrafts}
+        setCatalogPinElectricalRoleDrafts={formsState.setCatalogPinElectricalRoleDrafts}
+        catalogPinElectricalRoleSelection={formsState.catalogPinElectricalRoleSelection}
+        setCatalogPinElectricalRoleSelection={formsState.setCatalogPinElectricalRoleSelection}
         catalogFormError={formsState.catalogFormError}
       />
     </section>

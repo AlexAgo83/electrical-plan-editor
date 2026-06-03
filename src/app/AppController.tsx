@@ -483,6 +483,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCatalogShowConnectorPhysicalLayout: formsState.setCatalogShowConnectorPhysicalLayout,
     catalogIsFuseBox: formsState.catalogIsFuseBox,
     setCatalogIsFuseBox: formsState.setCatalogIsFuseBox,
+    catalogPinElectricalRoleDrafts: formsState.catalogPinElectricalRoleDrafts,
+    setCatalogPinElectricalRoleDrafts: formsState.setCatalogPinElectricalRoleDrafts,
+    setCatalogPinElectricalRoleSelection: formsState.setCatalogPinElectricalRoleSelection,
     setCatalogFormError: formsState.setCatalogFormError
   });
   useNetworkSummaryViewStateSync({

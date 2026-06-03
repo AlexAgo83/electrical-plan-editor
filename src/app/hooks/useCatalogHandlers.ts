@@ -1,6 +1,12 @@
 import type { FormEvent } from "react";
 import type { CatalogAdditionalAccessory, CatalogItem, CatalogItemId, ConnectorLayout, FuseBoxConfig } from "../../core/entities";
 import { normalizeConnectorLayout } from "../../core/connectorLayout";
+import {
+  formatPinElectricalRoleDrafts,
+  hasInvalidPinElectricalRoleDraft,
+  serializePinElectricalRoleDrafts,
+  type ConnectorPinElectricalRoleDrafts
+} from "./connectorPinElectricalRoles";
 import type { AppStore } from "../../store";
 import { appActions, isValidCatalogUrlInput } from "../../store";
 import { analyzeCatalogDeleteImpact } from "../../store/deleteImpact";
@@ -56,6 +62,9 @@ interface UseCatalogHandlersParams {
   setCatalogShowConnectorPhysicalLayout?: (value: boolean) => void;
   catalogIsFuseBox?: boolean;
   setCatalogIsFuseBox?: (value: boolean) => void;
+  catalogPinElectricalRoleDrafts?: ConnectorPinElectricalRoleDrafts;
+  setCatalogPinElectricalRoleDrafts?: (value: ConnectorPinElectricalRoleDrafts) => void;
+  setCatalogPinElectricalRoleSelection?: (value: number[]) => void;
   setCatalogFormError: (value: string | null) => void;
 }
 
@@ -113,6 +122,9 @@ export function useCatalogHandlers({
   setCatalogShowConnectorPhysicalLayout = () => {},
   catalogIsFuseBox = false,
   setCatalogIsFuseBox = () => {},
+  catalogPinElectricalRoleDrafts = {},
+  setCatalogPinElectricalRoleDrafts = () => {},
+  setCatalogPinElectricalRoleSelection = () => {},
   setCatalogFormError
 }: UseCatalogHandlersParams) {
   function clearCatalogMaterialDefaults(): void {
@@ -126,6 +138,8 @@ export function useCatalogHandlers({
     setCatalogConnectorLayout(undefined);
     setCatalogShowConnectorPhysicalLayout(false);
     setCatalogIsFuseBox(false);
+    setCatalogPinElectricalRoleDrafts({});
+    setCatalogPinElectricalRoleSelection([]);
   }
 
   function clearCatalogForm(): void {
@@ -185,6 +199,10 @@ export function useCatalogHandlers({
     setCatalogConnectorLayout(item.connectorLayout);
     setCatalogShowConnectorPhysicalLayout(item.connectorLayout !== undefined);
     setCatalogIsFuseBox(item.fuseBoxConfig !== undefined);
+    setCatalogPinElectricalRoleDrafts(
+      formatPinElectricalRoleDrafts(item.connectorDefaults?.pinElectricalRoles, item.connectionCount)
+    );
+    setCatalogPinElectricalRoleSelection([]);
     setCatalogFormError(null);
     dispatchAction(appActions.select({ kind: "catalog", id: item.id }), { trackHistory: false });
   }
@@ -257,6 +275,13 @@ export function useCatalogHandlers({
       setCatalogFormError("Plug definitions must use one line per plug: reference,quantity,name.");
       return;
     }
+    if (catalogShowConnectorMaterialDefaults && hasInvalidPinElectricalRoleDraft(catalogPinElectricalRoleDrafts)) {
+      setCatalogFormError("Pin role currents must be numeric values greater than or equal to 0 A.");
+      return;
+    }
+    const pinElectricalRoles = catalogShowConnectorMaterialDefaults
+      ? serializePinElectricalRoleDrafts(catalogPinElectricalRoleDrafts, connectionCount)
+      : undefined;
     const normalizedConnectorLayout = catalogShowConnectorPhysicalLayout
       ? normalizeConnectorLayout(catalogConnectorLayout, connectionCount)
       : undefined;
@@ -298,7 +323,8 @@ export function useCatalogHandlers({
                 sealReference: catalogDefaultSealReference.trim() || undefined,
                 sealName: catalogDefaultSealName.trim() || undefined
               },
-              plugs: plugDefinitions.length > 0 ? plugDefinitions : undefined
+              plugs: plugDefinitions.length > 0 ? plugDefinitions : undefined,
+              pinElectricalRoles
             }
           : undefined,
         connectorLayout: normalizedConnectorLayout,

@@ -18,6 +18,12 @@ import {
   type ConnectorFusePairOverrideDrafts,
   type ConnectorFusePairRatingDrafts
 } from "./connectorFusePairRatings";
+import {
+  formatPinElectricalRoleDrafts,
+  hasInvalidPinElectricalRoleDraft,
+  serializePinElectricalRoleDrafts,
+  type ConnectorPinElectricalRoleDrafts
+} from "./connectorPinElectricalRoles";
 
 type DispatchAction = (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean }) => void;
 
@@ -51,6 +57,9 @@ interface UseConnectorHandlersParams {
   setConnectorFusePairRatings: (value: ConnectorFusePairRatingDrafts) => void;
   connectorFusePairOverrides: ConnectorFusePairOverrideDrafts;
   setConnectorFusePairOverrides: (value: ConnectorFusePairOverrideDrafts) => void;
+  connectorPinElectricalRoleDrafts: ConnectorPinElectricalRoleDrafts;
+  setConnectorPinElectricalRoleDrafts: (value: ConnectorPinElectricalRoleDrafts) => void;
+  setConnectorPinElectricalRoleSelection: (value: number[]) => void;
   connectorAutoCreateLinkedNode: boolean;
   setConnectorAutoCreateLinkedNode: (value: boolean) => void;
   defaultAutoCreateLinkedNodes: boolean;
@@ -94,6 +103,9 @@ export function useConnectorHandlers({
   setConnectorFusePairRatings,
   connectorFusePairOverrides,
   setConnectorFusePairOverrides,
+  connectorPinElectricalRoleDrafts,
+  setConnectorPinElectricalRoleDrafts,
+  setConnectorPinElectricalRoleSelection,
   connectorAutoCreateLinkedNode,
   setConnectorAutoCreateLinkedNode,
   defaultAutoCreateLinkedNodes,
@@ -148,6 +160,8 @@ export function useConnectorHandlers({
       setConnectorApplyCatalogSeals(true);
       setConnectorTerminalOverridesText("");
       setConnectorFusePairRatings({});
+      setConnectorPinElectricalRoleDrafts({});
+      setConnectorPinElectricalRoleSelection([]);
       setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
       setCavityCount("4");
       setConnectorFormError("Create a catalog item first to define manufacturer reference and connection count.");
@@ -168,6 +182,8 @@ export function useConnectorHandlers({
     setConnectorTerminalOverridesText("");
     setConnectorFusePairRatings({});
     setConnectorFusePairOverrides({});
+    setConnectorPinElectricalRoleDrafts({});
+    setConnectorPinElectricalRoleSelection([]);
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setConnectorFormError(null);
   }
@@ -186,6 +202,8 @@ export function useConnectorHandlers({
     setConnectorTerminalOverridesText("");
     setConnectorFusePairRatings({});
     setConnectorFusePairOverrides({});
+    setConnectorPinElectricalRoleDrafts({});
+    setConnectorPinElectricalRoleSelection([]);
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setCavityCount("4");
     setConnectorFormError(null);
@@ -230,6 +248,10 @@ export function useConnectorHandlers({
     setConnectorFusePairRatings(formatFusePairRatingDrafts(connector.fusePairRatings));
     const effectiveOverrides = connector.fusePairOverrides ?? catalogItem?.fuseBoxConfig?.pairs;
     setConnectorFusePairOverrides(formatFusePairOverrideDrafts(effectiveOverrides));
+    setConnectorPinElectricalRoleDrafts(
+      formatPinElectricalRoleDrafts(connector.pinElectricalRoles, connector.cavityCount)
+    );
+    setConnectorPinElectricalRoleSelection([]);
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setConnectorFormError(null);
     dispatchAction(appActions.select({ kind: "connector", id: connector.id }));
@@ -306,6 +328,19 @@ export function useConnectorHandlers({
     const fusePairRatings = serializeFusePairRatings(connectorFusePairRatings, fusePairIndexes.size === 0 ? undefined : fusePairIndexes);
     const fusePairOverrides = serializeFusePairOverrides(connectorFusePairOverrides, catalogFuseBoxPairs);
 
+    if (hasInvalidPinElectricalRoleDraft(connectorPinElectricalRoleDrafts)) {
+      setConnectorFormError("Pin role currents must be numeric values greater than or equal to 0 A.");
+      const firstInvalidPinInput = event.currentTarget.querySelector<HTMLInputElement>(
+        "[data-pin-role-invalid='true'] input"
+      );
+      firstInvalidPinInput?.focus();
+      return;
+    }
+    const pinElectricalRoles = serializePinElectricalRoleDrafts(
+      connectorPinElectricalRoleDrafts,
+      normalizedCavityCount
+    );
+
     setConnectorFormError(null);
 
     const wasCreateMode = connectorFormMode === "create";
@@ -336,6 +371,7 @@ export function useConnectorHandlers({
               }, {}),
         fusePairRatings,
         fusePairOverrides,
+        pinElectricalRoles,
         cavityCount: normalizedCavityCount
       })
     );

@@ -7,3 +7,7 @@ export * from "./pathfinding";
 export * from "./schema";
 export * from "./wireSection";
 export * from "./networkMetadata";
+export * from "./pinElectricalRole";
+export * from "./wireAmpacity";
+export * from "./pinElectricalLoad";
+export * from "./pinElectricalLoadAssembly";
