@@ -358,34 +358,32 @@
 
 .connector-ways-view {
   display: grid;
-  grid-template-columns: minmax(13rem, 0.8fr) minmax(0, 1.2fr);
-  gap: 0.8rem;
+  grid-template-columns: minmax(14rem, 0.52fr) minmax(0, 1.48fr);
+  gap: 0.9rem;
   align-items: start;
 }
 
-.connector-ways-side-panel {
+.connector-ways-assignment-panel,
+.pin-electrical-roles-editor--panel {
   min-width: 0;
   display: grid;
-  gap: 0.8rem;
-}
-
-.connector-ways-assignment-panel {
-  min-width: 0;
-  display: grid;
-  gap: 0.55rem;
-  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  gap: 0.7rem;
+  border: 1px solid var(--theme-border, color-mix(in srgb, currentColor 16%, transparent));
   border-radius: 0.6rem;
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--theme-accent, currentColor) 5%, var(--theme-panel, transparent)),
+      color-mix(in srgb, var(--theme-panel, transparent) 92%, transparent)
+    );
+  color: inherit;
   padding: 0.7rem;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, currentColor 8%, transparent);
 }
 
 .connector-ways-assignment-form {
   grid-template-columns: minmax(0, 1fr);
   gap: 0.6rem;
-}
-
-.connector-ways-cavity-grid {
-  margin-top: 0;
 }
 
 .cavity {
@@ -414,14 +412,6 @@
   color: #24445c;
 }
 
-.connector-way-role-summary {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-}
-
-.connector-way-role-chip,
 .pin-electrical-roles-source {
   display: inline-flex;
   align-items: center;
@@ -434,25 +424,6 @@
   font-size: 0.72rem;
   font-weight: 800;
   line-height: 1.1;
-}
-
-.connector-way-role-chip--source {
-  background: color-mix(in srgb, currentColor 7%, transparent);
-  border-color: color-mix(in srgb, currentColor 22%, transparent);
-}
-
-.connector-way-role-chip--consumer {
-  background: color-mix(in srgb, var(--theme-accent, currentColor) 12%, transparent);
-  border-color: color-mix(in srgb, var(--theme-accent, currentColor) 30%, transparent);
-}
-
-.connector-way-role-chip--passive {
-  background: color-mix(in srgb, currentColor 5%, transparent);
-}
-
-.connector-way-role-chip--bidirectional {
-  background: color-mix(in srgb, currentColor 9%, transparent);
-  border-color: color-mix(in srgb, var(--theme-accent, currentColor) 24%, transparent);
 }
 
 .pin-electrical-roles-source {
@@ -471,35 +442,6 @@
   border-color: color-mix(in srgb, currentColor 22%, transparent);
 }
 
-.connector-way-role-details {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  color: color-mix(in srgb, currentColor 74%, transparent);
-}
-
-.connector-way-role-details span {
-  display: inline-flex;
-  min-height: 1.25rem;
-  align-items: center;
-  border-radius: 0.35rem;
-  background: color-mix(in srgb, currentColor 5%, transparent);
-  padding: 0.05rem 0.35rem;
-  font-size: 0.76rem;
-  font-weight: 700;
-}
-
-.pin-electrical-roles-editor--panel {
-  min-width: 0;
-  display: grid;
-  gap: 0.7rem;
-  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
-  border-radius: 0.6rem;
-  background: color-mix(in srgb, currentColor 3.5%, transparent);
-  padding: 0.7rem;
-}
-
 .pin-electrical-roles-panel-header {
   display: flex;
   align-items: center;
@@ -511,6 +453,7 @@
   margin: 0;
   font-size: 0.88rem;
   font-weight: 800;
+  color: var(--theme-strong, inherit);
 }
 
 .pin-electrical-roles-bulk {
@@ -537,16 +480,16 @@
   align-items: center;
   gap: 0.4rem;
   min-width: 38rem;
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--theme-border, currentColor) 72%, transparent);
   border-radius: 0.45rem;
-  background: color-mix(in srgb, currentColor 2.5%, transparent);
+  background: color-mix(in srgb, var(--theme-panel, transparent) 86%, currentColor 3%);
   padding: 0.35rem;
 }
 
 .pin-electrical-roles-row--header {
   border-color: transparent;
   background: transparent;
-  color: color-mix(in srgb, currentColor 70%, transparent);
+  color: var(--theme-muted, color-mix(in srgb, currentColor 70%, transparent));
   font-size: 0.72rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -563,6 +506,9 @@
 .pin-electrical-roles-row input,
 .pin-electrical-roles-row select {
   min-width: 0;
+  border-color: color-mix(in srgb, var(--theme-border, currentColor) 78%, transparent);
+  background: color-mix(in srgb, var(--theme-panel, transparent) 82%, currentColor 4%);
+  color: inherit;
 }
 
 .pin-electrical-roles-row input[type="checkbox"] {
@@ -573,6 +519,15 @@
 .pin-electrical-roles-row .inline-error {
   display: block;
   margin-top: 0.2rem;
+}
+
+.pin-electrical-roles-effective {
+  display: block;
+  margin-top: 0.18rem;
+  color: var(--theme-muted, color-mix(in srgb, currentColor 68%, transparent));
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .pin-electrical-roles-footer {

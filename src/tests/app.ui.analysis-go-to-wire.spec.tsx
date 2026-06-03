@@ -17,7 +17,7 @@ describe("App integration UI - analysis go-to wire actions", () => {
     localStorage.clear();
   });
 
-  it("opens wire editing from connector occupancy card and keeps Go to before Release", () => {
+  it("opens wire editing from connector physical occupancy card", () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("analysis");
@@ -27,13 +27,14 @@ describe("App integration UI - analysis go-to wire actions", () => {
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
     const occupiedCard = within(connectorAnalysisPanel).getByText("W-1 / A").closest("article");
     expect(occupiedCard).not.toBeNull();
     expect((occupiedCard as HTMLElement).querySelector(".cavity-occupant-ref-icon")).not.toBeNull();
 
     const cardButtons = within(occupiedCard as HTMLElement).getAllByRole("button");
     const cardButtonLabels = cardButtons.map((button) => button.textContent?.trim());
-    expect(cardButtonLabels).toEqual(["Go to", "Release"]);
+    expect(cardButtonLabels).toEqual(["Go to"]);
 
     fireEvent.click(within(occupiedCard as HTMLElement).getByRole("button", { name: "Go to" }));
 
@@ -49,7 +50,7 @@ describe("App integration UI - analysis go-to wire actions", () => {
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Splice$/, hidden: true })).toHaveClass("is-active");
   });
 
-  it("shows wire color markers in connector ways and physical views", () => {
+  it("shows wire color markers in connector physical view", () => {
     const baseState = createUiIntegrationState();
     const wire = baseState.wires.byId[asWireId("W1")];
     if (wire === undefined) {
@@ -74,10 +75,6 @@ describe("App integration UI - analysis go-to wire actions", () => {
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
-    const waysCard = within(connectorAnalysisPanel).getByText("W-1 / A").closest("article");
-    expect(waysCard).not.toBeNull();
-    expect((waysCard as HTMLElement).querySelectorAll('[title="Red / Blue"]')).toHaveLength(2);
-
     fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
     const physicalCard = within(connectorAnalysisPanel).getByText("W-1 / A").closest("article");
     expect(physicalCard).not.toBeNull();
@@ -234,7 +231,7 @@ describe("App integration UI - analysis go-to wire actions", () => {
     );
   });
 
-  it("disables Go to when occupancy references a missing wire and keeps Release enabled", () => {
+  it("does not expose Go to when physical occupancy references a missing wire", () => {
     const baseState = createUiIntegrationState();
     const stateWithMissingWireOccupancy = {
       ...baseState,
@@ -256,10 +253,10 @@ describe("App integration UI - analysis go-to wire actions", () => {
     fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
     const occupiedCard = within(connectorAnalysisPanel).getByText("W-GHOST / A").closest("article");
     expect(occupiedCard).not.toBeNull();
-    expect(within(occupiedCard as HTMLElement).getByRole("button", { name: "Go to" })).toBeDisabled();
-    expect(within(occupiedCard as HTMLElement).getByRole("button", { name: "Release" })).toBeEnabled();
+    expect(within(occupiedCard as HTMLElement).queryByRole("button", { name: "Go to" })).not.toBeInTheDocument();
   });
 
   it("opens segment analysis from node analysis associated segments table", () => {

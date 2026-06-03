@@ -1,9 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
-import type { PinElectricalRoleKind } from "../../../core/entities";
-import {
-  resolvePinElectricalRoleDescriptor,
-  type PinElectricalRoleSource
-} from "../../../core/pinElectricalRole";
+import { resolvePinElectricalRoleDescriptor } from "../../../core/pinElectricalRole";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { formatOccupantRefForDisplay, parseWireOccupantRef } from "../../lib/app-utils-networking";
@@ -22,23 +18,6 @@ import { EntityReferenceButton } from "./EntityReferenceButton";
 import { PinElectricalRolesEditor } from "./PinElectricalRolesEditor";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
-
-const PIN_ROLE_LABELS: Record<PinElectricalRoleKind, string> = {
-  source: "Source",
-  consumer: "Consumer",
-  passive: "Passive",
-  bidirectional: "Bidirectional"
-};
-
-function describePinRoleSource(source: PinElectricalRoleSource): string {
-  if (source === "override") {
-    return "override";
-  }
-  if (source === "catalog") {
-    return "catalog";
-  }
-  return "default";
-}
 
 export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContentProps): ReactElement {
   const {
@@ -66,7 +45,6 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     setConnectorOccupantRefInput,
     handleReserveCavity,
     connectorCavityStatuses,
-    handleReleaseCavity,
     onOpenWireFromAnalysisTable,
     onOpenConnectorFromAnalysisTable,
     onOpenSpliceFromAnalysisTable,
@@ -115,21 +93,6 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   const wireById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire] as const)), [wires]);
   const formatOccupantRef = (occupantRef: string | null): string =>
     occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
-  const renderConnectorOccupantRef = (occupantRef: string | null): ReactElement => {
-    if (occupantRef === null) {
-      return <span>Free</span>;
-    }
-    const parsed = parseWireOccupantRef(occupantRef);
-    if (parsed === null) {
-      return <span>{occupantRef}</span>;
-    }
-    const technicalId = wireTechnicalIdById.get(parsed.wireId) ?? parsed.wireId;
-    return (
-      <span className="cavity-occupant-ref" aria-label={`Wire ${technicalId} / ${parsed.side}`}>
-        <span>{technicalId} / {parsed.side}</span>
-      </span>
-    );
-  };
   const parseOccupantWireId = (occupantRef: string | null) => {
     const parsed = occupantRef === null ? null : parseWireOccupantRef(occupantRef);
     return parsed !== null && wireById.has(parsed.wireId) ? parsed.wireId : null;
@@ -529,137 +492,74 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
       </p>
       <div className="connector-ways-view">
-        <div className="connector-ways-side-panel">
-          <section className="connector-ways-assignment-panel" aria-label="Manual way assignment">
-            <form className="row-form connector-ways-assignment-form" onSubmit={handleReserveCavitySubmit}>
-              <label>
-                Way index
-                <input
-                  type="number"
-                  min={1}
-                  max={selectedConnector.cavityCount}
-                  step={1}
-                  value={cavityIndexInput}
-                  onChange={(event) => setCavityIndexInput(event.target.value)}
-                  aria-invalid={connectorReserveValidationMessage !== null ? true : undefined}
-                  required
-                />
-              </label>
+        <section className="connector-ways-assignment-panel" aria-label="Manual way assignment">
+          <form className="row-form connector-ways-assignment-form" onSubmit={handleReserveCavitySubmit}>
+            <label>
+              Way index
+              <input
+                type="number"
+                min={1}
+                max={selectedConnector.cavityCount}
+                step={1}
+                value={cavityIndexInput}
+                onChange={(event) => setCavityIndexInput(event.target.value)}
+                aria-invalid={connectorReserveValidationMessage !== null ? true : undefined}
+                required
+              />
+            </label>
 
-              <label>
-                Occupant reference
-                <input
-                  value={connectorOccupantRefInput}
-                  onChange={(event) => setConnectorOccupantRefInput(event.target.value)}
-                  placeholder="wire-draft-001:A"
-                  required
-                />
-              </label>
+            <label>
+              Occupant reference
+              <input
+                value={connectorOccupantRefInput}
+                onChange={(event) => setConnectorOccupantRefInput(event.target.value)}
+                placeholder="wire-draft-001:A"
+                required
+              />
+            </label>
 
-              <button type="submit" className="button-with-icon" disabled={!canReserveCavity}>
-                <span className="action-button-icon is-lock-move" aria-hidden="true" />
-                Reserve way
+            <button type="submit" className="button-with-icon" disabled={!canReserveCavity}>
+              <span className="action-button-icon is-lock-move" aria-hidden="true" />
+              Reserve way
+            </button>
+          </form>
+          {connectorReserveValidationMessage !== null ? <small className="inline-error">{connectorReserveValidationMessage}</small> : null}
+          {connectorReserveValidationMessage === null && nextFreeCavityIndex !== null ? (
+            <small className="inline-help">Suggested next free way: C{nextFreeCavityIndex}</small>
+          ) : null}
+          {connectorReserveValidationMessage === null && nextFreeCavityIndex === null ? (
+            <small className="inline-help">No available ways on this connector.</small>
+          ) : null}
+        </section>
+        <PinElectricalRolesEditor
+          mode="panel"
+          title="Electrical roles"
+          cavityCount={selectedConnector.cavityCount}
+          drafts={pinRoleDrafts}
+          setDrafts={(nextDrafts) => {
+            setPinRoleDrafts(nextDrafts);
+            setPinRoleSaveMessage(null);
+          }}
+          selection={pinRoleSelection}
+          setSelection={setPinRoleSelection}
+          catalogItem={selectedConnectorCatalogItem}
+          footerActions={
+            <>
+              <button
+                type="button"
+                className="button-with-icon"
+                disabled={pinRoleDraftsAreInvalid}
+                onClick={handleSavePinElectricalRoles}
+              >
+                <span className="action-button-icon is-save" aria-hidden="true" />
+                Save roles
               </button>
-            </form>
-            {connectorReserveValidationMessage !== null ? <small className="inline-error">{connectorReserveValidationMessage}</small> : null}
-            {connectorReserveValidationMessage === null && nextFreeCavityIndex !== null ? (
-              <small className="inline-help">Suggested next free way: C{nextFreeCavityIndex}</small>
-            ) : null}
-            {connectorReserveValidationMessage === null && nextFreeCavityIndex === null ? (
-              <small className="inline-help">No available ways on this connector.</small>
-            ) : null}
-          </section>
-          <PinElectricalRolesEditor
-            mode="panel"
-            title="Electrical roles"
-            cavityCount={selectedConnector.cavityCount}
-            drafts={pinRoleDrafts}
-            setDrafts={(nextDrafts) => {
-              setPinRoleDrafts(nextDrafts);
-              setPinRoleSaveMessage(null);
-            }}
-            selection={pinRoleSelection}
-            setSelection={setPinRoleSelection}
-            catalogItem={selectedConnectorCatalogItem}
-            footerActions={
-              <>
-                <button
-                  type="button"
-                  className="button-with-icon"
-                  disabled={pinRoleDraftsAreInvalid}
-                  onClick={handleSavePinElectricalRoles}
-                >
-                  <span className="action-button-icon is-save" aria-hidden="true" />
-                  Save roles
-                </button>
-                {pinRoleSaveMessage === null ? null : (
-                  <small className={pinRoleDraftsAreInvalid ? "inline-error" : "inline-help"}>{pinRoleSaveMessage}</small>
-                )}
-              </>
-            }
-          />
-        </div>
-
-        <div className="cavity-grid connector-ways-cavity-grid" aria-label="Way occupancy grid">
-          {connectorCavityStatuses.map((slot) => {
-            const parsedOccupantRef = slot.occupantRef === null ? null : parseWireOccupantRef(slot.occupantRef);
-            const canGoToWire =
-              parsedOccupantRef !== null &&
-              wireById.has(parsedOccupantRef.wireId);
-            const roleDescriptor = resolvePinElectricalRoleDescriptor(selectedConnector, selectedConnectorCatalogItem, slot.cavityIndex);
-            const roleLabel = PIN_ROLE_LABELS[roleDescriptor.role.role];
-
-            return (
-              <article key={slot.cavityIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
-                <h3>C{slot.cavityIndex}</h3>
-                <p className="cavity-occupant-line">
-                  {slot.isOccupied ? <span className="action-button-icon is-wires cavity-occupant-ref-icon" aria-hidden="true" /> : null}
-                  {slot.isOccupied ? renderWireColorPrefixMarker(parsedOccupantRef === null ? null : wireById.get(parsedOccupantRef.wireId)) : null}
-                  {slot.isOccupied ? renderConnectorOccupantRef(slot.occupantRef) : <span>Free</span>}
-                </p>
-                <div
-                  className="connector-way-role-summary"
-                  aria-label={`C${slot.cavityIndex} electrical role ${roleLabel}, ${describePinRoleSource(roleDescriptor.source)}`}
-                >
-                  <span className={`connector-way-role-chip connector-way-role-chip--${roleDescriptor.role.role}`}>
-                    {roleLabel}
-                  </span>
-                  <small className={`pin-electrical-roles-source pin-electrical-roles-source--${roleDescriptor.source}`}>
-                    {describePinRoleSource(roleDescriptor.source)}
-                  </small>
-                </div>
-                {roleDescriptor.role.currentA !== undefined || roleDescriptor.role.label !== undefined ? (
-                  <p className="connector-way-role-details">
-                    {roleDescriptor.role.label !== undefined ? <span>{roleDescriptor.role.label}</span> : null}
-                    {roleDescriptor.role.currentA !== undefined ? <span>{roleDescriptor.role.currentA} A</span> : null}
-                  </p>
-                ) : null}
-                {slot.isOccupied ? (
-                  <div className="cavity-actions">
-                    <button
-                      type="button"
-                      className="validation-row-go-to-button button-with-icon"
-                      disabled={!canGoToWire}
-                      onClick={() => {
-                        if (!canGoToWire || parsedOccupantRef === null) {
-                          return;
-                        }
-                        onOpenWireFromAnalysisTable(parsedOccupantRef.wireId);
-                      }}
-                    >
-                      <span className="action-button-icon is-open" aria-hidden="true" />
-                      Go to
-                    </button>
-                    <button type="button" className="button-with-icon" onClick={() => handleReleaseCavity(slot.cavityIndex)}>
-                      <span className="action-button-icon is-cancel" aria-hidden="true" />
-                      Release
-                    </button>
-                  </div>
-                ) : null}
-              </article>
-            );
-          })}
-        </div>
+              {pinRoleSaveMessage === null ? null : (
+                <small className={pinRoleDraftsAreInvalid ? "inline-error" : "inline-help"}>{pinRoleSaveMessage}</small>
+              )}
+            </>
+          }
+        />
       </div>
     </>
   ) : connectorAnalysisView === "physical" ? (

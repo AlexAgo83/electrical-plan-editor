@@ -161,17 +161,17 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     renderAppWithState(state);
     const panel = openConnectorAnalysis("ECU connector");
     expect(within(panel).getByRole("button", { name: "Ways & roles" })).toHaveAttribute("aria-pressed", "true");
+    expect(panel.querySelector(".connector-ways-cavity-grid")).toBeNull();
 
-    const firstWay = within(panel).getByText("C1").closest("article") as HTMLElement;
-    const secondWay = within(panel).getByText("C2").closest("article") as HTMLElement;
+    const firstWay = within(panel).getByLabelText("Select pin 1").closest('[role="row"]') as HTMLElement;
+    const secondWay = within(panel).getByLabelText("Select pin 2").closest('[role="row"]') as HTMLElement;
 
     expect(within(firstWay).getByText("Consumer")).toBeInTheDocument();
     expect(within(firstWay).getByText("catalog")).toBeInTheDocument();
-    expect(within(firstWay).getByText("BAT+")).toBeInTheDocument();
-    expect(within(firstWay).getByText("40 A")).toBeInTheDocument();
+    expect(within(firstWay).getByText("BAT+ / 40 A")).toBeInTheDocument();
     expect(within(secondWay).getByText("Source")).toBeInTheDocument();
     expect(within(secondWay).getByText("override")).toBeInTheDocument();
-    expect(within(secondWay).getByText("2.5 A")).toBeInTheDocument();
+    expect(within(secondWay).getByDisplayValue("2.5")).toBeInTheDocument();
   });
 
   it("applies a bulk role to selected pins as a single save", () => {

@@ -167,6 +167,12 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
           );
           const effectiveSource: "override" | "catalog" | "default" =
             draft.role !== "" ? "override" : resolved.source;
+          const inheritedDetails =
+            draft.role === "" && (resolved.role.label !== undefined || resolved.role.currentA !== undefined)
+              ? [resolved.role.label, resolved.role.currentA === undefined ? undefined : `${resolved.role.currentA} A`].filter(
+                  (value): value is string => value !== undefined
+                )
+              : [];
           const isSelected = selection.includes(cavityIndex);
           return (
             <div
@@ -247,6 +253,9 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                 >
                   {describeSource(effectiveSource)}
                 </small>
+                {inheritedDetails.length === 0 ? null : (
+                  <small className="pin-electrical-roles-effective">{inheritedDetails.join(" / ")}</small>
+                )}
                 {draftError === null ? null : (
                   <small className="inline-error">{draftError}</small>
                 )}
