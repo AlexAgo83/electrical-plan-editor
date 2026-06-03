@@ -1,11 +1,11 @@
 ## item_611_electrical_dimensioning_validation_category - Electrical dimensioning validation category (D1–D4)
 
-> From version: 1.13.1
+> From version: 1.14.0
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 80%
-> Confidence: 75%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 95%
+> Progress: 100% (delivered)
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -83,11 +83,15 @@ flowchart LR
   - BOM column for "Computed downstream load (A)" is non-blocking for this slice — implement it in `item_612` once the engine output shape is settled.
 - Architecture follow-up: No ADR required.
 
+# Delivery outcome
+- Electrical dimensioning validation category delivered through `task_119_electrical_dimensioning_validation_category`.
+- D1-D4 issue families, current-network scoping, category muting, Go to targets, and regression coverage are tracked in the linked task DoD.
+
 # Links
 - Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
 - Architecture decision(s): (none)
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
-- Primary task(s): TBD on promotion
+- Primary task(s): `logics/tasks/task_119_electrical_dimensioning_validation_category.md`
 
 # AI Context
 - Summary: Adds the Electrical dimensioning validation category with D1, D2, D3, D4 families, computed against the current-network scope, all permissive (D3/D4 never block).
@@ -103,4 +107,4 @@ flowchart LR
 - Created by hand; regenerate signatures with `python3 -m logics_manager lint --require-status` before commit when the tool becomes available.
 
 # Tasks
-- TBD on promotion.
+- `logics/tasks/task_119_electrical_dimensioning_validation_category.md`

@@ -1,24 +1,24 @@
 ## task_119_electrical_dimensioning_validation_category - Electrical dimensioning validation category (D1–D4)
 
-> From version: 1.13.1
+> From version: 1.14.0
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 85%
-> Confidence: 80%
-> Progress: 100%
+> Status: Done
+> Understanding: 100%
+> Confidence: 95%
+> Progress: 100% (delivered)
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 
 # Definition of Done (DoD)
-- [ ] `buildValidationIssues` emits issues in a new **Electrical dimensioning** category for D1–D4.
-- [ ] D1 thresholds: `error` > 100% ampacity, `warning` > 90%, `info` 80–90%.
-- [ ] D2 thresholds: `error` over rating, `warning` 80–100%, `warning` rating-missing-with-load.
-- [ ] D3: `warning` (non-blocking) when supply pin under-rated vs. declared output sum.
-- [ ] D4: `info` for consumer-only branch, `warning` for facing sources; never `error`.
-- [ ] All issues use `scope = "currentNetwork"`. No cross-network contribution.
-- [ ] Each issue exposes `Go to` (connector+pin / wire / branch entry).
-- [ ] Category can be disabled from the validation center; disabling hides every D-issue.
-- [ ] Tests cover D1–D4 thresholds, permissive baselines, and `Go to` resolution.
+- [x] `buildValidationIssues` emits issues in a new **Electrical dimensioning** category for D1–D4.
+- [x] D1 thresholds: `error` > 100% ampacity, `warning` > 90%, `info` 80–90%.
+- [x] D2 thresholds: `error` over rating, `warning` 80–100%, `warning` rating-missing-with-load.
+- [x] D3: `warning` (non-blocking) when supply pin under-rated vs. declared output sum.
+- [x] D4: `info` for consumer-only branch, `warning` for facing sources; never `error`.
+- [x] All issues use `scope = "currentNetwork"`. No cross-network contribution.
+- [x] Each issue exposes `Go to` (connector+pin / wire / branch entry).
+- [x] Category can be disabled from the validation center; disabling hides every D-issue.
+- [x] Tests cover D1–D4 thresholds, permissive baselines, and `Go to` resolution.
 
 # Backlog
 - `item_611_electrical_dimensioning_validation_category`
@@ -74,6 +74,9 @@ Mirror `item_611` AC1–AC14.
 - `npm run -s lint && npm run -s typecheck`
 - `npx vitest run src/tests/app.validation.electrical-dimensioning.spec.ts`
 - `npm run ci:blocking`
+
+# Delivery snapshot
+- Status synchronized after delivery so workflow audit can close the linked backlog item cleanly.
 
 # Links
 - Request: `req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics`
