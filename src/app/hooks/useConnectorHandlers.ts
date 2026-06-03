@@ -4,6 +4,7 @@ import type { AppStore } from "../../store";
 import { appActions } from "../../store";
 import { analyzeConnectorDeleteImpact } from "../../store/deleteImpact";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
+import { parseConnectorTerminalOverridesDraft } from "../lib/connectorTerminalOverridesDraft";
 import { suggestAutoConnectorNodeId, suggestNextConnectorTechnicalId } from "../lib/technical-id-suggestions";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 import { hasConnectorOccupancyIndexAboveLimit, hasConnectorWireEndpointIndexAboveLimit } from "./connectorCavityGuards";
@@ -272,39 +273,13 @@ export function useConnectorHandlers({
     }
 
     const normalizedCavityCount = selectedCatalogItem.connectionCount;
-    const terminalOverrides = connectorTerminalOverridesText
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0)
-      .map((line) => {
-        const [cavityIndexText = "", terminalReference = "", sealReference = "", terminalName = "", sealName = ""] = line
-          .split(",")
-          .map((part) => part.trim());
-        const cavityIndex = Number(cavityIndexText);
-        return {
-          cavityIndex,
-          material: {
-            terminalReference: terminalReference || undefined,
-            terminalName: terminalName || undefined,
-            sealReference: sealReference || undefined,
-            sealName: sealName || undefined
-          }
-        };
-      });
+    const terminalOverrides = parseConnectorTerminalOverridesDraft(connectorTerminalOverridesText, normalizedCavityCount);
     if (trimmedName.length === 0 || trimmedTechnicalId.length === 0 || normalizedCavityCount < 1) {
       setConnectorFormError("All fields are required and way count must be >= 1.");
       return;
     }
-    if (
-      terminalOverrides.some(
-        (override) =>
-          !Number.isInteger(override.cavityIndex) ||
-          override.cavityIndex < 1 ||
-          override.cavityIndex > normalizedCavityCount ||
-          (override.material.terminalReference === undefined && override.material.sealReference === undefined)
-      )
-    ) {
-      setConnectorFormError("Terminal overrides must use one line per override: cavity,terminal,seal,terminal name,seal name.");
+    if (!terminalOverrides.ok) {
+      setConnectorFormError(terminalOverrides.message);
       return;
     }
     if (hasInvalidFusePairRatingDraft(connectorFusePairRatings)) {
@@ -362,13 +337,7 @@ export function useConnectorHandlers({
         isMainHarnessConnector: connectorIsMainHarnessConnector === true ? true : undefined,
         applyCatalogPlugs: connectorApplyCatalogPlugs ? undefined : false,
         applyCatalogSeals: connectorApplyCatalogSeals ? undefined : false,
-        terminalOverrides:
-          terminalOverrides.length === 0
-            ? undefined
-            : terminalOverrides.reduce<NonNullable<Connector["terminalOverrides"]>>((overrides, override) => {
-                overrides[override.cavityIndex] = override.material;
-                return overrides;
-              }, {}),
+        terminalOverrides: terminalOverrides.terminalOverrides,
         fusePairRatings,
         fusePairOverrides,
         pinElectricalRoles,

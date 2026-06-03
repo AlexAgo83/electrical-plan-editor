@@ -12,6 +12,7 @@ import type { AppControllerSelectionEntitiesModel } from "../../hooks/useAppCont
 import type { CatalogHandlersModel } from "../../hooks/useCatalogHandlers";
 import type { WireEndpointDescriptions } from "../../hooks/useWireEndpointDescriptions";
 import type { AppControllerModelingHandlersOrchestrator } from "../../hooks/controller/useAppControllerModelingHandlersOrchestrator";
+import { parseConnectorTerminalOverridesDraft } from "../../lib/connectorTerminalOverridesDraft";
 import {
   buildAnalysisScreenContentSlice,
   buildModelingScreenContentSlice
@@ -398,6 +399,28 @@ export function useAppControllerModelingAnalysisScreenDomains({
           pinElectricalRoles
         })
       );
+    },
+    [dispatchAction, store]
+  );
+  const handleSaveConnectorCatalogMaterialApplication: AnalysisSliceParams["onSaveConnectorCatalogMaterialApplication"] = useCallback(
+    (connectorId, input) => {
+      const connector = store.getState().connectors.byId[connectorId];
+      if (connector === undefined) {
+        return { ok: false, message: "Select a connector first." };
+      }
+      const terminalOverrides = parseConnectorTerminalOverridesDraft(input.terminalOverridesText, connector.cavityCount);
+      if (!terminalOverrides.ok) {
+        return terminalOverrides;
+      }
+      dispatchAction(
+        appActions.upsertConnector({
+          ...connector,
+          applyCatalogPlugs: input.applyCatalogPlugs ? undefined : false,
+          applyCatalogSeals: input.applyCatalogSeals ? undefined : false,
+          terminalOverrides: terminalOverrides.terminalOverrides
+        })
+      );
+      return { ok: true };
     },
     [dispatchAction, store]
   );
@@ -803,6 +826,13 @@ export function useAppControllerModelingAnalysisScreenDomains({
     getSortIndicator: listModel.getSortIndicator,
     connectorAnalysisView,
     setConnectorAnalysisView,
+    connectorApplyCatalogPlugs: formsState.connectorApplyCatalogPlugs,
+    setConnectorApplyCatalogPlugs: formsState.setConnectorApplyCatalogPlugs,
+    connectorApplyCatalogSeals: formsState.connectorApplyCatalogSeals,
+    setConnectorApplyCatalogSeals: formsState.setConnectorApplyCatalogSeals,
+    connectorTerminalOverridesText: formsState.connectorTerminalOverridesText,
+    setConnectorTerminalOverridesText: formsState.setConnectorTerminalOverridesText,
+    onSaveConnectorCatalogMaterialApplication: handleSaveConnectorCatalogMaterialApplication,
     onSaveConnectorPinElectricalRoles: handleSaveConnectorPinElectricalRoles,
     selectedSplice: selection.selectedSplice,
     selectedSpliceId: selection.selectedSpliceId,

@@ -35,7 +35,7 @@ export interface SplicePortStatus extends OccupancyStatus {
   portIndex: number;
 }
 
-export type ConnectorAnalysisView = "cavities" | "physical" | "synthesis";
+export type ConnectorAnalysisView = "cavities" | "physical" | "catalogMaterial" | "synthesis";
 export type SpliceAnalysisView = "ports" | "synthesis";
 
 export interface AnalysisWorkspaceContentProps {
@@ -75,6 +75,20 @@ export interface AnalysisWorkspaceContentProps {
   getSortIndicator: (sortState: SortState, field: SortState["field"]) => string;
   connectorAnalysisView: ConnectorAnalysisView;
   setConnectorAnalysisView: (value: ConnectorAnalysisView) => void;
+  connectorApplyCatalogPlugs: boolean;
+  setConnectorApplyCatalogPlugs: (value: boolean) => void;
+  connectorApplyCatalogSeals: boolean;
+  setConnectorApplyCatalogSeals: (value: boolean) => void;
+  connectorTerminalOverridesText: string;
+  setConnectorTerminalOverridesText: (value: string) => void;
+  onSaveConnectorCatalogMaterialApplication: (
+    connectorId: ConnectorId,
+    input: {
+      applyCatalogPlugs: boolean;
+      applyCatalogSeals: boolean;
+      terminalOverridesText: string;
+    }
+  ) => { ok: true } | { ok: false; message: string };
   onSaveConnectorPinElectricalRoles: (
     connectorId: ConnectorId,
     pinElectricalRoles: Record<number, PinElectricalRole> | undefined

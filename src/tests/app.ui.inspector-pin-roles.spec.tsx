@@ -174,6 +174,59 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     expect(within(secondWay).getByDisplayValue("2.5")).toBeInTheDocument();
   });
 
+  it("edits catalog material application from connector analysis", () => {
+    const catalogItemId = asCatalogItemId("CAT-ECU");
+    const connectorId = asConnectorId("C-ECU");
+    let state = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "ECU-4",
+        connectionCount: 4
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: connectorId,
+        name: "ECU connector",
+        technicalId: "ECU-C1",
+        cavityCount: 4,
+        catalogItemId,
+        manufacturerReference: "ECU-4"
+      })
+    );
+
+    const { store } = renderAppWithState(state);
+    const panel = openConnectorAnalysis("ECU connector");
+    const viewButtons = within(panel).getAllByRole("button", { pressed: false }).map((button) => button.textContent?.trim());
+    expect(viewButtons).toContain("Catalog material");
+
+    fireEvent.click(within(panel).getByRole("button", { name: "Catalog material" }));
+    expect(within(panel).getByRole("button", { name: "Catalog material" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(panel).getByText("Catalog material application").closest("fieldset")).toHaveClass(
+      "catalog-material-application-fieldset"
+    );
+
+    fireEvent.click(within(panel).getByLabelText("Apply catalog seals"));
+    fireEvent.change(within(panel).getByLabelText("Terminal and seal overrides"), {
+      target: { value: "1,TERM-A,SEAL-A,Terminal A,Seal A" }
+    });
+    fireEvent.click(within(panel).getByRole("button", { name: "Save material application" }));
+
+    const saved = store.getState().connectors.byId[connectorId];
+    expect(saved?.applyCatalogSeals).toBe(false);
+    expect(saved?.applyCatalogPlugs).toBeUndefined();
+    expect(saved?.terminalOverrides).toEqual({
+      1: {
+        terminalReference: "TERM-A",
+        sealReference: "SEAL-A",
+        terminalName: "Terminal A",
+        sealName: "Seal A"
+      }
+    });
+  });
+
   it("applies a bulk role to selected pins as a single save", () => {
     const catalogItemId = asCatalogItemId("CAT-ECU");
     const connectorId = asConnectorId("C-ECU");

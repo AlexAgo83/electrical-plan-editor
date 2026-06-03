@@ -54,6 +54,13 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     setConnectorSynthesisSort: _setConnectorSynthesisSort,
     connectorAnalysisView,
     setConnectorAnalysisView,
+    connectorApplyCatalogPlugs,
+    setConnectorApplyCatalogPlugs,
+    connectorApplyCatalogSeals,
+    setConnectorApplyCatalogSeals,
+    connectorTerminalOverridesText,
+    setConnectorTerminalOverridesText,
+    onSaveConnectorCatalogMaterialApplication,
     onSaveConnectorPinElectricalRoles,
     getSortIndicator: _getSortIndicator
   } = props;
@@ -68,6 +75,8 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   const [pinRoleDrafts, setPinRoleDrafts] = useState<ConnectorPinElectricalRoleDrafts>({});
   const [pinRoleSelection, setPinRoleSelection] = useState<number[]>([]);
   const [pinRoleSaveMessage, setPinRoleSaveMessage] = useState<string | null>(null);
+  const [catalogMaterialSaveMessage, setCatalogMaterialSaveMessage] = useState<string | null>(null);
+  const [catalogMaterialSaveIsError, setCatalogMaterialSaveIsError] = useState(false);
   const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   const selectedConnectorCatalogItem = selectedConnector?.catalogItemId === undefined ? undefined : catalogItemById.get(selectedConnector.catalogItemId);
   const pinRoleDraftsAreInvalid = hasInvalidPinElectricalRoleDraft(pinRoleDrafts);
@@ -221,6 +230,24 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     setPinRoleSaveMessage("Roles saved.");
   }
 
+  function handleSaveCatalogMaterialApplication(): void {
+    if (selectedConnector === null) {
+      return;
+    }
+    const result = onSaveConnectorCatalogMaterialApplication(selectedConnector.id, {
+      applyCatalogPlugs: connectorApplyCatalogPlugs,
+      applyCatalogSeals: connectorApplyCatalogSeals,
+      terminalOverridesText: connectorTerminalOverridesText
+    });
+    if (!result.ok) {
+      setCatalogMaterialSaveIsError(true);
+      setCatalogMaterialSaveMessage(result.message);
+      return;
+    }
+    setCatalogMaterialSaveIsError(false);
+    setCatalogMaterialSaveMessage("Catalog material application saved.");
+  }
+
   useEffect(() => {
     if (selectedConnector === null) {
       setPinRoleDrafts({});
@@ -231,6 +258,8 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     setPinRoleDrafts(formatPinElectricalRoleDrafts(selectedConnector.pinElectricalRoles, selectedConnector.cavityCount));
     setPinRoleSelection([]);
     setPinRoleSaveMessage(null);
+    setCatalogMaterialSaveMessage(null);
+    setCatalogMaterialSaveIsError(false);
   }, [selectedConnector]);
 
   return (
@@ -429,6 +458,14 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         </button>
         <button
           type="button"
+          className={connectorAnalysisView === "catalogMaterial" ? "filter-chip is-active" : "filter-chip"}
+          aria-pressed={connectorAnalysisView === "catalogMaterial"}
+          onClick={() => setConnectorAnalysisView("catalogMaterial")}
+        >
+          Catalog material
+        </button>
+        <button
+          type="button"
           className={connectorAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
           aria-pressed={connectorAnalysisView === "synthesis"}
           onClick={() => setConnectorAnalysisView("synthesis")}
@@ -440,7 +477,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         type="button"
         className="filter-chip table-export-button"
         onClick={() => {
-          if (connectorAnalysisView === "cavities" || connectorAnalysisView === "physical") {
+          if (connectorAnalysisView === "cavities" || connectorAnalysisView === "physical" || connectorAnalysisView === "catalogMaterial") {
             downloadCsvFile(
               `analysis-connector-ways-${selectedConnector?.technicalId ?? "selection"}`,
               ["Way", "Status", "Occupant reference", "Role", "Max current (A)", "Label", "Role source"],
@@ -475,6 +512,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           selectedConnector === null ||
           (connectorAnalysisView === "cavities"
             || connectorAnalysisView === "physical"
+            || connectorAnalysisView === "catalogMaterial"
             ? connectorCavityStatuses.length === 0
             : sortedConnectorSynthesisRowsByColumns.length === 0)
         }
@@ -576,6 +614,60 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         parseOccupantWireId={parseOccupantWireId}
         onGoToWire={onOpenWireFromAnalysisTable}
       />
+    </>
+  ) : connectorAnalysisView === "catalogMaterial" ? (
+    <>
+      <p className="meta-line">
+        <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
+      </p>
+      <fieldset className="inline-fieldset catalog-material-application-fieldset">
+        <legend>Catalog material application</legend>
+        <div className="stack-form">
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={connectorApplyCatalogSeals}
+              onChange={(event) => {
+                setConnectorApplyCatalogSeals(event.target.checked);
+                setCatalogMaterialSaveMessage(null);
+              }}
+            />
+            Apply catalog seals
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={connectorApplyCatalogPlugs}
+              onChange={(event) => {
+                setConnectorApplyCatalogPlugs(event.target.checked);
+                setCatalogMaterialSaveMessage(null);
+              }}
+            />
+            Apply catalog plugs
+          </label>
+          <label>
+            Terminal and seal overrides
+            <textarea
+              value={connectorTerminalOverridesText}
+              onChange={(event) => {
+                setConnectorTerminalOverridesText(event.target.value);
+                setCatalogMaterialSaveMessage(null);
+              }}
+              placeholder={"1,TERM-A,SEAL-A,Terminal name,Seal name\n2,TERM-B,SEAL-B"}
+              rows={5}
+            />
+          </label>
+        </div>
+      </fieldset>
+      <div className="row-actions compact">
+        <button type="button" className="button-with-icon" onClick={handleSaveCatalogMaterialApplication}>
+          <span className="action-button-icon is-save" aria-hidden="true" />
+          Save material application
+        </button>
+        {catalogMaterialSaveMessage === null ? null : (
+          <small className={catalogMaterialSaveIsError ? "inline-error" : "inline-help"}>{catalogMaterialSaveMessage}</small>
+        )}
+      </div>
     </>
   ) : sortedConnectorSynthesisRowsByColumns.length === 0 ? (
     <p className="empty-copy">No wire currently connected to this connector.</p>
