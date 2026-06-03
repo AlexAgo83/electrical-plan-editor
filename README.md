@@ -5,7 +5,7 @@ A local-first electrical network editor for modeling, validating, and documentin
 The app treats connectors, splices, nodes, segments, and wires as a graph, computes routes deterministically, and keeps canvas preferences and export outputs aligned with the current workspace state.
 
 [![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/electrical-plan-editor)](LICENSE)
-[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.14.3-4C8BF5)
+[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.14.4-4C8BF5)
 
 <img width="1173" height="810" alt="image" src="https://github.com/user-attachments/assets/b4d0b4a9-1fee-43a4-bfb1-ae72caf97302" />
 <img width="1159" height="280" alt="image" src="https://github.com/user-attachments/assets/7bfad15a-cc62-446a-abc6-b06c15ec1466" />
@@ -32,18 +32,19 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 
 - Production: [https://e-plan-editor.onrender.com](https://e-plan-editor.onrender.com)
 - Hosting: Render Static Site (Blueprint via `render.yaml`)
-- Current version: `1.14.3`
+- Current version: `1.14.4`
 - CI status: see the GitHub Actions badge above
 
 ## Product
 
 - Electrical modeling for connectors, splices, nodes, segments, and wires, with occupancy rules and wire-side connection / seal references.
 - Automatic route computation, forced-route locking, and live wire-length recomputation after segment edits.
-- Interactive 2D workspace with drag-and-drop nodes, zoom/pan controls, selectable segments, sub-network filtering, configurable callouts, wire-linked pin highlighting, and quick navigation between `Modeling`, `Analysis`, `Harness`, and `Settings`.
+- Interactive 2D workspace with drag-and-drop nodes, zoom/pan controls, selectable segments, sub-network filtering, configurable callouts, wire-linked pin highlighting, and quick navigation between `Modeling`, `Analysis`, `Statistics`, `Harness`, and `Settings`.
 - Connector and splice callouts with tabular wire details, optional wire-name columns, draggable positions, and catalog connector drawings when a physical layout was edited.
 - Catalog-backed connector physical layout editor with reusable way geometry, keying features, shell shape controls, and physical connector analysis views.
 - Harness assembly workflows for multi-network grouping, master connector references, inter-harness connector links, saved assembly graphs, current-network functional graphs, and contextual assembly help.
 - Analysis workflows with targeted `Go to` actions, including navigation from `Node analysis` to `Segment analysis`, from `Segment analysis` to `Wire analysis`, and from connector analysis into physical views.
+- Statistics workspace for active-network KPIs, manual multi-network comparison, wire-length metrics, section/color distributions, and utilization tables.
 - Network-scoped catalog management with catalog-first connector flows, optional splice linkage, seeded starter items, usage analysis, and pricing context settings.
 - Home workspace hub with Quick start actions, active-network context, changelog feed, and rich recent-change rows that can navigate back to changed objects when possible.
 - Themed toast notifications for important workspace actions, including undo/redo and connector/splice occupancy changes.
