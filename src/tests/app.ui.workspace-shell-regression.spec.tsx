@@ -38,6 +38,23 @@ describe("App integration UI - workspace shell regression", () => {
     expect(document.activeElement).toBe(opsButton);
   });
 
+  it("prevents mouse wheel from editing focused numeric inputs", () => {
+    renderAppWithState(createUiIntegrationState());
+
+    const numericInput = document.createElement("input");
+    numericInput.type = "number";
+    numericInput.value = "2";
+    document.body.appendChild(numericInput);
+
+    numericInput.focus();
+    expect(document.activeElement).toBe(numericInput);
+
+    fireEvent.wheel(numericInput, { deltaY: 100 });
+
+    expect(document.activeElement).not.toBe(numericInput);
+    expect(numericInput).toHaveValue(2);
+  });
+
   it("closes drawer and operations panel on focus loss", () => {
     renderAppWithState(createUiIntegrationState());
 
