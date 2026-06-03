@@ -10,7 +10,7 @@ import { useAppControllerAuxScreenContentDomains } from "./useAppControllerAuxSc
 type AuxDomainsParams = Parameters<typeof useAppControllerAuxScreenContentDomains>[0];
 type AuxDomainsResult = ReturnType<typeof useAppControllerAuxScreenContentDomains>;
 
-type ScreenChangeTarget = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenChangeTarget = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "statistics" | "validation" | "settings";
 type NetworkScopeSortSetter = Dispatch<SetStateAction<AuxDomainsParams["networkScope"]["networkSort"]>>;
 
 interface UseAppControllerAuxDomainAssemblyParams {

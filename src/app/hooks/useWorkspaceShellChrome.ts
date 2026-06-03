@@ -10,8 +10,8 @@ export interface BeforeInstallPromptEventLike extends Event {
 }
 
 interface UseWorkspaceShellChromeArgs {
-  activeScreen: "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
-  setActiveScreen: (screen: "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings") => void;
+  activeScreen: "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "statistics" | "validation" | "settings";
+  setActiveScreen: (screen: "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "statistics" | "validation" | "settings") => void;
   navigationDrawerRef: RefObject<HTMLDivElement | null>;
   navigationToggleButtonRef: RefObject<HTMLButtonElement | null>;
   operationsPanelRef: RefObject<HTMLDivElement | null>;
@@ -56,7 +56,7 @@ export function useWorkspaceShellChrome({
     typeof window === "undefined" ? 1440 : window.innerWidth
   );
   const [isDialogFocusActive, setIsDialogFocusActive] = useState(false);
-  const previousNonSettingsScreenRef = useRef<"home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation">("home");
+  const previousNonSettingsScreenRef = useRef<"home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "statistics" | "validation">("home");
 
   useEffect(() => {
     if (activeScreen !== "settings") {

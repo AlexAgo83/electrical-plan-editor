@@ -64,6 +64,9 @@ const appUiModulesLazy = {
     loadLazyUiModule("NetworkScopeScreen", () => import("./screens/NetworkScopeScreen"), (module) => module.NetworkScopeScreen)
   ),
   SettingsScreen: lazy(() => loadLazyUiModule("SettingsScreen", () => import("./screens/SettingsScreen"), (module) => module.SettingsScreen)),
+  StatisticsScreen: lazy(() =>
+    loadLazyUiModule("StatisticsScreen", () => import("./screens/StatisticsScreen"), (module) => module.StatisticsScreen)
+  ),
   ValidationScreen: lazy(() =>
     loadLazyUiModule("ValidationScreen", () => import("./screens/ValidationScreen"), (module) => module.ValidationScreen)
   ),
@@ -87,6 +90,9 @@ const appUiModulesLazy = {
   ),
   SettingsWorkspaceContent: lazy(() =>
     loadLazyUiModule("SettingsWorkspaceContent", () => import("./workspace/SettingsWorkspaceContent"), (module) => module.SettingsWorkspaceContent)
+  ),
+  StatisticsWorkspaceContent: lazy(() =>
+    loadLazyUiModule("StatisticsWorkspaceContent", () => import("./workspace/StatisticsWorkspaceContent"), (module) => module.StatisticsWorkspaceContent)
   ),
   ValidationWorkspaceContent: lazy(() =>
     loadLazyUiModule("ValidationWorkspaceContent", () => import("./workspace/ValidationWorkspaceContent"), (module) => module.ValidationWorkspaceContent)
@@ -140,6 +146,9 @@ export const appUiModules = {
   get SettingsScreen() {
     return getActiveAppUiModulesRegistry().SettingsScreen;
   },
+  get StatisticsScreen() {
+    return getActiveAppUiModulesRegistry().StatisticsScreen;
+  },
   get ValidationScreen() {
     return getActiveAppUiModulesRegistry().ValidationScreen;
   },
@@ -163,6 +172,9 @@ export const appUiModules = {
   },
   get SettingsWorkspaceContent() {
     return getActiveAppUiModulesRegistry().SettingsWorkspaceContent;
+  },
+  get StatisticsWorkspaceContent() {
+    return getActiveAppUiModulesRegistry().StatisticsWorkspaceContent;
   },
   get ValidationWorkspaceContent() {
     return getActiveAppUiModulesRegistry().ValidationWorkspaceContent;

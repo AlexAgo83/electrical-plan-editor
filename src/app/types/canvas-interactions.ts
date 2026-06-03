@@ -17,7 +17,7 @@ export interface UseCanvasInteractionHandlersParams {
   isModelingScreen: boolean;
   isModelingAnalysisFocused: boolean;
   activeSubScreen: SubScreenId;
-  setActiveScreen: (screen: "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings") => void;
+  setActiveScreen: (screen: "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "statistics" | "validation" | "settings") => void;
   setActiveSubScreen: (screen: SubScreenId) => void;
   setNodeFormMode: (mode: "create" | "edit") => void;
   setEditingNodeId: (id: NodeId | null) => void;

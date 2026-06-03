@@ -9,7 +9,7 @@ import type { ImportExportStatus, SubScreenId } from "../types/app-controller";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 import type { FileFeedbackDialogModel } from "./networkImportExportTypes";
 
-type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "statistics" | "validation" | "settings";
 
 interface UseCatalogCsvImportExportOptions {
   store: AppStore;

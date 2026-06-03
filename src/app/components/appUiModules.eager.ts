@@ -4,6 +4,7 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { ModelingScreen } from "./screens/ModelingScreen";
 import { NetworkScopeScreen } from "./screens/NetworkScopeScreen";
 import { SettingsScreen } from "./screens/SettingsScreen";
+import { StatisticsScreen } from "./screens/StatisticsScreen";
 import { ValidationScreen } from "./screens/ValidationScreen";
 import { AnalysisWorkspaceContent } from "./workspace/AnalysisWorkspaceContent";
 import { HomeWorkspaceContent } from "./workspace/HomeWorkspaceContent";
@@ -12,6 +13,7 @@ import { ModelingPrimaryTables } from "./workspace/ModelingPrimaryTables";
 import { ModelingSecondaryTables } from "./workspace/ModelingSecondaryTables";
 import { NetworkScopeWorkspaceContent } from "./workspace/NetworkScopeWorkspaceContent";
 import { SettingsWorkspaceContent } from "./workspace/SettingsWorkspaceContent";
+import { StatisticsWorkspaceContent } from "./workspace/StatisticsWorkspaceContent";
 import { ValidationWorkspaceContent } from "./workspace/ValidationWorkspaceContent";
 
 export const appUiModulesEager = {
@@ -21,6 +23,7 @@ export const appUiModulesEager = {
   ModelingScreen,
   NetworkScopeScreen,
   SettingsScreen,
+  StatisticsScreen,
   ValidationScreen,
   AnalysisWorkspaceContent,
   HomeWorkspaceContent,
@@ -29,5 +32,6 @@ export const appUiModulesEager = {
   ModelingSecondaryTables,
   NetworkScopeWorkspaceContent,
   SettingsWorkspaceContent,
+  StatisticsWorkspaceContent,
   ValidationWorkspaceContent
 } as const;

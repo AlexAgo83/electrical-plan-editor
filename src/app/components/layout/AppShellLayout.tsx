@@ -75,6 +75,7 @@ interface AppShellLayoutProps {
   activeSubScreen: WorkspaceSidebarPanelProps["activeSubScreen"];
   isModelingScreen: WorkspaceSidebarPanelProps["isModelingScreen"];
   isAnalysisScreen: WorkspaceSidebarPanelProps["isAnalysisScreen"];
+  isStatisticsScreen: WorkspaceSidebarPanelProps["isStatisticsScreen"];
   isValidationScreen: WorkspaceSidebarPanelProps["isValidationScreen"];
   entityCountBySubScreen: WorkspaceSidebarPanelProps["entityCountBySubScreen"];
   isAiAgentOpen: boolean;
@@ -99,6 +100,7 @@ interface AppShellLayoutProps {
   HomeScreenComponent: ScreenContainerComponent;
   ModelingScreenComponent: ScreenContainerComponent;
   AnalysisScreenComponent: ScreenContainerComponent;
+  StatisticsScreenComponent: ScreenContainerComponent;
   ValidationScreenComponent: ScreenContainerComponent;
   SettingsScreenComponent: ScreenContainerComponent;
   isHomeScreen: boolean;
@@ -113,6 +115,7 @@ interface AppShellLayoutProps {
   modelingFormsColumnContent: ReactNode;
   networkSummaryPanel: ReactNode;
   analysisWorkspaceContent: ReactNode;
+  statisticsWorkspaceContent: ReactNode;
   validationWorkspaceContent: ReactNode;
   settingsWorkspaceContent: ReactNode;
   isSettingsScreen: boolean;
@@ -171,6 +174,7 @@ export function AppShellLayout({
   activeSubScreen,
   isModelingScreen,
   isAnalysisScreen,
+  isStatisticsScreen,
   isValidationScreen,
   entityCountBySubScreen,
   isAiAgentOpen,
@@ -195,6 +199,7 @@ export function AppShellLayout({
   HomeScreenComponent,
   ModelingScreenComponent,
   AnalysisScreenComponent,
+  StatisticsScreenComponent,
   ValidationScreenComponent,
   SettingsScreenComponent,
   isHomeScreen,
@@ -209,6 +214,7 @@ export function AppShellLayout({
   modelingFormsColumnContent,
   networkSummaryPanel,
   analysisWorkspaceContent,
+  statisticsWorkspaceContent,
   validationWorkspaceContent,
   settingsWorkspaceContent,
   isSettingsScreen,
@@ -492,6 +498,14 @@ export function AppShellLayout({
         workspaceContent={settingsWorkspaceContent}
       />
     );
+  } else if (isStatisticsScreen) {
+    activeWorkspaceContent = (
+      <ValidationWorkspaceContainer
+        ScreenComponent={StatisticsScreenComponent}
+        isActive={isStatisticsScreen}
+        workspaceContent={statisticsWorkspaceContent}
+      />
+    );
   } else if (!hasActiveNetwork) {
     activeWorkspaceContent = (
       <section className="panel">
@@ -593,6 +607,7 @@ export function AppShellLayout({
             activeSubScreen={activeSubScreen}
             isModelingScreen={isModelingScreen}
             isAnalysisScreen={isAnalysisScreen}
+            isStatisticsScreen={isStatisticsScreen}
             isValidationScreen={isValidationScreen}
             validationIssuesCount={validationIssuesCount}
             validationErrorCount={validationErrorCount}

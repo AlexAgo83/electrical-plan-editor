@@ -75,7 +75,7 @@ export type { AppProps } from "./types/app-controller";
 const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor";
 export function AppController({ store = appStore }: AppProps): ReactElement {
   const currentYear = new Date().getFullYear(), state = useAppSnapshot(store);
-  const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, ValidationScreen, AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables, NetworkScopeWorkspaceContent, SettingsWorkspaceContent, ValidationWorkspaceContent } = appUiModules;
+  const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, StatisticsScreen, ValidationScreen, AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables, NetworkScopeWorkspaceContent, SettingsWorkspaceContent, StatisticsWorkspaceContent, ValidationWorkspaceContent } = appUiModules;
   const {
     networks,
     activeNetworkId,
@@ -184,6 +184,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     isHarnessAssemblyScreen,
     isModelingScreen,
     isAnalysisScreen,
+    isStatisticsScreen,
     isValidationScreen,
     isSettingsScreen,
     activeScreenRef
@@ -861,6 +862,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     harnessAssemblyWorkspaceContent,
     headerHarnessAssemblyFunctionalScopeNavigation,
     validationWorkspaceContent,
+    statisticsWorkspaceContent,
     settingsWorkspaceContent
   } = useAppControllerWorkspaceContentAssembly({
     components: {
@@ -871,6 +873,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       ModelingFormsColumnComponent: ModelingFormsColumn,
       AnalysisWorkspaceContentComponent: AnalysisWorkspaceContent,
       NetworkScopeWorkspaceContentComponent: NetworkScopeWorkspaceContent,
+      StatisticsWorkspaceContentComponent: StatisticsWorkspaceContent,
       ValidationWorkspaceContentComponent: ValidationWorkspaceContent,
       SettingsWorkspaceContentComponent: SettingsWorkspaceContent
     },
@@ -884,6 +887,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isAnalysisScreen,
       isModelingAnalysisFocused,
       isNetworkScopeScreen,
+      isStatisticsScreen,
       isValidationScreen,
       isSettingsScreen,
       isCatalogSubScreen,
@@ -907,7 +911,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isAiAgentModelingOpen,
       isAiAgentReady: aiSettings.readiness.isReady,
       aiAgentDisabledReason,
-      aiProviderReadiness: aiSettings.readiness
+      aiProviderReadiness: aiSettings.readiness,
+      appState: state
     },
     entities: {
       entityCountBySubScreen,
@@ -1030,6 +1035,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       activeSubScreen,
       isModelingScreen,
       isAnalysisScreen,
+      isStatisticsScreen,
       isValidationScreen,
       entityCountBySubScreen,
       isAiAgentOpen: isAiAgentModelingOpen,
@@ -1053,7 +1059,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       handleOpenValidationScreen: selectionHandlersDomain.handleOpenValidationScreen,
       moveValidationIssueCursor: selectionHandlersDomain.moveValidationIssueCursor
     },
-    screenComponents: { HomeScreenComponent: HomeScreen, NetworkScopeScreenComponent: NetworkScopeScreen, ModelingScreenComponent: ModelingScreen, AnalysisScreenComponent: AnalysisScreen, ValidationScreenComponent: ValidationScreen, SettingsScreenComponent: SettingsScreen },
+    screenComponents: { HomeScreenComponent: HomeScreen, NetworkScopeScreenComponent: NetworkScopeScreen, ModelingScreenComponent: ModelingScreen, AnalysisScreenComponent: AnalysisScreen, StatisticsScreenComponent: StatisticsScreen, ValidationScreenComponent: ValidationScreen, SettingsScreenComponent: SettingsScreen },
     workspace: {
       isHomeScreen,
       isNetworkScopeScreen,
@@ -1067,6 +1073,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       modelingFormsColumnContent: modelingFormsColumnContentForLayout,
       networkSummaryPanel,
       analysisWorkspaceContent: analysisWorkspaceContentForLayout,
+      statisticsWorkspaceContent,
       validationWorkspaceContent,
       settingsWorkspaceContent,
       isSettingsScreen

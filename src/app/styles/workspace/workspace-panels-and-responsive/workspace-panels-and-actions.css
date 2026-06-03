@@ -219,6 +219,58 @@
   padding: 0.35rem 0.6rem;
 }
 
+.statistics-manual-selection {
+  display: grid;
+  gap: 0.48rem;
+  margin-top: 0.7rem;
+}
+
+.statistics-manual-selection h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: inherit;
+}
+
+.statistics-network-list {
+  display: grid;
+  gap: 0.38rem;
+}
+
+.statistics-network-option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.52rem;
+  min-height: 2.5rem;
+  border: 1px solid #cbdae6;
+  border-radius: 0.6rem;
+  background: #f8fbfe;
+  color: #17374e;
+  padding: 0.45rem 0.62rem;
+}
+
+.statistics-network-option:hover {
+  border-color: color-mix(in srgb, var(--theme-primary, #17374e) 42%, #cbdae6);
+  background: color-mix(in srgb, var(--theme-primary, #17374e) 7%, #f8fbfe);
+}
+
+.statistics-network-option.is-selected {
+  border-color: color-mix(in srgb, var(--theme-primary, #17374e) 74%, #cbdae6);
+  background: color-mix(in srgb, var(--theme-primary, #17374e) 11%, #f8fbfe);
+}
+
+.statistics-network-option input {
+  margin: 0;
+  accent-color: var(--theme-primary, #17374e);
+}
+
+.statistics-network-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+  line-height: 1.18;
+}
+
 .row-actions.network-scope-list-actions {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

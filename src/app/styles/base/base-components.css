@@ -189,6 +189,7 @@
 .app-shell.theme-dark .inspector-context-toggle,
 .app-shell.theme-dark .header-nav-toggle,
 .app-shell.theme-dark .network-scope-create-button,
+.app-shell.theme-dark .statistics-network-option,
 .app-shell.theme-dark .header-install-toggle,
 .app-shell.theme-dark .header-update-toggle,
 .app-shell.theme-dark .header-settings-toggle,
@@ -209,6 +210,21 @@
   background: #7fc5ff;
   color: #092038;
   border-color: #7fc5ff;
+}
+
+.app-shell.theme-dark .statistics-network-option:hover {
+  border-color: #6f95b7;
+  background: #2d4c68;
+}
+
+.app-shell.theme-dark .statistics-network-option.is-selected {
+  border-color: #7fc5ff;
+  background: #244f70;
+  color: #f2f8ff;
+}
+
+.app-shell.theme-dark .statistics-network-option input {
+  accent-color: #7fc5ff;
 }
 
 .app-shell.theme-dark .header-settings-toggle.is-active {

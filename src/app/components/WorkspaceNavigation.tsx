@@ -7,6 +7,7 @@ interface WorkspaceNavigationProps {
   activeSubScreen: SubScreenId;
   isModelingScreen: boolean;
   isAnalysisScreen: boolean;
+  isStatisticsScreen: boolean;
   isValidationScreen: boolean;
   validationIssuesCount: number;
   validationErrorCount: number;
@@ -24,6 +25,7 @@ export function WorkspaceNavigation({
   activeSubScreen,
   isModelingScreen,
   isAnalysisScreen,
+  isStatisticsScreen,
   isValidationScreen,
   validationIssuesCount,
   validationErrorCount,
@@ -46,6 +48,7 @@ export function WorkspaceNavigation({
     harnessAssembly: "is-harness-assembly",
     modeling: "is-edit",
     analysis: "is-analysis",
+    statistics: "is-validation",
     validation: "is-validation"
   };
   const subScreenIconClassById: Record<SubScreenId, string> = {
@@ -82,6 +85,7 @@ export function WorkspaceNavigation({
           ["networkScope", "Network Scope"],
           ["harnessAssembly", "Harness Assembly"],
           ["modeling", "Modeling"],
+          ["statistics", "Statistics"],
           ["validation", "Validation"]
         ] as const).map(([screenId, label]) => (
           <button
@@ -167,6 +171,8 @@ export function WorkspaceNavigation({
           ? "Home workspace: start, resume, shortcuts, and quick preferences."
           : isModelingScreen || isAnalysisScreen
           ? "Modeling workspace: entity editor, operational lists, and analysis panels."
+          : isStatisticsScreen
+          ? "Statistics workspace: read-only network metrics and manual multi-network comparison."
           : isValidationScreen
           ? "Validation center: grouped model integrity issues with one-click navigation."
           : "Settings workspace: workspace preferences and project-level options."}

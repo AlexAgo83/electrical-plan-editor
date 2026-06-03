@@ -4,7 +4,7 @@ import type { InteractionMode, UndoHistoryEntry } from "../../types/app-controll
 import type { CatalogItemId, ConnectorId, HarnessAssemblyId, NetworkId, NodeId, SegmentId, SpliceId, WireId } from "../../../core/entities";
 import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
 
-type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "statistics" | "validation" | "settings";
 type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
 
 type HomeWorkspaceContentProps = Parameters<

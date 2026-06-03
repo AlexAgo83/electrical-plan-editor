@@ -19,6 +19,7 @@ import type { AppControllerWorkspaceNetworkDomainAssemblyModel } from "./useAppC
 import type { AppControllerCatalogAnalysisActionsModel } from "./useAppControllerCatalogAnalysisActions";
 import type { AppControllerSelectionHandlersDomainAssemblyModel } from "./useAppControllerSelectionHandlersDomainAssembly";
 import type { AppControllerCanvasInteractionDomainAssemblyModel } from "./useAppControllerCanvasInteractionDomainAssembly";
+import type { ComponentType } from "react";
 import { useAppControllerHomeWorkspaceContent } from "./useAppControllerHomeWorkspaceContent";
 import { useAppControllerNetworkSummaryPanelDomain } from "./useAppControllerNetworkSummaryPanelDomain";
 import { useAppControllerModelingAnalysisDomainAssembly } from "./useAppControllerModelingAnalysisDomainAssembly";
@@ -31,6 +32,9 @@ type NetworkSummaryParams = Parameters<typeof useAppControllerNetworkSummaryPane
 type ModelingAnalysisParams = Parameters<typeof useAppControllerModelingAnalysisDomainAssembly>[0];
 type CatalogDomainsParams = Omit<Parameters<typeof useAppControllerCatalogScreenDomains>[0], "modelingLeftColumnContent" | "modelingFormsColumnContent" | "analysisWorkspaceContent">;
 type AuxDomainsParams = Parameters<typeof useAppControllerAuxDomainAssembly>[0];
+type StatisticsWorkspaceContentProps = Parameters<
+  typeof import("../../components/workspace/StatisticsWorkspaceContent").StatisticsWorkspaceContent
+>[0];
 
 export interface AppControllerWorkspaceContentAssemblyParams {
   components: {
@@ -41,6 +45,7 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     ModelingFormsColumnComponent: ModelingAnalysisParams["components"]["ModelingFormsColumnComponent"];
     AnalysisWorkspaceContentComponent: ModelingAnalysisParams["components"]["AnalysisWorkspaceContentComponent"];
     NetworkScopeWorkspaceContentComponent: AuxDomainsParams["components"]["NetworkScopeWorkspaceContentComponent"];
+    StatisticsWorkspaceContentComponent: ComponentType<StatisticsWorkspaceContentProps>;
     ValidationWorkspaceContentComponent: AuxDomainsParams["components"]["ValidationWorkspaceContentComponent"];
     SettingsWorkspaceContentComponent: AuxDomainsParams["components"]["SettingsWorkspaceContentComponent"];
   };
@@ -54,6 +59,7 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     isAnalysisScreen: boolean;
     isModelingAnalysisFocused: boolean;
     isNetworkScopeScreen: boolean;
+    isStatisticsScreen: boolean;
     isValidationScreen: boolean;
     isSettingsScreen: boolean;
     isCatalogSubScreen: boolean;
@@ -78,6 +84,7 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     isAiAgentReady: boolean;
     aiAgentDisabledReason: string;
     aiProviderReadiness: AiProviderReadiness;
+    appState: StatisticsWorkspaceContentProps["appState"];
   };
   entities: {
     entityCountBySubScreen: NetworkSummaryParams["entityCountBySubScreen"];
@@ -493,6 +500,9 @@ export function useAppControllerWorkspaceContentAssembly({
     networkScopeWorkspaceContent,
     harnessAssemblyWorkspaceContent: networkFunctionalSchematicPanel,
     headerHarnessAssemblyFunctionalScopeNavigation,
+    statisticsWorkspaceContent: state.isStatisticsScreen ? (
+      <components.StatisticsWorkspaceContentComponent appState={state.appState} />
+    ) : null,
     validationWorkspaceContent,
     settingsWorkspaceContent
   };

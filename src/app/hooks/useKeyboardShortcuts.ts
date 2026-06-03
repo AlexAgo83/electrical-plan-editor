@@ -1,6 +1,6 @@
 import { useEffect, type MutableRefObject } from "react";
 
-type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "statistics" | "validation" | "settings";
 type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
 
 function isEditableElement(target: EventTarget | null): boolean {

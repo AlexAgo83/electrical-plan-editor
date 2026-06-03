@@ -7,6 +7,7 @@ interface WorkspaceSidebarPanelProps {
   activeSubScreen: SubScreenId;
   isModelingScreen: boolean;
   isAnalysisScreen: boolean;
+  isStatisticsScreen: boolean;
   isValidationScreen: boolean;
   validationIssuesCount: number;
   validationErrorCount: number;
@@ -24,6 +25,7 @@ export function WorkspaceSidebarPanel({
   activeSubScreen,
   isModelingScreen,
   isAnalysisScreen,
+  isStatisticsScreen,
   isValidationScreen,
   validationIssuesCount,
   validationErrorCount,
@@ -42,6 +44,7 @@ export function WorkspaceSidebarPanel({
         activeSubScreen={activeSubScreen}
         isModelingScreen={isModelingScreen}
         isAnalysisScreen={isAnalysisScreen}
+        isStatisticsScreen={isStatisticsScreen}
         isValidationScreen={isValidationScreen}
         validationIssuesCount={validationIssuesCount}
         validationErrorCount={validationErrorCount}

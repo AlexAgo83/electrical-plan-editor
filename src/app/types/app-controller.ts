@@ -39,7 +39,15 @@ export interface SpliceSynthesisRow {
 }
 
 export type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
-export type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
+export type ScreenId =
+  | "home"
+  | "networkScope"
+  | "harnessAssembly"
+  | "modeling"
+  | "analysis"
+  | "statistics"
+  | "validation"
+  | "settings";
 // Product-supported canvas interaction modes (legacy addSegment/connect/route flows removed from UI).
 export type InteractionMode = "select" | "addNode";
 export type TableDensity = "comfortable" | "compact";

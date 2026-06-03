@@ -9,7 +9,7 @@ import {
 } from "../../lib/onboarding";
 import type { SubScreenId } from "../../types/app-controller";
 
-type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "validation" | "settings";
+type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "analysis" | "statistics" | "validation" | "settings";
 type OnboardingStepTarget = OnboardingStepDefinition["target"];
 
 interface OnboardingTargetAction {

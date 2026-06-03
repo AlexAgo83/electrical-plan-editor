@@ -11,6 +11,7 @@ interface UseWorkspaceNavigationResult {
   isHomeScreen: boolean;
   isModelingScreen: boolean;
   isAnalysisScreen: boolean;
+  isStatisticsScreen: boolean;
   isValidationScreen: boolean;
   isSettingsScreen: boolean;
   activeScreenRef: MutableRefObject<ScreenId>;
@@ -26,6 +27,7 @@ export function useWorkspaceNavigation(): UseWorkspaceNavigationResult {
   const isHarnessAssemblyScreen = activeScreen === "harnessAssembly";
   const isModelingScreen = activeScreen === "modeling";
   const isAnalysisScreen = activeScreen === "analysis";
+  const isStatisticsScreen = activeScreen === "statistics";
   const isValidationScreen = activeScreen === "validation";
   const isSettingsScreen = activeScreen === "settings";
 
@@ -43,6 +45,7 @@ export function useWorkspaceNavigation(): UseWorkspaceNavigationResult {
     isHarnessAssemblyScreen,
     isModelingScreen,
     isAnalysisScreen,
+    isStatisticsScreen,
     isValidationScreen,
     isSettingsScreen,
     activeScreenRef

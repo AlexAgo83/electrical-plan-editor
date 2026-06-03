@@ -53,6 +53,7 @@ interface BuildAppControllerShellLayoutPropsParams {
     | "activeSubScreen"
     | "isModelingScreen"
     | "isAnalysisScreen"
+    | "isStatisticsScreen"
     | "isValidationScreen"
     | "entityCountBySubScreen"
     | "isAiAgentOpen"
@@ -83,6 +84,7 @@ interface BuildAppControllerShellLayoutPropsParams {
     | "HomeScreenComponent"
     | "ModelingScreenComponent"
     | "AnalysisScreenComponent"
+    | "StatisticsScreenComponent"
     | "ValidationScreenComponent"
     | "SettingsScreenComponent"
   >;
@@ -100,6 +102,7 @@ interface BuildAppControllerShellLayoutPropsParams {
     | "modelingFormsColumnContent"
     | "networkSummaryPanel"
     | "analysisWorkspaceContent"
+    | "statisticsWorkspaceContent"
     | "validationWorkspaceContent"
     | "settingsWorkspaceContent"
     | "isSettingsScreen"
