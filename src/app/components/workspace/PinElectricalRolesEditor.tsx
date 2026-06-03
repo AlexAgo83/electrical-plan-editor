@@ -147,8 +147,8 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
         aria-label="Pin electrical roles"
       >
         <div className="pin-electrical-roles-row pin-electrical-roles-row--header" role="row">
-          <span role="columnheader" className="sr-only">
-            Select
+          <span role="columnheader">
+            <span className="sr-only">Select</span>
           </span>
           <span role="columnheader">Pin</span>
           <span role="columnheader">Role</span>
