@@ -210,6 +210,37 @@ describe("home workspace screen", () => {
     expect(within(resumePanel).queryByLabelText("Workspace summary")).not.toBeInTheDocument();
   });
 
+  it("keeps Home workspace activity readable in dark theme", async () => {
+    renderAppWithState(createUiIntegrationState());
+    const closeOnboardingButton = screen.queryByRole("button", { name: "Close onboarding" });
+    if (closeOnboardingButton !== null) {
+      fireEvent.click(closeOnboardingButton);
+    }
+
+    const appShell = document.querySelector("main.app-shell");
+    expect(appShell).not.toBeNull();
+    switchScreenDrawerAware("settings");
+    const settingsPanel = within(document.body).getByRole("heading", { name: "Appearance preferences" }).closest(".panel");
+    expect(settingsPanel).not.toBeNull();
+    fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "dark" } });
+    switchScreenDrawerAware("networkScope");
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    fireEvent.click(within(networkScopePanel).getByText("Main network (Sample)").closest("tr") as HTMLElement);
+    const editFormPanel = getPanelByHeading("Edit network");
+    fireEvent.change(within(editFormPanel).getByLabelText("Description (optional)"), { target: { value: "Dark theme recent activity" } });
+    fireEvent.click(within(editFormPanel).getByRole("button", { name: "Save network" }));
+    switchScreenDrawerAware("home");
+
+    expect(appShell).toHaveClass("theme-dark");
+    const workspacePanel = getPanelByHeading("Workspace");
+    await waitFor(() => {
+      expect(within(workspacePanel).getByLabelText("Recent changes for active network")).toBeInTheDocument();
+    });
+    const recentChangesShell = within(workspacePanel).getByLabelText("Recent changes for active network");
+    expect(recentChangesShell).toHaveClass("home-network-recent-changes");
+    expect(within(recentChangesShell).getByLabelText("Recent changes list")).toBeInTheDocument();
+  });
+
   it("routes home resume CTA to modeling", () => {
     renderAppWithState(createUiIntegrationState());
 
