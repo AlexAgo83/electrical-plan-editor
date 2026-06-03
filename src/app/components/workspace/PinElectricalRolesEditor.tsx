@@ -104,7 +104,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
 
   const editorBody = (
     <>
-      <div className="pin-electrical-roles-bulk">
+      <div className="pin-electrical-roles-bulk row-form row-actions compact">
         <button type="button" className="link-button" onClick={selectAll}>
           Select all
         </button>
@@ -176,7 +176,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
           const isSelected = selection.includes(cavityIndex);
           return (
             <div
-              className={`pin-electrical-roles-row${draftError === null ? "" : " has-error"}`}
+              className={`pin-electrical-roles-row row-form${draftError === null ? "" : " has-error"}`}
               role="row"
               key={cavityIndex}
               data-pin-role-invalid={draftError === null ? undefined : "true"}
@@ -264,7 +264,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
           );
         })}
       </div>
-      {footerActions === undefined ? null : <div className="pin-electrical-roles-footer">{footerActions}</div>}
+      {footerActions === undefined ? null : <div className="pin-electrical-roles-footer row-actions compact">{footerActions}</div>}
     </>
   );
 

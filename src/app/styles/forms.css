@@ -506,9 +506,6 @@
 .pin-electrical-roles-row input,
 .pin-electrical-roles-row select {
   min-width: 0;
-  border-color: color-mix(in srgb, var(--theme-border, currentColor) 78%, transparent);
-  background: color-mix(in srgb, var(--theme-panel, transparent) 82%, currentColor 4%);
-  color: inherit;
 }
 
 .pin-electrical-roles-row input[type="checkbox"] {
