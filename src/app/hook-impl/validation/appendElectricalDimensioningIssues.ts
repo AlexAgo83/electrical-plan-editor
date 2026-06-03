@@ -200,7 +200,7 @@ export function appendElectricalDimensioningIssues(
         message: `Supply pins on '${connector?.name ?? connectorId}' declared at ${balance.totalConsumerA.toFixed(1)} A are under-rated vs. declared output sum of ${balance.totalSourceA.toFixed(1)} A.`,
         subScreen: "connector",
         selectionKind: "connector",
-        selectionId: connectorId as string
+        selectionId: connectorId
       });
     }
   }
