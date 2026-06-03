@@ -1,7 +1,11 @@
 ## task_120_pin_role_inspector_and_cross_connector_mass_edit_view - Pin role inspector + mass-edit view
 
 > From version: 1.13.1
+> Schema version: 1.0
 > Status: Ready
+> Understanding: 75%
+> Confidence: 70%
+> Progress: 50%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 

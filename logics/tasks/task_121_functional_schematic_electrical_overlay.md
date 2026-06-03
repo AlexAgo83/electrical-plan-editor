@@ -1,7 +1,11 @@
 ## task_121_functional_schematic_electrical_overlay - Functional schematic electrical overlay
 
 > From version: 1.13.1
+> Schema version: 1.0
 > Status: Ready
+> Understanding: 75%
+> Confidence: 75%
+> Progress: 0%
 > Complexity: Small
 > Theme: Electrical analysis / Diagnostics
 

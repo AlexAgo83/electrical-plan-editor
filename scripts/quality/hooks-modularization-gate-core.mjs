@@ -7,7 +7,9 @@ export const ALLOWED_HOOKS_OVERSIZE = {
   "src/app/hooks/useNetworkImportExport.ts":
     "Orchestrates the full import/export lifecycle (JSON, CSV, SVG, BOM, wire-export preview) across multiple adapters and async rendering steps. Splitting would scatter tightly coupled async state across hooks with no clean seam.",
   "src/app/hooks/controller/useAppControllerWorkspaceContentAssembly.tsx":
-    "Top-level workspace content assembly hook that wires together all screen-domain sub-assemblies (home, network-summary, catalog, AI agent, modeling analysis, aux). The coupling between sub-assemblies makes extraction non-trivial without introducing prop-drilling or a context layer."
+    "Top-level workspace content assembly hook that wires together all screen-domain sub-assemblies (home, network-summary, catalog, AI agent, modeling analysis, aux). The coupling between sub-assemblies makes extraction non-trivial without introducing prop-drilling or a context layer.",
+  "src/app/hooks/useConnectorHandlers.ts":
+    "Single source of truth for the connector form lifecycle (reset/clear/startEdit/submit/delete + cavity reserve/release + terminal/seal/fuse/pin-role serialization). The handlers share store/dispatch wiring and form-mode side effects; splitting one concern out would duplicate that wiring without a clean seam."
 };
 
 function normalizeRelativePath(relativePath) {

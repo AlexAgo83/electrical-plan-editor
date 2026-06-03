@@ -1,7 +1,11 @@
 ## task_122_multi_network_functional_analysis_view_and_assembly_scope - Multi-network functional analysis view + assembly scope + L1
 
 > From version: 1.13.1
+> Schema version: 1.0
 > Status: Ready
+> Understanding: 70%
+> Confidence: 65%
+> Progress: 40%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 

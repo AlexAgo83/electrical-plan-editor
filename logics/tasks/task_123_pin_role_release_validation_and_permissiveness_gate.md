@@ -1,7 +1,11 @@
 ## task_123_pin_role_release_validation_and_permissiveness_gate - Pin role release validation and permissiveness gate
 
 > From version: 1.13.1
+> Schema version: 1.0
 > Status: Ready
+> Understanding: 75%
+> Confidence: 70%
+> Progress: 0%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 

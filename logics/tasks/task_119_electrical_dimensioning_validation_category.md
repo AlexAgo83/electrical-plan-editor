@@ -1,7 +1,11 @@
 ## task_119_electrical_dimensioning_validation_category - Electrical dimensioning validation category (D1–D4)
 
 > From version: 1.13.1
+> Schema version: 1.0
 > Status: Ready
+> Understanding: 85%
+> Confidence: 80%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 
