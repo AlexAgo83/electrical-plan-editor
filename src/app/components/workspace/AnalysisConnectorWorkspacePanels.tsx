@@ -583,6 +583,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           selection={pinRoleSelection}
           setSelection={setPinRoleSelection}
           catalogItem={selectedConnectorCatalogItem}
+          connectorLayout={selectedConnectorCatalogItem?.connectorLayout}
           allowInheritedRoles={true}
           footerActions={
             <>

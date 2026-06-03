@@ -371,9 +371,11 @@ export function ConnectorPhysicalView({
                         Go to
                       </button>
                     ) : null}
-                    <button type="button" className="button-with-icon" onClick={() => onReleaseCavity(way.cavityIndex)}>
-                      Release
-                    </button>
+                    {wireId === null ? (
+                      <button type="button" className="button-with-icon" onClick={() => onReleaseCavity(way.cavityIndex)}>
+                        Release
+                      </button>
+                    ) : null}
                   </div>
                 ) : null}
               </article>

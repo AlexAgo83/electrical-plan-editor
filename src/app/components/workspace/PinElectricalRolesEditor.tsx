@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { useState } from "react";
-import type { CatalogItem, PinElectricalRoleKind } from "../../../core/entities";
+import type { CatalogItem, ConnectorLayout, PinElectricalRoleKind } from "../../../core/entities";
+import { getConnectorLayoutWayDisplayLabel } from "../../../core/connectorLayout";
 import {
   PIN_ELECTRICAL_ROLE_KINDS,
   resolvePinElectricalRoleDescriptor
@@ -21,6 +22,7 @@ export interface PinElectricalRolesEditorProps {
   selection: number[];
   setSelection: (value: number[]) => void;
   catalogItem: CatalogItem | undefined;
+  connectorLayout?: ConnectorLayout;
   allowInheritedRoles?: boolean;
   mode?: "fieldset" | "panel";
   title?: string;
@@ -43,6 +45,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
     selection,
     setSelection,
     catalogItem,
+    connectorLayout,
     allowInheritedRoles = true,
     mode = "fieldset",
     title = "Pin electrical roles",
@@ -94,6 +97,11 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
       return;
     }
     setDrafts(resetSelectedDraftsToCatalog(drafts, selection));
+  }
+
+  function formatPinLabel(cavityIndex: number): string {
+    const layoutWay = connectorLayout?.ways.find((way) => way.cavityIndex === cavityIndex);
+    return getConnectorLayoutWayDisplayLabel(layoutWay ?? { cavityIndex });
   }
 
   if (safeCavityCount === 0) {
@@ -157,6 +165,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
         </div>
         {Array.from({ length: safeCavityCount }, (_, index) => {
           const cavityIndex = index + 1;
+          const pinLabel = formatPinLabel(cavityIndex);
           const draft = drafts[cavityIndex] ?? createEmptyPinElectricalRoleDraft();
           const draftError = getPinElectricalRoleDraftError(draft);
           const resolved = resolvePinElectricalRoleDescriptor({ pinElectricalRoles: undefined }, catalogItem, cavityIndex);
@@ -179,22 +188,22 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
             >
               <span role="cell" data-label="Select">
                 <label className="sr-only" htmlFor={`pin-role-select-${cavityIndex}`}>
-                  Select pin {cavityIndex}
+                  Select pin {pinLabel}
                 </label>
                 <input
                   id={`pin-role-select-${cavityIndex}`}
                   type="checkbox"
                   checked={isSelected}
                   onChange={() => toggleSelection(cavityIndex)}
-                  aria-label={`Select pin ${cavityIndex}`}
+                  aria-label={`Select pin ${pinLabel}`}
                 />
               </span>
               <span role="cell" className="pin-electrical-roles-index" data-label="Pin">
-                {cavityIndex}
+                {pinLabel}
               </span>
               <span role="cell" data-label="Role">
                 <label className="sr-only" htmlFor={`pin-role-role-${cavityIndex}`}>
-                  Role for pin {cavityIndex}
+                  Role for pin {pinLabel}
                 </label>
                 <select
                   id={`pin-role-role-${cavityIndex}`}
@@ -215,11 +224,13 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                 {hidesRoleDetails ? null : (
                   <>
                     <label className="sr-only" htmlFor={`pin-role-current-${cavityIndex}`}>
-                      Max current for pin {cavityIndex}
+                      Max current for pin {pinLabel}
                     </label>
                     <input
                       id={`pin-role-current-${cavityIndex}`}
                       type="number"
+                      name={`pin-role-current-${cavityIndex}`}
+                      autoComplete="off"
                       min={0}
                       step={0.1}
                       value={draft.currentA}
@@ -241,11 +252,13 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                 {hidesRoleDetails ? null : (
                   <>
                     <label className="sr-only" htmlFor={`pin-role-label-${cavityIndex}`}>
-                      Label for pin {cavityIndex}
+                      Label for pin {pinLabel}
                     </label>
                     <input
                       id={`pin-role-label-${cavityIndex}`}
                       type="text"
+                      name={`pin-role-label-${cavityIndex}`}
+                      autoComplete="off"
                       maxLength={80}
                       value={draft.label}
                       placeholder="BAT+, KL15, LS_OUT..."

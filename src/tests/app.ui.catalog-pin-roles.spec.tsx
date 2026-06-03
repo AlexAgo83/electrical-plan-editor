@@ -33,20 +33,33 @@ describe("App integration UI - catalog connector defaults pin electrical roles",
         id: catalogItemId,
         manufacturerReference: "ECU-4",
         connectionCount: 4,
-        connectorDefaults: { allSameTerminals: true }
+        connectorDefaults: { allSameTerminals: true },
+        connectorLayout: {
+          version: 1,
+          units: "grid",
+          width: 2,
+          height: 2,
+          ways: [
+            { cavityIndex: 1, x: 1, y: 1, shape: "round", label: "A1" },
+            { cavityIndex: 2, x: 2, y: 1, shape: "round" },
+            { cavityIndex: 3, x: 1, y: 2, shape: "round" },
+            { cavityIndex: 4, x: 2, y: 2, shape: "round" }
+          ]
+        }
       })
     );
 
     const { store } = renderAppWithState(state);
     const pinRolesPanel = openCatalogEditor("ECU-4");
 
-    const roleSelect = within(pinRolesPanel).getByLabelText("Role for pin 1");
-    expect(within(pinRolesPanel).queryByLabelText("Max current for pin 1")).not.toBeInTheDocument();
-    expect(within(pinRolesPanel).queryByLabelText("Label for pin 1")).not.toBeInTheDocument();
+    const roleSelect = within(pinRolesPanel).getByLabelText("Role for pin A1");
+    expect(within(pinRolesPanel).getByText("A1")).toBeInTheDocument();
+    expect(within(pinRolesPanel).queryByLabelText("Max current for pin A1")).not.toBeInTheDocument();
+    expect(within(pinRolesPanel).queryByLabelText("Label for pin A1")).not.toBeInTheDocument();
 
     fireEvent.change(roleSelect, { target: { value: "consumer" } });
-    const currentInput = within(pinRolesPanel).getByLabelText("Max current for pin 1");
-    const labelInput = within(pinRolesPanel).getByLabelText("Label for pin 1");
+    const currentInput = within(pinRolesPanel).getByLabelText("Max current for pin A1");
+    const labelInput = within(pinRolesPanel).getByLabelText("Label for pin A1");
     fireEvent.change(currentInput, { target: { value: "40" } });
     fireEvent.change(labelInput, { target: { value: "BAT+" } });
 
@@ -72,16 +85,17 @@ describe("App integration UI - catalog connector defaults pin electrical roles",
 
     const { store } = renderAppWithState(state);
     const pinRolesPanel = openCatalogEditor("ECU-4");
-    const roleSelect = within(pinRolesPanel).getByLabelText("Role for pin 1");
+    const roleSelect = within(pinRolesPanel).getByLabelText("Role for pin C1");
 
     expect(roleSelect).toHaveValue("");
     expect(within(pinRolesPanel).queryByRole("option", { name: "(inherit)" })).not.toBeInTheDocument();
     expect(within(pinRolesPanel).queryByRole("button", { name: "Reset to catalog default" })).not.toBeInTheDocument();
-    expect(within(pinRolesPanel).queryByLabelText("Max current for pin 1")).not.toBeInTheDocument();
-    expect(within(pinRolesPanel).queryByLabelText("Label for pin 1")).not.toBeInTheDocument();
+    expect(within(pinRolesPanel).getByText("C1")).toBeInTheDocument();
+    expect(within(pinRolesPanel).queryByLabelText("Max current for pin C1")).not.toBeInTheDocument();
+    expect(within(pinRolesPanel).queryByLabelText("Label for pin C1")).not.toBeInTheDocument();
 
     fireEvent.change(roleSelect, { target: { value: "source" } });
-    fireEvent.change(within(pinRolesPanel).getByLabelText("Max current for pin 1"), { target: { value: "12" } });
+    fireEvent.change(within(pinRolesPanel).getByLabelText("Max current for pin C1"), { target: { value: "12" } });
     fireEvent.click(within(pinRolesPanel).getByRole("button", { name: "Save" }));
 
     const saved = store.getState().catalogItems.byId[catalogItemId];

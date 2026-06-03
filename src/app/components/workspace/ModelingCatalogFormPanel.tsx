@@ -481,6 +481,7 @@ export function ModelingCatalogFormPanel({
             selection={catalogPinElectricalRoleSelection}
             setSelection={setCatalogPinElectricalRoleSelection}
             catalogItem={undefined}
+            connectorLayout={catalogConnectorLayout}
             allowInheritedRoles={false}
             mode="panel"
             title="Pin electric roles"

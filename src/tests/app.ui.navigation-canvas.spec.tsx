@@ -137,7 +137,9 @@ describe("App integration UI - navigation and canvas", () => {
     switchSubScreenDrawerAware("connector");
 
     const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
     expect(within(connectorAnalysisPanel).getByText("W-1 / A")).toBeInTheDocument();
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Ways & roles" }));
     const wayIndexInput = within(connectorAnalysisPanel).getByLabelText("Way index");
     expect(wayIndexInput).toHaveValue(2);
     fireEvent.change(wayIndexInput, { target: { value: "1" } });
@@ -159,7 +161,8 @@ describe("App integration UI - navigation and canvas", () => {
     expect(await screen.findByText("Connector way reserved")).toBeInTheDocument();
     expect(screen.getAllByText("Connector 1 (C-1) · C2 · manual-assignment")).toHaveLength(1);
 
-    const reservedCavity = within(connectorAnalysisPanel).getByText("C2").closest("article");
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Physical" }));
+    const reservedCavity = within(connectorAnalysisPanel).getByText("manual-assignment").closest("article");
     expect(reservedCavity).not.toBeNull();
     fireEvent.click(within(reservedCavity as HTMLElement).getByRole("button", { name: "Release" }));
 

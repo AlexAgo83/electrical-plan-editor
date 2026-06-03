@@ -67,7 +67,7 @@ describe("home workspace screen", () => {
       "Help",
       "Create empty workspace",
       "Save workspace",
-      "Import workspace"
+      "Load workspace"
     ]);
     expect(screen.queryByRole("button", { name: "Validation" })).not.toBeInTheDocument();
   });
@@ -146,7 +146,7 @@ describe("home workspace screen", () => {
     const savedPayload = JSON.parse(savedWrites[0] ?? "{}") as { payloadKind?: unknown };
     expect(savedPayload.payloadKind).toBe(WORKSPACE_FILE_PAYLOAD_KIND);
 
-    fireEvent.click(within(quickStartPanel).getByRole("button", { name: "Import workspace" }));
+    fireEvent.click(within(quickStartPanel).getByRole("button", { name: "Load workspace" }));
     await waitFor(() => expect(showOpenFilePicker).toHaveBeenCalled());
     const openPickerOptions = showOpenFilePicker.mock.calls[0]?.[0];
     expect(openPickerOptions?.multiple).toBe(false);

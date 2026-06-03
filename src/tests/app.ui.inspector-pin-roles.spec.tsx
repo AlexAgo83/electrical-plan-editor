@@ -50,14 +50,14 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     const { store } = renderAppWithState(state);
     const panel = openConnectorAnalysis("ECU connector");
 
-    const roleSelect = within(panel).getByLabelText("Role for pin 1");
+    const roleSelect = within(panel).getByLabelText("Role for pin C1");
     expect(roleSelect).toHaveDisplayValue("(inherit)");
-    expect(within(panel).queryByLabelText("Max current for pin 1")).not.toBeInTheDocument();
-    expect(within(panel).queryByLabelText("Label for pin 1")).not.toBeInTheDocument();
+    expect(within(panel).queryByLabelText("Max current for pin C1")).not.toBeInTheDocument();
+    expect(within(panel).queryByLabelText("Label for pin C1")).not.toBeInTheDocument();
 
     fireEvent.change(roleSelect, { target: { value: "consumer" } });
-    const currentInput = within(panel).getByLabelText("Max current for pin 1");
-    const labelInput = within(panel).getByLabelText("Label for pin 1");
+    const currentInput = within(panel).getByLabelText("Max current for pin C1");
+    const labelInput = within(panel).getByLabelText("Label for pin C1");
     fireEvent.change(currentInput, { target: { value: "40" } });
     fireEvent.change(labelInput, { target: { value: "BAT+" } });
 
@@ -76,7 +76,19 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
         id: catalogItemId,
         manufacturerReference: "ECU-4",
         connectionCount: 4,
-        connectorDefaults: { pinElectricalRoles: { 1: { role: "consumer", currentA: 40, label: "BAT+" } } }
+        connectorDefaults: { pinElectricalRoles: { 1: { role: "consumer", currentA: 40, label: "BAT+" } } },
+        connectorLayout: {
+          version: 1,
+          units: "grid",
+          width: 2,
+          height: 2,
+          ways: [
+            { cavityIndex: 1, x: 1, y: 1, shape: "round", label: "A1" },
+            { cavityIndex: 2, x: 2, y: 1, shape: "round" },
+            { cavityIndex: 3, x: 1, y: 2, shape: "round" },
+            { cavityIndex: 4, x: 2, y: 2, shape: "round" }
+          ]
+        }
       })
     );
     state = appReducer(
@@ -95,7 +107,7 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     renderAppWithState(state);
     const panel = openConnectorAnalysis("ECU connector");
 
-    const row1 = within(panel).getByLabelText("Select pin 1").closest('[role="row"]') as HTMLElement;
+    const row1 = within(panel).getByLabelText("Select pin A1").closest('[role="row"]') as HTMLElement;
     const columnHeaders = within(panel)
       .getAllByRole("columnheader")
       .map((header) => header.textContent?.trim())
@@ -103,7 +115,8 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
 
     expect(columnHeaders).toEqual(["Select", "Pin", "Role", "Max current (A)", "Label"]);
     expect(row1.querySelector("[data-pin-role-source]")).toBeNull();
-    expect(within(row1).getByLabelText("Role for pin 1")).toHaveDisplayValue("(inherit: Consumer)");
+    expect(within(row1).getByText("A1")).toBeInTheDocument();
+    expect(within(row1).getByLabelText("Role for pin A1")).toHaveDisplayValue("(inherit: Consumer)");
     expect(within(row1).getByText("40 A")).toBeInTheDocument();
     expect(within(row1).getByText("BAT+")).toBeInTheDocument();
   });
@@ -170,19 +183,19 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     expect(within(panel).getByRole("button", { name: "Ways & roles" })).toHaveAttribute("aria-pressed", "true");
     expect(panel.querySelector(".connector-ways-cavity-grid")).toBeNull();
 
-    const firstWay = within(panel).getByLabelText("Select pin 1").closest('[role="row"]') as HTMLElement;
-    const secondWay = within(panel).getByLabelText("Select pin 2").closest('[role="row"]') as HTMLElement;
+    const firstWay = within(panel).getByLabelText("Select pin C1").closest('[role="row"]') as HTMLElement;
+    const secondWay = within(panel).getByLabelText("Select pin C2").closest('[role="row"]') as HTMLElement;
 
     expect(within(firstWay).getByText("Consumer")).toBeInTheDocument();
     expect(within(firstWay).getByText("BAT+")).toBeInTheDocument();
     expect(within(firstWay).getByText("40 A")).toBeInTheDocument();
-    expect(within(firstWay).queryByLabelText("Max current for pin 1")).not.toBeInTheDocument();
-    expect(within(firstWay).queryByLabelText("Label for pin 1")).not.toBeInTheDocument();
+    expect(within(firstWay).queryByLabelText("Max current for pin C1")).not.toBeInTheDocument();
+    expect(within(firstWay).queryByLabelText("Label for pin C1")).not.toBeInTheDocument();
     expect(within(secondWay).getByText("Source")).toBeInTheDocument();
     expect(within(panel).queryByRole("columnheader", { name: "Source" })).not.toBeInTheDocument();
     expect(within(secondWay).getByDisplayValue("2.5")).toBeInTheDocument();
-    expect(within(secondWay).getByLabelText("Max current for pin 2")).toBeInTheDocument();
-    expect(within(secondWay).getByLabelText("Label for pin 2")).toBeInTheDocument();
+    expect(within(secondWay).getByLabelText("Max current for pin C2")).toBeInTheDocument();
+    expect(within(secondWay).getByLabelText("Label for pin C2")).toBeInTheDocument();
   });
 
   it("hides current and label inputs when a pin role inherits", () => {
@@ -212,15 +225,15 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
 
     const { store } = renderAppWithState(state);
     const panel = openConnectorAnalysis("ECU connector");
-    const firstWay = within(panel).getByLabelText("Select pin 1").closest('[role="row"]') as HTMLElement;
+    const firstWay = within(panel).getByLabelText("Select pin C1").closest('[role="row"]') as HTMLElement;
 
     expect(within(firstWay).getByDisplayValue("2.5")).toBeInTheDocument();
     expect(within(firstWay).getByDisplayValue("Override")).toBeInTheDocument();
 
-    fireEvent.change(within(firstWay).getByLabelText("Role for pin 1"), { target: { value: "" } });
+    fireEvent.change(within(firstWay).getByLabelText("Role for pin C1"), { target: { value: "" } });
 
-    expect(within(firstWay).queryByLabelText("Max current for pin 1")).not.toBeInTheDocument();
-    expect(within(firstWay).queryByLabelText("Label for pin 1")).not.toBeInTheDocument();
+    expect(within(firstWay).queryByLabelText("Max current for pin C1")).not.toBeInTheDocument();
+    expect(within(firstWay).queryByLabelText("Label for pin C1")).not.toBeInTheDocument();
     expect(within(firstWay).getByText("40 A")).toBeInTheDocument();
     expect(within(firstWay).getByText("BAT+")).toBeInTheDocument();
 
@@ -309,8 +322,8 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     const { store } = renderAppWithState(state);
     const panel = openConnectorAnalysis("ECU connector");
 
-    fireEvent.click(within(panel).getByLabelText("Select pin 1"));
-    fireEvent.click(within(panel).getByLabelText("Select pin 3"));
+    fireEvent.click(within(panel).getByLabelText("Select pin C1"));
+    fireEvent.click(within(panel).getByLabelText("Select pin C3"));
 
     const bulkRoleSelect = within(panel).getByLabelText(/Bulk role/i);
     fireEvent.change(bulkRoleSelect, { target: { value: "source" } });
@@ -353,7 +366,7 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     const { store } = renderAppWithState(state);
     const panel = openConnectorAnalysis("ECU connector");
 
-    fireEvent.click(within(panel).getByLabelText("Select pin 1"));
+    fireEvent.click(within(panel).getByLabelText("Select pin C1"));
     fireEvent.click(within(panel).getByRole("button", { name: "Reset to catalog default" }));
     fireEvent.click(within(panel).getByRole("button", { name: "Save roles" }));
 

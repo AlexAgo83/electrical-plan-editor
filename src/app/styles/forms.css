@@ -321,13 +321,12 @@
 
 .pin-electrical-roles-row {
   display: grid;
-  grid-template-columns: 1.8rem 2rem minmax(7rem, 1fr) minmax(5rem, 0.65fr) minmax(7rem, 1fr);
+  grid-template-columns: 1.8rem 2.75rem minmax(10rem, 0.7fr) minmax(5rem, 0.65fr) minmax(7rem, 1fr);
   align-items: center;
   gap: 0.4rem;
   min-width: 32rem;
-  border: 1px solid color-mix(in srgb, var(--theme-border, currentColor) 72%, transparent);
-  border-radius: 0.45rem;
-  background: color-mix(in srgb, var(--theme-panel, transparent) 86%, currentColor 3%);
+  border: 1px solid transparent;
+  background: transparent;
   padding: 0.35rem;
 }
 
@@ -415,6 +414,9 @@
     grid-template-columns: minmax(0, 1fr);
     align-items: stretch;
     min-width: 0;
+    border-color: color-mix(in srgb, var(--theme-border, currentColor) 72%, transparent);
+    border-radius: 0.45rem;
+    background: color-mix(in srgb, var(--theme-panel, transparent) 86%, currentColor 3%);
   }
 
   .pin-electrical-roles-row--header {

@@ -98,7 +98,7 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Replace the current workspace with an empty workspace? This removes current workspace changes.":
     "Remplacer l'espace de travail courant par un espace vide ? Cela supprime les changements actuels de l'espace.",
   "Import from file": "Importer depuis un fichier",
-  "Import workspace": "Importer un workspace",
+  "Load workspace": "Charger un workspace",
   "Import / Export networks": "Importer / Exporter des réseaux",
   "Portability": "Portabilité",
   "Deterministic JSON import/export for active, selected, or full network scopes.": "Import/export JSON déterministe pour les périmètres réseau actif, sélectionné ou complet.",

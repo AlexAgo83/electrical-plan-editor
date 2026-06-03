@@ -333,7 +333,7 @@ export function HomeWorkspaceContent({
             </button>
             <button type="button" className="button-with-icon" onClick={onOpenImportPicker}>
               <span className="action-button-icon is-home-import" aria-hidden="true" />
-              <span>Import workspace</span>
+              <span>Load workspace</span>
             </button>
           </div>
           <input
