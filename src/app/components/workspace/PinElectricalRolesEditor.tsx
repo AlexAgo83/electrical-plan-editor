@@ -23,6 +23,7 @@ export interface PinElectricalRolesEditorProps {
   catalogItem: CatalogItem | undefined;
   mode?: "fieldset" | "panel";
   title?: string;
+  showPanelHeader?: boolean;
   footerActions?: ReactNode;
 }
 
@@ -43,6 +44,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
     catalogItem,
     mode = "fieldset",
     title = "Pin electrical roles",
+    showPanelHeader = true,
     footerActions
   } = props;
   const [isOpen, setIsOpen] = useState(mode === "panel");
@@ -243,9 +245,11 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
   if (mode === "panel") {
     return (
       <section className="pin-electrical-roles-editor pin-electrical-roles-editor--panel" aria-label={title}>
-        <header className="pin-electrical-roles-panel-header">
-          <h3>{title}</h3>
-        </header>
+        {showPanelHeader ? (
+          <header className="pin-electrical-roles-panel-header">
+            <h3>{title}</h3>
+          </header>
+        ) : null}
         {editorBody}
       </section>
     );

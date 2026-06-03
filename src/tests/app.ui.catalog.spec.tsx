@@ -51,6 +51,7 @@ describe("App integration UI - catalog", () => {
     expect(screen.queryByRole("heading", { name: "Connector material defaults" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Connector physical layout" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Additional accessories" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Pin electric roles" })).not.toBeInTheDocument();
     fireEvent.click(within(catalogFormPanel).getByLabelText("Additional accessories"));
     const catalogAccessoriesPanel = getPanelByHeading("Additional accessories");
     expect(catalogAccessoriesPanel).toHaveClass("catalog-accessories-panel");
@@ -63,6 +64,10 @@ describe("App integration UI - catalog", () => {
     const catalogLayoutPanel = getPanelByHeading("Connector physical layout");
     expect(catalogLayoutPanel).toHaveClass("catalog-connector-layout-panel");
     expect(within(catalogLayoutPanel).getByRole("button", { name: "Create" })).toBeDisabled();
+    fireEvent.click(within(catalogFormPanel).getByLabelText("Pin electric roles"));
+    const catalogPinRolesPanel = getPanelByHeading("Pin electric roles");
+    expect(catalogPinRolesPanel).toHaveClass("catalog-pin-electrical-roles-panel");
+    expect(within(catalogPinRolesPanel).getByRole("button", { name: "Create" })).toBeDisabled();
     expect(within(catalogLayoutPanel).getByRole("heading", { name: "Global layout" })).toBeInTheDocument();
     expect(within(catalogLayoutPanel).getByText("6 ways").closest(".connector-layout-control-card-header")).not.toBeNull();
     expect(within(catalogLayoutPanel).getByLabelText("Border shape")).toHaveValue("square");

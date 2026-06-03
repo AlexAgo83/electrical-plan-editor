@@ -483,6 +483,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setCatalogShowConnectorPhysicalLayout: formsState.setCatalogShowConnectorPhysicalLayout,
     catalogIsFuseBox: formsState.catalogIsFuseBox,
     setCatalogIsFuseBox: formsState.setCatalogIsFuseBox,
+    catalogShowPinElectricalRoles: formsState.catalogShowPinElectricalRoles,
+    setCatalogShowPinElectricalRoles: formsState.setCatalogShowPinElectricalRoles,
     catalogPinElectricalRoleDrafts: formsState.catalogPinElectricalRoleDrafts,
     setCatalogPinElectricalRoleDrafts: formsState.setCatalogPinElectricalRoleDrafts,
     setCatalogPinElectricalRoleSelection: formsState.setCatalogPinElectricalRoleSelection,

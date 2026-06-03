@@ -62,6 +62,8 @@ interface UseCatalogHandlersParams {
   setCatalogShowConnectorPhysicalLayout?: (value: boolean) => void;
   catalogIsFuseBox?: boolean;
   setCatalogIsFuseBox?: (value: boolean) => void;
+  catalogShowPinElectricalRoles?: boolean;
+  setCatalogShowPinElectricalRoles?: (value: boolean) => void;
   catalogPinElectricalRoleDrafts?: ConnectorPinElectricalRoleDrafts;
   setCatalogPinElectricalRoleDrafts?: (value: ConnectorPinElectricalRoleDrafts) => void;
   setCatalogPinElectricalRoleSelection?: (value: number[]) => void;
@@ -78,6 +80,19 @@ function normalizeOptionalNumber(raw: string): number | undefined {
     return Number.NaN;
   }
   return parsed;
+}
+
+function hasConnectorMaterialDefaults(item: CatalogItem): boolean {
+  const defaults = item.connectorDefaults;
+  if (defaults === undefined) {
+    return false;
+  }
+  return (
+    defaults.allSameTerminals === true ||
+    defaults.defaultTerminal !== undefined ||
+    defaults.terminalOverrides !== undefined ||
+    (defaults.plugs?.length ?? 0) > 0
+  );
 }
 
 export function useCatalogHandlers({
@@ -122,6 +137,8 @@ export function useCatalogHandlers({
   setCatalogShowConnectorPhysicalLayout = () => {},
   catalogIsFuseBox = false,
   setCatalogIsFuseBox = () => {},
+  catalogShowPinElectricalRoles = false,
+  setCatalogShowPinElectricalRoles = () => {},
   catalogPinElectricalRoleDrafts = {},
   setCatalogPinElectricalRoleDrafts = () => {},
   setCatalogPinElectricalRoleSelection = () => {},
@@ -138,6 +155,7 @@ export function useCatalogHandlers({
     setCatalogConnectorLayout(undefined);
     setCatalogShowConnectorPhysicalLayout(false);
     setCatalogIsFuseBox(false);
+    setCatalogShowPinElectricalRoles(false);
     setCatalogPinElectricalRoleDrafts({});
     setCatalogPinElectricalRoleSelection([]);
   }
@@ -185,7 +203,7 @@ export function useCatalogHandlers({
     setCatalogUrl(item.url ?? "");
     setCatalogAdditionalAccessories(item.additionalAccessories ?? []);
     setCatalogShowAdditionalAccessories((item.additionalAccessories?.length ?? 0) > 0);
-    setCatalogShowConnectorMaterialDefaults(item.connectorDefaults !== undefined);
+    setCatalogShowConnectorMaterialDefaults(hasConnectorMaterialDefaults(item));
     setCatalogAllSameTerminals(item.connectorDefaults?.allSameTerminals === true);
     setCatalogDefaultTerminalReference(item.connectorDefaults?.defaultTerminal?.terminalReference ?? "");
     setCatalogDefaultTerminalName(item.connectorDefaults?.defaultTerminal?.terminalName ?? "");
@@ -199,6 +217,7 @@ export function useCatalogHandlers({
     setCatalogConnectorLayout(item.connectorLayout);
     setCatalogShowConnectorPhysicalLayout(item.connectorLayout !== undefined);
     setCatalogIsFuseBox(item.fuseBoxConfig !== undefined);
+    setCatalogShowPinElectricalRoles(item.connectorDefaults?.pinElectricalRoles !== undefined);
     setCatalogPinElectricalRoleDrafts(
       formatPinElectricalRoleDrafts(item.connectorDefaults?.pinElectricalRoles, item.connectionCount)
     );
@@ -229,19 +248,21 @@ export function useCatalogHandlers({
         accessoryReference: accessory.accessoryReference,
         accessoryName: accessory.accessoryName.length === 0 ? undefined : accessory.accessoryName
       }));
-    const plugDefinitions = catalogPlugDefinitionsText
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0)
-      .map((line) => {
-        const [reference = "", quantityText = "", name = ""] = line.split(",").map((part) => part.trim());
-        const quantity = Number(quantityText);
-        return {
-          plugReference: reference,
-          quantity: Number.isInteger(quantity) && quantity > 0 ? quantity : Number.NaN,
-          plugName: name.length === 0 ? undefined : name
-        };
-      });
+    const plugDefinitions = catalogShowConnectorMaterialDefaults
+      ? catalogPlugDefinitionsText
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter((line) => line.length > 0)
+          .map((line) => {
+            const [reference = "", quantityText = "", name = ""] = line.split(",").map((part) => part.trim());
+            const quantity = Number(quantityText);
+            return {
+              plugReference: reference,
+              quantity: Number.isInteger(quantity) && quantity > 0 ? quantity : Number.NaN,
+              plugName: name.length === 0 ? undefined : name
+            };
+          })
+      : [];
 
     if (manufacturerReference.length === 0) {
       setCatalogFormError("Manufacturer reference is required.");
@@ -275,11 +296,11 @@ export function useCatalogHandlers({
       setCatalogFormError("Plug definitions must use one line per plug: reference,quantity,name.");
       return;
     }
-    if (catalogShowConnectorMaterialDefaults && hasInvalidPinElectricalRoleDraft(catalogPinElectricalRoleDrafts)) {
+    if (catalogShowPinElectricalRoles && hasInvalidPinElectricalRoleDraft(catalogPinElectricalRoleDrafts)) {
       setCatalogFormError("Pin role currents must be numeric values greater than or equal to 0 A.");
       return;
     }
-    const pinElectricalRoles = catalogShowConnectorMaterialDefaults
+    const pinElectricalRoles = catalogShowPinElectricalRoles
       ? serializePinElectricalRoleDrafts(catalogPinElectricalRoleDrafts, connectionCount)
       : undefined;
     const normalizedConnectorLayout = catalogShowConnectorPhysicalLayout
@@ -314,16 +335,18 @@ export function useCatalogHandlers({
         unitPriceExclTax,
         url: url.length === 0 ? undefined : url,
         additionalAccessories: catalogShowAdditionalAccessories && additionalAccessories.length > 0 ? additionalAccessories : undefined,
-        connectorDefaults: catalogShowConnectorMaterialDefaults
+        connectorDefaults: catalogShowConnectorMaterialDefaults || pinElectricalRoles !== undefined
           ? {
-              allSameTerminals: catalogAllSameTerminals ? true : undefined,
-              defaultTerminal: {
-                terminalReference: catalogDefaultTerminalReference.trim() || undefined,
-                terminalName: catalogDefaultTerminalName.trim() || undefined,
-                sealReference: catalogDefaultSealReference.trim() || undefined,
-                sealName: catalogDefaultSealName.trim() || undefined
-              },
-              plugs: plugDefinitions.length > 0 ? plugDefinitions : undefined,
+              allSameTerminals: catalogShowConnectorMaterialDefaults && catalogAllSameTerminals ? true : undefined,
+              defaultTerminal: catalogShowConnectorMaterialDefaults
+                ? {
+                    terminalReference: catalogDefaultTerminalReference.trim() || undefined,
+                    terminalName: catalogDefaultTerminalName.trim() || undefined,
+                    sealReference: catalogDefaultSealReference.trim() || undefined,
+                    sealName: catalogDefaultSealName.trim() || undefined
+                  }
+                : undefined,
+              plugs: catalogShowConnectorMaterialDefaults && plugDefinitions.length > 0 ? plugDefinitions : undefined,
               pinElectricalRoles
             }
           : undefined,

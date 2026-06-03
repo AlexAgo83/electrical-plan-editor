@@ -15,7 +15,9 @@ function openCatalogEditor(manufacturerReference: string): HTMLElement {
   switchSubScreenDrawerAware("catalog");
   const catalogPanel = getPanelByHeading("Catalog");
   fireEvent.click(within(catalogPanel).getByText(manufacturerReference));
-  return getPanelByHeading("Connector material defaults");
+  const catalogFormPanel = getPanelByHeading("Edit catalog item");
+  fireEvent.click(within(catalogFormPanel).getByLabelText("Pin electric roles"));
+  return getPanelByHeading("Pin electric roles");
 }
 
 describe("App integration UI - catalog connector defaults pin electrical roles", () => {
@@ -36,19 +38,16 @@ describe("App integration UI - catalog connector defaults pin electrical roles",
     );
 
     const { store } = renderAppWithState(state);
-    const defaultsPanel = openCatalogEditor("ECU-4");
+    const pinRolesPanel = openCatalogEditor("ECU-4");
 
-    const toggle = within(defaultsPanel).getByRole("button", { name: /Pin electrical roles/i });
-    fireEvent.click(toggle);
-
-    const roleSelect = within(defaultsPanel).getByLabelText("Role for pin 1");
-    const currentInput = within(defaultsPanel).getByLabelText("Max current for pin 1");
-    const labelInput = within(defaultsPanel).getByLabelText("Label for pin 1");
+    const roleSelect = within(pinRolesPanel).getByLabelText("Role for pin 1");
+    const currentInput = within(pinRolesPanel).getByLabelText("Max current for pin 1");
+    const labelInput = within(pinRolesPanel).getByLabelText("Label for pin 1");
     fireEvent.change(roleSelect, { target: { value: "consumer" } });
     fireEvent.change(currentInput, { target: { value: "40" } });
     fireEvent.change(labelInput, { target: { value: "BAT+" } });
 
-    fireEvent.click(within(defaultsPanel).getByRole("button", { name: "Save" }));
+    fireEvent.click(within(pinRolesPanel).getByRole("button", { name: "Save" }));
 
     const saved = store.getState().catalogItems.byId[catalogItemId];
     expect(saved?.connectorDefaults?.pinElectricalRoles).toEqual({

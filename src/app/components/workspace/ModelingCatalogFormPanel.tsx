@@ -51,6 +51,8 @@ interface ModelingCatalogFormPanelProps {
   cancelCatalogEdit: () => void;
   catalogIsFuseBox: boolean;
   setCatalogIsFuseBox: (v: boolean) => void;
+  catalogShowPinElectricalRoles: boolean;
+  setCatalogShowPinElectricalRoles: (value: boolean) => void;
   catalogPinElectricalRoleDrafts: ConnectorPinElectricalRoleDrafts;
   setCatalogPinElectricalRoleDrafts: (value: ConnectorPinElectricalRoleDrafts) => void;
   catalogPinElectricalRoleSelection: number[];
@@ -100,6 +102,8 @@ export function ModelingCatalogFormPanel({
   cancelCatalogEdit,
   catalogIsFuseBox,
   setCatalogIsFuseBox,
+  catalogShowPinElectricalRoles,
+  setCatalogShowPinElectricalRoles,
   catalogPinElectricalRoleDrafts,
   setCatalogPinElectricalRoleDrafts,
   catalogPinElectricalRoleSelection,
@@ -275,6 +279,24 @@ export function ModelingCatalogFormPanel({
         <label className="settings-checkbox">
           <input
             type="checkbox"
+            checked={catalogShowPinElectricalRoles}
+            onChange={(event) => {
+              const checked = event.target.checked;
+              setCatalogShowPinElectricalRoles(checked);
+              if (!checked) {
+                setCatalogPinElectricalRoleDrafts({});
+                setCatalogPinElectricalRoleSelection([]);
+              }
+              if (checked) {
+                scrollToFormPanel(FORM_PANEL_IDS.catalogPinElectricalRoles);
+              }
+            }}
+          />
+          Pin electric roles
+        </label>
+        <label className="settings-checkbox">
+          <input
+            type="checkbox"
             checked={catalogShowConnectorPhysicalLayout}
             onChange={(event) => {
               const checked = event.target.checked;
@@ -442,6 +464,16 @@ export function ModelingCatalogFormPanel({
               rows={3}
             />
           </label>
+          <div className="row-actions catalog-item-submit-actions">
+            {renderCatalogSubmitButton()}
+          </div>
+          {renderCatalogFormError()}
+        </article>
+      ) : null}
+
+      {catalogShowPinElectricalRoles ? (
+        <article className="panel catalog-pin-electrical-roles-panel" data-form-panel={FORM_PANEL_IDS.catalogPinElectricalRoles}>
+          {renderFormHeader("Pin electric roles", catalogFormMode)}
           <PinElectricalRolesEditor
             cavityCount={Number(catalogConnectionCount)}
             drafts={catalogPinElectricalRoleDrafts}
@@ -449,6 +481,9 @@ export function ModelingCatalogFormPanel({
             selection={catalogPinElectricalRoleSelection}
             setSelection={setCatalogPinElectricalRoleSelection}
             catalogItem={undefined}
+            mode="panel"
+            title="Pin electric roles"
+            showPanelHeader={false}
           />
           <div className="row-actions catalog-item-submit-actions">
             {renderCatalogSubmitButton()}

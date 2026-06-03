@@ -37,6 +37,7 @@ export function useEntityFormsState() {
   const [catalogConnectorLayout, setCatalogConnectorLayout] = useState<ConnectorLayout | undefined>(undefined);
   const [catalogShowConnectorPhysicalLayout, setCatalogShowConnectorPhysicalLayout] = useState(false);
   const [catalogIsFuseBox, setCatalogIsFuseBox] = useState(false);
+  const [catalogShowPinElectricalRoles, setCatalogShowPinElectricalRoles] = useState(false);
   const [catalogPinElectricalRoleDrafts, setCatalogPinElectricalRoleDrafts] =
     useState<ConnectorPinElectricalRoleDrafts>({});
   const [catalogPinElectricalRoleSelection, setCatalogPinElectricalRoleSelection] = useState<number[]>([]);
@@ -179,6 +180,8 @@ export function useEntityFormsState() {
     catalogShowConnectorPhysicalLayout,
     setCatalogShowConnectorPhysicalLayout,
     catalogIsFuseBox,
+    catalogShowPinElectricalRoles,
+    setCatalogShowPinElectricalRoles,
     catalogPinElectricalRoleDrafts,
     setCatalogPinElectricalRoleDrafts,
     catalogPinElectricalRoleSelection,

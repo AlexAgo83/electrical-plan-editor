@@ -444,19 +444,19 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
       <div className="chip-group list-panel-filters" role="group" aria-label="Connector analysis view">
         <button
           type="button"
-          className={connectorAnalysisView === "cavities" ? "filter-chip is-active" : "filter-chip"}
-          aria-pressed={connectorAnalysisView === "cavities"}
-          onClick={() => setConnectorAnalysisView("cavities")}
-        >
-          Ways & roles
-        </button>
-        <button
-          type="button"
           className={connectorAnalysisView === "physical" ? "filter-chip is-active" : "filter-chip"}
           aria-pressed={connectorAnalysisView === "physical"}
           onClick={() => setConnectorAnalysisView("physical")}
         >
           Physical
+        </button>
+        <button
+          type="button"
+          className={connectorAnalysisView === "cavities" ? "filter-chip is-active" : "filter-chip"}
+          aria-pressed={connectorAnalysisView === "cavities"}
+          onClick={() => setConnectorAnalysisView("cavities")}
+        >
+          Ways & roles
         </button>
         <button
           type="button"

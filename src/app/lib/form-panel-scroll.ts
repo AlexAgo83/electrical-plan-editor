@@ -4,6 +4,7 @@ export const FORM_PANEL_IDS = {
   catalog: "catalog-item-form",
   catalogAdditionalAccessories: "catalog-additional-accessories-form",
   catalogConnectorDefaults: "catalog-connector-defaults-form",
+  catalogPinElectricalRoles: "catalog-pin-electrical-roles-form",
   catalogConnectorLayout: "catalog-connector-layout-form",
   connector: "modeling-connector-form",
   splice: "modeling-splice-form",
