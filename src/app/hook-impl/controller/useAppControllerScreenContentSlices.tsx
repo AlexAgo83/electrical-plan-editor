@@ -739,6 +739,7 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
     setConnectorApplyCatalogSeals: params.setConnectorApplyCatalogSeals,
     connectorTerminalOverridesText: params.connectorTerminalOverridesText,
     setConnectorTerminalOverridesText: params.setConnectorTerminalOverridesText,
+    onClearConnectorTerminalAndSealOverrides: params.onClearConnectorTerminalAndSealOverrides,
     onSaveConnectorCatalogMaterialApplication: params.onSaveConnectorCatalogMaterialApplication,
     onSaveConnectorPinElectricalRoles: params.onSaveConnectorPinElectricalRoles,
     selectedSplice: params.selectedSplice,

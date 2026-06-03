@@ -138,7 +138,7 @@ describe("App integration UI - creation flow catalog ergonomics", () => {
     }
   });
 
-  it("clears connector terminal and seal overrides from the edit form", () => {
+  it("clears connector terminal and seal overrides from catalog material analysis", () => {
     const connectorId = asConnectorId("C-OVERRIDE");
     const otherConnectorId = asConnectorId("C-OTHER");
     const state = [
@@ -219,16 +219,23 @@ describe("App integration UI - creation flow catalog ergonomics", () => {
       })
     ].reduce(appReducer, createInitialStateWithCatalog());
     const { store } = renderAppWithState(state);
-    switchScreenDrawerAware("modeling");
+    switchScreenDrawerAware("analysis");
     switchSubScreenDrawerAware("connector");
 
     const connectorsPanel = getPanelByHeading("Connectors");
     fireEvent.click(within(connectorsPanel).getByText("Override connector"));
-    const editConnectorPanel = getPanelByHeading("Edit Connector");
-    const overridesInput = within(editConnectorPanel).getByLabelText("Terminal and seal overrides");
+    const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Catalog material" }));
+    const overridesInput = within(connectorAnalysisPanel).getByLabelText("Terminal and seal overrides");
     expect(overridesInput).toHaveValue("1,TERM-OLD,SEAL-OLD,Old terminal,Old seal");
 
-    const clearButton = within(editConnectorPanel).getByRole("button", { name: "Clear terminal and seal overrides" });
+    const actionButtons = within(connectorAnalysisPanel)
+      .getAllByRole("button")
+      .map((button) => button.textContent?.trim())
+      .filter((text): text is string => text === "Save material application" || text === "Clear terminal and seal overrides");
+    expect(actionButtons).toEqual(["Save material application", "Clear terminal and seal overrides"]);
+
+    const clearButton = within(connectorAnalysisPanel).getByRole("button", { name: "Clear terminal and seal overrides" });
     expect(clearButton).toBeEnabled();
     fireEvent.click(clearButton);
     expect(overridesInput).toHaveValue("");
@@ -253,7 +260,7 @@ describe("App integration UI - creation flow catalog ergonomics", () => {
     expect(clearedSideB?.endpointBSealReference).toBeUndefined();
     expect(clearedSideB?.endpointBSealName).toBeUndefined();
 
-    fireEvent.click(within(editConnectorPanel).getByRole("button", { name: "Save" }));
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Save material application" }));
     expect(store.getState().connectors.byId[connectorId]?.terminalOverrides).toBeUndefined();
   });
 

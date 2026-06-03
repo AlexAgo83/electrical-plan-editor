@@ -64,7 +64,7 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     expect(saved?.pinElectricalRoles).toEqual({ 1: { role: "consumer", currentA: 40, label: "BAT+" } });
   });
 
-  it("badges per-pin source as catalog when only a catalog default exists, and override when set by the connector", () => {
+  it("shows inherited pin role details without a source column", () => {
     const catalogItemId = asCatalogItemId("CAT-ECU");
     const connectorId = asConnectorId("C-ECU");
     let state = appReducer(
@@ -93,12 +93,15 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     const panel = openConnectorAnalysis("ECU connector");
 
     const row1 = within(panel).getByLabelText("Select pin 1").closest('[role="row"]') as HTMLElement;
-    const row2 = within(panel).getByLabelText("Select pin 2").closest('[role="row"]') as HTMLElement;
-    const row3 = within(panel).getByLabelText("Select pin 3").closest('[role="row"]') as HTMLElement;
+    const columnHeaders = within(panel)
+      .getAllByRole("columnheader")
+      .map((header) => header.textContent?.trim())
+      .filter((text): text is string => text !== undefined && text.length > 0);
 
-    expect(row1.querySelector("[data-pin-role-source]")?.getAttribute("data-pin-role-source")).toBe("catalog");
-    expect(row2.querySelector("[data-pin-role-source]")?.getAttribute("data-pin-role-source")).toBe("override");
-    expect(row3.querySelector("[data-pin-role-source]")?.getAttribute("data-pin-role-source")).toBe("default");
+    expect(columnHeaders).toEqual(["Select", "Pin", "Role", "Max current (A)", "Label"]);
+    expect(row1.querySelector("[data-pin-role-source]")).toBeNull();
+    expect(within(row1).getByText("40 A")).toBeInTheDocument();
+    expect(within(row1).getByText("BAT+")).toBeInTheDocument();
   });
 
   it("does not render the old connector form pin roles panel", () => {
@@ -167,10 +170,10 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     const secondWay = within(panel).getByLabelText("Select pin 2").closest('[role="row"]') as HTMLElement;
 
     expect(within(firstWay).getByText("Consumer")).toBeInTheDocument();
-    expect(within(firstWay).getByText("catalog")).toBeInTheDocument();
-    expect(within(firstWay).getByText("BAT+ / 40 A")).toBeInTheDocument();
+    expect(within(firstWay).getByText("BAT+")).toBeInTheDocument();
+    expect(within(firstWay).getByText("40 A")).toBeInTheDocument();
     expect(within(secondWay).getByText("Source")).toBeInTheDocument();
-    expect(within(secondWay).getByText("override")).toBeInTheDocument();
+    expect(within(panel).queryByRole("columnheader", { name: "Source" })).not.toBeInTheDocument();
     expect(within(secondWay).getByDisplayValue("2.5")).toBeInTheDocument();
   });
 

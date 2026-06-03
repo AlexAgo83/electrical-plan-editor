@@ -832,6 +832,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     setConnectorApplyCatalogSeals: formsState.setConnectorApplyCatalogSeals,
     connectorTerminalOverridesText: formsState.connectorTerminalOverridesText,
     setConnectorTerminalOverridesText: formsState.setConnectorTerminalOverridesText,
+    onClearConnectorTerminalAndSealOverrides: modelingHandlers.connector.handleClearConnectorTerminalAndSealOverrides,
     onSaveConnectorCatalogMaterialApplication: handleSaveConnectorCatalogMaterialApplication,
     onSaveConnectorPinElectricalRoles: handleSaveConnectorPinElectricalRoles,
     selectedSplice: selection.selectedSplice,

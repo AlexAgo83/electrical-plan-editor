@@ -471,18 +471,19 @@ export function useConnectorHandlers({
 
   function handleClearConnectorTerminalAndSealOverrides(): void {
     setConnectorTerminalOverridesText("");
-    if (connectorFormMode !== "edit" || editingConnectorId === null) {
+    const targetConnectorId = connectorFormMode === "edit" ? editingConnectorId : selectedConnectorId;
+    if (targetConnectorId === null) {
       return;
     }
 
     const state = store.getState();
     const wiresToUpdate = state.wires.allIds.flatMap((wireId) => {
       const wire = state.wires.byId[wireId];
-      return wire !== undefined && hasConnectorEndpointReferenceFields(wire, editingConnectorId) ? [wire] : [];
+      return wire !== undefined && hasConnectorEndpointReferenceFields(wire, targetConnectorId) ? [wire] : [];
     });
 
     wiresToUpdate.forEach((wire, index) => {
-      dispatchAction(appActions.saveWire(clearConnectorEndpointReferences(wire, editingConnectorId)), {
+      dispatchAction(appActions.saveWire(clearConnectorEndpointReferences(wire, targetConnectorId)), {
         trackHistory: index === 0
       });
     });

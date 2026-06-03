@@ -33,16 +33,6 @@ const ROLE_LABELS: Record<PinElectricalRoleKind, string> = {
   bidirectional: "Bidirectional"
 };
 
-function describeSource(source: "override" | "catalog" | "default"): string {
-  if (source === "override") {
-    return "override";
-  }
-  if (source === "catalog") {
-    return "catalog";
-  }
-  return "default";
-}
-
 export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): ReactElement {
   const {
     cavityCount,
@@ -154,25 +144,12 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
           <span role="columnheader">Role</span>
           <span role="columnheader">Max current (A)</span>
           <span role="columnheader">Label</span>
-          <span role="columnheader">Source</span>
         </div>
         {Array.from({ length: safeCavityCount }, (_, index) => {
           const cavityIndex = index + 1;
           const draft = drafts[cavityIndex] ?? createEmptyPinElectricalRoleDraft();
           const draftError = getPinElectricalRoleDraftError(draft);
-          const resolved = resolvePinElectricalRoleDescriptor(
-            { pinElectricalRoles: undefined },
-            catalogItem,
-            cavityIndex
-          );
-          const effectiveSource: "override" | "catalog" | "default" =
-            draft.role !== "" ? "override" : resolved.source;
-          const inheritedDetails =
-            draft.role === "" && (resolved.role.label !== undefined || resolved.role.currentA !== undefined)
-              ? [resolved.role.label, resolved.role.currentA === undefined ? undefined : `${resolved.role.currentA} A`].filter(
-                  (value): value is string => value !== undefined
-                )
-              : [];
+          const resolved = resolvePinElectricalRoleDescriptor({ pinElectricalRoles: undefined }, catalogItem, cavityIndex);
           const isSelected = selection.includes(cavityIndex);
           return (
             <div
@@ -181,7 +158,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
               key={cavityIndex}
               data-pin-role-invalid={draftError === null ? undefined : "true"}
             >
-              <span role="cell">
+              <span role="cell" data-label="Select">
                 <label className="sr-only" htmlFor={`pin-role-select-${cavityIndex}`}>
                   Select pin {cavityIndex}
                 </label>
@@ -193,10 +170,10 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                   aria-label={`Select pin ${cavityIndex}`}
                 />
               </span>
-              <span role="cell" className="pin-electrical-roles-index">
+              <span role="cell" className="pin-electrical-roles-index" data-label="Pin">
                 {cavityIndex}
               </span>
-              <span role="cell">
+              <span role="cell" data-label="Role">
                 <label className="sr-only" htmlFor={`pin-role-role-${cavityIndex}`}>
                   Role for pin {cavityIndex}
                 </label>
@@ -215,7 +192,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                   ))}
                 </select>
               </span>
-              <span role="cell">
+              <span role="cell" data-label="Max current (A)">
                 <label className="sr-only" htmlFor={`pin-role-current-${cavityIndex}`}>
                   Max current for pin {cavityIndex}
                 </label>
@@ -230,8 +207,14 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                     updateDraftField(cavityIndex, "currentA", event.target.value)
                   }
                 />
+                {draft.role === "" && resolved.role.currentA !== undefined ? (
+                  <small className="pin-electrical-roles-effective">{resolved.role.currentA} A</small>
+                ) : null}
+                {draftError === null ? null : (
+                  <small className="inline-error">{draftError}</small>
+                )}
               </span>
-              <span role="cell">
+              <span role="cell" data-label="Label">
                 <label className="sr-only" htmlFor={`pin-role-label-${cavityIndex}`}>
                   Label for pin {cavityIndex}
                 </label>
@@ -245,20 +228,9 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                     updateDraftField(cavityIndex, "label", event.target.value)
                   }
                 />
-              </span>
-              <span role="cell">
-                <small
-                  className={`pin-electrical-roles-source pin-electrical-roles-source--${effectiveSource}`}
-                  data-pin-role-source={effectiveSource}
-                >
-                  {describeSource(effectiveSource)}
-                </small>
-                {inheritedDetails.length === 0 ? null : (
-                  <small className="pin-electrical-roles-effective">{inheritedDetails.join(" / ")}</small>
-                )}
-                {draftError === null ? null : (
-                  <small className="inline-error">{draftError}</small>
-                )}
+                {draft.role === "" && resolved.role.label !== undefined ? (
+                  <small className="pin-electrical-roles-effective">{resolved.role.label}</small>
+                ) : null}
               </span>
             </div>
           );

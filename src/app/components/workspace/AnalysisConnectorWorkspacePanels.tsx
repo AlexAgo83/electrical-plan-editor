@@ -61,6 +61,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     setConnectorApplyCatalogSeals,
     connectorTerminalOverridesText,
     setConnectorTerminalOverridesText,
+    onClearConnectorTerminalAndSealOverrides,
     onSaveConnectorCatalogMaterialApplication,
     onSaveConnectorPinElectricalRoles,
     getSortIndicator: _getSortIndicator
@@ -659,6 +660,17 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         <button type="button" className="button-with-icon" onClick={handleSaveCatalogMaterialApplication}>
           <span className="action-button-icon is-save" aria-hidden="true" />
           Save material application
+        </button>
+        <button
+          type="button"
+          className="button-with-icon"
+          onClick={() => {
+            onClearConnectorTerminalAndSealOverrides();
+            setCatalogMaterialSaveMessage(null);
+          }}
+        >
+          <span className="action-button-icon is-cancel" aria-hidden="true" />
+          Clear terminal and seal overrides
         </button>
         {catalogMaterialSaveMessage === null ? null : (
           <small className={catalogMaterialSaveIsError ? "inline-error" : "inline-help"}>{catalogMaterialSaveMessage}</small>

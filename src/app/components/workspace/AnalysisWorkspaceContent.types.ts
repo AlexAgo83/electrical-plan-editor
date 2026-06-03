@@ -81,6 +81,7 @@ export interface AnalysisWorkspaceContentProps {
   setConnectorApplyCatalogSeals: (value: boolean) => void;
   connectorTerminalOverridesText: string;
   setConnectorTerminalOverridesText: (value: string) => void;
+  onClearConnectorTerminalAndSealOverrides: () => void;
   onSaveConnectorCatalogMaterialApplication: (
     connectorId: ConnectorId,
     input: {
