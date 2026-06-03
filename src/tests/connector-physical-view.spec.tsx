@@ -55,6 +55,7 @@ describe("ConnectorPhysicalView", () => {
           return parseWireOccupantRef(occupantRef)?.wireId ?? null;
         }}
         onGoToWire={vi.fn()}
+        onReleaseCavity={vi.fn()}
       />
     );
 

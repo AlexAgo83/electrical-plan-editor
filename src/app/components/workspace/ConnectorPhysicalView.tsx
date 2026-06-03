@@ -35,6 +35,7 @@ interface ConnectorPhysicalViewProps {
   selectedWireId: WireId | null;
   parseOccupantWireId: (occupantRef: string | null) => WireId | null;
   onGoToWire: (wireId: WireId) => void;
+  onReleaseCavity: (cavityIndex: number) => void;
 }
 
 type RenderableKeying = {
@@ -260,7 +261,8 @@ export function ConnectorPhysicalView({
   wireById,
   selectedWireId,
   parseOccupantWireId,
-  onGoToWire
+  onGoToWire,
+  onReleaseCavity
 }: ConnectorPhysicalViewProps): ReactElement {
   const layout = resolveConnectorLayout(catalogItem?.connectorLayout, connector.cavityCount);
   const statusByCavity = new Map(connectorCavityStatuses.map((status) => [status.cavityIndex, status] as const));
@@ -361,11 +363,16 @@ export function ConnectorPhysicalView({
                   {status?.isOccupied === true ? renderWireColorPrefixMarker(wire) : null}
                   {status?.isOccupied === true ? renderPhysicalOccupantRef(occupantRef, wireById) : <span>Free</span>}
                 </p>
-                {wireId !== null ? (
+                {status?.isOccupied === true ? (
                   <div className="cavity-actions">
-                    <button type="button" className="validation-row-go-to-button button-with-icon" onClick={() => onGoToWire(wireId)}>
-                      <span className="action-button-icon is-open" aria-hidden="true" />
-                      Go to
+                    {wireId !== null ? (
+                      <button type="button" className="validation-row-go-to-button button-with-icon" onClick={() => onGoToWire(wireId)}>
+                        <span className="action-button-icon is-open" aria-hidden="true" />
+                        Go to
+                      </button>
+                    ) : null}
+                    <button type="button" className="button-with-icon" onClick={() => onReleaseCavity(way.cavityIndex)}>
+                      Release
                     </button>
                   </div>
                 ) : null}

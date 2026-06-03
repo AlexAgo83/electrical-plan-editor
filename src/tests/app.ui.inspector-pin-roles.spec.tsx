@@ -204,9 +204,9 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
 
     fireEvent.click(within(panel).getByRole("button", { name: "Catalog material" }));
     expect(within(panel).getByRole("button", { name: "Catalog material" })).toHaveAttribute("aria-pressed", "true");
-    expect(within(panel).getByText("Catalog material application").closest("fieldset")).toHaveClass(
-      "catalog-material-application-fieldset"
-    );
+    expect(within(panel).queryByText("Catalog material application")).not.toBeInTheDocument();
+    expect(within(panel).getByLabelText("Apply catalog seals")).toBeInTheDocument();
+    expect(within(panel).getByLabelText("Terminal and seal overrides")).toBeInTheDocument();
 
     fireEvent.click(within(panel).getByLabelText("Apply catalog seals"));
     fireEvent.change(within(panel).getByLabelText("Terminal and seal overrides"), {

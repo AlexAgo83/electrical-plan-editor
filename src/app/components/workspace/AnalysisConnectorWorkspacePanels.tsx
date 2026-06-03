@@ -44,6 +44,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     connectorOccupantRefInput,
     setConnectorOccupantRefInput,
     handleReserveCavity,
+    handleReleaseCavity,
     connectorCavityStatuses,
     onOpenWireFromAnalysisTable,
     onOpenConnectorFromAnalysisTable,
@@ -613,52 +614,47 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         selectedWireId={selectedWireId}
         parseOccupantWireId={parseOccupantWireId}
         onGoToWire={onOpenWireFromAnalysisTable}
+        onReleaseCavity={handleReleaseCavity}
       />
     </>
   ) : connectorAnalysisView === "catalogMaterial" ? (
     <>
-      <p className="meta-line">
-        <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
-      </p>
-      <fieldset className="inline-fieldset catalog-material-application-fieldset">
-        <legend>Catalog material application</legend>
-        <div className="stack-form">
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={connectorApplyCatalogSeals}
-              onChange={(event) => {
-                setConnectorApplyCatalogSeals(event.target.checked);
-                setCatalogMaterialSaveMessage(null);
-              }}
-            />
-            Apply catalog seals
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={connectorApplyCatalogPlugs}
-              onChange={(event) => {
-                setConnectorApplyCatalogPlugs(event.target.checked);
-                setCatalogMaterialSaveMessage(null);
-              }}
-            />
-            Apply catalog plugs
-          </label>
-          <label>
-            Terminal and seal overrides
-            <textarea
-              value={connectorTerminalOverridesText}
-              onChange={(event) => {
-                setConnectorTerminalOverridesText(event.target.value);
-                setCatalogMaterialSaveMessage(null);
-              }}
-              placeholder={"1,TERM-A,SEAL-A,Terminal name,Seal name\n2,TERM-B,SEAL-B"}
-              rows={5}
-            />
-          </label>
-        </div>
-      </fieldset>
+      <div className="stack-form catalog-material-application-form">
+        <label className="settings-checkbox">
+          <input
+            type="checkbox"
+            checked={connectorApplyCatalogSeals}
+            onChange={(event) => {
+              setConnectorApplyCatalogSeals(event.target.checked);
+              setCatalogMaterialSaveMessage(null);
+            }}
+          />
+          Apply catalog seals
+        </label>
+        <label className="settings-checkbox">
+          <input
+            type="checkbox"
+            checked={connectorApplyCatalogPlugs}
+            onChange={(event) => {
+              setConnectorApplyCatalogPlugs(event.target.checked);
+              setCatalogMaterialSaveMessage(null);
+            }}
+          />
+          Apply catalog plugs
+        </label>
+        <label>
+          Terminal and seal overrides
+          <textarea
+            value={connectorTerminalOverridesText}
+            onChange={(event) => {
+              setConnectorTerminalOverridesText(event.target.value);
+              setCatalogMaterialSaveMessage(null);
+            }}
+            placeholder={"1,TERM-A,SEAL-A,Terminal name,Seal name\n2,TERM-B,SEAL-B"}
+            rows={5}
+          />
+        </label>
+      </div>
       <div className="row-actions compact">
         <button type="button" className="button-with-icon" onClick={handleSaveCatalogMaterialApplication}>
           <span className="action-button-icon is-save" aria-hidden="true" />

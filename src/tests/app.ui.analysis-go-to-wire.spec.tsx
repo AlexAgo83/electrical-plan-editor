@@ -17,7 +17,7 @@ describe("App integration UI - analysis go-to wire actions", () => {
     localStorage.clear();
   });
 
-  it("opens wire editing from connector physical occupancy card", () => {
+  it("opens wire editing from connector physical occupancy card and keeps Go to before Release", () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("analysis");
@@ -34,7 +34,7 @@ describe("App integration UI - analysis go-to wire actions", () => {
 
     const cardButtons = within(occupiedCard as HTMLElement).getAllByRole("button");
     const cardButtonLabels = cardButtons.map((button) => button.textContent?.trim());
-    expect(cardButtonLabels).toEqual(["Go to"]);
+    expect(cardButtonLabels).toEqual(["Go to", "Release"]);
 
     fireEvent.click(within(occupiedCard as HTMLElement).getByRole("button", { name: "Go to" }));
 
