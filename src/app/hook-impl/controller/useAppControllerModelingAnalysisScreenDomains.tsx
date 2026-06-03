@@ -386,6 +386,21 @@ export function useAppControllerModelingAnalysisScreenDomains({
     },
     [catalogHandlers, dispatchAction, markSelectionPanelsFromTable, openCatalogSubScreen, store]
   );
+  const handleSaveConnectorPinElectricalRoles: AnalysisSliceParams["onSaveConnectorPinElectricalRoles"] = useCallback(
+    (connectorId, pinElectricalRoles) => {
+      const connector = store.getState().connectors.byId[connectorId];
+      if (connector === undefined) {
+        return;
+      }
+      dispatchAction(
+        appActions.upsertConnector({
+          ...connector,
+          pinElectricalRoles
+        })
+      );
+    },
+    [dispatchAction, store]
+  );
   const handleSelectConnectorReference: ModelingSliceParams["onSelectConnectorReference"] = useCallback(
     (connectorId) => {
       markSelectionPanelsFromTable?.();
@@ -788,6 +803,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     getSortIndicator: listModel.getSortIndicator,
     connectorAnalysisView,
     setConnectorAnalysisView,
+    onSaveConnectorPinElectricalRoles: handleSaveConnectorPinElectricalRoles,
     selectedSplice: selection.selectedSplice,
     selectedSpliceId: selection.selectedSpliceId,
     spliceOccupancyFilter: listModel.spliceOccupancyFilter,

@@ -6,6 +6,7 @@ import type {
   ConnectorId,
   NetworkNode,
   NodeId,
+  PinElectricalRole,
   Segment,
   SegmentId,
   Splice,
@@ -74,6 +75,10 @@ export interface AnalysisWorkspaceContentProps {
   getSortIndicator: (sortState: SortState, field: SortState["field"]) => string;
   connectorAnalysisView: ConnectorAnalysisView;
   setConnectorAnalysisView: (value: ConnectorAnalysisView) => void;
+  onSaveConnectorPinElectricalRoles: (
+    connectorId: ConnectorId,
+    pinElectricalRoles: Record<number, PinElectricalRole> | undefined
+  ) => void;
   selectedSplice: Splice | null;
   selectedSpliceId: SpliceId | null;
   spliceOccupancyFilter: "all" | "occupied" | "free";

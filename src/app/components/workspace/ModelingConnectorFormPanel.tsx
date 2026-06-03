@@ -7,7 +7,6 @@ import { EntityReferenceButton } from "./EntityReferenceButton";
 import type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 import { renderFormHeader, renderIdleCopy } from "./ModelingFormsColumn.shared";
 import { getFusePairOverrideDraftError, getFusePairRatingDraftError } from "../../hooks/connectorFusePairRatings";
-import { PinElectricalRolesEditor } from "./PinElectricalRolesEditor";
 
 const FUSE_RATING_QUICK_PICKS = ["3", "4", "5", "7.5", "10", "15", "20", "25", "30", "40"] as const;
 
@@ -38,11 +37,6 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     setConnectorFusePairRatings,
     connectorFusePairOverrides,
     setConnectorFusePairOverrides,
-    connectorPinElectricalRoleDrafts,
-    setConnectorPinElectricalRoleDrafts,
-    connectorPinElectricalRoleSelection,
-    setConnectorPinElectricalRoleSelection,
-    connectorPinRoleCatalogItem,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,
@@ -376,14 +370,6 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         </div>
       </fieldset>
     ) : null}
-    <PinElectricalRolesEditor
-      cavityCount={cavityCountForValidation}
-      drafts={connectorPinElectricalRoleDrafts}
-      setDrafts={setConnectorPinElectricalRoleDrafts}
-      selection={connectorPinElectricalRoleSelection}
-      setSelection={setConnectorPinElectricalRoleSelection}
-      catalogItem={connectorPinRoleCatalogItem}
-    />
     <label className="settings-checkbox">
       <input
         type="checkbox"

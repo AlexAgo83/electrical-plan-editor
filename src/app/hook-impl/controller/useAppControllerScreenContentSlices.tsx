@@ -733,6 +733,7 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
     getSortIndicator: params.getSortIndicator,
     connectorAnalysisView: params.connectorAnalysisView,
     setConnectorAnalysisView: params.setConnectorAnalysisView,
+    onSaveConnectorPinElectricalRoles: params.onSaveConnectorPinElectricalRoles,
     selectedSplice: params.selectedSplice,
     selectedSpliceId: params.selectedSpliceId,
     spliceOccupancyFilter: params.spliceOccupancyFilter,

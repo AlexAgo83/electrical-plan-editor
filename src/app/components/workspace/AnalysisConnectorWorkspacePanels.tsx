@@ -10,9 +10,16 @@ import { formatOccupantRefForDisplay, parseWireOccupantRef } from "../../lib/app
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
+import {
+  formatPinElectricalRoleDrafts,
+  hasInvalidPinElectricalRoleDraft,
+  serializePinElectricalRoleDrafts,
+  type ConnectorPinElectricalRoleDrafts
+} from "../../hooks/connectorPinElectricalRoles";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 import { ConnectorPhysicalView } from "./ConnectorPhysicalView";
 import { EntityReferenceButton } from "./EntityReferenceButton";
+import { PinElectricalRolesEditor } from "./PinElectricalRolesEditor";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
@@ -69,6 +76,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     setConnectorSynthesisSort: _setConnectorSynthesisSort,
     connectorAnalysisView,
     setConnectorAnalysisView,
+    onSaveConnectorPinElectricalRoles,
     getSortIndicator: _getSortIndicator
   } = props;
   void _connectorSynthesisSort;
@@ -79,8 +87,12 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   const isMobileViewport = useIsMobileViewport();
   const [connectorTableSort, setConnectorTableSort] = useState<{ field: ConnectorAnalysisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const [connectorSynthesisTableSort, setConnectorSynthesisTableSort] = useState<{ field: ConnectorSynthesisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
+  const [pinRoleDrafts, setPinRoleDrafts] = useState<ConnectorPinElectricalRoleDrafts>({});
+  const [pinRoleSelection, setPinRoleSelection] = useState<number[]>([]);
+  const [pinRoleSaveMessage, setPinRoleSaveMessage] = useState<string | null>(null);
   const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   const selectedConnectorCatalogItem = selectedConnector?.catalogItemId === undefined ? undefined : catalogItemById.get(selectedConnector.catalogItemId);
+  const pinRoleDraftsAreInvalid = hasInvalidPinElectricalRoleDraft(pinRoleDrafts);
   const connectorFilterPlaceholder =
     connectorFilterField === "name" ? "Connector name" : connectorFilterField === "technicalId" ? "Technical ID" : "Name or technical ID...";
   const sortedVisibleConnectors = useMemo(
@@ -229,6 +241,34 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     }
     handleReserveCavity(event);
   }
+
+  function handleSavePinElectricalRoles(): void {
+    if (selectedConnector === null) {
+      return;
+    }
+    if (pinRoleDraftsAreInvalid) {
+      setPinRoleSaveMessage("Fix invalid pin role values before saving.");
+      return;
+    }
+    onSaveConnectorPinElectricalRoles(
+      selectedConnector.id,
+      serializePinElectricalRoleDrafts(pinRoleDrafts, selectedConnector.cavityCount)
+    );
+    setPinRoleSelection([]);
+    setPinRoleSaveMessage("Roles saved.");
+  }
+
+  useEffect(() => {
+    if (selectedConnector === null) {
+      setPinRoleDrafts({});
+      setPinRoleSelection([]);
+      setPinRoleSaveMessage(null);
+      return;
+    }
+    setPinRoleDrafts(formatPinElectricalRoleDrafts(selectedConnector.pinElectricalRoles, selectedConnector.cavityCount));
+    setPinRoleSelection([]);
+    setPinRoleSaveMessage(null);
+  }, [selectedConnector]);
 
   return (
     <>
@@ -489,45 +529,76 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
       </p>
       <div className="connector-ways-view">
-        <section className="connector-ways-assignment-panel" aria-label="Manual way assignment">
-          <form className="row-form connector-ways-assignment-form" onSubmit={handleReserveCavitySubmit}>
-            <label>
-              Way index
-              <input
-                type="number"
-                min={1}
-                max={selectedConnector.cavityCount}
-                step={1}
-                value={cavityIndexInput}
-                onChange={(event) => setCavityIndexInput(event.target.value)}
-                aria-invalid={connectorReserveValidationMessage !== null ? true : undefined}
-                required
-              />
-            </label>
+        <div className="connector-ways-side-panel">
+          <section className="connector-ways-assignment-panel" aria-label="Manual way assignment">
+            <form className="row-form connector-ways-assignment-form" onSubmit={handleReserveCavitySubmit}>
+              <label>
+                Way index
+                <input
+                  type="number"
+                  min={1}
+                  max={selectedConnector.cavityCount}
+                  step={1}
+                  value={cavityIndexInput}
+                  onChange={(event) => setCavityIndexInput(event.target.value)}
+                  aria-invalid={connectorReserveValidationMessage !== null ? true : undefined}
+                  required
+                />
+              </label>
 
-            <label>
-              Occupant reference
-              <input
-                value={connectorOccupantRefInput}
-                onChange={(event) => setConnectorOccupantRefInput(event.target.value)}
-                placeholder="wire-draft-001:A"
-                required
-              />
-            </label>
+              <label>
+                Occupant reference
+                <input
+                  value={connectorOccupantRefInput}
+                  onChange={(event) => setConnectorOccupantRefInput(event.target.value)}
+                  placeholder="wire-draft-001:A"
+                  required
+                />
+              </label>
 
-            <button type="submit" className="button-with-icon" disabled={!canReserveCavity}>
-              <span className="action-button-icon is-lock-move" aria-hidden="true" />
-              Reserve way
-            </button>
-          </form>
-          {connectorReserveValidationMessage !== null ? <small className="inline-error">{connectorReserveValidationMessage}</small> : null}
-          {connectorReserveValidationMessage === null && nextFreeCavityIndex !== null ? (
-            <small className="inline-help">Suggested next free way: C{nextFreeCavityIndex}</small>
-          ) : null}
-          {connectorReserveValidationMessage === null && nextFreeCavityIndex === null ? (
-            <small className="inline-help">No available ways on this connector.</small>
-          ) : null}
-        </section>
+              <button type="submit" className="button-with-icon" disabled={!canReserveCavity}>
+                <span className="action-button-icon is-lock-move" aria-hidden="true" />
+                Reserve way
+              </button>
+            </form>
+            {connectorReserveValidationMessage !== null ? <small className="inline-error">{connectorReserveValidationMessage}</small> : null}
+            {connectorReserveValidationMessage === null && nextFreeCavityIndex !== null ? (
+              <small className="inline-help">Suggested next free way: C{nextFreeCavityIndex}</small>
+            ) : null}
+            {connectorReserveValidationMessage === null && nextFreeCavityIndex === null ? (
+              <small className="inline-help">No available ways on this connector.</small>
+            ) : null}
+          </section>
+          <PinElectricalRolesEditor
+            mode="panel"
+            title="Electrical roles"
+            cavityCount={selectedConnector.cavityCount}
+            drafts={pinRoleDrafts}
+            setDrafts={(nextDrafts) => {
+              setPinRoleDrafts(nextDrafts);
+              setPinRoleSaveMessage(null);
+            }}
+            selection={pinRoleSelection}
+            setSelection={setPinRoleSelection}
+            catalogItem={selectedConnectorCatalogItem}
+            footerActions={
+              <>
+                <button
+                  type="button"
+                  className="button-with-icon"
+                  disabled={pinRoleDraftsAreInvalid}
+                  onClick={handleSavePinElectricalRoles}
+                >
+                  <span className="action-button-icon is-save" aria-hidden="true" />
+                  Save roles
+                </button>
+                {pinRoleSaveMessage === null ? null : (
+                  <small className={pinRoleDraftsAreInvalid ? "inline-error" : "inline-help"}>{pinRoleSaveMessage}</small>
+                )}
+              </>
+            }
+          />
+        </div>
 
         <div className="cavity-grid connector-ways-cavity-grid" aria-label="Way occupancy grid">
           {connectorCavityStatuses.map((slot) => {

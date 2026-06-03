@@ -363,6 +363,12 @@
   align-items: start;
 }
 
+.connector-ways-side-panel {
+  min-width: 0;
+  display: grid;
+  gap: 0.8rem;
+}
+
 .connector-ways-assignment-panel {
   min-width: 0;
   display: grid;
@@ -482,6 +488,98 @@
   padding: 0.05rem 0.35rem;
   font-size: 0.76rem;
   font-weight: 700;
+}
+
+.pin-electrical-roles-editor--panel {
+  min-width: 0;
+  display: grid;
+  gap: 0.7rem;
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, currentColor 3.5%, transparent);
+  padding: 0.7rem;
+}
+
+.pin-electrical-roles-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.pin-electrical-roles-panel-header h3 {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.pin-electrical-roles-bulk {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.pin-electrical-roles-bulk-role {
+  min-width: 9rem;
+  flex: 1 1 9rem;
+}
+
+.pin-electrical-roles-table {
+  display: grid;
+  gap: 0.38rem;
+  overflow-x: auto;
+}
+
+.pin-electrical-roles-row {
+  display: grid;
+  grid-template-columns: 1.8rem 2rem minmax(7rem, 1fr) minmax(5rem, 0.65fr) minmax(7rem, 1fr) minmax(5.5rem, auto);
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 38rem;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, currentColor 2.5%, transparent);
+  padding: 0.35rem;
+}
+
+.pin-electrical-roles-row--header {
+  border-color: transparent;
+  background: transparent;
+  color: color-mix(in srgb, currentColor 70%, transparent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.pin-electrical-roles-row.has-error {
+  border-color: color-mix(in srgb, var(--theme-danger, #dc2626) 58%, currentColor 18%);
+}
+
+.pin-electrical-roles-index {
+  font-weight: 800;
+}
+
+.pin-electrical-roles-row input,
+.pin-electrical-roles-row select {
+  min-width: 0;
+}
+
+.pin-electrical-roles-row input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+}
+
+.pin-electrical-roles-row .inline-error {
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.pin-electrical-roles-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
 }
 
 .cavity-actions {

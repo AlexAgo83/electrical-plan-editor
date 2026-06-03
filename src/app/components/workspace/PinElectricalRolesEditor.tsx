@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { useState } from "react";
 import type { CatalogItem, PinElectricalRoleKind } from "../../../core/entities";
 import {
@@ -21,6 +21,9 @@ export interface PinElectricalRolesEditorProps {
   selection: number[];
   setSelection: (value: number[]) => void;
   catalogItem: CatalogItem | undefined;
+  mode?: "fieldset" | "panel";
+  title?: string;
+  footerActions?: ReactNode;
 }
 
 const ROLE_LABELS: Record<PinElectricalRoleKind, string> = {
@@ -41,8 +44,18 @@ function describeSource(source: "override" | "catalog" | "default"): string {
 }
 
 export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): ReactElement {
-  const { cavityCount, drafts, setDrafts, selection, setSelection, catalogItem } = props;
-  const [isOpen, setIsOpen] = useState(false);
+  const {
+    cavityCount,
+    drafts,
+    setDrafts,
+    selection,
+    setSelection,
+    catalogItem,
+    mode = "fieldset",
+    title = "Pin electrical roles",
+    footerActions
+  } = props;
+  const [isOpen, setIsOpen] = useState(mode === "panel");
   const [bulkRole, setBulkRole] = useState<PinElectricalRoleKind>("source");
   const safeCavityCount = Number.isFinite(cavityCount) && cavityCount > 0 ? Math.trunc(cavityCount) : 0;
 
@@ -89,6 +102,174 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
     return <></>;
   }
 
+  const editorBody = (
+    <>
+      <div className="pin-electrical-roles-bulk">
+        <button type="button" className="link-button" onClick={selectAll}>
+          Select all
+        </button>
+        <button type="button" className="link-button" onClick={clearSelection}>
+          Clear selection
+        </button>
+        <label className="pin-electrical-roles-bulk-role">
+          Bulk role
+          <select
+            value={bulkRole}
+            onChange={(event) => setBulkRole(event.target.value as PinElectricalRoleKind)}
+          >
+            {PIN_ELECTRICAL_ROLE_KINDS.map((kind) => (
+              <option key={kind} value={kind}>
+                {ROLE_LABELS[kind]}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          type="button"
+          className="button-with-icon"
+          disabled={selection.length === 0}
+          onClick={applyBulkRole}
+        >
+          Apply role to selected pins
+        </button>
+        <button
+          type="button"
+          className="button-with-icon"
+          disabled={selection.length === 0}
+          onClick={resetSelectionToCatalog}
+        >
+          Reset to catalog default
+        </button>
+      </div>
+      <div
+        className="pin-electrical-roles-table"
+        role="table"
+        aria-label="Pin electrical roles"
+      >
+        <div className="pin-electrical-roles-row pin-electrical-roles-row--header" role="row">
+          <span role="columnheader" className="sr-only">
+            Select
+          </span>
+          <span role="columnheader">Pin</span>
+          <span role="columnheader">Role</span>
+          <span role="columnheader">Max current (A)</span>
+          <span role="columnheader">Label</span>
+          <span role="columnheader">Source</span>
+        </div>
+        {Array.from({ length: safeCavityCount }, (_, index) => {
+          const cavityIndex = index + 1;
+          const draft = drafts[cavityIndex] ?? createEmptyPinElectricalRoleDraft();
+          const draftError = getPinElectricalRoleDraftError(draft);
+          const resolved = resolvePinElectricalRoleDescriptor(
+            { pinElectricalRoles: undefined },
+            catalogItem,
+            cavityIndex
+          );
+          const effectiveSource: "override" | "catalog" | "default" =
+            draft.role !== "" ? "override" : resolved.source;
+          const isSelected = selection.includes(cavityIndex);
+          return (
+            <div
+              className={`pin-electrical-roles-row${draftError === null ? "" : " has-error"}`}
+              role="row"
+              key={cavityIndex}
+              data-pin-role-invalid={draftError === null ? undefined : "true"}
+            >
+              <span role="cell">
+                <label className="sr-only" htmlFor={`pin-role-select-${cavityIndex}`}>
+                  Select pin {cavityIndex}
+                </label>
+                <input
+                  id={`pin-role-select-${cavityIndex}`}
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={() => toggleSelection(cavityIndex)}
+                  aria-label={`Select pin ${cavityIndex}`}
+                />
+              </span>
+              <span role="cell" className="pin-electrical-roles-index">
+                {cavityIndex}
+              </span>
+              <span role="cell">
+                <label className="sr-only" htmlFor={`pin-role-role-${cavityIndex}`}>
+                  Role for pin {cavityIndex}
+                </label>
+                <select
+                  id={`pin-role-role-${cavityIndex}`}
+                  value={draft.role}
+                  onChange={(event) =>
+                    updateDraftField(cavityIndex, "role", event.target.value)
+                  }
+                >
+                  <option value="">(inherit)</option>
+                  {PIN_ELECTRICAL_ROLE_KINDS.map((kind) => (
+                    <option key={kind} value={kind}>
+                      {ROLE_LABELS[kind]}
+                    </option>
+                  ))}
+                </select>
+              </span>
+              <span role="cell">
+                <label className="sr-only" htmlFor={`pin-role-current-${cavityIndex}`}>
+                  Max current for pin {cavityIndex}
+                </label>
+                <input
+                  id={`pin-role-current-${cavityIndex}`}
+                  type="number"
+                  min={0}
+                  step={0.1}
+                  value={draft.currentA}
+                  aria-invalid={draftError === null ? undefined : true}
+                  onChange={(event) =>
+                    updateDraftField(cavityIndex, "currentA", event.target.value)
+                  }
+                />
+              </span>
+              <span role="cell">
+                <label className="sr-only" htmlFor={`pin-role-label-${cavityIndex}`}>
+                  Label for pin {cavityIndex}
+                </label>
+                <input
+                  id={`pin-role-label-${cavityIndex}`}
+                  type="text"
+                  maxLength={80}
+                  value={draft.label}
+                  placeholder="BAT+, KL15, LS_OUT..."
+                  onChange={(event) =>
+                    updateDraftField(cavityIndex, "label", event.target.value)
+                  }
+                />
+              </span>
+              <span role="cell">
+                <small
+                  className={`pin-electrical-roles-source pin-electrical-roles-source--${effectiveSource}`}
+                  data-pin-role-source={effectiveSource}
+                >
+                  {describeSource(effectiveSource)}
+                </small>
+                {draftError === null ? null : (
+                  <small className="inline-error">{draftError}</small>
+                )}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      {footerActions === undefined ? null : <div className="pin-electrical-roles-footer">{footerActions}</div>}
+    </>
+  );
+
+  if (mode === "panel") {
+    return (
+      <section className="pin-electrical-roles-editor pin-electrical-roles-editor--panel" aria-label={title}>
+        <header className="pin-electrical-roles-panel-header">
+          <h3>{title}</h3>
+        </header>
+        {editorBody}
+      </section>
+    );
+  }
+
   return (
     <fieldset className="inline-fieldset pin-electrical-roles-editor">
       <legend>
@@ -98,164 +279,10 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
           aria-expanded={isOpen}
           onClick={() => setIsOpen((previous) => !previous)}
         >
-          Pin electrical roles ({safeCavityCount})
+          {title} ({safeCavityCount})
         </button>
       </legend>
-      {isOpen ? (
-        <>
-          <div className="pin-electrical-roles-bulk">
-            <button type="button" className="link-button" onClick={selectAll}>
-              Select all
-            </button>
-            <button type="button" className="link-button" onClick={clearSelection}>
-              Clear selection
-            </button>
-            <label className="pin-electrical-roles-bulk-role">
-              Bulk role
-              <select
-                value={bulkRole}
-                onChange={(event) => setBulkRole(event.target.value as PinElectricalRoleKind)}
-              >
-                {PIN_ELECTRICAL_ROLE_KINDS.map((kind) => (
-                  <option key={kind} value={kind}>
-                    {ROLE_LABELS[kind]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button
-              type="button"
-              className="button-with-icon"
-              disabled={selection.length === 0}
-              onClick={applyBulkRole}
-            >
-              Apply role to selected pins
-            </button>
-            <button
-              type="button"
-              className="button-with-icon"
-              disabled={selection.length === 0}
-              onClick={resetSelectionToCatalog}
-            >
-              Reset to catalog default
-            </button>
-          </div>
-          <div
-            className="pin-electrical-roles-table"
-            role="table"
-            aria-label="Pin electrical roles"
-          >
-            <div className="pin-electrical-roles-row pin-electrical-roles-row--header" role="row">
-              <span role="columnheader" className="sr-only">
-                Select
-              </span>
-              <span role="columnheader">Pin</span>
-              <span role="columnheader">Role</span>
-              <span role="columnheader">Max current (A)</span>
-              <span role="columnheader">Label</span>
-              <span role="columnheader">Source</span>
-            </div>
-            {Array.from({ length: safeCavityCount }, (_, index) => {
-              const cavityIndex = index + 1;
-              const draft = drafts[cavityIndex] ?? createEmptyPinElectricalRoleDraft();
-              const draftError = getPinElectricalRoleDraftError(draft);
-              const resolved = resolvePinElectricalRoleDescriptor(
-                { pinElectricalRoles: undefined },
-                catalogItem,
-                cavityIndex
-              );
-              const effectiveSource: "override" | "catalog" | "default" =
-                draft.role !== "" ? "override" : resolved.source;
-              const isSelected = selection.includes(cavityIndex);
-              return (
-                <div
-                  className={`pin-electrical-roles-row${draftError === null ? "" : " has-error"}`}
-                  role="row"
-                  key={cavityIndex}
-                  data-pin-role-invalid={draftError === null ? undefined : "true"}
-                >
-                  <span role="cell">
-                    <label className="sr-only" htmlFor={`pin-role-select-${cavityIndex}`}>
-                      Select pin {cavityIndex}
-                    </label>
-                    <input
-                      id={`pin-role-select-${cavityIndex}`}
-                      type="checkbox"
-                      checked={isSelected}
-                      onChange={() => toggleSelection(cavityIndex)}
-                      aria-label={`Select pin ${cavityIndex}`}
-                    />
-                  </span>
-                  <span role="cell" className="pin-electrical-roles-index">
-                    {cavityIndex}
-                  </span>
-                  <span role="cell">
-                    <label className="sr-only" htmlFor={`pin-role-role-${cavityIndex}`}>
-                      Role for pin {cavityIndex}
-                    </label>
-                    <select
-                      id={`pin-role-role-${cavityIndex}`}
-                      value={draft.role}
-                      onChange={(event) =>
-                        updateDraftField(cavityIndex, "role", event.target.value)
-                      }
-                    >
-                      <option value="">(inherit)</option>
-                      {PIN_ELECTRICAL_ROLE_KINDS.map((kind) => (
-                        <option key={kind} value={kind}>
-                          {ROLE_LABELS[kind]}
-                        </option>
-                      ))}
-                    </select>
-                  </span>
-                  <span role="cell">
-                    <label className="sr-only" htmlFor={`pin-role-current-${cavityIndex}`}>
-                      Max current for pin {cavityIndex}
-                    </label>
-                    <input
-                      id={`pin-role-current-${cavityIndex}`}
-                      type="number"
-                      min={0}
-                      step={0.1}
-                      value={draft.currentA}
-                      aria-invalid={draftError === null ? undefined : true}
-                      onChange={(event) =>
-                        updateDraftField(cavityIndex, "currentA", event.target.value)
-                      }
-                    />
-                  </span>
-                  <span role="cell">
-                    <label className="sr-only" htmlFor={`pin-role-label-${cavityIndex}`}>
-                      Label for pin {cavityIndex}
-                    </label>
-                    <input
-                      id={`pin-role-label-${cavityIndex}`}
-                      type="text"
-                      maxLength={80}
-                      value={draft.label}
-                      placeholder="BAT+, KL15, LS_OUT…"
-                      onChange={(event) =>
-                        updateDraftField(cavityIndex, "label", event.target.value)
-                      }
-                    />
-                  </span>
-                  <span role="cell">
-                    <small
-                      className={`pin-electrical-roles-source pin-electrical-roles-source--${effectiveSource}`}
-                      data-pin-role-source={effectiveSource}
-                    >
-                      {describeSource(effectiveSource)}
-                    </small>
-                    {draftError === null ? null : (
-                      <small className="inline-error">{draftError}</small>
-                    )}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </>
-      ) : null}
+      {isOpen ? editorBody : null}
     </fieldset>
   );
 }

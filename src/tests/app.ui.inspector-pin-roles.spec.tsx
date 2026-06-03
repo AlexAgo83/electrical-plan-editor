@@ -10,17 +10,13 @@ import {
   switchSubScreenDrawerAware
 } from "./helpers/app-ui-test-utils";
 
-function openConnectorInspector(connectorName: string) {
+function openConnectorAnalysis(connectorName: string) {
   fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
-  switchScreenDrawerAware("modeling");
+  switchScreenDrawerAware("analysis");
+  switchSubScreenDrawerAware("connector");
   const connectorsPanel = getPanelByHeading("Connectors");
   fireEvent.click(within(connectorsPanel).getByText(connectorName));
-  return getPanelByHeading("Edit Connector");
-}
-
-function openPinRolesSection(panel: HTMLElement): void {
-  const toggle = within(panel).getByRole("button", { name: /Pin electrical roles/i });
-  fireEvent.click(toggle);
+  return getPanelByHeading("Connector analysis");
 }
 
 describe("App integration UI - connector pin electrical roles inspector", () => {
@@ -52,8 +48,7 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     );
 
     const { store } = renderAppWithState(state);
-    const panel = openConnectorInspector("ECU connector");
-    openPinRolesSection(panel);
+    const panel = openConnectorAnalysis("ECU connector");
 
     const roleSelect = within(panel).getByLabelText("Role for pin 1");
     const currentInput = within(panel).getByLabelText("Max current for pin 1");
@@ -63,7 +58,7 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     fireEvent.change(currentInput, { target: { value: "40" } });
     fireEvent.change(labelInput, { target: { value: "BAT+" } });
 
-    fireEvent.click(within(panel).getByRole("button", { name: "Save" }));
+    fireEvent.click(within(panel).getByRole("button", { name: "Save roles" }));
 
     const saved = store.getState().connectors.byId[connectorId];
     expect(saved?.pinElectricalRoles).toEqual({ 1: { role: "consumer", currentA: 40, label: "BAT+" } });
@@ -95,8 +90,7 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     );
 
     renderAppWithState(state);
-    const panel = openConnectorInspector("ECU connector");
-    openPinRolesSection(panel);
+    const panel = openConnectorAnalysis("ECU connector");
 
     const row1 = within(panel).getByLabelText("Select pin 1").closest('[role="row"]') as HTMLElement;
     const row2 = within(panel).getByLabelText("Select pin 2").closest('[role="row"]') as HTMLElement;
@@ -105,6 +99,38 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     expect(row1.querySelector("[data-pin-role-source]")?.getAttribute("data-pin-role-source")).toBe("catalog");
     expect(row2.querySelector("[data-pin-role-source]")?.getAttribute("data-pin-role-source")).toBe("override");
     expect(row3.querySelector("[data-pin-role-source]")?.getAttribute("data-pin-role-source")).toBe("default");
+  });
+
+  it("does not render the old connector form pin roles panel", () => {
+    const catalogItemId = asCatalogItemId("CAT-ECU");
+    const connectorId = asConnectorId("C-ECU");
+    let state = appReducer(
+      createInitialState(),
+      appActions.upsertCatalogItem({
+        id: catalogItemId,
+        manufacturerReference: "ECU-4",
+        connectionCount: 4
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: connectorId,
+        name: "ECU connector",
+        technicalId: "ECU-C1",
+        cavityCount: 4,
+        catalogItemId,
+        manufacturerReference: "ECU-4"
+      })
+    );
+
+    renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("ECU connector"));
+
+    expect(within(getPanelByHeading("Edit Connector")).queryByText(/Pin electrical roles/i)).not.toBeInTheDocument();
   });
 
   it("shows pin roles in the connector analysis ways view", () => {
@@ -133,12 +159,7 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     );
 
     renderAppWithState(state);
-    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
-    switchScreenDrawerAware("analysis");
-    switchSubScreenDrawerAware("connector");
-    fireEvent.click(within(getPanelByHeading("Connectors")).getByText("ECU connector"));
-
-    const panel = getPanelByHeading("Connector analysis");
+    const panel = openConnectorAnalysis("ECU connector");
     expect(within(panel).getByRole("button", { name: "Ways & roles" })).toHaveAttribute("aria-pressed", "true");
 
     const firstWay = within(panel).getByText("C1").closest("article") as HTMLElement;
@@ -177,8 +198,7 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     );
 
     const { store } = renderAppWithState(state);
-    const panel = openConnectorInspector("ECU connector");
-    openPinRolesSection(panel);
+    const panel = openConnectorAnalysis("ECU connector");
 
     fireEvent.click(within(panel).getByLabelText("Select pin 1"));
     fireEvent.click(within(panel).getByLabelText("Select pin 3"));
@@ -187,7 +207,7 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     fireEvent.change(bulkRoleSelect, { target: { value: "source" } });
     fireEvent.click(within(panel).getByRole("button", { name: "Apply role to selected pins" }));
 
-    fireEvent.click(within(panel).getByRole("button", { name: "Save" }));
+    fireEvent.click(within(panel).getByRole("button", { name: "Save roles" }));
 
     const saved = store.getState().connectors.byId[connectorId];
     expect(saved?.pinElectricalRoles).toEqual({
@@ -222,12 +242,11 @@ describe("App integration UI - connector pin electrical roles inspector", () => 
     );
 
     const { store } = renderAppWithState(state);
-    const panel = openConnectorInspector("ECU connector");
-    openPinRolesSection(panel);
+    const panel = openConnectorAnalysis("ECU connector");
 
     fireEvent.click(within(panel).getByLabelText("Select pin 1"));
     fireEvent.click(within(panel).getByRole("button", { name: "Reset to catalog default" }));
-    fireEvent.click(within(panel).getByRole("button", { name: "Save" }));
+    fireEvent.click(within(panel).getByRole("button", { name: "Save roles" }));
 
     const saved = store.getState().connectors.byId[connectorId];
     expect(saved?.pinElectricalRoles).toBeUndefined();
