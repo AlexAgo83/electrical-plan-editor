@@ -13,6 +13,7 @@ import {
   getConnectorLayoutKeyingAnchor,
   getConnectorLayoutShellCornerRadius,
   getConnectorLayoutShellStrokeWidth,
+  getConnectorLayoutWaySpan,
   getConnectorLayoutWayDisplayLabel
 } from "../../../core/connectorLayout";
 
@@ -38,19 +39,20 @@ export function renderConnectorLayoutWay(way: ConnectorLayoutWay, isSelected: bo
   const commonProps = {
     className: `connector-layout-way-shape${isSelected ? " is-selected" : ""}${
       way.strokeStyle === "dashed" ? " is-dashed" : ""
-    }`
+    }${way.size === "big" ? " is-big" : ""}`
   };
   const scale = getWayRenderScale(getConnectorLayoutCellPadding(layout));
+  const sizeScale = getConnectorLayoutWaySpan(way);
   if (way.shape === "square") {
-    const size = 0.56 * scale;
+    const size = 0.56 * scale * sizeScale;
     return <rect {...commonProps} x={-size / 2} y={-size / 2} width={size} height={size} rx={0.08 * scale} />;
   }
   if (way.shape === "slot") {
-    const width = 0.64 * scale;
-    const height = 0.44 * scale;
+    const width = 0.64 * scale * sizeScale;
+    const height = 0.44 * scale * sizeScale;
     return <rect {...commonProps} x={-width / 2} y={-height / 2} width={width} height={height} rx={height / 2} />;
   }
-  return <circle {...commonProps} r={0.32 * scale} />;
+  return <circle {...commonProps} r={0.32 * scale * sizeScale} />;
 }
 
 export function renderConnectorLayoutKeying(

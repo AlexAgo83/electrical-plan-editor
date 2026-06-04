@@ -6,6 +6,7 @@ import type {
   ConnectorLayoutKeyingSide,
   ConnectorLayoutShellShape,
   ConnectorLayoutWay,
+  ConnectorLayoutWaySize,
   ConnectorLayoutWayShape,
   ConnectorLayoutWayStrokeStyle
 } from "./entities";
@@ -15,6 +16,7 @@ export const MAX_CONNECTOR_LAYOUT_SIZE = 48;
 const MAX_LAYOUT_SIZE = MAX_CONNECTOR_LAYOUT_SIZE;
 const DEFAULT_WAY_SHAPE: ConnectorLayoutWayShape = "round";
 const DEFAULT_WAY_STROKE_STYLE: ConnectorLayoutWayStrokeStyle = "solid";
+const DEFAULT_WAY_SIZE: ConnectorLayoutWaySize = "normal";
 const DEFAULT_KEYING_SIDE: ConnectorLayoutKeyingSide = "right";
 const DEFAULT_KEYING_SHAPE: ConnectorLayoutKeyingShape = "arrow";
 const DEFAULT_SHELL_SHAPE: ConnectorLayoutShellShape = "square";
@@ -76,6 +78,54 @@ function normalizeWayStrokeStyle(value: unknown): ConnectorLayoutWayStrokeStyle 
     return "dashed";
   }
   return undefined;
+}
+
+function normalizeWaySize(value: unknown): ConnectorLayoutWaySize | undefined {
+  if (value === "big") {
+    return "big";
+  }
+  return undefined;
+}
+
+export function getConnectorLayoutWaySpan(way: Pick<ConnectorLayoutWay, "size">): number {
+  return way.size === "big" ? 2 : 1;
+}
+
+function clampWayX(value: unknown, layoutWidth: number, way: Pick<ConnectorLayoutWay, "size">): number {
+  return clampInteger(value, 1, Math.max(1, layoutWidth - getConnectorLayoutWaySpan(way) + 1)) ?? 1;
+}
+
+function clampWayY(value: unknown, layoutHeight: number, way: Pick<ConnectorLayoutWay, "size">): number {
+  return clampInteger(value, 1, Math.max(1, layoutHeight - getConnectorLayoutWaySpan(way) + 1)) ?? 1;
+}
+
+export function getConnectorLayoutWayOccupiedCells(way: Pick<ConnectorLayoutWay, "x" | "y" | "size">): Array<{ x: number; y: number }> {
+  const span = getConnectorLayoutWaySpan(way);
+  return Array.from({ length: span }, (_, xOffset) =>
+    Array.from({ length: span }, (_inner, yOffset) => ({
+      x: way.x + xOffset,
+      y: way.y + yOffset
+    }))
+  ).flat();
+}
+
+export function getConnectorLayoutWayRenderCenter(way: Pick<ConnectorLayoutWay, "x" | "y" | "size">): { x: number; y: number } {
+  const offset = (getConnectorLayoutWaySpan(way) - 1) / 2;
+  return {
+    x: way.x + offset,
+    y: way.y + offset
+  };
+}
+
+function connectorLayoutWayFootprintsOverlap(left: ConnectorLayoutWay, right: ConnectorLayoutWay): boolean {
+  const rightCells = new Set(getConnectorLayoutWayOccupiedCells(right).map((cell) => `${cell.x}:${cell.y}`));
+  return getConnectorLayoutWayOccupiedCells(left).some((cell) => rightCells.has(`${cell.x}:${cell.y}`));
+}
+
+function connectorLayoutWayFootprintFits(layout: Pick<ConnectorLayout, "width" | "height">, way: ConnectorLayoutWay): boolean {
+  return getConnectorLayoutWayOccupiedCells(way).every(
+    (cell) => cell.x >= 1 && cell.x <= layout.width && cell.y >= 1 && cell.y <= layout.height
+  );
 }
 
 function normalizeShellShape(value: unknown): ConnectorLayoutShellShape {
@@ -456,12 +506,16 @@ export function normalizeConnectorLayout(
     }
     const fallbackWay = buildFallbackWay(cavityIndex, safeCount);
     const strokeStyle = normalizeWayStrokeStyle(candidate.strokeStyle);
+    const normalizedSize = normalizeWaySize(candidate.size);
+    const size = normalizedSize === "big" && width >= 2 && height >= 2 ? normalizedSize : undefined;
+    const sizingContext = { size };
     normalizedByIndex.set(cavityIndex, {
       cavityIndex,
-      x: clampInteger(candidate.x, 1, width) ?? clampInteger(fallbackWay.x, 1, width) ?? 1,
-      y: clampInteger(candidate.y, 1, height) ?? clampInteger(fallbackWay.y, 1, height) ?? 1,
+      x: clampWayX(candidate.x ?? fallbackWay.x, width, sizingContext),
+      y: clampWayY(candidate.y ?? fallbackWay.y, height, sizingContext),
       shape: normalizeWayShape(candidate.shape),
       ...(strokeStyle !== undefined ? { strokeStyle } : {}),
+      ...(size !== undefined ? { size } : {}),
       label: normalizeWayLabel(candidate.label)
     });
   }
@@ -471,8 +525,8 @@ export function normalizeConnectorLayout(
       const fallbackWay = buildFallbackWay(cavityIndex, safeCount);
       normalizedByIndex.set(cavityIndex, {
         ...fallbackWay,
-        x: clampInteger(fallbackWay.x, 1, width) ?? 1,
-        y: clampInteger(fallbackWay.y, 1, height) ?? 1
+        x: clampWayX(fallbackWay.x, width, fallbackWay),
+        y: clampWayY(fallbackWay.y, height, fallbackWay)
       });
     }
   }
@@ -532,6 +586,7 @@ function connectorLayoutWaysMatch(left: ConnectorLayoutWay[], right: ConnectorLa
         leftWay.y === rightWay.y &&
         leftWay.shape === rightWay.shape &&
         (leftWay.strokeStyle ?? DEFAULT_WAY_STROKE_STYLE) === (rightWay.strokeStyle ?? DEFAULT_WAY_STROKE_STYLE) &&
+        (leftWay.size ?? DEFAULT_WAY_SIZE) === (rightWay.size ?? DEFAULT_WAY_SIZE) &&
         leftWay.label === rightWay.label
       );
     })
@@ -579,8 +634,10 @@ export function moveConnectorLayoutWay(
   x: number,
   y: number
 ): ConnectorLayout {
-  const nextX = clampInteger(x, 1, layout.width) ?? 1;
-  const nextY = clampInteger(y, 1, layout.height) ?? 1;
+  const currentWay = layout.ways.find((way) => way.cavityIndex === cavityIndex);
+  const sizingContext = currentWay ?? { size: undefined };
+  const nextX = clampWayX(x, layout.width, sizingContext);
+  const nextY = clampWayY(y, layout.height, sizingContext);
 
   return {
     ...layout,
@@ -598,9 +655,16 @@ export function canMoveConnectorLayoutWay(
   x: number,
   y: number
 ): boolean {
-  const nextX = clampInteger(x, 1, layout.width) ?? 1;
-  const nextY = clampInteger(y, 1, layout.height) ?? 1;
-  return !layout.ways.some((way) => way.cavityIndex !== cavityIndex && way.x === nextX && way.y === nextY);
+  const currentWay = layout.ways.find((way) => way.cavityIndex === cavityIndex);
+  if (currentWay === undefined) {
+    return false;
+  }
+  const candidate = {
+    ...currentWay,
+    x: clampWayX(x, layout.width, currentWay),
+    y: clampWayY(y, layout.height, currentWay)
+  };
+  return !layout.ways.some((way) => way.cavityIndex !== cavityIndex && connectorLayoutWayFootprintsOverlap(candidate, way));
 }
 
 export function moveConnectorLayoutWayIfFree(
@@ -618,13 +682,50 @@ export function getConnectorLayoutDuplicatePositions(layout: ConnectorLayout): C
   const waysByPosition = new Map<string, ConnectorLayoutWay[]>();
 
   for (const way of layout.ways) {
-    const key = `${way.x}:${way.y}`;
-    const ways = waysByPosition.get(key) ?? [];
-    ways.push(way);
-    waysByPosition.set(key, ways);
+    for (const cell of getConnectorLayoutWayOccupiedCells(way)) {
+      const key = `${cell.x}:${cell.y}`;
+      const ways = waysByPosition.get(key) ?? [];
+      ways.push(way);
+      waysByPosition.set(key, ways);
+    }
   }
 
-  return [...waysByPosition.values()].filter((ways) => ways.length > 1);
+  const duplicateGroups = new Map<string, ConnectorLayoutWay[]>();
+  for (const ways of waysByPosition.values()) {
+    if (ways.length <= 1) {
+      continue;
+    }
+    const key = ways
+      .map((way) => way.cavityIndex)
+      .sort((left, right) => left - right)
+      .join(":");
+    if (!duplicateGroups.has(key)) {
+      duplicateGroups.set(key, ways);
+    }
+  }
+  return [...duplicateGroups.values()];
+}
+
+export function canUpdateConnectorLayoutWay(
+  layout: ConnectorLayout,
+  cavityIndex: number,
+  patch: Pick<Partial<ConnectorLayoutWay>, "x" | "y" | "size">
+): boolean {
+  const currentWay = layout.ways.find((way) => way.cavityIndex === cavityIndex);
+  if (currentWay === undefined) {
+    return false;
+  }
+  const candidateSize: ConnectorLayoutWaySize | undefined = patch.size === "big" ? "big" : undefined;
+  const candidate = {
+    ...currentWay,
+    ...(patch.size !== undefined ? { size: candidateSize } : {}),
+    x: patch.x ?? currentWay.x,
+    y: patch.y ?? currentWay.y
+  };
+  if (!connectorLayoutWayFootprintFits(layout, candidate)) {
+    return false;
+  }
+  return !layout.ways.some((way) => way.cavityIndex !== cavityIndex && connectorLayoutWayFootprintsOverlap(candidate, way));
 }
 
 export function getConnectorLayoutKeyingSide(layout: ConnectorLayout): ConnectorLayoutKeyingSide {

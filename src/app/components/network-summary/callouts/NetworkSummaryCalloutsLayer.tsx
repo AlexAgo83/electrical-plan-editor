@@ -18,6 +18,8 @@ import {
   getConnectorLayoutShellPadding,
   getConnectorLayoutShellStrokeWidth,
   getConnectorLayoutShellShape,
+  getConnectorLayoutWayRenderCenter,
+  getConnectorLayoutWaySpan,
   getConnectorLayoutWayDisplayLabel
 } from "../../../../core/connectorLayout";
 import {
@@ -256,6 +258,8 @@ export function renderConnectorLayoutDrawing(
           </g>
         ))}
         {layout.ways.map((way) => {
+          const wayCenter = getConnectorLayoutWayRenderCenter(way);
+          const waySizeScale = getConnectorLayoutWaySpan(way);
           const label = getConnectorLayoutWayDisplayLabel(way);
           const labelClassName = `network-callout-connector-way-label${label.length > 2 ? " is-long-label" : ""}`;
           const labelFontSize = label.length > 2 ? 4.7 : 5.8;
@@ -265,7 +269,7 @@ export function renderConnectorLayoutDrawing(
           const isUnused = wireId === undefined;
           const wayClassName = `network-callout-connector-way${isWireHighlighted ? " is-wire-highlighted" : ""}${
             isUnused ? " is-unused" : ""
-          }${way.strokeStyle === "dashed" ? " is-dashed" : ""}`;
+          }${way.strokeStyle === "dashed" ? " is-dashed" : ""}${way.size === "big" ? " is-big" : ""}`;
           const handleSelectCavityWire = (event: ReactMouseEvent<SVGGElement>): void => {
             if (!canSelectWire) {
               return;
@@ -280,7 +284,7 @@ export function renderConnectorLayoutDrawing(
               className={`${isWireHighlighted ? "network-callout-connector-way-group is-wire-highlighted" : "network-callout-connector-way-group"}${
                 canSelectWire ? " is-selectable-wire" : ""
               }${isUnused ? " is-unused" : ""}`}
-              transform={`translate(${way.x} ${way.y})`}
+              transform={`translate(${wayCenter.x} ${wayCenter.y})`}
               role={canSelectWire ? "button" : undefined}
               tabIndex={canSelectWire ? 0 : undefined}
               aria-label={canSelectWire ? `Select wire connected to ${label}` : undefined}
@@ -312,23 +316,23 @@ export function renderConnectorLayoutDrawing(
               {way.shape === "square" ? (
                 <rect
                   className={wayClassName}
-                  x={-(0.56 * wayScale) / 2}
-                  y={-(0.56 * wayScale) / 2}
-                  width={0.56 * wayScale}
-                  height={0.56 * wayScale}
+                  x={-(0.56 * wayScale * waySizeScale) / 2}
+                  y={-(0.56 * wayScale * waySizeScale) / 2}
+                  width={0.56 * wayScale * waySizeScale}
+                  height={0.56 * wayScale * waySizeScale}
                   rx={0.08 * wayScale}
                 />
               ) : way.shape === "slot" ? (
                 <rect
                   className={wayClassName}
-                  x={-(0.64 * wayScale) / 2}
-                  y={-(0.44 * wayScale) / 2}
-                  width={0.64 * wayScale}
-                  height={0.44 * wayScale}
-                  rx={(0.44 * wayScale) / 2}
+                  x={-(0.64 * wayScale * waySizeScale) / 2}
+                  y={-(0.44 * wayScale * waySizeScale) / 2}
+                  width={0.64 * wayScale * waySizeScale}
+                  height={0.44 * wayScale * waySizeScale}
+                  rx={(0.44 * wayScale * waySizeScale) / 2}
                 />
               ) : (
-                <circle className={wayClassName} r={0.32 * wayScale} />
+                <circle className={wayClassName} r={0.32 * wayScale * waySizeScale} />
               )}
               <text
                 className={labelClassName}

@@ -11,6 +11,8 @@ import {
   getConnectorLayoutShellPadding,
   getConnectorLayoutShellStrokeWidth,
   getConnectorLayoutShellShape,
+  canUpdateConnectorLayoutWay,
+  getConnectorLayoutWayOccupiedCells,
   getConnectorLayoutWayDisplayLabel,
   addConnectorLayoutKeying,
   moveConnectorLayoutWay,
@@ -100,6 +102,70 @@ describe("connector layout", () => {
     expect(layout?.ways[0]).toEqual({ cavityIndex: 1, x: 1, y: 1, shape: "round" });
     expect(layout?.ways[1]).toEqual({ cavityIndex: 2, x: 2, y: 1, shape: "round", strokeStyle: "dashed" });
     expect(resolveEditedConnectorLayout(layout, 2)).toBeDefined();
+  });
+
+  it("normalizes big ways as 2x2 footprints anchored from the top-left cell", () => {
+    const layout = normalizeConnectorLayout(
+      {
+        version: 1,
+        units: "grid",
+        width: 3,
+        height: 3,
+        ways: [
+          { cavityIndex: 1, x: 2, y: 2, shape: "square", size: "big" },
+          { cavityIndex: 2, x: 3, y: 3, shape: "round", size: "big" }
+        ]
+      },
+      2
+    );
+
+    expect(layout?.ways[0]).toEqual({ cavityIndex: 1, x: 2, y: 2, shape: "square", size: "big" });
+    expect(layout?.ways[1]).toEqual({ cavityIndex: 2, x: 2, y: 2, shape: "round", size: "big" });
+    expect(layout?.ways[0] === undefined ? [] : getConnectorLayoutWayOccupiedCells(layout.ways[0])).toEqual([
+      { x: 2, y: 2 },
+      { x: 2, y: 3 },
+      { x: 3, y: 2 },
+      { x: 3, y: 3 }
+    ]);
+  });
+
+  it("prevents big ways from overlapping other occupied cells", () => {
+    const layout = normalizeConnectorLayout(
+      {
+        version: 1,
+        units: "grid",
+        width: 3,
+        height: 3,
+        ways: [
+          { cavityIndex: 1, x: 1, y: 1, shape: "round", size: "big" },
+          { cavityIndex: 2, x: 3, y: 3, shape: "round" }
+        ]
+      },
+      2
+    );
+
+    expect(layout).toBeDefined();
+    expect(layout === undefined ? false : canUpdateConnectorLayoutWay(layout, 2, { x: 2, y: 2, size: "big" })).toBe(false);
+    expect(layout === undefined ? true : moveConnectorLayoutWayIfFree(layout, 2, 2, 2)).toBe(layout);
+  });
+
+  it("rejects big way mode at layout edges until the way can fit", () => {
+    const layout = normalizeConnectorLayout(
+      {
+        version: 1,
+        units: "grid",
+        width: 2,
+        height: 2,
+        ways: [{ cavityIndex: 1, x: 2, y: 1, shape: "round" }]
+      },
+      1
+    );
+
+    expect(layout).toBeDefined();
+    expect(layout === undefined ? false : canUpdateConnectorLayoutWay(layout, 1, { size: "big" })).toBe(false);
+    const moved = layout === undefined ? undefined : moveConnectorLayoutWayIfFree(layout, 1, 1, 1);
+    expect(moved?.ways[0]).toMatchObject({ cavityIndex: 1, x: 1, y: 1 });
+    expect(moved === undefined ? false : canUpdateConnectorLayoutWay(moved, 1, { size: "big" })).toBe(true);
   });
 
   it("resolves malformed layout input to a generated fallback", () => {

@@ -220,4 +220,43 @@ describe("App integration UI - catalog layout", () => {
       "C3"
     );
   });
+
+  it("only enables big ways when the 2x2 footprint is free", () => {
+    renderAppWithState(createUiIntegrationState());
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+
+    const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
+    expect(secondaryNavRow).not.toBeNull();
+    fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$/, hidden: true }));
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    fireEvent.click(within(catalogPanel).getByRole("button", { name: "Create catalog item" }));
+    const catalogFormPanel = getPanelByHeading("Create catalog item");
+    fireEvent.click(within(catalogFormPanel).getByLabelText("Connector physical layout"));
+    const catalogLayoutPanel = getPanelByHeading("Connector physical layout");
+
+    fireEvent.change(within(catalogFormPanel).getByLabelText("Connection count"), {
+      target: { value: "4" }
+    });
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Auto layout" }));
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Select and move way 1" }));
+    let waySizeSelect = within(catalogLayoutPanel).getByLabelText("Way size");
+    expect(within(waySizeSelect).getByRole("option", { name: "Big (2 x 2)" })).toBeDisabled();
+
+    fireEvent.change(within(catalogFormPanel).getByLabelText("Connection count"), {
+      target: { value: "1" }
+    });
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Auto layout" }));
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Add column on right" }));
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Add row on bottom" }));
+    fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Select and move way 1" }));
+    waySizeSelect = within(catalogLayoutPanel).getByLabelText("Way size");
+    expect(within(waySizeSelect).getByRole("option", { name: "Big (2 x 2)" })).toBeEnabled();
+    fireEvent.change(waySizeSelect, {
+      target: { value: "big" }
+    });
+    expect(waySizeSelect).toHaveValue("big");
+    expect(catalogLayoutPanel.querySelector(".connector-layout-way-shape.is-selected.is-big")).not.toBeNull();
+  });
 });

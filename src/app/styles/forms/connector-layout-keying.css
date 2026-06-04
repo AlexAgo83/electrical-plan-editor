@@ -1,0 +1,139 @@
+.connector-layout-keying-list {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.connector-layout-keying-list-header,
+.connector-layout-keying-row {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.connector-layout-keying-list-header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.connector-layout-keying-list-header .meta-line {
+  margin: 0;
+}
+
+.connector-layout-keying-list-header h4 {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.connector-layout-keying-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.connector-layout-keying-row > .connector-layout-slider-field {
+  grid-column: 1 / -1;
+}
+
+.connector-layout-keying-row > label:not(.connector-layout-checkbox-field),
+.connector-layout-keying-color-control {
+  grid-column: 1 / -1;
+}
+
+.connector-layout-keying-row > .connector-layout-keying-remove-button {
+  grid-column: 1;
+  justify-self: start;
+}
+
+.connector-layout-keying-row > .connector-layout-checkbox-field {
+  grid-column: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  justify-self: start;
+  min-height: 2.05rem;
+}
+
+.connector-layout-checkbox-field input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--theme-primary, currentColor);
+}
+
+.connector-layout-keying-row > label:not(.connector-layout-checkbox-field),
+.connector-layout-keying-color-control {
+  display: grid;
+  grid-template-rows: 1rem minmax(2.05rem, auto);
+  align-items: end;
+  gap: 0.35rem;
+  min-width: 0;
+  color: color-mix(in srgb, var(--theme-primary, currentColor) 64%, currentColor);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.connector-layout-keying-row select,
+.connector-layout-keying-row input:not([type="checkbox"]):not([type="radio"]) {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.05rem;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, currentColor 6%, transparent);
+  color: inherit;
+  font: inherit;
+}
+
+.connector-layout-keying-color-control > div {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.4rem;
+}
+
+.connector-layout-keying-color-control input[type="color"] {
+  width: 100%;
+  padding: 0.18rem;
+}
+
+.connector-layout-keying-color-reset-button {
+  width: 2.05rem;
+  padding-inline: 0;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.connector-layout-keying-list-header button,
+.connector-layout-keying-row button {
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 34%, transparent);
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 9%, transparent);
+  color: inherit;
+  padding: 0.32rem 0.65rem;
+  min-height: 2.05rem;
+  min-width: 0;
+}
+
+.connector-layout-keying-list-header button.button-with-icon,
+.connector-layout-keying-row button.button-with-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+@media (max-width: 980px) {
+  .connector-layout-keying-list-header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .connector-layout-keying-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .connector-layout-keying-row > .connector-layout-slider-field,
+  .connector-layout-keying-row > .connector-layout-keying-remove-button,
+  .connector-layout-keying-row > .connector-layout-checkbox-field {
+    grid-column: auto;
+  }
+}

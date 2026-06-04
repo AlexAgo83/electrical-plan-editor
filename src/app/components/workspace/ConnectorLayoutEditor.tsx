@@ -5,17 +5,21 @@ import type {
   ConnectorLayoutKeyingShape,
   ConnectorLayoutShellShape,
   ConnectorLayoutWay,
+  ConnectorLayoutWaySize,
   ConnectorLayoutWayShape,
   ConnectorLayoutWayStrokeStyle
 } from "../../../core/entities";
 import {
   addConnectorLayoutKeying,
+  canUpdateConnectorLayoutWay,
   getConnectorLayoutShellPadding,
   getConnectorLayoutShellCornerRadius,
   getConnectorLayoutShellStrokeWidth,
   getConnectorLayoutCellPadding,
   getConnectorLayoutDuplicatePositions,
   getConnectorLayoutKeyings,
+  getConnectorLayoutWayOccupiedCells,
+  getConnectorLayoutWayRenderCenter,
   getConnectorLayoutShellShape,
   getConnectorLayoutWayDisplayLabel,
   DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE,
@@ -69,6 +73,11 @@ const WAY_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutWayShape; label: string }
 const WAY_STROKE_STYLE_OPTIONS: Array<{ value: ConnectorLayoutWayStrokeStyle; label: string }> = [
   { value: "solid", label: "Line" },
   { value: "dashed", label: "Dashed" }
+];
+
+const WAY_SIZE_OPTIONS: Array<{ value: ConnectorLayoutWaySize; label: string }> = [
+  { value: "normal", label: "Normal" },
+  { value: "big", label: "Big (2 x 2)" }
 ];
 
 const KEYING_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutKeyingShape; label: string }> = [
@@ -149,6 +158,7 @@ export function ConnectorLayoutEditor({
   const shellCornerRadius = getConnectorLayoutShellCornerRadius(layout);
   const shellStrokeWidth = getConnectorLayoutShellStrokeWidth(layout);
   const cellPadding = getConnectorLayoutCellPadding(layout);
+  const selectedWaySpan = selectedWay?.size === "big" ? 2 : 1;
 
   function commitLayout(nextLayout: ConnectorLayout): void {
     setConnectorLayout(resolveConnectorLayout(nextLayout, parsedConnectionCount));
@@ -158,6 +168,11 @@ export function ConnectorLayoutEditor({
     if (selectedWay === null) {
       return;
     }
+    if ((patch.x !== undefined || patch.y !== undefined || patch.size !== undefined) && !canUpdateConnectorLayoutWay(layout, selectedWay.cavityIndex, patch)) {
+      setLayoutSizeError(`Cannot update C${selectedWay.cavityIndex}: clear the target way cells first.`);
+      return;
+    }
+    setLayoutSizeError(null);
     commitLayout({
       ...layout,
       ways: layout.ways.map((way) =>
@@ -183,7 +198,9 @@ export function ConnectorLayoutEditor({
     if (!Number.isInteger(parsed) || parsed < 1) {
       return;
     }
-    const blockedWays = layout.ways.filter((way) => (axis === "width" ? way.x : way.y) > parsed);
+    const blockedWays = layout.ways.filter((way) =>
+      getConnectorLayoutWayOccupiedCells(way).some((cell) => (axis === "width" ? cell.x : cell.y) > parsed)
+    );
     if (blockedWays.length > 0) {
       setLayoutSizeError(
         `Cannot reduce grid ${axis}: move ${blockedWays.map((way) => `C${way.cavityIndex}`).join(", ")} inside the new ${axis} first.`
@@ -404,15 +421,15 @@ export function ConnectorLayoutEditor({
       return false;
     }
     if (side === "left") {
-      return !layout.ways.some((way) => way.x <= 1);
+      return !layout.ways.some((way) => getConnectorLayoutWayOccupiedCells(way).some((cell) => cell.x <= 1));
     }
     if (side === "right") {
-      return !layout.ways.some((way) => way.x >= layout.width);
+      return !layout.ways.some((way) => getConnectorLayoutWayOccupiedCells(way).some((cell) => cell.x >= layout.width));
     }
     if (side === "top") {
-      return !layout.ways.some((way) => way.y <= 1);
+      return !layout.ways.some((way) => getConnectorLayoutWayOccupiedCells(way).some((cell) => cell.y <= 1));
     }
-    return !layout.ways.some((way) => way.y >= layout.height);
+    return !layout.ways.some((way) => getConnectorLayoutWayOccupiedCells(way).some((cell) => cell.y >= layout.height));
   }
 
   function resizeLayout(side: ConnectorLayoutResizeSide, delta: 1 | -1): void {
@@ -597,11 +614,12 @@ export function ConnectorLayoutEditor({
               const isSelected = detailPanel === "selectedWay" && selectedWay?.cavityIndex === way.cavityIndex;
               const label = getConnectorLayoutWayDisplayLabel(way);
               const labelClassName = `connector-layout-way-label${label.length > 2 ? " is-long-label" : ""}`;
+              const wayCenter = getConnectorLayoutWayRenderCenter(way);
               return (
                 <g
                   key={way.cavityIndex}
                   className="connector-layout-way"
-                  transform={`translate(${way.x} ${way.y})`}
+                  transform={`translate(${wayCenter.x} ${wayCenter.y})`}
                   role="button"
                   tabIndex={0}
                   aria-label={`Select and move way ${way.cavityIndex}`}
@@ -773,7 +791,7 @@ export function ConnectorLayoutEditor({
                   <input
                     type="number"
                     min={1}
-                    max={layout.width}
+                    max={Math.max(1, layout.width - selectedWaySpan + 1)}
                     step={1}
                     value={selectedWay.x}
                     onChange={(event) => moveWayToGridPosition(selectedWay.cavityIndex, Number(event.target.value), selectedWay.y)}
@@ -784,7 +802,7 @@ export function ConnectorLayoutEditor({
                   <input
                     type="number"
                     min={1}
-                    max={layout.height}
+                    max={Math.max(1, layout.height - selectedWaySpan + 1)}
                     step={1}
                     value={selectedWay.y}
                     onChange={(event) => moveWayToGridPosition(selectedWay.cavityIndex, selectedWay.x, Number(event.target.value))}
@@ -799,6 +817,30 @@ export function ConnectorLayoutEditor({
                 >
                   {WAY_SHAPE_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Way size
+                <select
+                  value={selectedWay.size ?? "normal"}
+                  onChange={(event) => {
+                    const size = event.target.value as ConnectorLayoutWaySize;
+                    updateSelectedWay({ size });
+                  }}
+                >
+                  {WAY_SIZE_OPTIONS.map((option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                      disabled={
+                        option.value === "big" &&
+                        selectedWay.size !== "big" &&
+                        !canUpdateConnectorLayoutWay(layout, selectedWay.cavityIndex, { size: "big" })
+                      }
+                    >
                       {option.label}
                     </option>
                   ))}
