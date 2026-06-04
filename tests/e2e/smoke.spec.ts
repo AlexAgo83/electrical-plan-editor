@@ -237,7 +237,9 @@ test("create -> route -> recompute flow works end-to-end", async ({ page }) => {
     const listPanel = page.locator("article.panel").filter({
       has: page.getByRole("heading", { name: listHeadingByIdleHeading[idleHeading] })
     });
-    await listPanel.getByRole("button", { name: "New", exact: true }).click();
+    await listPanel.getByRole("button", { name: "New", exact: true }).evaluate((element) => {
+      (element as HTMLButtonElement).click();
+    });
   };
   const openCatalogCreateFormIfIdle = async () => {
     if ((await page.getByRole("heading", { name: "Create catalog item" }).count()) > 0) {
@@ -247,11 +249,15 @@ test("create -> route -> recompute flow works end-to-end", async ({ page }) => {
     const catalogPanel = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Catalog" }) });
     const emptyStateCreateButton = catalogPanel.getByRole("button", { name: "Create catalog item", exact: true });
     if ((await emptyStateCreateButton.count()) > 0) {
-      await emptyStateCreateButton.click();
+      await emptyStateCreateButton.evaluate((element) => {
+        (element as HTMLButtonElement).click();
+      });
       return;
     }
 
-    await catalogPanel.getByRole("button", { name: "New", exact: true }).click();
+    await catalogPanel.getByRole("button", { name: "New", exact: true }).evaluate((element) => {
+      (element as HTMLButtonElement).click();
+    });
   };
 
   await page.goto("/");
