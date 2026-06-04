@@ -101,4 +101,61 @@ describe("NetworkSummaryCalloutsLayer", () => {
     fireEvent.mouseDown(selectableWay as Element);
     expect(onSelectWireFromConnectorPin).toHaveBeenCalledWith("W1");
   });
+
+  it("keeps out-of-viewport callouts rendered so export fit can include them", () => {
+    const renderedCallout: RenderedCableCallout = {
+      callout: {
+        key: "connector:C1",
+        kind: "connector",
+        entityId: "C1" as ConnectorId,
+        nodeId: "N-C1" as NodeId,
+        nodePosition: { x: 0, y: 0 },
+        position: { x: 5000, y: 5000 },
+        title: "Far connector",
+        subtitle: "C-FAR",
+        groups: [],
+        isDeemphasized: false,
+        isSelected: false
+      },
+      layout: {
+        width: 120,
+        drawingTopY: null,
+        drawingWidth: 0,
+        drawingHeight: 0,
+        titleStartY: 12,
+        subtitleStartY: 24,
+        headerY: 34,
+        rowsStartY: 42,
+        rowStep: 8,
+        rowHeight: 6,
+        height: 48,
+        columns: [],
+        rows: []
+      },
+      lineEnd: { x: 4940, y: 5000 },
+      calloutClassName: "network-callout-group",
+      isVisibleInViewport: false
+    };
+
+    const { container } = render(
+      <svg>
+        <NetworkSummaryCalloutsLayer
+          renderedCableCallouts={[renderedCallout]}
+          inverseLabelScale={1}
+          selectedWireId={null}
+          onHoverCallout={vi.fn()}
+          onCalloutMouseDown={vi.fn()}
+          onSelectConnectorFromCallout={vi.fn()}
+          onSelectSpliceFromCallout={vi.fn()}
+          onSelectWireFromConnectorPin={vi.fn()}
+          onOpenInspectorForSelection={vi.fn()}
+          networkOffset={{ x: 0, y: 0 }}
+          networkScale={1}
+        />
+      </svg>
+    );
+
+    expect(container.querySelector(".network-callout-frame")).not.toBeNull();
+    expect(container).toHaveTextContent("Far connector");
+  });
 });

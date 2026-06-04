@@ -160,7 +160,6 @@ export function NetworkSummaryPanel({
   showFunctionalSchematic = true,
   imperativeRef
 }: NetworkSummaryPanelProps): ReactElement {
-  const [pendingFitSvgPreviewOptions, setPendingFitSvgPreviewOptions] = useState<SvgPreviewOptions | null>(null);
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
   const networkCanvasShellRef = useRef<HTMLDivElement | null>(null);
   const graphStats = [
@@ -614,40 +613,6 @@ export function NetworkSummaryPanel({
     [createPngPreview, createSvgPreview, setExportIncludeCartouche, setExportIncludeFrame]
   );
 
-  const handleFitNetworkAndRefreshSvgPreview = useCallback(() => {
-    setPendingFitSvgPreviewOptions(
-      activeSvgPreview === null
-        ? {
-            format: "svg",
-            includeFrame: exportIncludeFrame,
-            includeCartouche: exportIncludeCartouche,
-            includeGrid: showNetworkGrid,
-            themeMode
-          }
-        : {
-            format: activeSvgPreview.format,
-            includeFrame: activeSvgPreview.includeFrame,
-            includeCartouche: activeSvgPreview.includeCartouche,
-            includeGrid: activeSvgPreview.includeGrid,
-            themeMode: activeSvgPreview.themeMode
-          }
-    );
-    fitNetworkToContent();
-  }, [activeSvgPreview, exportIncludeCartouche, exportIncludeFrame, fitNetworkToContent, showNetworkGrid, themeMode]);
-
-  useEffect(() => {
-    if (pendingFitSvgPreviewOptions === null) {
-      return;
-    }
-
-    if (pendingFitSvgPreviewOptions.format === "png") {
-      void createPngPreview(pendingFitSvgPreviewOptions);
-    } else {
-      void createSvgPreview(pendingFitSvgPreviewOptions);
-    }
-    setPendingFitSvgPreviewOptions(null);
-  }, [createPngPreview, createSvgPreview, pendingFitSvgPreviewOptions]);
-
   const normalizedConnectorDrawingScale = clampNumber(connectorDrawingScalePercent / 100, 1, 2);
   const normalizedConnectorNodeDrawingScale =
     connectorDrawingDisplayMode === "nodes" ? normalizedConnectorDrawingScale * 2.4 : normalizedConnectorDrawingScale;
@@ -971,7 +936,6 @@ export function NetworkSummaryPanel({
         showGridOption={true}
         preview={activeSvgPreview}
         onPreviewOptionsChange={handleSvgPreviewOptionsChange}
-        onFitNetwork={handleFitNetworkAndRefreshSvgPreview}
         onConfirm={handleDownloadSvgPreview}
         onCancel={handleCloseSvgPreview}
       />

@@ -813,23 +813,6 @@ export function FunctionalSchematicPanel({
     },
     [createPngPreview, createSvgPreview]
   );
-  const handleRefreshPreview = useCallback(() => {
-    const options =
-      activeSvgPreview === null
-        ? undefined
-        : {
-            format: activeSvgPreview.format,
-            includeFrame: activeSvgPreview.includeFrame,
-            includeCartouche: activeSvgPreview.includeCartouche,
-            includeGrid: activeSvgPreview.includeGrid,
-            themeMode: activeSvgPreview.themeMode
-          };
-    if (options?.format === "png") {
-      void createPngPreview(options);
-      return;
-    }
-    void createSvgPreview(options);
-  }, [activeSvgPreview, createPngPreview, createSvgPreview]);
   const canExport = graph.nodes.length > 0;
   return (
     <section
@@ -1013,10 +996,8 @@ export function FunctionalSchematicPanel({
         isOpen={activeSvgPreview !== null}
         themeHostClassName={dialogThemeHostClassName}
         showDecorationOptions={showSvgPreviewDecorationOptions}
-        showFitAction={showSvgPreviewDecorationOptions}
         preview={activeSvgPreview}
         onPreviewOptionsChange={handlePreviewOptionsChange}
-        onFitNetwork={handleRefreshPreview}
         onConfirm={handleDownloadSvgPreview}
         onCancel={handleCloseSvgPreview}
       />

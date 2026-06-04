@@ -41,6 +41,13 @@ describe("App integration UI - network summary SVG preview", () => {
       renderAppWithState(createUiIntegrationState());
       switchScreenDrawerAware("modeling");
       const networkSummaryPanel = getPanelByHeading("Network summary");
+      const sourceNetworkSvg = within(networkSummaryPanel).getByLabelText(
+        "2D network diagram",
+      );
+      const sourceSegmentLayerTransformBefore =
+        sourceNetworkSvg
+          .querySelector(".network-graph-layer-segments")
+          ?.getAttribute("transform") ?? "";
       openExportMenu(networkSummaryPanel);
       fireEvent.click(
         within(networkSummaryPanel).getByRole("button", { name: "SVG" }),
@@ -81,6 +88,12 @@ describe("App integration UI - network summary SVG preview", () => {
         .getByLabelText("SVG export preview")
         .querySelector("svg");
       expect(previewSvg?.outerHTML).not.toContain("visibility: hidden");
+      const previewLabelLayerTransformBefore =
+        previewSvg
+          ?.querySelector(".network-graph-layer-labels")
+          ?.getAttribute("transform") ?? "";
+      expect(within(previewDialog).queryByRole("button", { name: "Fit export" })).not.toBeInTheDocument();
+      expect(previewLabelLayerTransformBefore).not.toBe(sourceSegmentLayerTransformBefore);
 
       fireEvent.click(within(previewDialog).getByLabelText("Include frame"));
       await waitFor(() => {
@@ -88,14 +101,34 @@ describe("App integration UI - network summary SVG preview", () => {
           within(previewDialog).getByLabelText("Include frame"),
         ).toBeChecked();
       });
-      fireEvent.click(
-        within(previewDialog).getByRole("button", { name: "Fit network" }),
-      );
+      const refreshedPreviewDialog = await screen.findByRole("dialog", {
+        name: "SVG preview",
+      });
+      await waitFor(() => {
+        expect(within(refreshedPreviewDialog).getByText("Size")).toBeInTheDocument();
+      });
+      const fittedPreviewSvg = within(refreshedPreviewDialog)
+        .getByLabelText("SVG export preview")
+        .querySelector("svg");
       expect(
-        await screen.findByRole("dialog", { name: "SVG preview" }),
-      ).toBeInTheDocument();
+        fittedPreviewSvg
+          ?.querySelector(".network-graph-layer-labels")
+          ?.getAttribute("transform") ?? "",
+      ).toBe(previewLabelLayerTransformBefore);
+      expect(
+        fittedPreviewSvg
+          ?.querySelector(".network-segment-label-anchor")
+          ?.getAttribute("transform") ?? "",
+      ).toBe(previewSvg?.querySelector(".network-segment-label-anchor")?.getAttribute("transform") ?? "");
+      expect(
+        sourceNetworkSvg
+          .querySelector(".network-graph-layer-segments")
+          ?.getAttribute("transform") ?? "",
+      ).toBe(sourceSegmentLayerTransformBefore);
       fireEvent.click(
-        within(previewDialog).getByRole("button", { name: "Download SVG" }),
+        within(refreshedPreviewDialog).getByRole("button", {
+          name: "Download SVG",
+        }),
       );
 
       await waitFor(() => {

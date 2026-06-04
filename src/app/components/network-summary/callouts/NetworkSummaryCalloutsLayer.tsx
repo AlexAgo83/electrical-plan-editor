@@ -388,11 +388,7 @@ export function NetworkSummaryCalloutsLayer({
       className="network-graph-layer network-graph-layer-callouts"
       transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
     >
-      {renderedCableCallouts.map(({ callout, layout, calloutClassName, isVisibleInViewport }) => {
-        if (!isVisibleInViewport) {
-          return null;
-        }
-
+      {renderedCableCallouts.map(({ callout, layout, calloutClassName }) => {
         const contentLeftX = -layout.width / 2 + 4;
         const headerY = -layout.height / 2 + layout.headerY;
         const rowsStartY = -layout.height / 2 + layout.rowsStartY;

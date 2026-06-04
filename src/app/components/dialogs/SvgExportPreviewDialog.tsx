@@ -8,10 +8,8 @@ interface SvgExportPreviewDialogProps {
   themeHostClassName?: string;
   showDecorationOptions?: boolean;
   showGridOption?: boolean;
-  showFitAction?: boolean;
   preview: SvgExportPreviewState | null;
   onPreviewOptionsChange: (options: SvgPreviewOptions) => void;
-  onFitNetwork: () => void;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -29,10 +27,8 @@ export function SvgExportPreviewDialog({
   themeHostClassName,
   showDecorationOptions = true,
   showGridOption = false,
-  showFitAction = true,
   preview,
   onPreviewOptionsChange,
-  onFitNetwork,
   onConfirm,
   onCancel
 }: SvgExportPreviewDialogProps): ReactElement | null {
@@ -126,6 +122,7 @@ export function SvgExportPreviewDialog({
       includeFrame,
       includeCartouche: preview.includeCartouche,
       includeGrid: preview.includeGrid,
+      fitToContent: preview.fitToContent,
       themeMode: preview.themeMode
     });
   };
@@ -136,6 +133,7 @@ export function SvgExportPreviewDialog({
       includeFrame: preview.includeFrame,
       includeCartouche,
       includeGrid: preview.includeGrid,
+      fitToContent: preview.fitToContent,
       themeMode: preview.themeMode
     });
   };
@@ -146,6 +144,7 @@ export function SvgExportPreviewDialog({
       includeFrame: preview.includeFrame,
       includeCartouche: preview.includeCartouche,
       includeGrid,
+      fitToContent: preview.fitToContent,
       themeMode: preview.themeMode
     });
   };
@@ -156,6 +155,7 @@ export function SvgExportPreviewDialog({
       includeFrame: preview.includeFrame,
       includeCartouche: preview.includeCartouche,
       includeGrid: preview.includeGrid,
+      fitToContent: preview.fitToContent,
       themeMode
     });
   };
@@ -225,11 +225,6 @@ export function SvgExportPreviewDialog({
               ))}
             </select>
           </label>
-          {showFitAction ? (
-            <button type="button" className="workspace-tab" onClick={onFitNetwork}>
-              Fit network
-            </button>
-          ) : null}
         </div>
         <div ref={previewShellRef} className="svg-preview-shell" tabIndex={0} aria-label={previewAriaLabel}>
           <div className={previewThemeHostClassName}>

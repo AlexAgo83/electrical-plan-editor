@@ -81,20 +81,15 @@ describe("App integration UI - settings canvas export", () => {
       expect(previewImage).not.toBeNull();
       expect(previewImage).toHaveAttribute("src", "data:image/png;base64,preview");
       expect(clickSpy).not.toHaveBeenCalled();
+      expect(within(previewDialog).queryByRole("button", { name: "Fit export" })).not.toBeInTheDocument();
+      expect(within(previewDialog).queryByRole("button", { name: "Download SVG" })).not.toBeInTheDocument();
 
-      fireEvent.click(within(previewDialog).getByRole("button", { name: "Fit network" }));
-      const refreshedPreviewDialog = await screen.findByRole("dialog", { name: "PNG preview" });
-      await waitFor(() => {
-        expect(within(refreshedPreviewDialog).getByRole("button", { name: "Download PNG" })).toBeInTheDocument();
-      });
-      expect(within(refreshedPreviewDialog).queryByRole("button", { name: "Download SVG" })).not.toBeInTheDocument();
-
-      fireEvent.click(within(refreshedPreviewDialog).getByRole("button", { name: "Download PNG" }));
+      fireEvent.click(within(previewDialog).getByRole("button", { name: "Download PNG" }));
 
       await waitFor(() => {
         expect(clickSpy).toHaveBeenCalledTimes(1);
       });
-      expect(createObjectUrl).toHaveBeenCalledTimes(2);
+      expect(createObjectUrl).toHaveBeenCalledTimes(1);
       expect(revokeObjectUrl).toHaveBeenCalledWith("blob:png-preview-source");
     } finally {
       clickSpy.mockRestore();
