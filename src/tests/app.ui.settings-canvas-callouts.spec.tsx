@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { fireEvent, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { buildCalloutLayoutMetrics } from "../app/components/network-summary/callouts/calloutLayout";
@@ -23,6 +25,17 @@ function openViewMenu(panel: HTMLElement): void {
 describe("App integration UI - settings canvas callouts", () => {
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  it("themes canvas range value labels from the surrounding settings field color", () => {
+    const styles = readFileSync(
+      resolve(process.cwd(), "src/app/styles/validation-settings/settings-panels-and-actions.css"),
+      "utf8"
+    );
+    const rangeValueRule = styles.match(/\.settings-range-value\s*\{(?<body>[^}]+)\}/)?.groups?.body ?? "";
+
+    expect(rangeValueRule).toContain("currentColor");
+    expect(rangeValueRule).not.toMatch(/color:\s*#[0-9a-f]{3,6}/i);
   });
 
   it("applies and persists selected-callout-only preference as an override over full callouts", () => {

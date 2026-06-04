@@ -144,7 +144,7 @@
   min-width: 3.8rem;
   text-align: right;
   font-size: 0.82rem;
-  color: #355975;
+  color: color-mix(in srgb, currentColor 82%, transparent);
   font-variant-numeric: tabular-nums;
 }
 
