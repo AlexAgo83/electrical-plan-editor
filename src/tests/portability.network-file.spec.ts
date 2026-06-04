@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { CatalogItemId, ConnectorId, NetworkId, SpliceId, WireId } from "../core/entities";
+import type { CatalogItemId, ConnectorId, NetworkId, NodeId, SpliceId, WireId } from "../core/entities";
 import { APP_RELEASE_VERSION } from "../core/schema";
 import {
   buildNetworkFilePayload,
@@ -17,6 +17,10 @@ function asNetworkId(value: string): NetworkId {
 
 function asConnectorId(value: string): ConnectorId {
   return value as ConnectorId;
+}
+
+function asNodeId(value: string): NodeId {
+  return value as NodeId;
 }
 
 function asSpliceId(value: string): SpliceId {
@@ -77,6 +81,25 @@ describe("network file portability", () => {
     expect(parsed.payload?.payloadKind).toBe(NETWORK_FILE_PAYLOAD_KIND);
     expect(parsed.payload?.schemaVersion).toBe(3);
     expect(parsed.payload?.networks).toHaveLength(1);
+  });
+
+  it("deduplicates imported entity allIds before exposing the network state", () => {
+    const seeded = createSampleNetworkState();
+    const payload = buildNetworkFilePayload(seeded, "active", [], "2026-06-04T15:50:00.000Z");
+    const rawPayload = JSON.parse(serializeNetworkFilePayload(payload)) as Record<string, unknown>;
+    const rawBundles = rawPayload.networks as Array<Record<string, unknown>>;
+    const rawState = rawBundles[0]?.state as Record<string, unknown>;
+    const rawNodes = rawState.nodes as { byId: Record<string, unknown>; allIds: string[] };
+    const duplicateNodeId = "N-C-SRC";
+    expect(rawNodes.byId[duplicateNodeId]).toBeDefined();
+    rawNodes.allIds.push(duplicateNodeId);
+
+    const parsed = parseNetworkFilePayload(JSON.stringify(rawPayload));
+
+    expect(parsed.error).toBeNull();
+    const parsedNodeIds = parsed.payload?.networks[0]?.state.nodes.allIds ?? [];
+    expect(parsedNodeIds.filter((nodeId) => nodeId === asNodeId(duplicateNodeId))).toHaveLength(1);
+    expect(parsed.payload?.networks[0]?.state.nodes.byId[asNodeId(duplicateNodeId)]).toBeDefined();
   });
 
   it("patches imported wires missing section/colors/side references to defaults", () => {

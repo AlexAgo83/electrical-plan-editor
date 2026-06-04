@@ -24,7 +24,21 @@ function selectCollection<T, Id extends string>(
   byId: Record<Id, T>,
   allIds: Id[]
 ): T[] {
-  return allIds.map((id) => byId[id]);
+  const seen = new Set<Id>();
+  const result: T[] = [];
+
+  for (const id of allIds) {
+    if (seen.has(id)) {
+      continue;
+    }
+    seen.add(id);
+    const entity = byId[id];
+    if (entity !== undefined) {
+      result.push(entity);
+    }
+  }
+
+  return result;
 }
 
 function createCollectionSelector<T, Id extends string>() {

@@ -3,6 +3,7 @@ import type {
   CatalogItemId,
   Connector,
   ConnectorId,
+  NetworkNode,
   HarnessAssembly,
   HarnessAssemblyId,
   InterHarnessConnectorLinkId,
@@ -85,6 +86,21 @@ function isEntityState(value: unknown): boolean {
   return isRecord(value) && Array.isArray(value.allIds) && isRecord(value.byId);
 }
 
+function normalizeEntityAllIds<Id extends string>(allIds: readonly Id[], byId: Partial<Record<Id, unknown>>): Id[] {
+  const seen = new Set<Id>();
+  const normalized: Id[] = [];
+
+  for (const id of allIds) {
+    if (seen.has(id) || byId[id] === undefined) {
+      continue;
+    }
+    seen.add(id);
+    normalized.push(id);
+  }
+
+  return normalized.sort((left, right) => left.localeCompare(right));
+}
+
 function normalizeNodePositions(value: unknown): Record<NodeId, LayoutNodePosition> {
   if (!isRecord(value)) {
     return {};
@@ -154,7 +170,7 @@ function normalizeWiresEntityState(
   }
 
   return {
-    allIds: [...wires.allIds],
+    allIds: normalizeEntityAllIds(wires.allIds, byId),
     byId
   };
 }
@@ -181,7 +197,7 @@ function normalizeConnectorsEntityState(
   }
 
   return {
-    allIds: [...connectors.allIds],
+    allIds: normalizeEntityAllIds(connectors.allIds, byId),
     byId
   };
 }
@@ -322,7 +338,37 @@ function normalizeSplicesEntityState(splices: NetworkScopedState["splices"]): Ne
   }
 
   return {
-    allIds: [...splices.allIds],
+    allIds: normalizeEntityAllIds(splices.allIds, byId),
+    byId
+  };
+}
+
+function normalizeNodesEntityState(nodes: NetworkScopedState["nodes"]): NetworkScopedState["nodes"] {
+  const byId = {} as Record<NodeId, NetworkNode>;
+  for (const nodeId of nodes.allIds) {
+    const node = nodes.byId[nodeId];
+    if (node !== undefined) {
+      byId[nodeId] = node;
+    }
+  }
+
+  return {
+    allIds: normalizeEntityAllIds(nodes.allIds, byId),
+    byId
+  };
+}
+
+function normalizeSegmentsEntityState(segments: NetworkScopedState["segments"]): NetworkScopedState["segments"] {
+  const byId = {} as NetworkScopedState["segments"]["byId"];
+  for (const segmentId of segments.allIds) {
+    const segment = segments.byId[segmentId];
+    if (segment !== undefined) {
+      byId[segmentId] = segment;
+    }
+  }
+
+  return {
+    allIds: normalizeEntityAllIds(segments.allIds, byId),
     byId
   };
 }
@@ -392,28 +438,19 @@ function isExportedNetworkBundle(value: unknown): value is ExportedNetworkBundle
 }
 
 function normalizeScopedState(scoped: NetworkScopedState): NetworkScopedState {
+  const connectors = normalizeConnectorsEntityState(scoped.connectors);
+  const splices = normalizeSplicesEntityState(scoped.splices);
+  const nodes = normalizeNodesEntityState(scoped.nodes);
+  const segments = normalizeSegmentsEntityState(scoped.segments);
+  const wires = normalizeWiresEntityState(scoped.wires);
+
   return bootstrapCatalogForScopedState({
     catalogItems: normalizeCatalogItemsEntityState(scoped.catalogItems),
-    connectors: {
-      allIds: [...scoped.connectors.allIds].sort((left, right) => left.localeCompare(right)),
-      byId: normalizeConnectorsEntityState(scoped.connectors).byId
-    },
-    splices: {
-      allIds: [...scoped.splices.allIds].sort((left, right) => left.localeCompare(right)),
-      byId: normalizeSplicesEntityState(scoped.splices).byId
-    },
-    nodes: {
-      allIds: [...scoped.nodes.allIds].sort((left, right) => left.localeCompare(right)),
-      byId: { ...scoped.nodes.byId }
-    },
-    segments: {
-      allIds: [...scoped.segments.allIds].sort((left, right) => left.localeCompare(right)),
-      byId: { ...scoped.segments.byId }
-    },
-    wires: {
-      allIds: [...scoped.wires.allIds].sort((left, right) => left.localeCompare(right)),
-      byId: normalizeWiresEntityState(scoped.wires).byId
-    },
+    connectors,
+    splices,
+    nodes,
+    segments,
+    wires,
     nodePositions: normalizeNodePositions(scoped.nodePositions),
     connectorCavityOccupancy: { ...scoped.connectorCavityOccupancy },
     splicePortOccupancy: { ...scoped.splicePortOccupancy }
