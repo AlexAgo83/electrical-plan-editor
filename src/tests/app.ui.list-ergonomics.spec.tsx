@@ -1,4 +1,4 @@
-import { fireEvent, screen, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { appActions, appReducer, createSampleNetworkState } from "../store";
 import {
@@ -190,6 +190,40 @@ describe("App integration UI - list ergonomics", () => {
     fireEvent.change(tagFilterSelect, { target: { value: "all" } });
     expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();
     expect(within(wiresPanel).getByText("Secondary Feed B")).toBeInTheDocument();
+  });
+
+  it("clears the wire tag filter when the active network does not expose the selected tag", async () => {
+    const baseState = createSampleNetworkState();
+    const feedWire = baseState.wires.byId[asWireId("W-001")];
+    if (feedWire === undefined) {
+      throw new Error("Expected sample wire to exist.");
+    }
+    const taggedState = appReducer(baseState, appActions.saveWire({ ...feedWire, functionalDomainTag: "CAN" }));
+
+    renderAppWithState(taggedState);
+
+    switchSubScreen("wire");
+    let wiresPanel = getPanelByHeading("Wires");
+    const tagFilterSelect = within(wiresPanel).getByLabelText("Wire tag filter");
+
+    fireEvent.change(tagFilterSelect, { target: { value: "CAN" } });
+    expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();
+
+    switchScreen("networkScope");
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    const lightingNetworkRow = within(networkScopePanel).getByText("Lighting branch (Sample)").closest("tr");
+    expect(lightingNetworkRow).not.toBeNull();
+    fireEvent.click(lightingNetworkRow as HTMLElement);
+    fireEvent.click(within(getPanelByHeading("Edit network")).getByRole("button", { name: "Set active" }));
+
+    switchScreen("modeling");
+    switchSubScreen("wire");
+    wiresPanel = getPanelByHeading("Wires");
+
+    await waitFor(() => {
+      expect(within(wiresPanel).getByLabelText("Wire tag filter")).toHaveValue("all");
+    });
+    expect(within(wiresPanel).getByText("Lighting Feed")).toBeInTheDocument();
   });
 
   it("splits wire endpoints into Endpoint A and Endpoint B columns and updates the displayed entry count footer when filtering", () => {

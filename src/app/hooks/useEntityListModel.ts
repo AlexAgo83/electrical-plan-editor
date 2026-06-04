@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getWireColorSearchText } from "../../core/cableColors";
 import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, Splice, SpliceId, Wire } from "../../core/entities";
 import { selectConnectorCavityStatuses, selectSplicePortStatuses, type AppState } from "../../store";
@@ -165,6 +165,15 @@ export function useEntityListModel({
       ).sort((left, right) => left.localeCompare(right, undefined, { numeric: true, sensitivity: "base" })),
     [wires]
   );
+
+  useEffect(() => {
+    if (wireFunctionalTagFilter === "all") {
+      return;
+    }
+    if (!wireFunctionalTagOptions.includes(wireFunctionalTagFilter)) {
+      setWireFunctionalTagFilter("all");
+    }
+  }, [wireFunctionalTagFilter, wireFunctionalTagOptions]);
   const sortedConnectorSynthesisRows = useMemo(() => sortByNameAndTechnicalId(connectorSynthesisRows, connectorSynthesisSort, (row) => row.wireName, (row) => row.wireTechnicalId), [connectorSynthesisRows, connectorSynthesisSort]);
   const sortedSpliceSynthesisRows = useMemo(() => sortByNameAndTechnicalId(spliceSynthesisRows, spliceSynthesisSort, (row) => row.wireName, (row) => row.wireTechnicalId), [spliceSynthesisRows, spliceSynthesisSort]);
 
