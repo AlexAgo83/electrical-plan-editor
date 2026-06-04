@@ -1,5 +1,6 @@
 export interface GroupedSvgExportProgress {
   current: number;
+  format?: "png" | "svg";
   total: number;
   networkName: string;
 }
@@ -43,5 +44,5 @@ export function renderGroupedSvgExportOverlay(progress: GroupedSvgExportProgress
     document.body.appendChild(overlay);
   }
 
-  overlay.innerHTML = `<div style="background:#1f2937;padding:24px 32px;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,0.4);text-align:center;max-width:480px"><div style="font-weight:600;font-size:16px;margin-bottom:6px">Exporting SVG ${progress.current} of ${progress.total}</div><div style="opacity:0.85;font-size:14px">${escapeHtml(progress.networkName)}</div></div>`;
+  overlay.innerHTML = `<div style="background:#1f2937;padding:24px 32px;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,0.4);text-align:center;max-width:480px"><div style="font-weight:600;font-size:16px;margin-bottom:6px">Exporting ${(progress.format ?? "svg").toUpperCase()} ${progress.current} of ${progress.total}</div><div style="opacity:0.85;font-size:14px">${escapeHtml(progress.networkName)}</div></div>`;
 }

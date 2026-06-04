@@ -1,6 +1,7 @@
 import type { Dispatch, MouseEvent as ReactMouseEvent, Ref, SetStateAction, WheelEvent as ReactWheelEvent } from "react";
 
 export interface NetworkSummaryPanelHandle {
+  exportPngDirect: () => Promise<void>;
   exportSvgDirect: () => Promise<void>;
 }
 import type {

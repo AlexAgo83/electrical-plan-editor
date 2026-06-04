@@ -986,6 +986,7 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     resetWorkspacePreferencesToDefaults: params.resetWorkspacePreferencesToDefaults,
     importOverwriteDialog: params.importOverwriteDialog,
     handleExportGroupedBom: params.handleExportGroupedBom,
+    handleExportGroupedPng: params.handleExportGroupedPng,
     handleExportGroupedSvg: params.handleExportGroupedSvg,
     aiSettings: params.aiSettings,
     workspaceFileStatus: params.workspaceFileStatus,

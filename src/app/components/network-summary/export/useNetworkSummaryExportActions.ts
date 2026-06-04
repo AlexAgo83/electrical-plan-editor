@@ -765,9 +765,28 @@ export function useNetworkSummaryExportActions({
     await createPngPreview();
   }, [createPngPreview]);
 
+  const handleExportPlanAsPngDirect = useCallback(async () => {
+    await waitForPreviewRenderTurn();
+    const prepared = await prepareDecoratedSvgClone({ fitToContent: true });
+    if (prepared === null) {
+      return;
+    }
+    const pngDataUrl = await renderPreparedSvgAsPngDataUrl(prepared);
+    if (pngDataUrl === null) {
+      return;
+    }
+    const downloadLink = document.createElement("a");
+    downloadLink.href = pngDataUrl;
+    downloadLink.download = buildTimestampedFileName(["network-plan", exportCartoucheNetworkName], "png");
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+  }, [exportCartoucheNetworkName, prepareDecoratedSvgClone, renderPreparedSvgAsPngDataUrl]);
+
   const handleExportPlanAsSvgDirect = useCallback(async () => {
     await waitForPreviewRenderTurn();
-    const prepared = await prepareDecoratedSvgClone();
+    const prepared = await prepareDecoratedSvgClone({ fitToContent: true });
     if (prepared === null) {
       return;
     }
@@ -781,6 +800,7 @@ export function useNetworkSummaryExportActions({
     createSvgPreview,
     handleCloseSvgPreview,
     handleDownloadSvgPreview,
+    handleExportPlanAsPngDirect,
     handleExportPlanAsPng,
     handleExportPlanAsSvg,
     handleExportPlanAsSvgDirect,

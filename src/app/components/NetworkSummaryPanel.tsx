@@ -572,6 +572,7 @@ export function NetworkSummaryPanel({
     handleCloseSvgPreview,
     handleDownloadSvgPreview,
     handleExportPlanAsPng,
+    handleExportPlanAsPngDirect,
     handleExportPlanAsSvg,
     handleExportPlanAsSvgDirect,
     isSvgPreviewLoading,
@@ -595,7 +596,14 @@ export function NetworkSummaryPanel({
     exportCartoucheNotes
   });
 
-  useImperativeHandle(imperativeRef, (): NetworkSummaryPanelHandle => ({ exportSvgDirect: handleExportPlanAsSvgDirect }), [handleExportPlanAsSvgDirect]);
+  useImperativeHandle(
+    imperativeRef,
+    (): NetworkSummaryPanelHandle => ({
+      exportPngDirect: handleExportPlanAsPngDirect,
+      exportSvgDirect: handleExportPlanAsSvgDirect
+    }),
+    [handleExportPlanAsPngDirect, handleExportPlanAsSvgDirect]
+  );
   const handleSvgPreviewOptionsChange = useCallback(
     (options: SvgPreviewOptions) => {
       if (options.includeFrame !== undefined) {

@@ -386,19 +386,19 @@ export function useNetworkImportExport({
     })();
   }
 
-  function handleExportGroupedSvg(networkIds: NetworkId[]): void {
+  function handleExportGroupedPlanImages(networkIds: NetworkId[], format: "png" | "svg"): void {
     if (networkIds.length === 0) {
       return;
     }
     if (networkSummaryPanelRef === undefined) {
-      setImportExportStatus({ kind: "failed", message: "Grouped SVG export is unavailable in this context." });
+      setImportExportStatus({ kind: "failed", message: `Grouped ${format.toUpperCase()} export is unavailable in this context.` });
       return;
     }
     void (async () => {
       ensureNetworkPlanScreen?.();
       const panelReady = await waitFor(() => networkSummaryPanelRef.current !== null, 60, 100);
       if (!panelReady) {
-        setImportExportStatus({ kind: "failed", message: "Network plan is not ready for SVG export." });
+        setImportExportStatus({ kind: "failed", message: `Network plan is not ready for ${format.toUpperCase()} export.` });
         return;
       }
 
@@ -413,22 +413,35 @@ export function useNetworkImportExport({
           const network = validNetworks[i]!;
           setGroupedSvgExportProgress({
             current: i + 1,
+            format,
             total: validNetworks.length,
             networkName: network.name || network.technicalId || String(network.id)
           });
           dispatchAction(appActions.selectNetwork(network.id));
           await waitForNextFrames(3);
-          await networkSummaryPanelRef.current?.exportSvgDirect();
+          if (format === "png") {
+            await networkSummaryPanelRef.current?.exportPngDirect();
+          } else {
+            await networkSummaryPanelRef.current?.exportSvgDirect();
+          }
           exportedCount += 1;
         }
         if (originalNetworkId !== null && originalNetworkId !== store.getState().activeNetworkId) {
           dispatchAction(appActions.selectNetwork(originalNetworkId));
         }
-        setImportExportStatus({ kind: "success", message: `Exported grouped SVG for ${exportedCount} network(s).` });
+        setImportExportStatus({ kind: "success", message: `Exported grouped ${format.toUpperCase()} for ${exportedCount} network(s).` });
       } finally {
         setGroupedSvgExportProgress(null);
       }
     })();
+  }
+
+  function handleExportGroupedPng(networkIds: NetworkId[]): void {
+    handleExportGroupedPlanImages(networkIds, "png");
+  }
+
+  function handleExportGroupedSvg(networkIds: NetworkId[]): void {
+    handleExportGroupedPlanImages(networkIds, "svg");
   }
 
   function handleOpenImportPicker(): void {
@@ -548,6 +561,7 @@ export function useNetworkImportExport({
     handleExportNetworks,
     handleExportNetwork,
     handleExportGroupedBom,
+    handleExportGroupedPng,
     handleExportGroupedSvg,
     handleOpenImportPicker,
     handleImportFileChange

@@ -152,6 +152,7 @@ interface SettingsWorkspaceContentProps {
   importOverwriteDialog?: import("../../hooks/useNetworkImportExport").ImportOverwriteDialogModel | null;
   importFailureDialog?: import("../../hooks/useNetworkImportExport").FileFeedbackDialogModel | null;
   handleExportGroupedBom?: (networkIds: NetworkId[]) => void;
+  handleExportGroupedPng?: (networkIds: NetworkId[]) => void;
   handleExportGroupedSvg?: (networkIds: NetworkId[]) => void;
   aiSettings: AiSettingsModel;
   workspaceFileStatus: WorkspaceFileStorageStatus;
@@ -286,6 +287,7 @@ export function SettingsWorkspaceContent({
   importOverwriteDialog = null,
   importFailureDialog = null,
   handleExportGroupedBom,
+  handleExportGroupedPng,
   handleExportGroupedSvg,
   aiSettings,
   workspaceFileStatus,
@@ -1362,6 +1364,13 @@ export function SettingsWorkspaceContent({
                 disabled={selectedExportNetworkIds.length === 0 || handleExportGroupedSvg === undefined}
               >
                 Export grouped SVG
+              </button>
+              <button
+                type="button"
+                onClick={() => handleExportGroupedPng?.(selectedExportNetworkIds)}
+                disabled={selectedExportNetworkIds.length === 0 || handleExportGroupedPng === undefined}
+              >
+                Export grouped PNG
               </button>
             </div>
             <div className="row-actions settings-actions">
