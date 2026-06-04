@@ -388,7 +388,7 @@ export function NetworkSummaryCalloutsLayer({
       className="network-graph-layer network-graph-layer-callouts"
       transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
     >
-      {renderedCableCallouts.map(({ callout, layout, calloutClassName }) => {
+      {renderedCableCallouts.map(({ callout, layout, calloutClassName, isVisibleInViewport }) => {
         const contentLeftX = -layout.width / 2 + 4;
         const headerY = -layout.height / 2 + layout.headerY;
         const rowsStartY = -layout.height / 2 + layout.rowsStartY;
@@ -397,57 +397,71 @@ export function NetworkSummaryCalloutsLayer({
           lastColumn === undefined ? contentLeftX : contentLeftX + lastColumn.x + lastColumn.width;
         const highlightedCavityIndexes = getHighlightedConnectorCavityIndexes(callout.groups, selectedWireId);
         const wireIdByCavityIndex = getConnectorCavityWireIdByIndex(callout.groups);
+        const isInteractive = isVisibleInViewport;
 
         return (
           <g
             key={callout.key}
             className={calloutClassName}
-            onMouseEnter={() => onHoverCallout(callout.key)}
-            onMouseLeave={() => onHoverCallout(null)}
+            onMouseEnter={isInteractive ? () => onHoverCallout(callout.key) : undefined}
+            onMouseLeave={isInteractive ? () => onHoverCallout(null) : undefined}
+            aria-hidden={isInteractive ? undefined : "true"}
           >
             <g
-              className="network-callout-anchor"
+              className={isInteractive ? "network-callout-anchor" : "network-callout-export-anchor"}
               transform={`translate(${callout.position.x} ${callout.position.y}) scale(${inverseLabelScale})`}
-              role="button"
-              tabIndex={0}
-              focusable="true"
-              aria-label={`Select ${callout.kind} ${callout.title}`}
-              onMouseDown={(event) => onCalloutMouseDown(event, callout)}
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                if (event.detail < 2 && !isRepeatedClick(`callout:${callout.key}`)) {
-                  return;
-                }
-                if (callout.kind === "connector") {
-                  onSelectConnectorFromCallout(callout.entityId as ConnectorId);
-                } else {
-                  onSelectSpliceFromCallout(callout.entityId as SpliceId);
-                }
-                onOpenInspectorForSelection();
-              }}
-              onDoubleClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                if (callout.kind === "connector") {
-                  onSelectConnectorFromCallout(callout.entityId as ConnectorId);
-                } else {
-                  onSelectSpliceFromCallout(callout.entityId as SpliceId);
-                }
-                onOpenInspectorForSelection();
-              }}
-              onKeyDown={(event: ReactKeyboardEvent<SVGGElement>) => {
-                if (event.key !== "Enter" && event.key !== " ") {
-                  return;
-                }
-                event.preventDefault();
-                event.stopPropagation();
-                if (callout.kind === "connector") {
-                  onSelectConnectorFromCallout(callout.entityId as ConnectorId);
-                } else {
-                  onSelectSpliceFromCallout(callout.entityId as SpliceId);
-                }
-              }}
+              role={isInteractive ? "button" : undefined}
+              tabIndex={isInteractive ? 0 : undefined}
+              focusable={isInteractive ? "true" : undefined}
+              aria-label={isInteractive ? `Select ${callout.kind} ${callout.title}` : undefined}
+              onMouseDown={isInteractive ? (event) => onCalloutMouseDown(event, callout) : undefined}
+              onClick={
+                isInteractive
+                  ? (event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      if (event.detail < 2 && !isRepeatedClick(`callout:${callout.key}`)) {
+                        return;
+                      }
+                      if (callout.kind === "connector") {
+                        onSelectConnectorFromCallout(callout.entityId as ConnectorId);
+                      } else {
+                        onSelectSpliceFromCallout(callout.entityId as SpliceId);
+                      }
+                      onOpenInspectorForSelection();
+                    }
+                  : undefined
+              }
+              onDoubleClick={
+                isInteractive
+                  ? (event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      if (callout.kind === "connector") {
+                        onSelectConnectorFromCallout(callout.entityId as ConnectorId);
+                      } else {
+                        onSelectSpliceFromCallout(callout.entityId as SpliceId);
+                      }
+                      onOpenInspectorForSelection();
+                    }
+                  : undefined
+              }
+              onKeyDown={
+                isInteractive
+                  ? (event: ReactKeyboardEvent<SVGGElement>) => {
+                      if (event.key !== "Enter" && event.key !== " ") {
+                        return;
+                      }
+                      event.preventDefault();
+                      event.stopPropagation();
+                      if (callout.kind === "connector") {
+                        onSelectConnectorFromCallout(callout.entityId as ConnectorId);
+                      } else {
+                        onSelectSpliceFromCallout(callout.entityId as SpliceId);
+                      }
+                    }
+                  : undefined
+              }
             >
               <rect
                 className="network-callout-frame"

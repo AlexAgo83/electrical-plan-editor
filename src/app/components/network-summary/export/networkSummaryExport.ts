@@ -465,7 +465,7 @@ function appendExportCartoucheOverlay(params: {
     return Math.max(maxWidth, measureTextWidth(row.text, rowFont));
   }, 0);
   const maxCartoucheWidth = Math.min(
-    clampNumberValue(Math.round(params.width * 0.5), 250, 620),
+    clampNumberValue(Math.round(params.width * 0.8), 250, 620),
     Math.max(180, params.width - margin * 2)
   );
   const minCartoucheWidth = Math.min(210, maxCartoucheWidth);
