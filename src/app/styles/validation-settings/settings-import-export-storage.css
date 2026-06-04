@@ -308,6 +308,11 @@
   .settings-import-export-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
+
+  .settings-import-export-selection-column {
+    min-height: 18rem;
+    max-height: 18rem;
+  }
 }
 
 .settings-import-summary {
