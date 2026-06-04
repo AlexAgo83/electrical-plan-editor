@@ -75,12 +75,15 @@ describe("App integration UI - creation flow wire ergonomics", () => {
     clickNewFromPanel("Wires");
     const createWirePanel = getPanelByHeading("Create Wire");
 
-    const primaryColorSelect = within(createWirePanel).getByLabelText("Primary color");
-    expect(primaryColorSelect).toHaveValue("");
-    expect(within(createWirePanel).queryByLabelText("Color mode")).not.toBeInTheDocument();
+    const colorModeSelect = within(createWirePanel).getByLabelText("Color mode");
+    expect(colorModeSelect).toHaveValue("none");
+    expect(within(createWirePanel).queryByLabelText("Primary color")).not.toBeInTheDocument();
     expect(within(createWirePanel).queryByLabelText("Secondary color")).not.toBeInTheDocument();
     expect(within(createWirePanel).getAllByText("Not specified").length).toBeGreaterThan(0);
 
+    fireEvent.change(colorModeSelect, { target: { value: "catalog" } });
+    const primaryColorSelect = within(createWirePanel).getByLabelText("Primary color");
+    expect(primaryColorSelect).toHaveValue("");
     fireEvent.change(primaryColorSelect, { target: { value: "RD" } });
     const secondaryColorSelect = within(createWirePanel).getByLabelText("Secondary color");
     expect(secondaryColorSelect).toHaveValue("");
@@ -95,6 +98,7 @@ describe("App integration UI - creation flow wire ergonomics", () => {
     fireEvent.click(within(createWirePanel).getByRole("button", { name: "Create" }));
 
     const editWirePanel = getPanelByHeading("Edit Wire");
+    expect(within(editWirePanel).getByLabelText("Color mode")).toHaveValue("catalog");
     expect(within(editWirePanel).getByLabelText("Primary color")).toHaveValue("RD");
     expect(within(editWirePanel).getByLabelText("Secondary color")).toHaveValue("");
     const wiresPanel = getPanelByHeading("Wires");

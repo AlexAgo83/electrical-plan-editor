@@ -156,11 +156,13 @@ export function useWireHandlers({
   setWireCurrentA,
   wireMaterial,
   setWireMaterial,
+  wireColorMode,
   setWireColorMode,
   wirePrimaryColorId,
   setWirePrimaryColorId,
   wireSecondaryColorId,
   setWireSecondaryColorId,
+  wireFreeColorLabel,
   setWireFreeColorLabel,
   wireFuseEnabled,
   setWireFuseEnabled,
@@ -521,12 +523,18 @@ export function useWireHandlers({
       setWireColorMode("catalog");
       setWirePrimaryColorId(wire.primaryColorId ?? "");
       setWireSecondaryColorId(wire.secondaryColorId ?? "");
+      setWireFreeColorLabel("");
+    } else if (normalizedWireColorMode === "free") {
+      setWireColorMode("free");
+      setWirePrimaryColorId("");
+      setWireSecondaryColorId("");
+      setWireFreeColorLabel(wire.freeColorLabel ?? "");
     } else {
       setWireColorMode("none");
       setWirePrimaryColorId("");
       setWireSecondaryColorId("");
+      setWireFreeColorLabel("");
     }
-    setWireFreeColorLabel("");
     setWireEndpointAConnectionReference(wire.endpointAConnectionReference ?? "");
     setWireEndpointAConnectionName(wire.endpointAConnectionName ?? "");
     setWireEndpointASealReference(wire.endpointASealReference ?? "");
@@ -640,7 +648,12 @@ export function useWireHandlers({
       setWireFormError("Wire current must be a positive value in A.");
       return;
     }
-    const normalizedColors = normalizeWireColorState(wirePrimaryColorId, wireSecondaryColorId, null);
+    const normalizedColors = normalizeWireColorState(
+      wirePrimaryColorId,
+      wireSecondaryColorId,
+      wireFreeColorLabel,
+      wireColorMode
+    );
     const endpointAConnectionReference = normalizeWireEndpointReferenceInput(wireEndpointAConnectionReference);
     const endpointASealReference = normalizeWireEndpointReferenceInput(wireEndpointASealReference);
     const endpointBConnectionReference = normalizeWireEndpointReferenceInput(wireEndpointBConnectionReference);

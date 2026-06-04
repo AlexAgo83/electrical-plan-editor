@@ -28,7 +28,11 @@ describe("App integration UI - wire color selection", () => {
     localStorage.clear();
   });
 
-  it("shows Not specified as default primary color with no secondary color picker", () => {
+  function switchColorMode(panel: HTMLElement, value: "none" | "catalog" | "free"): void {
+    fireEvent.change(within(panel).getByLabelText("Color mode"), { target: { value } });
+  }
+
+  it("shows Not specified as default color mode with no catalog color pickers", () => {
     renderAppWithState(createUiIntegrationDenseWiresState());
     closeOnboardingIfOpen();
     switchScreenDrawerAware("modeling");
@@ -37,11 +41,12 @@ describe("App integration UI - wire color selection", () => {
     clickNewWire();
     const createWirePanel = getPanelByHeading("Create Wire");
 
-    const primarySelect = within(createWirePanel).getByLabelText("Primary color");
-    expect(primarySelect).toHaveValue("");
-    expect(within(primarySelect).getByRole("option", { name: /Not specified/i })).toBeInTheDocument();
+    const colorModeSelect = within(createWirePanel).getByLabelText("Color mode");
+    expect(colorModeSelect).toHaveValue("none");
+    expect(within(colorModeSelect).getByRole("option", { name: /Not specified/i })).toBeInTheDocument();
+    expect(within(colorModeSelect).getByRole("option", { name: "Free" })).toBeInTheDocument();
+    expect(within(createWirePanel).queryByLabelText("Primary color")).not.toBeInTheDocument();
     expect(within(createWirePanel).queryByLabelText("Secondary color")).not.toBeInTheDocument();
-    expect(within(createWirePanel).queryByLabelText("Color mode")).not.toBeInTheDocument();
   });
 
   it("shows secondary color picker only after a primary color is selected", () => {
@@ -55,6 +60,7 @@ describe("App integration UI - wire color selection", () => {
 
     expect(within(createWirePanel).queryByLabelText("Secondary color")).not.toBeInTheDocument();
 
+    switchColorMode(createWirePanel, "catalog");
     fireEvent.change(within(createWirePanel).getByLabelText("Primary color"), { target: { value: "RD" } });
 
     expect(within(createWirePanel).getByLabelText("Secondary color")).toBeInTheDocument();
@@ -70,12 +76,13 @@ describe("App integration UI - wire color selection", () => {
     clickNewWire();
     const createWirePanel = getPanelByHeading("Create Wire");
 
+    switchColorMode(createWirePanel, "catalog");
     fireEvent.change(within(createWirePanel).getByLabelText("Primary color"), { target: { value: "BU" } });
     fireEvent.change(within(createWirePanel).getByLabelText("Secondary color"), { target: { value: "WH" } });
 
     expect(within(createWirePanel).getByLabelText("Secondary color")).toHaveValue("WH");
 
-    fireEvent.change(within(createWirePanel).getByLabelText("Primary color"), { target: { value: "" } });
+    switchColorMode(createWirePanel, "none");
 
     expect(within(createWirePanel).queryByLabelText("Secondary color")).not.toBeInTheDocument();
   });
@@ -91,6 +98,7 @@ describe("App integration UI - wire color selection", () => {
     const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
     const endpointBFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint B" });
 
+    switchColorMode(createWirePanel, "catalog");
     fireEvent.change(within(createWirePanel).getByLabelText("Primary color"), { target: { value: "BK" } });
     fireEvent.change(within(createWirePanel).getByLabelText("Secondary color"), { target: { value: "YE" } });
     fireEvent.change(within(createWirePanel).getByLabelText("Functional name"), { target: { value: "Catalog color wire" } });
@@ -137,7 +145,38 @@ describe("App integration UI - wire color selection", () => {
     expect(savedWire?.secondaryColorId).toBeNull();
   });
 
-  it("loads existing wire with free color mode as Not specified in the form", () => {
+  it("saves wire with free color mode as an intentional open color", () => {
+    const { store } = renderAppWithState(createUiIntegrationDenseWiresState());
+    closeOnboardingIfOpen();
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+
+    clickNewWire();
+    const createWirePanel = getPanelByHeading("Create Wire");
+    const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
+    const endpointBFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint B" });
+
+    switchColorMode(createWirePanel, "free");
+    expect(within(createWirePanel).queryByLabelText("Primary color")).not.toBeInTheDocument();
+    expect(within(createWirePanel).queryByLabelText("Secondary color")).not.toBeInTheDocument();
+    fireEvent.change(within(createWirePanel).getByLabelText("Functional name"), { target: { value: "Free color wire" } });
+    fireEvent.change(within(createWirePanel).getByLabelText("Technical ID"), { target: { value: "W-FREE-COL-1" } });
+    fireEvent.change(within(endpointAFieldset).getByLabelText("Connector"), { target: { value: "C1" } });
+    fireEvent.change(within(endpointBFieldset).getByLabelText("Splice"), { target: { value: "S1" } });
+    fireEvent.click(within(createWirePanel).getByRole("button", { name: "Create" }));
+
+    const state = store.getState();
+    const savedWireId = state.wires.allIds.find((id) => state.wires.byId[id]?.technicalId === "W-FREE-COL-1");
+    expect(savedWireId).toBeDefined();
+    if (savedWireId === undefined) throw new Error("Expected saved wire.");
+    const savedWire = state.wires.byId[savedWireId];
+    expect(savedWire?.colorMode).toBe("free");
+    expect(savedWire?.primaryColorId).toBeNull();
+    expect(savedWire?.secondaryColorId).toBeNull();
+    expect(savedWire?.freeColorLabel).toBeNull();
+  });
+
+  it("loads existing wire with free color mode as Free in the form", () => {
     const base = createUiIntegrationDenseWiresState();
     const stateWithFreeWire = appReducer(
       base,
@@ -168,8 +207,8 @@ describe("App integration UI - wire color selection", () => {
     fireEvent.click(wireRow);
 
     const editWirePanel = getPanelByHeading("Edit Wire");
-    expect(within(editWirePanel).getByLabelText("Primary color")).toHaveValue("");
+    expect(within(editWirePanel).getByLabelText("Color mode")).toHaveValue("free");
+    expect(within(editWirePanel).queryByLabelText("Primary color")).not.toBeInTheDocument();
     expect(within(editWirePanel).queryByLabelText("Secondary color")).not.toBeInTheDocument();
-    expect(within(editWirePanel).queryByLabelText("Color mode")).not.toBeInTheDocument();
   });
 });

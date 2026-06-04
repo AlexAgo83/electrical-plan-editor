@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG } from "../../../core/cableColors";
+import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG, type WireColorMode } from "../../../core/cableColors";
 import {
   FUNCTIONAL_FILTER_12V_POWER,
   FUNCTIONAL_FILTER_48V,
@@ -101,11 +101,13 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireMaterial,
     recommendedWireSectionMm2,
     handleApplyRecommendedWireSection,
+    wireColorMode,
     setWireColorMode,
     wirePrimaryColorId,
     setWirePrimaryColorId,
     wireSecondaryColorId,
     setWireSecondaryColorId,
+    setWireFreeColorLabel,
     wireFuseEnabled,
     setWireFuseEnabled,
     wireFuseCatalogItemId,
@@ -171,6 +173,16 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     selectedEndpointASplice !== undefined && resolveSplicePortMode(selectedEndpointASplice) === "directional";
   const endpointBIsDirectionalSplice =
     selectedEndpointBSplice !== undefined && resolveSplicePortMode(selectedEndpointBSplice) === "directional";
+  function handleWireColorModeChange(nextMode: WireColorMode): void {
+    setWireColorMode(nextMode);
+    if (nextMode === "catalog") {
+      setWireFreeColorLabel("");
+      return;
+    }
+    setWirePrimaryColorId("");
+    setWireSecondaryColorId("");
+    setWireFreeColorLabel("");
+  }
   const functionalDomainTagOptions = [
     FUNCTIONAL_FILTER_SIGNAL,
     FUNCTIONAL_FILTER_12V_POWER,
@@ -374,27 +386,36 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       </>
     ) : null}
     <label>
-      Primary color
-      <select
-        value={wirePrimaryColorId}
-        onChange={(event) => {
-          const nextPrimary = event.target.value;
-          setWirePrimaryColorId(nextPrimary);
-          setWireColorMode(nextPrimary.length === 0 ? "none" : "catalog");
-          if (nextPrimary.length === 0) {
-            setWireSecondaryColorId("");
-          }
-        }}
-      >
-        <option value="">Not specified</option>
-        {CABLE_COLOR_CATALOG.map((color) => (
-          <option key={color.id} value={color.id}>
-            {color.id} - {color.label}
-          </option>
-        ))}
+      Color mode
+      <select value={wireColorMode} onChange={(event) => handleWireColorModeChange(event.target.value as WireColorMode)}>
+        <option value="none">Not specified</option>
+        <option value="free">Free</option>
+        <option value="catalog">Selected color</option>
       </select>
     </label>
-    {wirePrimaryColorId.length > 0 ? (
+    {wireColorMode === "catalog" ? (
+      <label>
+        Primary color
+        <select
+          value={wirePrimaryColorId}
+          onChange={(event) => {
+            const nextPrimary = event.target.value;
+            setWirePrimaryColorId(nextPrimary);
+            if (nextPrimary.length === 0) {
+              setWireSecondaryColorId("");
+            }
+          }}
+        >
+          <option value="">Not specified</option>
+          {CABLE_COLOR_CATALOG.map((color) => (
+            <option key={color.id} value={color.id}>
+              {color.id} - {color.label}
+            </option>
+          ))}
+        </select>
+      </label>
+    ) : null}
+    {wireColorMode === "catalog" && wirePrimaryColorId.length > 0 ? (
       <label>
         Secondary color
         <select
@@ -410,23 +431,25 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         </select>
       </label>
     ) : null}
-    <small className="inline-help">
-      {primaryColor === undefined ? (
-        <>Not specified</>
-      ) : (
-        <>
-          {swatch(primaryColor.hex, primaryColor.label)}
-          {primaryColor.id} {primaryColor.label}
-          {secondaryColor !== undefined ? (
-            <>
-              {" + "}
-              {swatch(secondaryColor.hex, secondaryColor.label)}
-              {secondaryColor.id} {secondaryColor.label}
-            </>
-          ) : null}
-        </>
-      )}
-    </small>
+    {wireColorMode === "catalog" ? (
+      <small className="inline-help">
+        {primaryColor === undefined ? (
+          <>Not specified</>
+        ) : (
+          <>
+            {swatch(primaryColor.hex, primaryColor.label)}
+            {primaryColor.id} {primaryColor.label}
+            {secondaryColor !== undefined ? (
+              <>
+                {" + "}
+                {swatch(secondaryColor.hex, secondaryColor.label)}
+                {secondaryColor.id} {secondaryColor.label}
+              </>
+            ) : null}
+          </>
+        )}
+      </small>
+    ) : null}
     {wireTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
     <div className="form-split wire-endpoints-grid">
       <fieldset className="inline-fieldset wire-endpoint-fieldset">

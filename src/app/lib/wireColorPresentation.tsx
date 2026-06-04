@@ -21,7 +21,9 @@ const neutralBadgeStyle: CSSProperties = {
   lineHeight: 1.2
 };
 
-export function getWireColorCsvValue(wire: Pick<Wire, "primaryColorId" | "secondaryColorId" | "freeColorLabel">): string {
+type WireColorPresentationWire = Pick<Wire, "colorMode" | "primaryColorId" | "secondaryColorId" | "freeColorLabel">;
+
+export function getWireColorCsvValue(wire: WireColorPresentationWire): string {
   if (isWireFreeColorMode(wire)) {
     return wire.freeColorLabel === null ? "" : getWireColorLabel(wire);
   }
@@ -31,7 +33,7 @@ export function getWireColorCsvValue(wire: Pick<Wire, "primaryColorId" | "second
   return getWireColorCode(wire);
 }
 
-function getFreeColorCellText(wire: Pick<Wire, "primaryColorId" | "secondaryColorId" | "freeColorLabel">): string {
+function getFreeColorCellText(wire: WireColorPresentationWire): string {
   const colorLabel = getWireColorLabel(wire);
   if (colorLabel === "Free color (unspecified)") {
     return "Unspecified";
@@ -40,7 +42,7 @@ function getFreeColorCellText(wire: Pick<Wire, "primaryColorId" | "secondaryColo
 }
 
 export function renderWireColorCellValue(
-  wire: Pick<Wire, "primaryColorId" | "secondaryColorId" | "freeColorLabel">
+  wire: WireColorPresentationWire
 ): ReactElement {
   if (isWireFreeColorMode(wire)) {
     const colorLabel = getWireColorLabel(wire);
@@ -72,7 +74,7 @@ export function renderWireColorCellValue(
 }
 
 export function renderWireColorPrefixMarker(
-  wire: Pick<Wire, "primaryColorId" | "secondaryColorId" | "freeColorLabel"> | null | undefined
+  wire: WireColorPresentationWire | null | undefined
 ): ReactElement | null {
   if (wire === null || wire === undefined) {
     return null;

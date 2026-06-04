@@ -113,4 +113,49 @@ describe("App integration UI - list ergonomics wire colors", () => {
     expect(within(wiresPanel).getByText("Feed Main Junction")).toBeInTheDocument();
     expect(within(wiresPanel).queryByText("Secondary Feed B")).not.toBeInTheDocument();
   });
+
+  it("renders not specified wire colors as an empty table value", () => {
+    const state = createSampleNetworkState();
+    const firstWireId = state.wires.allIds[0];
+    const activeNetworkId = state.activeNetworkId;
+    if (firstWireId === undefined || activeNetworkId === null) {
+      throw new Error("Expected sample state with active network and wires.");
+    }
+
+    state.wires.byId[firstWireId] = {
+      ...state.wires.byId[firstWireId]!,
+      colorMode: "none",
+      primaryColorId: null,
+      secondaryColorId: null,
+      freeColorLabel: null
+    };
+    state.networkStates[activeNetworkId] = {
+      ...state.networkStates[activeNetworkId]!,
+      wires: {
+        ...state.networkStates[activeNetworkId]!.wires,
+        byId: {
+          ...state.networkStates[activeNetworkId]!.wires.byId,
+          [firstWireId]: {
+            ...state.networkStates[activeNetworkId]!.wires.byId[firstWireId]!,
+            colorMode: "none",
+            primaryColorId: null,
+            secondaryColorId: null,
+            freeColorLabel: null
+          }
+        }
+      }
+    };
+
+    renderAppWithState(state);
+    switchSubScreen("wire");
+
+    const wiresPanel = getPanelByHeading("Wires");
+    const wireRow = within(wiresPanel).getByText("Feed Main Junction").closest("tr");
+    expect(wireRow).not.toBeNull();
+    if (wireRow !== null) {
+      expect(within(wireRow).queryByText("Not specified")).not.toBeInTheDocument();
+      expect(within(wireRow).queryByText("No color")).not.toBeInTheDocument();
+      expect(within(wireRow).queryByText("Free")).not.toBeInTheDocument();
+    }
+  });
 });
