@@ -6,13 +6,15 @@ import type {
   ConnectorLayoutKeyingSide,
   ConnectorLayoutShellShape,
   ConnectorLayoutWay,
-  ConnectorLayoutWayShape
+  ConnectorLayoutWayShape,
+  ConnectorLayoutWayStrokeStyle
 } from "./entities";
 
 const MIN_LAYOUT_SIZE = 1;
 export const MAX_CONNECTOR_LAYOUT_SIZE = 48;
 const MAX_LAYOUT_SIZE = MAX_CONNECTOR_LAYOUT_SIZE;
 const DEFAULT_WAY_SHAPE: ConnectorLayoutWayShape = "round";
+const DEFAULT_WAY_STROKE_STYLE: ConnectorLayoutWayStrokeStyle = "solid";
 const DEFAULT_KEYING_SIDE: ConnectorLayoutKeyingSide = "right";
 const DEFAULT_KEYING_SHAPE: ConnectorLayoutKeyingShape = "arrow";
 const DEFAULT_SHELL_SHAPE: ConnectorLayoutShellShape = "square";
@@ -67,6 +69,13 @@ function roundTo(value: number, decimals: number): number {
 
 function normalizeWayShape(value: unknown): ConnectorLayoutWayShape {
   return value === "square" || value === "slot" || value === "round" ? value : DEFAULT_WAY_SHAPE;
+}
+
+function normalizeWayStrokeStyle(value: unknown): ConnectorLayoutWayStrokeStyle | undefined {
+  if (value === "dashed") {
+    return "dashed";
+  }
+  return undefined;
 }
 
 function normalizeShellShape(value: unknown): ConnectorLayoutShellShape {
@@ -446,11 +455,13 @@ export function normalizeConnectorLayout(
       continue;
     }
     const fallbackWay = buildFallbackWay(cavityIndex, safeCount);
+    const strokeStyle = normalizeWayStrokeStyle(candidate.strokeStyle);
     normalizedByIndex.set(cavityIndex, {
       cavityIndex,
       x: clampInteger(candidate.x, 1, width) ?? clampInteger(fallbackWay.x, 1, width) ?? 1,
       y: clampInteger(candidate.y, 1, height) ?? clampInteger(fallbackWay.y, 1, height) ?? 1,
       shape: normalizeWayShape(candidate.shape),
+      ...(strokeStyle !== undefined ? { strokeStyle } : {}),
       label: normalizeWayLabel(candidate.label)
     });
   }
@@ -520,6 +531,7 @@ function connectorLayoutWaysMatch(left: ConnectorLayoutWay[], right: ConnectorLa
         leftWay.x === rightWay.x &&
         leftWay.y === rightWay.y &&
         leftWay.shape === rightWay.shape &&
+        (leftWay.strokeStyle ?? DEFAULT_WAY_STROKE_STYLE) === (rightWay.strokeStyle ?? DEFAULT_WAY_STROKE_STYLE) &&
         leftWay.label === rightWay.label
       );
     })

@@ -66,10 +66,16 @@ function getPhysicalWayRenderScale(cellPadding: number): number {
   return (1 - cellPadding) / DEFAULT_WAY_RENDER_CELL_SIZE;
 }
 
-function renderPhysicalWayShape(shape: string, isOccupied: boolean, isWireHighlighted: boolean, cellPadding: number): ReactElement {
+function renderPhysicalWayShape(
+  shape: string,
+  strokeStyle: string | undefined,
+  isOccupied: boolean,
+  isWireHighlighted: boolean,
+  cellPadding: number
+): ReactElement {
   const className = `connector-physical-way-shape${isOccupied ? " is-occupied" : ""}${
     isWireHighlighted ? " is-wire-highlighted" : ""
-  }`;
+  }${strokeStyle === "dashed" ? " is-dashed" : ""}`;
   const scale = getPhysicalWayRenderScale(cellPadding);
   if (shape === "square") {
     const size = 0.6 * scale;
@@ -315,7 +321,7 @@ export function ConnectorPhysicalView({
                 transform={`translate(${way.x} ${way.y})`}
               >
                 {wireName.length > 0 ? <title>{wireName}</title> : null}
-                {renderPhysicalWayShape(way.shape, isOccupied, isWireHighlighted, cellPadding)}
+                {renderPhysicalWayShape(way.shape, way.strokeStyle, isOccupied, isWireHighlighted, cellPadding)}
                 <text className={labelClassName} y={0}>
                   {label}
                 </text>

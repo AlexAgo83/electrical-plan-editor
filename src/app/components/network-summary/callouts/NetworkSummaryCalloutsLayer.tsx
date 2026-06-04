@@ -265,7 +265,7 @@ export function renderConnectorLayoutDrawing(
           const isUnused = wireId === undefined;
           const wayClassName = `network-callout-connector-way${isWireHighlighted ? " is-wire-highlighted" : ""}${
             isUnused ? " is-unused" : ""
-          }`;
+          }${way.strokeStyle === "dashed" ? " is-dashed" : ""}`;
           const handleSelectCavityWire = (event: ReactMouseEvent<SVGGElement>): void => {
             if (!canSelectWire) {
               return;

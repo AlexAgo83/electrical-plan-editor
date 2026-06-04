@@ -120,6 +120,7 @@ export interface CatalogAdditionalAccessory {
 }
 
 export type ConnectorLayoutWayShape = "round" | "square" | "slot";
+export type ConnectorLayoutWayStrokeStyle = "solid" | "dashed";
 export type ConnectorLayoutKeyingSide = "none" | "top" | "right" | "bottom" | "left";
 export type ConnectorLayoutKeyingShape = "arrow" | "square" | "round" | "diamond";
 export type ConnectorLayoutShellShape = "square" | "circle";
@@ -143,6 +144,7 @@ export interface ConnectorLayoutWay {
   x: number;
   y: number;
   shape: ConnectorLayoutWayShape;
+  strokeStyle?: ConnectorLayoutWayStrokeStyle;
   label?: string;
 }
 

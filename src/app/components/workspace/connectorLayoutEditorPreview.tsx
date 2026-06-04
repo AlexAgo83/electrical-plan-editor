@@ -36,7 +36,9 @@ function getWayRenderScale(cellPadding: number): number {
 
 export function renderConnectorLayoutWay(way: ConnectorLayoutWay, isSelected: boolean, layout: ConnectorLayout): ReactElement {
   const commonProps = {
-    className: isSelected ? "connector-layout-way-shape is-selected" : "connector-layout-way-shape"
+    className: `connector-layout-way-shape${isSelected ? " is-selected" : ""}${
+      way.strokeStyle === "dashed" ? " is-dashed" : ""
+    }`
   };
   const scale = getWayRenderScale(getConnectorLayoutCellPadding(layout));
   if (way.shape === "square") {

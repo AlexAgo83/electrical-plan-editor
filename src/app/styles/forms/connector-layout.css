@@ -235,6 +235,12 @@
   stroke-width: 0.08;
 }
 
+.connector-layout-way-shape.is-dashed,
+.connector-physical-way-shape.is-dashed {
+  stroke-dasharray: 0.12 0.14;
+  stroke-linecap: round;
+}
+
 .connector-layout-way-shape.is-selected {
   fill: color-mix(in srgb, var(--theme-primary, currentColor) 28%, var(--network-label-stroke-color, var(--theme-surface, Canvas)));
   stroke: var(--theme-primary, currentColor);

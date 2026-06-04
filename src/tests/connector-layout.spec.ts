@@ -61,7 +61,7 @@ describe("connector layout", () => {
         cellPadding: 0.22,
         keying: { side: "bottom", position: 99 },
         ways: [
-          { cavityIndex: 2, x: 4, y: 3, shape: "slot", label: "B" },
+          { cavityIndex: 2, x: 4, y: 3, shape: "slot", strokeStyle: "dashed", label: "B" },
           { cavityIndex: 99, x: 50, y: 50, shape: "square" },
           { cavityIndex: 2, x: 1, y: 1, shape: "round" }
         ]
@@ -78,8 +78,28 @@ describe("connector layout", () => {
     ]);
     expect(layout !== undefined ? getConnectorLayoutKeyingSide(layout) : null).toBe("bottom");
     expect(layout !== undefined ? getConnectorLayoutKeyingPosition(layout) : null).toBe(8);
-    expect(layout?.ways[1]).toEqual({ cavityIndex: 2, x: 4, y: 3, shape: "slot", label: "B" });
+    expect(layout?.ways[1]).toEqual({ cavityIndex: 2, x: 4, y: 3, shape: "slot", strokeStyle: "dashed", label: "B" });
     expect(layout?.ways[2]?.cavityIndex).toBe(3);
+  });
+
+  it("keeps way stroke style solid by default and stores dashed as an edit", () => {
+    const layout = normalizeConnectorLayout(
+      {
+        version: 1,
+        units: "grid",
+        width: 2,
+        height: 1,
+        ways: [
+          { cavityIndex: 1, x: 1, y: 1, shape: "round", strokeStyle: "solid" },
+          { cavityIndex: 2, x: 2, y: 1, shape: "round", strokeStyle: "dashed" }
+        ]
+      },
+      2
+    );
+
+    expect(layout?.ways[0]).toEqual({ cavityIndex: 1, x: 1, y: 1, shape: "round" });
+    expect(layout?.ways[1]).toEqual({ cavityIndex: 2, x: 2, y: 1, shape: "round", strokeStyle: "dashed" });
+    expect(resolveEditedConnectorLayout(layout, 2)).toBeDefined();
   });
 
   it("resolves malformed layout input to a generated fallback", () => {

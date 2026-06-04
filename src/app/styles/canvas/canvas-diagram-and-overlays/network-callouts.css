@@ -97,6 +97,11 @@
   stroke-width: 0.12;
 }
 
+.network-callout-connector-way.is-dashed {
+  stroke-dasharray: 0.12 0.14;
+  stroke-linecap: round;
+}
+
 .network-callout-connector-way-label {
   font-size: 0.36px;
   font-family: "IBM Plex Mono", "SFMono-Regular", monospace;

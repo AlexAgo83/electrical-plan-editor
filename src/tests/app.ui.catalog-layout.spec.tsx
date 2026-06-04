@@ -40,7 +40,7 @@ describe("App integration UI - catalog layout", () => {
           ],
           ways: [
             { cavityIndex: 1, x: 2, y: 2, shape: "square", label: "A10" },
-            { cavityIndex: 2, x: 4, y: 2, shape: "slot", label: "A2" }
+            { cavityIndex: 2, x: 4, y: 2, shape: "slot", strokeStyle: "dashed", label: "A2" }
           ]
         }
       }),
@@ -84,7 +84,7 @@ describe("App integration UI - catalog layout", () => {
     const squareKeying = connectorAnalysisPanel.querySelector(".connector-physical-keying");
     expect(squareKeying?.getAttribute("style")).toMatch(/fill: (#ff8800|rgb\(255, 136, 0\))/);
     expect(Number(squareKeying?.getAttribute("y"))).toBeGreaterThan(0);
-    expect(connectorAnalysisPanel.querySelector('.connector-physical-way-shape[width="0.66"]')).not.toBeNull();
+    expect(connectorAnalysisPanel.querySelector('.connector-physical-way-shape.is-dashed[width="0.66"]')).not.toBeNull();
   });
 
   it("supports keyboard layout moves without allowing overlapping ways", () => {
@@ -166,6 +166,13 @@ describe("App integration UI - catalog layout", () => {
       target: { value: "2" }
     });
     expect(within(catalogLayoutPanel).getByLabelText("Y")).toHaveValue(1);
+    const shapeLineSelect = within(catalogLayoutPanel).getByLabelText("Line style");
+    expect(shapeLineSelect).toHaveValue("solid");
+    fireEvent.change(shapeLineSelect, {
+      target: { value: "dashed" }
+    });
+    expect(shapeLineSelect).toHaveValue("dashed");
+    expect(catalogLayoutPanel.querySelector(".connector-layout-way-shape.is-selected.is-dashed")).not.toBeNull();
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Keying features" }));
     fireEvent.click(within(catalogLayoutPanel).getByRole("button", { name: "Add keying" }));
     expect(catalogLayoutPanel.querySelector(".connector-layout-keying")?.getAttribute("style")).toBeNull();

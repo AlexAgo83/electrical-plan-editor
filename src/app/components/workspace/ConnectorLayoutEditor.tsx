@@ -5,7 +5,8 @@ import type {
   ConnectorLayoutKeyingShape,
   ConnectorLayoutShellShape,
   ConnectorLayoutWay,
-  ConnectorLayoutWayShape
+  ConnectorLayoutWayShape,
+  ConnectorLayoutWayStrokeStyle
 } from "../../../core/entities";
 import {
   addConnectorLayoutKeying,
@@ -63,6 +64,11 @@ const WAY_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutWayShape; label: string }
   { value: "round", label: "Round" },
   { value: "square", label: "Square" },
   { value: "slot", label: "Slot" }
+];
+
+const WAY_STROKE_STYLE_OPTIONS: Array<{ value: ConnectorLayoutWayStrokeStyle; label: string }> = [
+  { value: "solid", label: "Line" },
+  { value: "dashed", label: "Dashed" }
 ];
 
 const KEYING_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutKeyingShape; label: string }> = [
@@ -792,6 +798,22 @@ export function ConnectorLayoutEditor({
                   onChange={(event) => updateSelectedWay({ shape: event.target.value as ConnectorLayoutWayShape })}
                 >
                   {WAY_SHAPE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Line style
+                <select
+                  value={selectedWay.strokeStyle ?? "solid"}
+                  onChange={(event) => {
+                    const strokeStyle = event.target.value as ConnectorLayoutWayStrokeStyle;
+                    updateSelectedWay({ strokeStyle: strokeStyle === "solid" ? undefined : strokeStyle });
+                  }}
+                >
+                  {WAY_STROKE_STYLE_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
