@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import type { NetworkId } from "../core/entities";
 import { createEmptyNetworkScopedState } from "../store";
 import { createUiIntegrationState, getPanelByHeading, renderAppWithState, switchScreen } from "./helpers/app-ui-test-utils";
 
@@ -137,7 +138,13 @@ describe("App integration UI - import/export", () => {
     fireEvent.click(within(overwriteDialog).getByRole("radio", { name: "Keep both (rename incoming)" }));
     fireEvent.click(within(overwriteDialog).getByRole("button", { name: "Confirm" }));
 
-    const warningDetails = await screen.findByRole("status", { name: "Import warning details" });
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog", { name: "Similar networks detected" })).not.toBeInTheDocument();
+      expect(store.getState().networks.byId["network-main-import" as NetworkId]).toBeDefined();
+      expect(within(panel).getByText("Warnings").closest(".meta-line")).toHaveTextContent("2");
+    });
+
+    const warningDetails = await within(panel).findByRole("status", { name: "Import warning details" });
     expect(within(warningDetails).getByText("Warning details")).toBeInTheDocument();
     expect(within(warningDetails).getByText(/Network ID 'network-main' was renamed to 'network-main-import' during import\./)).toBeInTheDocument();
     expect(within(warningDetails).getByText(/Network technical ID 'NET-MAIN-SAMPLE' was renamed to 'NET-MAIN-SAMPLE-IMP' during import\./)).toBeInTheDocument();
