@@ -43,14 +43,11 @@ export function renderWireColorCellValue(
   wire: Pick<Wire, "primaryColorId" | "secondaryColorId" | "freeColorLabel">
 ): ReactElement {
   if (isWireFreeColorMode(wire)) {
-    if (wire.freeColorLabel === null) {
-      return <></>;
-    }
     const colorLabel = getWireColorLabel(wire);
     return (
       <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }} title={colorLabel}>
         <span aria-hidden="true" style={neutralBadgeStyle}>Free</span>
-        <span>{getFreeColorCellText(wire)}</span>
+        {wire.freeColorLabel !== null ? <span>{getFreeColorCellText(wire)}</span> : null}
       </span>
     );
   }
