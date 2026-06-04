@@ -580,7 +580,7 @@ export function ModelingSecondaryTables({
             disabled={sortedVisibleSegments.length === 0}
           >
             <span className="action-button-icon is-multi-select" aria-hidden="true" />
-            Select multiple
+            {isMobileViewport ? "Select" : "Select multiple"}
           </button>
           <button
             type="button"
@@ -885,7 +885,7 @@ export function ModelingSecondaryTables({
             disabled={sortedVisibleWires.length === 0}
           >
             <span className="action-button-icon is-multi-select" aria-hidden="true" />
-            Select multiple
+            {isMobileViewport ? "Select" : "Select multiple"}
           </button>
           <button
             type="button"

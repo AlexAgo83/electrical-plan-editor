@@ -560,7 +560,7 @@ export function ModelingPrimaryTables({
             disabled={sortedVisibleConnectors.length === 0}
           >
             <span className="action-button-icon is-multi-select" aria-hidden="true" />
-            Select multiple
+            {isMobileViewport ? "Select" : "Select multiple"}
           </button>
           <button
             type="button"
@@ -776,7 +776,7 @@ export function ModelingPrimaryTables({
             disabled={sortedVisibleSplices.length === 0}
           >
             <span className="action-button-icon is-multi-select" aria-hidden="true" />
-            Select multiple
+            {isMobileViewport ? "Select" : "Select multiple"}
           </button>
           <button
             type="button"
@@ -973,7 +973,7 @@ export function ModelingPrimaryTables({
             disabled={sortedVisibleNodes.length === 0}
           >
             <span className="action-button-icon is-multi-select" aria-hidden="true" />
-            Select multiple
+            {isMobileViewport ? "Select" : "Select multiple"}
           </button>
           <button
             type="button"

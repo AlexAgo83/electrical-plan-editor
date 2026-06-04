@@ -11,7 +11,8 @@ import {
   getPanelByHeading,
   renderAppWithState,
   switchScreen,
-  switchSubScreen
+  switchSubScreen,
+  withViewportSize
 } from "./helpers/app-ui-test-utils";
 
 function createSegmentAnalysisSortingState() {
@@ -265,6 +266,32 @@ describe("App integration UI - list ergonomics", () => {
       "Delete"
     ]);
     expect(within(wireActions).getByRole("button", { name: "Select multiple" }).querySelector(".action-button-icon.is-multi-select")).not.toBeNull();
+  });
+
+  it("shortens Select multiple action labels to Select on mobile modeling lists", () => {
+    withViewportSize({ width: 390, height: 844 }, () => {
+      renderAppWithState(createUiIntegrationState());
+      switchScreen("modeling");
+
+      ([
+        ["connector", "Connectors"],
+        ["splice", "Splices"],
+        ["node", "Nodes"],
+        ["segment", "Segments"],
+        ["wire", "Wires"]
+      ] as const).forEach(([subScreen, panelHeading]) => {
+        switchSubScreen(subScreen);
+        const panel = getPanelByHeading(panelHeading);
+        const actions = panel.querySelector(".modeling-list-actions");
+        expect(actions).not.toBeNull();
+        if (!(actions instanceof HTMLElement)) {
+          throw new Error(`Expected ${panelHeading} action row.`);
+        }
+
+        expect(within(actions).getByRole("button", { name: "Select" }).querySelector(".action-button-icon.is-multi-select")).not.toBeNull();
+        expect(within(actions).queryByRole("button", { name: "Select multiple" })).toBeNull();
+      });
+    });
   });
 
   it("exports wire CSV with split begin/end columns and without endpoints column", () => {
