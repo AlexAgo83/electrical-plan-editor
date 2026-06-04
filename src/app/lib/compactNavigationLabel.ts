@@ -32,6 +32,6 @@ export function getCountedNavigationLabel(label: string, count: number): string 
   return COMPACT_LABEL_BY_NORMALIZED_LABEL[normalizeLabel(trimmedLabel)] ?? `${Array.from(trimmedLabel).slice(0, 4).join("")}.`;
 }
 
-export function getCountedNavigationAriaLabel(label: string, count: number): string {
-  return `${label} ${count}`;
+export function getCountedNavigationAriaLabel(label: string, _count: number): string {
+  return label;
 }

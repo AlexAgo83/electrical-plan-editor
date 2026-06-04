@@ -82,6 +82,7 @@ export function NetworkSummaryQuickEntityNavigation({
               onClick={() => onQuickEntityNavigation(item.subScreen)}
               aria-pressed={!isAiAgentOpen && activeSubScreen === item.subScreen}
               aria-label={navigationLabel === item.label ? undefined : getCountedNavigationAriaLabel(item.label, entityCount)}
+              title={item.label}
             >
               <span
                 className={`action-button-icon network-summary-quick-entity-nav-icon ${SUB_SCREEN_ICON_CLASS_BY_ID[item.subScreen]}`}
@@ -98,9 +99,10 @@ export function NetworkSummaryQuickEntityNavigation({
             className={isAiAgentOpen ? "filter-chip is-ai-agent-tab is-active" : "filter-chip is-ai-agent-tab"}
             onClick={onOpenAiAgent}
             aria-label="AI Agent"
+            aria-description={isAiAgentReady ? "AI Agent modeling workspace" : aiAgentDisabledReason}
             aria-pressed={isAiAgentOpen}
             disabled={!isAiAgentReady || onOpenAiAgent === undefined}
-            title={isAiAgentReady ? "Open AI Agent" : aiAgentDisabledReason}
+            title="AI Agent"
           >
             <span className="action-button-icon network-summary-quick-entity-nav-icon is-ai-agent" aria-hidden="true" />
             <span className="network-summary-quick-entity-nav-label">AI Agent</span>

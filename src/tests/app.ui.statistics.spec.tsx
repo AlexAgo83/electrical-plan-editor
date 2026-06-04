@@ -108,6 +108,12 @@ describe("Statistics workspace", () => {
     expect(modelingIndex).toBeGreaterThanOrEqual(0);
     expect(statisticsIndex).toBeGreaterThan(modelingIndex);
     expect(validationIndex).toBeGreaterThan(statisticsIndex);
+
+    const statisticsButton = within(primaryNavRow as HTMLElement).getByRole("button", { name: "Statistics", hidden: true });
+    const validationButton = within(primaryNavRow as HTMLElement).getByRole("button", { name: /Validation/, hidden: true });
+    expect(statisticsButton.querySelector(".action-button-icon.is-statistics")).not.toBeNull();
+    expect(statisticsButton.querySelector(".action-button-icon.is-validation")).toBeNull();
+    expect(validationButton.querySelector(".action-button-icon.is-validation")).not.toBeNull();
   });
 
   it("opens on active-network statistics by default", () => {

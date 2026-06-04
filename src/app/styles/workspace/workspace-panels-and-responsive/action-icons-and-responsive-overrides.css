@@ -164,6 +164,11 @@
   mask: url("/icons/health.svg") center / contain no-repeat;
 }
 
+.action-button-icon.is-statistics {
+  -webkit-mask: url("/icons/ico_statistics.svg") center / contain no-repeat;
+  mask: url("/icons/ico_statistics.svg") center / contain no-repeat;
+}
+
 .action-button-icon.is-settings {
   -webkit-mask: url("/icons/settings.svg") center / contain no-repeat;
   mask: url("/icons/settings.svg") center / contain no-repeat;

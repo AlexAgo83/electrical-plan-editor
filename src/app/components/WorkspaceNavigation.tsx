@@ -48,7 +48,7 @@ export function WorkspaceNavigation({
     harnessAssembly: "is-harness-assembly",
     modeling: "is-edit",
     analysis: "is-analysis",
-    statistics: "is-validation",
+    statistics: "is-statistics",
     validation: "is-validation"
   };
   const subScreenIconClassById: Record<SubScreenId, string> = {
@@ -132,6 +132,7 @@ export function WorkspaceNavigation({
                   className={!isAiAgentOpen && activeSubScreen === subScreenId ? "workspace-tab is-active" : "workspace-tab"}
                   onClick={() => onSubScreenChange(subScreenId)}
                   aria-label={navigationLabel === label ? undefined : getCountedNavigationAriaLabel(label, entityCount)}
+                  title={label}
                 >
                   <span className="workspace-tab-content">
                     <span className={`action-button-icon ${subScreenIconClassById[subScreenId]}`} aria-hidden="true" />
@@ -151,7 +152,7 @@ export function WorkspaceNavigation({
                 aria-label="AI Agent"
                 aria-description={isAiAgentReady ? "AI Agent modeling workspace" : aiAgentDisabledReason}
                 disabled={!isAiAgentReady || onOpenAiAgent === undefined}
-                title={isAiAgentReady ? "Open AI Agent" : aiAgentDisabledReason}
+                title="AI Agent"
               >
                 <span className="workspace-tab-content">
                   <span className="action-button-icon is-ai-agent" aria-hidden="true" />

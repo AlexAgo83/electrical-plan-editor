@@ -26,6 +26,7 @@ describe("App integration UI - catalog navigation", () => {
     const secondaryLabels = secondaryButtons.map((button) => button.textContent?.trim() ?? "");
     expect(secondaryLabels[0]).toMatch(/^Catalog\d*$/);
     expect(secondaryLabels[1]).toMatch(/^Connector\d*$/);
+    expect(secondaryButtons[0]).toHaveAttribute("title", "Catalog");
 
     const quickNavPanel = document.querySelector("[data-quick-entity-nav-source='true']");
     const quickNavGroup = quickNavPanel?.querySelector(".network-summary-quick-entity-nav");
@@ -38,6 +39,7 @@ describe("App integration UI - catalog navigation", () => {
     const quickNavLabels = quickNavButtons.map((button) => button.textContent?.trim() ?? "");
     expect(quickNavLabels[0]).toMatch(/^Catalog\d+$/);
     expect(quickNavLabels[1]).toMatch(/^Connectors\d+$/);
+    expect(quickNavButtons[0]).toHaveAttribute("title", "Catalog");
 
     fireEvent.click(within(quickNavGroup as HTMLElement).getByRole("button", { name: /^Catalog/i }));
     expect(getPanelByHeading("Catalog")).toBeInTheDocument();
@@ -68,16 +70,18 @@ describe("App integration UI - catalog navigation", () => {
     const secondaryNavRow = document.querySelector(".workspace-nav-row.secondary");
     expect(secondaryNavRow).not.toBeNull();
     const connectorSecondaryButton = within(secondaryNavRow as HTMLElement).getByRole("button", {
-      name: /^Connector\s+\d+$/,
+      name: "Connector",
       hidden: true
     });
     expect(connectorSecondaryButton.textContent).toMatch(/^Conn\.\d+$/);
+    expect(connectorSecondaryButton).toHaveAttribute("title", "Connector");
 
     const quickNavPanel = document.querySelector("[data-quick-entity-nav-source='true']");
     const quickNavGroup = quickNavPanel?.querySelector(".network-summary-quick-entity-nav");
     expect(quickNavGroup).not.toBeNull();
-    const connectorQuickNavButton = within(quickNavGroup as HTMLElement).getByRole("button", { name: /^Connectors\s+\d+$/ });
+    const connectorQuickNavButton = within(quickNavGroup as HTMLElement).getByRole("button", { name: "Connectors" });
     expect(connectorQuickNavButton.textContent).toMatch(/^Conn\.\d+$/);
+    expect(connectorQuickNavButton).toHaveAttribute("title", "Connectors");
   });
 
   it("docks quick entity navigation into the header after the source strip scrolls under it", async () => {

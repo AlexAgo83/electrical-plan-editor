@@ -23,6 +23,6 @@ describe("compact navigation labels", () => {
   });
 
   it("keeps the full label available for accessibility", () => {
-    expect(getCountedNavigationAriaLabel("Connectors", 12)).toBe("Connectors 12");
+    expect(getCountedNavigationAriaLabel("Connectors", 12)).toBe("Connectors");
   });
 });

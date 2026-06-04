@@ -20,6 +20,11 @@ describe("App integration UI - settings AI Agent", () => {
     const quickEntityNavigation = screen.getByRole("region", { name: "Quick entity navigation" });
     const disabledAiAgentButton = within(quickEntityNavigation).getByRole("button", { name: "AI Agent" });
     expect(disabledAiAgentButton).toBeDisabled();
+    expect(disabledAiAgentButton).toHaveAttribute("title", "AI Agent");
+    expect(disabledAiAgentButton).toHaveAttribute(
+      "aria-description",
+      "OpenAI API key is required. Configure a valid provider in Settings."
+    );
 
     switchScreenDrawerAware("settings");
     const aiProviderPanel = getPanelByHeading("AI provider");
@@ -39,6 +44,7 @@ describe("App integration UI - settings AI Agent", () => {
       name: "AI Agent"
     });
     expect(enabledAiAgentButton).toBeEnabled();
+    expect(enabledAiAgentButton).toHaveAttribute("title", "AI Agent");
     fireEvent.click(enabledAiAgentButton);
     expect(screen.getByRole("heading", { name: "AI Agent" })).toBeInTheDocument();
     expect(screen.queryByText("Provider ready")).not.toBeInTheDocument();
