@@ -58,6 +58,7 @@ export function NetworkSummaryPanel({
   showSelectedCalloutOnly,
   showCalloutWireNames,
   connectorDrawingDisplayMode,
+  useConsistentConnectorLayoutScale,
   connectorDrawingScalePercent,
   globalRenderScalePercent,
   setGlobalRenderScalePercent,
@@ -671,6 +672,7 @@ export function NetworkSummaryPanel({
         connectorDrawingDisplayMode,
         normalizedNodeShapeScale,
         connectorDrawingScale: normalizedConnectorNodeDrawingScale,
+        useConsistentConnectorLayoutScale,
         zoomInvariantNodeShapes,
         inverseLabelScale,
         autoSegmentLabelRotation,
@@ -692,6 +694,7 @@ export function NetworkSummaryPanel({
       connectorDrawingDisplayMode,
       normalizedNodeShapeScale,
       normalizedConnectorNodeDrawingScale,
+      useConsistentConnectorLayoutScale,
       zoomInvariantNodeShapes,
       inverseLabelScale,
       autoSegmentLabelRotation,
@@ -895,6 +898,7 @@ export function NetworkSummaryPanel({
           zoomInvariantNodeShapes={zoomInvariantNodeShapes}
           normalizedNodeShapeScale={normalizedNodeShapeScale}
           normalizedConnectorNodeDrawingScale={normalizedConnectorNodeDrawingScale}
+          useConsistentConnectorLayoutScale={useConsistentConnectorLayoutScale}
           nodeStrokeWidth={nodeStrokeWidth}
           nodeStrokeEmphasisWidth={nodeStrokeEmphasisWidth}
           describeNode={describeNode}

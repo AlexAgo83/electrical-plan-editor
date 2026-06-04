@@ -35,6 +35,8 @@ const KEYING_MARKER_RADIUS = 0.15;
 const KEYING_ARROW_WIDTH = 0.32;
 const KEYING_ARROW_DEPTH = 0.19;
 const DEFAULT_WAY_RENDER_CELL_SIZE = 1 - DEFAULT_CONNECTOR_LAYOUT_CELL_PADDING;
+const CONSISTENT_LAYOUT_REFERENCE_WIDTH = 5;
+const CONSISTENT_LAYOUT_REFERENCE_HEIGHT = 3;
 const DOUBLE_CLICK_INTERVAL_MS = 450;
 
 type RenderableKeying = {
@@ -87,6 +89,36 @@ function getKeyingStyle(keying: RenderableKeying): CSSProperties | undefined {
 
 function getWayRenderScale(cellPadding: number): number {
   return (1 - cellPadding) / DEFAULT_WAY_RENDER_CELL_SIZE;
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function getConnectorLayoutDrawingViewMetrics(layout: ConnectorLayout): {
+  minX: number;
+  minY: number;
+  viewWidth: number;
+  viewHeight: number;
+} {
+  const shellPadding = getConnectorLayoutShellPadding(layout);
+  return {
+    minX: 1 - shellPadding - 0.5,
+    minY: 1 - shellPadding - 0.5,
+    viewWidth: layout.width - 1 + shellPadding * 2 + 1,
+    viewHeight: layout.height - 1 + shellPadding * 2 + 1
+  };
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export function getConsistentConnectorLayoutDrawingSize(
+  layout: ConnectorLayout,
+  referenceWidth: number,
+  referenceHeight: number
+): { width: number; height: number } {
+  const metrics = getConnectorLayoutDrawingViewMetrics(layout);
+  const unitScale = Math.min(referenceWidth / CONSISTENT_LAYOUT_REFERENCE_WIDTH, referenceHeight / CONSISTENT_LAYOUT_REFERENCE_HEIGHT);
+  return {
+    width: metrics.viewWidth * unitScale,
+    height: metrics.viewHeight * unitScale
+  };
 }
 
 function renderConnectorKeying(
@@ -170,10 +202,7 @@ export function renderConnectorLayoutDrawing(
   const cellPadding = getConnectorLayoutCellPadding(layout);
   const wayScale = getWayRenderScale(cellPadding);
   const shellShape = getConnectorLayoutShellShape(layout);
-  const minX = 1 - shellPadding - 0.5;
-  const minY = 1 - shellPadding - 0.5;
-  const viewWidth = layout.width - 1 + shellPadding * 2 + 1;
-  const viewHeight = layout.height - 1 + shellPadding * 2 + 1;
+  const { minX, minY, viewWidth, viewHeight } = getConnectorLayoutDrawingViewMetrics(layout);
   const scale = Math.min(width / viewWidth, height / viewHeight);
   const inverseDrawingScale = scale > 0 ? 1 / scale : 1;
   const originX = -width / 2 + (width - viewWidth * scale) / 2 - minX * scale;

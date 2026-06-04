@@ -65,6 +65,7 @@ interface NetworkSummaryCanvasPanelProps {
   zoomInvariantNodeShapes: boolean;
   normalizedNodeShapeScale: number;
   normalizedConnectorNodeDrawingScale: number;
+  useConsistentConnectorLayoutScale: boolean;
   nodeStrokeWidth: number;
   nodeStrokeEmphasisWidth: number;
   describeNode: (node: NetworkNode) => string;
@@ -133,6 +134,7 @@ export function NetworkSummaryCanvasPanel({
   zoomInvariantNodeShapes,
   normalizedNodeShapeScale,
   normalizedConnectorNodeDrawingScale,
+  useConsistentConnectorLayoutScale,
   nodeStrokeWidth,
   nodeStrokeEmphasisWidth,
   describeNode,
@@ -209,6 +211,7 @@ export function NetworkSummaryCanvasPanel({
                 zoomInvariantNodeShapes={zoomInvariantNodeShapes}
                 normalizedNodeShapeScale={normalizedNodeShapeScale}
                 connectorDrawingScale={normalizedConnectorNodeDrawingScale}
+                useConsistentConnectorLayoutScale={useConsistentConnectorLayoutScale}
                 nodeStrokeWidth={nodeStrokeWidth}
                 nodeStrokeEmphasisWidth={nodeStrokeEmphasisWidth}
                 describeNode={describeNode}

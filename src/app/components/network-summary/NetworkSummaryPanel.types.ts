@@ -42,6 +42,7 @@ export interface NetworkSummaryPanelProps {
   showSelectedCalloutOnly: boolean;
   showCalloutWireNames: boolean;
   connectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
+  useConsistentConnectorLayoutScale: boolean;
   connectorDrawingScalePercent: number;
   globalRenderScalePercent: number;
   setGlobalRenderScalePercent: (value: number) => void;

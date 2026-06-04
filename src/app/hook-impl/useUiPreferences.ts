@@ -142,6 +142,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultAutoSegmentLabelRotation: boolean;
   canvasShowCalloutWireNames: boolean;
   canvasConnectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
+  canvasUseConsistentConnectorLayoutScale: boolean;
   canvasCalloutConnectorDrawingScalePercent: number;
   canvasGlobalRenderScalePercent: number;
   canvasZoomInvariantNodeShapes: boolean;
@@ -201,6 +202,7 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   setCanvasShowCalloutWireNames: (value: boolean) => void;
   setCanvasConnectorDrawingDisplayMode: (value: ConnectorDrawingDisplayMode) => void;
+  setCanvasUseConsistentConnectorLayoutScale: (value: boolean) => void;
   setCanvasCalloutConnectorDrawingScalePercent: (value: number) => void;
   setCanvasGlobalRenderScalePercent: (value: number) => void;
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
@@ -376,6 +378,7 @@ export function useUiPreferences({
   canvasDefaultAutoSegmentLabelRotation,
   canvasShowCalloutWireNames,
   canvasConnectorDrawingDisplayMode,
+  canvasUseConsistentConnectorLayoutScale,
   canvasCalloutConnectorDrawingScalePercent,
   canvasGlobalRenderScalePercent,
   canvasZoomInvariantNodeShapes,
@@ -435,6 +438,7 @@ export function useUiPreferences({
   setCanvasDefaultAutoSegmentLabelRotation,
   setCanvasShowCalloutWireNames,
   setCanvasConnectorDrawingDisplayMode,
+  setCanvasUseConsistentConnectorLayoutScale,
   setCanvasCalloutConnectorDrawingScalePercent,
   setCanvasGlobalRenderScalePercent,
   setCanvasZoomInvariantNodeShapes,
@@ -576,6 +580,11 @@ export function useUiPreferences({
       setCanvasConnectorDrawingDisplayMode(
         normalizeConnectorDrawingDisplayMode(preferences.canvasConnectorDrawingDisplayMode)
       );
+      setCanvasUseConsistentConnectorLayoutScale(
+        typeof preferences.canvasUseConsistentConnectorLayoutScale === "boolean"
+          ? preferences.canvasUseConsistentConnectorLayoutScale
+          : true
+      );
       setCanvasCalloutConnectorDrawingScalePercent(
         normalizeCanvasCalloutConnectorDrawingScalePercent(preferences.canvasCalloutConnectorDrawingScalePercent)
       );
@@ -654,6 +663,7 @@ export function useUiPreferences({
     setCanvasDefaultAutoSegmentLabelRotation,
     setCanvasShowCalloutWireNames,
     setCanvasConnectorDrawingDisplayMode,
+    setCanvasUseConsistentConnectorLayoutScale,
     setCanvasCalloutConnectorDrawingScalePercent,
     setCanvasGlobalRenderScalePercent,
     setCanvasZoomInvariantNodeShapes,
@@ -753,6 +763,7 @@ export function useUiPreferences({
       canvasDefaultAutoSegmentLabelRotation,
       canvasShowCalloutWireNames,
       canvasConnectorDrawingDisplayMode,
+      canvasUseConsistentConnectorLayoutScale,
       canvasCalloutConnectorDrawingScalePercent,
       canvasGlobalRenderScalePercent,
       canvasZoomInvariantNodeShapes,
@@ -791,6 +802,7 @@ export function useUiPreferences({
     canvasDefaultAutoSegmentLabelRotation,
     canvasShowCalloutWireNames,
     canvasConnectorDrawingDisplayMode,
+    canvasUseConsistentConnectorLayoutScale,
     canvasCalloutConnectorDrawingScalePercent,
     canvasGlobalRenderScalePercent,
     canvasZoomInvariantNodeShapes,

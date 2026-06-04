@@ -243,6 +243,8 @@ export function useAppControllerAuxScreenContentDomains({
     setCanvasShowCalloutWireNames: settings.prefs.setCanvasShowCalloutWireNames,
     canvasConnectorDrawingDisplayMode: settings.prefs.canvasConnectorDrawingDisplayMode,
     setCanvasConnectorDrawingDisplayMode: settings.prefs.setCanvasConnectorDrawingDisplayMode,
+    canvasUseConsistentConnectorLayoutScale: settings.prefs.canvasUseConsistentConnectorLayoutScale,
+    setCanvasUseConsistentConnectorLayoutScale: settings.prefs.setCanvasUseConsistentConnectorLayoutScale,
     canvasCalloutConnectorDrawingScalePercent: settings.prefs.canvasCalloutConnectorDrawingScalePercent,
     setCanvasCalloutConnectorDrawingScalePercent: settings.prefs.setCanvasCalloutConnectorDrawingScalePercent,
     canvasGlobalRenderScalePercent: settings.prefs.canvasGlobalRenderScalePercent,

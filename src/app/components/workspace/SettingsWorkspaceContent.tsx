@@ -112,6 +112,8 @@ interface SettingsWorkspaceContentProps {
   setCanvasShowCalloutWireNames: (value: boolean) => void;
   canvasConnectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
   setCanvasConnectorDrawingDisplayMode: (value: ConnectorDrawingDisplayMode) => void;
+  canvasUseConsistentConnectorLayoutScale: boolean;
+  setCanvasUseConsistentConnectorLayoutScale: (value: boolean) => void;
   canvasCalloutConnectorDrawingScalePercent: number;
   setCanvasCalloutConnectorDrawingScalePercent: (value: number) => void;
   canvasGlobalRenderScalePercent: number;
@@ -248,6 +250,8 @@ export function SettingsWorkspaceContent({
   setCanvasShowCalloutWireNames,
   canvasConnectorDrawingDisplayMode,
   setCanvasConnectorDrawingDisplayMode,
+  canvasUseConsistentConnectorLayoutScale,
+  setCanvasUseConsistentConnectorLayoutScale,
   canvasCalloutConnectorDrawingScalePercent,
   setCanvasCalloutConnectorDrawingScalePercent,
   canvasGlobalRenderScalePercent,
@@ -821,6 +825,15 @@ export function SettingsWorkspaceContent({
               <option value="callouts">Callouts</option>
               <option value="nodes">Nodes</option>
             </select>
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasUseConsistentConnectorLayoutScale}
+              disabled={canvasConnectorDrawingDisplayMode !== "nodes"}
+              onChange={(event) => setCanvasUseConsistentConnectorLayoutScale(event.target.checked)}
+            />
+            {renderSettingLabel("Use consistent physical layout scale")}
           </label>
           <label className="settings-field settings-range-field">
             {renderSettingLabel("Connector drawing size (%)")}

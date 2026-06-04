@@ -127,6 +127,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
     AppControllerPreferencesStateModel,
     | "canvasShowCalloutWireNames"
     | "canvasConnectorDrawingDisplayMode"
+    | "canvasUseConsistentConnectorLayoutScale"
     | "canvasCalloutConnectorDrawingScalePercent"
     | "canvasGlobalRenderScalePercent"
     | "setCanvasGlobalRenderScalePercent"
@@ -359,6 +360,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
         networkAutoSegmentLabelRotation: canvasDisplayState.networkAutoSegmentLabelRotation,
         showCalloutWireNames: preferencesState.canvasShowCalloutWireNames,
         connectorDrawingDisplayMode: preferencesState.canvasConnectorDrawingDisplayMode,
+        useConsistentConnectorLayoutScale: preferencesState.canvasUseConsistentConnectorLayoutScale,
         connectorDrawingScalePercent: preferencesState.canvasCalloutConnectorDrawingScalePercent,
         globalRenderScalePercent: preferencesState.canvasGlobalRenderScalePercent,
         setGlobalRenderScalePercent: preferencesState.setCanvasGlobalRenderScalePercent,

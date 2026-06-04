@@ -15,7 +15,7 @@ import type {
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 13;
+const UI_PREFERENCES_SCHEMA_VERSION = 14;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 type TableDensity = "comfortable" | "compact";
@@ -58,6 +58,7 @@ export interface UiPreferencesPayload {
   canvasDefaultAutoSegmentLabelRotation: boolean;
   canvasShowCalloutWireNames: boolean;
   canvasConnectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
+  canvasUseConsistentConnectorLayoutScale: boolean;
   canvasCalloutConnectorDrawingScalePercent: number;
   canvasGlobalRenderScalePercent: number;
   canvasZoomInvariantNodeShapes: boolean;
@@ -193,6 +194,17 @@ function migrateUiPreferencesFromV12(candidate: Record<string, unknown>): Record
   };
 }
 
+function migrateUiPreferencesFromV13(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    canvasUseConsistentConnectorLayoutScale:
+      typeof candidate.canvasUseConsistentConnectorLayoutScale === "boolean"
+        ? candidate.canvasUseConsistentConnectorLayoutScale
+        : true,
+    schemaVersion: 14
+  };
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -268,6 +280,11 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
     if (version === 12) {
       migrated = migrateUiPreferencesFromV12(migrated);
       version = 13;
+      continue;
+    }
+    if (version === 13) {
+      migrated = migrateUiPreferencesFromV13(migrated);
+      version = 14;
       continue;
     }
     return null;

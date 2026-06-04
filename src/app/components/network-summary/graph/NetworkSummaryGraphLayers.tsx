@@ -8,7 +8,7 @@ import {
 } from "react";
 import type { NetworkNode, NodeId, SegmentId, WireId } from "../../../../core/entities";
 import type { NodePosition } from "../../../types/app-controller";
-import { renderConnectorLayoutDrawing } from "../callouts/NetworkSummaryCalloutsLayer";
+import { getConsistentConnectorLayoutDrawingSize, renderConnectorLayoutDrawing } from "../callouts/NetworkSummaryCalloutsLayer";
 import type { RenderedNodeModel, RenderedSegmentModel } from "./networkSummaryGraphModel";
 
 const DOUBLE_CLICK_INTERVAL_MS = 450;
@@ -48,6 +48,7 @@ interface NetworkSummaryGraphLayersProps {
   zoomInvariantNodeShapes: boolean;
   normalizedNodeShapeScale: number;
   connectorDrawingScale: number;
+  useConsistentConnectorLayoutScale: boolean;
   nodeStrokeWidth: number;
   nodeStrokeEmphasisWidth: number;
   describeNode: (node: NetworkNode) => string;
@@ -108,6 +109,7 @@ export function NetworkSummaryGraphLayers({
   zoomInvariantNodeShapes,
   normalizedNodeShapeScale,
   connectorDrawingScale,
+  useConsistentConnectorLayoutScale,
   nodeStrokeWidth,
   nodeStrokeEmphasisWidth,
   describeNode,
@@ -228,8 +230,16 @@ export function NetworkSummaryGraphLayers({
         {renderedNodes.map(({ node, position, nodeClassName, nodeLabel, connectorLayout, highlightedConnectorCavityIndexes, connectorCavityWireIdByIndex }) => {
           const connectorWidth = 46 * normalizedNodeShapeScale;
           const connectorHeight = 30 * normalizedNodeShapeScale;
-          const connectorDrawingWidth = connectorWidth * connectorDrawingScale;
-          const connectorDrawingHeight = connectorHeight * connectorDrawingScale;
+          const connectorDrawingReferenceWidth = connectorWidth * connectorDrawingScale;
+          const connectorDrawingReferenceHeight = connectorHeight * connectorDrawingScale;
+          const connectorDrawingSize =
+            connectorLayout !== undefined && useConsistentConnectorLayoutScale
+              ? getConsistentConnectorLayoutDrawingSize(
+                  connectorLayout,
+                  connectorDrawingReferenceWidth,
+                  connectorDrawingReferenceHeight
+                )
+              : { width: connectorDrawingReferenceWidth, height: connectorDrawingReferenceHeight };
           const spliceDiamondSize = 30 * normalizedNodeShapeScale;
           const connectorHitboxWidth = 56 * normalizedNodeShapeScale;
           const connectorHitboxHeight = 40 * normalizedNodeShapeScale;
@@ -295,12 +305,12 @@ export function NetworkSummaryGraphLayers({
                     ) : (
                       <g
                         className="network-node-connector-drawing"
-                        transform={`translate(${position.x} ${position.y - connectorDrawingHeight / 2})`}
+                        transform={`translate(${position.x} ${position.y - connectorDrawingSize.height / 2})`}
                       >
                         {renderConnectorLayoutDrawing(
                           connectorLayout,
-                          connectorDrawingWidth,
-                          connectorDrawingHeight,
+                          connectorDrawingSize.width,
+                          connectorDrawingSize.height,
                           highlightedConnectorCavityIndexes,
                           nodeLabel,
                           connectorCavityWireIdByIndex,

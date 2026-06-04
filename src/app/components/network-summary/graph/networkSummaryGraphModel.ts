@@ -15,7 +15,11 @@ import { resolveEditedConnectorLayout } from "../../../../core/connectorLayout";
 import type { NodePosition } from "../../../types/app-controller";
 import type { ConnectorDrawingDisplayMode } from "../../../types/app-controller";
 import type { CalloutGroup } from "../callouts/calloutLayout";
-import { getConnectorCavityWireIdByIndex, getHighlightedConnectorCavityIndexes } from "../callouts/NetworkSummaryCalloutsLayer";
+import {
+  getConnectorCavityWireIdByIndex,
+  getConsistentConnectorLayoutDrawingSize,
+  getHighlightedConnectorCavityIndexes
+} from "../callouts/NetworkSummaryCalloutsLayer";
 import { normalizeReadableSegmentLabelAngle } from "../callouts/calloutLayout";
 
 export interface RenderedSegmentModel {
@@ -59,6 +63,7 @@ interface BuildRenderedSegmentsParams {
   connectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
   normalizedNodeShapeScale: number;
   connectorDrawingScale: number;
+  useConsistentConnectorLayoutScale: boolean;
   zoomInvariantNodeShapes: boolean;
   inverseLabelScale: number;
   autoSegmentLabelRotation: boolean;
@@ -144,7 +149,8 @@ function getSegmentNodeVisualBounds(
   catalogItemById: ReadonlyMap<CatalogItem["id"], CatalogItem>,
   connectorDrawingDisplayMode: ConnectorDrawingDisplayMode,
   nodeShapeScale: number,
-  connectorDrawingScale: number
+  connectorDrawingScale: number,
+  useConsistentConnectorLayoutScale: boolean
 ): SegmentNodeVisualBounds | undefined {
   if (node === undefined) {
     return undefined;
@@ -174,6 +180,19 @@ function getSegmentNodeVisualBounds(
           connector.cavityCount
         )
       : undefined;
+  if (connectorLayout !== undefined && useConsistentConnectorLayoutScale) {
+    const size = getConsistentConnectorLayoutDrawingSize(
+      connectorLayout,
+      CONNECTOR_NODE_WIDTH * nodeShapeScale * connectorDrawingScale,
+      CONNECTOR_NODE_HEIGHT * nodeShapeScale * connectorDrawingScale
+    );
+    return {
+      halfWidth: size.width / 2,
+      halfHeight: size.height / 2,
+      kind: "rect"
+    };
+  }
+
   const layoutScale = connectorLayout === undefined ? 1 : connectorDrawingScale;
 
   return {
@@ -197,6 +216,7 @@ export function buildRenderedSegments({
   connectorDrawingDisplayMode,
   normalizedNodeShapeScale,
   connectorDrawingScale,
+  useConsistentConnectorLayoutScale,
   zoomInvariantNodeShapes,
   inverseLabelScale,
   autoSegmentLabelRotation,
@@ -233,7 +253,8 @@ export function buildRenderedSegments({
         catalogItemById,
         connectorDrawingDisplayMode,
         nodeShapeScale,
-        connectorDrawingScale
+        connectorDrawingScale,
+        useConsistentConnectorLayoutScale
       ),
       getSegmentNodeVisualBounds(
         nodeById.get(segment.nodeB),
@@ -241,7 +262,8 @@ export function buildRenderedSegments({
         catalogItemById,
         connectorDrawingDisplayMode,
         nodeShapeScale,
-        connectorDrawingScale
+        connectorDrawingScale,
+        useConsistentConnectorLayoutScale
       )
     );
     const segmentVectorX = nodeBPosition.x - nodeAPosition.x;

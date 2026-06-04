@@ -226,6 +226,7 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Show connector/splice cable callouts by default": "Afficher les cartouches câble connecteur/épissure par défaut",
   "Connector drawing display": "Affichage du dessin connecteur",
   "Disabled": "Desactive",
+  "Use consistent physical layout scale": "Utiliser une échelle de layout physique cohérente",
   "Connector drawing size (%)": "Taille du dessin connecteur (%)",
   "Summary global scale (%)": "Échelle globale du summary (%)",
   "Show only selected connector/splice callout": "Afficher uniquement le cartouche connecteur/épissure sélectionné",

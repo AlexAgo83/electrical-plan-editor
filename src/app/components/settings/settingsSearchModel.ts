@@ -13,6 +13,7 @@ export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
       "2D label size",
       "Callout text size",
       "Connector drawing display",
+      "Use consistent physical layout scale",
       "Connector drawing size (%)",
       "Summary global scale (%)",
       "Auto segment label rotation",

@@ -57,6 +57,7 @@ export function useAppControllerPreferencesState() {
   const [canvasShowCalloutWireNames, setCanvasShowCalloutWireNames] = useState(false);
   const [canvasConnectorDrawingDisplayMode, setCanvasConnectorDrawingDisplayMode] =
     useState<ConnectorDrawingDisplayMode>("nodes");
+  const [canvasUseConsistentConnectorLayoutScale, setCanvasUseConsistentConnectorLayoutScale] = useState(true);
   const [canvasCalloutConnectorDrawingScalePercent, setCanvasCalloutConnectorDrawingScalePercent] = useState(150);
   const [canvasGlobalRenderScalePercent, setCanvasGlobalRenderScalePercent] = useState(0);
   const [canvasZoomInvariantNodeShapes, setCanvasZoomInvariantNodeShapes] = useState(true);
@@ -144,6 +145,8 @@ export function useAppControllerPreferencesState() {
     setCanvasShowCalloutWireNames,
     canvasConnectorDrawingDisplayMode,
     setCanvasConnectorDrawingDisplayMode,
+    canvasUseConsistentConnectorLayoutScale,
+    setCanvasUseConsistentConnectorLayoutScale,
     canvasCalloutConnectorDrawingScalePercent,
     setCanvasCalloutConnectorDrawingScalePercent,
     canvasGlobalRenderScalePercent,

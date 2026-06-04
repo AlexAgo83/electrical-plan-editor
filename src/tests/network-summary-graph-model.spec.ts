@@ -25,6 +25,7 @@ const emptySegmentRenderContext = {
   connectorDrawingDisplayMode: "disabled" as const,
   normalizedNodeShapeScale: 1,
   connectorDrawingScale: 1,
+  useConsistentConnectorLayoutScale: true,
   zoomInvariantNodeShapes: false,
   inverseLabelScale: 1
 };
@@ -141,6 +142,7 @@ describe("buildRenderedSegments", () => {
       connectorDrawingDisplayMode: "nodes",
       normalizedNodeShapeScale: 1,
       connectorDrawingScale: 2,
+      useConsistentConnectorLayoutScale: false,
       zoomInvariantNodeShapes: false,
       inverseLabelScale: 1,
       autoSegmentLabelRotation: true,
@@ -220,6 +222,7 @@ describe("buildRenderedSegments", () => {
       connectorDrawingDisplayMode: "nodes",
       normalizedNodeShapeScale: 1,
       connectorDrawingScale: 2,
+      useConsistentConnectorLayoutScale: false,
       zoomInvariantNodeShapes: false,
       inverseLabelScale: 1,
       autoSegmentLabelRotation: true,
@@ -231,6 +234,87 @@ describe("buildRenderedSegments", () => {
     expect(rendered).toHaveLength(1);
     expect(rendered[0]?.labelX).toBeGreaterThan(33);
     expect(rendered[0]?.labelX).toBeCloseTo(47.5);
+  });
+
+  it("uses the physical layout width as connector bounds when consistent layout scale is enabled", () => {
+    const connectorId = asConnectorId("C-WIDE");
+    const catalogItemId = asCatalogItemId("CAT-WIDE");
+    const segment: Segment = {
+      id: asSegmentId("SEG-WIDE"),
+      nodeA: asNodeId("N-A"),
+      nodeB: asNodeId("N-B"),
+      lengthMm: 320
+    };
+
+    const rendered = buildRenderedSegments({
+      segments: [segment],
+      nodes: [
+        {
+          id: asNodeId("N-A"),
+          kind: "connector",
+          connectorId
+        },
+        {
+          id: asNodeId("N-B"),
+          kind: "intermediate",
+          label: "Hub"
+        }
+      ],
+      networkNodePositions: {
+        [asNodeId("N-A")]: { x: 0, y: 0 },
+        [asNodeId("N-B")]: { x: 320, y: 0 }
+      },
+      segmentSubNetworkTagById: new Map(),
+      isSubNetworkFilteringActive: false,
+      activeSubNetworkTagSet: new Set(),
+      selectedWireRouteSegmentIds: new Set(),
+      selectedSegmentId: null,
+      connectorMap: new Map([
+        [
+          connectorId,
+          {
+            id: connectorId,
+            name: "Connector Wide",
+            technicalId: "C-WIDE",
+            cavityCount: 10,
+            catalogItemId
+          }
+        ]
+      ]),
+      catalogItems: [
+        {
+          id: catalogItemId,
+          manufacturerReference: "REF-WIDE",
+          name: "Wide connector",
+          connectionCount: 10,
+          connectorLayout: {
+            version: 1,
+            units: "grid",
+            width: 10,
+            height: 2,
+            ways: Array.from({ length: 10 }, (_, index) => ({
+              cavityIndex: index + 1,
+              x: index + 1,
+              y: 1,
+              shape: "round" as const
+            }))
+          }
+        }
+      ],
+      connectorDrawingDisplayMode: "nodes",
+      normalizedNodeShapeScale: 1,
+      connectorDrawingScale: 2,
+      useConsistentConnectorLayoutScale: true,
+      zoomInvariantNodeShapes: false,
+      inverseLabelScale: 1,
+      autoSegmentLabelRotation: true,
+      labelRotationDegrees: 0,
+      showSegmentNames: false,
+      showSegmentLengths: true
+    });
+
+    expect(rendered).toHaveLength(1);
+    expect(rendered[0]?.labelX).toBeCloseTo(202.1);
   });
 });
 
