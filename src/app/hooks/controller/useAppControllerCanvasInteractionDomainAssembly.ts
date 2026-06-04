@@ -1,4 +1,4 @@
-import type { NodeId } from "../../../core/entities";
+import type { NetworkNode, NodeId } from "../../../core/entities";
 import { appActions } from "../../../store";
 import type { NodePosition } from "../../types/app-controller";
 import type { EntityFormsStateModel } from "../useEntityFormsState";
@@ -14,6 +14,7 @@ type ScreenId = "home" | "networkScope" | "harnessAssembly" | "modeling" | "anal
 interface UseAppControllerCanvasInteractionDomainAssemblyParams {
   core: {
     state: CanvasInteractionAssemblyParams["core"]["state"];
+    nodes: NetworkNode[];
     nodesCount: number;
     interactionMode: CanvasInteractionAssemblyParams["core"]["interactionMode"];
     isModelingScreen: boolean;
@@ -61,6 +62,7 @@ export function useAppControllerCanvasInteractionDomainAssembly({
   return useAppControllerCanvasInteractionHandlersAssembly({
     core: {
       state: core.state,
+      nodes: core.nodes,
       nodesCount: core.nodesCount,
       interactionMode: core.interactionMode,
       isModelingScreen: core.isModelingScreen,
@@ -100,8 +102,6 @@ export function useAppControllerCanvasInteractionDomainAssembly({
     },
     actions: {
       dispatchAction: actions.dispatchAction,
-      persistNodePosition: (nodeId, position) =>
-        actions.dispatchAction(appActions.setNodePosition(nodeId, position), { trackHistory: false }),
       persistNodePositions: (positions) =>
         actions.dispatchAction(appActions.setNodePositions(positions), { trackHistory: false }),
       resetNetworkViewToConfiguredScale: actions.resetNetworkViewToConfiguredScale,

@@ -211,6 +211,7 @@ interface UseAppControllerCanvasInteractionHandlersAssemblyParams {
   core: Pick<
     CanvasInteractionHandlersParams,
     | "state"
+    | "nodes"
     | "nodesCount"
     | "interactionMode"
     | "isModelingScreen"
@@ -253,7 +254,6 @@ interface UseAppControllerCanvasInteractionHandlersAssemblyParams {
   actions: Pick<
     CanvasInteractionHandlersParams,
     | "dispatchAction"
-    | "persistNodePosition"
     | "persistNodePositions"
     | "resetNetworkViewToConfiguredScale"
     | "startConnectorEdit"

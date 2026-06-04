@@ -771,6 +771,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const canvasInteractionDomain = useAppControllerCanvasInteractionDomainAssembly({
     core: {
       state,
+      nodes,
       nodesCount: nodes.length,
       interactionMode,
       isModelingScreen,

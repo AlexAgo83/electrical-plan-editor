@@ -11,6 +11,26 @@ import {
 } from "./helpers/app-ui-test-utils";
 import { getNetworkSummaryViewportTransform, mockSvgRect } from "./helpers/navigation-canvas-test-utils";
 
+function getRenderedNodeCenter(panel: HTMLElement, nodeId: string): { x: number; y: number } {
+  const node = panel.querySelector(`[data-node-id="${nodeId}"]`);
+  const shape = node?.querySelector(".network-node-shape");
+  if (shape === null || shape === undefined) {
+    throw new Error(`Expected rendered shape for ${nodeId}.`);
+  }
+
+  if (shape.hasAttribute("cx") && shape.hasAttribute("cy")) {
+    return {
+      x: Number(shape.getAttribute("cx")),
+      y: Number(shape.getAttribute("cy"))
+    };
+  }
+
+  return {
+    x: Number(shape.getAttribute("x")) + Number(shape.getAttribute("width")) / 2,
+    y: Number(shape.getAttribute("y")) + Number(shape.getAttribute("height")) / 2
+  };
+}
+
 describe("App integration UI - navigation canvas interactions", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -80,6 +100,33 @@ describe("App integration UI - navigation canvas interactions", () => {
 
     expect(store.getState().nodePositions[asNodeId("N-C1")]).toEqual({ x: 60, y: 80 });
     expect(connectorNode).toHaveClass("is-selected");
+  });
+
+  it("freezes the rendered auto layout before the first 2D node drag", () => {
+    const { store } = renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const connectorNode = networkSummaryPanel.querySelector('[data-node-id="N-C1"]');
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
+    expect(connectorNode).not.toBeNull();
+    expect(Object.keys(store.getState().nodePositions)).toHaveLength(0);
+
+    const connectorBefore = getRenderedNodeCenter(networkSummaryPanel, "N-C1");
+    const intermediateBefore = getRenderedNodeCenter(networkSummaryPanel, "N-MID");
+    const spliceBefore = getRenderedNodeCenter(networkSummaryPanel, "N-S1");
+
+    const rectSpy = mockSvgRect(networkSvg);
+    fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 180, clientY: 120 });
+    fireEvent.mouseMove(networkSvg, { clientX: 420, clientY: 250 });
+    fireEvent.mouseUp(networkSvg, { clientX: 420, clientY: 250 });
+    rectSpy.mockRestore();
+
+    const positions = store.getState().nodePositions;
+    expect(Object.keys(positions)).toHaveLength(3);
+    expect(positions[asNodeId("N-MID")]).toEqual(intermediateBefore);
+    expect(positions[asNodeId("N-S1")]).toEqual(spliceBefore);
+    expect(positions[asNodeId("N-C1")]).not.toEqual(connectorBefore);
   });
 
 

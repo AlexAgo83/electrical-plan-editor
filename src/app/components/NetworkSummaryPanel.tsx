@@ -397,6 +397,34 @@ export function NetworkSummaryPanel({
     ]
   );
 
+  useEffect(() => {
+    if (!showCableCallouts || cableCalloutViewModels.length === 0) {
+      return;
+    }
+
+    for (const callout of cableCalloutViewModels) {
+      if (callout.kind === "connector") {
+        const connector = connectorMap.get(callout.entityId as ConnectorId);
+        if (connector?.cableCalloutPosition === undefined) {
+          onPersistConnectorCalloutPosition(callout.entityId as ConnectorId, callout.position);
+        }
+        continue;
+      }
+
+      const splice = spliceMap.get(callout.entityId as SpliceId);
+      if (splice?.cableCalloutPosition === undefined) {
+        onPersistSpliceCalloutPosition(callout.entityId as SpliceId, callout.position);
+      }
+    }
+  }, [
+    cableCalloutViewModels,
+    connectorMap,
+    onPersistConnectorCalloutPosition,
+    onPersistSpliceCalloutPosition,
+    showCableCallouts,
+    spliceMap
+  ]);
+
   const orderedCableCallouts = useMemo(() => {
     if (cableCalloutViewModels.length <= 1) {
       return cableCalloutViewModels;

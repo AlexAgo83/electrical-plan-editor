@@ -1,4 +1,4 @@
-import type { NodeId } from "../../core/entities";
+import type { NetworkNode, NodeId } from "../../core/entities";
 import { NETWORK_GRID_STEP, snapToGrid } from "./app-utils-shared";
 import type { NodePosition } from "../types/app-controller";
 
@@ -66,4 +66,57 @@ export function applyGroupDragDelta(
     };
   }
   return nextPositions;
+}
+
+export function shouldFreezeRenderedLayoutPositions(
+  nodes: NetworkNode[],
+  persistedPositions: Record<NodeId, NodePosition>
+): boolean {
+  return nodes.every((node) => persistedPositions[node.id] === undefined);
+}
+
+export function buildRenderedLayoutPositionSnapshot(
+  nodes: NetworkNode[],
+  getPosition: (nodeId: NodeId) => NodePosition | null
+): Record<NodeId, NodePosition> {
+  const positions = {} as Record<NodeId, NodePosition>;
+  for (const node of nodes) {
+    const renderedPosition = getPosition(node.id);
+    if (renderedPosition !== null) {
+      positions[node.id] = renderedPosition;
+    }
+  }
+  return positions;
+}
+
+interface DragStopGroupState {
+  anchorNodeId: NodeId;
+  nodeIds: NodeId[];
+  layoutFreezePositions: Record<NodeId, NodePosition> | null;
+  hasStartedDrag: boolean;
+}
+
+export interface DragStopPersistence {
+  positions: Record<NodeId, NodePosition>;
+  manualNodeIdsToClear: NodeId[];
+}
+
+export function buildDragStopPersistence(
+  draggingNodeGroup: DragStopGroupState,
+  manualNodePositions: Record<NodeId, NodePosition>
+): DragStopPersistence | null {
+  if (!draggingNodeGroup.hasStartedDrag) {
+    return null;
+  }
+
+  const positions = { ...(draggingNodeGroup.layoutFreezePositions ?? {}) } as Record<NodeId, NodePosition>;
+  const nodeIds = draggingNodeGroup.nodeIds.length > 1 ? draggingNodeGroup.nodeIds : [draggingNodeGroup.anchorNodeId];
+  for (const nodeId of nodeIds) {
+    const draggedPosition = manualNodePositions[nodeId];
+    if (draggedPosition !== undefined) {
+      positions[nodeId] = draggedPosition;
+    }
+  }
+
+  return Object.keys(positions).length === 0 ? null : { positions, manualNodeIdsToClear: nodeIds };
 }

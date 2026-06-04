@@ -12,6 +12,7 @@ type DispatchAction = (
 
 export interface UseCanvasInteractionHandlersParams {
   state: ReturnType<AppStore["getState"]>;
+  nodes: NetworkNode[];
   nodesCount: number;
   interactionMode: InteractionMode;
   isModelingScreen: boolean;
@@ -53,7 +54,6 @@ export interface UseCanvasInteractionHandlersParams {
     | null
   >;
   dispatchAction: DispatchAction;
-  persistNodePosition: (nodeId: NodeId, position: NodePosition) => void;
   persistNodePositions: (positions: Record<NodeId, NodePosition>) => void;
   resetNetworkViewToConfiguredScale: () => void;
   startConnectorEdit: (connector: Connector) => void;
@@ -68,6 +68,7 @@ export interface DraggingNodeGroupState {
   anchorStartPosition: NodePosition;
   nodeIds: NodeId[];
   originPositions: Record<NodeId, NodePosition>;
+  layoutFreezePositions: Record<NodeId, NodePosition> | null;
   startClientX: number;
   startClientY: number;
   hasStartedDrag: boolean;

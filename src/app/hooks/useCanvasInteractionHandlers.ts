@@ -3,7 +3,13 @@ import { unstable_batchedUpdates } from "react-dom";
 import type { NodeId, SegmentId } from "../../core/entities";
 import { appActions } from "../../store";
 import { NETWORK_MAX_SCALE, NETWORK_MIN_SCALE, clamp } from "../lib/app-utils-shared";
-import { applyGroupDragDelta, getSvgCoordinates } from "../lib/canvasInteractionGeometry";
+import {
+  applyGroupDragDelta,
+  buildDragStopPersistence,
+  buildRenderedLayoutPositionSnapshot,
+  getSvgCoordinates,
+  shouldFreezeRenderedLayoutPositions
+} from "../lib/canvasInteractionGeometry";
 import type { NodePosition } from "../types/app-controller";
 import type { DraggingNodeGroupState, UseCanvasInteractionHandlersParams } from "../types/canvas-interactions";
 
@@ -12,6 +18,7 @@ const PAN_CLICK_SUPPRESSION_THRESHOLD_PX = 4;
 
 export function useCanvasInteractionHandlers({
   state,
+  nodes,
   nodesCount,
   interactionMode,
   isModelingScreen,
@@ -44,7 +51,6 @@ export function useCanvasInteractionHandlers({
   setIsPanningNetwork,
   panStartRef,
   dispatchAction,
-  persistNodePosition,
   persistNodePositions,
   resetNetworkViewToConfiguredScale,
   startConnectorEdit,
@@ -266,12 +272,17 @@ export function useCanvasInteractionHandlers({
     if (anchorStartPosition === undefined) {
       return;
     }
+    const layoutFreezePositions =
+      shouldFreezeRenderedLayoutPositions(nodes, state.nodePositions)
+        ? buildRenderedLayoutPositionSnapshot(nodes, getStoredNodePosition)
+        : null;
 
     draggingNodeGroupRef.current = {
       anchorNodeId: nodeId,
       anchorStartPosition,
       nodeIds: selectedNodeIds,
       originPositions,
+      layoutFreezePositions,
       startClientX: event.clientX,
       startClientY: event.clientY,
       hasStartedDrag: false
@@ -431,43 +442,20 @@ export function useCanvasInteractionHandlers({
   function stopNetworkNodeDrag(): void {
     const draggingNodeGroup = draggingNodeGroupRef.current;
     if (draggingNodeGroup !== null) {
-      if (draggingNodeGroup.hasStartedDrag && draggingNodeGroup.nodeIds.length > 1) {
-        const nextPersistedPositions = {} as Record<NodeId, NodePosition>;
-        for (const nodeId of draggingNodeGroup.nodeIds) {
-          const draggedPosition = manualNodePositions[nodeId];
-          if (draggedPosition !== undefined) {
-            nextPersistedPositions[nodeId] = draggedPosition;
+      const persistence = buildDragStopPersistence(draggingNodeGroup, manualNodePositions);
+      if (persistence !== null) {
+        persistNodePositions(persistence.positions);
+        setManualNodePositions((previous) => {
+          const next = { ...previous };
+          let changed = false;
+          for (const nodeId of persistence.manualNodeIdsToClear) {
+            if (next[nodeId] !== undefined) {
+              delete next[nodeId];
+              changed = true;
+            }
           }
-        }
-
-        if (Object.keys(nextPersistedPositions).length > 0) {
-          persistNodePositions(nextPersistedPositions);
-          setManualNodePositions((previous) => {
-            let changed = false;
-            const next = { ...previous };
-            for (const nodeId of Object.keys(nextPersistedPositions) as NodeId[]) {
-              if (next[nodeId] !== undefined) {
-                delete next[nodeId];
-                changed = true;
-              }
-            }
-            return changed ? next : previous;
-          });
-        }
-      } else if (draggingNodeGroup.hasStartedDrag) {
-        const draggedPosition = manualNodePositions[draggingNodeGroup.anchorNodeId];
-        if (draggedPosition !== undefined) {
-          persistNodePosition(draggingNodeGroup.anchorNodeId, draggedPosition);
-          setManualNodePositions((previous) => {
-            if (previous[draggingNodeGroup.anchorNodeId] === undefined) {
-              return previous;
-            }
-
-            const next = { ...previous };
-            delete next[draggingNodeGroup.anchorNodeId];
-            return next;
-          });
-        }
+          return changed ? next : previous;
+        });
       }
 
       draggingNodeGroupRef.current = null;
