@@ -7,12 +7,7 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 [![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/electrical-plan-editor)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.14.7-4C8BF5)
 
-<img width="1173" height="810" alt="image" src="https://github.com/user-attachments/assets/b4d0b4a9-1fee-43a4-bfb1-ae72caf97302" />
-<img width="1159" height="280" alt="image" src="https://github.com/user-attachments/assets/7bfad15a-cc62-446a-abc6-b06c15ec1466" />
-<img width="1173" height="339" alt="image" src="https://github.com/user-attachments/assets/3480d4f6-1c74-4586-94d7-f6fbcba0c431" />
-<img width="1168" height="618" alt="image" src="https://github.com/user-attachments/assets/7da539ae-9a75-41d0-97f8-bb8cb693bd3e" />
-
-
+<img width="951" height="708" alt="network_summary" src="https://github.com/user-attachments/assets/342133f2-4171-4836-a2dd-2b8354af73f3" />
 
 ## Table of Contents
 
@@ -84,10 +79,6 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 ## AI Agent Workspace
 
 The Modeling `AI Agent` workspace supports controlled, reversible AI-assisted plan edits. The agent is not allowed to patch raw application state. It receives scoped electrical-plan context, asks the configured provider for a structured plan change, then lets the app derive, validate, preview, and apply bounded operations through the same domain rules as manual Modeling.
-
-The first shipped workflow focuses on assisted proposals: users choose a target scope, write an instruction, select permissions, review accepted/rejected operations, then apply or reject the proposal. Applied AI sessions create a rollbackable snapshot and keep delete operations disabled unless explicitly permitted. Settings expose OpenAI/Gemini provider configuration, editable model names, local API-key storage, connection testing, strict mode, and an opt-in experimental mode gate.
-
-Delivered operation families include add, move, update, route regeneration, delete gating, catalog assignment, connector layout edits, terminal material changes, batch movement, and route locks. Multi-network proposals must include an explicit or locally inferable `networkId`; ambiguous cross-network mutations are rejected instead of falling back to the active network.
 
 ```mermaid
 flowchart LR
