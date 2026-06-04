@@ -39,7 +39,7 @@ describe("App integration UI - network summary layering", () => {
     }
   }
 
-  it("renders labels in a dedicated SVG layer after segment and node geometry", () => {
+  it("renders segment labels behind nodes and node labels above node geometry", () => {
     renderAppWithState(createUiIntegrationState());
     enableSegmentNamesFromSettings();
     switchScreenDrawerAware("analysis");
@@ -48,23 +48,33 @@ describe("App integration UI - network summary layering", () => {
     const diagram = within(networkSummaryPanel).getByLabelText("2D network diagram");
     const segmentLayer = diagram.querySelector(".network-graph-layer-segments");
     const nodeLayer = diagram.querySelector(".network-graph-layer-nodes");
-    const labelLayer = diagram.querySelector(".network-graph-layer-labels");
+    const segmentLabelLayer = diagram.querySelector(".network-graph-layer-segment-labels");
+    const nodeLabelLayer = diagram.querySelector(".network-graph-layer-node-labels");
+    const physicalConnectorNodeLayer = diagram.querySelector(".network-graph-layer-physical-connector-nodes");
 
     expect(segmentLayer).not.toBeNull();
     expect(nodeLayer).not.toBeNull();
-    expect(labelLayer).not.toBeNull();
+    expect(segmentLabelLayer).not.toBeNull();
+    expect(nodeLabelLayer).not.toBeNull();
+    expect(physicalConnectorNodeLayer).not.toBeNull();
 
     const topLevelGroups = Array.from(diagram.children);
     expect(topLevelGroups.indexOf(segmentLayer as Element)).toBeGreaterThan(-1);
     expect(topLevelGroups.indexOf(nodeLayer as Element)).toBeGreaterThan(-1);
-    expect(topLevelGroups.indexOf(labelLayer as Element)).toBeGreaterThan(-1);
-    expect(topLevelGroups.indexOf(labelLayer as Element)).toBeGreaterThan(topLevelGroups.indexOf(segmentLayer as Element));
-    expect(topLevelGroups.indexOf(labelLayer as Element)).toBeGreaterThan(topLevelGroups.indexOf(nodeLayer as Element));
+    expect(topLevelGroups.indexOf(segmentLabelLayer as Element)).toBeGreaterThan(-1);
+    expect(topLevelGroups.indexOf(nodeLabelLayer as Element)).toBeGreaterThan(-1);
+    expect(topLevelGroups.indexOf(physicalConnectorNodeLayer as Element)).toBeGreaterThan(-1);
+    expect(topLevelGroups.indexOf(segmentLabelLayer as Element)).toBeGreaterThan(topLevelGroups.indexOf(segmentLayer as Element));
+    expect(topLevelGroups.indexOf(segmentLabelLayer as Element)).toBeLessThan(topLevelGroups.indexOf(nodeLayer as Element));
+    expect(topLevelGroups.indexOf(nodeLabelLayer as Element)).toBeGreaterThan(topLevelGroups.indexOf(nodeLayer as Element));
+    expect(topLevelGroups.indexOf(nodeLabelLayer as Element)).toBeLessThan(topLevelGroups.indexOf(physicalConnectorNodeLayer as Element));
 
-    expect(labelLayer?.querySelector(".network-segment-label")).not.toBeNull();
-    expect(labelLayer?.querySelector(".network-node-label")).not.toBeNull();
-    expect(labelLayer?.querySelector(".network-segment")).toBeNull();
-    expect(labelLayer?.querySelector(".network-node")).toBeNull();
+    expect(segmentLabelLayer?.querySelector(".network-segment-label")).not.toBeNull();
+    expect(segmentLabelLayer?.querySelector(".network-node-label")).toBeNull();
+    expect(nodeLabelLayer?.querySelector(".network-node-label")).not.toBeNull();
+    expect(nodeLabelLayer?.querySelector(".network-segment-label")).toBeNull();
+    expect(segmentLabelLayer?.querySelector(".network-segment")).toBeNull();
+    expect(nodeLabelLayer?.querySelector(".network-node")).toBeNull();
   });
 
   it("keeps 2D labels zoom-invariant using inverse-scale label anchors", () => {

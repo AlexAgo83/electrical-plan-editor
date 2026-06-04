@@ -126,6 +126,141 @@ export function NetworkSummaryGraphLayers({
     lastClickRef.current = { key, timestamp };
     return isRepeated;
   };
+  const renderNode = ({
+    node,
+    position,
+    nodeClassName,
+    nodeLabel,
+    connectorLayout,
+    highlightedConnectorCavityIndexes,
+    connectorCavityWireIdByIndex
+  }: RenderedNodeModel): ReactElement => {
+    const connectorWidth = 46 * normalizedNodeShapeScale;
+    const connectorHeight = 30 * normalizedNodeShapeScale;
+    const connectorDrawingReferenceWidth = connectorWidth * connectorDrawingScale;
+    const connectorDrawingReferenceHeight = connectorHeight * connectorDrawingScale;
+    const connectorDrawingSize =
+      connectorLayout !== undefined && useConsistentConnectorLayoutScale
+        ? getConsistentConnectorLayoutDrawingSize(
+            connectorLayout,
+            connectorDrawingReferenceWidth,
+            connectorDrawingReferenceHeight
+          )
+        : { width: connectorDrawingReferenceWidth, height: connectorDrawingReferenceHeight };
+    const spliceDiamondSize = 30 * normalizedNodeShapeScale;
+    const connectorHitboxWidth = 56 * normalizedNodeShapeScale;
+    const connectorHitboxHeight = 40 * normalizedNodeShapeScale;
+    const spliceHitboxSize = 38 * normalizedNodeShapeScale;
+    const intermediateRadius = 17 * normalizedNodeShapeScale;
+    const intermediateHitboxRadius = 22 * normalizedNodeShapeScale;
+    const shapeAnchorTransform = `translate(${position.x} ${position.y}) scale(${inverseLabelScale}) translate(${-position.x} ${-position.y})`;
+
+    return (
+      <g
+        key={node.id}
+        className={nodeClassName}
+        data-node-id={node.id}
+        role="button"
+        tabIndex={0}
+        focusable="true"
+        aria-label={`Select ${describeNode(node)}`}
+        onMouseDown={(event) => onNodeMouseDown(event, node.id)}
+        onKeyDown={(event) => handleNetworkNodeKeyDown(event, node.id, onNodeActivate)}
+        onClick={(event) => {
+          // Selection/editing is handled on mouse-down to support immediate drag interactions.
+          // Keep click from bubbling to future parent click handlers.
+          event.stopPropagation();
+          if (event.detail >= 2 || isRepeatedClick(`node:${node.id}`)) {
+            onNodeActivate(node.id);
+            onOpenInspectorForSelection();
+          }
+        }}
+        onDoubleClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          onNodeActivate(node.id);
+          onOpenInspectorForSelection();
+        }}
+      >
+        <title>{describeNode(node)}</title>
+        <g
+          className={zoomInvariantNodeShapes ? "network-node-shape-anchor" : undefined}
+          transform={zoomInvariantNodeShapes ? shapeAnchorTransform : undefined}
+        >
+          {node.kind === "connector" ? (
+            <>
+              {connectorLayout === undefined ? (
+                <>
+                  <rect
+                    className="network-node-hitbox"
+                    x={position.x - connectorHitboxWidth / 2}
+                    y={position.y - connectorHitboxHeight / 2}
+                    width={connectorHitboxWidth}
+                    height={connectorHitboxHeight}
+                    rx={9}
+                    ry={9}
+                  />
+                  <rect
+                    className="network-node-shape"
+                    x={position.x - connectorWidth / 2}
+                    y={position.y - connectorHeight / 2}
+                    width={connectorWidth}
+                    height={connectorHeight}
+                    rx={7}
+                    ry={7}
+                  />
+                </>
+              ) : (
+                <g
+                  className="network-node-connector-drawing"
+                  transform={`translate(${position.x} ${position.y - connectorDrawingSize.height / 2})`}
+                >
+                  {renderConnectorLayoutDrawing(
+                    connectorLayout,
+                    connectorDrawingSize.width,
+                    connectorDrawingSize.height,
+                    highlightedConnectorCavityIndexes,
+                    nodeLabel,
+                    connectorCavityWireIdByIndex,
+                    onSelectWireFromConnectorPin,
+                    onOpenInspectorForSelection
+                  )}
+                </g>
+              )}
+            </>
+          ) : node.kind === "splice" ? (
+            <>
+              <rect
+                className="network-node-hitbox"
+                x={position.x - spliceHitboxSize / 2}
+                y={position.y - spliceHitboxSize / 2}
+                width={spliceHitboxSize}
+                height={spliceHitboxSize}
+                rx={7}
+                ry={7}
+                transform={`rotate(45 ${position.x} ${position.y})`}
+              />
+              <rect
+                className="network-node-shape"
+                x={position.x - spliceDiamondSize / 2}
+                y={position.y - spliceDiamondSize / 2}
+                width={spliceDiamondSize}
+                height={spliceDiamondSize}
+                rx={5}
+                ry={5}
+                transform={`rotate(45 ${position.x} ${position.y})`}
+              />
+            </>
+          ) : (
+            <>
+              <circle className="network-node-hitbox" cx={position.x} cy={position.y} r={intermediateHitboxRadius} />
+              <circle className="network-node-shape" cx={position.x} cy={position.y} r={intermediateRadius} />
+            </>
+          )}
+        </g>
+      </g>
+    );
+  };
 
   return (
     <>
@@ -218,144 +353,9 @@ export function NetworkSummaryGraphLayers({
       </g>
 
       <g
-        className="network-graph-layer network-graph-layer-nodes"
+        className="network-graph-layer network-graph-layer-labels network-graph-layer-segment-labels"
         transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
-        style={
-          {
-            "--network-node-stroke-width": `${nodeStrokeWidth}`,
-            "--network-node-stroke-emphasis-width": `${nodeStrokeEmphasisWidth}`
-          } as CSSProperties
-        }
       >
-        {renderedNodes.map(({ node, position, nodeClassName, nodeLabel, connectorLayout, highlightedConnectorCavityIndexes, connectorCavityWireIdByIndex }) => {
-          const connectorWidth = 46 * normalizedNodeShapeScale;
-          const connectorHeight = 30 * normalizedNodeShapeScale;
-          const connectorDrawingReferenceWidth = connectorWidth * connectorDrawingScale;
-          const connectorDrawingReferenceHeight = connectorHeight * connectorDrawingScale;
-          const connectorDrawingSize =
-            connectorLayout !== undefined && useConsistentConnectorLayoutScale
-              ? getConsistentConnectorLayoutDrawingSize(
-                  connectorLayout,
-                  connectorDrawingReferenceWidth,
-                  connectorDrawingReferenceHeight
-                )
-              : { width: connectorDrawingReferenceWidth, height: connectorDrawingReferenceHeight };
-          const spliceDiamondSize = 30 * normalizedNodeShapeScale;
-          const connectorHitboxWidth = 56 * normalizedNodeShapeScale;
-          const connectorHitboxHeight = 40 * normalizedNodeShapeScale;
-          const spliceHitboxSize = 38 * normalizedNodeShapeScale;
-          const intermediateRadius = 17 * normalizedNodeShapeScale;
-          const intermediateHitboxRadius = 22 * normalizedNodeShapeScale;
-          const shapeAnchorTransform = `translate(${position.x} ${position.y}) scale(${inverseLabelScale}) translate(${-position.x} ${-position.y})`;
-          return (
-            <g
-              key={node.id}
-              className={nodeClassName}
-              data-node-id={node.id}
-              role="button"
-              tabIndex={0}
-              focusable="true"
-              aria-label={`Select ${describeNode(node)}`}
-              onMouseDown={(event) => onNodeMouseDown(event, node.id)}
-              onKeyDown={(event) => handleNetworkNodeKeyDown(event, node.id, onNodeActivate)}
-              onClick={(event) => {
-                // Selection/editing is handled on mouse-down to support immediate drag interactions.
-                // Keep click from bubbling to future parent click handlers.
-                event.stopPropagation();
-                if (event.detail >= 2 || isRepeatedClick(`node:${node.id}`)) {
-                  onNodeActivate(node.id);
-                  onOpenInspectorForSelection();
-                }
-              }}
-              onDoubleClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                onNodeActivate(node.id);
-                onOpenInspectorForSelection();
-              }}
-            >
-              <title>{describeNode(node)}</title>
-              <g
-                className={zoomInvariantNodeShapes ? "network-node-shape-anchor" : undefined}
-                transform={zoomInvariantNodeShapes ? shapeAnchorTransform : undefined}
-              >
-                {node.kind === "connector" ? (
-                  <>
-                    {connectorLayout === undefined ? (
-                      <>
-                        <rect
-                          className="network-node-hitbox"
-                          x={position.x - connectorHitboxWidth / 2}
-                          y={position.y - connectorHitboxHeight / 2}
-                          width={connectorHitboxWidth}
-                          height={connectorHitboxHeight}
-                          rx={9}
-                          ry={9}
-                        />
-                        <rect
-                          className="network-node-shape"
-                          x={position.x - connectorWidth / 2}
-                          y={position.y - connectorHeight / 2}
-                          width={connectorWidth}
-                          height={connectorHeight}
-                          rx={7}
-                          ry={7}
-                        />
-                      </>
-                    ) : (
-                      <g
-                        className="network-node-connector-drawing"
-                        transform={`translate(${position.x} ${position.y - connectorDrawingSize.height / 2})`}
-                      >
-                        {renderConnectorLayoutDrawing(
-                          connectorLayout,
-                          connectorDrawingSize.width,
-                          connectorDrawingSize.height,
-                          highlightedConnectorCavityIndexes,
-                          nodeLabel,
-                          connectorCavityWireIdByIndex,
-                          onSelectWireFromConnectorPin,
-                          onOpenInspectorForSelection
-                        )}
-                      </g>
-                    )}
-                  </>
-                ) : node.kind === "splice" ? (
-                  <>
-                    <rect
-                      className="network-node-hitbox"
-                      x={position.x - spliceHitboxSize / 2}
-                      y={position.y - spliceHitboxSize / 2}
-                      width={spliceHitboxSize}
-                      height={spliceHitboxSize}
-                      rx={7}
-                      ry={7}
-                      transform={`rotate(45 ${position.x} ${position.y})`}
-                    />
-                    <rect
-                      className="network-node-shape"
-                      x={position.x - spliceDiamondSize / 2}
-                      y={position.y - spliceDiamondSize / 2}
-                      width={spliceDiamondSize}
-                      height={spliceDiamondSize}
-                      rx={5}
-                      ry={5}
-                      transform={`rotate(45 ${position.x} ${position.y})`}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <circle className="network-node-hitbox" cx={position.x} cy={position.y} r={intermediateHitboxRadius} />
-                    <circle className="network-node-shape" cx={position.x} cy={position.y} r={intermediateRadius} />
-                  </>
-                )}
-              </g>
-            </g>
-          );
-        })}
-      </g>
-
-      <g className="network-graph-layer network-graph-layer-labels" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
         {renderedSegments.map(
           ({
             segment,
@@ -414,7 +414,25 @@ export function NetworkSummaryGraphLayers({
             </g>
           )
         )}
+      </g>
 
+      <g
+        className="network-graph-layer network-graph-layer-nodes"
+        transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
+        style={
+          {
+            "--network-node-stroke-width": `${nodeStrokeWidth}`,
+            "--network-node-stroke-emphasis-width": `${nodeStrokeEmphasisWidth}`
+          } as CSSProperties
+        }
+      >
+        {renderedNodes.filter(({ connectorLayout }) => connectorLayout === undefined).map(renderNode)}
+      </g>
+
+      <g
+        className="network-graph-layer network-graph-layer-labels network-graph-layer-node-labels"
+        transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
+      >
         {renderedNodes.map(({ node, position, nodeLabel, labelOffsetY, connectorLayout, isSubNetworkDeemphasized }) => {
           if (connectorLayout !== undefined) {
             return null;
@@ -444,6 +462,19 @@ export function NetworkSummaryGraphLayers({
             </g>
           );
         })}
+      </g>
+
+      <g
+        className="network-graph-layer network-graph-layer-nodes network-graph-layer-physical-connector-nodes"
+        transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
+        style={
+          {
+            "--network-node-stroke-width": `${nodeStrokeWidth}`,
+            "--network-node-stroke-emphasis-width": `${nodeStrokeEmphasisWidth}`
+          } as CSSProperties
+        }
+      >
+        {renderedNodes.filter(({ connectorLayout }) => connectorLayout !== undefined).map(renderNode)}
       </g>
     </>
   );
