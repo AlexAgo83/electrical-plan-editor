@@ -43,6 +43,9 @@
 
 .connector-layout-preview {
   position: relative;
+  --connector-layout-resize-button-background: color-mix(in srgb, var(--theme-surface, Canvas) 88%, var(--theme-primary, currentColor) 12%);
+  --connector-layout-resize-button-border: color-mix(in srgb, var(--theme-primary, currentColor) 44%, transparent);
+  --connector-layout-resize-button-color: color-mix(in srgb, currentColor 86%, var(--theme-primary, currentColor) 14%);
 }
 
 .connector-layout-preview,
@@ -65,16 +68,40 @@
   place-items: center;
   width: 1.7rem;
   height: 1.7rem;
-  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 44%, transparent);
+  border: 1px solid var(--connector-layout-resize-button-border);
   border-radius: 50%;
-  background: color-mix(in srgb, var(--theme-surface, Canvas) 88%, var(--theme-primary, currentColor) 12%);
-  color: color-mix(in srgb, currentColor 86%, var(--theme-primary, currentColor) 14%);
+  background: var(--connector-layout-resize-button-background);
+  color: var(--connector-layout-resize-button-color);
   font-size: 1rem;
   font-weight: 800;
   line-height: 1;
+  box-shadow: 0 0.35rem 0.9rem color-mix(in srgb, #000 18%, transparent);
   opacity: 0;
   pointer-events: none;
   transition: opacity 120ms ease, transform 120ms ease, background-color 120ms ease;
+}
+
+.app-shell:is(
+  .theme-dark,
+  .theme-slate-neon,
+  .theme-deep-green,
+  .theme-burgundy-noir,
+  .theme-amber-night,
+  .theme-cyberpunk,
+  .theme-olive,
+  .theme-steel-blue,
+  .theme-forest-graphite,
+  .theme-petrol-slate,
+  .theme-copper-night,
+  .theme-moss-taupe,
+  .theme-navy-ash,
+  .theme-charcoal-plum,
+  .theme-smoked-teal,
+  .theme-circle-mobility-dark
+) .connector-layout-preview {
+  --connector-layout-resize-button-background: color-mix(in srgb, #0b1220 84%, var(--theme-primary, #5aa8ff) 16%);
+  --connector-layout-resize-button-border: color-mix(in srgb, var(--theme-primary, #5aa8ff) 64%, #f8fafc 16%);
+  --connector-layout-resize-button-color: #f8fafc;
 }
 
 .connector-layout-preview:hover .connector-layout-resize-button,

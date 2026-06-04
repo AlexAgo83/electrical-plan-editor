@@ -15,6 +15,14 @@ describe("ConnectorPhysicalView", () => {
     expect(styles).not.toContain(".connector-physical-canvas {\n  overflow: auto;");
   });
 
+  it("keeps physical layout resize controls readable on dark themes", () => {
+    const styles = readFileSync(resolve(process.cwd(), "src/app/styles/forms/connector-layout.css"), "utf8");
+    expect(styles).toContain("--connector-layout-resize-button-background");
+    expect(styles).toContain(".theme-circle-mobility-dark");
+    expect(styles).toContain("--connector-layout-resize-button-color: #f8fafc");
+    expect(styles).toContain("background: var(--connector-layout-resize-button-background)");
+  });
+
   it("highlights the physical way and detail card linked to the selected wire", () => {
     const connector: Connector = {
       id: asConnectorId("C1"),
