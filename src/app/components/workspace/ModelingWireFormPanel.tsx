@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG, type WireColorMode } from "../../../core/cableColors";
+import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG } from "../../../core/cableColors";
 import {
   FUNCTIONAL_FILTER_12V_POWER,
   FUNCTIONAL_FILTER_48V,
@@ -173,14 +173,25 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     selectedEndpointASplice !== undefined && resolveSplicePortMode(selectedEndpointASplice) === "directional";
   const endpointBIsDirectionalSplice =
     selectedEndpointBSplice !== undefined && resolveSplicePortMode(selectedEndpointBSplice) === "directional";
-  function handleWireColorModeChange(nextMode: WireColorMode): void {
-    setWireColorMode(nextMode);
-    if (nextMode === "catalog") {
+  const primaryColorSelectValue =
+    wireColorMode === "free" ? "__free__" : wireColorMode === "catalog" ? wirePrimaryColorId : "";
+  function handleWirePrimaryColorSelection(nextValue: string): void {
+    if (nextValue === "__free__") {
+      setWireColorMode("free");
+      setWirePrimaryColorId("");
+      setWireSecondaryColorId("");
       setWireFreeColorLabel("");
       return;
     }
-    setWirePrimaryColorId("");
-    setWireSecondaryColorId("");
+    if (nextValue.length === 0) {
+      setWireColorMode("none");
+      setWirePrimaryColorId("");
+      setWireSecondaryColorId("");
+      setWireFreeColorLabel("");
+      return;
+    }
+    setWireColorMode("catalog");
+    setWirePrimaryColorId(nextValue);
     setWireFreeColorLabel("");
   }
   const functionalDomainTagOptions = [
@@ -386,35 +397,20 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       </>
     ) : null}
     <label>
-      Color mode
-      <select value={wireColorMode} onChange={(event) => handleWireColorModeChange(event.target.value as WireColorMode)}>
-        <option value="none">Not specified</option>
-        <option value="free">Free</option>
-        <option value="catalog">Selected color</option>
+      Primary color
+      <select
+        value={primaryColorSelectValue}
+        onChange={(event) => handleWirePrimaryColorSelection(event.target.value)}
+      >
+        <option value="">Not specified</option>
+        <option value="__free__">Free</option>
+        {CABLE_COLOR_CATALOG.map((color) => (
+          <option key={color.id} value={color.id}>
+            {color.id} - {color.label}
+          </option>
+        ))}
       </select>
     </label>
-    {wireColorMode === "catalog" ? (
-      <label>
-        Primary color
-        <select
-          value={wirePrimaryColorId}
-          onChange={(event) => {
-            const nextPrimary = event.target.value;
-            setWirePrimaryColorId(nextPrimary);
-            if (nextPrimary.length === 0) {
-              setWireSecondaryColorId("");
-            }
-          }}
-        >
-          <option value="">Not specified</option>
-          {CABLE_COLOR_CATALOG.map((color) => (
-            <option key={color.id} value={color.id}>
-              {color.id} - {color.label}
-            </option>
-          ))}
-        </select>
-      </label>
-    ) : null}
     {wireColorMode === "catalog" && wirePrimaryColorId.length > 0 ? (
       <label>
         Secondary color
