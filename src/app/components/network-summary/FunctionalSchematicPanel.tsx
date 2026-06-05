@@ -169,6 +169,17 @@ function sortFunctionalNodes(graph: FunctionalSchematicGraph, nodes: FunctionalS
   });
 }
 
+function sortFunctionalRootNodes(graph: FunctionalSchematicGraph, nodes: FunctionalSchematicNode[]): FunctionalSchematicNode[] {
+  return [...nodes].sort((left, right) => {
+    const leftMain = left.isMainHarnessConnector === true ? 0 : 1;
+    const rightMain = right.isMainHarnessConnector === true ? 0 : 1;
+    if (leftMain !== rightMain) {
+      return leftMain - rightMain;
+    }
+    return getNodeSortIndex(graph, left.id) - getNodeSortIndex(graph, right.id) || left.label.localeCompare(right.label);
+  });
+}
+
 function nodeMatchesSeed(node: FunctionalSchematicNode, seed: FunctionalTraceSeed): boolean {
   if (seed.kind === "connector") {
     return seed.connectorId !== null && node.kind === "connector" && node.sourceIds.includes(String(seed.connectorId));
@@ -360,7 +371,7 @@ function buildFunctionalSchematicLayout(graph: FunctionalSchematicGraph): Functi
     return nextColumn;
   };
 
-  let nextDisconnectedColumn = assignRootColumns(sortFunctionalNodes(graph, roots), 0);
+  let nextDisconnectedColumn = assignRootColumns(sortFunctionalRootNodes(graph, roots), 0);
   for (const rank of sortedRanks) {
     const row = rows.get(rank) ?? [];
     for (const node of row) {

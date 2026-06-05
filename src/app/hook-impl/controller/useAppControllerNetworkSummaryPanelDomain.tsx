@@ -562,19 +562,11 @@ export function useAppControllerNetworkSummaryPanelDomain({
           ];
         })
       );
-      const rootConnectorRefs =
-        displayedHarnessAssembly.masterConnectorRefs.length > 0
-          ? displayedHarnessAssembly.masterConnectorRefs
-          : [...networksById].flatMap(([networkId, bundle]) =>
-              [...bundle.connectorMap.values()]
-                .filter((connector) => connector.isMainHarnessConnector === true)
-                .map((connector) => ({ networkId, connectorId: connector.id }))
-            );
       return buildHarnessAssemblyFunctionalSchematicGraph({
         assembly: displayedHarnessAssembly,
         networksById,
         activeFilter,
-        rootConnectorRefs
+        rootConnectorRefs: displayedHarnessAssembly.masterConnectorRefs
       });
     };
   }, [displayedHarnessAssembly, store]);

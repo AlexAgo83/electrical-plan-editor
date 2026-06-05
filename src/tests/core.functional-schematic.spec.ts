@@ -800,4 +800,480 @@ describe("buildFunctionalSchematicGraph", () => {
     expect(graph.edges.some((edge) => edge.label === "W-LEAK")).toBe(false);
     expect(graph.nodes.some((node) => node.label.includes("HUB"))).toBe(true);
   });
+
+  it("keeps a selected root connector pin visible when the root connector is also an interconnector", () => {
+    const networkA: Network = {
+      id: asNetworkId("net-root-a"),
+      name: "Root harness",
+      technicalId: "H-ROOT",
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+    const networkB: Network = {
+      id: asNetworkId("net-root-b"),
+      name: "Distant harness",
+      technicalId: "H-DIST",
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+    const assembly: HarnessAssembly = {
+      id: asHarnessAssemblyId("asm-root-visual"),
+      name: "Root visual assembly",
+      technicalId: "ASM-ROOT",
+      members: [{ networkId: networkA.id, color: "#2563eb" }, { networkId: networkB.id, color: "#16a34a" }],
+      masterConnectorRefs: [{ networkId: networkA.id, connectorId: asConnectorId("C-A-ROOT") }],
+      connectorLinks: [
+        {
+          id: "link-root" as never,
+          name: "Root interco",
+          sourceNetworkId: networkA.id,
+          sourceConnectorId: asConnectorId("C-A-ROOT"),
+          targetNetworkId: networkB.id,
+          targetConnectorId: asConnectorId("C-B-IN")
+        }
+      ],
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+    const networkAConnectors: Connector[] = [
+      { id: asConnectorId("C-A-ROOT"), name: "Checked root", technicalId: "A-ROOT", cavityCount: 2 },
+      { id: asConnectorId("C-A-LOCAL"), name: "Local load", technicalId: "A-LOCAL", cavityCount: 2 }
+    ];
+    const networkBConnectors: Connector[] = [
+      { id: asConnectorId("C-B-IN"), name: "Distant input", technicalId: "B-IN", cavityCount: 2 },
+      { id: asConnectorId("C-B-END"), name: "Distant end", technicalId: "B-END", cavityCount: 2 }
+    ];
+    const graph = buildHarnessAssemblyFunctionalSchematicGraph({
+      assembly,
+      activeFilter: "all",
+      networksById: new Map([
+        [
+          networkA.id,
+          {
+            network: networkA,
+            wires: [
+              {
+                id: asWireId("W-A-ROOT"),
+                name: "Local root wire",
+                technicalId: "W-A-ROOT",
+                sectionMm2: 0.35,
+                primaryColorId: null,
+                secondaryColorId: null,
+                endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-A-ROOT"), cavityIndex: 1 },
+                endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-A-LOCAL"), cavityIndex: 1 },
+                routeSegmentIds: [],
+                lengthMm: 50,
+                isRouteLocked: false
+              }
+            ],
+            segments: [],
+            connectorMap: new Map(networkAConnectors.map((connector) => [connector.id, connector])),
+            spliceMap: new Map(),
+            catalogItemMap: new Map()
+          }
+        ],
+        [
+          networkB.id,
+          {
+            network: networkB,
+            wires: [
+              {
+                id: asWireId("W-B-DIST"),
+                name: "Distant wire",
+                technicalId: "W-B-DIST",
+                sectionMm2: 0.35,
+                primaryColorId: null,
+                secondaryColorId: null,
+                endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-B-IN"), cavityIndex: 1 },
+                endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-B-END"), cavityIndex: 1 },
+                routeSegmentIds: [],
+                lengthMm: 50,
+                isRouteLocked: false
+              }
+            ],
+            segments: [],
+            connectorMap: new Map(networkBConnectors.map((connector) => [connector.id, connector])),
+            spliceMap: new Map(),
+            catalogItemMap: new Map()
+          }
+        ]
+      ])
+    });
+
+    expect(graph.nodes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "interconnector:link-root:pin:1", kind: "interconnector" })
+      ])
+    );
+    expect(graph.nodes.find((node) => node.id === "network:net-root-a:connector:C-A-ROOT:pin:1")).toBeUndefined();
+    expect(graph.rootNodeIds).not.toContain("network:net-root-a:connector:C-A-ROOT:pin:1");
+    expect(graph.edges.some((edge) => edge.fromNodeId === "network:net-root-a:connector:C-A-ROOT:pin:1")).toBe(false);
+    expect(graph.edges).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          fromNodeId: "interconnector:link-root:pin:1",
+          toNodeId: "network:net-root-a:connector:C-A-LOCAL:pin:1",
+          label: "W-A-ROOT"
+        })
+      ])
+    );
+  });
+
+  it("traverses and renders configured fuse-box pairs in harness assembly graphs", () => {
+    const fixture = createFuseBoxTraceFixture();
+    const network: Network = {
+      id: asNetworkId("net-fuse"),
+      name: "Fuse harness",
+      technicalId: "H-FUSE",
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+    const assembly: HarnessAssembly = {
+      id: asHarnessAssemblyId("asm-fuse"),
+      name: "Fuse assembly",
+      technicalId: "ASM-FUSE",
+      members: [{ networkId: network.id, color: "#2563eb" }],
+      masterConnectorRefs: [{ networkId: network.id, connectorId: asConnectorId("C-MAIN") }],
+      connectorLinks: [],
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+
+    const graph = buildHarnessAssemblyFunctionalSchematicGraph({
+      assembly,
+      activeFilter: "12V power",
+      networksById: new Map([
+        [
+          network.id,
+          {
+            network,
+            wires: fixture.wires.map((wire) =>
+              wire.id === asWireId("W-IN") ? { ...wire, functionalDomainTag: "12V power" } : wire
+            ),
+            segments: [],
+            connectorMap: fixture.connectorMap,
+            spliceMap: new Map(),
+            catalogItemMap: fixture.catalogItemMap
+          }
+        ]
+      ])
+    });
+
+    expect(graph.includedWireIds).toEqual([asWireId("W-IN"), asWireId("W-OUT")]);
+    expect(graph.nodes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: "network:net-fuse:fuse-box:C-FUSE:pair:0",
+          kind: "fuse",
+          label: "FUSEBOX",
+          ratingLabel: "10A"
+        })
+      ])
+    );
+    expect(graph.nodes.find((node) => node.id === "network:net-fuse:connector:C-FUSE:pin:1")).toBeUndefined();
+    expect(graph.nodes.find((node) => node.id === "network:net-fuse:connector:C-FUSE:pin:2")).toBeUndefined();
+    expect(graph.edges).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "W-IN",
+          fromNodeId: "network:net-fuse:connector:C-MAIN:pin:1",
+          toNodeId: "network:net-fuse:fuse-box:C-FUSE:pair:0"
+        }),
+        expect.objectContaining({
+          label: "W-OUT",
+          fromNodeId: "network:net-fuse:fuse-box:C-FUSE:pair:0",
+          toNodeId: "network:net-fuse:connector:C-LOAD:pin:1"
+        })
+      ])
+    );
+    expect(graph.includedWireIds).not.toContain(asWireId("W-AUX-IN"));
+    expect(graph.includedWireIds).not.toContain(asWireId("W-AUX-OUT"));
+  });
+
+  it("traverses fuse-box pairs even when the fuse-box connector is marked as a main harness connector", () => {
+    const fuseBoxCatalogItem = createFuseBoxCatalogItem();
+    const networkConnectors: Connector[] = [
+      { id: asConnectorId("C-MAIN"), name: "Main root", technicalId: "MAIN", cavityCount: 2 },
+      {
+        id: asConnectorId("C-FUSE"),
+        name: "Fuse box",
+        technicalId: "FUSEBOX",
+        cavityCount: 4,
+        catalogItemId: fuseBoxCatalogItem.id,
+        fusePairRatings: { 0: 10 },
+        isMainHarnessConnector: true
+      },
+      { id: asConnectorId("C-LOAD"), name: "Load", technicalId: "LOAD", cavityCount: 2 }
+    ];
+    const networkWires: Wire[] = [
+      {
+        id: asWireId("W-IN"),
+        name: "Main feed",
+        technicalId: "W-IN",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-MAIN"), cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-OUT"),
+        name: "Protected load",
+        technicalId: "W-OUT",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE"), cavityIndex: 2 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-LOAD"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      }
+    ];
+    const network: Network = {
+      id: asNetworkId("net-fuse-main"),
+      name: "Fuse harness",
+      technicalId: "H-FUSE",
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+    const assembly: HarnessAssembly = {
+      id: asHarnessAssemblyId("asm-fuse-main"),
+      name: "Fuse assembly",
+      technicalId: "ASM-FUSE-MAIN",
+      members: [{ networkId: network.id, color: "#2563eb" }],
+      masterConnectorRefs: [{ networkId: network.id, connectorId: asConnectorId("C-MAIN") }],
+      connectorLinks: [],
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+
+    const graph = buildHarnessAssemblyFunctionalSchematicGraph({
+      assembly,
+      activeFilter: "all",
+      networksById: new Map([
+        [
+          network.id,
+          {
+            network,
+            wires: networkWires,
+            segments: [],
+            connectorMap: new Map(networkConnectors.map((connector) => [connector.id, connector])),
+            spliceMap: new Map(),
+            catalogItemMap: new Map([[fuseBoxCatalogItem.id, fuseBoxCatalogItem]])
+          }
+        ]
+      ])
+    });
+
+    expect(graph.includedWireIds).toEqual([asWireId("W-IN"), asWireId("W-OUT")]);
+    expect(graph.edges).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "W-OUT",
+          fromNodeId: "network:net-fuse-main:fuse-box:C-FUSE:pair:0",
+          toNodeId: "network:net-fuse-main:connector:C-LOAD:pin:1"
+        })
+      ])
+    );
+  });
+
+  it("does not leak branches from one saved master root into another through shared electrical continuity", () => {
+    const fuseBoxCatalogItem = createFuseBoxCatalogItem("FBOX-SHARED");
+    const network: Network = {
+      id: asNetworkId("net-shared"),
+      name: "Shared harness",
+      technicalId: "H-SHARED",
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+    const connectorsLocal: Connector[] = [
+      {
+        id: asConnectorId("C-ROOT-A"),
+        name: "Root A",
+        technicalId: "ROOT-A",
+        cavityCount: 2,
+        isMainHarnessConnector: true
+      },
+      {
+        id: asConnectorId("C-ROOT-B"),
+        name: "Root B",
+        technicalId: "ROOT-B",
+        cavityCount: 2,
+        isMainHarnessConnector: true
+      },
+      {
+        id: asConnectorId("C-FUSE-SH"),
+        name: "Fuse box shared",
+        technicalId: "FUSE-SH",
+        cavityCount: 4,
+        catalogItemId: fuseBoxCatalogItem.id
+      },
+      { id: asConnectorId("C-LEAK-LOAD"), name: "Unrelated", technicalId: "LEAK-LOAD", cavityCount: 2 }
+    ];
+    const wiresLocal: Wire[] = [
+      {
+        id: asWireId("W-A-IN"),
+        name: "Root A feed",
+        technicalId: "W-A-IN",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-ROOT-A"), cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE-SH"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-B-OUT"),
+        name: "Root B feed",
+        technicalId: "W-B-OUT",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE-SH"), cavityIndex: 2 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-ROOT-B"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-B-LEAK"),
+        name: "Unrelated branch from Root B",
+        technicalId: "W-B-LEAK",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-ROOT-B"), cavityIndex: 2 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-LEAK-LOAD"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      }
+    ];
+    const assembly: HarnessAssembly = {
+      id: asHarnessAssemblyId("asm-shared"),
+      name: "Shared assembly",
+      technicalId: "ASM-SHARED",
+      members: [{ networkId: network.id, color: "#2563eb" }],
+      masterConnectorRefs: [{ networkId: network.id, connectorId: asConnectorId("C-ROOT-A") }],
+      connectorLinks: [],
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+
+    const graph = buildHarnessAssemblyFunctionalSchematicGraph({
+      assembly,
+      activeFilter: "all",
+      networksById: new Map([
+        [
+          network.id,
+          {
+            network,
+            wires: wiresLocal,
+            segments: [],
+            connectorMap: new Map(connectorsLocal.map((connector) => [connector.id, connector])),
+            spliceMap: new Map(),
+            catalogItemMap: new Map([[fuseBoxCatalogItem.id, fuseBoxCatalogItem]])
+          }
+        ]
+      ])
+    });
+
+    expect(graph.includedWireIds).toContain(asWireId("W-A-IN"));
+    expect(graph.includedWireIds).toContain(asWireId("W-B-OUT"));
+    expect(graph.includedWireIds).not.toContain(asWireId("W-B-LEAK"));
+  });
+
+  it("keeps fuse-box pair edges flowing through the fuse node when both pins are reachable from different roots at equal distance", () => {
+    const fuseBoxCatalogItem = createFuseBoxCatalogItem("FBOX-MULTI");
+    const network: Network = {
+      id: asNetworkId("net-multi"),
+      name: "Multi-root harness",
+      technicalId: "H-MULTI",
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+    const connectorsLocal: Connector[] = [
+      { id: asConnectorId("C-ROOT-1"), name: "Root 1", technicalId: "ROOT-1", cavityCount: 2 },
+      { id: asConnectorId("C-ROOT-2"), name: "Root 2", technicalId: "ROOT-2", cavityCount: 2 },
+      {
+        id: asConnectorId("C-FUSE-M"),
+        name: "Fuse box multi",
+        technicalId: "FUSE-M",
+        cavityCount: 4,
+        catalogItemId: fuseBoxCatalogItem.id,
+        fusePairRatings: { 0: 5 }
+      }
+    ];
+    const wiresLocal: Wire[] = [
+      {
+        id: asWireId("W-IN-1"),
+        name: "Root 1 to fuse pin A",
+        technicalId: "W-IN-1",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-ROOT-1"), cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE-M"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-IN-2"),
+        name: "Root 2 to fuse pin B",
+        technicalId: "W-IN-2",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-ROOT-2"), cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE-M"), cavityIndex: 2 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      }
+    ];
+    const assembly: HarnessAssembly = {
+      id: asHarnessAssemblyId("asm-multi"),
+      name: "Multi-root assembly",
+      technicalId: "ASM-MULTI",
+      members: [{ networkId: network.id, color: "#2563eb" }],
+      masterConnectorRefs: [
+        { networkId: network.id, connectorId: asConnectorId("C-ROOT-1") },
+        { networkId: network.id, connectorId: asConnectorId("C-ROOT-2") }
+      ],
+      connectorLinks: [],
+      createdAt: "2026-05-11T00:00:00.000Z",
+      updatedAt: "2026-05-11T00:00:00.000Z"
+    };
+
+    const graph = buildHarnessAssemblyFunctionalSchematicGraph({
+      assembly,
+      activeFilter: "all",
+      networksById: new Map([
+        [
+          network.id,
+          {
+            network,
+            wires: wiresLocal,
+            segments: [],
+            connectorMap: new Map(connectorsLocal.map((connector) => [connector.id, connector])),
+            spliceMap: new Map(),
+            catalogItemMap: new Map([[fuseBoxCatalogItem.id, fuseBoxCatalogItem]])
+          }
+        ]
+      ])
+    });
+
+    const fuseNodeId = "network:net-multi:fuse-box:C-FUSE-M:pair:0";
+    const inEdges = graph.edges.filter((edge) => edge.toNodeId === fuseNodeId);
+    const outEdges = graph.edges.filter((edge) => edge.fromNodeId === fuseNodeId);
+    expect(inEdges.length).toBeGreaterThan(0);
+    expect(outEdges.length).toBeGreaterThan(0);
+  });
 });
