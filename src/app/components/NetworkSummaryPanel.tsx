@@ -597,9 +597,11 @@ export function NetworkSummaryPanel({
   const {
     activeSvgPreview,
     createPngPreview,
+    createPdfPage,
     createSvgPreview,
     handleCloseSvgPreview,
     handleDownloadSvgPreview,
+    handleExportPlanAsPdfDirect,
     handleExportPlanAsPng,
     handleExportPlanAsPngDirect,
     handleExportPlanAsSvg,
@@ -629,9 +631,11 @@ export function NetworkSummaryPanel({
     imperativeRef,
     (): NetworkSummaryPanelHandle => ({
       exportPngDirect: handleExportPlanAsPngDirect,
+      exportPdfDirect: handleExportPlanAsPdfDirect,
+      exportPdfPage: createPdfPage,
       exportSvgDirect: handleExportPlanAsSvgDirect
     }),
-    [handleExportPlanAsPngDirect, handleExportPlanAsSvgDirect]
+    [createPdfPage, handleExportPlanAsPdfDirect, handleExportPlanAsPngDirect, handleExportPlanAsSvgDirect]
   );
   const handleSvgPreviewOptionsChange = useCallback(
     (options: SvgPreviewOptions) => {
@@ -855,6 +859,7 @@ export function NetworkSummaryPanel({
           showCableCallouts={showCableCallouts}
           canExportSvg={nodes.length > 0}
           canExportPng={nodes.length > 0}
+          canExportPdf={nodes.length > 0}
           canExportNetwork={activeNetwork !== null}
           canExportBomCsv={canExportBomCsv}
           onSelectActiveNetwork={onSelectActiveNetwork}
@@ -872,6 +877,9 @@ export function NetworkSummaryPanel({
           }}
           onExportPng={() => {
             void handleExportPlanAsPng();
+          }}
+          onExportPdf={() => {
+            void handleExportPlanAsPdfDirect();
           }}
           onExportNetwork={onExportNetwork}
           onExportBomCsv={onExportBomCsv}

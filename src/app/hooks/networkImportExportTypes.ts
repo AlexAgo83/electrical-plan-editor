@@ -59,6 +59,7 @@ export interface UseNetworkImportExportResult {
   handleExportNetworks: (scope: "active" | "selected" | "all", exportedAtIsoOverride?: string) => void;
   handleExportNetwork: (networkId: NetworkId, exportedAtIsoOverride?: string) => void;
   handleExportGroupedBom: (networkIds: NetworkId[]) => void;
+  handleExportGroupedPdf: (networkIds: NetworkId[]) => void;
   handleExportGroupedPng: (networkIds: NetworkId[]) => void;
   handleExportGroupedSvg: (networkIds: NetworkId[]) => void;
   handleOpenImportPicker: () => void;

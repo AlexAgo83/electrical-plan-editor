@@ -3,10 +3,12 @@ import { useEffect, useRef, useState, type ReactElement } from "react";
 interface NetworkSummaryExportMenuProps {
   canExportSvg: boolean;
   canExportPng: boolean;
+  canExportPdf?: boolean;
   canExportNetwork?: boolean;
   canExportBomCsv?: boolean;
   onExportSvg: () => void;
   onExportPng: () => void;
+  onExportPdf?: () => void;
   onExportNetwork?: () => void;
   onExportBomCsv?: () => void;
 }
@@ -14,10 +16,12 @@ interface NetworkSummaryExportMenuProps {
 export function NetworkSummaryExportMenu({
   canExportSvg,
   canExportPng,
+  canExportPdf,
   canExportNetwork,
   canExportBomCsv,
   onExportSvg,
   onExportPng,
+  onExportPdf,
   onExportNetwork,
   onExportBomCsv
 }: NetworkSummaryExportMenuProps): ReactElement {
@@ -43,6 +47,11 @@ export function NetworkSummaryExportMenu({
   function handleExportPng() {
     setOpen(false);
     onExportPng();
+  }
+
+  function handleExportPdf() {
+    setOpen(false);
+    onExportPdf?.();
   }
 
   function handleExportBom() {
@@ -87,6 +96,17 @@ export function NetworkSummaryExportMenu({
             <span className="network-summary-export-icon" aria-hidden="true" />
             PNG
           </button>
+          {onExportPdf === undefined ? null : (
+            <button
+              type="button"
+              className="network-summary-view-menu-item"
+              onClick={handleExportPdf}
+              disabled={!canExportPdf}
+            >
+              <span className="network-summary-export-icon" aria-hidden="true" />
+              PDF
+            </button>
+          )}
           {onExportNetwork === undefined ? null : (
             <button
               type="button"

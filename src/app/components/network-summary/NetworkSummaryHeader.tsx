@@ -16,6 +16,7 @@ interface NetworkSummaryHeaderProps {
   showCableCallouts: boolean;
   canExportSvg: boolean;
   canExportPng: boolean;
+  canExportPdf: boolean;
   canExportBomCsv: boolean;
   canExportNetwork: boolean;
   onSelectActiveNetwork: (networkId: NetworkId) => void;
@@ -30,6 +31,7 @@ interface NetworkSummaryHeaderProps {
   onOpenCurrentNetworkFunctional?: () => void;
   onExportSvg: () => void;
   onExportPng: () => void;
+  onExportPdf: () => void;
   onExportNetwork: () => void;
   onExportBomCsv: () => void;
 }
@@ -46,6 +48,7 @@ export function NetworkSummaryHeader({
   showCableCallouts,
   canExportSvg,
   canExportPng,
+  canExportPdf,
   canExportBomCsv,
   canExportNetwork,
   onSelectActiveNetwork,
@@ -60,6 +63,7 @@ export function NetworkSummaryHeader({
   onOpenCurrentNetworkFunctional,
   onExportSvg,
   onExportPng,
+  onExportPdf,
   onExportNetwork,
   onExportBomCsv
 }: NetworkSummaryHeaderProps): ReactElement {
@@ -133,10 +137,12 @@ export function NetworkSummaryHeader({
         <NetworkSummaryExportMenu
           canExportSvg={canExportSvg}
           canExportPng={canExportPng}
+          canExportPdf={canExportPdf}
           canExportNetwork={canExportNetwork}
           canExportBomCsv={canExportBomCsv}
           onExportSvg={onExportSvg}
           onExportPng={onExportPng}
+          onExportPdf={onExportPdf}
           onExportNetwork={onExportNetwork}
           onExportBomCsv={onExportBomCsv}
         />

@@ -154,6 +154,7 @@ interface SettingsWorkspaceContentProps {
   importOverwriteDialog?: import("../../hooks/useNetworkImportExport").ImportOverwriteDialogModel | null;
   importFailureDialog?: import("../../hooks/useNetworkImportExport").FileFeedbackDialogModel | null;
   handleExportGroupedBom?: (networkIds: NetworkId[]) => void;
+  handleExportGroupedPdf?: (networkIds: NetworkId[]) => void;
   handleExportGroupedPng?: (networkIds: NetworkId[]) => void;
   handleExportGroupedSvg?: (networkIds: NetworkId[]) => void;
   aiSettings: AiSettingsModel;
@@ -291,6 +292,7 @@ export function SettingsWorkspaceContent({
   importOverwriteDialog = null,
   importFailureDialog = null,
   handleExportGroupedBom,
+  handleExportGroupedPdf,
   handleExportGroupedPng,
   handleExportGroupedSvg,
   aiSettings,
@@ -1384,6 +1386,13 @@ export function SettingsWorkspaceContent({
                 disabled={selectedExportNetworkIds.length === 0 || handleExportGroupedPng === undefined}
               >
                 Export grouped PNG
+              </button>
+              <button
+                type="button"
+                onClick={() => handleExportGroupedPdf?.(selectedExportNetworkIds)}
+                disabled={selectedExportNetworkIds.length === 0 || handleExportGroupedPdf === undefined}
+              >
+                Export grouped PDF
               </button>
             </div>
             <div className="row-actions settings-actions">

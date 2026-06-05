@@ -3,6 +3,7 @@ import type { ThemeMode } from "../../../../store";
 import { buildTimestampedFileName } from "../../../lib/exportFileName";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
 import { getThemeClassNames } from "../../../lib/themeModes";
+import { buildImagePdfBlob, downloadPdfBlob, type PdfImagePage } from "../../../lib/pdfExport";
 import {
   applyExportDecorations,
   copyComputedStylesToSvgClone,
@@ -84,6 +85,9 @@ interface Matrix2d {
 const SVG_FIT_EXPORT_PADDING = 48;
 const SVG_TEXT_FALLBACK_WIDTH_FACTOR = 7.2;
 const SVG_TEXT_FALLBACK_HEIGHT = 16;
+const PDF_EXPORT_RASTER_SCALE = 4;
+const PDF_EXPORT_MAX_CANVAS_SIDE = 16384;
+const PDF_EXPORT_MAX_CANVAS_PIXELS = 80_000_000;
 
 const IDENTITY_MATRIX: Matrix2d = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
 
@@ -400,6 +404,18 @@ function waitForPreviewRenderTurn(): Promise<void> {
   });
 }
 
+function resolvePdfRasterScale(width: number, height: number): number {
+  const safeWidth = Math.max(1, width);
+  const safeHeight = Math.max(1, height);
+  const sideLimitedScale = Math.min(
+    PDF_EXPORT_RASTER_SCALE,
+    PDF_EXPORT_MAX_CANVAS_SIDE / safeWidth,
+    PDF_EXPORT_MAX_CANVAS_SIDE / safeHeight
+  );
+  const pixelLimitedScale = Math.sqrt(PDF_EXPORT_MAX_CANVAS_PIXELS / (safeWidth * safeHeight));
+  return Math.max(1, Math.floor(Math.min(sideLimitedScale, pixelLimitedScale)));
+}
+
 async function withThemedSourceSvg<T>(
   sourceSvg: SVGSVGElement,
   themeMode: ThemeMode,
@@ -589,6 +605,49 @@ export function useNetworkSummaryExportActions({
         context.drawImage(image, 0, 0, prepared.exportWidth, prepared.exportHeight);
 
         return canvas.toDataURL("image/png");
+      } finally {
+        URL.revokeObjectURL(svgUrl);
+      }
+    },
+    [networkCanvasShellRef, pngExportIncludeBackground]
+  );
+
+  const renderPreparedSvgAsJpegDataUrl = useCallback(
+    async (prepared: PreparedSvgExport, rasterScale = 1): Promise<string | null> => {
+      if (typeof window === "undefined") {
+        return null;
+      }
+
+      const serializedSvg = new XMLSerializer().serializeToString(prepared.svgClone);
+      const svgBlob = new Blob([serializedSvg], { type: "image/svg+xml;charset=utf-8" });
+      const svgUrl = URL.createObjectURL(svgBlob);
+      try {
+        const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+          const nextImage = new Image();
+          nextImage.decoding = "async";
+          nextImage.onload = () => resolve(nextImage);
+          nextImage.onerror = () => reject(new Error("Unable to render SVG PDF export."));
+          nextImage.src = svgUrl;
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = prepared.exportWidth * rasterScale;
+        canvas.height = prepared.exportHeight * rasterScale;
+
+        const context = getCanvasTextMeasurementContext(canvas);
+        if (context === null) {
+          return null;
+        }
+
+        context.setTransform(rasterScale, 0, 0, rasterScale, 0, 0);
+        const backgroundFill = pngExportIncludeBackground
+          ? resolveCanvasExportBackgroundFill(networkCanvasShellRef.current) ?? "#ffffff"
+          : "#ffffff";
+        context.fillStyle = backgroundFill;
+        context.fillRect(0, 0, prepared.exportWidth, prepared.exportHeight);
+        context.drawImage(image, 0, 0, prepared.exportWidth, prepared.exportHeight);
+
+        return canvas.toDataURL("image/jpeg", 0.98);
       } finally {
         URL.revokeObjectURL(svgUrl);
       }
@@ -794,16 +853,47 @@ export function useNetworkSummaryExportActions({
     downloadSvgMarkup(svgMarkup);
   }, [downloadSvgMarkup, prepareDecoratedSvgClone]);
 
+  const createPdfPage = useCallback(async (): Promise<PdfImagePage | null> => {
+    await waitForPreviewRenderTurn();
+    const prepared = await prepareDecoratedSvgClone({ fitToContent: true });
+    if (prepared === null) {
+      return null;
+    }
+    const rasterScale = resolvePdfRasterScale(prepared.exportWidth, prepared.exportHeight);
+    const jpegDataUrl = await renderPreparedSvgAsJpegDataUrl(prepared, rasterScale);
+    if (jpegDataUrl === null) {
+      return null;
+    }
+    return {
+      width: prepared.exportWidth,
+      height: prepared.exportHeight,
+      imageWidth: prepared.exportWidth * rasterScale,
+      imageHeight: prepared.exportHeight * rasterScale,
+      jpegDataUrl
+    };
+  }, [prepareDecoratedSvgClone, renderPreparedSvgAsJpegDataUrl]);
+
+  const handleExportPlanAsPdfDirect = useCallback(async () => {
+    const page = await createPdfPage();
+    if (page === null) {
+      return;
+    }
+    const blob = buildImagePdfBlob([page]);
+    downloadPdfBlob(buildTimestampedFileName(["network-plan", exportCartoucheNetworkName], "pdf"), blob);
+  }, [createPdfPage, exportCartoucheNetworkName]);
+
   return {
     activeSvgPreview,
     createPngPreview,
     createSvgPreview,
     handleCloseSvgPreview,
     handleDownloadSvgPreview,
+    handleExportPlanAsPdfDirect,
     handleExportPlanAsPngDirect,
     handleExportPlanAsPng,
     handleExportPlanAsSvg,
     handleExportPlanAsSvgDirect,
+    createPdfPage,
     isSvgPreviewLoading,
     svgPreviewLoadingFormat
   };

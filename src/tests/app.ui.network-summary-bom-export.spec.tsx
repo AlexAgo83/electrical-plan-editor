@@ -107,6 +107,9 @@ describe("App integration UI - network summary BOM export", () => {
         "button",
         { name: "BOM" },
       );
+      expect(
+        within(refreshedNetworkSummaryPanel).getByRole("button", { name: "PDF" }),
+      ).toBeInTheDocument();
       expect(exportSvgButton).toHaveTextContent("SVG");
       expect(exportNetworkButton).toBeEnabled();
       expect(

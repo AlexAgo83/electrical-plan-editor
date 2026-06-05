@@ -19,6 +19,7 @@ import type { ImportExportStatus } from "../types/app-controller";
 import { buildNetworkExportFilename, exportJsonFile } from "../lib/jsonFileExport";
 import { convertLegacyNumericSplicesToDirectional, hasLegacyNumericSplices } from "../lib/importLegacySpliceConversion";
 import { removeGroupedSvgExportOverlay, renderGroupedSvgExportOverlay, type GroupedSvgExportProgress } from "../lib/groupedSvgExportOverlay";
+import { buildImagePdfBlob, downloadPdfBlob, type PdfImagePage } from "../lib/pdfExport";
 import type { ImportOverwriteDialogModel, PendingOverwriteImport, UseNetworkImportExportParams, UseNetworkImportExportResult } from "./networkImportExportTypes";
 
 function waitForNextFrames(frameCount: number): Promise<void> {
@@ -386,8 +387,9 @@ export function useNetworkImportExport({
     })();
   }
 
-  function handleExportGroupedPlanImages(networkIds: NetworkId[], format: "png" | "svg"): void {
+  function handleExportGroupedPlanImages(networkIds: NetworkId[], format: "pdf" | "png" | "svg"): void {
     if (networkIds.length === 0) {
+      setImportExportStatus({ kind: "failed", message: `Select at least one network for grouped ${format.toUpperCase()} export.` });
       return;
     }
     if (networkSummaryPanelRef === undefined) {
@@ -407,8 +409,13 @@ export function useNetworkImportExport({
         const network = store.getState().networks.byId[id];
         return network === undefined ? [] : [network];
       });
+      if (validNetworks.length === 0) {
+        setImportExportStatus({ kind: "failed", message: "No network data found for selected networks." });
+        return;
+      }
       try {
         let exportedCount = 0;
+        const pdfPages: PdfImagePage[] = [];
         for (let i = 0; i < validNetworks.length; i++) {
           const network = validNetworks[i]!;
           setGroupedSvgExportProgress({
@@ -419,18 +426,33 @@ export function useNetworkImportExport({
           });
           dispatchAction(appActions.selectNetwork(network.id));
           await waitForNextFrames(3);
-          if (format === "png") {
+          if (format === "pdf") {
+            const page = await networkSummaryPanelRef.current?.exportPdfPage();
+            if (page !== undefined && page !== null) {
+              pdfPages.push(page);
+              exportedCount += 1;
+            }
+          } else if (format === "png") {
             await networkSummaryPanelRef.current?.exportPngDirect();
+            exportedCount += 1;
           } else {
             await networkSummaryPanelRef.current?.exportSvgDirect();
+            exportedCount += 1;
           }
-          exportedCount += 1;
         }
-        if (originalNetworkId !== null && originalNetworkId !== store.getState().activeNetworkId) {
-          dispatchAction(appActions.selectNetwork(originalNetworkId));
+        if (format === "pdf") {
+          if (pdfPages.length === 0) {
+            setImportExportStatus({ kind: "failed", message: "No PDF page could be rendered for selected networks." });
+            return;
+          }
+          const blob = buildImagePdfBlob(pdfPages);
+          downloadPdfBlob(`network-plan-grouped-${pdfPages.length}-networks.pdf`, blob);
         }
         setImportExportStatus({ kind: "success", message: `Exported grouped ${format.toUpperCase()} for ${exportedCount} network(s).` });
       } finally {
+        if (originalNetworkId !== null && originalNetworkId !== store.getState().activeNetworkId) {
+          dispatchAction(appActions.selectNetwork(originalNetworkId));
+        }
         setGroupedSvgExportProgress(null);
       }
     })();
@@ -438,6 +460,10 @@ export function useNetworkImportExport({
 
   function handleExportGroupedPng(networkIds: NetworkId[]): void {
     handleExportGroupedPlanImages(networkIds, "png");
+  }
+
+  function handleExportGroupedPdf(networkIds: NetworkId[]): void {
+    handleExportGroupedPlanImages(networkIds, "pdf");
   }
 
   function handleExportGroupedSvg(networkIds: NetworkId[]): void {
@@ -561,6 +587,7 @@ export function useNetworkImportExport({
     handleExportNetworks,
     handleExportNetwork,
     handleExportGroupedBom,
+    handleExportGroupedPdf,
     handleExportGroupedPng,
     handleExportGroupedSvg,
     handleOpenImportPicker,

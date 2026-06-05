@@ -1,6 +1,6 @@
 export interface GroupedSvgExportProgress {
   current: number;
-  format?: "png" | "svg";
+  format?: "pdf" | "png" | "svg";
   total: number;
   networkName: string;
 }

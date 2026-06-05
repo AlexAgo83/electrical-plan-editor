@@ -36,9 +36,11 @@ describe("App integration UI - import/export", () => {
     const exportAllButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export all" });
     const groupedSvgButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export grouped SVG" });
     const groupedPngButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export grouped PNG" });
+    const groupedPdfButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export grouped PDF" });
     const importButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Import from file" });
     expect(exportAllButton.compareDocumentPosition(importButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     expect(groupedSvgButton.compareDocumentPosition(groupedPngButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    expect(groupedPngButton.compareDocumentPosition(groupedPdfButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     expect(within(selectionColumn as HTMLElement).getByText("Selected networks for export")).toBeInTheDocument();
   });
 

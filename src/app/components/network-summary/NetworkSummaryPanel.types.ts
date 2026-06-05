@@ -1,7 +1,10 @@
 import type { Dispatch, MouseEvent as ReactMouseEvent, Ref, SetStateAction, WheelEvent as ReactWheelEvent } from "react";
+import type { PdfImagePage } from "../../lib/pdfExport";
 
 export interface NetworkSummaryPanelHandle {
   exportPngDirect: () => Promise<void>;
+  exportPdfDirect: () => Promise<void>;
+  exportPdfPage: () => Promise<PdfImagePage | null>;
   exportSvgDirect: () => Promise<void>;
 }
 import type {

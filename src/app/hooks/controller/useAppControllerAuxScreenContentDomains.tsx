@@ -175,6 +175,7 @@ export function useAppControllerAuxScreenContentDomains({
     importOverwriteDialog: settings.importExport.importOverwriteDialog,
     importFailureDialog: settings.importExport.importFailureDialog,
     handleExportGroupedBom: settings.importExport.handleExportGroupedBom,
+    handleExportGroupedPdf: settings.importExport.handleExportGroupedPdf,
     handleExportGroupedPng: settings.importExport.handleExportGroupedPng,
     handleExportGroupedSvg: settings.importExport.handleExportGroupedSvg,
     locale: settings.prefs.locale,
