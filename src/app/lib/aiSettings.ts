@@ -1,6 +1,25 @@
 export type AiProviderId = "openai" | "gemini";
 
-export type AiProviderReadinessStatus = "missingApiKey" | "missingModel" | "ready";
+export type AiProviderReadinessStatus = "missingApiKey" | "missingModel" | "insecureEndpoint" | "ready";
+
+export function isAiEndpointSecure(endpoint: string): boolean {
+  const trimmed = endpoint.trim();
+  if (trimmed.length === 0) {
+    return false;
+  }
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === "https:") {
+      return true;
+    }
+    if (parsed.protocol === "http:") {
+      return parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1" || parsed.hostname === "[::1]";
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
 
 export interface AiProviderConfig {
   apiKey: string;
@@ -63,6 +82,14 @@ export function resolveAiProviderReadiness(settings: AiSettings): AiProviderRead
       status: "missingModel",
       isReady: false,
       message: `${providerLabel} model name is required.`
+    };
+  }
+  if (!isAiEndpointSecure(config.endpoint)) {
+    return {
+      provider: settings.provider,
+      status: "insecureEndpoint",
+      isReady: false,
+      message: `${providerLabel} endpoint must use https (or http on localhost).`
     };
   }
   return {

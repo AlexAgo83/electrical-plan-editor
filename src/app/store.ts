@@ -10,7 +10,10 @@ export const PERSISTENCE_STORAGE_WARNING_MESSAGE =
 
 interface AttachPersistenceSyncOptions {
   save?: (state: ReturnType<AppStore["getState"]>) => SaveStateResult | Promise<SaveStateResult>;
+  debounceMs?: number;
 }
+
+const DEFAULT_PERSISTENCE_DEBOUNCE_MS = 200;
 
 function mapPersistenceResultToMessage(result: SaveStateResult): string | null {
   if (!result.ok) {
@@ -38,14 +41,13 @@ function isPersistenceFeedbackMessage(message: string | null): boolean {
 
 export function attachPersistenceSync(store: AppStore, options?: AttachPersistenceSyncOptions): () => void {
   const save = options?.save ?? saveState;
+  const debounceMs = options?.debounceMs ?? DEFAULT_PERSISTENCE_DEBOUNCE_MS;
   let isApplyingPersistenceFeedback = false;
   let saveSequence = 0;
+  let pendingTimerId: ReturnType<typeof setTimeout> | null = null;
 
-  return store.subscribe(() => {
-    if (isApplyingPersistenceFeedback) {
-      return;
-    }
-
+  function flushPendingSave(): void {
+    pendingTimerId = null;
     const currentState = store.getState();
     const currentSequence = saveSequence + 1;
     saveSequence = currentSequence;
@@ -94,7 +96,31 @@ export function attachPersistenceSync(store: AppStore, options?: AttachPersisten
         store.dispatch(appActions.setError(PERSISTENCE_WRITE_FAILURE_MESSAGE));
         isApplyingPersistenceFeedback = false;
       });
+  }
+
+  const unsubscribe = store.subscribe(() => {
+    if (isApplyingPersistenceFeedback) {
+      return;
+    }
+
+    if (debounceMs <= 0) {
+      flushPendingSave();
+      return;
+    }
+
+    if (pendingTimerId !== null) {
+      clearTimeout(pendingTimerId);
+    }
+    pendingTimerId = setTimeout(flushPendingSave, debounceMs);
   });
+
+  return () => {
+    if (pendingTimerId !== null) {
+      clearTimeout(pendingTimerId);
+      pendingTimerId = null;
+    }
+    unsubscribe();
+  };
 }
 
 export const appStore = createAppStore(loadState());

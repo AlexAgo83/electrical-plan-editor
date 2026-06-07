@@ -36,6 +36,7 @@ export type AppAction =
       payload: {
         network: Network;
         setActive?: boolean;
+        nowIso: string;
       };
     }
   | { type: "network/select"; payload: { id: NetworkId } }
@@ -70,9 +71,10 @@ export type AppAction =
       payload: {
         sourceNetworkId: NetworkId;
         network: Network;
+        nowIso: string;
       };
     }
-  | { type: "network/delete"; payload: { id: NetworkId } }
+  | { type: "network/delete"; payload: { id: NetworkId; nowIso: string } }
   | {
       type: "network/importMany";
       payload: {
@@ -82,6 +84,7 @@ export type AppAction =
         activateFirst?: boolean;
         overwriteNetworkIds?: NetworkId[];
         overwriteHarnessAssemblyIds?: HarnessAssemblyId[];
+        nowIso: string;
       };
     }
   | { type: "harnessAssembly/upsert"; payload: HarnessAssembly }
@@ -163,10 +166,14 @@ export type AppAction =
   | { type: "ui/clearSelection" }
   | { type: "ui/clearError" };
 
+function getNowIso(): string {
+  return new Date().toISOString();
+}
+
 export const appActions = {
   createNetwork: (network: Network, setActive = true): AppAction => ({
     type: "network/create",
-    payload: { network, setActive }
+    payload: { network, setActive, nowIso: getNowIso() }
   }),
   selectNetwork: (id: NetworkId): AppAction => ({ type: "network/select", payload: { id } }),
   setNetworkSummaryViewState: (id: NetworkId, viewState: NetworkSummaryViewState): AppAction => ({
@@ -209,9 +216,12 @@ export const appActions = {
   }),
   duplicateNetwork: (sourceNetworkId: NetworkId, network: Network): AppAction => ({
     type: "network/duplicate",
-    payload: { sourceNetworkId, network }
+    payload: { sourceNetworkId, network, nowIso: getNowIso() }
   }),
-  deleteNetwork: (id: NetworkId): AppAction => ({ type: "network/delete", payload: { id } }),
+  deleteNetwork: (id: NetworkId): AppAction => ({
+    type: "network/delete",
+    payload: { id, nowIso: getNowIso() }
+  }),
   importNetworks: (
     networks: Network[],
     networkStates: Record<NetworkId, NetworkScopedState>,
@@ -231,7 +241,8 @@ export const appActions = {
         harnessAssemblies,
         activateFirst: resolvedActivateFirst,
         overwriteNetworkIds,
-        overwriteHarnessAssemblyIds
+        overwriteHarnessAssemblyIds,
+        nowIso: getNowIso()
       }
     };
   },

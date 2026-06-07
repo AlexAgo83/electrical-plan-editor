@@ -28,7 +28,7 @@ describe("createAppStore", () => {
       .fn()
       .mockReturnValueOnce({ ok: false as const, reason: "write-failed" as const })
       .mockReturnValueOnce({ ok: true as const });
-    const detach = attachPersistenceSync(store, { save });
+    const detach = attachPersistenceSync(store, { save, debounceMs: 0 });
 
     try {
       store.dispatch(

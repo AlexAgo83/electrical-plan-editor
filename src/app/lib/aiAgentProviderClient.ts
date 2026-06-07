@@ -1,4 +1,4 @@
-import type { AiSettings } from "./aiSettings";
+import { isAiEndpointSecure, type AiSettings } from "./aiSettings";
 import type { AiAgentContext } from "./aiAgentContext";
 import { AI_AGENT_OPERATION_SCHEMA_VERSION } from "./aiAgentOperationContract";
 import { buildAiAgentEditablePlan } from "./aiAgentPlanDiff";
@@ -178,6 +178,11 @@ export async function requestAiAgentProviderProposal({
   instruction
 }: AiAgentProviderRequest): Promise<AiAgentProviderResponse> {
   const providerConfig = settings.providers[settings.provider];
+  if (!isAiEndpointSecure(providerConfig.endpoint)) {
+    throw new Error(
+      `Refusing to send the API key to a non-secure endpoint (${providerConfig.endpoint || "<empty>"}). Configure an https endpoint.`
+    );
+  }
   const endpoint = providerConfig.endpoint.replace(/\/+$/, "");
   const prompt = buildProviderPrompt(context, instruction);
 

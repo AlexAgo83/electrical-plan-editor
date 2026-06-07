@@ -24,7 +24,11 @@ function hasDuplicateTechnicalId(state: AppState, technicalId: string, excludedI
   });
 }
 
-function cleanupAssembliesAfterNetworkDelete(state: AppState, deletedNetworkId: NetworkId): AppState {
+function cleanupAssembliesAfterNetworkDelete(
+  state: AppState,
+  deletedNetworkId: NetworkId,
+  nowIso: string
+): AppState {
   let didChange = false;
   const nextById = { ...state.harnessAssemblies.byId };
   for (const assemblyId of state.harnessAssemblies.allIds) {
@@ -50,7 +54,7 @@ function cleanupAssembliesAfterNetworkDelete(state: AppState, deletedNetworkId: 
       members: nextMembers,
       masterConnectorRefs: nextMasterConnectorRefs,
       connectorLinks: nextConnectorLinks,
-      updatedAt: new Date().toISOString()
+      updatedAt: nowIso
     };
   }
 
@@ -127,6 +131,10 @@ export function handleHarnessAssemblyActions(state: AppState, action: AppAction)
   }
 }
 
-export function cleanupHarnessAssembliesForDeletedNetwork(state: AppState, deletedNetworkId: NetworkId): AppState {
-  return cleanupAssembliesAfterNetworkDelete(state, deletedNetworkId);
+export function cleanupHarnessAssembliesForDeletedNetwork(
+  state: AppState,
+  deletedNetworkId: NetworkId,
+  nowIso: string
+): AppState {
+  return cleanupAssembliesAfterNetworkDelete(state, deletedNetworkId, nowIso);
 }

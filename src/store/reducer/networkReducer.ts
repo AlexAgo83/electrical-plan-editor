@@ -59,7 +59,7 @@ function withUiResetSelection(state: AppState): AppState {
 export function handleNetworkActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "network/create": {
-      const { network, setActive = true } = action.payload;
+      const { network, setActive = true, nowIso } = action.payload;
       const normalizedName = network.name.trim();
       const normalizedTechnicalId = network.technicalId.trim();
       if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
@@ -71,7 +71,6 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       if (hasDuplicateNetworkTechnicalId(state, normalizedTechnicalId)) {
         return withError(state, `Network technical ID '${normalizedTechnicalId}' is already used.`);
       }
-      const nowIso = new Date().toISOString();
       const normalizedCreatedAt = normalizeNetworkIsoTimestamp(network.createdAt, nowIso);
       const normalizedUpdatedAt = normalizeNetworkIsoTimestamp(network.updatedAt, normalizedCreatedAt);
       const normalizedMetadata = normalizeNetworkMetadata(network, {
@@ -234,6 +233,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         return withError(state, "Cannot duplicate unknown network.");
       }
       const duplicated = action.payload.network;
+      const { nowIso } = action.payload;
       const normalizedName = duplicated.name.trim();
       const normalizedTechnicalId = duplicated.technicalId.trim();
       if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
@@ -245,7 +245,6 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
       if (hasDuplicateNetworkTechnicalId(state, normalizedTechnicalId)) {
         return withError(state, `Network technical ID '${normalizedTechnicalId}' is already used.`);
       }
-      const nowIso = new Date().toISOString();
       const normalizedCreatedAt = normalizeNetworkIsoTimestamp(duplicated.createdAt, nowIso);
       const normalizedUpdatedAt = normalizeNetworkIsoTimestamp(duplicated.updatedAt, normalizedCreatedAt);
       const normalizedMetadata = normalizeNetworkMetadata(duplicated, {
@@ -305,7 +304,8 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
           networks: remainingNetworks,
           networkStates: nextNetworkStates
         },
-        action.payload.id
+        action.payload.id,
+        action.payload.nowIso
       );
       if (fallbackId === null) {
         const cleared = clearActiveScope(
@@ -341,7 +341,7 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         networkStates: action.payload.networkStates,
         persisted,
         overwriteSet,
-        nowIso: new Date().toISOString()
+        nowIso: action.payload.nowIso
       });
       if (rejections.length > 0) {
         const firstReason = rejections[0]!.reason;
