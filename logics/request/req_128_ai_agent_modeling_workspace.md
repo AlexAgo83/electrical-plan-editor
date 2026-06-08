@@ -1,9 +1,9 @@
 ## req_128_ai_agent_modeling_workspace - AI Agent Modeling Workspace
 > From version: 1.10.3
 > Schema version: 1.0
-> Status: In progress
-> Understanding: 99%
-> Confidence: 97%
+> Status: Done
+> Understanding: 100%
+> Confidence: 98%
 > Complexity: High
 > Theme: AI
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -168,5 +168,7 @@ flowchart TD
 - `logics/backlog/item_600_ai_provider_settings_and_capability_contract.md`
 - `logics/backlog/item_601_ai_agent_context_builder_and_operation_contract.md`
 - `logics/backlog/item_602_modeling_ai_agent_assisted_proposal_workflow.md`
-- `logics/backlog/item_603_ai_agent_experimental_direct_execution_and_rollback.md`
 - `logics/backlog/item_604_ai_agent_validation_regression_and_release_gate.md`
+
+# Follow-up
+- True no-confirmation direct execution remains open as a post-1.11.0 follow-up, outside the delivered `req_128` closure scope.

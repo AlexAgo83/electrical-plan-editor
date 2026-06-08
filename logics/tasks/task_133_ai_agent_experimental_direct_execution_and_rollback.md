@@ -2,9 +2,9 @@
 > From version: 1.10.3
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Understanding: 91%
+> Confidence: 86%
+> Progress: 5%
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -53,6 +53,17 @@ flowchart TD
 - Skip when: The work is still at the request or backlog shaping stage.
 
 # Links
-- Request: `req_128_ai_agent_modeling_workspace`
+- Request: `req_139_ai_agent_true_direct_execution_follow_up`
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
+
+# AC Traceability
+- request-AC1 -> This task. Proof: Covered by task AC1 for global AI settings opt-in gating.
+- request-AC2 -> This task. Proof: Covered by task AC2 for visibly experimental direct-execution UI.
+- request-AC3 -> This task. Proof: Covered by task AC4 for direct execution through the shared validator/executor path, with implementation still pending.
+- request-AC4 -> This task. Proof: Covered by task AC4 for reuse of the assisted-mode validator and executor.
+- request-AC5 -> This task. Proof: Covered by task AC5 for rejected invalid, unsupported, or out-of-permission operations.
+- request-AC6 -> This task. Proof: Covered by task AC6 for explicit delete permission gating.
+- request-AC7 -> This task. Proof: Covered by task AC3, AC8, and AC9 for snapshot creation and rollback restoration.
+- request-AC8 -> This task. Proof: Covered by task AC7 for session result summaries.
+- request-AC9 -> This task. Proof: Covered by task AC10 for opt-in, snapshot, rejection, delete gate, validated apply, and rollback tests.

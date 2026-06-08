@@ -2,7 +2,7 @@
 > From version: 1.10.3
 > Schema version: 1.0
 > Status: In progress
-> Understanding: 98%
+> Understanding: 99%
 > Confidence: 91%
 > Progress: 70%
 > Complexity: High
@@ -32,7 +32,7 @@ True no-confirmation direct execution remains a follow-up so the first shipped m
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|ai-agent-experimental-direct-execution-a|req-128-ai-agent-modeling-workspace|advanced-users-want-an-experimental-mode|ac1-experimental-direct-mode-is-unavaila
+%% logics-signature: backlog|ai-agent-experimental-direct-execution-a|req-139-ai-agent-true-direct-execution-f|advanced-users-want-an-experimental-mode|ac1-experimental-direct-mode-is-unavaila
 flowchart TD
     OptIn[Settings opt-in] --> DirectMode[Experimental direct mode]
     DirectMode --> Snapshot[Pre-run snapshot]
@@ -105,7 +105,7 @@ flowchart TD
 # Links
 - Product brief(s): `logics/product/prod_004_ai_agent_modeling_workspace.md`
 - Architecture decision(s): `logics/architecture/adr_009_ai_agent_operation_contract_and_reversible_execution.md`
-- Request: `logics/request/req_128_ai_agent_modeling_workspace.md`
+- Request: `logics/request/req_139_ai_agent_true_direct_execution_follow_up.md`
 <!-- When creating a task from this item, add: Derived from `logics/backlog/item_603_ai_agent_experimental_direct_execution_and_rollback.md` in the task # Links section -->
 
 # Priority
