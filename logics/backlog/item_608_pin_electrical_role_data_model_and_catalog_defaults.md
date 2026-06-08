@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 80%
-> Confidence: 80%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -32,6 +32,7 @@ The app has no representation of which pin of a connector emits versus absorbs c
 
 ```mermaid
 %% logics-kind: backlog
+%% logics-signature: backlog|pin-electrical-role-data-model-and-catal|req-133-pin-level-source-consumer-curren|the-app-has-no-representation-of|ac1-connector-pinelectricalroles-is-an-o
 flowchart LR
     Connector[Connector.pinElectricalRoles] --> Merge[Catalog merge per pin]
     Catalog[CatalogItem.connectorDefaults.pinElectricalRoles] --> Merge
@@ -86,6 +87,11 @@ flowchart LR
 - Architecture decision(s): (none)
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
 - Primary task(s): `task_116_pin_electrical_role_data_model_and_catalog_defaults`
+
+# Delivery Status
+- Delivered in 1.14.0 through `task_116_pin_electrical_role_data_model_and_catalog_defaults`.
+- Implementation evidence: `src/core/entities.ts`, `src/core/pinElectricalRole.ts`, and persistence / portability paths support optional connector and catalog `pinElectricalRoles` without a schema-version bump.
+- Validation evidence: `src/tests/core.pin-electrical-role.spec.ts`; recorded in `changelogs/CHANGELOGS_1_14_0.md` under `item_608` / `task_116`.
 
 # AI Context
 - Summary: Foundation slice — adds the pin electrical role types, catalog defaults, normalization, and merge logic. No diagnostics, no UI, no propagation yet.

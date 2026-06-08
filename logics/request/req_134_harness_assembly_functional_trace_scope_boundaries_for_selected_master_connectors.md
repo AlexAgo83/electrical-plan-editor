@@ -1,9 +1,9 @@
 ## req_134_harness_assembly_functional_trace_scope_boundaries_for_selected_master_connectors - Harness Assembly Functional Trace Scope Boundaries For Selected Master Connectors
 > From version: 1.14.0
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 88%
-> Confidence: 91%
+> Status: Done
+> Understanding: 100%
+> Confidence: 96%
 > Complexity: Medium
 > Theme: Functional schematic / Harness assembly
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -130,8 +130,13 @@ flowchart TD
 - Skip when: The work only affects current-network functional graphs, connector-link persistence, or electrical load aggregation.
 
 # Backlog
-- TBD on promotion
 - `item_623_harness_assembly_functional_trace_scope_boundaries_for_selected_master_connectors`
 
 # Tasks
-- TBD on promotion
+- `task_132_harness_assembly_functional_trace_scope_boundaries_for_selected_master_connectors`
+
+# Delivery Status
+- Delivered in 1.14.1.
+- Implementation evidence: `src/core/functionalSchematic.ts` treats unselected saved master connectors as traversal boundaries during harness assembly functional trace expansion.
+- Test evidence: `src/tests/core.functional-schematic.spec.ts` covers the regression where assembly expansion stops at unselected master connectors so unrelated downstream branches do not leak.
+- Release evidence: `changelogs/CHANGELOGS_1_14_1.md` records the selected-root scope fix and focused validation.

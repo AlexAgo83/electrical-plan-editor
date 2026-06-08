@@ -2,26 +2,36 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 75%
-> Confidence: 70%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Definition of Done (DoD)
-- [ ] New pure module `src/core/pinElectricalLoad.ts` exporting `computePinElectricalLoad(input, scope, options?)`.
-- [ ] `PinElectricalLoadScope` discriminated union with `currentNetwork` arm implemented and `assembly` arm declared but throwing `NotImplemented` (delivered by `item_614`).
-- [ ] Outputs: `pinLoadByConnectorPin`, `branchLoadByWire`, `deviceBalance`, `fuseProtectedLoad`, `warnings` (loops).
-- [ ] Splice and fuse-box pair propagation respects Kirchhoff conservation.
-- [ ] Bidirectional pins contribute to both source and consumer aggregates and are excluded from no-source detection.
-- [ ] Cycle-safe traversal keyed by `(connectorId, cavityIndex)`; one warning per loop, no throw.
-- [ ] Engine is referentially transparent: stable outputs across identical inputs.
-- [ ] Unit tests for empty / passive-only network, linear chain, splice fan-out, fuse-box pair, ECU asymmetric device, loop, bidirectional pin, regression on `sampleNetwork.ts`.
+- [x] New pure module `src/core/pinElectricalLoad.ts` exporting `computePinElectricalLoad(input, scope, options?)`.
+- [x] `PinElectricalLoadScope` discriminated union with `currentNetwork` arm implemented and `assembly` arm declared but throwing `NotImplemented` (delivered by `item_614`).
+- [x] Outputs: `pinLoadByConnectorPin`, `branchLoadByWire`, `deviceBalance`, `fuseProtectedLoad`, `warnings` (loops).
+- [x] Splice and fuse-box pair propagation respects Kirchhoff conservation.
+- [x] Bidirectional pins contribute to both source and consumer aggregates and are excluded from no-source detection.
+- [x] Cycle-safe traversal keyed by `(connectorId, cavityIndex)`; one warning per loop, no throw.
+- [x] Engine is referentially transparent: stable outputs across identical inputs.
+- [x] Unit tests for empty / passive-only network, linear chain, splice fan-out, fuse-box pair, ECU asymmetric device, loop, bidirectional pin, regression on `sampleNetwork.ts`.
 
 # Backlog
 - `item_610_in_network_pin_load_aggregation_engine`
+
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|in-network-pin-load-aggregation-engine|item-610-in-network-pin-load-aggregation|1-confirm-scope|python3-m-logics-manager-lint-require-s
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```
 
 # Acceptance criteria
 See `item_610_in_network_pin_load_aggregation_engine` AC1–AC10. The task mirrors them 1:1.
@@ -99,7 +109,10 @@ See `item_610_in_network_pin_load_aggregation_engine` AC1–AC10. The task mirro
 - Then `npm run ci:blocking`.
 
 # Report
-- TBD on completion.
+- Delivered in 1.14.0 as the current-network aggregation engine slice for `req_133`.
+- Code evidence: `src/core/pinElectricalLoad.ts` implements `computePinElectricalLoad` for `currentNetwork` scope, stable maps for pin / branch / device / fuse outputs, cycle warnings, bidirectional contribution rules, and a declared `assembly` arm that remains out of this slice.
+- Test evidence: `src/tests/core.pin-electrical-load.spec.ts` covers passive networks, linear chains, splice fan-out, fuse-box pairs, ECU asymmetric balance, loops, bidirectional pins, determinism, and sample fixture regressions.
+- Release evidence: `changelogs/CHANGELOGS_1_14_0.md` records the `item_610` / `task_118` delivery and focused validation suite.
 
 # AI Context
 - Summary: Pure aggregation engine producing per-wire / per-fuse / per-device loads from declared pin roles. currentNetwork scope only in this task; assembly arm delivered in `item_614`.

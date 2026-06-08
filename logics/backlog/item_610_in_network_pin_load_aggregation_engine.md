@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 75%
-> Confidence: 70%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -35,6 +35,7 @@ With pin roles declared at the connector level, the application needs a pure agg
 
 ```mermaid
 %% logics-kind: backlog
+%% logics-signature: backlog|in-network-pin-load-aggregation-engine|req-133-pin-level-source-consumer-curren|with-pin-roles-declared-at-the|ac1-computepinelectricalload-network-kin
 flowchart LR
     Roles[Resolved pin roles] --> Engine[computePinElectricalLoad]
     Graph[Network graph: connectors / splices / fuse-box pairs / wires] --> Engine
@@ -90,7 +91,12 @@ flowchart LR
 - Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
 - Architecture decision(s): `adr_010_inter_network_current_bridge_semantics`
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
-- Primary task(s): TBD on promotion
+- Primary task(s): `task_118_in_network_pin_load_aggregation_engine`
+
+# Delivery Status
+- Delivered in 1.14.0 through `task_118_in_network_pin_load_aggregation_engine`.
+- Implementation evidence: `src/core/pinElectricalLoad.ts` implements the current-network scope with pin, branch, device, fuse, loop-warning, bidirectional, and deterministic outputs; the assembly view scope remains separate in `item_614`.
+- Validation evidence: `src/tests/core.pin-electrical-load.spec.ts`; recorded in `changelogs/CHANGELOGS_1_14_0.md` under `item_610` / `task_118`.
 
 # AI Context
 - Summary: Pure aggregation engine that takes the network graph + resolved pin roles and produces per-wire / per-fuse / per-device loads. Cycle-safe. Scope-aware (currentNetwork only in this slice).
@@ -106,4 +112,4 @@ flowchart LR
 - Created by hand; regenerate signatures with `python3 -m logics_manager lint --require-status` before commit when the tool becomes available.
 
 # Tasks
-- TBD on promotion.
+- `task_118_in_network_pin_load_aggregation_engine`

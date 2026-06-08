@@ -2,26 +2,36 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 80%
-> Confidence: 80%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Small
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Definition of Done (DoD)
-- [ ] Default copper ampacity table shipped next to `src/core/wireSizing.ts` (or sibling `src/core/wireAmpacity.ts`).
-- [ ] Aluminum values derived from copper via the existing `MATERIAL_RESISTIVITY_OHM_MM2_PER_M` ratio.
-- [ ] `Network` gains an optional `ampacityOverrides?: Partial<Record<number, number>>` (copper only for this release; aluminum is computed from copper at resolution time).
-- [ ] New helper `resolveAmpacityA(sectionMm2, material, network)` returning the resolved value.
-- [ ] Negative or non-finite override values rejected at normalization.
-- [ ] Settings → Electrical surfaces an editable table with per-row reset and "Reset all" action.
-- [ ] Persistence round-trip preserves `ampacityOverrides`. No `schemaVersion` bump.
-- [ ] Tests cover default table, aluminum derivation, override precedence, invalid rejection, reset actions, persistence round-trip.
+- [x] Default copper ampacity table shipped next to `src/core/wireSizing.ts` (or sibling `src/core/wireAmpacity.ts`).
+- [x] Aluminum values derived from copper via the existing `MATERIAL_RESISTIVITY_OHM_MM2_PER_M` ratio.
+- [x] `Network` gains an optional `ampacityOverrides?: Partial<Record<number, number>>` (copper only for this release; aluminum is computed from copper at resolution time).
+- [x] New helper `resolveAmpacityA(sectionMm2, material, network)` returning the resolved value.
+- [x] Negative or non-finite override values rejected at normalization.
+- [x] Settings → Electrical surfaces an editable table with per-row reset and "Reset all" action.
+- [x] Persistence round-trip preserves `ampacityOverrides`. No `schemaVersion` bump.
+- [x] Tests cover default table, aluminum derivation, override precedence, invalid rejection, reset actions, persistence round-trip.
 
 # Backlog
 - `item_609_automotive_ampacity_reference_table_and_project_override`
+
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|automotive-ampacity-reference-table-and-|item-609-automotive-ampacity-reference-t|1-confirm-scope|python3-m-logics-manager-lint-require-s
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```
 
 # Acceptance criteria
 - AC1: `resolveAmpacityA(0.5, "copper", network)` returns 11 with no overrides.
@@ -72,7 +82,11 @@
 - Focused vitest scope on the new specs, then `npm run ci:blocking`.
 
 # Report
-- TBD on completion.
+- Delivered in 1.14.0 as the ampacity table and per-project override slice for `req_133`.
+- Code evidence: `src/core/wireAmpacity.ts` provides the shipped copper table, aluminum derivation, override normalization, and `resolveAmpacityA`; `Network.ampacityOverrides` persists the project override.
+- UI evidence: Settings -> Electrical exposes row-level and full-table reset controls for ampacity overrides.
+- Test evidence: `src/tests/core.wire-ampacity.spec.ts` and the 1.14.0 focused suite cover default table values, aluminum derivation, override precedence, invalid rejection, reset actions, and persistence.
+- Release evidence: `changelogs/CHANGELOGS_1_14_0.md` records the `item_609` / `task_117` delivery and focused validation suite.
 
 # AI Context
 - Summary: Ship the automotive copper ampacity table, aluminum derivation, Network override + Settings UI, persistence round-trip.

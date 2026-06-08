@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 80%
-> Confidence: 80%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Small
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -30,6 +30,7 @@
 
 ```mermaid
 %% logics-kind: backlog
+%% logics-signature: backlog|automotive-ampacity-reference-table-and-|req-133-pin-level-source-consumer-curren|wiresizing-ts-exposes-section-material-p|ac1-resolveampacitya-0-5-copper-network-
 flowchart LR
     DefaultTable[Default copper table] --> Resolve[resolveAmpacityA]
     AluminumRatio[Material resistivity ratio] --> Resolve
@@ -78,7 +79,12 @@ flowchart LR
 - Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
 - Architecture decision(s): (none)
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
-- Primary task(s): TBD on promotion
+- Primary task(s): `task_117_automotive_ampacity_reference_table_and_project_override`
+
+# Delivery Status
+- Delivered in 1.14.0 through `task_117_automotive_ampacity_reference_table_and_project_override`.
+- Implementation evidence: `src/core/wireAmpacity.ts`, `Network.ampacityOverrides`, and Settings -> Electrical support the default table, aluminum derivation, project overrides, and reset actions.
+- Validation evidence: `src/tests/core.wire-ampacity.spec.ts`; recorded in `changelogs/CHANGELOGS_1_14_0.md` under `item_609` / `task_117`.
 
 # AI Context
 - Summary: Ships the automotive copper ampacity table, aluminum derivation, and per-project override in Settings → Electrical.
@@ -94,4 +100,4 @@ flowchart LR
 - Created by hand; regenerate signatures with `python3 -m logics_manager lint --require-status` before commit when the tool becomes available.
 
 # Tasks
-- TBD on promotion.
+- `task_117_automotive_ampacity_reference_table_and_project_override`

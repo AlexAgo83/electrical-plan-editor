@@ -2,31 +2,32 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 80%
-> Confidence: 80%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Definition of Done (DoD)
-- [ ] `Connector.pinElectricalRoles?: Record<number, PinElectricalRole>` and `CatalogItem.connectorDefaults.pinElectricalRoles?` declared in `src/core/entities.ts`, additive and optional.
-- [ ] `PinElectricalRole` fields: `role` (`"source" | "consumer" | "passive" | "bidirectional"`, default `passive`), `currentA?` (non-negative finite number), `label?`, `notes?`. No mode / duty / peak / RMS field.
-- [ ] New helper module `src/core/pinElectricalRole.ts` exposing `normalizePinElectricalRole`, `normalizePinElectricalRolesMap`, and `resolvePinElectricalRole(connector, catalogItem, cavityIndex)`.
-- [ ] Per-pin merge precedence: per-connector override wins for each declared field; absent fields fall back to the catalog default; absent on both sides resolves to `{ role: "passive" }`.
-- [ ] Normalization rejects negative / non-finite `currentA` and entries whose cavity index is out of the connector's `cavityCount`. Rejected entries are dropped at persistence and surfaced through the existing import warning channel.
-- [ ] Persistence round-trip: `localStorage` save/load and network file export/import preserve `pinElectricalRoles` exactly. No `schemaVersion` bump.
-- [ ] No new validation issue is emitted by this task (diagnostics are deferred to `item_611`).
-- [ ] No UI surface is introduced (editing surfaces are deferred to `item_612`).
-- [ ] Tests cover: type defaults, normalization (valid / negative / NaN / out-of-range), merge precedence (override wins, catalog falls back, both absent), persistence round-trip, import warning for out-of-range entries, and a fixture-based regression asserting `src/store/sampleNetwork.ts` is unchanged.
-- [ ] Validation suite passes (`npm run -s lint`, `npm run -s typecheck`, focused vitest, `npm run ci:blocking`).
+- [x] `Connector.pinElectricalRoles?: Record<number, PinElectricalRole>` and `CatalogItem.connectorDefaults.pinElectricalRoles?` declared in `src/core/entities.ts`, additive and optional.
+- [x] `PinElectricalRole` fields: `role` (`"source" | "consumer" | "passive" | "bidirectional"`, default `passive`), `currentA?` (non-negative finite number), `label?`, `notes?`. No mode / duty / peak / RMS field.
+- [x] New helper module `src/core/pinElectricalRole.ts` exposing `normalizePinElectricalRole`, `normalizePinElectricalRolesMap`, and `resolvePinElectricalRole(connector, catalogItem, cavityIndex)`.
+- [x] Per-pin merge precedence: per-connector override wins for each declared field; absent fields fall back to the catalog default; absent on both sides resolves to `{ role: "passive" }`.
+- [x] Normalization rejects negative / non-finite `currentA` and entries whose cavity index is out of the connector's `cavityCount`. Rejected entries are dropped at persistence and surfaced through the existing import warning channel.
+- [x] Persistence round-trip: `localStorage` save/load and network file export/import preserve `pinElectricalRoles` exactly. No `schemaVersion` bump.
+- [x] No new validation issue is emitted by this task (diagnostics are deferred to `item_611`).
+- [x] No UI surface is introduced (editing surfaces are deferred to `item_612`).
+- [x] Tests cover: type defaults, normalization (valid / negative / NaN / out-of-range), merge precedence (override wins, catalog falls back, both absent), persistence round-trip, import warning for out-of-range entries, and a fixture-based regression asserting `src/store/sampleNetwork.ts` is unchanged.
+- [x] Validation suite passes (`npm run -s lint`, `npm run -s typecheck`, focused vitest, `npm run ci:blocking`).
 
 # Backlog
 - `item_608_pin_electrical_role_data_model_and_catalog_defaults`
 
 ```mermaid
 %% logics-kind: task
+%% logics-signature: task|pin-electrical-role-data-model-and-catal|item-608-pin-electrical-role-data-model-|1-confirm-scope|python3-m-logics-manager-lint-require-s
 flowchart LR
     Types[entities.ts adds PinElectricalRole + connector/catalog fields] --> Normalize[pinElectricalRole.ts normalization]
     Normalize --> Merge[resolvePinElectricalRole catalog merge]
@@ -103,7 +104,10 @@ flowchart LR
 - `python3 -m logics_manager flow finish task task_116_pin_electrical_role_data_model_and_catalog_defaults.md` after implementation.
 
 # Report
-- TBD on completion.
+- Delivered in 1.14.0 as the pin electrical role data-model slice for `req_133`.
+- Code evidence: `src/core/entities.ts`, `src/core/pinElectricalRole.ts`, and persistence / portability hydration preserve optional `pinElectricalRoles` for connectors and catalog defaults without a schema-version bump.
+- Test evidence: `src/tests/core.pin-electrical-role.spec.ts` covers role defaults, normalization rejection, catalog/connector merge precedence, import warnings, persistence, and unchanged sample fixtures.
+- Release evidence: `changelogs/CHANGELOGS_1_14_0.md` records the `item_608` / `task_116` delivery and focused validation suite.
 
 # AI Context
 - Summary: Implement the pin-level electrical role data model — types, normalization, catalog merge, persistence round-trip — without diagnostics, UI, or aggregation. Foundation for `req_133`.

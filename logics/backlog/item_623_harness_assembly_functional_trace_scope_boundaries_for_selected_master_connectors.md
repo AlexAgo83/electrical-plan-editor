@@ -1,10 +1,10 @@
 ## item_623_harness_assembly_functional_trace_scope_boundaries_for_selected_master_connectors - Harness Assembly Functional Trace Scope Boundaries For Selected Master Connectors
 > From version: 1.14.0
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Status: Done
+> Understanding: 100%
+> Confidence: 96%
+> Progress: 100%
 > Complexity: High
 > Theme: Operator workflow and runtime integration
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -73,7 +73,12 @@ flowchart TD
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
 - Request: `logics/request/req_134_harness_assembly_functional_trace_scope_boundaries_for_selected_master_connectors.md`
-- Primary task(s): (none yet)
+- Primary task(s): `task_132_harness_assembly_functional_trace_scope_boundaries_for_selected_master_connectors`
+
+# Delivery Status
+- Delivered in 1.14.1 through `task_132_harness_assembly_functional_trace_scope_boundaries_for_selected_master_connectors`.
+- Implementation evidence: `src/core/functionalSchematic.ts` stops assembly functional trace traversal at unselected saved master connectors while preserving selected roots and valid in-scope interconnector crossings.
+- Validation evidence: `src/tests/core.functional-schematic.spec.ts`; recorded in `changelogs/CHANGELOGS_1_14_1.md`.
 
 # AI Context
 - Summary: Harness Assembly Functional Trace Scope Boundaries For Selected Master Connectors
