@@ -81,15 +81,24 @@ describe("App integration UI - onboarding", () => {
     expect(lastTargetAction).toHaveFocus();
   });
 
-  it("adds a final full-flow onboarding step for settings with Open Settings CTA on the left and Finish on the right", () => {
+  it("adds pin role onboarding before the final settings step", () => {
     renderAppWithState(createUiIntegrationState());
 
-    for (let index = 0; index < 7; index += 1) {
+    for (let index = 0; index < 3; index += 1) {
+      fireEvent.click(screen.getByRole("button", { name: "Next" }));
+    }
+
+    const pinRoleStepDialog = screen.getByRole("dialog", { name: "Declare pin roles" });
+    expect(within(pinRoleStepDialog).getByText("Step 4 of 9")).toBeInTheDocument();
+    expect(within(pinRoleStepDialog).getByText("Pin electrical roles")).toBeInTheDocument();
+    expect(within(pinRoleStepDialog).getByRole("button", { name: "Open Connectors" })).toBeInTheDocument();
+
+    for (let index = 0; index < 5; index += 1) {
       fireEvent.click(screen.getByRole("button", { name: "Next" }));
     }
 
     const finalStepDialog = screen.getByRole("dialog", { name: "Configure your workspace defaults" });
-    expect(within(finalStepDialog).getByText("Step 8 of 8")).toBeInTheDocument();
+    expect(within(finalStepDialog).getByText("Step 9 of 9")).toBeInTheDocument();
     const openSettingsButton = within(finalStepDialog).getByRole("button", { name: "Open Settings" });
     const finishButton = within(finalStepDialog).getByRole("button", { name: "Finish" });
     expect(openSettingsButton).toBeInTheDocument();

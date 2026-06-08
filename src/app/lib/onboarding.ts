@@ -4,6 +4,7 @@ export type OnboardingStepId =
   | "networkScope"
   | "catalog"
   | "connectorSpliceLibrary"
+  | "pinRoles"
   | "nodes"
   | "segments"
   | "wires"
@@ -85,6 +86,23 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
       subScreen: "connector",
       panelSelector: '[data-onboarding-panel="modeling-connectors"]',
       panelLabel: "Connectors / Splices"
+    }
+  },
+  {
+    id: "pinRoles",
+    title: "Declare pin roles",
+    badge: "PIN",
+    badgeIconClass: "is-connectors",
+    description: [
+      { text: "Use the connector inspector's " },
+      { text: "Pin electrical roles", strong: true },
+      { text: " section to declare source, consumer, passive, or bidirectional pins with optional continuous current and labels. These declarations feed electrical dimensioning diagnostics." }
+    ],
+    target: {
+      screen: "modeling",
+      subScreen: "connector",
+      panelSelector: '[data-onboarding-panel="modeling-connectors"]',
+      panelLabel: "Connectors"
     }
   },
   {
