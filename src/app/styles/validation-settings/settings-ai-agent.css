@@ -105,6 +105,14 @@
   align-items: center;
 }
 
+.settings-info-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.35rem;
+  vertical-align: middle;
+}
+
 .ai-agent-response-info {
   width: 1.15rem;
   height: 1.15rem;
@@ -115,6 +123,21 @@
   place-items: center;
   background: #eef6fc;
   color: #20435f;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.settings-info-tooltip-button {
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 48%, var(--theme-border, currentColor) 52%);
+  border-radius: 999px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 12%, var(--theme-panel, Canvas) 88%);
+  color: color-mix(in srgb, var(--theme-primary, currentColor) 78%, var(--theme-strong, currentColor) 22%);
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1;
@@ -155,8 +178,35 @@
   visibility: hidden;
 }
 
+.settings-info-tooltip-popover {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.45rem);
+  z-index: 20;
+  width: min(32rem, 82vw);
+  transform: translateX(-50%);
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 34%, var(--theme-border, currentColor) 66%);
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--theme-panel, Canvas) 94%, var(--theme-primary, currentColor) 6%);
+  box-shadow: 0 14px 32px color-mix(in srgb, var(--theme-strong, currentColor) 18%, transparent);
+  padding: 0.65rem;
+  color: var(--theme-strong, currentColor);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
 .ai-agent-response-hover:hover .ai-agent-response-popover,
 .ai-agent-response-hover:focus-within .ai-agent-response-popover {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.settings-info-tooltip:hover .settings-info-tooltip-popover,
+.settings-info-tooltip:focus-within .settings-info-tooltip-popover {
   opacity: 1;
   pointer-events: auto;
   visibility: visible;

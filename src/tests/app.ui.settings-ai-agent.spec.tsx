@@ -29,6 +29,8 @@ describe("App integration UI - settings AI Agent", () => {
     switchScreenDrawerAware("settings");
     const aiProviderPanel = getPanelByHeading("AI provider");
     expect(within(aiProviderPanel).getByText("OpenAI API key is required.")).toBeInTheDocument();
+    expect(within(aiProviderPanel).getByRole("button", { name: "AI provider API key security notice" })).toBeInTheDocument();
+    expect(within(aiProviderPanel).getByText(/Anyone with access to this browser profile/)).toBeInTheDocument();
     expect(within(aiProviderPanel).getByLabelText("Model")).toHaveValue("gpt-5.5");
     fireEvent.change(within(aiProviderPanel).getByLabelText("API key"), {
       target: { value: "sk-local-test" }

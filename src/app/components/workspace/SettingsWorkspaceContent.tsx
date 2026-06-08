@@ -676,16 +676,16 @@ export function SettingsWorkspaceContent({
         </header>
         <p className="settings-panel-intro">
           Configure the local provider used by the Modeling AI Agent. API keys are stored locally in this browser.
-        </p>
-        <p
-          className="settings-panel-warning"
-          role="note"
-          aria-label="AI provider security notice"
-          data-testid="ai-provider-security-notice"
-        >
-          Warning: your API key is kept in this browser's localStorage and sent directly to the provider over HTTPS.
-          Anyone with access to this browser profile (extensions, shared device) can read it. Avoid using personal or
-          high-privilege keys, and prefer a dedicated proxy when sharing the workspace.
+          <span className="settings-info-tooltip">
+            <button type="button" className="settings-info-tooltip-button" aria-label="AI provider API key security notice">
+              i
+            </button>
+            <span className="settings-info-tooltip-popover" role="tooltip">
+              Warning: your API key is kept in this browser&apos;s localStorage and sent directly to the provider over HTTPS.
+              Anyone with access to this browser profile (extensions, shared device) can read it. Avoid using personal or
+              high-privilege keys, and prefer a dedicated proxy when sharing the workspace.
+            </span>
+          </span>
         </p>
         <div className="settings-state-row" aria-label="AI provider status">
           <span className={aiSettings.readiness.isReady ? "settings-state-chip is-ok" : "settings-state-chip is-warn"}>
