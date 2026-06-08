@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 70%
-> Confidence: 70%
-> Progress: 0%
+> Status: In progress
+> Understanding: 90%
+> Confidence: 82%
+> Progress: 25%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -32,6 +32,7 @@ The release ships eight intertwined behaviors: data model, ampacity table, in-ne
 
 ```mermaid
 %% logics-kind: backlog
+%% logics-signature: backlog|pin-role-release-validation-and-permissi|req-133-pin-level-source-consumer-curren|the-release-ships-eight-intertwined-beha|ac1-a-playwright-scenario-walks-through
 flowchart LR
     AllSlices[item_608 to item_614] --> Gate[Release validation gate]
     Gate --> E2E[Playwright end-to-end scenario]
@@ -86,7 +87,12 @@ flowchart LR
 - Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
 - Architecture decision(s): (none)
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
-- Primary task(s): TBD on promotion
+- Primary task(s): `task_123_pin_role_release_validation_and_permissiveness_gate`
+
+# Delivery Status
+- Partially covered by the 1.14.0 focused unit/UI validation, but the release-gate slice is not complete.
+- Delivered evidence: focused type/lint/vitest coverage for data model, ampacity, current-network and assembly aggregation, D1-D4 validation, inspector pin roles, and catalog pin roles.
+- Remaining: Playwright full-flow, mass-edit and overlay coverage, multi-network view coverage, sample-network silence gate, export/import gate, canvas unchanged snapshot, AI Agent context unchanged snapshot, performance budgets, and onboarding step.
 
 # AI Context
 - Summary: Release-gate slice for the pin-level source/consumer release. End-to-end Playwright, permissiveness assertions, modeling-canvas-unchanged snapshot, AI-Agent-untouched snapshot, performance budgets, onboarding step.
@@ -102,4 +108,4 @@ flowchart LR
 - Created by hand; regenerate signatures with `python3 -m logics_manager lint --require-status` before commit when the tool becomes available.
 
 # Tasks
-- TBD on promotion.
+- `task_123_pin_role_release_validation_and_permissiveness_gate`

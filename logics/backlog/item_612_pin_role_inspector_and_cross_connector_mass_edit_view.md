@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 75%
-> Confidence: 70%
-> Progress: 0%
+> Status: In progress
+> Understanding: 95%
+> Confidence: 88%
+> Progress: 55%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -33,6 +33,7 @@ With the data model and aggregation engine landed, the user needs ergonomic surf
 
 ```mermaid
 %% logics-kind: backlog
+%% logics-signature: backlog|pin-role-inspector-section-and-cross-con|req-133-pin-level-source-consumer-curren|with-the-data-model-and-aggregation|ac1-the-connector-inspector-shows-a
 flowchart LR
     Inspector[Connector inspector — Pin electrical roles] --> Store[Reducer set/clear pinElectricalRole]
     CatalogEditor[Catalog item editor — pin roles defaults] --> Store
@@ -87,7 +88,12 @@ flowchart LR
 - Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
 - Architecture decision(s): (none)
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
-- Primary task(s): TBD on promotion
+- Primary task(s): `task_120_pin_role_inspector_and_cross_connector_mass_edit_view`
+
+# Delivery Status
+- Partially delivered in 1.14.0.
+- Delivered: connector inspector pin-role editor, catalog defaults editor, catalog/override/default badges, inspector bulk apply, reset to catalog default, and focused UI tests for inspector/catalog workflows.
+- Remaining: cross-connector mass-edit view with filters and CSV paste, optional BOM downstream-load column, 2D-canvas unchanged regression assertion, and full component coverage for the deferred surfaces.
 
 # AI Context
 - Summary: Editing surfaces — pin-role inspector section, catalog-defaults table, cross-connector mass edit view with CSV paste, and an optional BOM fuse column.
@@ -103,4 +109,4 @@ flowchart LR
 - Created by hand; regenerate signatures with `python3 -m logics_manager lint --require-status` before commit when the tool becomes available.
 
 # Tasks
-- TBD on promotion.
+- `task_120_pin_role_inspector_and_cross_connector_mass_edit_view`

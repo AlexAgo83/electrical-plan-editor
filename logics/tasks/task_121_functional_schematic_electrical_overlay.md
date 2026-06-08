@@ -3,8 +3,8 @@
 > From version: 1.13.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 75%
-> Confidence: 75%
+> Understanding: 95%
+> Confidence: 90%
 > Progress: 0%
 > Complexity: Small
 > Theme: Electrical analysis / Diagnostics
@@ -19,6 +19,16 @@
 
 # Backlog
 - `item_613_functional_schematic_electrical_overlay`
+
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|functional-schematic-electrical-overlay|item-613-functional-schematic-electrical|1-confirm-scope|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```
 
 # Acceptance criteria
 Mirror `item_613` AC1–AC8.
@@ -46,3 +56,6 @@ Mirror `item_613` AC1–AC8.
 # Links
 - Request: `req_133`
 - Architecture decision(s): `adr_010_inter_network_current_bridge_semantics`
+
+# Progress Report
+- Not delivered yet. The 1.14.0 changelog explicitly deferred the functional schematic electrical overlay and on-by-default toggle.

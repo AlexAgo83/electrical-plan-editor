@@ -3,18 +3,18 @@
 > From version: 1.13.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 70%
-> Confidence: 65%
-> Progress: 40%
+> Understanding: 95%
+> Confidence: 88%
+> Progress: 55%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 
 # Definition of Done (DoD)
-- [ ] `computePinElectricalLoad` `assembly` arm implemented per `adr_010`.
-- [ ] Bridges (`InterHarnessConnectorLink` + shared master connector refs) treated as Kirchhoff pass-through with 1:1 cavity pairing.
-- [ ] Cycle-safe traversal keyed by `(networkId, connectorId, cavityIndex)`.
-- [ ] L1 link declaration mismatch emitted as `warning` with `max(currentA)` continuation per ADR.
-- [ ] Out-of-assembly networks excluded; bridges with far end outside the selected `networkIds` reported in `skippedBridges`.
+- [x] `computePinElectricalLoad` `assembly` arm implemented per `adr_010`.
+- [x] Bridges (`InterHarnessConnectorLink` + shared master connector refs) treated as Kirchhoff pass-through with 1:1 cavity pairing.
+- [x] Cycle-safe traversal keyed by `(networkId, connectorId, cavityIndex)`.
+- [x] L1 link declaration mismatch emitted as `warning` with `max(currentA)` continuation per ADR.
+- [x] Out-of-assembly networks excluded; bridges with far end outside the selected `networkIds` reported in `skippedBridges`.
 - [ ] New top-level "Multi-network functional analysis" view, read-only, with scope picker (current network only / active assembly / custom subset).
 - [ ] D1–D4 + L1 + loop / skipped-bridge diagnostics listed inside the view.
 - [ ] `Go to` switches active network before focusing the entity.
@@ -22,6 +22,16 @@
 
 # Backlog
 - `item_614_multi_network_functional_analysis_view_and_assembly_scope`
+
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|multi-network-functional-analysis-view-a|item-614-multi-network-functional-analys|1-confirm-scope|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```
 
 # Acceptance criteria
 Mirror `item_614` AC1–AC14.
@@ -56,3 +66,7 @@ Mirror `item_614` AC1–AC14.
 # Links
 - Request: `req_133`
 - Architecture decision(s): `adr_010_inter_network_current_bridge_semantics`
+
+# Progress Report
+- Delivered in 1.14.0: assembly-scope aggregation core, bridge traversal, shared master connector bridge behavior, loop safety, skipped-bridge diagnostics, L1 mismatch computation, and core assembly tests.
+- Remaining: read-only multi-network functional analysis view, scope picker UI, view-level D1-D4/L1 findings list, active-network switching for `Go to`, and component coverage.

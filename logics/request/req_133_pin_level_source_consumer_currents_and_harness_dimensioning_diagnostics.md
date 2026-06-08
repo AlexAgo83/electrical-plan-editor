@@ -2,9 +2,9 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 70%
-> Confidence: 65%
+> Status: In progress
+> Understanding: 100%
+> Confidence: 92%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -37,7 +37,7 @@ The release introduces a pin-level electrical role model, a dimensioning diagnos
 
 ```mermaid
 %% logics-kind: request
-%% logics-signature: request|pin-level-source-consumer-currents-and|introduce-a-first-class-electrical-role|ac1-a-connector-pin-can-be-declared
+%% logics-signature: request|pin-level-source-consumer-currents-and-h|introduce-a-first-class-electrical-role-|ac1-a-connector-pin-can-be
 flowchart LR
     Pin[Connector pin] -->|role + currentA| Role[Pin electrical role]
     Role --> AggregateLocal[In-network aggregation]
@@ -204,3 +204,9 @@ flowchart LR
 - `item_613_functional_schematic_electrical_overlay`
 - `item_614_multi_network_functional_analysis_view_and_assembly_scope`
 - `item_615_pin_role_release_validation_and_permissiveness_gate`
+
+# Delivery Status
+- Partially delivered in 1.14.0.
+- Delivered: pin electrical role data model, catalog defaults, ampacity overrides, current-network aggregation engine, assembly aggregation core, D1-D4 validation category, connector inspector pin-role editor, catalog pin-role editor, bulk inspector apply/reset, and focused validation coverage.
+- Remaining follow-up scope: cross-connector mass-edit view with filters and CSV paste, BOM "Computed downstream load (A)" export column, functional schematic electrical overlay, multi-network analysis view UX, L1 view surfacing, and the final permissiveness/release gate.
+- Source evidence: `changelogs/CHANGELOGS_1_14_0.md` records the delivered 1.14.0 slices and the deferred remainder.

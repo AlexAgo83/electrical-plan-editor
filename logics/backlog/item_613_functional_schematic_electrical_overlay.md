@@ -3,8 +3,8 @@
 > From version: 1.13.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 75%
-> Confidence: 75%
+> Understanding: 95%
+> Confidence: 90%
 > Progress: 0%
 > Complexity: Small
 > Theme: Electrical analysis / Diagnostics
@@ -29,6 +29,7 @@ The functional schematic already renders connectors, splices, fuse-box pairs, an
 
 ```mermaid
 %% logics-kind: backlog
+%% logics-signature: backlog|functional-schematic-electrical-overlay|req-133-pin-level-source-consumer-curren|the-functional-schematic-already-renders|ac1-the-functional-schematic-prints-2-5
 flowchart LR
     Engine[computePinElectricalLoad currentNetwork] --> Overlay[Schematic overlay renderer]
     Toggle[Canvas toggle — on by default] --> Overlay
@@ -80,7 +81,10 @@ flowchart LR
 - Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
 - Architecture decision(s): (none)
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
-- Primary task(s): TBD on promotion
+- Primary task(s): `task_121_functional_schematic_electrical_overlay`
+
+# Delivery Status
+- Not delivered yet. The 1.14.0 release explicitly deferred the functional schematic electrical overlay and canvas toggle.
 
 # AI Context
 - Summary: Adds a functional schematic overlay showing pin directions, pin currents, wire-derived currents, and fuse-protected sums. On by default with a canvas toggle.
@@ -96,4 +100,4 @@ flowchart LR
 - Created by hand; regenerate signatures with `python3 -m logics_manager lint --require-status` before commit when the tool becomes available.
 
 # Tasks
-- TBD on promotion.
+- `task_121_functional_schematic_electrical_overlay`

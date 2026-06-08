@@ -3,23 +3,33 @@
 > From version: 1.13.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 75%
-> Confidence: 70%
-> Progress: 50%
+> Understanding: 95%
+> Confidence: 88%
+> Progress: 55%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 
 # Definition of Done (DoD)
-- [ ] Connector inspector exposes a collapsible "Pin electrical roles" section with per-pin role, currentA, label edits.
-- [ ] Catalog item editor exposes the same table for `CatalogItem.connectorDefaults.pinElectricalRoles`.
-- [ ] Bulk "Apply role to selected pins" + "Reset to catalog default"; one history entry per bulk operation.
-- [ ] Catalog-vs-override badge per row.
+- [x] Connector inspector exposes a collapsible "Pin electrical roles" section with per-pin role, currentA, label edits.
+- [x] Catalog item editor exposes the same table for `CatalogItem.connectorDefaults.pinElectricalRoles`.
+- [x] Bulk "Apply role to selected pins" + "Reset to catalog default"; one history entry per bulk operation.
+- [x] Catalog-vs-override badge per row.
 - [ ] New cross-connector mass-edit view: filters, bulk apply, CSV-style copy/paste.
 - [ ] Optional BOM column "Computed downstream load (A)" on fuse rows, off by default.
 - [ ] Component tests cover all DoD items.
 
 # Backlog
 - `item_612_pin_role_inspector_and_cross_connector_mass_edit_view`
+
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|pin-role-inspector-mass-edit-view|item-612-pin-role-inspector-and-cross-co|1-confirm-scope|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```
 
 # Acceptance criteria
 Mirror `item_612` AC1–AC10.
@@ -60,3 +70,7 @@ Mirror `item_612` AC1–AC10.
 # Links
 - Request: `req_133`
 - Architecture decision(s): `adr_010_inter_network_current_bridge_semantics`
+
+# Progress Report
+- Delivered in 1.14.0: connector inspector editing, catalog defaults editing, override/catalog/default badges, bulk inspector apply/reset, and focused inspector/catalog tests.
+- Remaining: cross-connector mass-edit view, filters, CSV paste, optional BOM downstream-load column, 2D-canvas unchanged regression, and complete component coverage for the deferred surfaces.

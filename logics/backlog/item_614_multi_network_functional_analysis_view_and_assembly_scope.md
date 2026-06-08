@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 65%
-> Confidence: 60%
-> Progress: 0%
+> Status: In progress
+> Understanding: 95%
+> Confidence: 88%
+> Progress: 55%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -37,6 +37,7 @@ The in-network engine ignores inter-network bridges by design. A user with a mul
 
 ```mermaid
 %% logics-kind: backlog
+%% logics-signature: backlog|multi-network-functional-analysis-view-a|req-133-pin-level-source-consumer-curren|the-in-network-engine-ignores-inter-netw|ac1-computepinelectricalload-networks-ki
 flowchart LR
     Picker[Scope picker — single / active assembly / custom subset] --> Engine[computePinElectricalLoad assembly]
     Engine -->|inter-network bridges| Union[Union graph]
@@ -93,7 +94,12 @@ flowchart LR
 - Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
 - Architecture decision(s): `adr_010_inter_network_current_bridge_semantics`
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
-- Primary task(s): TBD on promotion
+- Primary task(s): `task_122_multi_network_functional_analysis_view_and_assembly_scope`
+
+# Delivery Status
+- Partially delivered in 1.14.0.
+- Delivered: assembly-scope aggregation core in `src/core/pinElectricalLoadAssembly.ts`, inter-harness link traversal, shared master connector bridge handling, L1 mismatch computation, loop safety, and core assembly tests.
+- Remaining: read-only multi-network functional analysis view, scope picker UX, D1-D4/L1 finding list in that view, skipped-bridge/view diagnostics, and `Go to` behavior that switches active network before focusing the entity.
 
 # AI Context
 - Summary: Adds the multi-network analysis view (read-only, scope picker) and the assembly-scope aggregation that traverses inter-network bridges. New L1 link mismatch warning lives here.
@@ -109,4 +115,4 @@ flowchart LR
 - Created by hand; regenerate signatures with `python3 -m logics_manager lint --require-status` before commit when the tool becomes available.
 
 # Tasks
-- TBD on promotion.
+- `task_122_multi_network_functional_analysis_view_and_assembly_scope`

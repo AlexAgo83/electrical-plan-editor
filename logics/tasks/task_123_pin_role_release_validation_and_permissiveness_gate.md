@@ -3,9 +3,9 @@
 > From version: 1.13.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 75%
-> Confidence: 70%
-> Progress: 0%
+> Understanding: 90%
+> Confidence: 82%
+> Progress: 25%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 
@@ -22,6 +22,16 @@
 
 # Backlog
 - `item_615_pin_role_release_validation_and_permissiveness_gate`
+
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|pin-role-release-validation-and-permissi|item-615-pin-role-release-validation-and|1-confirm-scope|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```
 
 # Acceptance criteria
 Mirror `item_615` AC1–AC9.
@@ -56,3 +66,7 @@ Mirror `item_615` AC1–AC9.
 # Links
 - Request: `req_133`
 - Architecture decision(s): `adr_010_inter_network_current_bridge_semantics`
+
+# Progress Report
+- Partially covered by 1.14.0 focused validation: data model, ampacity, current-network aggregation, assembly aggregation core, D1-D4 validation, inspector pin roles, and catalog pin roles.
+- Remaining: Playwright full-flow, sample-network silence gate, export/import gate, canvas unchanged snapshot, AI Agent context unchanged snapshot, performance budgets, onboarding, and CI release-gate wiring.
