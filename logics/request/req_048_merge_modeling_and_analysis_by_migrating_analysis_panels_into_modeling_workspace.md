@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -177,6 +178,15 @@ This request aims to simplify the workflow by making `Modeling` the primary unif
 - New analysis features unrelated to the migration (for example new panel types not already present in `Analysis`).
 - Full removal of all legacy `Analysis` code paths in the same iteration if a compatibility phase is chosen (can be follow-up cleanup).
 - Final post-stabilization cleanup/removal of the compatibility `Analysis` alias entry (if deferred to a follow-up phase).
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|merge-modeling-and-analysis-by-migrating|merge-modeling-and-analysis-into-a|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_297_modeling_workspace_composition_adds_access_to_analysis_panels.md`

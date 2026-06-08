@@ -8,6 +8,7 @@
 > Theme: Cross-Screen List/Form UX Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -75,3 +76,12 @@ Backlog scope covered:
   - `npm run quality:ui-modularization` KO (pre-existing line-budget baseline debt)
   - `npm run test:ci` OK
   - `npm run test:e2e` OK
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|list-form-workspace-harmonization-orches|item-074-list-form-pattern-baseline-and-|1-deliver-wave-0-baseline-contract|python3-logics-skills-logics-doc-linter-
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

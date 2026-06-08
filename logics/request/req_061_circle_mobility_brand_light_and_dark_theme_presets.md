@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -31,6 +32,15 @@ The user explicitly wants:
 - `1` new clear/light preset
 - `1` new dark preset
 - both derived from Circle Mobility styling used by the company apps (Driver / Fleet / Dashboard)
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|circle-mobility-brand-light-and-dark-the|add-a-new-light-theme-preset|ac1-the-app-exposes-two-new
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Deliver two new theme presets (`Circle Mobility Light` and `Circle Mobility Dark`) integrated into the app theme system.

@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -271,6 +272,15 @@ What remains is intentionally outside the baseline acceptance scope, but still i
 - Large redesign of workspace panels beyond the shared filter-bar rollout and metadata surfacing follow-up.
 - Advanced query/filter syntax or search indexing.
 - Mandatory export-schema expansion for every new field if the product decides to defer export surfacing.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|post-req-035-042-follow-up-phase-2-rollo|formalize-the-remaining-non-blocking-wor|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_255_table_filter_bar_phase_2_rollout_to_connectors_splices_nodes_and_segments_panels.md`

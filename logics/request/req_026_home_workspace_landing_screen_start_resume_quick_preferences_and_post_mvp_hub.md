@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -119,6 +120,15 @@ These modules should be considered in layout extensibility and data contracts, e
 - Heavy onboarding/tutorial system.
 - Large animation/motion redesign for app startup.
 - Mandatory implementation of all post-MVP modules in the first delivery.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|home-workspace-landing-screen-for-start-|introduce-a-dedicated-home-screen-that|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - Implemented / tracked via:

@@ -8,6 +8,7 @@
 > Theme: UX/UI Theming Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -51,3 +52,12 @@ Backlog scope covered:
   - Keep all mode-specific overrides under `.app-shell.theme-dark` and avoid one-off inline colors.
   - Preserve explicit focus/status overrides and validate with UI integration tests.
   - Keep persistence/toggle tests in CI as release gates.
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|theme-mode-orchestration-and-delivery-co|item-020-theme-mode-state-and-persistenc|1-freeze-theme-state-and-persistence|python3-logics-skills-logics-doc-linter-
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

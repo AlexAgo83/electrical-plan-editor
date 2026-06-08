@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and references when editing this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -25,6 +26,15 @@
 - Existing network export handlers:
   - `src/app/hooks/useNetworkImportExport.ts`
   - `src/app/hooks/useWorkspaceHandlers.ts`
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|override-ctrl-cmd-s-to-export-active-pla|ctrl-cmd-s-currently-resolves-to|ac1-pressing-ctrl-cmd-s-does
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Capture `Ctrl+S` / `Cmd+S` globally in the app.

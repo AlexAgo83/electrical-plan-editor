@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -140,6 +141,15 @@ This request should preserve existing wire creation/edit flows while adding a cl
 - Electrical calculations or validation based on cable section ampacity.
 - Bulk-editing cable section for existing wires.
 - Full UX redesign of wire tables/analysis screens to heavily feature cable section (beyond compatibility or explicit small additions).
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|wire-cable-section-mm2-field-default-pre|add-cable-section-mm2-to-wire|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_230_wire_entity_section_mm2_field_and_wire_save_flow_contract_update.md`

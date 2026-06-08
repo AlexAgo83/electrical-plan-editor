@@ -8,6 +8,7 @@
 > Theme: Follow-up Delivery Orchestration for Post req_035-042 UX, Surfacing, Hardening, and Closure Work
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -233,3 +234,12 @@ Rationale:
 - `README.md`
 - `package.json`
 - `.github/workflows/ci.yml`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|req-043-follow-up-orchestration-phase-2-|item-255-table-filter-bar-phase-2-rollou|wave-0-test-hardening-early-pass|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

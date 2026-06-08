@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -23,6 +24,15 @@
 - a valid `cavityCount` / `portCount`.
 
 When `manufacturerReference` is missing/empty, the fallback currently skips catalog bootstrap for that entity. The entity remains loadable, but it may stay without `catalogItemId`, which weakens the catalog-first transition for legacy datasets.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|legacy-catalog-fallback-generate-determi|improve-the-req-051-legacy-fallback-beha|ac1-legacy-connectors-without-manufactur
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Extend legacy fallback bootstrap so connectors/splices with missing `manufacturerReference` still receive a generated catalog item and `catalogItemId` when capacity is valid.

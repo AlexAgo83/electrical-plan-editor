@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -76,6 +77,15 @@ Architecture reference to preserve:
 - Multiple sample templates in this wave.
 - Remote sample catalogs or downloadable presets.
 - Tutorial overlay/coachmarks content design.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|bootstrap-with-comprehensive-sample-netw|initialize-the-app-with-a-realistic|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - To create from this request:

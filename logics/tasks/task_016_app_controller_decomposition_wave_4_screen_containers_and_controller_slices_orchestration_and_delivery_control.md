@@ -8,6 +8,7 @@
 > Theme: AppController Composition Root Reduction Sequencing
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -112,3 +113,12 @@ Backlog scope covered:
   - AC6: Satisfied by targeted UI integration regression runs plus full `test:ci` and `test:e2e` smoke coverage.
   - AC7: Satisfied by explicit dependency contracts and green `lint`/`typecheck`/quality gates with no circular-import regressions observed.
   - AC8: Satisfied by full closure pipeline passing (`lint`, `typecheck`, UI/store gates, `test:ci`, `test:e2e`, `build`, `quality:pwa`, Logics lint).
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|appcontroller-decomposition-wave-4-scree|item-100-app-controller-modeling-screen-|1-deliver-wave-0-modeling-screen|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

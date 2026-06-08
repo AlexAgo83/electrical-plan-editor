@@ -8,6 +8,7 @@
 > Theme: Persistence resilience against storage read exceptions
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Problem
 If storage read access throws during state load, the persistence path can break hard and compromise app bootstrap reliability.
 
@@ -19,6 +20,15 @@ If storage read access throws during state load, the persistence path can break 
 - Out:
   - Persistence schema redesign.
   - New backup formats.
+
+
+```mermaid
+%% logics-kind: backlog
+%% logics-signature: backlog|persistence-load-guard-when-storage-read|req-077-review-followups-persistence-ver|if-storage-read-access-throws-during|storage-read-exceptions-during-load-no
+flowchart TD
+    Request[Request source] --> Scope[Backlog scope]
+    Scope --> Task[Delivery task]
+```
 
 # Acceptance criteria
 - Storage read exceptions during load no longer crash bootstrap.

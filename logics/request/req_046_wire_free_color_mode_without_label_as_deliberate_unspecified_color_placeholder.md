@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -41,6 +42,15 @@ With only `freeColorLabel` + catalog IDs, an empty free-color label collapses to
 To support this need safely, the model should persist an explicit wire color mode (recommended name examples):
 - `colorMode: "none" | "catalog" | "free"`
 or equivalent finalized field.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|wire-free-color-mode-without-label-as-de|allow-free-color-mode-to-be|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Context (follow-up positioning)
 This request is a **follow-up corrective extension** to `req_045` after implementation/usage feedback.

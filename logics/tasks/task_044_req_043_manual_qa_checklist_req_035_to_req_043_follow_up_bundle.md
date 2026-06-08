@@ -7,6 +7,7 @@
 > Complexity: Medium
 > Theme: Manual QA Checklist and Execution Notes for Baseline + Follow-up Bundle
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -43,3 +44,12 @@ Provide an explicit manual QA checklist for the delivered `req_035` through `req
 - `logics/request/req_043_post_req_035_to_req_042_phase_2_rollout_optional_metadata_surfacing_test_hardening_and_delivery_closure.md`
 - `logics/tasks/task_044_req_043_follow_up_phase_2_rollout_onboarding_polish_metadata_surfacing_test_hardening_and_doc_sync_orchestration.md`
 - `logics/backlog/item_260_manual_qa_checklist_for_req_035_to_req_042_follow_up_bundle.md`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|manual-qa-checklist-for-req-035-to-req-0|item-260-manual-qa-checklist-for-req-035|1-confirm-scope|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

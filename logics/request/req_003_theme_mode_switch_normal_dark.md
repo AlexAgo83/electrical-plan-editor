@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -80,6 +81,15 @@ Architecture reference to preserve:
 - User-custom theme builder.
 - Additional theme variants beyond `normal` and `dark`.
 - Brand redesign beyond mode adaptation.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|theme-mode-switch-normal-and-dark|allow-users-to-switch-between-current|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - To create from this request:

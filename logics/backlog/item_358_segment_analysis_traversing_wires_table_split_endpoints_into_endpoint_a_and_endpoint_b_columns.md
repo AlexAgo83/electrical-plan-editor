@@ -8,6 +8,7 @@
 > Theme: Segment analysis table readability and endpoint column split
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Problem
 The `Segment analysis` traversing-wires table compresses both wire endpoints into one `Endpoints` cell, reducing scanability when comparing multiple rows.
 
@@ -21,6 +22,15 @@ The `Segment analysis` traversing-wires table compresses both wire endpoints int
 - Out:
   - Sorting contract changes for endpoint columns (handled in `item_359`)
   - Regression test additions (handled in `item_360`)
+
+
+```mermaid
+%% logics-kind: backlog
+%% logics-signature: backlog|segment-analysis-traversing-wires-table-|req-065-segment-analysis-split-endpoints|the-segment-analysis-traversing-wires-ta|segment-analysis-traversing-wires-table-
+flowchart TD
+    Request[Request source] --> Scope[Backlog scope]
+    Scope --> Task[Delivery task]
+```
 
 # Acceptance criteria
 - Segment-analysis traversing-wires table shows `Endpoint A` then `Endpoint B` instead of `Endpoints`.

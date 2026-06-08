@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -159,6 +160,15 @@ Critical product constraint:
 - Full semantic versioning policy for the entire application release process (beyond persisted data/schema compatibility).
 - Migration support for arbitrarily corrupted payloads beyond safe rejection and error reporting.
 - One-click user-facing “downgrade” of saved data to older app versions (forward export compatibility beyond explicit support).
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|save-data-versioning-with-backward-compa|introduce-a-save-data-versioning-system|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_195_persistence_schema_version_envelope_and_current_version_contract_for_saved_data.md`

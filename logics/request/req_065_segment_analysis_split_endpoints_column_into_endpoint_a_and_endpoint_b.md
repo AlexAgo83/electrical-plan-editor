@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -29,6 +30,15 @@ The `Segment analysis` panel (for a selected segment) renders a sortable table o
 - `Route mode`
 
 The combined `Endpoints` cell is less scannable when comparing multiple wires because both sides are merged into one column.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|segment-analysis-split-endpoints-column-|in-segments-segment-analysis-the-current|ac1-in-segments-segment-analysis-the
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Improve readability in `Segment analysis` by splitting the combined `Endpoints` column into `Endpoint A` and `Endpoint B`.

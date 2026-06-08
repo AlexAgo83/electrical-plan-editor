@@ -9,6 +9,7 @@
 > Theme: Cross-request delivery coordination for req_110 to req_112
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Context
 This orchestration task coordinates a three-request delivery bundle:
 - `req_110`: assisted wire sizing from current, material, network voltage, and wire length

@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -27,6 +28,15 @@ Recent quality work (req_068) delivered:
 Current residual risks:
 - UI suites still dominate runtime cost and can benefit from additional stabilization waves
 - segmented lane contract requires intentional updates when adding new UI spec files (by design)
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|ci-observability-execution-order-test-se|the-project-now-exposes-useful-informati|ac1-coverage-ui-report-and-test-ci-ui-sl
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Ensure diagnostic observability still runs when the main suite fails.

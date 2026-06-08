@@ -8,6 +8,7 @@
 > Theme: Cross-request delivery orchestration for wide-screen shell behavior, 2D readability controls, export quality/contracts, and CSV wire schema hardening
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -226,3 +227,12 @@ The queue is cross-cutting across settings/persistence, network-summary renderin
 - request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 - request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 - request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|super-orchestration-delivery-execution-f|item-437-settings-workspace-panels-wide-|step-1-deliver-req-086-implementation-bu|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

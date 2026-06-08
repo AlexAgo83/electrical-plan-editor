@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -25,6 +26,15 @@ The app already supports many mutating workflows across a shared workspace state
 - edit/save/cancel flows in forms
 
 As the feature set grows (pricing settings, catalog CSV import/export, endpoint/node swap actions), lack of undo/redo increases recovery cost and regression risk for editing ergonomics.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|global-undo-redo-history-for-modeling-an|users-need-a-fast-and-reliable|ac1-users-can-trigger-global-undo
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Introduce a V1 global undo/redo capability for workspace mutations with deterministic behavior and clear scope boundaries.

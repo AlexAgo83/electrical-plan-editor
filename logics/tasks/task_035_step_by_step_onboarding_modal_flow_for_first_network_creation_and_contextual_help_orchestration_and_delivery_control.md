@@ -8,6 +8,7 @@
 > Theme: Delivery Orchestration for Guided First-Time Onboarding, Contextual Help, and Persisted Opt-Out UX
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -147,3 +148,12 @@ Backlog scope covered:
 - `src/tests/persistence.localStorage.spec.ts`
 - `.github/workflows/ci.yml`
 - `package.json`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|step-by-step-onboarding-modal-flow-for-f|item-211-onboarding-modal-flow-shell-ste|1-deliver-wave-0-onboarding-modal|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

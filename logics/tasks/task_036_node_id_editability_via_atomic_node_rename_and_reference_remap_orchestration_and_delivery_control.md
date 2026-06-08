@@ -8,6 +8,7 @@
 > Theme: Delivery Orchestration for Safe Node ID Editing with Atomic Store Rename and UI State Coherence
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -111,3 +112,11 @@ Backlog scope covered:
 - `.github/workflows/ci.yml`
 - `package.json`
 
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|node-id-editability-via-atomic-node-rena|item-220-atomic-node-rename-store-action|1-deliver-wave-0-atomic-node|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

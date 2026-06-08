@@ -8,6 +8,7 @@
 > Theme: Wire edit form state manipulation for endpoint A/B inversion
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Problem
 The wire edit form has no deterministic one-click state transform to invert `Endpoint A` and `Endpoint B`, forcing manual edits across multiple interdependent fields.
 
@@ -20,6 +21,15 @@ The wire edit form has no deterministic one-click state transform to invert `End
 - Out:
   - UI button placement/wiring (handled in `item_353`)
   - Regression test coverage (handled in `item_354`)
+
+
+```mermaid
+%% logics-kind: backlog
+%% logics-signature: backlog|wire-edit-form-endpoint-swap-state-trans|req-063-wire-edit-swap-endpoint-a-b-acti|the-wire-edit-form-has-no|swap-transform-correctly-exchanges-all-e
+flowchart TD
+    Request[Request source] --> Scope[Backlog scope]
+    Scope --> Task[Delivery task]
+```
 
 # Acceptance criteria
 - Swap transform correctly exchanges all endpoint A/B draft fields.

@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -31,6 +32,15 @@ A V1 wire-level protection metadata model is a pragmatic bridge:
 - fast to implement on top of current wire workflows
 - compatible with existing save/cancel semantics
 - extensible if future versions introduce a dedicated `ProtectionDevice` entity
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|wire-protection-metadata-v1-with-fuse-ki|users-want-to-represent-a-fuse-like|ac1-a-wire-can-optionally-carry
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Add a V1 wire-level protection metadata contract with `fuse` as the first supported protection kind.

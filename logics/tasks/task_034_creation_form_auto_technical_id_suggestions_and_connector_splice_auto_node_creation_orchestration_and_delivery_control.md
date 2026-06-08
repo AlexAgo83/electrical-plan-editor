@@ -8,6 +8,7 @@
 > Theme: Delivery Orchestration for Creation Flow Ergonomics and Graph Bootstrap Automation
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -139,3 +140,12 @@ Backlog scope covered:
 - `src/tests/store.reducer.entities.spec.ts`
 - `.github/workflows/ci.yml`
 - `package.json`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|creation-form-auto-technical-id-suggesti|item-203-create-form-technical-id-sugges|1-deliver-wave-0-shared-next-available|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and references when editing this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -28,6 +29,15 @@ Occupancy values are stored as occupant references (ex: `wire:<wireId>:A|B`) and
 - `formatOccupantRefForDisplay(...)`
 
 The app already has wire navigation primitives (`onSelectWire`, wire sub-screen) that can be reused.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|connector-splice-analysis-add-go-to-wire|in-connectors-analysis-and-splices-analy|ac1-in-connector-analysis-occupancy-card
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Add a `Go to` action before `Release` on occupied connector/splice slot cards.

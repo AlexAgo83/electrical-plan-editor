@@ -9,6 +9,7 @@
 > Theme: Persistence safety / boot resilience
 > Reminder: Update understanding/confidence/progress and linked task references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Problem
 All `JSON.parse()` calls in the persistence layer are unguarded. A corrupted or truncated localStorage value causes an unhandled `SyntaxError` at boot, leaving the user with a blank screen and no recovery path. This is a silent data-loss scenario.
 

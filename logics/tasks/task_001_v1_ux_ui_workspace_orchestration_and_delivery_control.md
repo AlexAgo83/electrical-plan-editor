@@ -8,6 +8,7 @@
 > Theme: UX/UI Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -70,3 +71,12 @@ Backlog scope covered:
 - Mitigation status:
   - Regression suite (lint, typecheck, unit/integration, e2e) passes on latest UX/UI increments.
   - Logics docs/backlog/task synchronization remains enforced via `logics_lint`.
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|v1-ux-ui-workspace-orchestration-and-del|item-009-v1-workspace-navigation-and-lay|1-freeze-ux-information-architecture-and|python3-logics-skills-logics-doc-linter-
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

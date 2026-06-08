@@ -8,6 +8,7 @@
 > Theme: Cross-request closure governance for Home, Analysis navigation, confirmation dialogs, and PWA update emphasis
 > Reminder: Update Understanding/Confidence/Progress and references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -122,3 +123,12 @@ This task centralizes:
 - request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 - request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 - request-AC4A -> This task. Proof: Historical delivery or planned chain is recorded in the linked Logics report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|super-orchestration-closure-and-validati|item-394-req-070-home-workspace-changelo|1-create-explicit-closure-task-referenci|python3-logics-skills-logics-doc-linter-
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

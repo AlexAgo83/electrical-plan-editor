@@ -8,6 +8,7 @@
 > Theme: UI Modularization Completion Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -55,3 +56,12 @@ Backlog scope covered:
   - Preserve bounded extraction waves with mandatory gate execution at each wave boundary.
   - Keep module APIs explicit and monitor dependency direction during follow-up cleanups.
   - Continue full regression cadence (`typecheck`, `test:ci`, `test:e2e`, UI quality gate) for all future modularization steps.
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|app-shell-completion-orchestration-and-d|item-045-app-refactor-baseline-and-quali|1-freeze-pre-refactor-baseline-and-valid|python3-logics-skills-logics-doc-linter-
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

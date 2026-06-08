@@ -8,6 +8,7 @@
 > Theme: Cross-Request Delivery Coordination with Validation Discipline and Checkpoint Commits
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -167,3 +168,12 @@ Rationale:
 - `logics/backlog/item_254_req_042_wire_filter_bar_field_selector_and_layout_closure_ci_build_and_ac_traceability.md`
 - `package.json`
 - `.github/workflows/ci.yml`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|super-orchestration-delivery-execution-f|item-254-req-042-wire-filter-bar-field-s|step-1-deliver-task-035-onboarding-modal|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

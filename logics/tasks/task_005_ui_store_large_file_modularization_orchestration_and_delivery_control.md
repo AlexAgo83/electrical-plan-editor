@@ -8,6 +8,7 @@
 > Theme: Modularization Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -60,3 +61,12 @@ Backlog scope covered:
   - Maintain continuous regression runs across lint/typecheck/unit/e2e at each wave.
   - Enforce UI file-size policy (with documented exceptions) via `npm run quality:ui-modularization`.
   - Enforce store file-size and modularity policy with `npm run quality:store-modularization`.
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|ui-and-store-large-file-modularization-o|item-030-app-component-composition-split|1-freeze-module-boundary-strategy-for|python3-logics-skills-logics-doc-linter-
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

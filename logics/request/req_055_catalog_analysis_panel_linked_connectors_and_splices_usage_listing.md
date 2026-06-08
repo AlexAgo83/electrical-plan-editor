@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -24,6 +25,15 @@
 - faster navigation from a catalog item to dependent entities.
 
 This request reverses one UX decision from `req_051` ("no analysis panel for Catalog") and adds a focused `Catalog`-specific analysis panel.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|catalog-analysis-panel-linked-connectors|the-current-catalog-screen-introduced-by|ac1-the-catalog-screen-includes-an
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Add a `Catalog` analysis panel to the `Catalog` screen, aligned with the look-and-feel of analysis panels in other modeling sub-screens.

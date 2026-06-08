@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 ## Delivery status
 - Implemented (task execution complete via `task_052`).
 - Final validation completed:
@@ -52,6 +53,15 @@ The request also introduces a generic connection terminology (`connection`) suit
 - Generic count field label: `Connection count`
 - Required reference label: `Manufacturer reference`
 - Visual icon for `Catalog` navigation/UI: use `public/icons/ico_catalog.svg`
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|catalog-screen-with-catalog-item-crud-mo|add-a-new-catalog-concept-to|ac1-a-catalog-modeling-sub-screen-exists
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objectives
 - Add a first-class `Catalog` sub-screen to the modeling workspace navigation.

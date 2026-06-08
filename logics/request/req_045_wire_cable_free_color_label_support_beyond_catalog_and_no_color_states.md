@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -163,6 +164,15 @@ This creates a gap for real-world identification workflows where a **free-form c
 - Custom swatch hex/visual color picker for free color labels.
 - Multi-part free color pattern modeling beyond a single free-form label (for example custom striped pattern metadata).
 - Replacing canonical catalog IDs with free text across the app.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|wire-cable-free-color-label-support-beyo|allow-identifying-a-wire-cable-with|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_282_wire_entity_free_color_label_and_color_mode_invariant_normalization.md`

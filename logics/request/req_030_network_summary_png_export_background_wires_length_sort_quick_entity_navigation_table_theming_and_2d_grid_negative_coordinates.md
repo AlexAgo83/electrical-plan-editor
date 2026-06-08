@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -133,6 +134,15 @@ This request groups these refinements because they affect the same day-to-day mo
 - Broad redesign of all table layouts beyond header theming and highlight styling refinements.
 - Replacing `Entity navigation` entirely (this request adds a compact complementary quick-navigation strip near `Route preview`).
 - Changing network data schema for coordinate storage unless required and explicitly documented.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|network-summary-png-export-background-wi|add-a-settings-option-to-include|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_171_network_summary_png_export_background_option_and_ui_preference_persistence.md`

@@ -8,6 +8,7 @@
 > Theme: UI / Internationalization
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Problem
 Settings ordering and language support do not meet requested UX expectations:
 - `Global preferences` placement must move before `Action bar and shortcuts`;
@@ -26,6 +27,15 @@ Settings ordering and language support do not meet requested UX expectations:
   - additional locales beyond EN/FR;
   - changelog/import-export translation;
   - locale-specific changes to data formats (numbers/CSV/IDs).
+
+
+```mermaid
+%% logics-kind: backlog
+%% logics-signature: backlog|settings-panel-reorder-and-app-wide-i18n|req-098-settings-global-preferences-reor|settings-ordering-and-language-support-d|ac1-global-preferences-is-rendered-befor
+flowchart TD
+    Request[Request source] --> Scope[Backlog scope]
+    Scope --> Task[Delivery task]
+```
 
 # Acceptance criteria
 - AC1: `Global preferences` is rendered before `Action bar and shortcuts` in Settings.

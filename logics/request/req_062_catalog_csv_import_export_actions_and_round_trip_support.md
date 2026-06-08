@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -29,6 +30,15 @@ The app already includes:
 What is still missing is a direct CSV portability workflow for catalog items:
 - **Export CSV** from the Catalog screen for bulk review/editing,
 - **Import CSV** into the Catalog screen for bulk creation/update.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|catalog-csv-import-export-actions-and-ro|users-need-to-export-the-active-network|ac1-the-catalog-screen-exposes-a
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Add catalog CSV export and import actions to the `Catalog` UI with the requested placements.

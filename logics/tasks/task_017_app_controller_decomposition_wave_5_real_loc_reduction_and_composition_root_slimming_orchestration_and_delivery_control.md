@@ -8,6 +8,7 @@
 > Theme: Measurable AppController LOC Reduction Sequencing
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -124,3 +125,12 @@ Backlog scope covered:
   - AC6: Satisfied by preserved lazy/eager behavior through `appUiModules`, successful `build`, and passing `quality:pwa`.
   - AC7: Satisfied by targeted UI integration regressions (`navigation-canvas`, `workspace-shell`, `inspector`) plus `test:e2e` smoke coverage remaining green.
   - AC8: Satisfied by full closure pipeline passing (`lint`, `typecheck`, UI/store quality gates, `test:ci`, `test:e2e`, `build`, `quality:pwa`, Logics lint).
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|appcontroller-decomposition-wave-5-real-|item-107-app-controller-screen-slice-cal|1-deliver-wave-0-screen-slice-call-site|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

@@ -8,6 +8,7 @@
 > Theme: Delivery Orchestration for Wire Endpoint Occupancy-Aware Create Prefill and Manual-Input-Safe UX
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -110,3 +111,11 @@ Backlog scope covered:
 - `.github/workflows/ci.yml`
 - `package.json`
 
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|wire-creation-endpoint-occupancy-validat|item-225-wire-form-endpoint-occupancy-in|1-deliver-wave-0-shared-endpoint-slot|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

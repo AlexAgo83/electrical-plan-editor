@@ -8,6 +8,7 @@
 > Theme: Post-req_020 Follow-up Delivery for Compute Scoping and Regression Confidence
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -105,3 +106,12 @@ Backlog scope covered:
   - AC5: Satisfied by explicit `switchScreenStrict` / `switchScreenDrawerAware` and `switchSubScreenStrict` / `switchSubScreenDrawerAware` helper variants, with shell tests updated to explicit drawer-aware usage.
   - AC6: Satisfied by shared `withViewportWidth(...)` helper and guaranteed viewport restoration in touched shell tests (`workspace-shell` and `inspector-shell`).
   - AC7: Satisfied by full closure pipeline and Logics lint passing.
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|appcontroller-post-req-020-review-follow|item-124-app-controller-active-screen-do|1-deliver-wave-0-active-screen-domain|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

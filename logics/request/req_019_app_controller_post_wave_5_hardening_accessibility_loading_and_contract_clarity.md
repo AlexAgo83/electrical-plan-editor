@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -100,6 +101,15 @@ Related baseline and delivered context:
 - A broad AppController decomposition wave beyond the specific hardening findings listed here.
 - Store architecture changes.
 - Rewriting all shell components purely for stylistic reasons.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|appcontroller-post-wave-5-hardening-acce|address-post-wave-5-review-findings-that|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - Created and delivered from this request:

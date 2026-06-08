@@ -8,6 +8,7 @@
 > Theme: Wire domain model extension and validation for protection metadata
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Problem
 The wire entity cannot currently express protection semantics, so users cannot mark a wire as a fuse or enforce a required associated catalog manufacturer reference.
 
@@ -23,6 +24,15 @@ The wire entity cannot currently express protection semantics, so users cannot m
   - Wire form controls and UI wiring (handled in `item_366`)
   - UI visibility in wire tables/analysis (handled in `item_367`)
   - Regression coverage additions (handled in `item_368`)
+
+
+```mermaid
+%% logics-kind: backlog
+%% logics-signature: backlog|wire-entity-protection-metadata-contract|req-067-wire-protection-metadata-v1-fuse|the-wire-entity-cannot-currently-express|wire-supports-optional-protection-metada
+flowchart TD
+    Request[Request source] --> Scope[Backlog scope]
+    Scope --> Task[Delivery task]
+```
 
 # Acceptance criteria
 - `Wire` supports optional protection metadata with V1 `kind: "fuse"`.

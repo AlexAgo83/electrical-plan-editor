@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -201,6 +202,15 @@ This request introduces a guided onboarding flow that:
 - Video/tutorial media uploads or remote CMS-driven onboarding content.
 - Multi-language localization framework rollout.
 - Advanced analytics/telemetry tracking for onboarding completion.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|step-by-step-onboarding-modal-flow-for-f|add-a-step-by-step-onboarding-flow-to|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_211_onboarding_modal_flow_shell_step_state_and_dismissable_sequence_controller.md`

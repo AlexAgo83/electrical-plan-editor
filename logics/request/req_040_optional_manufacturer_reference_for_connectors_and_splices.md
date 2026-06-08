@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -133,6 +134,15 @@ This request introduces a dedicated optional `manufacturerReference` field on co
 - Manufacturer reference validation against external catalogs/APIs.
 - Full BOM/export redesign (though this field may support future BOM work).
 - Adding the field to `NetworkNode` entities.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|optional-manufacturer-reference-for-conn|add-an-optional-reference-field-on|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_240_connector_splice_manufacturer_reference_entity_contract_and_reducer_updates.md`

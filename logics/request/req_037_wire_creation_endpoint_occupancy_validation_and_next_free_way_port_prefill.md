@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -139,6 +140,15 @@ This creates friction during wire creation, especially in dense connectors/splic
 - Changes to connector/splice manual occupancy management panels beyond what is required for wire form UX.
 - Generalized slot-suggestion UX rollout to non-wire forms in this request.
 - Connector/splice capacity model changes (`cavityCount` / `portCount` semantics).
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|wire-creation-endpoint-occupancy-validat|indicate-when-a-selected-connector-way|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_225_wire_form_endpoint_occupancy_indicator_for_connector_ways_and_splice_ports.md`

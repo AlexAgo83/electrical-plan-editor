@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -33,6 +34,15 @@ Existing layout behavior:
 The request introduces a more intentional two-column structure:
 - left column focused on workspace actions and resume context,
 - right column dedicated to release notes/changelogs.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|home-workspace-panel-reorder-and-right-c|users-want-a-clearer-home-hierarchy|ac1-on-home-workspace-is-displayed
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Reorganize Home so `Workspace` is directly below `Quick start` in the left column.

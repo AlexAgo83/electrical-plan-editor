@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -185,6 +186,15 @@ This enables faster topology inspection while preserving the current interaction
 - Per-wire custom styling inside callouts beyond readability needs (unless required for theme contrast).
 - Partial callout filtering (per-entity/per-subset toggles) beyond the global show/hide control requested here.
 - Dedicated resize handles or manual width management for callouts in V1 (auto-wrap/auto-size only).
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|network-summary-2d-connector-splice-cabl|add-a-new-graphical-element-in|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_178_network_summary_callout_visibility_toggle_and_settings_default_preference_for_connector_splice_cable_frames.md`

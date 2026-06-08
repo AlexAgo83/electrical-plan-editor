@@ -8,6 +8,7 @@
 > Theme: Post-Refactor Hardening and Regression Coverage Sequencing
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -99,3 +100,12 @@ Backlog scope covered:
   - AC5: Satisfied by removing misleading state-allocating namespaced helper hooks and retaining builder/adaptor contracts only.
   - AC6: Satisfied by new workspace-shell regression coverage for hidden overlay keyboard/AT isolation and passing shell integration tests.
   - AC7: Satisfied by full closure validation pipeline (`lint`, `typecheck`, `test:ci`, `test:e2e`, `build`, `quality:pwa`, Logics lint).
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|appcontroller-post-wave-5-hardening-acce|item-114-app-shell-overlay-accessibility|1-deliver-wave-0-overlay-accessibility|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

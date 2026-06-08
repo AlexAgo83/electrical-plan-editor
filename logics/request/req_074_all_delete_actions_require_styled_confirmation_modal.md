@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and references when editing this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -35,6 +36,15 @@ Delete action entry points are surfaced in modeling/catalog panels:
 - `src/app/components/workspace/ModelingCatalogListPanel.tsx`
 - `src/app/components/workspace/ModelingPrimaryTables.tsx`
 - `src/app/components/workspace/ModelingSecondaryTables.tsx`
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|require-confirmation-modal-for-every-del|accidental-deletions-remain-possible-on-|ac1-each-delete-action-in-ui
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Guarantee that all user-triggered delete actions open a styled confirmation modal before mutation.

@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -29,6 +30,15 @@ This request should be treated as a validation follow-up/hardening request:
 - verify/complete catalog-item validation rules,
 - ensure they surface in Validation UI categories/filters,
 - provide a dedicated invalid sample or fixture path for testing.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|validation-support-for-catalog-item-erro|users-report-that-validation-appears-not|ac1-validation-reliably-surfaces-catalog
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Ensure Validation reliably detects and displays catalog-item errors (`Catalog` record integrity issues).

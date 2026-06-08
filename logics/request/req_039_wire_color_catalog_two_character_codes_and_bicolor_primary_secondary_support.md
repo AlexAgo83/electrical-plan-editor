@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -189,6 +190,15 @@ The proposed approach is to store a **color reference** on the wire (via a compa
 - Advanced striping patterns beyond one optional secondary color (e.g. triple-color, patterned legends).
 - Electrical validation rules derived from color (regulatory semantics).
 - Full redesign of all wire displays to emphasize color across every screen.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|wire-color-catalog-2-character-codes-and|add-a-wire-color-concept-to|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_235_canonical_wire_color_catalog_with_two_character_codes_labels_and_hex_swatch_values.md`

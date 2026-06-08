@@ -8,6 +8,7 @@
 > Theme: Delivery Orchestration for Tabular UX Completion, Analysis Expansion, and Cross-Cutting Hardening in req_044
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -235,3 +236,12 @@ Rationale:
 - `src/tests/app.ui.theme.spec.tsx`
 - `package.json`
 - `.github/workflows/ci.yml`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|req-044-orchestration-table-sortability-|item-269-shared-table-sortability-comple|wave-0-review-follow-up-hardening-early|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

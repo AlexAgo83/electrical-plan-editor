@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -101,6 +102,15 @@ The requested behavior is intentionally non-destructive:
 - Changes to sub-network tagging data model, schema, or import/export format.
 - New advanced filtering modes (invert selection, isolate only selected, save presets) beyond the requested toggles + “enable all”.
 - Persistence of subnetwork filter state across sessions (unless explicitly added and documented during implementation).
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|network-summary-2d-subnetwork-visibility|improve-the-usability-of-sub-network-tag|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - Implemented / tracked via:

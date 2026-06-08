@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -93,6 +94,15 @@ Related delivered context:
 - Full accessibility redesign of the entire 2D canvas subsystem.
 - Full performance benchmarking infrastructure replacement.
 - Broad testing framework migration.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|post-req-024-review-follow-up-for-networ|address-post-req-024-review-findings-req|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - Created from this request:

@@ -8,6 +8,7 @@
 > Theme: Delivery orchestration for explicit wire color mode semantics and free-color unspecified intent preservation
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -190,3 +191,12 @@ Rationale:
 - `package.json`
 - `.github/workflows/ci.yml`
 - `logics/tasks/task_047_req_046_wire_free_color_unspecified_semantics_orchestration_and_delivery_control.md`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|req-046-orchestration-wire-free-color-un|item-287-wire-color-mode-persisted-seman|wave-0-persisted-wire-color-mode|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

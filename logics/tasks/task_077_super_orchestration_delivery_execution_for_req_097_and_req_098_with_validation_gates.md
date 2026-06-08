@@ -8,6 +8,7 @@
 > Theme: UI / Internationalization / Onboarding
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Context
 - Super-orchestration task to deliver:
   - `req_097_hover_descriptions_for_buttons_selects_and_options`
@@ -130,3 +131,12 @@
   - `npm run -s typecheck` ✅
   - `npm run -s test:ci:ui` ✅
 - request-AC2A -> This task. Proof: Historical delivery or planned chain is recorded in the linked Logics report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|super-orchestration-delivery-execution-f|item-478-hover-descriptions-for-buttons-|1-finalize-implementation-strategy-and-s|python3-logics-skills-logics-doc-linter-
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

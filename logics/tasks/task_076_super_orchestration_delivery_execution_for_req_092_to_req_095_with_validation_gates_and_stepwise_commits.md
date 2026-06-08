@@ -8,6 +8,7 @@
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Context
 This orchestration task coordinates delivery for:
 - `req_092`: optional catalog association for splices;
@@ -208,3 +209,12 @@ The bundle spans domain model, validation, persistence/import, canvas rendering,
 - `src/app/components/NetworkSummaryPanel.tsx`
 - `src/app/hooks/useUiPreferences.ts`
 - request-AC2A -> This task. Proof: Historical delivery or planned chain is recorded in the linked Logics report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|super-orchestration-delivery-execution-f|item-461-splice-form-optional-catalog-se|step-1-deliver-req-092-implementation-bu|minimum-gate-after-each-implementation-i
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

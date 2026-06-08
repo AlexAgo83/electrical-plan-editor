@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -131,6 +132,15 @@ This request introduces safe `Node ID` editability without destabilizing existin
 - Refactoring the node domain model to introduce a permanent immutable internal node identifier plus separate editable node technical ID.
 - Renaming IDs for connectors, splices, segments, or wires as part of this request (scope remains `nodeId` only).
 - Persistence schema migration solely for this feature, unless implementation proves it is required.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|node-id-editability-via-atomic-node-rena|allow-editing-node-id-in-the|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_220_atomic_node_rename_store_action_and_reducer_reference_remap_for_node_ids.md`

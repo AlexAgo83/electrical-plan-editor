@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -30,6 +31,15 @@ However, broad review identified follow-up concerns worth formalizing:
 - production build warns about an oversized main chunk (>500 kB)
 - at least one heavy UI test needed an explicit timeout bump, suggesting growing flakiness risk as suite size increases
 - form validation behavior mixes native HTML validation and custom inline validation, which may become inconsistent across forms
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|project-review-follow-ups-for-hardening-|the-project-is-feature-rich-and-currentl|ac1-a-documented-implementation-plan-exi
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Capture and prioritize the current review findings as a dedicated engineering-quality request.

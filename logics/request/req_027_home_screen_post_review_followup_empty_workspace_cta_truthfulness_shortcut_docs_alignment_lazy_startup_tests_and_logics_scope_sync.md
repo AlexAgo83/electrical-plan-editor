@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -93,6 +94,15 @@ This follow-up request formalizes those corrections so the Home-screen rollout r
 - Reintroducing removed Home panels (`Quick shortcuts`, `Quick preferences`) as part of this follow-up unless explicitly requested.
 - Broad redesign of the Home information architecture.
 - Keyboard shortcut feature expansion beyond documentation alignment.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|home-screen-post-review-follow-up-for-em|address-post-implementation-review-findi|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - To be created from this request (proposed):

@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -31,6 +32,15 @@ Each endpoint carries multiple pieces of editable state:
 - side-specific metadata (`Connection reference`, `Seal reference`)
 
 Today, reversing endpoints requires manual edits across both fieldsets and is error-prone.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|wire-edit-endpoint-a-b-swap-action-betwe|in-wires-edit-wire-users-need|ac1-edit-wire-exposes-a-swap
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Add a dedicated `Swap Endpoint A/B` action in `Edit Wire` to invert the current endpoint form state in one click.

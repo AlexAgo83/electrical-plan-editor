@@ -8,6 +8,7 @@
 > Theme: Delivery orchestration for per-network 2D view-state persistence (viewport + canvas toggles)
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -175,3 +176,12 @@ Rationale:
 - `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
 - `src/tests/app.ui.networks.spec.tsx`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|req-050-orchestration-network-summary-2d|item-306-network-scoped-network-summary-|wave-0-network-scoped-2d-view-state-sche|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

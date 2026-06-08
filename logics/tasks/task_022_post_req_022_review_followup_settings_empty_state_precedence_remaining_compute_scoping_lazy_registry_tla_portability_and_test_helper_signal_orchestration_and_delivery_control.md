@@ -8,6 +8,7 @@
 > Theme: Follow-up Delivery for UX Correctness, Residual Compute Scoping, and Lazy Registry/Test Helper Robustness
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -109,3 +110,12 @@ Backlog scope covered:
   - AC5: Satisfied by making drawer-aware helper usage explicit in touched critical tests and documenting alias preference in shared test helpers.
   - AC6: Satisfied by passing targeted and full validation suites.
   - AC7: Satisfied by this task/request/backlog closure documentation and Logics lint passing.
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|post-req-022-review-follow-up-orchestrat|item-134-settings-screen-empty-state-pre|1-deliver-wave-0-settings-empty-state|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

@@ -4,6 +4,7 @@
 > Confidence: 99% (delivery is validated by targeted tests and full UI lane execution)
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -18,6 +19,15 @@
 - Existing update-ready visual behavior was introduced in `req_073`.
 - Existing save/export keyboard and action workflow was updated in `req_076`.
 - Current network JSON export filenames are static by scope (`active`, `selected`, `all`) and can overwrite or be hard to distinguish in downloads.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|update-app-button-breathing-glow-and-tim|the-update-app-header-action-should|ac1-update-app-action-no-longer
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Replace blinking behavior of the `Update app` action with a breathing glow animation that remains attention-grabbing but visually stable.

@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -83,6 +84,15 @@ Architecture reference for implementation kickoff:
 - Bundle diameter/sheath handling.
 - Slack/connectors margin rules.
 - Advanced industrial export (detailed BOM, manufacturer standard outputs).
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|kickoff-v1-electrical-plan-editor|build-a-v1-electrical-plan-editor|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `item_000_v1_foundation_domain_model_and_store.md`

@@ -8,6 +8,7 @@
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -72,3 +73,12 @@ Backlog scope covered:
 - Residual risks:
   - Future schema migrations beyond v1 snapshot format need dedicated migration tests per schema bump.
   - Additional E2E scenarios may be needed when introducing richer editing interactions or larger network datasets.
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|v1-backlog-orchestration-and-delivery-co|item-000-v1-foundation-domain-model-and-|1-freeze-dependency-order-and-delivery|python3-logics-skills-logics-doc-linter-
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

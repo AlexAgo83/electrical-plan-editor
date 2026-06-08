@@ -8,6 +8,7 @@
 > Theme: Delivery orchestration for unified Modeling workspace, migrated Analysis panels, and compatibility navigation alias in req_048
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -190,3 +191,12 @@ Rationale:
 - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
 - `src/tests/app.ui.list-ergonomics.spec.tsx`
 - `package.json`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|req-048-orchestration-modeling-analysis-|item-297-modeling-workspace-composition-|wave-0-unified-modeling-workspace-compos|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

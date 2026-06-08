@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -27,6 +28,15 @@ A targeted accessibility audit identified several concrete issues in current UI 
 - issue counters are visually shown but hidden from screen readers in primary navigation/header actions.
 
 The app already has strong accessibility foundations in some areas (drawer/panel toggle semantics, `Escape` close behavior for shell panels, visible focus styles, multiple keyboard-friendly data tables). This request should extend that baseline and remove the identified inconsistencies.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|accessibility-hardening-for-interactive-|improve-accessibility-of-the-app-based|ac1-the-network-summary-2d-svg
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Make the audited accessibility gaps explicit requirements and close them without regressing existing workflows.

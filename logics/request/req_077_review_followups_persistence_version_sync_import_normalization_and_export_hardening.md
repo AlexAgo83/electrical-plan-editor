@@ -4,6 +4,7 @@
 > Confidence: 99% (delivery is backed by targeted tests plus segmentation/fast/ui validation gates)
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -34,6 +35,15 @@
   - CSV export lacks spreadsheet formula-injection neutralization.
   - JSON export revokes object URL immediately after click, which is fragile on some browser timings.
 - Existing architecture already has strong test coverage; this request should preserve behavior while hardening edge cases.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|review-followups-persistence-version-syn|a-global-technical-review-identified-sev|ac1-persistence-load-path-no-longer
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Deliver a targeted hardening bundle that:

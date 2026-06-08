@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -81,6 +82,15 @@ Architecture references to preserve:
 - Manual orthogonal routing editor for per-segment bend points.
 - Full graph-drawing optimal solver guarantees.
 - Real-time collaborative layout synchronization.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|2d-layout-persistence-and-crossing-minim|persist-user-adjusted-positions-of-entit|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - To create from this request:

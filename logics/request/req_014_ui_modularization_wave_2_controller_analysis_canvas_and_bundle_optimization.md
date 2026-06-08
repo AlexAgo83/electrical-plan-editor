@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -162,6 +163,15 @@ Architecture references to preserve:
 - Visual redesign of current UX layouts/themes.
 - New end-user features unrelated to modularization/perf (except minimal lazy-loading fallbacks).
 - Full migration to a different state management solution.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|ui-modularization-wave-2-controller-anal|reduce-maintenance-risk-caused-by-very|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - To create from this request:

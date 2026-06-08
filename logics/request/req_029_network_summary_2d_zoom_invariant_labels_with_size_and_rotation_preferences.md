@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -116,6 +117,15 @@ This request is a display/UX refinement:
 - Per-label manual editing/dragging of label positions.
 - Advanced typography controls beyond the requested size and rotation modes (font family, per-type spacing, opacity, etc.).
 - Rewriting the 2D renderer architecture beyond what is needed to support zoom-invariant labels and preferences.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|network-summary-2d-zoom-invariant-labels|improve-readability-of-text-labels-in|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - Implemented / tracked via:

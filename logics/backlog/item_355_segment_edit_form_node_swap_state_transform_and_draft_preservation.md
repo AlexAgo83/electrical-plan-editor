@@ -8,6 +8,7 @@
 > Theme: Segment edit form draft-state manipulation for node A/B inversion
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Problem
 The segment edit form has no one-click draft-state transform to invert `Node A` and `Node B`, forcing users to manually reselect both nodes.
 
@@ -20,6 +21,15 @@ The segment edit form has no one-click draft-state transform to invert `Node A` 
 - Out:
   - UI button placement/wiring (handled in `item_356`)
   - Regression coverage (handled in `item_357`)
+
+
+```mermaid
+%% logics-kind: backlog
+%% logics-signature: backlog|segment-edit-form-node-swap-state-transf|req-064-segment-edit-swap-node-a-b-actio|the-segment-edit-form-has-no|swap-transform-correctly-exchanges-node-
+flowchart TD
+    Request[Request source] --> Scope[Backlog scope]
+    Scope --> Task[Delivery task]
+```
 
 # Acceptance criteria
 - Swap transform correctly exchanges `Node A` and `Node B` draft values.

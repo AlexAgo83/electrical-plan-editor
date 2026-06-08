@@ -9,6 +9,7 @@
 > Theme: Modeling productivity / destructive-action ergonomics / canvas interaction
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Context
 This orchestration task executes the full delivery bundle spanning `req_114` to `req_117`:
 - modeling create-flow ergonomics;

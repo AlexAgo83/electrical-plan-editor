@@ -8,6 +8,7 @@
 > Theme: Delivery Orchestration for 2D Label Readability Controls (Zoom Invariance + Size/Rotation Preferences)
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -113,3 +114,12 @@ Backlog scope covered:
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
 - `src/tests/app.ui.settings.spec.tsx`
 - `package.json`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|network-summary-2d-zoom-invariant-labels|item-166-network-summary-2d-zoom-invaria|1-deliver-wave-0-zoom-invariant-2d|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

@@ -8,6 +8,7 @@
 > Theme: Follow-up Delivery for Lazy Chunking Realism and Test Helper Contract Safety
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -103,3 +104,12 @@ Backlog scope covered:
   - AC5: Satisfied by strict sub-screen helper hardening (no implicit modeling auto-switch) while retaining explicit drawer-aware variants.
   - AC6: Satisfied by passing touched shell/lazy tests and readable explicit helper usage/coverage.
   - AC7: Satisfied by full closure pipeline and Logics lint passing.
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|post-req-021-review-follow-up-orchestrat|item-129-app-ui-modules-real-lazy-chunki|1-deliver-wave-0-real-lazy|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

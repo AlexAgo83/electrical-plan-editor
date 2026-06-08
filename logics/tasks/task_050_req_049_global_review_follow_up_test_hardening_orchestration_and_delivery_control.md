@@ -8,6 +8,7 @@
 > Theme: Delivery orchestration for review-driven test hardening (e2e semantics, selector resilience, shared filter clear coverage)
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -164,3 +165,12 @@ Rationale:
 - `src/app/components/workspace/TableFilterBar.tsx`
 - `src/app/styles/tables.css`
 - `package.json`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|req-049-orchestration-global-review-foll|item-302-e2e-smoke-navigation-helpers-al|wave-0-e2e-smoke-navigation-helper|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

@@ -8,6 +8,7 @@
 > Theme: PWA Delivery Orchestration
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -85,3 +86,12 @@ Backlog scope covered:
   - `npm run quality:pwa` OK
   - `npm run test:ci` OK
   - `npm run test:e2e` OK
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|pwa-enablement-installability-and-offlin|item-064-pwa-baseline-manifest-icons-and|1-deliver-wave-0-pwa-baseline|python3-logics-skills-logics-doc-linter-
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

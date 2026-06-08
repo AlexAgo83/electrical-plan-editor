@@ -8,6 +8,7 @@
 > Theme: Export / BOM / Compatibility
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Problem
 `Network summary` BOM export does not explicitly use the UTF-8 BOM download contract already applied to wire CSV exports, which creates risk of accented/special-character corruption in spreadsheet consumers.
 
@@ -19,6 +20,15 @@
 - Out:
   - BOM schema redesign;
   - non-BOM CSV export changes beyond shared utility reuse already required by this item.
+
+
+```mermaid
+%% logics-kind: backlog
+%% logics-signature: backlog|bom-csv-utf-8-compatibility-hardening-fo|req-106-bom-export-wire-termination-cove|network-summary-bom-export-does-not|ac1-network-summary-bom-csv-export
+flowchart TD
+    Request[Request source] --> Scope[Backlog scope]
+    Scope --> Task[Delivery task]
+```
 
 # Acceptance criteria
 - AC1: `Network summary` BOM CSV export preserves accented/special characters without mojibake.

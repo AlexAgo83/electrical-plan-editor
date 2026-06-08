@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -27,6 +28,15 @@ This creates a readability regression risk:
 - zoom/pan interaction remains correct but the rendered plan becomes harder to read.
 
 The user wants a strict visual rule: text should always be painted in front of nodes/segments in the 2D render.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|network-summary-2d-text-labels-must-rend|in-the-network-summary-2d-render|ac1-in-the-network-summary-2d
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Enforce a deterministic 2D render layering contract so text labels are always visually above nodes and segments.

@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and references when editing this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -31,6 +32,15 @@ Styling currently lives in base/theme styles:
 Update availability is driven by PWA events handled in shell hooks:
 - `src/app/hooks/useWorkspaceShellChrome.ts`
 - `src/app/pwa/registerServiceWorker.ts`
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|add-glowy-emphasis-when-update-ready-is-|the-update-ready-action-can-be|ac1-when-update-is-available-and
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Add a glowy visual effect to the `Update ready` button only when that button is present (i.e., update is available).

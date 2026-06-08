@@ -8,6 +8,7 @@
 > Theme: General
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Context
 - Request: `req_106_bom_export_wire_termination_coverage_wire_csv_termination_columns_and_horizontal_label_offset_harmonization`.
 - Backlog anchors:
@@ -98,3 +99,12 @@
   - update `README.md` after implementation is finalized;
   - generate the changelog artifact only at closure time so the filename/version matches the real project version at that moment, not a version guessed in advance.
 - request-AC17B -> This task. Proof: Historical delivery or planned chain is recorded in the linked Logics report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|req-106-export-analysis-navigation-and-r|item-519-bom-csv-utf8-compatibility-hard|1-harden-bom-csv-download-compatibility|python3-logics-skills-logics-doc-linter-
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

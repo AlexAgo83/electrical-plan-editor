@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and references when editing this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -28,6 +29,15 @@
 - Undo/Redo tracking exists but stores state snapshots only:
   - `src/app/hooks/useStoreHistory.ts`
   - `src/app/AppController.tsx`
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|add-a-recent-changes-panel-in-network-sc|network-scope-currently-shows-network-li|ac1-network-scope-screen-contains-a
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Insert a new panel between `Network Scope` and `Edit network`.

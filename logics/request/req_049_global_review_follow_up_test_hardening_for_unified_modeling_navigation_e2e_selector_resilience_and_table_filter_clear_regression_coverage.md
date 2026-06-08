@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -132,6 +133,15 @@ This request converts those review findings into a coherent hardening request so
 - New table filter features beyond the already delivered clear action (for example debounce, persistent filters, advanced query syntax).
 - Broad redesign of the e2e architecture unrelated to the identified review findings.
 - Functional changes to analysis logic, modeling logic, or table rendering semantics (outside minor testability hooks if required).
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|global-review-follow-up-test-hardening-f|convert-the-global-review-findings-into|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_302_e2e_smoke_navigation_helpers_align_with_unified_modeling_workspace_semantics.md`

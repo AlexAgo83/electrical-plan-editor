@@ -8,6 +8,7 @@
 > Theme: Controller and Layout Refactor Wave Sequencing
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -101,3 +102,12 @@ Backlog scope covered:
   - AC3/AC4: `app-utils-layout.ts` replaced by thin façade over `src/app/lib/layout/*` modules with no circular import issues observed (`lint`/`typecheck` green).
   - AC5/AC6: Layout behavior/responsiveness verified by targeted `core.layout` + navigation/canvas integration tests and E2E smoke; no performance changes added beyond structural split.
   - AC7/AC8: Full validation/build/PWA quality gates passed, including static build chunking and generated service worker/manifest artifacts.
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|app-controller-and-layout-engine-modular|item-094-app-controller-network-scope-fo|1-deliver-wave-0-controller-network|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

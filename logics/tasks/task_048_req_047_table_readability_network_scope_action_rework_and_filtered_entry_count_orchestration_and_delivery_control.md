@@ -8,6 +8,7 @@
 > Theme: Delivery orchestration for cross-surface UI readability polish and Network Scope operator-flow improvements in req_047
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -176,3 +177,12 @@ Rationale:
 - `src/tests/app.ui.list-ergonomics.spec.tsx`
 - `src/tests/app.ui.networks.spec.tsx`
 - `package.json`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|req-047-orchestration-table-readability-|item-292-wires-table-split-combined-endp|wave-0-shared-filterable-table-displayed|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

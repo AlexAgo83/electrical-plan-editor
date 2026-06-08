@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -175,6 +176,15 @@ There is also a broader UX goal: standardize this filter-bar pattern across tabl
 - Mandatory full rollout to every table-based panel in one implementation pass (recommended as follow-up after the wire pilot, unless explicitly included).
 - Advanced query syntax (AND/OR expressions, regex, fuzzy search operators).
 - Multi-field filtering with multiple simultaneous text inputs.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|wire-list-filter-bar-field-selector-and-|improve-the-wires-filter-ui-so|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_250_wire_panels_filter_row_layout_full_width_input_without_panel_growth.md`

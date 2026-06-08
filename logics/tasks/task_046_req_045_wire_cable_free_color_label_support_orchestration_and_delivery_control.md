@@ -8,6 +8,7 @@
 > Theme: Delivery orchestration for free-form wire color labels with invariant safety and compatibility coverage
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -202,3 +203,12 @@ Rationale:
 - `src/tests/portability.network-file.spec.ts`
 - `package.json`
 - `.github/workflows/ci.yml`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|req-045-orchestration-wire-cable-free-co|item-282-wire-entity-free-color-label-an|wave-0-wire-entity-store-invariant|run-the-relevant-automated-tests-before
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

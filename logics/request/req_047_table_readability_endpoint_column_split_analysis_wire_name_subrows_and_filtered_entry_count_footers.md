@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -198,6 +199,15 @@ This request is a focused **UI ergonomics polish** pass to improve scanability a
 - Reworking connector/splice analysis grouping logic beyond the requested wire-name subrow enhancement.
 - Changing the semantics of `Set active` vs `Open` beyond adding the new direct navigation behavior for `Open`.
 - Localization framework overhaul (only minor count label wording/pluralization as needed).
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|table-readability-network-scope-action-r|in-wires-tables-split-the-current|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_292_wires_table_split_combined_endpoints_into_endpoint_a_and_endpoint_b_columns.md`

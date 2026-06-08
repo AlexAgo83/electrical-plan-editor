@@ -8,6 +8,7 @@
 > Theme: Functional schematic / Harness assembly
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Needs
 - Prevent the harness assembly functional schematic from displaying unrelated connected branches when the operator intentionally selected only a subset of master connectors as trace roots.
 - Make the selected master connectors act as an explicit visualization scope boundary, not only as traversal seeds.

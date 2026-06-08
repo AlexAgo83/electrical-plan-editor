@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -22,6 +23,15 @@
 This makes it possible to generate a cost-oriented BOM based on actual modeled components.
 
 The user specifically wants the export action in the 2D render header (to the right of the PNG export button), so the BOM is generated from the same working context as the visual plan export.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|bom-csv-export-from-2d-render-header-for|users-need-to-generate-a-bom|ac1-the-2d-render-network-summary
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Add a `BOM CSV` export action in the 2D render (`Network summary`) header, positioned to the right of `Export PNG`.

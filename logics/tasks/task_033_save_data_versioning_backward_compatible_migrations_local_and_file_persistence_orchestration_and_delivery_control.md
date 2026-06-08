@@ -8,6 +8,7 @@
 > Theme: Delivery Orchestration for Persisted Data Versioning, Migration Safety, and Backward Compatibility
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -143,3 +144,12 @@ Backlog scope covered:
 - `src/tests/sample-network.compat.spec.ts`
 - `.github/workflows/ci.yml`
 - `package.json`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|save-data-versioning-and-backward-compat|item-195-persistence-schema-version-enve|1-deliver-wave-0-persistence-schema|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

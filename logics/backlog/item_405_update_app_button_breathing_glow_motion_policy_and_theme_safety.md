@@ -8,6 +8,7 @@
 > Theme: Attention-state animation refinement for update-ready action
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc. When you update backlog indicators, review and update any linked tasks as well.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Problem
 Current update-ready visual emphasis can feel blink-like and should be replaced by a smoother breathing glow without accessibility regressions.
 
@@ -20,6 +21,15 @@ Current update-ready visual emphasis can feel blink-like and should be replaced 
 - Out:
   - Header action system redesign.
   - PWA lifecycle logic changes.
+
+
+```mermaid
+%% logics-kind: backlog
+%% logics-signature: backlog|update-app-button-breathing-glow-motion-|req-078-update-app-button-breathing-glow|current-update-ready-visual-emphasis-can|update-ready-action-no-longer-blinks
+flowchart TD
+    Request[Request source] --> Scope[Backlog scope]
+    Scope --> Task[Delivery task]
+```
 
 # Acceptance criteria
 - Update-ready action no longer blinks.

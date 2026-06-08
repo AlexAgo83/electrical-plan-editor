@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -122,6 +123,15 @@ Related delivered baseline to preserve:
 - Routing/navigation semantic redesign.
 - A single mega `useAppControllerLogic()` abstraction that hides ownership.
 - Context proliferation solely to avoid explicit prop/dependency passing.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|appcontroller-decomposition-wave-5-real-|continue-appcontroller-decomposition-aft|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - Created and delivered from this request:

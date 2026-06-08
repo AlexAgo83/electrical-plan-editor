@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -31,6 +32,15 @@ The user now wants a settings-level configuration for:
 and suggests a dedicated settings section focused on catalog/BOM setup.
 
 This request should preserve the existing numeric `unitPriceExclTax` model while adding user-configurable pricing context and tax defaults for UI/BOM behavior.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|catalog-and-bom-settings-currency-and-ta|users-need-a-configurable-currency-and|ac1-settings-includes-a-dedicated-sectio
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Add a new `Settings` section (recommended label: `Catalog & BOM setup`) that lets users configure:

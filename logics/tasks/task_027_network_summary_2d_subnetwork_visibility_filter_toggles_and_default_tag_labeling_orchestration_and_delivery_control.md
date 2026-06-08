@@ -8,6 +8,7 @@
 > Theme: Delivery Orchestration for Interactive Subnetwork Visibility Filtering in the 2D Network Summary Panel
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -110,3 +111,12 @@ Backlog scope covered:
 - `src/app/styles/base/base-theme-overrides/network-canvas-entity-theme-variables.css`
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
 - `package.json`
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|network-summary-2d-subnetwork-visibility|item-161-network-summary-subnetwork-togg|1-deliver-wave-0-subnetwork-floating-pan|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

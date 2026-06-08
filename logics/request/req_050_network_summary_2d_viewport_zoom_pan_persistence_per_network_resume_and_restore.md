@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -157,6 +158,15 @@ The codebase already persists network-scoped editing state (entities, node posit
 - Per-screen viewport persistence outside the 2D `Network summary` canvas (unless explicitly requested later).
 - Persisting transient drag state (`isPanningNetwork`) or pointer gesture in-progress state.
 - Redesign of zoom limits, fit heuristics, or canvas interaction UX beyond what is needed for persistence.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|network-summary-2d-view-state-persistenc|persist-the-2d-network-view-viewport|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_306_network_scoped_network_summary_2d_view_state_persistence_schema_extension_scale_offset_and_canvas_toggles.md`

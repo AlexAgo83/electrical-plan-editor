@@ -8,6 +8,7 @@
 > Theme: Delivery Orchestration for Per-Side Wire Termination Metadata with Legacy Compatibility
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -118,3 +119,11 @@ Backlog scope covered:
 - `.github/workflows/ci.yml`
 - `package.json`
 
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|wire-endpoint-connection-reference-and-s|item-245-wire-per-side-connection-and-se|1-deliver-wave-0-wire-entity|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

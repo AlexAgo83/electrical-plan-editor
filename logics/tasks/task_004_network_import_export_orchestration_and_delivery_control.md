@@ -8,6 +8,7 @@
 > Theme: Data Portability Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -51,3 +52,12 @@ Backlog scope covered:
   - Keep parser/migration/conflict logic centralized in `src/adapters/portability/networkFile.ts`.
   - Preserve deterministic suffix tests and malformed payload tests in CI.
   - Keep UI failure path non-destructive with explicit status messaging.
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|network-import-export-orchestration-and-|item-025-network-export-schema-and-seria|1-freeze-file-payload-contract-and|python3-logics-skills-logics-doc-linter-
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

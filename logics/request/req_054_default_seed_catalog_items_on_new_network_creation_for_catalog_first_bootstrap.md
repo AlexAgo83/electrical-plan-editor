@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -25,6 +26,15 @@ Seeding a minimal default catalog at network creation improves:
 - onboarding continuity,
 - demo/sample flow readiness,
 without changing the catalog-first data model.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|default-seed-catalog-items-on-new-networ|the-catalog-first-workflow-introduced-by|ac1-creating-a-brand-new-network-initial
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Automatically create **exactly `3`** realistic default `Catalog` items when a **new network** is created.

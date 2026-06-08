@@ -8,6 +8,7 @@
 > Theme: Follow-up Delivery for Canvas Accessibility and Runtime/Test Contract Clarity
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -108,3 +109,12 @@ Backlog scope covered:
   - AC4: Satisfied by clearer wall-clock guardrail strategy documentation and optional `LAYOUT_RESPONSIVENESS_BUDGET_MS` override while retaining the regression assertion.
   - AC5: Satisfied by passing targeted and full validation suites.
   - AC6: Satisfied by this task/request/backlog closure documentation and Logics lint passing.
+
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|post-req-024-review-follow-up-orchestrat|item-145-network-summary-2d-node-keyboar|1-deliver-wave-0-2d-node|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```

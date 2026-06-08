@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and references when editing this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -32,6 +33,15 @@ Current app already includes a styled modal implementation:
 - `src/app/components/onboarding/OnboardingModal.tsx`
 
 This request is to align all system confirmations with an app-level modal pattern.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|replace-system-modals-with-styled-in-app|current-destructive-sensitive-actions-st|ac1-all-current-app-level-confirmation-f
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Replace system confirmation modals with styled, reusable in-app confirmation dialogs.

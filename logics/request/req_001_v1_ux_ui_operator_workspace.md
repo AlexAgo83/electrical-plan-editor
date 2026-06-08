@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -103,6 +104,15 @@ Architecture reference to preserve:
 - New routing mathematics or alternative shortest path algorithms.
 - 3D geometry, bend radius, or manufacturing-specific physical constraints.
 - BOM/export redesign in this wave.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|ux-ui-v1-operator-workspace-overhaul|improve-the-whole-application-ux-ui|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - To create from this request:

@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -28,6 +29,15 @@ The segment form currently exposes:
 - `Sub-network tag (optional)`
 
 `Node A` and `Node B` are separate controlled selects. Reversing a segment direction/order currently requires manual reselection and is slow/error-prone.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|segment-edit-node-a-b-swap-action-betwee|in-segments-edit-segment-users-need|ac1-edit-segment-exposes-a-swap
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Objective
 - Add a dedicated `Swap Node A/B` action in `Edit Segment` to invert the selected nodes in one click.

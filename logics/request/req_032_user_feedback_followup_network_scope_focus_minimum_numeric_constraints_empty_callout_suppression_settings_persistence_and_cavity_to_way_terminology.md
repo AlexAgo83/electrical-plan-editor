@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -133,6 +134,15 @@ These items are small-to-medium individually, but together form a coherent user-
 - Broad redesign of network-scope table interactions beyond fixing the single-click focus bug.
 - Changes to callout placement heuristics, callout typography, or leader-line styling (except suppression of empty callouts).
 - Global validation-rule redesign beyond the specified minimum guards.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|user-feedback-follow-up-network-scope-fo|fix-a-network-scope-table-focus|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_187_network_scope_table_single_click_focus_sync_with_edit_panel_selection_state.md`

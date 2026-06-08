@@ -7,6 +7,7 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Ready (DoR)
 - [x] Need, scope, and operator-visible outcome are captured.
 - [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
@@ -307,6 +308,15 @@ This request focuses on **surfacing and navigation quality**:
 - Advanced multi-column sort UX (shift-click secondary sort, saved sort presets) unless already trivial within the existing architecture.
 - Mandatory export-column parity for every newly surfaced analysis field (unless implemented opportunistically and documented).
 - Non-tabular settings lists/checklists.
+
+
+```mermaid
+%% logics-kind: request
+%% logics-signature: request|table-sortability-completion-nodes-segme|make-all-columns-of-all-tabular|ac1-define-a-measurable-outcome
+flowchart TD
+    Need[Request need] --> Backlog[Backlog slice]
+    Backlog --> Task[Delivery task]
+```
 
 # Backlog
 - `logics/backlog/item_269_shared_table_sortability_completion_audit_and_column_comparator_rollout.md`

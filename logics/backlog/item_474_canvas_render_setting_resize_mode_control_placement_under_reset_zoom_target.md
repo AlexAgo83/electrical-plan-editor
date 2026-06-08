@@ -8,12 +8,22 @@
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked task references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Problem
 Delivered in the `task_076` implementation wave for `req_092` to `req_095` to remove stale backlog placeholders and align execution tracking with shipped behavior.
 
 # Scope
 - In: Code delivery, persistence/validation/UI wiring, and targeted regression checks for the item scope.
 - Out: Unrelated architecture changes outside `req_092` to `req_095`.
+
+
+```mermaid
+%% logics-kind: backlog
+%% logics-signature: backlog|canvas-render-setting-resize-mode-contro|req-095-network-summary-resize-mode-to-l|delivered-in-the-task-076-implementation|ac1-implemented-and-validated-with-passi
+flowchart TD
+    Request[Request source] --> Scope[Backlog scope]
+    Scope --> Task[Delivery task]
+```
 
 # Acceptance criteria
 - AC1: Implemented and validated with passing `typecheck`, `lint`, and targeted tests for touched surfaces.

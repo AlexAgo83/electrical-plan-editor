@@ -8,6 +8,7 @@
 > Theme: Delivery Orchestration for Reusable Table Filter-Bar Pattern (Wires + Network Scope Pilot)
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+> Maintenance edit: strict Logics corpus repair formalized gates, traceability, and workflow overview metadata.
 # Definition of Done (DoD)
 - [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
 - [x] Validation evidence is recorded in the task report or validation section.
@@ -117,3 +118,11 @@ Backlog scope covered:
 - `.github/workflows/ci.yml`
 - `package.json`
 
+```mermaid
+%% logics-kind: task
+%% logics-signature: task|wire-list-filter-bar-field-selector-and-|item-250-wire-panels-filter-row-layout-f|1-deliver-wave-0-reusable-filter-row|documentation-logics
+flowchart TD
+    Backlog[Backlog item] --> Build[Implementation]
+    Build --> Validate[Validation]
+    Validate --> Close[Finish workflow]
+```
