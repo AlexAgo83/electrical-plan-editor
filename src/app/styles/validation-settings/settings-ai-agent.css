@@ -236,6 +236,19 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.ai-agent-panel .ai-agent-history-actions {
+  align-self: end;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.ai-agent-panel .ai-agent-history-actions > button {
+  min-height: 2rem;
+  padding-block: 0.35rem;
+  padding-inline: 0.55rem;
+  line-height: 1.15;
+}
+
 .ai-agent-panel .stack-form {
   gap: 0.65rem;
 }
@@ -269,4 +282,10 @@
 
 .app-shell .ai-agent-panel .ai-agent-permissions-fieldset .settings-checkbox {
   color: inherit;
+}
+
+@media (max-width: 560px) {
+  .ai-agent-panel .ai-agent-history-actions {
+    grid-template-columns: 1fr;
+  }
 }
