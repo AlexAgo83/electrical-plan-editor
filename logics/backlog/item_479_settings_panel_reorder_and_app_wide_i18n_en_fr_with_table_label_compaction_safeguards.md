@@ -72,3 +72,4 @@ Settings ordering and language support do not meet requested UX expectations:
 # Notes
 - Derived from `logics/request/req_098_settings_global_preferences_reorder_and_app_wide_i18n_en_fr_with_table_label_compaction.md`.
 - Orchestrated by `logics/tasks/task_077_super_orchestration_delivery_execution_for_req_097_and_req_098_with_validation_gates.md`.
+- request-AC2A -> This backlog slice. Proof: Historical delivery or planned chain is recorded in the linked Logics report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

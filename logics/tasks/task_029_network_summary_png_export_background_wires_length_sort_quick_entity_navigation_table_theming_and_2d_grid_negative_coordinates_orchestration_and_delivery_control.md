@@ -8,6 +8,11 @@
 > Theme: Delivery Orchestration for Cross-Cutting Workflow/Table/Canvas Polish and Interaction Freedom Improvements
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_030`. This task coordinates delivery of: PNG export background option (transparent default preserved), `Wires` sorting by `Length (mm)`, a compact quick entity navigation strip after `Route preview`, extension of `2D label rotation` to include inverse angles, table header theme/icon coverage and highlight styling refinement, and 2D negative-coordinate movement + expanded zoom-out range without regressing subnetwork node deemphasis behavior.
 

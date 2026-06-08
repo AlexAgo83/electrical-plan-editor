@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and references when editing this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Accidental deletions remain possible on several modeling/catalog actions.
 - The product should enforce explicit user confirmation before any delete action is executed.

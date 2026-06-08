@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Introduce a save/data versioning system so future app upgrades do not cause users to lose work.
 - Cover both persistence channels:

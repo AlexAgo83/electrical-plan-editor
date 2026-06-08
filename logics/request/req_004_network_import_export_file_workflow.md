@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Allow users to export networks to files for backup, sharing, and transfer.
 - Allow users to import network files into the app with safe validation and deterministic conflict handling.

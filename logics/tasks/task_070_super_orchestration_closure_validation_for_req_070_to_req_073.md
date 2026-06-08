@@ -8,6 +8,11 @@
 > Theme: Cross-request closure governance for Home, Analysis navigation, confirmation dialogs, and PWA update emphasis
 > Reminder: Update Understanding/Confidence/Progress and references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 `req_070` to `req_073` were delivered across a shared timeline around `0.9.13`, but they do not yet have a dedicated orchestration closure task equivalent to recent queues (`task_068`, `task_069`).
 
@@ -116,3 +121,4 @@ This task centralizes:
 - request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 - request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 - request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4A -> This task. Proof: Historical delivery or planned chain is recorded in the linked Logics report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

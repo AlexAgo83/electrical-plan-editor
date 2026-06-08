@@ -8,6 +8,11 @@
 > Theme: Delivery Orchestration for Safe Node ID Editing with Atomic Store Rename and UI State Coherence
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_036`. This task coordinates delivery of safe `Node ID` editability in Node edit mode by introducing an atomic store-level rename action and wiring the UI submit flow to use it without breaking graph references or history semantics.
 

@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Improve accessibility of the app based on a recent audit, with priority on keyboard access, screen reader semantics, and modal focus behavior.
 - Fix 6 identified gaps affecting the `Network summary` interactive SVG, onboarding modal, sortable tables, Validation table row interaction, and issue counters in navigation/header.

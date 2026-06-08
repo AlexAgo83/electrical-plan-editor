@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Reuse the `Network Scope` list/form interaction model as the baseline for every other screen combining a list and a create/edit form.
 - Rework entity-table actions so they are no longer embedded in an `Actions` column.

@@ -8,6 +8,11 @@
 > Theme: Electrical CAD
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for V1 electrical plan editor kickoff. This task coordinates backlog sequencing, dependency control, validation cadence, and progress reporting.
 

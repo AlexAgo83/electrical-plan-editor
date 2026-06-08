@@ -8,6 +8,11 @@
 > Theme: Delivery Orchestration for Canonical Wire Colors, Optional Bi-Color Modeling, and Legacy Compatibility
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_039`. This task coordinates delivery of a canonical wire color catalog (2-character IDs + English labels + hex swatches), optional wire color modeling (`No color`, mono-color, bi-color), wire form selectors/swatches, and backward-compatible normalization of legacy data that predates wire colors.
 

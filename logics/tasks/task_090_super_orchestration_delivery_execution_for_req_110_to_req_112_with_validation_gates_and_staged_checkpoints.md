@@ -176,3 +176,10 @@ flowchart LR
   - `npm test -- --run src/tests/modeling-select-options.spec.ts src/tests/app.ui.modeling-dropdown-ordering.spec.tsx src/tests/app.ui.creation-flow-ergonomics.spec.tsx src/tests/app.ui.creation-flow-wire-endpoint-refs.spec.tsx`
   - `npm run -s build`
   - `python3 logics/skills/logics-doc-linter/scripts/logics_lint.py`
+
+
+# Strict Audit Backlog Links
+- `logics/backlog/item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options.md`
+- `logics/backlog/item_547_modeling_form_dropdown_wiring_for_alphabetical_option_ordering_and_missing_fallback_pinning.md`
+- `logics/backlog/item_548_req_111_validation_matrix_and_modeling_dropdown_ordering_closure_traceability.md`
+

@@ -8,6 +8,11 @@
 > Theme: Delivery Orchestration for 2D Label Readability Controls (Zoom Invariance + Size/Rotation Preferences)
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_029`. This task coordinates delivery of zoom-invariant 2D label rendering in `Network summary`, label anchoring stability during pan/zoom, `Settings` preferences for label size (`Small / Normal / Large`) and rotation (`0° / 20° / 45° / 90°`), defaults/normalization handling, regression/theme/readability verification, and final closure traceability.
 

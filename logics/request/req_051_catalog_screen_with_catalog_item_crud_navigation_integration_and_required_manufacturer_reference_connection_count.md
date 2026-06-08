@@ -12,6 +12,11 @@
 - Final validation completed:
   - `logics_lint`, `lint`, `typecheck`, `quality:ui-modularization`, `quality:store-modularization`, `quality:pwa`, `build`, `test:ci`, `test:e2e` all passed.
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Add a new `Catalog` concept to manage reusable catalog objects independently from connector/splice type-specific forms.
 - Expose a dedicated `Catalog` screen/sub-screen with the same look-and-feel as the current connector modeling workspace composition:

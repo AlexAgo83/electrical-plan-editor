@@ -8,6 +8,11 @@
 > Theme: Delivery orchestration for cross-surface UI readability polish and Network Scope operator-flow improvements in req_047
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_047`, which bundles a focused but cross-cutting UI ergonomics pass across `Wires`, `Connectors`/`Splices` analysis, filterable workspace tables, and `Network Scope` actions:
 - split `Wires` table `Endpoints` into `Endpoint A` / `Endpoint B`

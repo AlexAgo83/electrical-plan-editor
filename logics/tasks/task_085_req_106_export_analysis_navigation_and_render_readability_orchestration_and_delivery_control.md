@@ -97,3 +97,4 @@
 - Documentation deliverables are part of the task scope:
   - update `README.md` after implementation is finalized;
   - generate the changelog artifact only at closure time so the filename/version matches the real project version at that moment, not a version guessed in advance.
+- request-AC17B -> This task. Proof: Historical delivery or planned chain is recorded in the linked Logics report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

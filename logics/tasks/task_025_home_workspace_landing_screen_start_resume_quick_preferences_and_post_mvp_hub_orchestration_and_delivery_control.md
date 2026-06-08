@@ -8,6 +8,11 @@
 > Theme: Delivery Orchestration for Home Workspace Entry Experience
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_026`. This task coordinates delivery of a new home workspace landing screen focused on action-first startup/resume flows and extension-ready structure for post-MVP modules. The previously planned `Quick shortcuts` / `Quick preferences` Home modules were removed from MVP scope and are tracked as a documented de-scope decision.
 

@@ -8,6 +8,11 @@
 > Theme: Delivery Orchestration for Persisted Data Versioning, Migration Safety, and Backward Compatibility
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_033`. This task coordinates delivery of a persistence compatibility safety framework so app upgrades do not cause users to lose work, including:
 - versioned save/file payload contracts,

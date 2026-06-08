@@ -47,3 +47,4 @@ Delivered in the `task_076` implementation wave for `req_092` to `req_095` to re
 
 # Notes
 - Request link: `req_095_network_summary_resize_mode_to_lock_content_scale_on_viewport_resize`.
+- request-AC2A -> This backlog slice. Proof: Historical delivery or planned chain is recorded in the linked Logics report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

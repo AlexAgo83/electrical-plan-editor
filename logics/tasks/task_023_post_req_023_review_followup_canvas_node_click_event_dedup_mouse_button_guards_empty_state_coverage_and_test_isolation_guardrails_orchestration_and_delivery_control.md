@@ -8,6 +8,11 @@
 > Theme: Follow-up Delivery for Canvas Interaction Correctness and Test Reliability
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_024`. This task coordinates follow-up hardening on 2D canvas node click deduplication, mouse-button guards for drag/pan interactions, explicit non-settings no-active-network empty-state regression coverage, `appUiModules` test-global cleanup isolation, and responsiveness test reliability follow-up.
 

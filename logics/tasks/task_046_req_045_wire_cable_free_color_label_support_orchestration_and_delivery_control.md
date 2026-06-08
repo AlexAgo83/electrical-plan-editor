@@ -8,6 +8,11 @@
 > Theme: Delivery orchestration for free-form wire color labels with invariant safety and compatibility coverage
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_045`. This task coordinates delivery of a new `Free color` wire/cable identification mode (text label) in addition to the existing `No color` and catalog mono/bi-color modes from `req_039`, while preserving deterministic behavior across reducer normalization, form UX, read-only display surfaces, and persistence/import/export compatibility.
 

@@ -8,6 +8,11 @@
 > Theme: AppController Composition Root Reduction Sequencing
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for wave-4 `AppController` decomposition introduced by `req_017`. This task coordinates sequencing, validation cadence, and regression mitigation for screen-container extraction, controller-slice boundaries, state-pack consolidation, derived-state extraction, and final closure/AC traceability.
 

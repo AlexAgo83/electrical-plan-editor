@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Add a new **light** theme preset and a new **dark** theme preset inspired by the Circle Mobility visual identity.
 - Base both presets on the provided Circle Mobility palette, gradients, and UI usage recommendations.

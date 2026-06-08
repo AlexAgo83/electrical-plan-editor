@@ -8,6 +8,11 @@
 > Theme: Cross-request delivery orchestration for wide-screen shell behavior, 2D readability controls, export quality/contracts, and CSV wire schema hardening
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 This super-orchestration task coordinates the next delivery bundle:
 - `req_086`: global `wide screen` option removing shell max-width cap;

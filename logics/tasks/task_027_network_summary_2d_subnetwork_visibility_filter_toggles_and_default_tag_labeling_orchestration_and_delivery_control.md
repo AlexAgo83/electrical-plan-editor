@@ -8,6 +8,11 @@
 > Theme: Delivery Orchestration for Interactive Subnetwork Visibility Filtering in the 2D Network Summary Panel
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_028`. This task coordinates delivery of interactive subnetwork visibility filters in the 2D `Network summary` floating panel, including toggle-button conversion, 2D deemphasis rendering for inactive subnetworks, multi-select + `Enable all` UX, default-tag display normalization (`DEFAULT` italic), regression/theme/a11y coverage, and final closure traceability.
 

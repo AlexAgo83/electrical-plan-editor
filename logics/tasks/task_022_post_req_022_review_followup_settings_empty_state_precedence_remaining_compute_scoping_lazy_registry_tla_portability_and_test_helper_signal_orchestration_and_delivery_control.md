@@ -8,6 +8,11 @@
 > Theme: Follow-up Delivery for UX Correctness, Residual Compute Scoping, and Lazy Registry/Test Helper Robustness
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_023`. This task coordinates follow-up work on Settings accessibility without active networks, remaining `NetworkSummaryPanel` compute scoping, `appUiModules` top-level-await portability risk reduction, test-helper signal hardening, and final closure/AC traceability.
 

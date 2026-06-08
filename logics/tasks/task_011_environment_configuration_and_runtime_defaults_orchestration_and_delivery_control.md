@@ -8,6 +8,11 @@
 > Theme: Env Configuration Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for environment configuration support introduced by `req_012`. This task coordinates wave sequencing, dependency control, validation cadence, and risk mitigation across env contract bootstrap, runtime resolution, validation/fallback, documentation, and regression closure.
 

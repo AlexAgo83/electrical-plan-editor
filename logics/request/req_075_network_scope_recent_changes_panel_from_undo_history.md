@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and references when editing this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Network Scope currently shows network list and edit form but no visibility on recent modeling/catalog mutations.
 - Operators need a quick audit trail to understand what changed recently without switching screens.

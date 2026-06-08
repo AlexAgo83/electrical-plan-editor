@@ -8,6 +8,11 @@
 > Theme: Reliability Hardening Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for reliability hardening and CI release-safety improvements introduced by `req_015`. This task coordinates sequencing, validation cadence, and regression control across persistence adapter hardening, empty-workspace persistence semantics, CSV export robustness, CI workflow completion, and final regression closure.
 

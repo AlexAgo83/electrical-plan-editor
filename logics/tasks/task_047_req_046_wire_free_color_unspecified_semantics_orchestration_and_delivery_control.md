@@ -8,6 +8,11 @@
 > Theme: Delivery orchestration for explicit wire color mode semantics and free-color unspecified intent preservation
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_046`, a semantic follow-up to `req_045`. The goal is to support `Free color` mode with an empty label as a valid “unspecified / to be decided later” state, while keeping it distinct from `No color` across reducer normalization, UI form behavior, read-only rendering, sorting/filter/search/export, and persistence/import/export compatibility.
 

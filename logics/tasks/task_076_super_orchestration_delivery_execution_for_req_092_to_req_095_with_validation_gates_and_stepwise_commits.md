@@ -207,3 +207,4 @@ The bundle spans domain model, validation, persistence/import, canvas rendering,
 - `src/app/components/workspace/SettingsWorkspaceContent.tsx`
 - `src/app/components/NetworkSummaryPanel.tsx`
 - `src/app/hooks/useUiPreferences.ts`
+- request-AC2A -> This task. Proof: Historical delivery or planned chain is recorded in the linked Logics report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

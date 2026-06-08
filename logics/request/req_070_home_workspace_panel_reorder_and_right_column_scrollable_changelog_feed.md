@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Users want a clearer Home hierarchy:
   - `Workspace` panel should be visually placed under `Quick start`.

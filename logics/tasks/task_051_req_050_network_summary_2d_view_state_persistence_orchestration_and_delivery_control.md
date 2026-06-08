@@ -8,6 +8,11 @@
 > Theme: Delivery orchestration for per-network 2D view-state persistence (viewport + canvas toggles)
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_050`, which formalizes per-network persistence and restore of the `Network summary` 2D view state:
 - viewport (`zoom + pan`),

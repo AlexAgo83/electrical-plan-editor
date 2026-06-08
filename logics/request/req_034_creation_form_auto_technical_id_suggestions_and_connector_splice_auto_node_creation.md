@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - In creation forms, pre-fill `Technical ID` fields with the next available/suggested ID so users do not need to type them manually every time.
 - When creating a `Connector` or a `Splice`, automatically create a corresponding `Node` representing it in the network graph (users may later delete or edit that node if needed).

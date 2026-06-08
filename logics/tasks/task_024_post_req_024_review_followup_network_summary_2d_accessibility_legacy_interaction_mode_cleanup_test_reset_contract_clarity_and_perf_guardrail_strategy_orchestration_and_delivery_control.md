@@ -8,6 +8,11 @@
 > Theme: Follow-up Delivery for Canvas Accessibility and Runtime/Test Contract Clarity
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_025`. This task coordinates follow-up work on 2D network node keyboard accessibility, legacy `interactionMode` cleanup/contract clarity (with product decision that only `select` is supported), `appUiModules` test reset contract clarity, and layout responsiveness guardrail strategy follow-up.
 

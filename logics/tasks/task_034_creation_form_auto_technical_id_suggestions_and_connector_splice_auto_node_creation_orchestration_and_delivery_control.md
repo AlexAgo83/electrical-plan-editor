@@ -8,6 +8,11 @@
 > Theme: Delivery Orchestration for Creation Flow Ergonomics and Graph Bootstrap Automation
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_034`. This task coordinates delivery of two user-feedback-driven creation workflow improvements:
 - automatic `Technical ID` suggestions/prefill in create forms (initially connector/splice),

@@ -84,3 +84,4 @@ flowchart LR
 - `npm run -s typecheck`
 - `npm test -- --run src/tests/persistence.localStorage.spec.ts`
 - `npm run -s build`
+- request-AC6B -> This backlog slice. Proof: Historical delivery or planned chain is recorded in the linked Logics report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

@@ -7,6 +7,11 @@
 > Complexity: Medium
 > Theme: Manual QA Checklist and Execution Notes for Baseline + Follow-up Bundle
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Purpose
 Provide an explicit manual QA checklist for the delivered `req_035` through `req_043` bundle and record execution notes for `task_044` closure.
 

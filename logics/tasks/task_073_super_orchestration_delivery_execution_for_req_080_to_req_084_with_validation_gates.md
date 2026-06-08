@@ -8,6 +8,11 @@
 > Theme: Cross-request delivery orchestration for 2D layout quality, callout focus mode, responsive compaction/mobile mode, and recent-changes persistence
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 This super-orchestration task coordinates the next delivery bundle:
 - `req_080`: stronger crossing reduction in 2D generate pipeline;

@@ -8,6 +8,11 @@
 > Theme: Delivery Orchestration for Wire Endpoint Occupancy-Aware Create Prefill and Manual-Input-Safe UX
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_037`. This task coordinates delivery of wire-form endpoint occupancy indication and next-free `way`/`port` suggestion used as create-mode prefill, with explicit guards to avoid overwriting manual user input.
 

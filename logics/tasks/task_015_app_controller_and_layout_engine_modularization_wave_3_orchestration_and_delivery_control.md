@@ -8,6 +8,11 @@
 > Theme: Controller and Layout Refactor Wave Sequencing
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for wave-3 modularization introduced by `req_016`. This task coordinates sequencing, validation cadence, and regression mitigation for continued `AppController` decomposition and `app-utils-layout` domain split, with final closure and AC traceability.
 

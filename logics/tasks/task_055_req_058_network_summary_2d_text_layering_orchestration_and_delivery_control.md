@@ -8,6 +8,11 @@
 > Theme: Orchestration for req_058 2D text layering readability fix and regression safety
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 `req_058` introduces a strict visual contract for the `Network summary` 2D render: text labels must always render above nodes and segments.
 

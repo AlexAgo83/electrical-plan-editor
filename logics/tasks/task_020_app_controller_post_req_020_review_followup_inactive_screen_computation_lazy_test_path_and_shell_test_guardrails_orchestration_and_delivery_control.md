@@ -8,6 +8,11 @@
 > Theme: Post-req_020 Follow-up Delivery for Compute Scoping and Regression Confidence
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_021`. This task coordinates follow-up work on inactive-screen domain content assembly reduction in `AppController`, lazy-path regression coverage for `appUiModules`/`Suspense`, navigation test helper explicitness, viewport cleanup guardrails across shell tests, and final closure/AC traceability.
 

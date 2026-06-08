@@ -8,6 +8,11 @@
 > Theme: Delivery Orchestration for Interactive 2D Connector/Splice Cable Callout Frames, Persistence, and Canvas Workflow Integration
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_031`. This task coordinates delivery of a new 2D `Network summary` visualization layer: connector/splice cable info callout frames with dashed leader lines, grouped cable content + lengths, default outward placement heuristics, drag interactions with node-like movement rules, persistence of callout positions in the network model, theme/deemphasis compatibility, and runtime/default visibility integration (toolbar toggle + `Settings`, plus PNG export/defaults interoperability).
 

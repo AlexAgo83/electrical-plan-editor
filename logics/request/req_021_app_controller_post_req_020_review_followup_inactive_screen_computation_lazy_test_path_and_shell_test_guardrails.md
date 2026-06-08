@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Address follow-up review findings after `req_020` / `task_019`, focused on residual `AppController` screen-domain computation cost and test coverage/guardrail gaps.
 - Reduce unnecessary inactive-screen content assembly work that still happens before active workspace rendering.

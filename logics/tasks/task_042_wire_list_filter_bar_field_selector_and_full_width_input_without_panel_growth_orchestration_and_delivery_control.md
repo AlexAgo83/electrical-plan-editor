@@ -8,6 +8,11 @@
 > Theme: Delivery Orchestration for Reusable Table Filter-Bar Pattern (Wires + Network Scope Pilot)
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_042`. This task coordinates delivery of a reusable table filter-bar pattern featuring a `Filter` label, field selector, and full-width text input (within existing panel width), with initial adoption in `Wires` (Modeling + Analysis) and `Network Scope`.
 

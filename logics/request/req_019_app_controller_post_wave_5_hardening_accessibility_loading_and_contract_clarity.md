@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Address post-wave-5 review findings that can still cause UX/accessibility regressions despite green tests and successful build/CI.
 - Harden shell overlay behavior (`drawer`, `operations panel`) so hidden UI is not keyboard-focusable or screen-reader exposed.

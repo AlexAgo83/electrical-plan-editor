@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Prevent app boot/runtime crashes when browser storage access is blocked or unavailable (`localStorage` access can throw in some contexts).
 - Preserve valid user intent when a persisted workspace is empty (do not silently re-bootstrap the sample network on reload).

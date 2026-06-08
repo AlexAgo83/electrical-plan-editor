@@ -96,3 +96,4 @@
 - `npm test -- --run src/tests/app.ui.network-summary-bom-export.spec.tsx`
 - `npm run lint`
 - `npm run typecheck`
+- request-AC17B -> This backlog slice. Proof: Historical delivery or planned chain is recorded in the linked Logics report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

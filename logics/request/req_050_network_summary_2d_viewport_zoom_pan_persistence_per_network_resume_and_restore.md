@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Persist the 2D network view viewport state (`zoom` + `pan`) so users can resume where they left off.
 - Persist the 2D network view toggles (`Info`, `Length`, `Callouts`, `Grid`, `Snap`, `Lock`) so the visual workspace state resumes consistently.

@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - The project now exposes useful informational signals (`coverage:ui:report`, slow-test top-N, bundle metrics), but CI execution order still limits their diagnostic value when core tests fail first.
 - Test-suite segmentation currently relies on naming conventions (`app.ui*`) that are easy to drift from and can produce blurred fast/UI boundaries.

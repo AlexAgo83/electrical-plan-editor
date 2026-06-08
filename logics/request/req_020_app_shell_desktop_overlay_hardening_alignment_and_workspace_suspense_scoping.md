@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Address follow-up review findings after `req_019` / `task_018` closure, focusing on desktop shell accessibility consistency and lazy-loading scoping.
 - Align drawer accessibility hardening behavior with actual CSS/visibility behavior across desktop and mobile breakpoints.

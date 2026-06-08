@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - The project is feature-rich and currently green on the full validation matrix, but recent review surfaced several quality follow-ups that should be tracked explicitly instead of remaining ad hoc notes.
 - The team needs a single request that consolidates hardening, performance, and test reliability improvements so they can be prioritized and delivered intentionally.

@@ -8,6 +8,11 @@
 > Theme: Mobile UX compaction and readability hardening across onboarding, network scope, modeling, analysis, catalog, and validation
 > Reminder: Update status/understanding/confidence/progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 `req_085` extends the mobile pass with explicit one-line placement and label-compaction rules:
 - onboarding modal header/actions must stay on single lines;

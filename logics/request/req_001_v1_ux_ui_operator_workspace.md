@@ -7,6 +7,11 @@
 > Reminder: Update Understanding/Confidence and dependencies/references when you edit this doc.
 > Status: Done
 
+# Definition of Ready (DoR)
+- [x] Need, scope, and operator-visible outcome are captured.
+- [x] Acceptance criteria are testable or intentionally scoped by linked backlog/tasks.
+- [x] Backlog/task linkage is recorded or the historical delivery chain is documented.
+
 # Needs
 - Improve the whole application UX/UI so electrical modeling and routing workflows are faster, clearer, and less error-prone.
 - Replace fragmented screen switching with a consistent operator workspace where modeling and analysis happen in one continuous flow.

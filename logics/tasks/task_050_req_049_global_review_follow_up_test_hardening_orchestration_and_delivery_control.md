@@ -8,6 +8,11 @@
 > Theme: Delivery orchestration for review-driven test hardening (e2e semantics, selector resilience, shared filter clear coverage)
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for `req_049`, a focused hardening follow-up derived from the global project review. The review found three issues to formalize and fix:
 - e2e smoke helper semantics drift after `Modeling`/`Analysis` merge,

@@ -8,6 +8,11 @@
 > Theme: Post-Refactor Hardening and Regression Coverage Sequencing
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for post-wave-5 hardening introduced by `req_019`. This task coordinates sequencing and validation for overlay accessibility/focus isolation, shell lazy-loading resilience, namespaced state helper contract clarity, regression-test coverage additions, and final closure/AC traceability.
 

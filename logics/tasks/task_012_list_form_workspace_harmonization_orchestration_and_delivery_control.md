@@ -8,6 +8,11 @@
 > Theme: Cross-Screen List/Form UX Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for list/form UX harmonization introduced by `req_013`. This task coordinates wave sequencing, dependency control, validation cadence, and delivery safety for migrating all list + create/edit form screens to the `Network Scope` interaction model.
 

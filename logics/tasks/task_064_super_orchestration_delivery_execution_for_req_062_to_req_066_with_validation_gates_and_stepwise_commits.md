@@ -8,6 +8,11 @@
 > Theme: Cross-request delivery coordination for the active task queue (`req_062`..`req_066`)
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 This super-orchestration task coordinates the currently open delivery queue:
 - `req_062` / `task_059`: Catalog CSV import/export

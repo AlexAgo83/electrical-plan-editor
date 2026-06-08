@@ -8,6 +8,11 @@
 > Theme: Multi-Network Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for multi-network management and navigation introduced by `req_002`. This task coordinates sequence, dependency control, validation cadence, and risk tracking for safe transition from single-network to multi-network runtime behavior.
 

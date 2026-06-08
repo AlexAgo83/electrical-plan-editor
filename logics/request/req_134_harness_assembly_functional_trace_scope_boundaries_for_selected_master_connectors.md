@@ -130,6 +130,7 @@ flowchart TD
 
 # Backlog
 - TBD on promotion
+- `item_623_harness_assembly_functional_trace_scope_boundaries_for_selected_master_connectors`
 
 # Tasks
 - TBD on promotion

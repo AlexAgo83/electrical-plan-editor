@@ -8,6 +8,11 @@
 > Theme: Modularization Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for large-file modularization across req_005 (UI) and req_006 (store). This task coordinates sequencing, dependency control, validation cadence, and risk tracking for splitting oversized files while preserving behavior.
 

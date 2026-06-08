@@ -8,6 +8,11 @@
 > Theme: Orchestration for global undo/redo delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 `req_066` introduces a high-impact editing safety feature: global `Undo / Redo` for workspace-domain mutations.
 

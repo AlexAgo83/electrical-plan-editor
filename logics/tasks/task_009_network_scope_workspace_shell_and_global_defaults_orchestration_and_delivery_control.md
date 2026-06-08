@@ -8,6 +8,11 @@
 > Theme: Workspace Shell and Navigation Delivery
 > Reminder: Update Understanding/Confidence/Progress and dependencies/references when you edit this doc.
 
+# Definition of Done (DoD)
+- [x] Linked acceptance criteria were delivered or explicitly closed in the task report.
+- [x] Validation evidence is recorded in the task report or validation section.
+- [x] Related request/backlog/task traceability is documented for the historical delivery chain.
+
 # Context
 Orchestration task for workspace shell and navigation restructuring introduced by `req_010`. This task coordinates sequencing, dependency control, validation cadence, and delivery safety across `Network Scope`, header/drawer shell, settings entrypoint changes, floating operational controls, and contextual inspector behavior.
 

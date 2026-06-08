@@ -129,3 +129,4 @@
   - `npm run -s lint` ✅
   - `npm run -s typecheck` ✅
   - `npm run -s test:ci:ui` ✅
+- request-AC2A -> This task. Proof: Historical delivery or planned chain is recorded in the linked Logics report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
