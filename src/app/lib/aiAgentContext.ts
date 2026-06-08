@@ -163,13 +163,53 @@ function filterSelectionEntities(state: AppState, selection: SelectionState): Ai
   const selectedCatalogItem =
     selection.kind === "catalog" ? state.catalogItems.byId[selection.id as CatalogItem["id"]] : undefined;
   return {
-    connectors: selectedConnector === undefined ? [] : [selectedConnector],
+    connectors: selectedConnector === undefined ? [] : [formatAiAgentConnector(selectedConnector)],
     splices: selectedSplice === undefined ? [] : [selectedSplice],
-    catalogItems: selectedCatalogItem === undefined ? [] : [selectedCatalogItem],
+    catalogItems: selectedCatalogItem === undefined ? [] : [formatAiAgentCatalogItem(selectedCatalogItem)],
     nodes: selectedNode === undefined ? [] : [selectedNode],
     segments: selectedSegment === undefined ? [] : [selectedSegment],
     wires: selectedWire === undefined ? [] : [selectedWire],
     nodePositions: state.nodePositions
+  };
+}
+
+function formatAiAgentConnector(
+  connector: Connector
+): AiAgentContext["entities"]["connectors"][number] {
+  return {
+    id: connector.id,
+    name: connector.name,
+    technicalId: connector.technicalId,
+    cavityCount: connector.cavityCount,
+    manufacturerReference: connector.manufacturerReference,
+    catalogItemId: connector.catalogItemId,
+    applyCatalogPlugs: connector.applyCatalogPlugs,
+    applyCatalogSeals: connector.applyCatalogSeals,
+    terminalOverrides: connector.terminalOverrides
+  };
+}
+
+function formatAiAgentCatalogItem(
+  catalogItem: CatalogItem
+): AiAgentContext["entities"]["catalogItems"][number] {
+  return {
+    id: catalogItem.id,
+    manufacturerReference: catalogItem.manufacturerReference,
+    connectionCount: catalogItem.connectionCount,
+    name: catalogItem.name,
+    unitPriceExclTax: catalogItem.unitPriceExclTax,
+    url: catalogItem.url,
+    additionalAccessories: catalogItem.additionalAccessories,
+    connectorDefaults:
+      catalogItem.connectorDefaults === undefined
+        ? undefined
+        : {
+            allSameTerminals: catalogItem.connectorDefaults.allSameTerminals,
+            defaultTerminal: catalogItem.connectorDefaults.defaultTerminal,
+            terminalOverrides: catalogItem.connectorDefaults.terminalOverrides,
+            plugs: catalogItem.connectorDefaults.plugs,
+          },
+    connectorLayout: catalogItem.connectorLayout
   };
 }
 
@@ -215,11 +255,20 @@ function mergeScopedEntities(
         return entities;
       }
       return {
-        connectors: [...entities.connectors, ...scoped.connectors.allIds.map((id) => scoped.connectors.byId[id]).filter((entry): entry is Connector => entry !== undefined)],
+        connectors: [
+          ...entities.connectors,
+          ...scoped.connectors.allIds
+            .map((id) => scoped.connectors.byId[id])
+            .filter((entry): entry is Connector => entry !== undefined)
+            .map(formatAiAgentConnector)
+        ],
         splices: [...entities.splices, ...scoped.splices.allIds.map((id) => scoped.splices.byId[id]).filter((entry): entry is Splice => entry !== undefined)],
         catalogItems: [
           ...entities.catalogItems,
-          ...scoped.catalogItems.allIds.map((id) => scoped.catalogItems.byId[id]).filter((entry): entry is CatalogItem => entry !== undefined)
+          ...scoped.catalogItems.allIds
+            .map((id) => scoped.catalogItems.byId[id])
+            .filter((entry): entry is CatalogItem => entry !== undefined)
+            .map(formatAiAgentCatalogItem)
         ],
         nodes: [...entities.nodes, ...scoped.nodes.allIds.map((id) => scoped.nodes.byId[id]).filter((entry): entry is NetworkNode => entry !== undefined)],
         segments: [...entities.segments, ...scoped.segments.allIds.map((id) => scoped.segments.byId[id]).filter((entry): entry is Segment => entry !== undefined)],
@@ -362,9 +411,9 @@ export function buildAiAgentContext(state: AppState, scope: AiAgentScope, option
   }
 
   const entities = {
-    connectors: selectConnectors(state),
+    connectors: selectConnectors(state).map(formatAiAgentConnector),
     splices: selectSplices(state),
-    catalogItems: selectCatalogItems(state),
+    catalogItems: selectCatalogItems(state).map(formatAiAgentCatalogItem),
     nodes: selectNodes(state),
     segments: selectSegments(state),
     wires: selectWires(state),

@@ -3,9 +3,9 @@
 > From version: 1.13.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 92%
-> Confidence: 84%
-> Progress: 35%
+> Understanding: 94%
+> Confidence: 86%
+> Progress: 45%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 
@@ -15,7 +15,7 @@
 - [ ] Export/import round-trip preserves `pinElectricalRoles`, catalog defaults, `ampacityOverrides`.
 - [ ] 2D modeling canvas byte-for-byte snapshot unchanged when only pin roles or ampacity overrides are edited.
 - [ ] Permissiveness gate: partial declarations emit zero error-level findings.
-- [ ] AI Agent context snapshot unchanged.
+- [x] AI Agent context snapshot unchanged.
 - [ ] Performance budgets captured (in-network engine + multi-network view open) with ratio ≤ 1.3.
 - [x] Onboarding step "Declare pin roles" added.
 - [ ] One failing assertion blocks the release through existing CI quality gates.
@@ -70,4 +70,5 @@ Mirror `item_615` AC1–AC9.
 # Progress Report
 - Partially covered by 1.14.0 focused validation: data model, ampacity, current-network aggregation, assembly aggregation core, D1-D4 validation, inspector pin roles, and catalog pin roles.
 - Delivered after 1.15.0: onboarding step "Declare pin roles" added to the full onboarding flow and covered by `npm run -s test -- src/tests/app.ui.onboarding.spec.tsx --run`.
-- Remaining: Playwright full-flow, sample-network silence gate, export/import gate, canvas unchanged snapshot, AI Agent context unchanged snapshot, performance budgets, and CI release-gate wiring.
+- Delivered after 1.15.0: AI Agent context snapshot coverage asserts pin electrical roles do not add AI context fields or leak role labels; covered by `npm run -s test -- src/tests/ai-agent-context.spec.ts --run` and `npm run -s typecheck`.
+- Remaining: Playwright full-flow, sample-network silence gate, export/import gate, canvas unchanged snapshot, performance budgets, and CI release-gate wiring.

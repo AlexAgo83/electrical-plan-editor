@@ -26,6 +26,31 @@ describe("AI agent context builder", () => {
     );
   });
 
+  it("keeps pin electrical roles out of the AI Agent context shape", () => {
+    const baseState = createSampleNetworkState();
+    const connector = baseState.connectors.byId["C-SRC" as ConnectorId];
+    if (connector === undefined) {
+      throw new Error("Expected sample source connector.");
+    }
+    const state = appReducer(
+      baseState,
+      appActions.upsertConnector({
+        ...connector,
+        pinElectricalRoles: {
+          1: { role: "source", currentA: 12, label: "BAT+" }
+        }
+      })
+    );
+
+    const context = buildAiAgentContext(state, "activeNetwork");
+    const serializedContext = JSON.stringify(context);
+
+    expect(context.entities.connectors[0]).not.toHaveProperty("pinElectricalRoles");
+    expect(serializedContext).not.toContain("pinElectricalRoles");
+    expect(serializedContext).not.toContain("electricalRoles");
+    expect(serializedContext).not.toContain("BAT+");
+  });
+
   it("builds a narrow current-selection context when a modeling entity is selected", () => {
     const baseState = createSampleNetworkState();
     const state = {
