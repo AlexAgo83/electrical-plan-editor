@@ -27,6 +27,7 @@ import {
   normalizeNetworkProjectCode
 } from "../../core/networkMetadata";
 import { normalizeNetworkVoltageV, normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
+import { normalizeAmpacityOverrides } from "../../core/wireAmpacity";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeWireEndpointReferenceName } from "../../core/wireReferences";
 import { normalizeConnectorTerminalMaterial } from "../../core/connectorCatalogMaterials";
@@ -551,9 +552,10 @@ function normalizeImportedNetworkTimestamps(
 function normalizeImportedNetworkMetadata(
   network: Network,
   warnings: string[]
-): Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes" | "voltageV"> {
+): Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes" | "voltageV" | "ampacityOverrides"> {
   const normalizedAuthor = normalizeNetworkAuthor(network.author);
   const normalizedVoltageV = normalizeNetworkVoltageV(network.voltageV);
+  const normalizedAmpacityOverrides = normalizeAmpacityOverrides(network.ampacityOverrides);
   const normalizedProjectCode = normalizeNetworkProjectCode(network.projectCode);
   const normalizedLogoUrl = normalizeNetworkLogoUrl(network.logoUrl);
   const normalizedExportNotes = normalizeNetworkExportNotes(network.exportNotes);
@@ -561,6 +563,9 @@ function normalizeImportedNetworkMetadata(
   const appliedFixes: string[] = [];
   if (network.voltageV !== undefined && normalizedVoltageV === undefined) {
     appliedFixes.push("voltageV<-undefined");
+  }
+  for (const warning of normalizedAmpacityOverrides.warnings) {
+    appliedFixes.push(warning);
   }
   if (normalizedProjectCode !== undefined && !isNetworkProjectCodeValid(normalizedProjectCode)) {
     appliedFixes.push("projectCode<-undefined");
@@ -576,6 +581,8 @@ function normalizeImportedNetworkMetadata(
   return {
     author: normalizedAuthor,
     voltageV: normalizedVoltageV,
+    ampacityOverrides:
+      Object.keys(normalizedAmpacityOverrides.value).length === 0 ? undefined : normalizedAmpacityOverrides.value,
     projectCode:
       normalizedProjectCode !== undefined && isNetworkProjectCodeValid(normalizedProjectCode)
         ? normalizedProjectCode
@@ -626,6 +633,10 @@ export function buildNetworkFilePayload(
       const normalizedNetwork: Network = {
         ...network,
         voltageV: normalizeNetworkVoltageV(network.voltageV),
+        ampacityOverrides:
+          Object.keys(normalizeAmpacityOverrides(network.ampacityOverrides).value).length === 0
+            ? undefined
+            : normalizeAmpacityOverrides(network.ampacityOverrides).value,
         author: normalizeNetworkAuthor(network.author),
         projectCode:
           normalizedProjectCode !== undefined && isNetworkProjectCodeValid(normalizedProjectCode)

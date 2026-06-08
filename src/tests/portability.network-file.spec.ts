@@ -9,7 +9,7 @@ import {
   resolveImportConflicts,
   serializeNetworkFilePayload
 } from "../adapters/portability";
-import { appActions, appReducer, createEmptyNetworkScopedState, createInitialState, createSampleNetworkState } from "../store";
+import { appActions, appReducer, createEmptyNetworkScopedState, createEmptyWorkspaceState, createInitialState, createSampleNetworkState } from "../store";
 
 function asNetworkId(value: string): NetworkId {
   return value as NetworkId;
@@ -251,6 +251,90 @@ describe("network file portability", () => {
     expect(parsed.payload?.networks[0]?.network.voltageV).toBe(24);
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.currentA).toBe(12);
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.material).toBe("copper");
+  });
+
+  it("preserves pin roles, catalog pin defaults, and ampacity overrides across export/import round-trip", () => {
+    let state = createSampleNetworkState();
+    const activeNetworkId = state.activeNetworkId;
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network in sample state.");
+    }
+    const connectorId = asConnectorId("C-SRC");
+    const catalogItemId = asCatalogItemId("CAT-SAMPLE-SRC-12W");
+    const connector = state.connectors.byId[connectorId];
+    const catalogItem = state.catalogItems.byId[catalogItemId];
+    if (connector === undefined || catalogItem === undefined) {
+      throw new Error("Expected sample connector and catalog item.");
+    }
+
+    state = appReducer(
+      state,
+      appActions.upsertCatalogItem({
+        ...catalogItem,
+        connectorDefaults: {
+          ...catalogItem.connectorDefaults,
+          pinElectricalRoles: {
+            1: { role: "source", currentA: 15, label: "CAT BAT+" }
+          }
+        }
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        ...connector,
+        pinElectricalRoles: {
+          2: { role: "consumer", currentA: 7.5, label: "Override load" }
+        }
+      })
+    );
+    state = {
+      ...state,
+      networks: {
+        ...state.networks,
+        byId: {
+          ...state.networks.byId,
+          [activeNetworkId]: {
+            ...state.networks.byId[activeNetworkId]!,
+            ampacityOverrides: {
+              0.5: 12,
+              1: 24
+            }
+          }
+        }
+      }
+    };
+
+    const payload = buildNetworkFilePayload(state, "active", [], "2026-06-08T08:00:00.000Z");
+    const parsed = parseNetworkFilePayload(serializeNetworkFilePayload(payload));
+    expect(parsed.error).toBeNull();
+    if (parsed.payload === null) {
+      throw new Error("Expected parsed network payload.");
+    }
+
+    const importedNetworkStates = parsed.payload.networks.reduce<Parameters<typeof appActions.importNetworks>[1]>((states, bundle) => {
+      states[bundle.network.id] = bundle.state;
+      return states;
+    }, {});
+    const imported = appReducer(
+      createEmptyWorkspaceState(),
+      appActions.importNetworks(
+        parsed.payload.networks.map((bundle) => bundle.network),
+        importedNetworkStates,
+        true
+      )
+    );
+
+    expect(imported.networks.byId[activeNetworkId]?.ampacityOverrides).toEqual({
+      0.5: 12,
+      1: 24
+    });
+    expect(imported.connectors.byId[connectorId]?.pinElectricalRoles).toEqual({
+      2: { role: "consumer", currentA: 7.5, label: "Override load" }
+    });
+    expect(imported.catalogItems.byId[catalogItemId]?.connectorDefaults?.pinElectricalRoles).toEqual({
+      1: { role: "source", currentA: 15, label: "CAT BAT+" }
+    });
   });
 
   it("normalizes imported wire side connection and seal references", () => {
