@@ -1,18 +1,18 @@
 ## task_133_ai_agent_experimental_direct_execution_and_rollback - AI Agent Experimental Direct Execution and Rollback
 > From version: 1.10.3
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 91%
 > Confidence: 86%
-> Progress: 5%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Definition of Done (DoD)
-- [ ] The backlog scope is implemented.
-- [ ] Acceptance criteria are covered.
-- [ ] Validation passes.
+- [x] The backlog scope is implemented.
+- [x] Acceptance criteria are covered.
+- [x] Validation passes.
 
 # Backlog
 - `item_603_ai_agent_experimental_direct_execution_and_rollback`
@@ -20,7 +20,7 @@
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|ai-agent-experimental-direct-execution-a|item-603-ai-agent-experimental-direct-ex|1-confirm-scope|run-python3-m-logics-manager-lint-requi
+%% logics-signature: task|ai-agent-experimental-direct-execution-a|item-603-ai-agent-experimental-direct-ex|1-confirm-scope|npm-run-s-test-src
 flowchart TD
     Backlog[Backlog item] --> Build[Implementation]
     Build --> Validate[Validation]
@@ -40,11 +40,16 @@ flowchart TD
 - AC10: Tests cover opt-in gating, snapshot creation, rejected operations, delete gating, validated apply, and rollback.
 
 # Validation
-- Run `python3 -m logics_manager lint --require-status`.
-- Run `python3 -m logics_manager flow finish task task_133_ai_agent_experimental_direct_execution_and_rollback.md` after implementation.
+- `npm run -s test -- src/tests/app.ui.settings-ai-agent.spec.tsx --run` passed.
+- Final Logics lint and full local CI are run after the full AI Agent follow-up batch.
 
 # Report
 - Implementation complete.
+- Direct execution remains unavailable until the Settings experimental opt-in is enabled.
+- The Modeling AI Agent panel labels direct mode as experimental and applies locally accepted operations immediately after provider validation, without the assisted `Apply` step.
+- Direct mode reuses the existing provider proposal parsing, bounded operation validator, and accepted-operation executor.
+- Invalid or out-of-permission operations remain in the result summary without mutation; delete stays blocked unless delete permission is explicitly enabled.
+- The result summary reports applied, skipped, rejected, unsupported, and failed counts, and the existing rollback action restores the pre-run state for the applied session.
 
 # AI Context
 - Summary: Implement ai agent experimental direct execution and rollback.

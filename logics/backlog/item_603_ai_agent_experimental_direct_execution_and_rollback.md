@@ -1,10 +1,10 @@
 ## item_603_ai_agent_experimental_direct_execution_and_rollback - AI Agent Experimental Direct Execution and Rollback
 > From version: 1.10.3
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 99%
 > Confidence: 91%
-> Progress: 70%
+> Progress: 100%
 > Complexity: High
 > Theme: AI
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -130,11 +130,11 @@ flowchart TD
 - Run targeted AI Agent and history tests, `npm run -s typecheck`, and `npm run -s lint`.
 
 # Delivery Status
-- Partially delivered in release `1.11.0`.
-- Delivered: Settings opt-in, experimental mode UI gating, shared local validation/executor path, delete permission gating, impact summary, pre-apply snapshot, and latest-session rollback.
-- Not delivered yet: true one-click direct execution that skips the assisted proposal apply step.
-- Covered by `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`.
-- Validation evidence: AI apply, operation contract, proposal, settings UI, lint, typecheck, build, and Logics lint.
+- Delivered after `1.15.0` workspace state.
+- Release `1.11.0` had already delivered Settings opt-in, experimental mode UI gating, shared local validation/executor path, delete permission gating, impact summary, pre-apply snapshot, and latest-session rollback.
+- This follow-up delivers true direct execution: direct mode requests provider output, validates it through the same bounded operation contract, applies accepted operations without the assisted `Apply` step, rejects invalid/out-of-permission operations without applying them, and leaves one-action rollback available for the applied session.
+- The direct-mode UI shows an experimental warning and the session result summarizes applied, skipped, rejected, unsupported, and failed counts.
+- Validation evidence: `npm run -s test -- src/tests/app.ui.settings-ai-agent.spec.tsx --run` passed, including direct opt-in, direct apply, delete gating, result summary, and rollback.
 
 # AI Context
 - Summary: Add opt-in experimental AI mode affordance with validated apply, pre-run snapshots, and one-click rollback; true no-confirmation direct execution remains future work.

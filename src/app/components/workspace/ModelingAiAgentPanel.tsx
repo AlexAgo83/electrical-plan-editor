@@ -140,6 +140,7 @@ export function ModelingAiAgentPanel({
   const selectedContextSummary = contextSummaries[targetScope];
   const canPrepareProposal =
     providerReadiness.isReady && selectedContextSummary.isAvailable && instruction.trim().length > 0 && !isPreparingProposal;
+  const primaryActionLabel = selectedMode === "direct" ? "Run direct" : "Prepare";
   const enabledPermissionCount = useMemo(() => Object.values(permissions).filter(Boolean).length, [permissions]);
   const proposalImpactPreview = useMemo(
     () => (proposalValidation === null ? null : buildAiAgentImpactPreview(proposalValidation)),
@@ -275,6 +276,14 @@ export function ModelingAiAgentPanel({
             </select>
           </label>
         </div>
+        {selectedMode === "direct" ? (
+          <div className="settings-import-summary" role="region" aria-label="Experimental direct execution warning">
+            <p className="meta-line">
+              <span>Experimental</span>
+              <strong>Direct execution applies locally valid operations immediately after provider validation.</strong>
+            </p>
+          </div>
+        ) : null}
 
         <fieldset className="inline-fieldset ai-agent-permissions-fieldset">
           <legend>Operation permissions</legend>
@@ -344,7 +353,11 @@ export function ModelingAiAgentPanel({
             disabled={!canPrepareProposal}
             onClick={() => {
               setIsPreparingProposal(true);
-              setDraftStatus("Requesting proposal from configured provider...");
+              setDraftStatus(
+                selectedMode === "direct"
+                  ? "Requesting and validating direct execution from configured provider..."
+                  : "Requesting proposal from configured provider..."
+              );
               setDraftRawResponse(null);
               void onPrepareProposal({
                 scope: targetScope,
@@ -352,11 +365,33 @@ export function ModelingAiAgentPanel({
                 permissions
               })
                 .then((draft) => {
+                  setDraftRawResponse(draft.rawResponse ?? null);
+                  if (selectedMode === "direct") {
+                    const result =
+                      draft.validation.accepted.length === 0
+                        ? {
+                            appliedCount: 0,
+                            skippedCount: 0,
+                            impactPreview: buildAiAgentImpactPreview(draft.validation),
+                            canRollback: false
+                          }
+                        : onApplyProposal(draft.validation);
+                    setProposalValidation(draft.validation);
+                    setLastAppliedImpactPreview(result.canRollback ? result.impactPreview : null);
+                    setCanRollbackLastSession(result.canRollback);
+                    setDraftStatus(
+                      `${draft.summary} Direct execution applied ${result.appliedCount} accepted operation${
+                        result.appliedCount === 1 ? "" : "s"
+                      }, skipped ${result.skippedCount}, rejected ${draft.validation.rejected.length}, unsupported ${
+                        draft.validation.unsupported.length
+                      }, failed 0.`
+                    );
+                    return;
+                  }
                   setProposalValidation(draft.validation);
                   setDraftStatus(
                     `${draft.summary} ${selectedContextSummary.scopeLabel} scope, ${enabledPermissionCount} enabled permission groups.`
                   );
-                  setDraftRawResponse(draft.rawResponse ?? null);
                 })
                 .catch((error: unknown) => {
                   setProposalValidation(null);
@@ -368,11 +403,11 @@ export function ModelingAiAgentPanel({
                 });
             }}
           >
-            {isPreparingProposal ? "Preparing..." : "Prepare"}
+            {isPreparingProposal ? (selectedMode === "direct" ? "Running..." : "Preparing...") : primaryActionLabel}
           </button>
           <button
             type="button"
-            disabled={proposalValidation === null || proposalValidation.accepted.length === 0}
+            disabled={selectedMode === "direct" || proposalValidation === null || proposalValidation.accepted.length === 0}
             onClick={() => {
               if (proposalValidation === null) {
                 return;
@@ -391,7 +426,7 @@ export function ModelingAiAgentPanel({
           </button>
           <button
             type="button"
-            disabled={proposalValidation === null}
+            disabled={selectedMode === "direct" || proposalValidation === null}
             onClick={() => {
               setProposalValidation(null);
               setDraftStatus("Proposal rejected. Modeling state was not changed.");

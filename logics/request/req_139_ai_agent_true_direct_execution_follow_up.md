@@ -1,9 +1,9 @@
 ## req_139_ai_agent_true_direct_execution_follow_up - AI Agent True Direct Execution Follow-up
 > From version: 1.11.0
 > Schema version: 1.0
-> Status: In progress
-> Understanding: 96%
-> Confidence: 91%
+> Status: Done
+> Understanding: 99%
+> Confidence: 94%
 > Complexity: Medium
 > Theme: AI
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -78,3 +78,12 @@ flowchart TD
 
 # Tasks
 - `logics/tasks/task_133_ai_agent_experimental_direct_execution_and_rollback.md`
+
+# Delivery Status
+- Delivered after `1.15.0` workspace state.
+- The Modeling AI Agent `direct` mode now runs provider output through the existing proposal preparation, operation validation, and accepted-operation executor path, then applies accepted operations without the assisted `Apply` step.
+- The UI keeps the direct mode behind the Settings opt-in, shows an experimental warning, reports applied/skipped/rejected/unsupported/failed counts, blocks manual re-apply after direct execution, and preserves one-action rollback for the applied session.
+- Delete operations remain rejected unless delete permission is enabled for the run.
+
+# Validation
+- `npm run -s test -- src/tests/app.ui.settings-ai-agent.spec.tsx --run` passed: covers provider readiness, direct-mode opt-in, experimental warning, direct apply, rejected delete without mutation, summary output, and rollback.

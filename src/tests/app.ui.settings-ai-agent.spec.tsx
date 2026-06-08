@@ -184,6 +184,60 @@ describe("App integration UI - settings AI Agent", () => {
     });
   });
 
+  it("runs experimental direct execution after validation and rolls back the session", async () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const aiProviderPanel = getPanelByHeading("AI provider");
+    fireEvent.change(within(aiProviderPanel).getByLabelText("API key"), {
+      target: { value: "sk-local-test" }
+    });
+    fireEvent.click(within(aiProviderPanel).getByLabelText("Enable experimental direct execution"));
+    const fetchMock = vi.fn<typeof fetch>(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            output_text: JSON.stringify({
+              schemaVersion: 1,
+              operations: [
+                { type: "add_node", label: "Direct proposed node", position: { x: 180, y: 220 } },
+                { type: "delete_entity", entityKind: "wire", entityId: "W-001", mode: "direct" }
+              ]
+            })
+          }),
+          { status: 200 }
+        )
+      )
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    switchScreenDrawerAware("modeling");
+    fireEvent.click(within(screen.getByRole("region", { name: "Quick entity navigation" })).getByRole("button", { name: "AI Agent" }));
+    fireEvent.change(screen.getByLabelText("Agent mode"), {
+      target: { value: "direct" }
+    });
+    expect(screen.getByRole("region", { name: "Experimental direct execution warning" })).toHaveTextContent(
+      "Direct execution applies locally valid operations immediately after provider validation."
+    );
+    fireEvent.change(screen.getByLabelText("Instruction"), {
+      target: { value: "Add a direct routing node and remove W-001." }
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Run direct" }));
+
+    expect(await screen.findByText(/Direct execution applied 1 accepted operation, skipped 0, rejected 1, unsupported 0, failed 0/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Apply" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Reject" })).toBeDisabled();
+    const proposalSummary = screen.getByRole("region", { name: "AI proposal summary" });
+    expect(within(proposalSummary).getByText("add_node")).toBeInTheDocument();
+    expect(within(proposalSummary).getByText("delete permission is disabled.")).toBeInTheDocument();
+    expect(within(screen.getByLabelText("AI context entity counts")).getByLabelText("4 nodes")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Rollback" }));
+    expect(screen.getByText("Rolled back the last applied AI session.")).toBeInTheDocument();
+    expect(within(screen.getByLabelText("AI context entity counts")).getByLabelText("3 nodes")).toBeInTheDocument();
+  });
+
   it("applies provider modified plans to visible connector fields", async () => {
     const state = createUiIntegrationState();
     const editablePlan = buildAiAgentEditablePlan(buildAiAgentContext(state, "activeNetwork"));
