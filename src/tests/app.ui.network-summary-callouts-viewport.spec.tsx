@@ -307,4 +307,58 @@ describe("App integration UI - network summary callouts and viewport persistence
     expect(getPanelByHeading("Network summary").querySelectorAll(".network-callout-frame").length).toBeGreaterThanOrEqual(2);
   });
 
+  it("drags merged segment sheath callouts and persists their position", () => {
+    const baseState = createUiIntegrationState();
+    const firstSegmentId = baseState.segments.allIds[0];
+    const segment = firstSegmentId === undefined ? undefined : baseState.segments.byId[firstSegmentId];
+    if (segment === undefined) {
+      throw new Error("Expected at least one segment in base integration state.");
+    }
+    const stateWithSheath = appReducer(
+      baseState,
+      appActions.upsertSegment({
+        ...segment,
+        sheathType: "Fixed Tube",
+        insulation: "XLPE",
+        lineStyle: "GAF-T2-D9",
+        internalPartReference: "X723061352"
+      })
+    );
+
+    renderAppWithState(stateWithSheath);
+    switchScreenDrawerAware("modeling");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    openViewMenu(networkSummaryPanel);
+    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram") as unknown as SVGSVGElement;
+    const segmentCallout = networkSummaryPanel.querySelector(".network-segment-callout-anchor");
+    expect(segmentCallout).not.toBeNull();
+
+    const transformBeforeDrag = (segmentCallout as SVGGElement).getAttribute("transform") ?? "";
+    const rectSpy = vi.spyOn(networkSvg, "getBoundingClientRect").mockImplementation(
+      () =>
+        ({
+          x: 0,
+          y: 0,
+          top: 0,
+          left: 0,
+          width: 800,
+          height: 520,
+          right: 800,
+          bottom: 520,
+          toJSON: () => ({})
+        })
+    );
+
+    fireEvent.mouseDown(segmentCallout as Element, { button: 0, clientX: 260, clientY: 150 });
+    fireEvent.mouseMove(networkSvg, { clientX: 600, clientY: 300 });
+    fireEvent.mouseUp(networkSvg);
+    rectSpy.mockRestore();
+
+    const movedSegmentCallout = networkSummaryPanel.querySelector(".network-segment-callout-anchor");
+    expect(movedSegmentCallout).not.toBeNull();
+    const transformAfterDrag = (movedSegmentCallout as SVGGElement).getAttribute("transform") ?? "";
+    expect(transformAfterDrag).not.toBe(transformBeforeDrag);
+  });
+
 });

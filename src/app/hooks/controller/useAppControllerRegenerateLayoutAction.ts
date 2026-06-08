@@ -63,6 +63,13 @@ export function useAppControllerRegenerateLayoutAction({
         const spliceWithoutCalloutPosition = { ...splice, cableCalloutPosition: undefined };
         nextState = appReducer(nextState, appActions.upsertSplice(spliceWithoutCalloutPosition));
       }
+      for (const segment of Object.values(nextState.segments.byId)) {
+        if (segment === undefined || segment.sheathCalloutPosition === undefined) {
+          continue;
+        }
+        const segmentWithoutCalloutPosition = { ...segment, sheathCalloutPosition: undefined };
+        nextState = appReducer(nextState, appActions.upsertSegment(segmentWithoutCalloutPosition));
+      }
 
       setManualNodePositions({});
       replaceStateWithHistory(nextState);

@@ -140,6 +140,7 @@ export interface NetworkSummaryPanelProps {
   onSelectWireFromConnectorPin: (wireId: Wire["id"]) => void;
   onPersistConnectorCalloutPosition: (connectorId: ConnectorId, position: NodePosition) => void;
   onPersistSpliceCalloutPosition: (spliceId: SpliceId, position: NodePosition) => void;
+  onPersistSegmentSheathCalloutPosition: (segmentId: SegmentId, position: NodePosition) => void;
   onViewportSizeChange?: (size: { width: number; height: number }) => void;
   pngExportIncludeBackground: boolean;
   canExportBomCsv: boolean;

@@ -178,6 +178,7 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
       isCurrentWorkspaceEmpty: workspace.isCurrentWorkspaceEmpty,
       hasBuiltInSampleState: workspace.hasBuiltInSampleState,
       nodes: core.nodes,
+      segments: core.segments,
       networkNodePositions: layout.networkNodePositions,
       connectorMap: workspace.connectorMap,
       spliceMap: workspace.spliceMap,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { CatalogItemId, ConnectorId, NetworkNode, NodeId, Segment, SegmentId } from "../core/entities";
+import type { CatalogItemId, ConnectorId, NetworkNode, NodeId, Segment, SegmentId, SpliceId } from "../core/entities";
 import { buildRenderedNodes, buildRenderedSegments } from "../app/components/network-summary/graph/networkSummaryGraphModel";
 
 function asNodeId(value: string): NodeId {
@@ -16,6 +16,10 @@ function asConnectorId(value: string): ConnectorId {
 
 function asCatalogItemId(value: string): CatalogItemId {
   return value as CatalogItemId;
+}
+
+function asSpliceId(value: string): SpliceId {
+  return value as SpliceId;
 }
 
 const emptySegmentRenderContext = {
@@ -315,6 +319,63 @@ describe("buildRenderedSegments", () => {
 
     expect(rendered).toHaveLength(1);
     expect(rendered[0]?.labelX).toBeCloseTo(202.1);
+  });
+
+  it("merges sheath callouts across same-style segments separated only by a splice", () => {
+    const spliceId = asSpliceId("SP-1");
+    const segments: Segment[] = [
+      {
+        id: asSegmentId("SEG-1"),
+        nodeA: asNodeId("N-A"),
+        nodeB: asNodeId("N-S"),
+        lengthMm: 20,
+        sheathType: "Fixed Tube",
+        insulation: "XLPE",
+        lineStyle: "GAF-T2-D9",
+        internalPartReference: "X723061352"
+      },
+      {
+        id: asSegmentId("SEG-2"),
+        nodeA: asNodeId("N-S"),
+        nodeB: asNodeId("N-B"),
+        lengthMm: 60,
+        sheathType: "Fixed Tube",
+        insulation: "XLPE",
+        lineStyle: "GAF-T2-D9",
+        internalPartReference: "X723061352"
+      }
+    ];
+    const nodes: NetworkNode[] = [
+      { id: asNodeId("N-A"), kind: "intermediate", label: "Start" },
+      { id: asNodeId("N-S"), kind: "splice", spliceId },
+      { id: asNodeId("N-B"), kind: "intermediate", label: "End" }
+    ];
+
+    const rendered = buildRenderedSegments({
+      ...emptySegmentRenderContext,
+      segments,
+      nodes,
+      networkNodePositions: {
+        [asNodeId("N-A")]: { x: 0, y: 0 },
+        [asNodeId("N-S")]: { x: 40, y: 0 },
+        [asNodeId("N-B")]: { x: 100, y: 0 }
+      },
+      segmentSubNetworkTagById: new Map(),
+      isSubNetworkFilteringActive: false,
+      activeSubNetworkTagSet: new Set(),
+      selectedWireRouteSegmentIds: new Set(),
+      selectedSegmentId: null,
+      spliceMap: new Map([[spliceId, { id: spliceId, name: "Splice", technicalId: "SP-1", portCount: 2 }]]),
+      autoSegmentLabelRotation: true,
+      labelRotationDegrees: 0,
+      showSegmentNames: false,
+      showSegmentLengths: true
+    });
+
+    expect(rendered).toHaveLength(2);
+    expect(rendered[0]?.segmentCallout?.routeLabel).toBe("Route: N-A to N-B");
+    expect(rendered[0]?.segmentCallout?.values[4]).toBe("80 mm");
+    expect(rendered[1]?.segmentCallout).toBeNull();
   });
 });
 

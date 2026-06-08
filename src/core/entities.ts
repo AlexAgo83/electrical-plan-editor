@@ -251,6 +251,10 @@ export interface Segment {
   insulation?: string;
   lineStyle?: string;
   internalPartReference?: string;
+  sheathCalloutPosition?: {
+    x: number;
+    y: number;
+  };
   mountingLabels?: MountingLabel[];
 }
 

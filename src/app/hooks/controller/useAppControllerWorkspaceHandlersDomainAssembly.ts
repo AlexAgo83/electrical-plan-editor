@@ -28,6 +28,7 @@ interface UseAppControllerWorkspaceHandlersDomainAssemblyParams {
     | "isCurrentWorkspaceEmpty"
     | "hasBuiltInSampleState"
     | "nodes"
+    | "segments"
     | "networkNodePositions"
     | "connectorMap"
     | "spliceMap"

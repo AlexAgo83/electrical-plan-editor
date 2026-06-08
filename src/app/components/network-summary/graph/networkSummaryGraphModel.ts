@@ -36,11 +36,17 @@ export interface RenderedSegmentModel {
   segmentLengthLabelX: number;
   segmentLengthLabelY: number;
   segmentCallout: {
+    key: string;
+    segmentId: SegmentId;
     anchorX: number;
     anchorY: number;
+    targetX: number;
+    targetY: number;
     width: number;
     height: number;
-    lines: string[];
+    routeLabel: string;
+    headers: [string, string, string, string, string];
+    values: [string, string, string, string, string];
   } | null;
   mountingLabels: Array<{
     key: string;
@@ -83,7 +89,14 @@ interface BuildRenderedSegmentsParams {
   labelRotationDegrees: number;
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
+  draftSegmentCalloutPositions?: Record<SegmentId, NodePosition>;
   spliceMap?: ReadonlyMap<SpliceId, Splice>;
+}
+
+interface SegmentRenderGeometry {
+  labelAnchor: NodePosition;
+  normalX: number;
+  normalY: number;
 }
 
 interface SegmentNodeVisualBounds {
@@ -96,6 +109,10 @@ const CONNECTOR_NODE_WIDTH = 46;
 const CONNECTOR_NODE_HEIGHT = 30;
 const SPLICE_DIAMOND_SIZE = 30;
 const INTERMEDIATE_NODE_RADIUS = 17;
+const SEGMENT_SHEATH_CALLOUT_HEADERS = ["Sheath", "Insulation", "Line Style", "Int Part", "Quantity"] as const;
+const SEGMENT_SHEATH_CALLOUT_WIDTH = 192;
+const SEGMENT_SHEATH_CALLOUT_HEIGHT = 28;
+const SEGMENT_SHEATH_CALLOUT_OFFSET = 26;
 
 function getSegmentLabelAnchor(
   nodeAPosition: NodePosition,
@@ -233,6 +250,42 @@ function resolveSegmentEndpointDisplayLabel(
   return spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId;
 }
 
+function hasSegmentSheathCallout(segment: Segment): boolean {
+  return (
+    segment.sheathType !== undefined ||
+    segment.insulation !== undefined ||
+    segment.lineStyle !== undefined ||
+    segment.internalPartReference !== undefined
+  );
+}
+
+function buildSegmentSheathSignature(segment: Segment): string {
+  return JSON.stringify([
+    segment.sheathType ?? "",
+    segment.insulation ?? "",
+    segment.lineStyle ?? "",
+    segment.internalPartReference ?? ""
+  ]);
+}
+
+function getDisplayValue(value: string | undefined): string {
+  return value === undefined || value.length === 0 ? "-" : value;
+}
+
+function resolveCalloutBoundaryNodeIds(
+  componentSegments: Segment[],
+  mergeableSpliceNodeIds: ReadonlySet<NodeId>
+): [NodeId, NodeId] | null {
+  const boundaryNodeIds = componentSegments.flatMap((segment) =>
+    [segment.nodeA, segment.nodeB].filter((nodeId) => !mergeableSpliceNodeIds.has(nodeId))
+  );
+  const uniqueBoundaryNodeIds = Array.from(new Set(boundaryNodeIds));
+  if (uniqueBoundaryNodeIds.length < 2) {
+    return null;
+  }
+  return [uniqueBoundaryNodeIds[0]!, uniqueBoundaryNodeIds[uniqueBoundaryNodeIds.length - 1]!];
+}
+
 export function buildRenderedSegments({
   segments,
   nodes,
@@ -254,12 +307,16 @@ export function buildRenderedSegments({
   labelRotationDegrees,
   showSegmentNames,
   showSegmentLengths,
+  draftSegmentCalloutPositions = {},
   spliceMap = new Map<SpliceId, Splice>()
 }: BuildRenderedSegmentsParams): RenderedSegmentModel[] {
   const result: RenderedSegmentModel[] = [];
   const nodeById = new Map(nodes.map((node) => [node.id, node] as const));
+  const segmentById = new Map(segments.map((segment) => [segment.id, segment] as const));
   const catalogItemById = new Map(catalogItems.map((item) => [item.id, item] as const));
   const nodeShapeScale = normalizedNodeShapeScale * (zoomInvariantNodeShapes ? inverseLabelScale : 1);
+  const segmentGeometryById = new Map<SegmentId, SegmentRenderGeometry>();
+  const segmentCalloutById = new Map<SegmentId, RenderedSegmentModel["segmentCallout"]>();
 
   for (const segment of segments) {
     const nodeAPosition = networkNodePositions[segment.nodeA];
@@ -267,15 +324,6 @@ export function buildRenderedSegments({
     if (nodeAPosition === undefined || nodeBPosition === undefined) {
       continue;
     }
-
-    const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
-    const isSubNetworkDeemphasized = isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentSubNetworkTag);
-    const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
-    const isSelectedSegment = selectedSegmentId === segment.id;
-    const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
-      isSelectedSegment ? " is-selected" : ""
-    }`;
-    const segmentGroupClassName = `network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`;
     const labelAnchor = getSegmentLabelAnchor(
       nodeAPosition,
       nodeBPosition,
@@ -305,6 +353,196 @@ export function buildRenderedSegments({
     );
     const segmentLabelRotationDegrees = autoSegmentLabelRotation ? segmentAngleDegrees : labelRotationDegrees;
     const segmentLabelRotationRadians = (segmentLabelRotationDegrees * Math.PI) / 180;
+    segmentGeometryById.set(segment.id, {
+      labelAnchor,
+      normalX: -Math.sin(segmentLabelRotationRadians),
+      normalY: Math.cos(segmentLabelRotationRadians)
+    });
+  }
+
+  const mergeableNeighborSegmentIdsBySpliceNodeId = new Map<NodeId, Set<SegmentId>>();
+  const eligibleSegmentsBySignature = new Map<string, Segment[]>();
+  for (const segment of segments) {
+    if (!hasSegmentSheathCallout(segment)) {
+      continue;
+    }
+    const signature = buildSegmentSheathSignature(segment);
+    const matchingSegments = eligibleSegmentsBySignature.get(signature) ?? [];
+    matchingSegments.push(segment);
+    eligibleSegmentsBySignature.set(signature, matchingSegments);
+  }
+  for (const matchingSegments of eligibleSegmentsBySignature.values()) {
+    for (const segment of matchingSegments) {
+      for (const nodeId of [segment.nodeA, segment.nodeB]) {
+        const node = nodeById.get(nodeId);
+        if (node?.kind !== "splice") {
+          continue;
+        }
+        const neighboringSegments = matchingSegments.filter(
+          (candidate) => candidate.id !== segment.id && (candidate.nodeA === nodeId || candidate.nodeB === nodeId)
+        );
+        if (neighboringSegments.length !== 1) {
+          continue;
+        }
+        const segmentIds = mergeableNeighborSegmentIdsBySpliceNodeId.get(nodeId) ?? new Set<SegmentId>();
+        segmentIds.add(segment.id);
+        segmentIds.add(neighboringSegments[0]!.id);
+        mergeableNeighborSegmentIdsBySpliceNodeId.set(nodeId, segmentIds);
+      }
+    }
+  }
+
+  const componentSegmentIdsById = new Map<SegmentId, Set<SegmentId>>();
+  for (const matchingSegments of eligibleSegmentsBySignature.values()) {
+    const adjacency = new Map<SegmentId, Set<SegmentId>>();
+    for (const segment of matchingSegments) {
+      adjacency.set(segment.id, new Set<SegmentId>());
+    }
+    for (const [spliceNodeId, connectedSegmentIds] of mergeableNeighborSegmentIdsBySpliceNodeId) {
+      const connectedIds = [...connectedSegmentIds].filter((segmentId) => adjacency.has(segmentId));
+      if (connectedIds.length !== 2) {
+        continue;
+      }
+      adjacency.get(connectedIds[0]!)?.add(connectedIds[1]!);
+      adjacency.get(connectedIds[1]!)?.add(connectedIds[0]!);
+      mergeableNeighborSegmentIdsBySpliceNodeId.set(spliceNodeId, new Set(connectedIds));
+    }
+    for (const segment of matchingSegments) {
+      if (componentSegmentIdsById.has(segment.id)) {
+        continue;
+      }
+      const queue = [segment.id];
+      const componentIds = new Set<SegmentId>();
+      while (queue.length > 0) {
+        const currentId = queue.shift()!;
+        if (componentIds.has(currentId)) {
+          continue;
+        }
+        componentIds.add(currentId);
+        for (const neighborId of adjacency.get(currentId) ?? []) {
+          if (!componentIds.has(neighborId)) {
+            queue.push(neighborId);
+          }
+        }
+      }
+      for (const componentSegmentId of componentIds) {
+        componentSegmentIdsById.set(componentSegmentId, componentIds);
+      }
+    }
+  }
+
+  const processedComponentAnchorIds = new Set<SegmentId>();
+  for (const segment of segments) {
+    if (!hasSegmentSheathCallout(segment)) {
+      continue;
+    }
+    const componentIds = componentSegmentIdsById.get(segment.id) ?? new Set<SegmentId>([segment.id]);
+    const orderedComponentIds = [...componentIds].sort((left, right) => left.localeCompare(right));
+    const anchorSegmentId = orderedComponentIds[0]!;
+    if (processedComponentAnchorIds.has(anchorSegmentId)) {
+      continue;
+    }
+    processedComponentAnchorIds.add(anchorSegmentId);
+    const componentSegments = orderedComponentIds.flatMap((segmentId) => {
+      const candidate = segmentById.get(segmentId);
+      return candidate === undefined ? [] : [candidate];
+    });
+    if (componentSegments.length === 0) {
+      continue;
+    }
+    const mergeableSpliceNodeIds = new Set<NodeId>();
+    for (const [spliceNodeId, connectedSegmentIds] of mergeableNeighborSegmentIdsBySpliceNodeId) {
+      if (connectedSegmentIds.size !== 2) {
+        continue;
+      }
+      if ([...connectedSegmentIds].every((segmentId) => componentIds.has(segmentId))) {
+        mergeableSpliceNodeIds.add(spliceNodeId);
+      }
+    }
+    const boundaryNodeIds = resolveCalloutBoundaryNodeIds(componentSegments, mergeableSpliceNodeIds);
+    if (boundaryNodeIds === null) {
+      continue;
+    }
+    const [boundaryNodeAId, boundaryNodeBId] = boundaryNodeIds;
+    const boundaryLabelA = resolveSegmentEndpointDisplayLabel(nodeById.get(boundaryNodeAId), connectorMap, spliceMap) ?? anchorSegmentId;
+    const boundaryLabelB = resolveSegmentEndpointDisplayLabel(nodeById.get(boundaryNodeBId), connectorMap, spliceMap) ?? anchorSegmentId;
+    const componentGeometry = componentSegments.flatMap((componentSegment) => {
+      const geometry = segmentGeometryById.get(componentSegment.id);
+      return geometry === undefined ? [] : [geometry];
+    });
+    if (componentGeometry.length === 0) {
+      continue;
+    }
+    const centroid = componentGeometry.reduce(
+      (accumulator, geometry) => ({
+        x: accumulator.x + geometry.labelAnchor.x,
+        y: accumulator.y + geometry.labelAnchor.y
+      }),
+      { x: 0, y: 0 }
+    );
+    const representativeGeometry = segmentGeometryById.get(anchorSegmentId) ?? componentGeometry[0]!;
+    const targetX = centroid.x / componentGeometry.length;
+    const targetY = centroid.y / componentGeometry.length;
+    const defaultPosition = {
+      x: targetX + representativeGeometry.normalX * SEGMENT_SHEATH_CALLOUT_OFFSET,
+      y: targetY + representativeGeometry.normalY * SEGMENT_SHEATH_CALLOUT_OFFSET
+    };
+    const persistedPosition = segmentById.get(anchorSegmentId)?.sheathCalloutPosition;
+    const draftPosition = draftSegmentCalloutPositions[anchorSegmentId];
+    const position = draftPosition ?? persistedPosition ?? defaultPosition;
+    segmentCalloutById.set(anchorSegmentId, {
+      key: `segment-sheath:${anchorSegmentId}`,
+      segmentId: anchorSegmentId,
+      anchorX: position.x,
+      anchorY: position.y,
+      targetX,
+      targetY,
+      width: SEGMENT_SHEATH_CALLOUT_WIDTH,
+      height: SEGMENT_SHEATH_CALLOUT_HEIGHT,
+      routeLabel: `Route: ${boundaryLabelA} to ${boundaryLabelB}`,
+      headers: [...SEGMENT_SHEATH_CALLOUT_HEADERS],
+      values: [
+        getDisplayValue(segment.sheathType),
+        getDisplayValue(segment.insulation),
+        getDisplayValue(segment.lineStyle),
+        getDisplayValue(segment.internalPartReference),
+        `${componentSegments.reduce((total, current) => total + current.lengthMm, 0)} mm`
+      ]
+    });
+    for (const componentSegment of componentSegments) {
+      if (componentSegment.id !== anchorSegmentId) {
+        segmentCalloutById.set(componentSegment.id, null);
+      }
+    }
+  }
+
+  for (const segment of segments) {
+    const nodeAPosition = networkNodePositions[segment.nodeA];
+    const nodeBPosition = networkNodePositions[segment.nodeB];
+    if (nodeAPosition === undefined || nodeBPosition === undefined) {
+      continue;
+    }
+
+    const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
+    const isSubNetworkDeemphasized = isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentSubNetworkTag);
+    const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
+    const isSelectedSegment = selectedSegmentId === segment.id;
+    const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
+      isSelectedSegment ? " is-selected" : ""
+    }`;
+    const segmentGroupClassName = `network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`;
+    const geometry = segmentGeometryById.get(segment.id);
+    if (geometry === undefined) {
+      continue;
+    }
+    const labelAnchor = geometry.labelAnchor;
+    const segmentVectorX = nodeBPosition.x - nodeAPosition.x;
+    const segmentVectorY = nodeBPosition.y - nodeAPosition.y;
+    const segmentAngleDegrees = normalizeReadableSegmentLabelAngle(
+      (Math.atan2(segmentVectorY, segmentVectorX) * 180) / Math.PI
+    );
+    const segmentLabelRotationDegrees = autoSegmentLabelRotation ? segmentAngleDegrees : labelRotationDegrees;
+    const segmentLabelRotationRadians = (segmentLabelRotationDegrees * Math.PI) / 180;
     const hasSegmentLabel = showSegmentLengths || showSegmentNames;
     const isNearHorizontalSegment = Math.abs(segmentAngleDegrees) <= 15;
     const segmentLabelOffsetDistance = hasSegmentLabel
@@ -314,28 +552,7 @@ export function buildRenderedSegments({
     // Keep ID/length split along the label-normal axis, including when labels are auto-rotated.
     const segmentLengthLabelOffsetX = -Math.sin(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
     const segmentLengthLabelOffsetY = Math.cos(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
-    const segmentNormalX = -Math.sin(segmentLabelRotationRadians);
-    const segmentNormalY = Math.cos(segmentLabelRotationRadians);
-    const endpointALabel = resolveSegmentEndpointDisplayLabel(nodeById.get(segment.nodeA), connectorMap, spliceMap);
-    const endpointBLabel = resolveSegmentEndpointDisplayLabel(nodeById.get(segment.nodeB), connectorMap, spliceMap);
-    const segmentCalloutLines = [
-      endpointALabel === null || endpointBLabel === null ? null : `${endpointALabel} -> ${endpointBLabel}`,
-      segment.sheathType === undefined ? null : `Sheath: ${segment.sheathType}`,
-      segment.insulation === undefined ? null : `Insulation: ${segment.insulation}`,
-      segment.lineStyle === undefined ? null : `Line style: ${segment.lineStyle}`,
-      segment.internalPartReference === undefined ? null : `Int Part: ${segment.internalPartReference}`,
-      `Qty: ${segment.lengthMm} mm`
-    ].filter((line): line is string => line !== null);
-    const segmentCallout =
-      segmentCalloutLines.length > 1
-        ? {
-            anchorX: labelAnchor.x + segmentNormalX * 20,
-            anchorY: labelAnchor.y + segmentNormalY * 20,
-            width: 86,
-            height: 12 + segmentCalloutLines.length * 9,
-            lines: segmentCalloutLines
-          }
-        : null;
+    const segmentCallout = segmentCalloutById.get(segment.id) ?? null;
     const segmentVectorLength = Math.hypot(segmentVectorX, segmentVectorY);
     const mountingLabels = (segment.mountingLabels ?? []).map((label) => {
       const ratio = Math.min(1, Math.max(0, label.positionRatio));

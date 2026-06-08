@@ -1,4 +1,4 @@
-import type { Connector, ConnectorId, Network, NetworkNode, NodeId, Splice, SpliceId } from "../../core/entities";
+import type { Connector, ConnectorId, Network, NetworkNode, NodeId, Segment, Splice, SpliceId } from "../../core/entities";
 import type { AppState, AppStore, ThemeMode } from "../../store";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 import type {
@@ -53,6 +53,7 @@ export interface UseWorkspaceHandlersParams {
   dispatchAction: DispatchAction;
   replaceStateWithHistory: (nextState: AppState) => void;
   nodes: NetworkNode[];
+  segments: Segment[];
   networkNodePositions: Record<NodeId, NodePosition>;
   connectorMap: Map<ConnectorId, Connector>;
   spliceMap: Map<SpliceId, Splice>;

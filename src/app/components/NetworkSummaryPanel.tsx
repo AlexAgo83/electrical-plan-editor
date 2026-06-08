@@ -43,6 +43,14 @@ import type { NetworkSummaryPanelHandle, NetworkSummaryPanelProps } from "./netw
 
 const CALLOUT_DRAG_START_THRESHOLD_PX = 4;
 
+interface DraggingSegmentCalloutState {
+  segmentId: SegmentId;
+  startPosition: NodePosition;
+  startClientX: number;
+  startClientY: number;
+  hasStartedDrag: boolean;
+}
+
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -147,6 +155,7 @@ export function NetworkSummaryPanel({
   onSelectWireFromConnectorPin,
   onPersistConnectorCalloutPosition,
   onPersistSpliceCalloutPosition,
+  onPersistSegmentSheathCalloutPosition,
   onViewportSizeChange,
   pngExportIncludeBackground,
   canExportBomCsv,
@@ -263,6 +272,8 @@ export function NetworkSummaryPanel({
   const [hoveredCalloutKey, setHoveredCalloutKey] = useState<CalloutTargetKey | null>(null);
   const [draggingCallout, setDraggingCallout] = useState<DraggingCalloutState | null>(null);
   const [draftCalloutPositions, setDraftCalloutPositions] = useState<Record<string, NodePosition>>({});
+  const [draggingSegmentCallout, setDraggingSegmentCallout] = useState<DraggingSegmentCalloutState | null>(null);
+  const [draftSegmentCalloutPositions, setDraftSegmentCalloutPositions] = useState<Record<SegmentId, NodePosition>>({});
 
   const graphCenter = useMemo(() => {
     const positionedNodes = nodes
@@ -505,8 +516,48 @@ export function NetworkSummaryPanel({
     },
     []
   );
+
   const handleCanvasMouseMoveWithCallouts = useCallback(
     (event: ReactMouseEvent<SVGSVGElement>) => {
+      if (draggingSegmentCallout !== null) {
+        let hasStartedDrag = draggingSegmentCallout.hasStartedDrag;
+        if (!hasStartedDrag) {
+          if (lockEntityMovement) {
+            return;
+          }
+          const deltaClientX = event.clientX - draggingSegmentCallout.startClientX;
+          const deltaClientY = event.clientY - draggingSegmentCallout.startClientY;
+          if (Math.hypot(deltaClientX, deltaClientY) < CALLOUT_DRAG_START_THRESHOLD_PX) {
+            return;
+          }
+          hasStartedDrag = true;
+          handleNetworkSegmentClick(draggingSegmentCallout.segmentId);
+          setDraggingSegmentCallout((current) =>
+            current !== null && current.segmentId === draggingSegmentCallout.segmentId
+              ? { ...current, hasStartedDrag: true }
+              : current
+          );
+        }
+        const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
+        if (coordinates === null) {
+          return;
+        }
+        setDraftSegmentCalloutPositions((current) => {
+          const previousPosition = current[draggingSegmentCallout.segmentId];
+          if (
+            previousPosition !== undefined &&
+            Math.abs(previousPosition.x - coordinates.x) <= 0.0001 &&
+            Math.abs(previousPosition.y - coordinates.y) <= 0.0001
+          ) {
+            return current;
+          }
+          return {
+            ...current,
+            [draggingSegmentCallout.segmentId]: coordinates
+          };
+        });
+        return;
+      }
       if (draggingCallout === null) {
         handleNetworkMouseMove(event);
         return;
@@ -548,8 +599,49 @@ export function NetworkSummaryPanel({
         };
       });
     },
-    [draggingCallout, getSvgCoordinates, handleNetworkMouseMove, lockEntityMovement, selectCalloutTarget]
+    [
+      draggingSegmentCallout,
+      lockEntityMovement,
+      handleNetworkSegmentClick,
+      getSvgCoordinates,
+      draggingCallout,
+      handleNetworkMouseMove,
+      selectCalloutTarget
+    ]
   );
+
+  const stopSegmentCalloutDrag = useCallback(() => {
+    if (draggingSegmentCallout === null) {
+      return;
+    }
+
+    const draftPosition = draftSegmentCalloutPositions[draggingSegmentCallout.segmentId];
+    if (!draggingSegmentCallout.hasStartedDrag) {
+      handleNetworkSegmentClick(draggingSegmentCallout.segmentId);
+    } else if (draftPosition !== undefined) {
+      const changed =
+        Math.abs(draftPosition.x - draggingSegmentCallout.startPosition.x) > 0.0001 ||
+        Math.abs(draftPosition.y - draggingSegmentCallout.startPosition.y) > 0.0001;
+      if (changed) {
+        onPersistSegmentSheathCalloutPosition(draggingSegmentCallout.segmentId, draftPosition);
+      }
+    }
+
+    setDraggingSegmentCallout(null);
+    setDraftSegmentCalloutPositions((current) => {
+      if (current[draggingSegmentCallout.segmentId] === undefined) {
+        return current;
+      }
+      const next = { ...current };
+      delete next[draggingSegmentCallout.segmentId];
+      return next;
+    });
+  }, [
+    draggingSegmentCallout,
+    draftSegmentCalloutPositions,
+    handleNetworkSegmentClick,
+    onPersistSegmentSheathCalloutPosition
+  ]);
 
   const stopCalloutDrag = useCallback(() => {
     if (draggingCallout === null) {
@@ -590,9 +682,10 @@ export function NetworkSummaryPanel({
   ]);
 
   const stopNetworkInteractions = useCallback(() => {
+    stopSegmentCalloutDrag();
     stopCalloutDrag();
     stopNetworkNodeDrag();
-  }, [stopCalloutDrag, stopNetworkNodeDrag]);
+  }, [stopSegmentCalloutDrag, stopCalloutDrag, stopNetworkNodeDrag]);
 
   const {
     activeSvgPreview,
@@ -711,6 +804,7 @@ export function NetworkSummaryPanel({
         labelRotationDegrees,
         showSegmentNames,
         showSegmentLengths,
+        draftSegmentCalloutPositions,
         spliceMap
       }),
     [
@@ -734,8 +828,31 @@ export function NetworkSummaryPanel({
       labelRotationDegrees,
       showSegmentNames,
       showSegmentLengths,
+      draftSegmentCalloutPositions,
       spliceMap
     ]
+  );
+
+  const handleSegmentCalloutMouseDown = useCallback(
+    (event: ReactMouseEvent<SVGGElement>, segmentId: SegmentId) => {
+      if (event.button !== 0) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      const segmentCallout = renderedSegments.find((entry) => entry.segment.id === segmentId)?.segmentCallout;
+      if (segmentCallout === null || segmentCallout === undefined) {
+        return;
+      }
+      setDraggingSegmentCallout({
+        segmentId,
+        startPosition: { x: segmentCallout.anchorX, y: segmentCallout.anchorY },
+        startClientX: event.clientX,
+        startClientY: event.clientY,
+        hasStartedDrag: false
+      });
+    },
+    [renderedSegments]
   );
 
   const splicePlacementPreviewSegments = useMemo(() => {
@@ -941,6 +1058,7 @@ export function NetworkSummaryPanel({
           nodeStrokeEmphasisWidth={nodeStrokeEmphasisWidth}
           describeNode={describeNode}
           handleNetworkSegmentClick={handleNetworkSegmentClick}
+          handleSegmentCalloutMouseDown={handleSegmentCalloutMouseDown}
           handleNetworkNodeMouseDown={handleNetworkNodeMouseDown}
           handleNetworkNodeActivate={handleNetworkNodeActivate}
           openInspectorForCanvasSelection={openInspectorForCanvasSelection}

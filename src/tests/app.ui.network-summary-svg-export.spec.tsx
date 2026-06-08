@@ -439,11 +439,16 @@ describe("App integration UI - network summary SVG export", () => {
       }
       const exportedSvg = await readBlobAsText(capturedSvgBlob);
       expect(exportedSvg).toContain('class="network-segment-callout-frame"');
+      expect(exportedSvg).toContain("Route:");
+      expect(exportedSvg).toContain("Sheath");
       expect(exportedSvg).toContain("CT5");
-      expect(exportedSvg).toContain("Insulation: XLPE");
-      expect(exportedSvg).toContain("Line style: Braided");
-      expect(exportedSvg).toContain("Int Part: IP-42");
-      expect(exportedSvg).toContain("Qty: 40 mm");
+      expect(exportedSvg).toContain("Insulation");
+      expect(exportedSvg).toContain("XLPE");
+      expect(exportedSvg).toContain("Line Style");
+      expect(exportedSvg).toContain("Braided");
+      expect(exportedSvg).toContain("Int Part");
+      expect(exportedSvg).toContain("IP-42");
+      expect(exportedSvg).toContain("40 mm");
       expect(exportedSvg).toContain('class="network-segment-mounting-label-frame"');
       expect(exportedSvg).toContain("TAG-42");
       expect(clickSpy).toHaveBeenCalledTimes(1);

@@ -1,4 +1,4 @@
-import type { Connector, ConnectorId, NetworkNode, NodeId, Splice, SpliceId } from "../../core/entities";
+import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, Splice, SpliceId } from "../../core/entities";
 import { NETWORK_MAX_SCALE, NETWORK_MIN_SCALE } from "./app-utils-shared";
 import { computeNetworkFitViewportForBounds } from "./networkSummaryViewport";
 import type { CanvasCalloutTextSize, NodePosition } from "../types/app-controller";
@@ -8,6 +8,7 @@ interface WorkspaceNetworkViewportParams {
   networkNodePositions: Record<NodeId, NodePosition>;
   connectorMap: Map<ConnectorId, Connector>;
   spliceMap: Map<SpliceId, Splice>;
+  segments: Segment[];
   configuredResetScale: number;
   networkViewWidth: number;
   networkViewHeight: number;
@@ -117,6 +118,18 @@ export function fitNetworkToContent(params: WorkspaceNetworkViewportParams): voi
       bounds.minY = Math.min(bounds.minY, persistedPosition.y - calloutHalfHeight);
       bounds.maxY = Math.max(bounds.maxY, persistedPosition.y + calloutHalfHeight);
     }
+  }
+  const segmentCalloutHalfWidth = 120;
+  const segmentCalloutHalfHeight = 24;
+  for (const segment of params.segments) {
+    const persistedPosition = segment.sheathCalloutPosition;
+    if (persistedPosition === undefined) {
+      continue;
+    }
+    bounds.minX = Math.min(bounds.minX, persistedPosition.x - segmentCalloutHalfWidth);
+    bounds.maxX = Math.max(bounds.maxX, persistedPosition.x + segmentCalloutHalfWidth);
+    bounds.minY = Math.min(bounds.minY, persistedPosition.y - segmentCalloutHalfHeight);
+    bounds.maxY = Math.max(bounds.maxY, persistedPosition.y + segmentCalloutHalfHeight);
   }
   const fittedViewport = computeNetworkFitViewportForBounds({
     bounds,

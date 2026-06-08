@@ -53,6 +53,7 @@ interface NetworkSummaryGraphLayersProps {
   nodeStrokeEmphasisWidth: number;
   describeNode: (node: NetworkNode) => string;
   onSelectSegment: (segmentId: SegmentId) => void;
+  onSegmentCalloutMouseDown: (event: ReactMouseEvent<SVGGElement>, segmentId: SegmentId) => void;
   onNodeMouseDown: (event: ReactMouseEvent<SVGGElement>, nodeId: NodeId) => void;
   onNodeActivate: (nodeId: NodeId) => void;
   onOpenInspectorForSelection: () => void;
@@ -114,6 +115,7 @@ export function NetworkSummaryGraphLayers({
   nodeStrokeEmphasisWidth,
   describeNode,
   onSelectSegment,
+  onSegmentCalloutMouseDown,
   onNodeMouseDown,
   onNodeActivate,
   onOpenInspectorForSelection,
@@ -422,7 +424,15 @@ export function NetworkSummaryGraphLayers({
                 <g
                   className="network-segment-callout-anchor"
                   transform={`translate(${segmentCallout.anchorX} ${segmentCallout.anchorY}) scale(${inverseLabelScale})`}
+                  onMouseDown={(event) => onSegmentCalloutMouseDown(event, segmentCallout.segmentId)}
                 >
+                  <line
+                    className="network-segment-callout-leader-line"
+                    x1={segmentCallout.targetX - segmentCallout.anchorX}
+                    y1={segmentCallout.targetY - segmentCallout.anchorY}
+                    x2={0}
+                    y2={0}
+                  />
                   <rect
                     className="network-segment-callout-frame"
                     x={-segmentCallout.width / 2}
@@ -432,17 +442,56 @@ export function NetworkSummaryGraphLayers({
                     rx={5}
                     ry={5}
                   />
-                  {segmentCallout.lines.map((line, index) => (
+                  <line
+                    className="network-segment-callout-table-divider"
+                    x1={-segmentCallout.width / 2}
+                    y1={-segmentCallout.height / 2 + 9}
+                    x2={segmentCallout.width / 2}
+                    y2={-segmentCallout.height / 2 + 9}
+                  />
+                  <line
+                    className="network-segment-callout-table-divider"
+                    x1={-segmentCallout.width / 2}
+                    y1={-segmentCallout.height / 2 + 18}
+                    x2={segmentCallout.width / 2}
+                    y2={-segmentCallout.height / 2 + 18}
+                  />
+                  {[
+                    -segmentCallout.width / 2 + 32,
+                    -segmentCallout.width / 2 + 66,
+                    -segmentCallout.width / 2 + 110,
+                    -segmentCallout.width / 2 + 152
+                  ].map((x, index) => (
+                    <line
+                      key={`${segment.id}-callout-divider-${index}`}
+                      className="network-segment-callout-table-divider"
+                      x1={x}
+                      y1={-segmentCallout.height / 2 + 9}
+                      x2={x}
+                      y2={segmentCallout.height / 2}
+                    />
+                  ))}
+                  <text className="network-segment-callout-text network-segment-callout-route" x={-segmentCallout.width / 2 + 3} y={-6}>
+                    {segmentCallout.routeLabel}
+                  </text>
+                  {segmentCallout.headers.map((header, index) => (
                     <text
-                      key={`${segment.id}-callout-line-${index}`}
-                      className={
-                        index === 0 ? "network-segment-callout-text network-segment-callout-route" : "network-segment-callout-text"
-                      }
-                      x={0}
-                      y={-segmentCallout.height / 2 + 10 + index * 9}
-                      textAnchor="middle"
+                      key={`${segment.id}-callout-header-${header}`}
+                      className="network-segment-callout-text network-segment-callout-header"
+                      x={[-segmentCallout.width / 2 + 3, -segmentCallout.width / 2 + 35, -segmentCallout.width / 2 + 69, -segmentCallout.width / 2 + 113, -segmentCallout.width / 2 + 155][index]}
+                      y={3}
                     >
-                      {line}
+                      {header}
+                    </text>
+                  ))}
+                  {segmentCallout.values.map((value, index) => (
+                    <text
+                      key={`${segment.id}-callout-value-${index}`}
+                      className="network-segment-callout-text"
+                      x={[-segmentCallout.width / 2 + 3, -segmentCallout.width / 2 + 35, -segmentCallout.width / 2 + 69, -segmentCallout.width / 2 + 113, -segmentCallout.width / 2 + 155][index]}
+                      y={12}
+                    >
+                      {value}
                     </text>
                   ))}
                 </g>

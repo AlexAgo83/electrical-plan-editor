@@ -277,6 +277,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     onSelectWireFromConnectorPin: params.onSelectWireFromConnectorPin,
     onPersistConnectorCalloutPosition: params.onPersistConnectorCalloutPosition,
     onPersistSpliceCalloutPosition: params.onPersistSpliceCalloutPosition,
+    onPersistSegmentSheathCalloutPosition: params.onPersistSegmentSheathCalloutPosition,
     onViewportSizeChange: params.onViewportSizeChange,
     pngExportIncludeBackground: params.pngExportIncludeBackground,
     canExportBomCsv: params.canExportBomCsv,

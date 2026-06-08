@@ -70,6 +70,7 @@ interface NetworkSummaryCanvasPanelProps {
   nodeStrokeEmphasisWidth: number;
   describeNode: (node: NetworkNode) => string;
   handleNetworkSegmentClick: (segmentId: SegmentId) => void;
+  handleSegmentCalloutMouseDown: (event: ReactMouseEvent<SVGGElement>, segmentId: SegmentId) => void;
   handleNetworkNodeMouseDown: (event: ReactMouseEvent<SVGGElement>, nodeId: NodeId) => void;
   handleNetworkNodeActivate: (nodeId: NodeId) => void;
   openInspectorForCanvasSelection: () => void;
@@ -139,6 +140,7 @@ export function NetworkSummaryCanvasPanel({
   nodeStrokeEmphasisWidth,
   describeNode,
   handleNetworkSegmentClick,
+  handleSegmentCalloutMouseDown,
   handleNetworkNodeMouseDown,
   handleNetworkNodeActivate,
   openInspectorForCanvasSelection,
@@ -216,6 +218,7 @@ export function NetworkSummaryCanvasPanel({
                 nodeStrokeEmphasisWidth={nodeStrokeEmphasisWidth}
                 describeNode={describeNode}
                 onSelectSegment={handleNetworkSegmentClick}
+                onSegmentCalloutMouseDown={handleSegmentCalloutMouseDown}
                 onNodeMouseDown={handleNetworkNodeMouseDown}
                 onNodeActivate={handleNetworkNodeActivate}
                 onOpenInspectorForSelection={openInspectorForCanvasSelection}

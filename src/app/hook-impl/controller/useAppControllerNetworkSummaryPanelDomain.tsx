@@ -330,6 +330,23 @@ export function useAppControllerNetworkSummaryPanelDomain({
     [dispatchAction, spliceMap]
   );
 
+  const persistSegmentSheathCalloutPosition = useCallback(
+    (segmentId: SegmentId, position: { x: number; y: number }) => {
+      const existing = segments.find((segment) => segment.id === segmentId);
+      if (existing === undefined) {
+        return;
+      }
+      dispatchAction(
+        appActions.upsertSegment({
+          ...existing,
+          sheathCalloutPosition: position
+        }),
+        { trackHistory: false }
+      );
+    },
+    [dispatchAction, segments]
+  );
+
   const shouldIncludeNetworkSummaryPanel = hasActiveNetwork && (isModelingScreen || isAnalysisScreen);
 
   const networkSummaryPanel = shouldIncludeNetworkSummaryPanel
@@ -438,6 +455,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
         onSelectWireFromConnectorPin: handleSelectWireFromConnectorPin,
         onPersistConnectorCalloutPosition: persistConnectorCalloutPosition,
         onPersistSpliceCalloutPosition: persistSpliceCalloutPosition,
+        onPersistSegmentSheathCalloutPosition: persistSegmentSheathCalloutPosition,
         onViewportSizeChange,
         pngExportIncludeBackground: preferencesState.canvasPngExportIncludeBackground,
     canExportBomCsv,

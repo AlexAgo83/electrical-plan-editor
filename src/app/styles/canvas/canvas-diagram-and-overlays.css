@@ -121,18 +121,34 @@
   stroke: var(--network-node-stroke-color, #55748d);
   stroke-width: 0.9px;
 }
+.network-segment-callout-leader-line {
+  stroke: var(--network-node-stroke-color, #55748d);
+  stroke-width: 0.8px;
+  stroke-dasharray: 1.7 2.4;
+  pointer-events: none;
+}
+.network-segment-callout-table-divider {
+  stroke: color-mix(in srgb, var(--network-node-stroke-color, #55748d) 65%, transparent);
+  stroke-width: 0.6px;
+  pointer-events: none;
+}
 .network-segment-callout-text {
-  font-size: 6.5px;
+  font-size: 5.1px;
   fill: var(--network-node-label-color, #183549);
   paint-order: stroke fill;
   stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
-  stroke-width: 1.1px;
+  stroke-width: 0.85px;
   stroke-linejoin: round;
   pointer-events: none;
 }
 .network-segment-callout-route {
   font-weight: 700;
   fill: var(--network-segment-label-color, #38566a);
+}
+.network-segment-callout-header {
+  font-size: 4.4px;
+  font-weight: 700;
+  fill: color-mix(in srgb, var(--network-segment-label-color, #38566a) 85%, var(--network-node-label-color, #183549));
 }
 .network-segment-mounting-label-frame {
   fill: color-mix(in srgb, var(--panel-surface, #ffffff) 90%, transparent);
