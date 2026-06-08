@@ -9,6 +9,7 @@
 > Theme: AI
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
 
+> Maintenance edit: linked follow-up task created to satisfy Logics workflow health without changing product scope.
 # Problem
 Advanced users want an experimental mode where the AI Agent can apply validated changes directly.
 Release 1.11.0 delivers the settings gate, UI affordance, shared local validator/executor path, pre-apply snapshot, and latest-session rollback.
@@ -143,3 +144,4 @@ flowchart TD
 
 # Tasks
 - `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`
+- `task_133_ai_agent_experimental_direct_execution_and_rollback`
