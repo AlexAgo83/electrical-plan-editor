@@ -1,7 +1,44 @@
 import type { AppAction } from "../actions";
+import type { Segment } from "../../core/entities";
 import type { AppState } from "../types";
 import { recomputeAllWiresForNetwork } from "./helpers/wireTransitions";
+import { resolveSegmentEndpointForRearBackshell } from "./helpers/rearBackshell";
 import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
+
+function normalizeOptionalSegmentText(value: string | undefined): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  const normalized = value.trim();
+  return normalized.length === 0 ? undefined : normalized;
+}
+
+function normalizeMountingLabels(segment: Segment): Segment["mountingLabels"] {
+  const labels = segment.mountingLabels;
+  if (!Array.isArray(labels)) {
+    return undefined;
+  }
+  const normalized = labels
+    .map((label) => {
+      const text = label.text.trim();
+      if (label.id.trim().length === 0 || text.length === 0) {
+        return null;
+      }
+      const positionRatio =
+        Number.isFinite(label.positionRatio) ? Math.min(1, Math.max(0, label.positionRatio)) : 0.5;
+      const offsetX = Number.isFinite(label.offsetX) ? label.offsetX : 0;
+      const offsetY = Number.isFinite(label.offsetY) ? label.offsetY : 0;
+      return {
+        ...label,
+        text,
+        positionRatio,
+        offsetX,
+        offsetY
+      };
+    })
+    .filter((label): label is NonNullable<typeof label> => label !== null);
+  return normalized.length === 0 ? undefined : normalized;
+}
 
 export function handleSegmentActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
@@ -22,15 +59,39 @@ export function handleSegmentActions(state: AppState, action: AppAction): AppSta
         return withError(state, "Segment lengthMm must be >= 1.");
       }
 
+      const normalizedNodeA = resolveSegmentEndpointForRearBackshell(
+        state,
+        action.payload.nodeA,
+        action.payload.nodeB,
+        action.payload.role
+      );
+      const normalizedNodeB = resolveSegmentEndpointForRearBackshell(
+        state,
+        action.payload.nodeB,
+        normalizedNodeA,
+        action.payload.role
+      );
+      if (normalizedNodeA === normalizedNodeB) {
+        return withError(state, "Segment endpoints must reference two different nodes.");
+      }
+
       const normalizedSubNetworkTag = action.payload.subNetworkTag?.trim();
       const stateWithUpdatedSegments = {
         ...clearLastError(state),
         segments: upsertEntity(state.segments, {
           ...action.payload,
           id: normalizedSegmentId,
+          nodeA: normalizedNodeA,
+          nodeB: normalizedNodeB,
+          role: action.payload.role === "rearBackshellLink" ? "rearBackshellLink" : undefined,
           subNetworkTag: normalizedSubNetworkTag === undefined || normalizedSubNetworkTag.length === 0
             ? undefined
-            : normalizedSubNetworkTag
+            : normalizedSubNetworkTag,
+          sheathType: normalizeOptionalSegmentText(action.payload.sheathType),
+          insulation: normalizeOptionalSegmentText(action.payload.insulation),
+          lineStyle: normalizeOptionalSegmentText(action.payload.lineStyle),
+          internalPartReference: normalizeOptionalSegmentText(action.payload.internalPartReference),
+          mountingLabels: normalizeMountingLabels(action.payload)
         })
       };
 
@@ -133,6 +194,49 @@ export function handleSegmentActions(state: AppState, action: AppAction): AppSta
       return bumpRevision({
         ...stateWithRemovedSegment,
         wires: recomputed.wires
+      });
+    }
+
+    case "mountingLabel/upsert": {
+      const segment = state.segments.byId[action.payload.segmentId];
+      if (segment === undefined) {
+        return withError(state, "Cannot save mounting label on unknown segment.");
+      }
+      const text = action.payload.label.text.trim();
+      if (action.payload.label.id.trim().length === 0 || text.length === 0) {
+        return withError(state, "Mounting label ID and text are required.");
+      }
+      const nextLabels = [
+        ...(segment.mountingLabels ?? []).filter((label) => label.id !== action.payload.label.id),
+        {
+          ...action.payload.label,
+          text,
+          positionRatio: Math.min(1, Math.max(0, action.payload.label.positionRatio)),
+          offsetX: Number.isFinite(action.payload.label.offsetX) ? action.payload.label.offsetX : 0,
+          offsetY: Number.isFinite(action.payload.label.offsetY) ? action.payload.label.offsetY : 0
+        }
+      ].sort((left, right) => left.id.localeCompare(right.id));
+      return bumpRevision({
+        ...clearLastError(state),
+        segments: upsertEntity(state.segments, {
+          ...segment,
+          mountingLabels: nextLabels
+        })
+      });
+    }
+
+    case "mountingLabel/remove": {
+      const segment = state.segments.byId[action.payload.segmentId];
+      if (segment === undefined) {
+        return clearLastError(state);
+      }
+      const nextLabels = (segment.mountingLabels ?? []).filter((label) => label.id !== action.payload.labelId);
+      return bumpRevision({
+        ...clearLastError(state),
+        segments: upsertEntity(state.segments, {
+          ...segment,
+          mountingLabels: nextLabels.length === 0 ? undefined : nextLabels
+        })
       });
     }
 

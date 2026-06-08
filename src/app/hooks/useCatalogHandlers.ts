@@ -56,6 +56,10 @@ interface UseCatalogHandlersParams {
   setCatalogDefaultSealName?: (value: string) => void;
   catalogPlugDefinitionsText?: string;
   setCatalogPlugDefinitionsText?: (value: string) => void;
+  catalogRearBackshellEnabled?: boolean;
+  setCatalogRearBackshellEnabled?: (value: boolean) => void;
+  catalogRearBackshellLengthMm?: string;
+  setCatalogRearBackshellLengthMm?: (value: string) => void;
   catalogConnectorLayout?: ConnectorLayout | undefined;
   setCatalogConnectorLayout?: (value: ConnectorLayout | undefined) => void;
   catalogShowConnectorPhysicalLayout?: boolean;
@@ -131,6 +135,10 @@ export function useCatalogHandlers({
   setCatalogDefaultSealName = () => {},
   catalogPlugDefinitionsText = "",
   setCatalogPlugDefinitionsText = () => {},
+  catalogRearBackshellEnabled = false,
+  setCatalogRearBackshellEnabled = () => {},
+  catalogRearBackshellLengthMm = "40",
+  setCatalogRearBackshellLengthMm = () => {},
   catalogConnectorLayout,
   setCatalogConnectorLayout = () => {},
   catalogShowConnectorPhysicalLayout = false,
@@ -151,6 +159,8 @@ export function useCatalogHandlers({
     setCatalogDefaultSealReference("");
     setCatalogDefaultSealName("");
     setCatalogPlugDefinitionsText("");
+    setCatalogRearBackshellEnabled(false);
+    setCatalogRearBackshellLengthMm("40");
     setCatalogShowConnectorMaterialDefaults(false);
     setCatalogConnectorLayout(undefined);
     setCatalogShowConnectorPhysicalLayout(false);
@@ -213,6 +223,12 @@ export function useCatalogHandlers({
       item.connectorDefaults?.plugs
         ?.map((plug) => [plug.plugReference, plug.quantity, plug.plugName ?? ""].join(","))
         .join("\n") ?? ""
+    );
+    setCatalogRearBackshellEnabled(item.connectorDefaults?.rearBackshell?.enabled === true);
+    setCatalogRearBackshellLengthMm(
+      item.connectorDefaults?.rearBackshell?.lengthMm === undefined
+        ? "40"
+        : String(item.connectorDefaults.rearBackshell.lengthMm)
     );
     setCatalogConnectorLayout(item.connectorLayout);
     setCatalogShowConnectorPhysicalLayout(item.connectorLayout !== undefined);
@@ -296,6 +312,11 @@ export function useCatalogHandlers({
       setCatalogFormError("Plug definitions must use one line per plug: reference,quantity,name.");
       return;
     }
+    const rearBackshellLengthMm = Number(catalogRearBackshellLengthMm.trim().replace(",", "."));
+    if (catalogShowConnectorMaterialDefaults && catalogRearBackshellEnabled && (!Number.isFinite(rearBackshellLengthMm) || rearBackshellLengthMm < 1)) {
+      setCatalogFormError("Rear backshell length must be a valid number >= 1 mm.");
+      return;
+    }
     if (catalogShowPinElectricalRoles && hasInvalidPinElectricalRoleDraft(catalogPinElectricalRoleDrafts)) {
       setCatalogFormError("Pin role currents must be numeric values greater than or equal to 0 A.");
       return;
@@ -347,7 +368,14 @@ export function useCatalogHandlers({
                   }
                 : undefined,
               plugs: catalogShowConnectorMaterialDefaults && plugDefinitions.length > 0 ? plugDefinitions : undefined,
-              pinElectricalRoles
+              pinElectricalRoles,
+              rearBackshell:
+                catalogShowConnectorMaterialDefaults && catalogRearBackshellEnabled
+                  ? {
+                      enabled: true,
+                      lengthMm: rearBackshellLengthMm
+                    }
+                  : undefined
             }
           : undefined,
         connectorLayout: normalizedConnectorLayout,

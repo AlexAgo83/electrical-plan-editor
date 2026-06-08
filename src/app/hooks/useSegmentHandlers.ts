@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import type { NodeId, Segment, SegmentId } from "../../core/entities";
+import type { MountingLabel, NodeId, Segment, SegmentId } from "../../core/entities";
 import type { AppStore } from "../../store";
 import { appActions, getAppErrorMessage } from "../../store";
 import { analyzeSegmentDeleteImpact } from "../../store/deleteImpact";
@@ -35,7 +35,57 @@ interface UseSegmentHandlersParams {
   setSegmentLengthMm: (value: string) => void;
   segmentSubNetworkTag: string;
   setSegmentSubNetworkTag: (value: string) => void;
+  segmentSheathType: string;
+  setSegmentSheathType: (value: string) => void;
+  segmentInsulation: string;
+  setSegmentInsulation: (value: string) => void;
+  segmentLineStyle: string;
+  setSegmentLineStyle: (value: string) => void;
+  segmentInternalPartReference: string;
+  setSegmentInternalPartReference: (value: string) => void;
+  segmentMountingLabelsText: string;
+  setSegmentMountingLabelsText: (value: string) => void;
   setSegmentFormError: (value: string | null) => void;
+}
+
+function formatMountingLabelsText(segment: Segment): string {
+  return (segment.mountingLabels ?? [])
+    .map((label) => [label.id, label.text, label.positionRatio, label.offsetX, label.offsetY].join(","))
+    .join("\n");
+}
+
+function parseMountingLabelsText(value: string): Segment["mountingLabels"] | { error: string } | undefined {
+  const lines = value
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+  if (lines.length === 0) {
+    return undefined;
+  }
+  const labels: MountingLabel[] = [];
+  for (const line of lines) {
+    const [id = "", text = "", positionRatioRaw = "0.5", offsetXRaw = "0", offsetYRaw = "0"] = line.split(",").map((part) => part.trim());
+    const positionRatio = Number(positionRatioRaw.replace(",", "."));
+    const offsetX = Number(offsetXRaw.replace(",", "."));
+    const offsetY = Number(offsetYRaw.replace(",", "."));
+    if (
+      id.length === 0 ||
+      text.length === 0 ||
+      !Number.isFinite(positionRatio) ||
+      !Number.isFinite(offsetX) ||
+      !Number.isFinite(offsetY)
+    ) {
+      return { error: "Mounting labels must use one line per label: id,text,positionRatio,offsetX,offsetY." };
+    }
+    labels.push({
+      id: id as MountingLabel["id"],
+      text,
+      positionRatio,
+      offsetX,
+      offsetY
+    });
+  }
+  return labels;
 }
 
 export function useSegmentHandlers({
@@ -59,6 +109,16 @@ export function useSegmentHandlers({
   setSegmentLengthMm,
   segmentSubNetworkTag,
   setSegmentSubNetworkTag,
+  segmentSheathType,
+  setSegmentSheathType,
+  segmentInsulation,
+  setSegmentInsulation,
+  segmentLineStyle,
+  setSegmentLineStyle,
+  segmentInternalPartReference,
+  setSegmentInternalPartReference,
+  segmentMountingLabelsText,
+  setSegmentMountingLabelsText,
   setSegmentFormError
 }: UseSegmentHandlersParams) {
   void _segmentEditAfterCreate;
@@ -73,6 +133,11 @@ export function useSegmentHandlers({
     setSegmentNodeB("");
     setSegmentLengthMm("120");
     setSegmentSubNetworkTag("");
+    setSegmentSheathType("");
+    setSegmentInsulation("");
+    setSegmentLineStyle("");
+    setSegmentInternalPartReference("");
+    setSegmentMountingLabelsText("");
     setSegmentFormError(null);
   }
 
@@ -85,6 +150,11 @@ export function useSegmentHandlers({
     setSegmentNodeB("");
     setSegmentLengthMm("120");
     setSegmentSubNetworkTag("");
+    setSegmentSheathType("");
+    setSegmentInsulation("");
+    setSegmentLineStyle("");
+    setSegmentInternalPartReference("");
+    setSegmentMountingLabelsText("");
     setSegmentFormError(null);
   }
 
@@ -114,6 +184,11 @@ export function useSegmentHandlers({
     setSegmentNodeB(segment.nodeB);
     setSegmentLengthMm(String(segment.lengthMm));
     setSegmentSubNetworkTag(segment.subNetworkTag ?? "");
+    setSegmentSheathType(segment.sheathType ?? "");
+    setSegmentInsulation(segment.insulation ?? "");
+    setSegmentLineStyle(segment.lineStyle ?? "");
+    setSegmentInternalPartReference(segment.internalPartReference ?? "");
+    setSegmentMountingLabelsText(formatMountingLabelsText(segment));
     dispatchAction(appActions.select({ kind: "segment", id: segment.id }));
   }
 
@@ -155,6 +230,11 @@ export function useSegmentHandlers({
       setSegmentFormError("Segment length must be >= 1 mm.");
       return;
     }
+    const mountingLabels = parseMountingLabelsText(segmentMountingLabelsText);
+    if (mountingLabels !== undefined && "error" in mountingLabels) {
+      setSegmentFormError(mountingLabels.error);
+      return;
+    }
 
     setSegmentFormError(null);
 
@@ -175,7 +255,12 @@ export function useSegmentHandlers({
         nodeA: segmentNodeA as NodeId,
         nodeB: segmentNodeB as NodeId,
         lengthMm,
-        subNetworkTag: segmentSubNetworkTag
+        subNetworkTag: segmentSubNetworkTag,
+        sheathType: segmentSheathType,
+        insulation: segmentInsulation,
+        lineStyle: segmentLineStyle,
+        internalPartReference: segmentInternalPartReference,
+        mountingLabels
       })
     );
 

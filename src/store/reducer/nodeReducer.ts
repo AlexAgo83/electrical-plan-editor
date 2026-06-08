@@ -1,5 +1,6 @@
 import type { AppAction } from "../actions";
 import type { AppState } from "../types";
+import { applyRearBackshellTopologyToConnector } from "./helpers/rearBackshell";
 import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
 
 function hasConnectorNodeConflict(state: AppState, nodeId: string, connectorId: string): boolean {
@@ -21,6 +22,17 @@ function hasSpliceNodeConflict(state: AppState, nodeId: string, spliceId: string
 
     const node = state.nodes.byId[id];
     return node?.kind === "splice" && node.spliceId === spliceId;
+  });
+}
+
+function hasConnectorBackshellHelperConflict(state: AppState, nodeId: string, connectorId: string): boolean {
+  return state.nodes.allIds.some((id) => {
+    if (id === nodeId) {
+      return false;
+    }
+
+    const node = state.nodes.byId[id];
+    return node?.kind === "connectorBackshellHelper" && node.connectorId === connectorId;
   });
 }
 
@@ -62,6 +74,16 @@ export function handleNodeActions(state: AppState, action: AppAction): AppState 
         }
       }
 
+      if (action.payload.kind === "connectorBackshellHelper") {
+        if (state.connectors.byId[action.payload.connectorId] === undefined) {
+          return withError(state, "Cannot create backshell helper node for unknown connector.");
+        }
+
+        if (hasConnectorBackshellHelperConflict(state, normalizedNodeId, action.payload.connectorId)) {
+          return withError(state, "Only one backshell helper node is allowed per connector.");
+        }
+      }
+
       if (action.payload.kind === "intermediate" && action.payload.label.trim().length === 0) {
         return withError(state, "Intermediate node label must be non-empty.");
       }
@@ -78,10 +100,20 @@ export function handleNodeActions(state: AppState, action: AppAction): AppState 
               id: normalizedNodeId
             };
 
-      return bumpRevision({
+      const nextState = bumpRevision({
         ...clearLastError(state),
         nodes: upsertEntity(state.nodes, normalizedPayload)
       });
+      if (normalizedPayload.kind !== "connector") {
+        return nextState;
+      }
+      const connector = nextState.connectors.byId[normalizedPayload.connectorId];
+      if (connector === undefined) {
+        return nextState;
+      }
+      const catalogItem =
+        connector.catalogItemId === undefined ? undefined : nextState.catalogItems.byId[connector.catalogItemId];
+      return applyRearBackshellTopologyToConnector(nextState, connector, catalogItem);
     }
 
     case "node/rename": {

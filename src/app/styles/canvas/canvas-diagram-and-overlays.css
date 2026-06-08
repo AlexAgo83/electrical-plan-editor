@@ -116,6 +116,37 @@
 .network-canvas--label-size-extraLarge .network-segment-length-label {
   font-size: 11px;
 }
+.network-segment-callout-frame {
+  fill: color-mix(in srgb, var(--panel-surface, #ffffff) 94%, transparent);
+  stroke: var(--network-node-stroke-color, #55748d);
+  stroke-width: 0.9px;
+}
+.network-segment-callout-text {
+  font-size: 6.5px;
+  fill: var(--network-node-label-color, #183549);
+  paint-order: stroke fill;
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
+  stroke-width: 1.1px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.network-segment-callout-route {
+  font-weight: 700;
+  fill: var(--network-segment-label-color, #38566a);
+}
+.network-segment-mounting-label-frame {
+  fill: color-mix(in srgb, var(--panel-surface, #ffffff) 90%, transparent);
+  stroke: var(--network-segment-length-label-color, #547086);
+  stroke-width: 0.9px;
+}
+.network-segment-mounting-label-text {
+  font-size: 6.5px;
+  fill: var(--network-node-label-color, #183549);
+  paint-order: stroke fill;
+  stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
+  stroke-width: 1px;
+  pointer-events: none;
+}
 .network-node {
   cursor: pointer;
 }

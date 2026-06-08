@@ -43,6 +43,10 @@ interface ModelingCatalogFormPanelProps {
   setCatalogDefaultSealName: (value: string) => void;
   catalogPlugDefinitionsText: string;
   setCatalogPlugDefinitionsText: (value: string) => void;
+  catalogRearBackshellEnabled: boolean;
+  setCatalogRearBackshellEnabled: (value: boolean) => void;
+  catalogRearBackshellLengthMm: string;
+  setCatalogRearBackshellLengthMm: (value: string) => void;
   catalogConnectorLayout: ConnectorLayout | undefined;
   setCatalogConnectorLayout: (value: ConnectorLayout | undefined) => void;
   catalogShowConnectorPhysicalLayout: boolean;
@@ -94,6 +98,10 @@ export function ModelingCatalogFormPanel({
   setCatalogDefaultSealName,
   catalogPlugDefinitionsText,
   setCatalogPlugDefinitionsText,
+  catalogRearBackshellEnabled,
+  setCatalogRearBackshellEnabled,
+  catalogRearBackshellLengthMm,
+  setCatalogRearBackshellLengthMm,
   catalogConnectorLayout,
   setCatalogConnectorLayout,
   catalogShowConnectorPhysicalLayout,
@@ -464,6 +472,26 @@ export function ModelingCatalogFormPanel({
               rows={3}
             />
           </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={catalogRearBackshellEnabled}
+              onChange={(event) => setCatalogRearBackshellEnabled(event.target.checked)}
+            />
+            Rear backshell helper node
+          </label>
+          {catalogRearBackshellEnabled ? (
+            <label>
+              Rear backshell length (mm)
+              <input
+                type="number"
+                min={1}
+                step={0.1}
+                value={catalogRearBackshellLengthMm}
+                onChange={(event) => setCatalogRearBackshellLengthMm(event.target.value)}
+              />
+            </label>
+          ) : null}
           <div className="row-actions catalog-item-submit-actions">
             {renderCatalogSubmitButton()}
           </div>

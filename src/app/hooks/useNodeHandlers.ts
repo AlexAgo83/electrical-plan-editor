@@ -108,9 +108,9 @@ export function useNodeHandlers({
     setEditingNodeId(node.id);
     setPendingNewNodePosition(null);
     setNodeIdInput(node.id);
-    setNodeKind(node.kind);
+    setNodeKind(node.kind === "connectorBackshellHelper" ? "connector" : node.kind);
     setNodeLabel(node.kind === "intermediate" ? node.label : "");
-    setNodeConnectorId(node.kind === "connector" ? node.connectorId : "");
+    setNodeConnectorId(node.kind === "connector" || node.kind === "connectorBackshellHelper" ? node.connectorId : "");
     setNodeSpliceId(node.kind === "splice" ? node.spliceId : "");
     dispatchAction(appActions.select({ kind: "node", id: node.id }));
   }

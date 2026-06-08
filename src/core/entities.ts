@@ -11,6 +11,7 @@ export type SpliceId = Brand<string, "SpliceId">;
 export type NodeId = Brand<string, "NodeId">;
 export type SegmentId = Brand<string, "SegmentId">;
 export type WireId = Brand<string, "WireId">;
+export type MountingLabelId = Brand<string, "MountingLabelId">;
 export type WireMaterial = "copper" | "aluminum";
 
 export interface Network {
@@ -52,6 +53,7 @@ export interface Connector {
   fusePairRatings?: Record<number, number>;
   fusePairOverrides?: FuseBoxPair[];
   pinElectricalRoles?: Record<number, PinElectricalRole>;
+  rearBackshellOverride?: ConnectorRearBackshellOverride;
   cableCalloutPosition?: {
     x: number;
     y: number;
@@ -179,6 +181,16 @@ export interface ConnectorPlugDefinition {
   quantity: number;
 }
 
+export interface ConnectorRearBackshell {
+  enabled: true;
+  lengthMm: number;
+}
+
+export interface ConnectorRearBackshellOverride {
+  enabled?: boolean;
+  lengthMm?: number;
+}
+
 export interface FuseBoxPair {
   pairIndex: number;  // 0-based
   pinA: number;       // 1-based cavity index
@@ -195,6 +207,7 @@ export interface ConnectorCatalogDefaults {
   terminalOverrides?: Record<number, ConnectorTerminalMaterial>;
   plugs?: ConnectorPlugDefinition[];
   pinElectricalRoles?: Record<number, PinElectricalRole>;
+  rearBackshell?: ConnectorRearBackshell;
 }
 
 export type NetworkNode =
@@ -210,16 +223,35 @@ export type NetworkNode =
     }
   | {
       id: NodeId;
+      kind: "connectorBackshellHelper";
+      connectorId: ConnectorId;
+    }
+  | {
+      id: NodeId;
       kind: "intermediate";
       label: string;
     };
+
+export interface MountingLabel {
+  id: MountingLabelId;
+  text: string;
+  positionRatio: number;
+  offsetX: number;
+  offsetY: number;
+}
 
 export interface Segment {
   id: SegmentId;
   nodeA: NodeId;
   nodeB: NodeId;
   lengthMm: number;
+  role?: "rearBackshellLink";
   subNetworkTag?: string;
+  sheathType?: string;
+  insulation?: string;
+  lineStyle?: string;
+  internalPartReference?: string;
+  mountingLabels?: MountingLabel[];
 }
 
 export type WireEndpoint =

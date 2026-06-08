@@ -15,6 +15,7 @@ import {
 } from "../catalog";
 import type { AppState } from "../types";
 import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
+import { applyRearBackshellTopologyToConnector } from "./helpers/rearBackshell";
 
 function hasDuplicateManufacturerReference(state: AppState, catalogItemId: string, manufacturerReference: string): boolean {
   const referenceKey = normalizeManufacturerReferenceKey(manufacturerReference);
@@ -186,12 +187,22 @@ export function handleCatalogActions(state: AppState, action: AppAction): AppSta
         nextSplices = upsertEntity(nextSplices, propagateCatalogToSplice(splice, normalizedCatalogItem));
       }
 
-      return bumpRevision({
+      let nextState: AppState = {
         ...clearLastError(state),
         catalogItems: upsertEntity(state.catalogItems, normalizedCatalogItem),
         connectors: nextConnectors,
         splices: nextSplices
-      });
+      };
+
+      for (const connectorId of nextConnectors.allIds) {
+        const connector = nextConnectors.byId[connectorId];
+        if (connector?.catalogItemId !== normalizedCatalogItem.id) {
+          continue;
+        }
+        nextState = applyRearBackshellTopologyToConnector(nextState, connector, normalizedCatalogItem);
+      }
+
+      return bumpRevision(nextState);
     }
 
     case "catalog/remove": {

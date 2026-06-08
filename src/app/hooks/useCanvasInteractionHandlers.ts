@@ -118,7 +118,7 @@ export function useCanvasInteractionHandlers({
       clearSelectedCanvasNodes();
 
       if (isModelingScreen && !isModelingAnalysisFocused) {
-        if (node.kind === "connector") {
+        if (node.kind === "connector" || node.kind === "connectorBackshellHelper") {
           const connector = state.connectors.byId[node.connectorId];
           if (connector !== undefined) {
             onExternalSelectionInteraction?.();
@@ -146,7 +146,7 @@ export function useCanvasInteractionHandlers({
         }
 
         onExternalSelectionInteraction?.();
-        if (node.kind === "connector") {
+        if (node.kind === "connector" || node.kind === "connectorBackshellHelper") {
           setActiveSubScreen("connector");
         } else if (node.kind === "splice") {
           setActiveSubScreen("splice");
@@ -157,7 +157,7 @@ export function useCanvasInteractionHandlers({
         return;
       }
 
-      if (node.kind === "connector") {
+      if (node.kind === "connector" || node.kind === "connectorBackshellHelper") {
         onExternalSelectionInteraction?.();
         setActiveSubScreen("connector");
         dispatchAction(appActions.select({ kind: "connector", id: node.connectorId }));

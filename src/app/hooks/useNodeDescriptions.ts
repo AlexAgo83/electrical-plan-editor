@@ -19,6 +19,13 @@ export function useNodeDescriptions(
       return connector === undefined ? `Connector node (${node.connectorId})` : `${connector.name} (${connector.technicalId})`;
     }
 
+    if (node.kind === "connectorBackshellHelper") {
+      const connector = connectorMap.get(node.connectorId);
+      return connector === undefined
+        ? `Backshell helper (${node.connectorId})`
+        : `Backshell helper (${connector.technicalId})`;
+    }
+
     const splice = spliceMap.get(node.spliceId);
     return splice === undefined ? `Splice node (${node.spliceId})` : `${splice.name} (${splice.technicalId})`;
   }, [connectorMap, spliceMap]);

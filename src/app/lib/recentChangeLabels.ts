@@ -155,10 +155,14 @@ function resolveNodeDisplayRefFromNode(state: AppState, node: NetworkNode | unde
   switch (node.kind) {
     case "connector":
       return resolveConnectorDisplayRef(state, node.connectorId);
+    case "connectorBackshellHelper":
+      return resolveConnectorDisplayRef(state, node.connectorId);
     case "splice":
       return resolveSpliceDisplayRef(state, node.spliceId);
     case "intermediate":
       return normalizeDisplayText(node.label);
+    default:
+      return null;
   }
 }
 
@@ -290,6 +294,8 @@ function actionVerb(action: AppAction, previousState: AppState): string {
     case "ui/setThemeMode":
     case "ui/clearSelection":
     case "ui/clearError":
+      return "updated";
+    default:
       return "updated";
   }
 }
@@ -452,6 +458,8 @@ function resolveDisplayRef(action: AppAction, previousState: AppState, nextState
     case "ui/setThemeMode":
     case "ui/clearSelection":
     case "ui/clearError":
+      return null;
+    default:
       return null;
   }
 }
@@ -845,6 +853,8 @@ function resolveNavigationTarget(action: AppAction): RecentChangeNavigationTarge
     case "ui/setThemeMode":
     case "ui/clearSelection":
     case "ui/clearError":
+      return null;
+    default:
       return null;
   }
 }

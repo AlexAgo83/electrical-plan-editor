@@ -143,6 +143,10 @@ export function useAppControllerCatalogScreenDomains({
         setCatalogShowAdditionalAccessories={formsState.setCatalogShowAdditionalAccessories}
         catalogShowConnectorMaterialDefaults={formsState.catalogShowConnectorMaterialDefaults}
         setCatalogShowConnectorMaterialDefaults={formsState.setCatalogShowConnectorMaterialDefaults}
+        catalogRearBackshellEnabled={formsState.catalogRearBackshellEnabled}
+        setCatalogRearBackshellEnabled={formsState.setCatalogRearBackshellEnabled}
+        catalogRearBackshellLengthMm={formsState.catalogRearBackshellLengthMm}
+        setCatalogRearBackshellLengthMm={formsState.setCatalogRearBackshellLengthMm}
         catalogAllSameTerminals={formsState.catalogAllSameTerminals}
         setCatalogAllSameTerminals={formsState.setCatalogAllSameTerminals}
         catalogDefaultTerminalReference={formsState.catalogDefaultTerminalReference}

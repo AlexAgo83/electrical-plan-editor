@@ -2,6 +2,7 @@ import type {
   CatalogItem,
   Connector,
   ConnectorCatalogDefaults,
+  ConnectorRearBackshell,
   ConnectorPlugDefinition,
   ConnectorTerminalMaterial,
   Wire
@@ -97,6 +98,20 @@ function normalizePlugDefinition(value: Partial<ConnectorPlugDefinition> | undef
   };
 }
 
+function normalizeRearBackshell(value: Partial<ConnectorRearBackshell> | undefined): ConnectorRearBackshell | undefined {
+  if (value === undefined || value.enabled !== true) {
+    return undefined;
+  }
+  const lengthMm = typeof value.lengthMm === "number" && Number.isFinite(value.lengthMm) ? value.lengthMm : Number.NaN;
+  if (lengthMm < 1) {
+    return undefined;
+  }
+  return {
+    enabled: true,
+    lengthMm
+  };
+}
+
 export function normalizeConnectorCatalogDefaults(
   value: Partial<ConnectorCatalogDefaults> | undefined,
   connectionCount: number
@@ -115,13 +130,15 @@ export function normalizeConnectorCatalogDefaults(
     : undefined;
   const allSameTerminals = value.allSameTerminals === true;
   const pinElectricalRoles = normalizePinElectricalRolesCatalogDefaults(value.pinElectricalRoles, connectionCount);
+  const rearBackshell = normalizeRearBackshell(value.rearBackshell);
 
   if (
     !allSameTerminals &&
     defaultTerminal === undefined &&
     terminalOverrides === undefined &&
     (plugs?.length ?? 0) === 0 &&
-    pinElectricalRoles === undefined
+    pinElectricalRoles === undefined &&
+    rearBackshell === undefined
   ) {
     return undefined;
   }
@@ -131,7 +148,8 @@ export function normalizeConnectorCatalogDefaults(
     defaultTerminal,
     terminalOverrides,
     plugs: plugs !== undefined && plugs.length > 0 ? plugs : undefined,
-    pinElectricalRoles
+    pinElectricalRoles,
+    rearBackshell
   };
 }
 

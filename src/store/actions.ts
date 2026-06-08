@@ -11,6 +11,8 @@ import type {
   NodeId,
   Segment,
   SegmentId,
+  MountingLabel,
+  MountingLabelId,
   Splice,
   SpliceId,
   WireEndpoint,
@@ -126,6 +128,8 @@ export type AppAction =
   | { type: "segment/upsert"; payload: Segment }
   | { type: "segment/rename"; payload: { fromId: SegmentId; toId: SegmentId } }
   | { type: "segment/remove"; payload: { id: SegmentId } }
+  | { type: "mountingLabel/upsert"; payload: { segmentId: SegmentId; label: MountingLabel } }
+  | { type: "mountingLabel/remove"; payload: { segmentId: SegmentId; labelId: MountingLabelId } }
   | {
       type: "wire/save";
       payload: {
@@ -303,6 +307,14 @@ export const appActions = {
   upsertSegment: (payload: Segment): AppAction => ({ type: "segment/upsert", payload }),
   renameSegment: (fromId: SegmentId, toId: SegmentId): AppAction => ({ type: "segment/rename", payload: { fromId, toId } }),
   removeSegment: (id: SegmentId): AppAction => ({ type: "segment/remove", payload: { id } }),
+  upsertMountingLabel: (segmentId: SegmentId, label: MountingLabel): AppAction => ({
+    type: "mountingLabel/upsert",
+    payload: { segmentId, label }
+  }),
+  removeMountingLabel: (segmentId: SegmentId, labelId: MountingLabelId): AppAction => ({
+    type: "mountingLabel/remove",
+    payload: { segmentId, labelId }
+  }),
 
   saveWire: (payload: {
     id: WireId;

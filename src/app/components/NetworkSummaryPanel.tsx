@@ -710,7 +710,8 @@ export function NetworkSummaryPanel({
         autoSegmentLabelRotation,
         labelRotationDegrees,
         showSegmentNames,
-        showSegmentLengths
+        showSegmentLengths,
+        spliceMap
       }),
     [
       segments,
@@ -732,7 +733,8 @@ export function NetworkSummaryPanel({
       autoSegmentLabelRotation,
       labelRotationDegrees,
       showSegmentNames,
-      showSegmentLengths
+      showSegmentLengths,
+      spliceMap
     ]
   );
 

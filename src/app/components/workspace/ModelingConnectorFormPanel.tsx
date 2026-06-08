@@ -31,6 +31,10 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     setConnectorFusePairRatings,
     connectorFusePairOverrides,
     setConnectorFusePairOverrides,
+    connectorRearBackshellOverrideEnabled,
+    setConnectorRearBackshellOverrideEnabled,
+    connectorRearBackshellOverrideLengthMm,
+    setConnectorRearBackshellOverrideLengthMm,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed,
@@ -42,6 +46,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
   const hasCatalogItems = catalogItems.length > 0;
   const selectedCatalogItem = catalogItems.find((item) => item.id === connectorCatalogItemId);
   const connectorCatalogFuseBoxPairs = selectedCatalogItem?.fuseBoxConfig?.pairs;
+  const catalogRearBackshell = selectedCatalogItem?.connectorDefaults?.rearBackshell;
   const catalogItemOptions = buildModelingDynamicSelectOptions({
     options: catalogItems.map((item) => ({
       value: item.id,
@@ -188,6 +193,36 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
       />
       Main harness connector for functional view
     </label>
+    <label>
+      Rear backshell override
+      <select
+        value={connectorRearBackshellOverrideEnabled}
+        onChange={(event) =>
+          setConnectorRearBackshellOverrideEnabled(event.target.value as "inherit" | "enabled" | "disabled")
+        }
+      >
+        <option value="inherit">
+          {catalogRearBackshell === undefined
+            ? "Inherit catalog (disabled)"
+            : `Inherit catalog (enabled, ${catalogRearBackshell.lengthMm} mm)`}
+        </option>
+        <option value="enabled">Enabled</option>
+        <option value="disabled">Disabled</option>
+      </select>
+    </label>
+    {connectorRearBackshellOverrideEnabled !== "disabled" ? (
+      <label>
+        Rear backshell length override (mm, optional)
+        <input
+          type="number"
+          min={1}
+          step={0.1}
+          value={connectorRearBackshellOverrideLengthMm}
+          onChange={(event) => setConnectorRearBackshellOverrideLengthMm(event.target.value)}
+          placeholder={catalogRearBackshell === undefined ? "40" : String(catalogRearBackshell.lengthMm)}
+        />
+      </label>
+    ) : null}
     {connectorCatalogFuseBoxPairs !== undefined && connectorCatalogFuseBoxPairs.length > 0 ? (
       <fieldset className="inline-fieldset fuse-rating-editor">
         <legend>

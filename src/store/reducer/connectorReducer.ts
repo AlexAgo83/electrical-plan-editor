@@ -1,7 +1,8 @@
 import type { AppAction } from "../actions";
 import { normalizeConnectorTerminalMaterial } from "../../core/connectorCatalogMaterials";
 import { normalizePinElectricalRolesMap } from "../../core/pinElectricalRole";
-import type { ConnectorTerminalMaterial, PinElectricalRole } from "../../core/entities";
+import type { Connector, ConnectorTerminalMaterial, PinElectricalRole } from "../../core/entities";
+import { getEffectiveRearBackshellConfig } from "../../core/rearBackshell";
 import { analyzeConnectorDeleteImpact } from "../deleteImpact";
 import type { AppState } from "../types";
 import {
@@ -13,6 +14,7 @@ import {
   upsertEntity,
   withError
 } from "./shared";
+import { applyRearBackshellTopologyToConnector } from "./helpers/rearBackshell";
 
 function hasDuplicateConnectorTechnicalId(state: AppState, connectorId: string, technicalId: string): boolean {
   return state.connectors.allIds.some((id) => {
@@ -76,6 +78,26 @@ function normalizeConnectorPinElectricalRoles(
   }
   const { value } = normalizePinElectricalRolesMap(roles, { cavityCount });
   return Object.keys(value).length === 0 ? undefined : value;
+}
+
+function normalizeRearBackshellOverride(
+  value: Connector["rearBackshellOverride"]
+): Connector["rearBackshellOverride"] {
+  if (value === undefined) {
+    return undefined;
+  }
+  const enabled = typeof value.enabled === "boolean" ? value.enabled : undefined;
+  const lengthMm =
+    typeof value.lengthMm === "number" && Number.isFinite(value.lengthMm) && value.lengthMm >= 1
+      ? value.lengthMm
+      : undefined;
+  if (enabled === undefined && lengthMm === undefined) {
+    return undefined;
+  }
+  return {
+    enabled,
+    lengthMm
+  };
 }
 
 function hasWireEndpointIndexOutOfRange(state: AppState, connectorId: string, cavityCount: number): boolean {
@@ -158,24 +180,34 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
         return withError(state, "Connector wayCount cannot be reduced below wire endpoint way indexes.");
       }
 
-      return bumpRevision({
+      const savedConnector = {
+        ...action.payload,
+        name: normalizedName,
+        technicalId: normalizedTechnicalId,
+        cavityCount,
+        isMainHarnessConnector: action.payload.isMainHarnessConnector === true ? true : undefined,
+        applyCatalogPlugs: normalizeApplyCatalogFlag(action.payload.applyCatalogPlugs),
+        applyCatalogSeals: normalizeApplyCatalogFlag(action.payload.applyCatalogSeals),
+        terminalOverrides: normalizeConnectorTerminalOverrides(action.payload.terminalOverrides, cavityCount),
+        pinElectricalRoles: normalizeConnectorPinElectricalRoles(action.payload.pinElectricalRoles, cavityCount),
+        rearBackshellOverride: normalizeRearBackshellOverride(action.payload.rearBackshellOverride),
+        manufacturerReference:
+          linkedCatalogItem !== undefined
+            ? linkedCatalogItem.manufacturerReference
+            : normalizeManufacturerReference(action.payload.manufacturerReference)
+      };
+
+      const stateWithConnector = {
         ...clearLastError(state),
-        connectors: upsertEntity(state.connectors, {
-          ...action.payload,
-          name: normalizedName,
-          technicalId: normalizedTechnicalId,
-          cavityCount,
-          isMainHarnessConnector: action.payload.isMainHarnessConnector === true ? true : undefined,
-          applyCatalogPlugs: normalizeApplyCatalogFlag(action.payload.applyCatalogPlugs),
-          applyCatalogSeals: normalizeApplyCatalogFlag(action.payload.applyCatalogSeals),
-          terminalOverrides: normalizeConnectorTerminalOverrides(action.payload.terminalOverrides, cavityCount),
-          pinElectricalRoles: normalizeConnectorPinElectricalRoles(action.payload.pinElectricalRoles, cavityCount),
-          manufacturerReference:
-            linkedCatalogItem !== undefined
-              ? linkedCatalogItem.manufacturerReference
-              : normalizeManufacturerReference(action.payload.manufacturerReference)
-        })
-      });
+        connectors: upsertEntity(state.connectors, savedConnector)
+      };
+
+      const stateWithTopology =
+        linkedCatalogItem !== undefined || getEffectiveRearBackshellConfig(savedConnector, linkedCatalogItem) !== undefined
+          ? applyRearBackshellTopologyToConnector(stateWithConnector, savedConnector, linkedCatalogItem)
+          : stateWithConnector;
+
+      return bumpRevision(stateWithTopology);
     }
 
     case "connector/remove": {

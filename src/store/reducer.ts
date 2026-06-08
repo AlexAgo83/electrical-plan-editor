@@ -20,6 +20,7 @@ function hasActiveNetworkForDomainActions(state: AppState, action: AppAction): b
     action.type.startsWith("splice/") ||
     action.type.startsWith("node/") ||
     action.type.startsWith("segment/") ||
+    action.type.startsWith("mountingLabel/") ||
     action.type.startsWith("wire/") ||
     action.type.startsWith("layout/")
   ) {
@@ -113,6 +114,11 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "segment/upsert":
     case "segment/rename":
     case "segment/remove": {
+      return runScopedDomainReducer(state, action, handleSegmentActions);
+    }
+
+    case "mountingLabel/upsert":
+    case "mountingLabel/remove": {
       return runScopedDomainReducer(state, action, handleSegmentActions);
     }
 

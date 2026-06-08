@@ -13,6 +13,7 @@ import type {
 } from "../../../core/entities";
 import { resolveConnectorPlugMaterials } from "../../../core/connectorCatalogMaterials";
 import { portIndexToSpliceSide } from "../../../core/directionalSplice";
+import { findRearBackshellHelperNodeId, getEffectiveRearBackshellConfig, isRearBackshellLinkSegment } from "../../../core/rearBackshell";
 import { isSplicePortIndexValid, resolveSplicePortMode } from "../../../core/splicePortMode";
 import type { AppStore } from "../../../store";
 import { isValidCatalogUrlInput, normalizeManufacturerReferenceKey } from "../../../store";
@@ -204,6 +205,18 @@ export function buildValidationIssues({
       });
     }
 
+    if (node.kind === "connectorBackshellHelper" && connectorMap.get(node.connectorId) === undefined) {
+      issues.push({
+        id: `node-missing-backshell-connector-${node.id}`,
+        severity: "error",
+        category: "Missing reference",
+        message: `Backshell helper node '${node.id}' references missing connector '${node.connectorId}'.`,
+        subScreen: "node",
+        selectionKind: "node",
+        selectionId: node.id
+      });
+    }
+
     if (node.kind === "intermediate" && node.label.trim().length === 0) {
       issues.push({
         id: `node-missing-label-${node.id}`,
@@ -257,21 +270,23 @@ export function buildValidationIssues({
     }
 
     const connectorCatalogItemId = connector.catalogItemId;
+    const linkedCatalogItem = connectorCatalogItemId === undefined ? undefined : state.catalogItems.byId[connectorCatalogItemId];
+    const effectiveRearBackshell = getEffectiveRearBackshellConfig(connector, linkedCatalogItem);
     if (connectorCatalogItemId === undefined) {
       if (!shouldValidateMissingCatalogLinks) {
-        continue;
+        // continue to backshell topology validation below
+      } else {
+        issues.push({
+          id: `connector-missing-catalog-link-${connector.id}`,
+          severity: "error",
+          category: catalogIntegrityCategory,
+          message: `Connector '${connector.technicalId}' is missing a catalog selection (catalogItemId).`,
+          subScreen: "connector",
+          selectionKind: "connector",
+          selectionId: connector.id
+        });
       }
-      issues.push({
-        id: `connector-missing-catalog-link-${connector.id}`,
-        severity: "error",
-        category: catalogIntegrityCategory,
-        message: `Connector '${connector.technicalId}' is missing a catalog selection (catalogItemId).`,
-        subScreen: "connector",
-        selectionKind: "connector",
-        selectionId: connector.id
-      });
     } else {
-      const linkedCatalogItem = state.catalogItems.byId[connectorCatalogItemId];
       if (linkedCatalogItem === undefined) {
         issues.push({
           id: `connector-broken-catalog-link-${connector.id}`,
@@ -309,6 +324,53 @@ export function buildValidationIssues({
           selectionKind: "connector",
           selectionId: connector.id
         });
+      }
+    }
+
+    if (effectiveRearBackshell !== undefined) {
+      const connectorNodeId = connectorNodeByConnectorId.get(connector.id) ?? null;
+      const helperNodeId = findRearBackshellHelperNodeId(state.nodes.byId, connector.id) ?? null;
+      if (connectorNodeId === null || helperNodeId === null) {
+        issues.push({
+          id: `connector-backshell-topology-missing-${connector.id}`,
+          severity: "error",
+          category: "Topology integrity",
+          message: `Connector '${connector.technicalId}' requires a backshell helper topology but it is incomplete.`,
+          subScreen: "connector",
+          selectionKind: "connector",
+          selectionId: connector.id
+        });
+      } else {
+        const linkSegment = segments.find((segment) => isRearBackshellLinkSegment(segment, connectorNodeId, helperNodeId));
+        if (linkSegment === undefined) {
+          issues.push({
+            id: `connector-backshell-link-missing-${connector.id}`,
+            severity: "error",
+            category: "Topology integrity",
+            message: `Connector '${connector.technicalId}' is missing its backshell link segment.`,
+            subScreen: "connector",
+            selectionKind: "connector",
+            selectionId: connector.id
+          });
+        }
+
+        for (const segment of segments) {
+          if (segment.nodeA !== connectorNodeId && segment.nodeB !== connectorNodeId) {
+            continue;
+          }
+          if (linkSegment !== undefined && segment.id === linkSegment.id) {
+            continue;
+          }
+          issues.push({
+            id: `connector-backshell-direct-segment-${connector.id}-${segment.id}`,
+            severity: "error",
+            category: "Topology integrity",
+            message: `Connector '${connector.technicalId}' has segment '${segment.id}' attached directly to the connector node instead of the backshell helper node.`,
+            subScreen: "connector",
+            selectionKind: "connector",
+            selectionId: connector.id
+          });
+        }
       }
     }
   }

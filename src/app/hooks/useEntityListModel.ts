@@ -215,6 +215,14 @@ export function useEntityListModel({
         );
         continue;
       }
+      if (node.kind === "connectorBackshellHelper") {
+        const connector = connectorMap.get(node.connectorId);
+        result.set(
+          node.id,
+          `${node.connectorId} backshell ${connector?.name ?? ""} ${connector?.technicalId ?? ""}`.toLocaleLowerCase()
+        );
+        continue;
+      }
       const splice = spliceMap.get(node.spliceId);
       result.set(node.id, `${node.spliceId} ${splice?.name ?? ""} ${splice?.technicalId ?? ""}`.toLocaleLowerCase());
     }

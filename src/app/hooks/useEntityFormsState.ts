@@ -34,6 +34,8 @@ export function useEntityFormsState() {
   const [catalogDefaultSealReference, setCatalogDefaultSealReference] = useState("");
   const [catalogDefaultSealName, setCatalogDefaultSealName] = useState("");
   const [catalogPlugDefinitionsText, setCatalogPlugDefinitionsText] = useState("");
+  const [catalogRearBackshellEnabled, setCatalogRearBackshellEnabled] = useState(false);
+  const [catalogRearBackshellLengthMm, setCatalogRearBackshellLengthMm] = useState("40");
   const [catalogConnectorLayout, setCatalogConnectorLayout] = useState<ConnectorLayout | undefined>(undefined);
   const [catalogShowConnectorPhysicalLayout, setCatalogShowConnectorPhysicalLayout] = useState(false);
   const [catalogIsFuseBox, setCatalogIsFuseBox] = useState(false);
@@ -59,6 +61,9 @@ export function useEntityFormsState() {
   const [connectorPinElectricalRoleDrafts, setConnectorPinElectricalRoleDrafts] =
     useState<ConnectorPinElectricalRoleDrafts>({});
   const [connectorPinElectricalRoleSelection, setConnectorPinElectricalRoleSelection] = useState<number[]>([]);
+  const [connectorRearBackshellOverrideEnabled, setConnectorRearBackshellOverrideEnabled] =
+    useState<"inherit" | "enabled" | "disabled">("inherit");
+  const [connectorRearBackshellOverrideLengthMm, setConnectorRearBackshellOverrideLengthMm] = useState("");
   const [connectorAutoCreateLinkedNode, setConnectorAutoCreateLinkedNode] = useState(true);
   const [cavityCount, setCavityCount] = useState("4");
   const [cavityIndexInput, setCavityIndexInput] = useState("1");
@@ -99,6 +104,11 @@ export function useEntityFormsState() {
   const [segmentNodeB, setSegmentNodeB] = useState("");
   const [segmentLengthMm, setSegmentLengthMm] = useState("120");
   const [segmentSubNetworkTag, setSegmentSubNetworkTag] = useState("");
+  const [segmentSheathType, setSegmentSheathType] = useState("");
+  const [segmentInsulation, setSegmentInsulation] = useState("");
+  const [segmentLineStyle, setSegmentLineStyle] = useState("");
+  const [segmentInternalPartReference, setSegmentInternalPartReference] = useState("");
+  const [segmentMountingLabelsText, setSegmentMountingLabelsText] = useState("");
   const [segmentFormError, setSegmentFormError] = useState<string | null>(null);
 
   const [wireFormMode, setWireFormMode] = useState<"idle" | "create" | "edit">("idle");
@@ -175,6 +185,10 @@ export function useEntityFormsState() {
     setCatalogDefaultSealName,
     catalogPlugDefinitionsText,
     setCatalogPlugDefinitionsText,
+    catalogRearBackshellEnabled,
+    setCatalogRearBackshellEnabled,
+    catalogRearBackshellLengthMm,
+    setCatalogRearBackshellLengthMm,
     catalogConnectorLayout,
     setCatalogConnectorLayout,
     catalogShowConnectorPhysicalLayout,
@@ -219,6 +233,10 @@ export function useEntityFormsState() {
     setConnectorPinElectricalRoleDrafts,
     connectorPinElectricalRoleSelection,
     setConnectorPinElectricalRoleSelection,
+    connectorRearBackshellOverrideEnabled,
+    setConnectorRearBackshellOverrideEnabled,
+    connectorRearBackshellOverrideLengthMm,
+    setConnectorRearBackshellOverrideLengthMm,
     connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode,
     cavityCount,
@@ -293,6 +311,16 @@ export function useEntityFormsState() {
     setSegmentLengthMm,
     segmentSubNetworkTag,
     setSegmentSubNetworkTag,
+    segmentSheathType,
+    setSegmentSheathType,
+    segmentInsulation,
+    setSegmentInsulation,
+    segmentLineStyle,
+    setSegmentLineStyle,
+    segmentInternalPartReference,
+    setSegmentInternalPartReference,
+    segmentMountingLabelsText,
+    setSegmentMountingLabelsText,
     segmentFormError,
     setSegmentFormError,
     wireFormMode,

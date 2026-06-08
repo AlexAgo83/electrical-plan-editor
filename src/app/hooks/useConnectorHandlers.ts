@@ -61,6 +61,10 @@ interface UseConnectorHandlersParams {
   connectorPinElectricalRoleDrafts: ConnectorPinElectricalRoleDrafts;
   setConnectorPinElectricalRoleDrafts: (value: ConnectorPinElectricalRoleDrafts) => void;
   setConnectorPinElectricalRoleSelection: (value: number[]) => void;
+  connectorRearBackshellOverrideEnabled: "inherit" | "enabled" | "disabled";
+  setConnectorRearBackshellOverrideEnabled: (value: "inherit" | "enabled" | "disabled") => void;
+  connectorRearBackshellOverrideLengthMm: string;
+  setConnectorRearBackshellOverrideLengthMm: (value: string) => void;
   connectorAutoCreateLinkedNode: boolean;
   setConnectorAutoCreateLinkedNode: (value: boolean) => void;
   defaultAutoCreateLinkedNodes: boolean;
@@ -107,6 +111,10 @@ export function useConnectorHandlers({
   connectorPinElectricalRoleDrafts,
   setConnectorPinElectricalRoleDrafts,
   setConnectorPinElectricalRoleSelection,
+  connectorRearBackshellOverrideEnabled,
+  setConnectorRearBackshellOverrideEnabled,
+  connectorRearBackshellOverrideLengthMm,
+  setConnectorRearBackshellOverrideLengthMm,
   connectorAutoCreateLinkedNode,
   setConnectorAutoCreateLinkedNode,
   defaultAutoCreateLinkedNodes,
@@ -161,6 +169,8 @@ export function useConnectorHandlers({
       setConnectorApplyCatalogSeals(true);
       setConnectorTerminalOverridesText("");
       setConnectorFusePairRatings({});
+      setConnectorRearBackshellOverrideEnabled("inherit");
+      setConnectorRearBackshellOverrideLengthMm("");
       setConnectorPinElectricalRoleDrafts({});
       setConnectorPinElectricalRoleSelection([]);
       setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
@@ -183,6 +193,8 @@ export function useConnectorHandlers({
     setConnectorTerminalOverridesText("");
     setConnectorFusePairRatings({});
     setConnectorFusePairOverrides({});
+    setConnectorRearBackshellOverrideEnabled("inherit");
+    setConnectorRearBackshellOverrideLengthMm("");
     setConnectorPinElectricalRoleDrafts({});
     setConnectorPinElectricalRoleSelection([]);
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
@@ -203,6 +215,8 @@ export function useConnectorHandlers({
     setConnectorTerminalOverridesText("");
     setConnectorFusePairRatings({});
     setConnectorFusePairOverrides({});
+    setConnectorRearBackshellOverrideEnabled("inherit");
+    setConnectorRearBackshellOverrideLengthMm("");
     setConnectorPinElectricalRoleDrafts({});
     setConnectorPinElectricalRoleSelection([]);
     setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
@@ -249,6 +263,16 @@ export function useConnectorHandlers({
     setConnectorFusePairRatings(formatFusePairRatingDrafts(connector.fusePairRatings));
     const effectiveOverrides = connector.fusePairOverrides ?? catalogItem?.fuseBoxConfig?.pairs;
     setConnectorFusePairOverrides(formatFusePairOverrideDrafts(effectiveOverrides));
+    setConnectorRearBackshellOverrideEnabled(
+      connector.rearBackshellOverride?.enabled === true
+        ? "enabled"
+        : connector.rearBackshellOverride?.enabled === false
+          ? "disabled"
+          : "inherit"
+    );
+    setConnectorRearBackshellOverrideLengthMm(
+      connector.rearBackshellOverride?.lengthMm === undefined ? "" : String(connector.rearBackshellOverride.lengthMm)
+    );
     setConnectorPinElectricalRoleDrafts(
       formatPinElectricalRoleDrafts(connector.pinElectricalRoles, connector.cavityCount)
     );
@@ -315,6 +339,17 @@ export function useConnectorHandlers({
       connectorPinElectricalRoleDrafts,
       normalizedCavityCount
     );
+    const rearBackshellOverrideLengthMm =
+      connectorRearBackshellOverrideLengthMm.trim().length === 0
+        ? undefined
+        : Number(connectorRearBackshellOverrideLengthMm.trim().replace(",", "."));
+    if (
+      rearBackshellOverrideLengthMm !== undefined &&
+      (!Number.isFinite(rearBackshellOverrideLengthMm) || rearBackshellOverrideLengthMm < 1)
+    ) {
+      setConnectorFormError("Rear backshell override length must be a valid number >= 1 mm.");
+      return;
+    }
 
     setConnectorFormError(null);
 
@@ -341,6 +376,16 @@ export function useConnectorHandlers({
         fusePairRatings,
         fusePairOverrides,
         pinElectricalRoles,
+        rearBackshellOverride:
+          connectorRearBackshellOverrideEnabled === "inherit" && rearBackshellOverrideLengthMm === undefined
+            ? undefined
+            : {
+                enabled:
+                  connectorRearBackshellOverrideEnabled === "inherit"
+                    ? undefined
+                    : connectorRearBackshellOverrideEnabled === "enabled",
+                lengthMm: rearBackshellOverrideLengthMm
+              },
         cavityCount: normalizedCavityCount
       })
     );

@@ -254,7 +254,12 @@ export function NetworkSummaryGraphLayers({
           ) : (
             <>
               <circle className="network-node-hitbox" cx={position.x} cy={position.y} r={intermediateHitboxRadius} />
-              <circle className="network-node-shape" cx={position.x} cy={position.y} r={intermediateRadius} />
+              <circle
+                className="network-node-shape"
+                cx={position.x}
+                cy={position.y}
+                r={node.kind === "connectorBackshellHelper" ? Math.max(5, intermediateRadius - 3) : intermediateRadius}
+              />
             </>
           )}
         </g>
@@ -366,7 +371,9 @@ export function NetworkSummaryGraphLayers({
             segmentIdLabelX,
             segmentIdLabelY,
             segmentLengthLabelX,
-            segmentLengthLabelY
+            segmentLengthLabelY,
+            segmentCallout,
+            mountingLabels
           }) => (
             <g key={`${segment.id}-labels`} className={segmentGroupClassName} data-segment-id={segment.id}>
               {showSegmentNames ? (
@@ -411,6 +418,47 @@ export function NetworkSummaryGraphLayers({
                   </text>
                 </g>
               ) : null}
+              {segmentCallout === null ? null : (
+                <g
+                  className="network-segment-callout-anchor"
+                  transform={`translate(${segmentCallout.anchorX} ${segmentCallout.anchorY}) scale(${inverseLabelScale})`}
+                >
+                  <rect
+                    className="network-segment-callout-frame"
+                    x={-segmentCallout.width / 2}
+                    y={-segmentCallout.height / 2}
+                    width={segmentCallout.width}
+                    height={segmentCallout.height}
+                    rx={5}
+                    ry={5}
+                  />
+                  {segmentCallout.lines.map((line, index) => (
+                    <text
+                      key={`${segment.id}-callout-line-${index}`}
+                      className={
+                        index === 0 ? "network-segment-callout-text network-segment-callout-route" : "network-segment-callout-text"
+                      }
+                      x={0}
+                      y={-segmentCallout.height / 2 + 10 + index * 9}
+                      textAnchor="middle"
+                    >
+                      {line}
+                    </text>
+                  ))}
+                </g>
+              )}
+              {mountingLabels.map((label) => (
+                <g
+                  key={label.key}
+                  className="network-segment-mounting-label-anchor"
+                  transform={`translate(${label.x} ${label.y}) scale(${inverseLabelScale})`}
+                >
+                  <rect className="network-segment-mounting-label-frame" x={-22} y={-8} width={44} height={16} rx={3} ry={3} />
+                  <text className="network-segment-mounting-label-text" x={0} y={0} textAnchor="middle" dominantBaseline="middle">
+                    {label.text}
+                  </text>
+                </g>
+              ))}
             </g>
           )
         )}

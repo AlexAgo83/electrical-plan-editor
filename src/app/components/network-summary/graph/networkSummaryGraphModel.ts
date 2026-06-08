@@ -35,6 +35,19 @@ export interface RenderedSegmentModel {
   segmentIdLabelY: number;
   segmentLengthLabelX: number;
   segmentLengthLabelY: number;
+  segmentCallout: {
+    anchorX: number;
+    anchorY: number;
+    width: number;
+    height: number;
+    lines: string[];
+  } | null;
+  mountingLabels: Array<{
+    key: string;
+    x: number;
+    y: number;
+    text: string;
+  }>;
 }
 
 export interface RenderedNodeModel {
@@ -70,6 +83,7 @@ interface BuildRenderedSegmentsParams {
   labelRotationDegrees: number;
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
+  spliceMap?: ReadonlyMap<SpliceId, Splice>;
 }
 
 interface SegmentNodeVisualBounds {
@@ -156,7 +170,7 @@ function getSegmentNodeVisualBounds(
     return undefined;
   }
 
-  if (node.kind === "intermediate") {
+  if (node.kind === "intermediate" || node.kind === "connectorBackshellHelper") {
     return {
       halfWidth: INTERMEDIATE_NODE_RADIUS * nodeShapeScale,
       halfHeight: INTERMEDIATE_NODE_RADIUS * nodeShapeScale,
@@ -202,6 +216,23 @@ function getSegmentNodeVisualBounds(
   };
 }
 
+function resolveSegmentEndpointDisplayLabel(
+  node: NetworkNode | undefined,
+  connectorMap: ReadonlyMap<ConnectorId, Connector>,
+  spliceMap: ReadonlyMap<SpliceId, Splice>
+): string | null {
+  if (node === undefined) {
+    return null;
+  }
+  if (node.kind === "intermediate") {
+    return node.id;
+  }
+  if (node.kind === "connector" || node.kind === "connectorBackshellHelper") {
+    return connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId;
+  }
+  return spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId;
+}
+
 export function buildRenderedSegments({
   segments,
   nodes,
@@ -222,7 +253,8 @@ export function buildRenderedSegments({
   autoSegmentLabelRotation,
   labelRotationDegrees,
   showSegmentNames,
-  showSegmentLengths
+  showSegmentLengths,
+  spliceMap = new Map<SpliceId, Splice>()
 }: BuildRenderedSegmentsParams): RenderedSegmentModel[] {
   const result: RenderedSegmentModel[] = [];
   const nodeById = new Map(nodes.map((node) => [node.id, node] as const));
@@ -282,6 +314,42 @@ export function buildRenderedSegments({
     // Keep ID/length split along the label-normal axis, including when labels are auto-rotated.
     const segmentLengthLabelOffsetX = -Math.sin(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
     const segmentLengthLabelOffsetY = Math.cos(segmentLabelRotationRadians) * segmentLabelOffsetDistance;
+    const segmentNormalX = -Math.sin(segmentLabelRotationRadians);
+    const segmentNormalY = Math.cos(segmentLabelRotationRadians);
+    const endpointALabel = resolveSegmentEndpointDisplayLabel(nodeById.get(segment.nodeA), connectorMap, spliceMap);
+    const endpointBLabel = resolveSegmentEndpointDisplayLabel(nodeById.get(segment.nodeB), connectorMap, spliceMap);
+    const segmentCalloutLines = [
+      endpointALabel === null || endpointBLabel === null ? null : `${endpointALabel} -> ${endpointBLabel}`,
+      segment.sheathType === undefined ? null : `Sheath: ${segment.sheathType}`,
+      segment.insulation === undefined ? null : `Insulation: ${segment.insulation}`,
+      segment.lineStyle === undefined ? null : `Line style: ${segment.lineStyle}`,
+      segment.internalPartReference === undefined ? null : `Int Part: ${segment.internalPartReference}`,
+      `Qty: ${segment.lengthMm} mm`
+    ].filter((line): line is string => line !== null);
+    const segmentCallout =
+      segmentCalloutLines.length > 1
+        ? {
+            anchorX: labelAnchor.x + segmentNormalX * 20,
+            anchorY: labelAnchor.y + segmentNormalY * 20,
+            width: 86,
+            height: 12 + segmentCalloutLines.length * 9,
+            lines: segmentCalloutLines
+          }
+        : null;
+    const segmentVectorLength = Math.hypot(segmentVectorX, segmentVectorY);
+    const mountingLabels = (segment.mountingLabels ?? []).map((label) => {
+      const ratio = Math.min(1, Math.max(0, label.positionRatio));
+      const baseX = nodeAPosition.x + segmentVectorX * ratio;
+      const baseY = nodeAPosition.y + segmentVectorY * ratio;
+      const offsetNormalX = segmentVectorLength <= 0 ? 0 : (-segmentVectorY / segmentVectorLength) * label.offsetY;
+      const offsetNormalY = segmentVectorLength <= 0 ? 0 : (segmentVectorX / segmentVectorLength) * label.offsetY;
+      return {
+        key: `${segment.id}:${label.id}`,
+        x: baseX + label.offsetX + offsetNormalX,
+        y: baseY + offsetNormalY,
+        text: label.text
+      };
+    });
 
     result.push({
       segment,
@@ -295,7 +363,9 @@ export function buildRenderedSegments({
       segmentIdLabelX: -segmentLengthLabelOffsetX,
       segmentIdLabelY: -segmentLengthLabelOffsetY,
       segmentLengthLabelX: segmentLengthLabelOffsetX,
-      segmentLengthLabelY: segmentLengthLabelOffsetY
+      segmentLengthLabelY: segmentLengthLabelOffsetY,
+      segmentCallout,
+      mountingLabels
     });
   }
 
@@ -368,6 +438,8 @@ export function buildRenderedNodes({
     const nodeLabel =
       node.kind === "intermediate"
         ? node.id
+        : node.kind === "connectorBackshellHelper"
+          ? `${connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId}-BS`
         : node.kind === "connector"
           ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
           : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);

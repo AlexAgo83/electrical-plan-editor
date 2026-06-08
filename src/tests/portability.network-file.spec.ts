@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { CatalogItemId, ConnectorId, NetworkId, NodeId, SpliceId, WireId } from "../core/entities";
+import type { CatalogItemId, ConnectorId, NetworkId, NodeId, SegmentId, SpliceId, WireId } from "../core/entities";
 import { APP_RELEASE_VERSION } from "../core/schema";
 import {
   buildNetworkFilePayload,
@@ -29,6 +29,10 @@ function asSpliceId(value: string): SpliceId {
 
 function asWireId(value: string): WireId {
   return value as WireId;
+}
+
+function asSegmentId(value: string): SegmentId {
+  return value as SegmentId;
 }
 
 function asCatalogItemId(value: string): CatalogItemId {
@@ -251,6 +255,101 @@ describe("network file portability", () => {
     expect(parsed.payload?.networks[0]?.network.voltageV).toBe(24);
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.currentA).toBe(12);
     expect(parsed.payload?.networks[0]?.state.wires.byId[firstWireId]?.material).toBe("copper");
+  });
+
+  it("preserves rear backshell settings and segment sheath annotations across export/import round-trip", () => {
+    let state = createInitialState();
+    state = appReducer(
+      state,
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-BS"),
+        manufacturerReference: "CAT-BS",
+        name: "Backshell catalog",
+        connectionCount: 2,
+        connectorDefaults: {
+          rearBackshell: {
+            enabled: true,
+            lengthMm: 28
+          }
+        }
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertConnector({
+        id: asConnectorId("CONN-BS"),
+        name: "Connector Backshell",
+        technicalId: "CT5",
+        catalogItemId: asCatalogItemId("CAT-BS"),
+        manufacturerReference: "CAT-BS",
+        cavityCount: 2,
+        rearBackshellOverride: {
+          enabled: true,
+          lengthMm: 32
+        }
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertNode({
+        id: asNodeId("N-CONN-BS"),
+        kind: "connector",
+        connectorId: asConnectorId("CONN-BS")
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertNode({
+        id: asNodeId("N10"),
+        kind: "intermediate",
+        label: "N10"
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-ANN"),
+        nodeA: asNodeId("N10"),
+        nodeB: asNodeId("N-CONN-BS"),
+        lengthMm: 88,
+        sheathType: "CT5",
+        insulation: "XLPE",
+        lineStyle: "Braided",
+        internalPartReference: "IP-77",
+        mountingLabels: [
+          {
+            id: "LBL-1" as never,
+            text: "TAG-A",
+            positionRatio: 0.4,
+            offsetX: 6,
+            offsetY: -4
+          }
+        ]
+      })
+    );
+
+    const payload = buildNetworkFilePayload(state, "active", [], "2026-06-08T10:00:00.000Z");
+    const parsed = parseNetworkFilePayload(serializeNetworkFilePayload(payload));
+
+    expect(parsed.error).toBeNull();
+    expect(parsed.payload?.networks[0]?.state.catalogItems.byId[asCatalogItemId("CAT-BS")]?.connectorDefaults?.rearBackshell).toEqual({
+      enabled: true,
+      lengthMm: 28
+    });
+    expect(parsed.payload?.networks[0]?.state.connectors.byId[asConnectorId("CONN-BS")]?.rearBackshellOverride).toEqual({
+      enabled: true,
+      lengthMm: 32
+    });
+    expect(parsed.payload?.networks[0]?.state.segments.byId[asSegmentId("SEG-ANN")]?.sheathType).toBe("CT5");
+    expect(parsed.payload?.networks[0]?.state.segments.byId[asSegmentId("SEG-ANN")]?.mountingLabels).toEqual([
+      {
+        id: "LBL-1",
+        text: "TAG-A",
+        positionRatio: 0.4,
+        offsetX: 6,
+        offsetY: -4
+      }
+    ]);
   });
 
   it("preserves pin roles, catalog pin defaults, and ampacity overrides across export/import round-trip", () => {

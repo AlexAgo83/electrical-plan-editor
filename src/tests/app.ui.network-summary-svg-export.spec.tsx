@@ -2,6 +2,8 @@ import { fireEvent, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { appActions, appReducer } from "../store";
 import {
+  asNodeId,
+  asSegmentId,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
@@ -338,6 +340,115 @@ describe("App integration UI - network summary SVG export", () => {
     } finally {
       clickSpy.mockRestore();
       getContextSpy.mockRestore();
+      if (originalCreateObjectUrl !== undefined) {
+        Object.defineProperty(URL, "createObjectURL", originalCreateObjectUrl);
+      }
+      if (originalRevokeObjectUrl !== undefined) {
+        Object.defineProperty(URL, "revokeObjectURL", originalRevokeObjectUrl);
+      }
+    }
+  });
+
+  it("includes segment sheath callouts and mounting labels in the network summary SVG export", async () => {
+    const baseState = createUiIntegrationState();
+    let state = appReducer(
+      baseState,
+      appActions.upsertSegment({
+        ...baseState.segments.byId[asSegmentId("SEG-A")],
+        id: asSegmentId("SEG-A"),
+        nodeA: asNodeId("N-C1"),
+        nodeB: asNodeId("N-MID"),
+        lengthMm: 40,
+        sheathType: "CT5",
+        insulation: "XLPE",
+        lineStyle: "Braided",
+        internalPartReference: "IP-42",
+        mountingLabels: [
+          {
+            id: "ML-1" as never,
+            text: "TAG-42",
+            positionRatio: 0.5,
+            offsetX: 0,
+            offsetY: -8
+          }
+        ]
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertNode({
+        id: asNodeId("N10"),
+        kind: "intermediate",
+        label: "N10"
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertSegment({
+        ...state.segments.byId[asSegmentId("SEG-A")],
+        id: asSegmentId("SEG-A"),
+        nodeA: asNodeId("N-C1"),
+        nodeB: asNodeId("N10"),
+        lengthMm: 40,
+        sheathType: "CT5",
+        insulation: "XLPE",
+        lineStyle: "Braided",
+        internalPartReference: "IP-42",
+        mountingLabels: [
+          {
+            id: "ML-1" as never,
+            text: "TAG-42",
+            positionRatio: 0.5,
+            offsetX: 0,
+            offsetY: -8
+          }
+        ]
+      })
+    );
+
+    const originalCreateObjectUrl = Object.getOwnPropertyDescriptor(URL, "createObjectURL");
+    const originalRevokeObjectUrl = Object.getOwnPropertyDescriptor(URL, "revokeObjectURL");
+    let capturedSvgBlob: Blob | null = null;
+    Object.defineProperty(URL, "createObjectURL", {
+      configurable: true,
+      writable: true,
+      value: vi.fn((value: Blob) => {
+        capturedSvgBlob = value;
+        return "blob:svg-export-segment-annotations";
+      }),
+    });
+    Object.defineProperty(URL, "revokeObjectURL", {
+      configurable: true,
+      writable: true,
+      value: vi.fn(),
+    });
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+
+    try {
+      renderAppWithState(state);
+      switchScreenDrawerAware("modeling");
+      const networkSummaryPanel = getPanelByHeading("Network summary");
+      openExportMenu(networkSummaryPanel);
+      await openSvgPreviewAndDownload(networkSummaryPanel);
+
+      await waitFor(() => {
+        expect(capturedSvgBlob).not.toBeNull();
+      });
+      if (capturedSvgBlob === null) {
+        throw new Error("Expected exported SVG blob.");
+      }
+      const exportedSvg = await readBlobAsText(capturedSvgBlob);
+      expect(exportedSvg).toContain('class="network-segment-callout-frame"');
+      expect(exportedSvg).toContain("CT5");
+      expect(exportedSvg).toContain("Insulation: XLPE");
+      expect(exportedSvg).toContain("Line style: Braided");
+      expect(exportedSvg).toContain("Int Part: IP-42");
+      expect(exportedSvg).toContain("Qty: 40 mm");
+      expect(exportedSvg).toContain('class="network-segment-mounting-label-frame"');
+      expect(exportedSvg).toContain("TAG-42");
+      expect(clickSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      clickSpy.mockRestore();
       if (originalCreateObjectUrl !== undefined) {
         Object.defineProperty(URL, "createObjectURL", originalCreateObjectUrl);
       }

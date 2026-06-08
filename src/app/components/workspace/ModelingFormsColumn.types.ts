@@ -42,6 +42,10 @@ export interface ModelingFormsColumnProps {
   connectorPinElectricalRoleSelection: number[];
   setConnectorPinElectricalRoleSelection: (value: number[]) => void;
   connectorPinRoleCatalogItem: CatalogItem | undefined;
+  connectorRearBackshellOverrideEnabled: "inherit" | "enabled" | "disabled";
+  setConnectorRearBackshellOverrideEnabled: (value: "inherit" | "enabled" | "disabled") => void;
+  connectorRearBackshellOverrideLengthMm: string;
+  setConnectorRearBackshellOverrideLengthMm: (value: string) => void;
   connectorAutoCreateLinkedNode: boolean;
   setConnectorAutoCreateLinkedNode: (value: boolean) => void;
   connectorTechnicalIdAlreadyUsed: boolean;
@@ -115,6 +119,16 @@ export interface ModelingFormsColumnProps {
   setSegmentLengthMm: (value: string) => void;
   segmentSubNetworkTag: string;
   setSegmentSubNetworkTag: (value: string) => void;
+  segmentSheathType: string;
+  setSegmentSheathType: (value: string) => void;
+  segmentInsulation: string;
+  setSegmentInsulation: (value: string) => void;
+  segmentLineStyle: string;
+  setSegmentLineStyle: (value: string) => void;
+  segmentInternalPartReference: string;
+  setSegmentInternalPartReference: (value: string) => void;
+  segmentMountingLabelsText: string;
+  setSegmentMountingLabelsText: (value: string) => void;
   cancelSegmentEdit: () => void;
   segmentFormError: string | null;
   isWireSubScreen: boolean;

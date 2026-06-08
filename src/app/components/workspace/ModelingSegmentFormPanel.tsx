@@ -22,6 +22,16 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
     setSegmentLengthMm,
     segmentSubNetworkTag,
     setSegmentSubNetworkTag,
+    segmentSheathType,
+    setSegmentSheathType,
+    segmentInsulation,
+    setSegmentInsulation,
+    segmentLineStyle,
+    setSegmentLineStyle,
+    segmentInternalPartReference,
+    setSegmentInternalPartReference,
+    segmentMountingLabelsText,
+    setSegmentMountingLabelsText,
     segmentFormError
   } = props;
   const segmentHandlers = useSegmentHandlersContext();
@@ -85,6 +95,36 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
       Sub-network tag (optional)
       <input value={segmentSubNetworkTag} onChange={(event) => setSegmentSubNetworkTag(event.target.value)} placeholder="front-harness" />
     </label>
+    <label>
+      Sheath type (optional)
+      <input value={segmentSheathType} onChange={(event) => setSegmentSheathType(event.target.value)} placeholder="CT5" />
+    </label>
+    <label>
+      Insulation (optional)
+      <input value={segmentInsulation} onChange={(event) => setSegmentInsulation(event.target.value)} placeholder="PVC" />
+    </label>
+    <label>
+      Line style (optional)
+      <input value={segmentLineStyle} onChange={(event) => setSegmentLineStyle(event.target.value)} placeholder="braided sleeve" />
+    </label>
+    <label>
+      Internal part reference (optional)
+      <input
+        value={segmentInternalPartReference}
+        onChange={(event) => setSegmentInternalPartReference(event.target.value)}
+        placeholder="INT-PART-001"
+      />
+    </label>
+    <label>
+      Mounting labels (optional)
+      <textarea
+        value={segmentMountingLabelsText}
+        onChange={(event) => setSegmentMountingLabelsText(event.target.value)}
+        placeholder={"LBL-001,Assembly label,0.5,0,-18\nLBL-002,Rear harness,0.2,0,14"}
+        rows={3}
+      />
+    </label>
+    <small className="inline-help">One line per label: id,text,positionRatio,offsetX,offsetY</small>
     <div className="row-actions">
       <button type="submit" className="button-with-icon">
         {segmentFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
