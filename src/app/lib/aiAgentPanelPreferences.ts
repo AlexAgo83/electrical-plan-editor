@@ -2,6 +2,8 @@ import type { AiAgentOperationPermissions, AiAgentScope } from "./aiAgentOperati
 
 const AI_AGENT_PANEL_PREFERENCES_SCHEMA_VERSION = 1;
 export const AI_AGENT_PANEL_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ai-agent-panel-preferences.v1";
+export const AI_AGENT_INSTRUCTION_HISTORY_STORAGE_KEY = "electrical-plan-editor.ai-agent-instruction-history.v1";
+export const AI_AGENT_INSTRUCTION_HISTORY_LIMIT = 10;
 
 export type AiAgentMode = "assisted" | "direct";
 
@@ -14,6 +16,11 @@ export interface AiAgentPanelPreferences {
 
 interface AiAgentPanelPreferencesPayload extends AiAgentPanelPreferences {
   schemaVersion: number;
+}
+
+interface AiAgentInstructionHistoryPayload {
+  schemaVersion: number;
+  instructions: string[];
 }
 
 export const DEFAULT_AI_AGENT_PANEL_PREFERENCES: AiAgentPanelPreferences = {
@@ -100,6 +107,87 @@ export function writeAiAgentPanelPreferences(preferences: AiAgentPanelPreference
       ...preferences
     };
     localStorage.setItem(AI_AGENT_PANEL_PREFERENCES_STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // Ignore storage write failures to preserve runtime behavior.
+  }
+}
+
+function normalizeInstruction(value: string): string {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+function normalizeInstructionHistoryPayload(parsed: unknown): string[] {
+  if (!isRecord(parsed) || !Array.isArray(parsed.instructions)) {
+    return [];
+  }
+  const seen = new Set<string>();
+  const instructions: string[] = [];
+  for (const value of parsed.instructions) {
+    if (typeof value !== "string") {
+      continue;
+    }
+    const normalized = normalizeInstruction(value);
+    if (normalized.length === 0 || seen.has(normalized)) {
+      continue;
+    }
+    seen.add(normalized);
+    instructions.push(normalized);
+    if (instructions.length >= AI_AGENT_INSTRUCTION_HISTORY_LIMIT) {
+      break;
+    }
+  }
+  return instructions;
+}
+
+export function readAiAgentInstructionHistory(): string[] {
+  try {
+    const raw = localStorage.getItem(AI_AGENT_INSTRUCTION_HISTORY_STORAGE_KEY);
+    if (raw === null) {
+      return [];
+    }
+    return normalizeInstructionHistoryPayload(JSON.parse(raw));
+  } catch {
+    return [];
+  }
+}
+
+function writeAiAgentInstructionHistory(instructions: string[]): void {
+  try {
+    const payload: AiAgentInstructionHistoryPayload = {
+      schemaVersion: AI_AGENT_PANEL_PREFERENCES_SCHEMA_VERSION,
+      instructions: instructions.slice(0, AI_AGENT_INSTRUCTION_HISTORY_LIMIT)
+    };
+    localStorage.setItem(AI_AGENT_INSTRUCTION_HISTORY_STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // Ignore storage write failures to preserve runtime behavior.
+  }
+}
+
+export function rememberAiAgentInstruction(instruction: string): string[] {
+  const normalized = normalizeInstruction(instruction);
+  if (normalized.length === 0) {
+    return readAiAgentInstructionHistory();
+  }
+  const nextHistory = [normalized, ...readAiAgentInstructionHistory().filter((item) => item !== normalized)].slice(
+    0,
+    AI_AGENT_INSTRUCTION_HISTORY_LIMIT
+  );
+  writeAiAgentInstructionHistory(nextHistory);
+  return nextHistory;
+}
+
+export function clearAiAgentInstructionHistory(): void {
+  try {
+    localStorage.removeItem(AI_AGENT_INSTRUCTION_HISTORY_STORAGE_KEY);
+  } catch {
+    // Ignore storage write failures to preserve runtime behavior.
+  }
+}
+
+export function clearAiAgentLocalData(): void {
+  try {
+    localStorage.removeItem(AI_AGENT_PANEL_PREFERENCES_STORAGE_KEY);
+    localStorage.removeItem(AI_AGENT_INSTRUCTION_HISTORY_STORAGE_KEY);
   } catch {
     // Ignore storage write failures to preserve runtime behavior.
   }

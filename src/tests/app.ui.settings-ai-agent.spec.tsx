@@ -4,7 +4,7 @@ import type { CatalogItemId, ConnectorId, NetworkId } from "../core/entities";
 import { asConnectorId, createUiIntegrationState, getPanelByHeading, renderAppWithState, switchScreenDrawerAware, switchSubScreenDrawerAware } from "./helpers/app-ui-test-utils";
 import { appActions, appReducer, createSampleNetworkState } from "../store";
 import { buildAiAgentContext } from "../app/lib/aiAgentContext";
-import { AI_AGENT_PANEL_PREFERENCES_STORAGE_KEY } from "../app/lib/aiAgentPanelPreferences";
+import { AI_AGENT_INSTRUCTION_HISTORY_STORAGE_KEY, AI_AGENT_PANEL_PREFERENCES_STORAGE_KEY } from "../app/lib/aiAgentPanelPreferences";
 import { buildAiAgentEditablePlan } from "../app/lib/aiAgentPlanDiff";
 
 describe("App integration UI - settings AI Agent", () => {
@@ -142,6 +142,68 @@ describe("App integration UI - settings AI Agent", () => {
     expect(screen.getByLabelText("Instruction")).toHaveValue("Keep this instruction available for the next AI Agent session.");
     expect(screen.getByLabelText("Add connectors, splices, nodes, segments, or valid wires")).not.toBeChecked();
     expect(screen.getByLabelText("Delete entities")).toBeChecked();
+  });
+
+  it("stores reusable instruction history and resets only AI Agent local data", async () => {
+    renderAppWithState(createUiIntegrationState());
+
+    switchScreenDrawerAware("settings");
+    const aiProviderPanel = getPanelByHeading("AI provider");
+    fireEvent.change(within(aiProviderPanel).getByLabelText("API key"), {
+      target: { value: "sk-local-test" }
+    });
+    const fetchMock = vi.fn<typeof fetch>(() =>
+      Promise.resolve(
+        new Response(
+          JSON.stringify({
+            output_text: JSON.stringify({
+              schemaVersion: 1,
+              operations: [{ type: "add_node", label: "Remembered node", position: { x: 100, y: 120 } }]
+            })
+          }),
+          { status: 200 }
+        )
+      )
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    switchScreenDrawerAware("modeling");
+    fireEvent.click(within(screen.getByRole("region", { name: "Quick entity navigation" })).getByRole("button", { name: "AI Agent" }));
+    fireEvent.change(screen.getByLabelText("Target scope"), {
+      target: { value: "allNetworks" }
+    });
+    fireEvent.click(screen.getByLabelText("Delete entities"));
+    fireEvent.change(screen.getByLabelText("Instruction"), {
+      target: { value: "  Remember this instruction for later reuse.  " }
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Prepare" }));
+    expect(await screen.findByText(/Provider draft generated/)).toBeInTheDocument();
+
+    expect(JSON.parse(localStorage.getItem(AI_AGENT_INSTRUCTION_HISTORY_STORAGE_KEY) ?? "{}")).toMatchObject({
+      instructions: ["Remember this instruction for later reuse."]
+    });
+
+    fireEvent.change(screen.getByLabelText("Instruction"), {
+      target: { value: "Temporary scratch instruction." }
+    });
+    fireEvent.change(screen.getByLabelText("Instruction history"), {
+      target: { value: "Remember this instruction for later reuse." }
+    });
+    expect(screen.getByLabelText("Instruction")).toHaveValue("Remember this instruction for later reuse.");
+
+    fireEvent.click(screen.getByRole("button", { name: "Clear history" }));
+    expect(screen.getByText("AI instruction history cleared.")).toBeInTheDocument();
+    expect(localStorage.getItem(AI_AGENT_INSTRUCTION_HISTORY_STORAGE_KEY)).toBeNull();
+    expect(screen.getByLabelText("Instruction history")).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Reset AI Agent local data" }));
+    expect(screen.getByText("AI Agent local data reset.")).toBeInTheDocument();
+    expect(screen.getByLabelText("Instruction")).toHaveValue("");
+    expect(screen.getByLabelText("Target scope")).toHaveValue("activeNetwork");
+    expect(screen.getByLabelText("Delete entities")).not.toBeChecked();
+
+    switchScreenDrawerAware("settings");
+    expect(within(getPanelByHeading("AI provider")).getByLabelText("API key")).toHaveValue("sk-local-test");
   });
 
   it("keeps persisted AI Agent direct mode behind the experimental setting", async () => {

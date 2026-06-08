@@ -1,9 +1,9 @@
 ## req_130_ai_agent_follow_up_memory_persistence_and_workflow_polish - AI Agent Follow-up Memory, Persistence, and Workflow Polish
 > From version: 1.11.0
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 90%
-> Confidence: 86%
+> Status: Done
+> Understanding: 99%
+> Confidence: 94%
 > Complexity: Medium
 > Theme: AI
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -103,8 +103,13 @@ flowchart TD
 - Release validation: `logics/tasks/task_112_ai_agent_modeling_workspace_release_validation.md`
 
 # Delivery Status
-- Not started.
-- Intended as a post-`1.11.0` follow-up request.
+- Delivered after `1.15.0` workspace state.
+- The AI Agent panel persists target scope, agent mode, instruction draft, and operation permissions using local UI preference storage. Persisted direct mode is downgraded when the Settings experimental gate is disabled, and delete remains disabled by default after reset.
+- Submitted non-empty instructions are normalized, de-duplicated, bounded to a recent local history, and can be loaded back into the instruction field for editing.
+- Users can clear instruction history independently or reset AI Agent local data without changing provider configuration or project data.
+- AI Agent preference/history data remains browser-local UI state and is not part of network/modeling export payloads.
+- True direct execution was delivered separately through `req_139_ai_agent_true_direct_execution_follow_up`.
+- Validation evidence: `npm run -s test -- src/tests/app.ui.settings-ai-agent.spec.tsx src/tests/ai-agent-panel-preferences.spec.ts --run` passed.
 
 # References
 - `logics/request/req_128_ai_agent_modeling_workspace.md`
@@ -118,4 +123,7 @@ flowchart TD
 - Skip when: Implementing the first AI Agent release, provider connection setup, operation contract validation, or raw modeling operation execution.
 
 # Backlog
-- To be created from this request.
+- `item_624_ai_agent_follow_up_memory_persistence_and_workflow_polish`
+
+# Tasks
+- `task_134_ai_agent_follow_up_memory_persistence_and_workflow_polish`

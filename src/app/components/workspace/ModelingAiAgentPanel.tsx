@@ -2,7 +2,12 @@ import { useEffect, useMemo, useState, type ReactElement } from "react";
 import type { AiAgentContextSummary } from "../../lib/aiAgentContext";
 import { buildAiAgentImpactPreview, type AiAgentImpactPreview } from "../../lib/aiAgentApply";
 import {
+  clearAiAgentInstructionHistory,
+  clearAiAgentLocalData,
+  DEFAULT_AI_AGENT_PANEL_PREFERENCES,
+  readAiAgentInstructionHistory,
   readAiAgentPanelPreferences,
+  rememberAiAgentInstruction,
   writeAiAgentPanelPreferences,
   type AiAgentMode
 } from "../../lib/aiAgentPanelPreferences";
@@ -130,6 +135,7 @@ export function ModelingAiAgentPanel({
   const [targetScope, setTargetScope] = useState<AiAgentScope>(initialPreferences.targetScope);
   const [agentMode, setAgentMode] = useState<AiAgentMode>(initialPreferences.agentMode);
   const [permissions, setPermissions] = useState<AiAgentOperationPermissions>(initialPreferences.permissions);
+  const [instructionHistory, setInstructionHistory] = useState(() => readAiAgentInstructionHistory());
   const [draftStatus, setDraftStatus] = useState<string | null>(null);
   const [draftRawResponse, setDraftRawResponse] = useState<string | null>(null);
   const [proposalValidation, setProposalValidation] = useState<AiAgentOperationValidationResult | null>(null);
@@ -240,6 +246,63 @@ export function ModelingAiAgentPanel({
             placeholder="Add a routing node near the dashboard connector and prepare route updates for selected wires."
           />
         </label>
+        <div className="form-split">
+          <label>
+            Instruction history
+            <select
+              aria-label="Instruction history"
+              value=""
+              disabled={instructionHistory.length === 0}
+              onChange={(event) => {
+                if (event.target.value.length === 0) {
+                  return;
+                }
+                setInstruction(event.target.value);
+                setDraftStatus(null);
+                setDraftRawResponse(null);
+                setProposalValidation(null);
+              }}
+            >
+              <option value="">Recent instructions</option>
+              {instructionHistory.map((historyInstruction) => (
+                <option value={historyInstruction} key={historyInstruction}>
+                  {historyInstruction}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="row-actions settings-actions ai-agent-history-actions">
+            <button
+              type="button"
+              disabled={instructionHistory.length === 0}
+              onClick={() => {
+                clearAiAgentInstructionHistory();
+                setInstructionHistory([]);
+                setDraftStatus("AI instruction history cleared.");
+              }}
+            >
+              Clear history
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                clearAiAgentLocalData();
+                setInstruction(DEFAULT_AI_AGENT_PANEL_PREFERENCES.instruction);
+                setTargetScope(DEFAULT_AI_AGENT_PANEL_PREFERENCES.targetScope);
+                setAgentMode(DEFAULT_AI_AGENT_PANEL_PREFERENCES.agentMode);
+                setPermissions(DEFAULT_AI_AGENT_PANEL_PREFERENCES.permissions);
+                setInstructionHistory([]);
+                setDraftStatus("AI Agent local data reset.");
+                setDraftRawResponse(null);
+                setProposalValidation(null);
+                setLastAppliedImpactPreview(null);
+                setCanRollbackLastSession(false);
+              }}
+            >
+              Reset AI Agent local data
+            </button>
+          </div>
+        </div>
         <div className="form-split">
           <label>
             Target scope
@@ -353,6 +416,7 @@ export function ModelingAiAgentPanel({
             disabled={!canPrepareProposal}
             onClick={() => {
               setIsPreparingProposal(true);
+              setInstructionHistory(rememberAiAgentInstruction(instruction));
               setDraftStatus(
                 selectedMode === "direct"
                   ? "Requesting and validating direct execution from configured provider..."
