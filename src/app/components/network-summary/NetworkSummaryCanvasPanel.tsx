@@ -9,7 +9,12 @@ import type { NetworkNode, NodeId, SegmentId, Wire } from "../../../core/entitie
 import type { CanvasCalloutTextSize, CanvasLabelSizeMode, CanvasLabelStrokeMode, NodePosition } from "../../types/app-controller";
 import { NetworkSummaryCalloutLeaders, NetworkSummaryCalloutsLayer } from "./callouts/NetworkSummaryCalloutsLayer";
 import type { CableCalloutViewModel, CalloutTargetKey, RenderedCableCallout } from "./callouts/calloutLayout";
-import { NetworkSummaryGraphLayers, type SplicePlacementPreviewNodeModel, type SplicePlacementPreviewSegmentModel } from "./graph/NetworkSummaryGraphLayers";
+import {
+  NetworkSummaryGraphLayers,
+  type NetworkSummaryCalloutObstacle,
+  type SplicePlacementPreviewNodeModel,
+  type SplicePlacementPreviewSegmentModel
+} from "./graph/NetworkSummaryGraphLayers";
 import type { RenderedNodeModel, RenderedSegmentModel } from "./graph/networkSummaryGraphModel";
 import { NetworkCanvasFloatingInfoPanels } from "./NetworkCanvasFloatingInfoPanels";
 import { NetworkSummaryLegend } from "./NetworkSummaryLegend";
@@ -58,6 +63,7 @@ interface NetworkSummaryCanvasPanelProps {
   splicePlacementPreviewSegments: SplicePlacementPreviewSegmentModel[];
   splicePlacementPreviewNode: SplicePlacementPreviewNodeModel | null;
   renderedNodes: RenderedNodeModel[];
+  calloutObstacles: NetworkSummaryCalloutObstacle[];
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
   inverseLabelScale: number;
@@ -128,6 +134,7 @@ export function NetworkSummaryCanvasPanel({
   splicePlacementPreviewSegments,
   splicePlacementPreviewNode,
   renderedNodes,
+  calloutObstacles,
   showSegmentNames,
   showSegmentLengths,
   inverseLabelScale,
@@ -206,6 +213,7 @@ export function NetworkSummaryCanvasPanel({
                 splicePlacementPreviewSegments={splicePlacementPreviewSegments}
                 splicePlacementPreviewNode={splicePlacementPreviewNode}
                 renderedNodes={renderedNodes}
+                calloutObstacles={calloutObstacles}
                 showSegmentNames={showSegmentNames}
                 showSegmentLengths={showSegmentLengths}
                 inverseLabelScale={inverseLabelScale}

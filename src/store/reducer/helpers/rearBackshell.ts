@@ -6,7 +6,7 @@ import {
   getEffectiveRearBackshellConfig,
   isRearBackshellLinkSegment
 } from "../../../core/rearBackshell";
-import type { CatalogItem, Connector, NetworkNode, NodeId, Segment } from "../../../core/entities";
+import type { CatalogItem, Connector, NodeId, Segment } from "../../../core/entities";
 import type { AppState } from "../../types";
 import { removeEntity, upsertEntity } from "../shared";
 
@@ -77,7 +77,7 @@ export function applyRearBackshellTopologyToConnector(
   }
 
   const resolvedHelperNodeId = helperNodeId ?? buildRearBackshellHelperNodeId(connector.id);
-  const helperNode = state.nodes.byId[resolvedHelperNodeId] as NetworkNode | undefined;
+  const helperNode = state.nodes.byId[resolvedHelperNodeId];
   const nextNodes =
     helperNode === undefined
       ? upsertEntity(state.nodes, {

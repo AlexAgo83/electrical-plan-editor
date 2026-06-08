@@ -4,7 +4,6 @@ import {
   useImperativeHandle,
   useMemo,
   useRef,
-  useState,
   type CSSProperties,
   type MouseEvent as ReactMouseEvent,
   type ReactElement
@@ -16,6 +15,7 @@ import { NetworkSummaryHeader } from "./network-summary/NetworkSummaryHeader";
 import { NetworkSummaryQuickEntityNavigation } from "./network-summary/NetworkSummaryQuickEntityNavigation";
 import { NetworkSummaryCanvasPanel } from "./network-summary/NetworkSummaryCanvasPanel";
 import { useActiveSubNetworkTags } from "./network-summary/useActiveSubNetworkTags";
+import { useNetworkSummaryCalloutDragging } from "./network-summary/useNetworkSummaryCalloutDragging";
 import { useNetworkSummaryRenderScaleControls } from "./network-summary/useNetworkSummaryRenderScaleControls";
 import { useNetworkSummaryViewportSizeChange } from "./network-summary/useNetworkSummaryViewportSizeChange";
 import {
@@ -29,8 +29,7 @@ import {
   disposeCalloutMeasurementResources,
   normalizeVector,
   type CableCalloutViewModel,
-  type CalloutTargetKey,
-  type DraggingCalloutState
+  type CalloutTargetKey
 } from "./network-summary/callouts/calloutLayout";
 import { buildRenderedNodes, buildRenderedSegments } from "./network-summary/graph/networkSummaryGraphModel";
 import { type SvgPreviewOptions, useNetworkSummaryExportActions } from "./network-summary/export/useNetworkSummaryExportActions";
@@ -40,16 +39,6 @@ import { PreviewLoadingDialog } from "./dialogs/PreviewLoadingDialog";
 import { snapToGrid } from "../lib/app-utils-shared";
 import { getThemeClassNames } from "../lib/themeModes";
 import type { NetworkSummaryPanelHandle, NetworkSummaryPanelProps } from "./network-summary/NetworkSummaryPanel.types";
-
-const CALLOUT_DRAG_START_THRESHOLD_PX = 4;
-
-interface DraggingSegmentCalloutState {
-  segmentId: SegmentId;
-  startPosition: NodePosition;
-  startClientX: number;
-  startClientY: number;
-  hasStartedDrag: boolean;
-}
 
 function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -269,12 +258,6 @@ export function NetworkSummaryPanel({
     }
     return byNodeId;
   }, [nodes, segments, segmentSubNetworkTagById, activeSubNetworkTags]);
-  const [hoveredCalloutKey, setHoveredCalloutKey] = useState<CalloutTargetKey | null>(null);
-  const [draggingCallout, setDraggingCallout] = useState<DraggingCalloutState | null>(null);
-  const [draftCalloutPositions, setDraftCalloutPositions] = useState<Record<string, NodePosition>>({});
-  const [draggingSegmentCallout, setDraggingSegmentCallout] = useState<DraggingSegmentCalloutState | null>(null);
-  const [draftSegmentCalloutPositions, setDraftSegmentCalloutPositions] = useState<Record<SegmentId, NodePosition>>({});
-
   const graphCenter = useMemo(() => {
     const positionedNodes = nodes
       .map((node) => networkNodePositions[node.id])
@@ -364,6 +347,59 @@ export function NetworkSummaryPanel({
     },
     [connectedSegmentDirectionByNodeId, graphCenter, inverseLabelScale]
   );
+
+  const getSvgCoordinates = useCallback(
+    (svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null => {
+      const bounds = svgElement.getBoundingClientRect();
+      if (bounds.width <= 0 || bounds.height <= 0) {
+        return null;
+      }
+
+      const localX = ((clientX - bounds.left) / bounds.width) * networkViewWidth;
+      const localY = ((clientY - bounds.top) / bounds.height) * networkViewHeight;
+      const modelX = (localX - networkOffset.x) / effectiveRenderScale;
+      const modelY = (localY - networkOffset.y) / effectiveRenderScale;
+      return {
+        x: snapNodesToGrid ? snapToGrid(modelX, networkGridStep) : modelX,
+        y: snapNodesToGrid ? snapToGrid(modelY, networkGridStep) : modelY
+      };
+    },
+    [effectiveRenderScale, networkGridStep, networkOffset.x, networkOffset.y, networkViewHeight, networkViewWidth, snapNodesToGrid]
+  );
+
+  const selectCalloutTarget = useCallback(
+    (callout: Pick<CableCalloutViewModel, "kind" | "entityId">) => {
+      clearSelectedCanvasNodes();
+      if (callout.kind === "connector") {
+        onSelectConnectorFromCallout(callout.entityId as ConnectorId);
+      } else {
+        onSelectSpliceFromCallout(callout.entityId as SpliceId);
+      }
+    },
+    [clearSelectedCanvasNodes, onSelectConnectorFromCallout, onSelectSpliceFromCallout]
+  );
+
+  const {
+    hoveredCalloutKey,
+    setHoveredCalloutKey,
+    draggingCallout,
+    draftCalloutPositions,
+    draftSegmentCalloutPositions,
+    handleCalloutMouseDown,
+    beginSegmentCalloutDrag,
+    handleCanvasMouseMoveWithCallouts,
+    stopNetworkInteractions
+  } = useNetworkSummaryCalloutDragging({
+    lockEntityMovement,
+    getSvgCoordinates,
+    handleNetworkMouseMove,
+    handleNetworkSegmentClick,
+    selectCalloutTarget,
+    onPersistConnectorCalloutPosition,
+    onPersistSpliceCalloutPosition,
+    onPersistSegmentSheathCalloutPosition,
+    stopNetworkNodeDrag
+  });
 
   const cableCalloutViewModels = useMemo(
     () =>
@@ -462,230 +498,6 @@ export function NetworkSummaryPanel({
       return left.title.localeCompare(right.title) || left.subtitle.localeCompare(right.subtitle);
     });
   }, [cableCalloutViewModels, draggingCallout?.key, hoveredCalloutKey]);
-
-  const getSvgCoordinates = useCallback(
-    (svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null => {
-      const bounds = svgElement.getBoundingClientRect();
-      if (bounds.width <= 0 || bounds.height <= 0) {
-        return null;
-      }
-
-      const localX = ((clientX - bounds.left) / bounds.width) * networkViewWidth;
-      const localY = ((clientY - bounds.top) / bounds.height) * networkViewHeight;
-      const modelX = (localX - networkOffset.x) / effectiveRenderScale;
-      const modelY = (localY - networkOffset.y) / effectiveRenderScale;
-      return {
-        x: snapNodesToGrid ? snapToGrid(modelX, networkGridStep) : modelX,
-        y: snapNodesToGrid ? snapToGrid(modelY, networkGridStep) : modelY
-      };
-    },
-    [effectiveRenderScale, networkGridStep, networkOffset.x, networkOffset.y, networkViewHeight, networkViewWidth, snapNodesToGrid]
-  );
-
-  const selectCalloutTarget = useCallback(
-    (callout: Pick<CableCalloutViewModel, "kind" | "entityId">) => {
-      clearSelectedCanvasNodes();
-      if (callout.kind === "connector") {
-        onSelectConnectorFromCallout(callout.entityId as ConnectorId);
-      } else {
-        onSelectSpliceFromCallout(callout.entityId as SpliceId);
-      }
-    },
-    [clearSelectedCanvasNodes, onSelectConnectorFromCallout, onSelectSpliceFromCallout]
-  );
-
-  const handleCalloutMouseDown = useCallback(
-    (
-      event: ReactMouseEvent<SVGGElement>,
-      callout: Pick<CableCalloutViewModel, "key" | "kind" | "entityId" | "position">
-    ) => {
-      if (event.button !== 0) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
-      setDraggingCallout({
-        key: callout.key,
-        kind: callout.kind,
-        entityId: callout.entityId,
-        startPosition: callout.position,
-        startClientX: event.clientX,
-        startClientY: event.clientY,
-        hasStartedDrag: false
-      });
-    },
-    []
-  );
-
-  const handleCanvasMouseMoveWithCallouts = useCallback(
-    (event: ReactMouseEvent<SVGSVGElement>) => {
-      if (draggingSegmentCallout !== null) {
-        let hasStartedDrag = draggingSegmentCallout.hasStartedDrag;
-        if (!hasStartedDrag) {
-          if (lockEntityMovement) {
-            return;
-          }
-          const deltaClientX = event.clientX - draggingSegmentCallout.startClientX;
-          const deltaClientY = event.clientY - draggingSegmentCallout.startClientY;
-          if (Math.hypot(deltaClientX, deltaClientY) < CALLOUT_DRAG_START_THRESHOLD_PX) {
-            return;
-          }
-          hasStartedDrag = true;
-          handleNetworkSegmentClick(draggingSegmentCallout.segmentId);
-          setDraggingSegmentCallout((current) =>
-            current !== null && current.segmentId === draggingSegmentCallout.segmentId
-              ? { ...current, hasStartedDrag: true }
-              : current
-          );
-        }
-        const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
-        if (coordinates === null) {
-          return;
-        }
-        setDraftSegmentCalloutPositions((current) => {
-          const previousPosition = current[draggingSegmentCallout.segmentId];
-          if (
-            previousPosition !== undefined &&
-            Math.abs(previousPosition.x - coordinates.x) <= 0.0001 &&
-            Math.abs(previousPosition.y - coordinates.y) <= 0.0001
-          ) {
-            return current;
-          }
-          return {
-            ...current,
-            [draggingSegmentCallout.segmentId]: coordinates
-          };
-        });
-        return;
-      }
-      if (draggingCallout === null) {
-        handleNetworkMouseMove(event);
-        return;
-      }
-      let hasStartedDrag = draggingCallout.hasStartedDrag;
-      if (!hasStartedDrag) {
-        if (lockEntityMovement) {
-          return;
-        }
-        const deltaClientX = event.clientX - draggingCallout.startClientX;
-        const deltaClientY = event.clientY - draggingCallout.startClientY;
-        if (Math.hypot(deltaClientX, deltaClientY) < CALLOUT_DRAG_START_THRESHOLD_PX) {
-          return;
-        }
-        hasStartedDrag = true;
-        selectCalloutTarget(draggingCallout);
-        setDraggingCallout((current) =>
-          current !== null && current.key === draggingCallout.key
-            ? { ...current, hasStartedDrag: true }
-            : current
-        );
-      }
-      const coordinates = getSvgCoordinates(event.currentTarget, event.clientX, event.clientY);
-      if (coordinates === null) {
-        return;
-      }
-      setDraftCalloutPositions((current) => {
-        const previousPosition = current[draggingCallout.key];
-        if (
-          previousPosition !== undefined &&
-          Math.abs(previousPosition.x - coordinates.x) <= 0.0001 &&
-          Math.abs(previousPosition.y - coordinates.y) <= 0.0001
-        ) {
-          return current;
-        }
-        return {
-          ...current,
-          [draggingCallout.key]: coordinates
-        };
-      });
-    },
-    [
-      draggingSegmentCallout,
-      lockEntityMovement,
-      handleNetworkSegmentClick,
-      getSvgCoordinates,
-      draggingCallout,
-      handleNetworkMouseMove,
-      selectCalloutTarget
-    ]
-  );
-
-  const stopSegmentCalloutDrag = useCallback(() => {
-    if (draggingSegmentCallout === null) {
-      return;
-    }
-
-    const draftPosition = draftSegmentCalloutPositions[draggingSegmentCallout.segmentId];
-    if (!draggingSegmentCallout.hasStartedDrag) {
-      handleNetworkSegmentClick(draggingSegmentCallout.segmentId);
-    } else if (draftPosition !== undefined) {
-      const changed =
-        Math.abs(draftPosition.x - draggingSegmentCallout.startPosition.x) > 0.0001 ||
-        Math.abs(draftPosition.y - draggingSegmentCallout.startPosition.y) > 0.0001;
-      if (changed) {
-        onPersistSegmentSheathCalloutPosition(draggingSegmentCallout.segmentId, draftPosition);
-      }
-    }
-
-    setDraggingSegmentCallout(null);
-    setDraftSegmentCalloutPositions((current) => {
-      if (current[draggingSegmentCallout.segmentId] === undefined) {
-        return current;
-      }
-      const next = { ...current };
-      delete next[draggingSegmentCallout.segmentId];
-      return next;
-    });
-  }, [
-    draggingSegmentCallout,
-    draftSegmentCalloutPositions,
-    handleNetworkSegmentClick,
-    onPersistSegmentSheathCalloutPosition
-  ]);
-
-  const stopCalloutDrag = useCallback(() => {
-    if (draggingCallout === null) {
-      return;
-    }
-
-    const draftPosition = draftCalloutPositions[draggingCallout.key];
-    if (!draggingCallout.hasStartedDrag) {
-      selectCalloutTarget(draggingCallout);
-    } else if (draftPosition !== undefined) {
-      const changed =
-        Math.abs(draftPosition.x - draggingCallout.startPosition.x) > 0.0001 ||
-        Math.abs(draftPosition.y - draggingCallout.startPosition.y) > 0.0001;
-      if (changed) {
-        if (draggingCallout.kind === "connector") {
-          onPersistConnectorCalloutPosition(draggingCallout.entityId as ConnectorId, draftPosition);
-        } else {
-          onPersistSpliceCalloutPosition(draggingCallout.entityId as SpliceId, draftPosition);
-        }
-      }
-    }
-
-    setDraggingCallout(null);
-    setDraftCalloutPositions((current) => {
-      if (current[draggingCallout.key] === undefined) {
-        return current;
-      }
-      const next = { ...current };
-      delete next[draggingCallout.key];
-      return next;
-    });
-  }, [
-    draggingCallout,
-    draftCalloutPositions,
-    onPersistConnectorCalloutPosition,
-    onPersistSpliceCalloutPosition,
-    selectCalloutTarget
-  ]);
-
-  const stopNetworkInteractions = useCallback(() => {
-    stopSegmentCalloutDrag();
-    stopCalloutDrag();
-    stopNetworkNodeDrag();
-  }, [stopSegmentCalloutDrag, stopCalloutDrag, stopNetworkNodeDrag]);
 
   const {
     activeSvgPreview,
@@ -848,24 +660,16 @@ export function NetworkSummaryPanel({
 
   const handleSegmentCalloutMouseDown = useCallback(
     (event: ReactMouseEvent<SVGGElement>, segmentId: SegmentId) => {
-      if (event.button !== 0) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
       const segmentCallout = renderedSegments.find((entry) => entry.segment.id === segmentId)?.segmentCallout;
-      if (segmentCallout === null || segmentCallout === undefined) {
-        return;
-      }
-      setDraggingSegmentCallout({
+      beginSegmentCalloutDrag(
+        event,
         segmentId,
-        startPosition: { x: segmentCallout.anchorX, y: segmentCallout.anchorY },
-        startClientX: event.clientX,
-        startClientY: event.clientY,
-        hasStartedDrag: false
-      });
+        segmentCallout === null || segmentCallout === undefined
+          ? null
+          : { x: segmentCallout.anchorX, y: segmentCallout.anchorY }
+      );
     },
-    [renderedSegments]
+    [beginSegmentCalloutDrag, renderedSegments]
   );
 
   const splicePlacementPreviewSegments = useMemo(() => {
