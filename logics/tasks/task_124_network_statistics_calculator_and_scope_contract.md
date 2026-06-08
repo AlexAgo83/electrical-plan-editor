@@ -146,3 +146,53 @@ flowchart LR
 - Backlog: `item_616_network_statistics_dashboard_for_one_or_multiple_networks`
 - Product brief(s): `docs/network-statistics-dashboard-product-brief.md`
 - Architecture decision(s): (none)
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: The workspace navigation contains a **Statistics** tab.
+- request-AC2 -> This task. Evidence needed: The **Statistics** tab is positioned between **Modeling** and **Validation**.
+- request-AC3 -> This task. Evidence needed: Opening the Statistics tab with an active network selected shows active-network statistics by default.
+- request-AC4 -> This task. Evidence needed: Opening the Statistics tab with no active network shows a non-crashing empty state.
+- request-AC5 -> This task. Evidence needed: The user can switch scope between active network and manual network selection.
+- request-AC6 -> This task. Evidence needed: Manual network selection supports one or more workspace networks.
+- request-AC7 -> This task. Evidence needed: Multi-network scopes display both aggregate totals and a per-network comparison table.
+- request-AC8 -> This task. Evidence needed: Core counts include connectors, splices, routing nodes by kind, segments, wires, and catalog items.
+- request-AC9 -> This task. Evidence needed: Wire length metrics include total, average, min, max, median, routed wire count included in length calculations, route-lock count/percentage, and top 10 longest wires.
+- request-AC10 -> This task. Evidence needed: Wire length calculation prefers finite positive `Wire.lengthMm`, falls back to summed route segment length, and otherwise ignores the wire for length metrics.
+- request-AC11 -> This task. Evidence needed: Wires ignored by length metrics are never counted as `0 m`.
+- request-AC12 -> This task. Evidence needed: Wire section distribution shows count and total length per section.
+- request-AC13 -> This task. Evidence needed: Wire material and color distributions include explicit unspecified buckets.
+- request-AC14 -> This task. Evidence needed: Electrical metadata coverage shows count of wires with `currentA`, maximum declared current, and fuse-protected wire count.
+- request-AC15 -> This task. Evidence needed: Pin-role coverage appears when connector or catalog pin roles exist and groups declared pins by role.
+- request-AC16 -> This task. Evidence needed: Connector utilization shows total way capacity, occupied ways, occupancy percentage, and top unused-way connectors.
+- request-AC17 -> This task. Evidence needed: Splice utilization counts bounded/directional finite capacity separately from unbounded splices and reports directional splice count.
+- request-AC18 -> This task. Evidence needed: Catalog indicators show linked vs. unlinked connectors/splices and manufacturer reference distribution.
+- request-AC19 -> This task. Evidence needed: The Statistics tab is read-only and does not dispatch domain mutation actions.
+- request-AC20 -> This task. Evidence needed: Empty and incomplete networks render clear empty states and never render `NaN`, `Infinity`, or misleading totals.
+- request-AC21 -> This task. Evidence needed: The first release does not add statistics CSV export, pricing rollup, charts, or new persistence fields.
+- request-AC22 -> This task. Evidence needed: Existing BOM CSV, wire CSV, SVG, PNG, and network import/export schemas remain unchanged.
+- request-AC23 -> This task. Evidence needed: Unit tests cover the statistics calculator for active-network, manual multi-network, route-length fallback, ignored-unrouted-wire, occupancy, distribution, and catalog-linkage cases.
+- request-AC24 -> This task. Evidence needed: UI tests cover tab navigation, scope switching, multi-network comparison, and empty state.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC9 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC10 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC11 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC12 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC13 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC14 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC15 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC16 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC17 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC18 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC19 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC20 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC21 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC22 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC23 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC24 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

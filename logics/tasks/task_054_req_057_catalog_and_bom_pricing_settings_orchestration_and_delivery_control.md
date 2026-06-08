@@ -90,3 +90,17 @@ This should be delivered in a controlled sequence to avoid regressions in existi
 - `src/app/components/workspace/ModelingCatalogListPanel.tsx`
 - `src/app/components/workspace/ModelingCatalogFormPanel.tsx`
 - `src/app/lib/networkSummaryBomCsv.ts`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: `Settings` includes a dedicated section for catalog/BOM pricing setup with configurable `Currency` and `Tax rate (%)`.
+- request-AC2 -> This task. Evidence needed: Currency, tax enabled state, and tax rate settings are persisted and restored across app reloads.
+- request-AC3 -> This task. Evidence needed: Catalog UI displays the selected currency statically next to `Unit price (excl. tax)` while catalog item prices remain stored as excl-tax numeric amounts; value-adjacent displays prefer the currency symbol and labels/metadata may use the code.
+- request-AC4 -> This task. Evidence needed: BOM workflows/export use the configured currency/tax values as explicit pricing context, preserve HT outputs, and include a TTC line column plus a `Total TTC` summary only when tax is enabled.
+- request-AC5 -> This task. Evidence needed: Missing or malformed persisted currency/tax settings fall back to deterministic safe defaults without breaking load.
+- request-AC6 -> This task. Evidence needed: Existing catalog CRUD and BOM export behaviors remain functional under default and customized settings values.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

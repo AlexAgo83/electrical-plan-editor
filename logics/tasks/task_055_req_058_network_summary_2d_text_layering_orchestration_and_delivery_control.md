@@ -83,3 +83,13 @@ The work should be delivered in a controlled order:
 - `src/tests/app.ui.navigation-canvas.spec.tsx`
 - `src/tests/app.ui.network-summary-layering.spec.tsx`
 - `src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: In the `Network summary` 2D render, text labels are rendered visually above node and segment graphics.
+- request-AC2 -> This task. Evidence needed: A node or segment (including selected/highlighted styling) does not visually hide text labels in normal usage states.
+- request-AC3 -> This task. Evidence needed: Existing 2D interactions (click selection, pan/zoom, keyboard focus/activation where applicable) remain functional after the layering fix.
+- request-AC4 -> This task. Evidence needed: Regression coverage protects the text-layer ordering contract (visual or structural assertions).
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

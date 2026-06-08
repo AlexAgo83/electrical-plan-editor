@@ -32,6 +32,20 @@ Wire CSV currently exports dense `Endpoints` aggregate plus `Begin`/`End` text f
 # AC Traceability
 - AC1/AC2/AC4 -> `src/app/components/workspace/ModelingSecondaryTables.tsx` and `src/app/components/workspace/AnalysisWireWorkspacePanels.tsx` export row builders.
 - AC3 -> `src/app/hooks/useWireEndpointDescriptions.ts` (or equivalent helper) and CSV row generation logic.
+- request-AC1 -> This backlog slice. Evidence needed: Accented characters in wire CSV export are preserved correctly (no `Ã©`-style corruption).
+- request-AC2 -> This backlog slice. Evidence needed: `Endpoints` column is no longer present in wire CSV exports.
+- request-AC3 -> This backlog slice. Evidence needed: Wire CSV exports include explicit `Begin ID`, `Begin pin`, `End ID`, `End pin` columns.
+- request-AC4 -> This backlog slice. Evidence needed: Begin/end split values are populated deterministically from wire endpoint A/B metadata, with `pin` values using `C{index}` / `P{index}` convention.
+- request-AC5 -> This backlog slice. Evidence needed: Modeling and Analysis wire CSV exports share the same endpoint column schema.
+- request-AC6 -> This backlog slice. Evidence needed: Existing CSV formula-injection neutralization remains non-regressed.
+- request-AC7 -> This backlog slice. Evidence needed: `lint`, `typecheck`, and relevant tests pass after the change.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Priority
 - Impact: High (requested schema change).

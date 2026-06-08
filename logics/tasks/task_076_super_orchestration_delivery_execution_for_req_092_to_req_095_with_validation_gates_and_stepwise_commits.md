@@ -91,6 +91,58 @@ The bundle spans domain model, validation, persistence/import, canvas rendering,
 - AC3 -> `item_470..item_473` with commits/tests and closure notes.
 - AC4 -> `item_474..item_477` with commits/tests and closure notes.
 - AC5 -> Orchestration report includes commit-by-step evidence and progress transitions.
+- request-AC1 -> This task. Evidence needed: A splice can be created and saved without selecting a catalog item.
+- request-AC2 -> This task. Evidence needed: Without catalog selection, bounded splice `portCount` is manually editable and save is blocked when `portCount` is not an integer `>= 1` (unbounded mode rules are defined in `req_093`).
+- request-AC3 -> This task. Evidence needed: Without catalog selection, splice `manufacturerReference` is not auto-generated and persists as empty/`undefined` by default.
+- request-AC4 -> This task. Evidence needed: A splice can still be created/edited with a catalog item; derived manufacturer reference and port count behavior remains unchanged.
+- request-AC5 -> This task. Evidence needed: Connector behavior is unchanged: connector `catalogItemId` remains required.
+- request-AC6 -> This task. Evidence needed: Validation no longer emits an error solely because a splice has no `catalogItemId`.
+- request-AC7 -> This task. Evidence needed: Validation still emits errors for broken splice catalog references and splice/catalog connection-count mismatches when `catalogItemId` is present.
+- request-AC8 -> This task. Evidence needed: Existing data with linked splices remains compatible and non-regressed.
+- request-AC9 -> This task. Evidence needed: Persistence/import round-trip supports mixed datasets (linked and unlinked splices) without data loss.
+- request-AC10 -> This task. Evidence needed: Relevant lint/typecheck/tests pass after the change.
+- request-AC1 -> This task. Evidence needed: Splice domain contract supports both `bounded` and `unbounded` capacity modes.
+- request-AC2 -> This task. Evidence needed: Existing splices load as `bounded` without behavior regression.
+- request-AC3 -> This task. Evidence needed: Users can create/edit an unbounded splice without specifying a max port count.
+- request-AC4 -> This task. Evidence needed: Wire endpoint validation accepts positive splice port indexes beyond previous `portCount` limits when target splice is `unbounded`.
+- request-AC5 -> This task. Evidence needed: Wire endpoint validation for bounded splices remains unchanged.
+- request-AC6 -> This task. Evidence needed: Catalog-linked splice behavior remains bounded with derived `portCount` from catalog `connectionCount`.
+- request-AC7 -> This task. Evidence needed: Selecting a catalog item on an unbounded splice automatically switches it to bounded mode and applies catalog-derived `portCount`, with explicit UX feedback.
+- request-AC8 -> This task. Evidence needed: Unbounded splice analysis UI shows adaptive finite port rendering with explicit `∞` indicator and default `+2` free-slot buffer.
+- request-AC9 -> This task. Evidence needed: Network summary splice callouts remain performant and readable for unbounded mode (no infinite rendering loops).
+- request-AC10 -> This task. Evidence needed: Occupancy and conflict detection remains correct in both modes.
+- request-AC11 -> This task. Evidence needed: Persistence/import round-trip supports mixed bounded/unbounded splice datasets.
+- request-AC12 -> This task. Evidence needed: Export behavior distinguishes unbounded capacity for all splice-bearing outputs in scope (`portMode` present; numeric `portCount` empty/omitted for unbounded in JSON/CSV splice exports).
+- request-AC13 -> This task. Evidence needed: BOM exports remain unchanged by this request.
+- request-AC14 -> This task. Evidence needed: Change is delivered without temporary feature flag.
+- request-AC15 -> This task. Evidence needed: Connector flows are non-regressed.
+- request-AC16 -> This task. Evidence needed: `logics_lint`, `lint`, `typecheck`, and relevant tests pass.
+- request-AC1 -> This task. Evidence needed: With zoom-invariant node shapes enabled, node border thickness remains visually proportional to node shape size across zoom/size changes.
+- request-AC2 -> This task. Evidence needed: The proportional stroke behavior applies to connector, splice, and intermediate node shapes.
+- request-AC3 -> This task. Evidence needed: Selected and focus-visible border states remain clearly stronger than default border after scaling.
+- request-AC4 -> This task. Evidence needed: Hitbox interaction area remains unchanged (no regression in click/drag/focus activation reliability).
+- request-AC5 -> This task. Evidence needed: With zoom-invariant node shapes disabled, existing stroke rendering behavior is unchanged.
+- request-AC6 -> This task. Evidence needed: `logics_lint`, `lint`, `typecheck`, and relevant UI tests pass.
+- request-AC1 -> This task. Evidence needed: A new canvas resize behavior option is present in Settings under `Reset zoom target (%)`.
+- request-AC2 -> This task. Evidence needed: Default value keeps existing responsive behavior.
+- request-AC3 -> This task. Evidence needed: In locked mode, resizing window/container does not change apparent node/segment/wire size on screen.
+- request-AC4 -> This task. Evidence needed: In locked mode, viewport resize changes visible graph extent (more area when larger, less when smaller).
+- request-AC5 -> This task. Evidence needed: `Reset current view` and configured reset zoom target still work in both modes.
+- request-AC6 -> This task. Evidence needed: `Fit network view to current graph` still works in both modes.
+- request-AC7 -> This task. Evidence needed: Preference persists/restores correctly.
+- request-AC8 -> This task. Evidence needed: Interaction behavior remains non-regressed after resize in both modes.
+- request-AC9 -> This task. Evidence needed: Behavior change is scoped to `Network summary` canvas only (no cross-surface regression).
+- request-AC10 -> This task. Evidence needed: `logics_lint`, `lint`, `typecheck`, and relevant tests pass.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC9 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC10 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Validation
 ## Minimum gate after each implementation item

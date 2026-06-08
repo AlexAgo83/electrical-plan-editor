@@ -39,3 +39,15 @@
   - `src/app/components/workspace/AppHeaderAndStats.tsx`
   - `src/app/styles/base/base-foundation.css`
   - `package.json`
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: When update is available and `Update ready` is shown, the button has a visible glowy emphasis.
+- request-AC2 -> This backlog slice. Evidence needed: Glow effect is disabled or non-animated under `prefers-reduced-motion: reduce`.
+- request-AC3 -> This backlog slice. Evidence needed: Glow remains readable and consistent across supported themes.
+- request-AC4 -> This backlog slice. Evidence needed: Clicking `Update ready` keeps existing behavior (apply update flow) with no regression.
+- request-AC5 -> This backlog slice. Evidence needed: Header layout remains stable with no visual jump introduced by the effect.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

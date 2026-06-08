@@ -47,6 +47,10 @@ flowchart LR
 - AC3 -> delete feedback is local to the action. Proof: no primary reliance on the passive banner for the guarded flow.
 - AC4 -> normal delete flows do not regress. Proof: existing confirmation tests still pass.
 - AC5 -> business rules stay intact. Proof: reducer behavior remains guarded and non-destructive.
+- request-AC6 -> This backlog slice. Evidence needed: Existing delete confirmation behavior from `req_074` remains non-regressed for normal deletions.
+- request-AC7 -> This backlog slice. Evidence needed: Integrity guards remain enforced for unsupported or unsafe cascade cases.
+- request-AC8 -> This backlog slice. Evidence needed: By default, `node`, `segment`, `catalog item`, and `network` blocked deletions remain explanation-only in V1 unless a later explicit expansion is documented.
+- request-AC9 -> This backlog slice. Evidence needed: Regression tests cover representative connector, splice, node, and catalog blocked-delete flows, plus any supported cascade cases.
 
 # Decision framing
 - Product framing: Not needed

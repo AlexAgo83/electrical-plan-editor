@@ -226,3 +226,41 @@ Rationale:
 - `logics/request/req_065_segment_analysis_split_endpoints_column_into_endpoint_a_and_endpoint_b.md`
 - `logics/request/req_066_global_undo_redo_history_for_modeling_and_catalog_mutations.md`
 - `logics/backlog/item_364_regression_coverage_for_global_undo_redo_mutations_shortcuts_and_scope_exclusions.md`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: The Catalog screen exposes a CSV export action in the list header tools row, positioned **before `Help`**.
+- request-AC2 -> This task. Evidence needed: The Catalog screen exposes a CSV import action in the bottom action row, positioned **between `Edit` and `Delete`**.
+- request-AC3 -> This task. Evidence needed: Catalog CSV export downloads a deterministic CSV of active-network catalog items with stable columns and safe escaping.
+- request-AC4 -> This task. Evidence needed: Catalog CSV import parses supported CSV rows and creates/updates catalog items using a documented deterministic conflict policy.
+- request-AC5 -> This task. Evidence needed: Invalid CSV rows (including invalid URL / invalid numeric fields) do not crash import and are strictly skipped/rejected with deterministic error reporting and user-visible feedback.
+- request-AC6 -> This task. Evidence needed: Existing Catalog CRUD/help interactions remain functional and visually coherent after adding the new actions.
+- request-AC7 -> This task. Evidence needed: Regression coverage exists for action placement, export schema/escaping, import parsing/conflicts, and a round-trip smoke path.
+- request-AC1 -> This task. Evidence needed: `Edit Wire` exposes a swap action between `Save` and `Cancel edit`.
+- request-AC2 -> This task. Evidence needed: Clicking the swap action swaps the full endpoint form state between `Endpoint A` and `Endpoint B` (kind, target ids, indexes, connection/seal references).
+- request-AC3 -> This task. Evidence needed: Swap is draft-only (no auto-save, no edit-mode exit) and preserves non-endpoint wire fields.
+- request-AC4 -> This task. Evidence needed: Derived endpoint hints/conditional fields remain coherent after swap.
+- request-AC5 -> This task. Evidence needed: Saving after swap persists the swapped endpoints correctly; existing cancel semantics remain functional.
+- request-AC6 -> This task. Evidence needed: Create-wire flow and existing wire form behaviors remain non-regressed.
+- request-AC1 -> This task. Evidence needed: `Edit Segment` exposes a swap action between `Save` and `Cancel edit`.
+- request-AC2 -> This task. Evidence needed: Clicking the swap action swaps the draft values of `Node A` and `Node B`.
+- request-AC3 -> This task. Evidence needed: Swap is draft-only (no auto-save, no edit-mode exit) and preserves non-node segment fields.
+- request-AC4 -> This task. Evidence needed: Saving after swap persists the swapped nodes correctly; cancel semantics remain functional.
+- request-AC5 -> This task. Evidence needed: Create-segment flow and existing segment form behaviors remain non-regressed.
+- request-AC1 -> This task. Evidence needed: In `Segments` > `Segment analysis`, the traversing-wires table replaces `Endpoints` with `Endpoint A` and `Endpoint B`.
+- request-AC2 -> This task. Evidence needed: The split columns preserve the endpoint-side information previously shown in the combined `Endpoints` cell.
+- request-AC3 -> This task. Evidence needed: Sorting and `aria-sort` semantics work for the new endpoint columns.
+- request-AC4 -> This task. Evidence needed: Existing `Segment analysis` table behavior and readability remain non-regressed.
+- request-AC1 -> This task. Evidence needed: Users can trigger global `Undo` and `Redo` for supported workspace mutations via visible UI actions.
+- request-AC2 -> This task. Evidence needed: Keyboard shortcuts (`Cmd/Ctrl+Z`, `Shift+Cmd/Ctrl+Z`, and optionally `Ctrl+Y`) perform undo/redo correctly.
+- request-AC3 -> This task. Evidence needed: Undo/redo applies to representative modeling and catalog mutations without corrupting workspace state.
+- request-AC4 -> This task. Evidence needed: Redo stack clears when a new mutation occurs after one or more undo operations.
+- request-AC5 -> This task. Evidence needed: Bulk mutations covered in V1 are undoable atomically as a single step.
+- request-AC6 -> This task. Evidence needed: UI-only state (theme/preferences/navigation/selection/viewport) is not affected by undo/redo in V1.
+- request-AC7 -> This task. Evidence needed: Existing form `Save`/`Cancel edit` semantics remain non-regressed.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

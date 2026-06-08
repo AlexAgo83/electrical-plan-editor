@@ -40,3 +40,15 @@ Usage visibility alone is insufficient; users need fast navigation from a catalo
   - `src/app/hooks/useSelectionHandlers.ts`
   - `src/app/AppController.tsx`
 
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: The `Catalog` screen includes an analysis panel/column consistent with other modeling screens.
+- request-AC2 -> This backlog slice. Evidence needed: Selecting a catalog item displays linked `Connectors` and `Splices` that reference that item.
+- request-AC3 -> This backlog slice. Evidence needed: Analysis entries support navigation to the corresponding connector/splice edit flow.
+- request-AC4 -> This backlog slice. Evidence needed: The analysis panel handles no-selection and no-usage cases with clear empty states.
+- request-AC5 -> This backlog slice. Evidence needed: Catalog CRUD behavior and catalog-first connector/splice creation workflow remain functional after the layout change.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

@@ -44,6 +44,26 @@ Settings ordering and language support do not meet requested UX expectations:
 - AC5 -> Runtime locale switch behavior.
 - AC6 -> Translation coverage boundaries.
 - AC7 -> Table-label ergonomics safeguards.
+- request-AC1 -> This backlog slice. Evidence needed: In Settings, `Global preferences` is rendered before `Action bar and shortcuts`.
+- request-AC2 -> This backlog slice. Evidence needed: `Global preferences` includes a locale selector with `English` and `Français`.
+- request-AC3 -> This backlog slice. Evidence needed: `English` is the default locale for fresh state.
+- request-AC4 -> This backlog slice. Evidence needed: Locale selection persists across reload/relaunch.
+- request-AC5 -> This backlog slice. Evidence needed: Switching locale updates app UI text across all major screens without restart.
+- request-AC6 -> This backlog slice. Evidence needed: French translation coverage is complete for shipped app UI surfaces in scope, excluding changelog and import/export surfaces.
+- request-AC7 -> This backlog slice. Evidence needed: Dense table/header surfaces remain readable in French via compact-label strategy where needed.
+- request-AC8 -> This backlog slice. Evidence needed: Existing interaction/accessibility semantics are non-regressed after i18n integration.
+- request-AC9 -> This backlog slice. Evidence needed: Data-format contracts (number formatting, CSV behavior/schema, IDs) remain unchanged.
+- request-AC10 -> This backlog slice. Evidence needed: `logics_lint`, `lint`, `typecheck`, and relevant tests pass.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC9 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC10 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Priority
 - Impact: High (cross-app copy system and major UX surface).

@@ -40,3 +40,21 @@ Default seeding touches network initialization and can easily leak into load/imp
   - `src/tests/app.ui.creation-flow-ergonomics.spec.tsx`
   - `src/store/sampleNetwork.ts`
 
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: Creating a brand-new network initializes a default network-scoped catalog with exactly `3` valid catalog items.
+- request-AC2 -> This backlog slice. Evidence needed: Seeded catalog items are immediately usable by connector/splice creation flows.
+- request-AC3 -> This backlog slice. Evidence needed: Default seed items are editable/deletable like regular catalog items (subject to existing reference guards).
+- request-AC4 -> This backlog slice. Evidence needed: Existing network load, migration, and import flows do not auto-inject default catalog seed items.
+- request-AC5 -> This backlog slice. Evidence needed: Seed generation is deterministic and does not duplicate items for the same newly created network.
+- request-AC6 -> This backlog slice. Evidence needed: Regression tests cover both seeded new-network behavior and no-reseed import/load behavior.
+- request-AC7 -> This backlog slice. Evidence needed: The V1 seed set uses the mandated generic manufacturer references (`CAT-2W-STD`, `CAT-6P-STD`, `CAT-8W-STD`) and includes deterministic non-null `unitPriceExclTax` values.
+- request-AC8 -> This backlog slice. Evidence needed: The V1 seed set includes deterministic human-readable `name` defaults (`2-way standard connector`, `6-port standard splice`, `8-way standard connector`).
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

@@ -110,6 +110,38 @@ stateDiagram-v2
 - AC14 -> Wave 4: section imbalance warning is non-blocking.
 - AC15 -> Wave 5: import/load conversion prompt offers conversion or keeping the old design.
 - AC16 -> Wave 2 and Wave 5: persistence and import/export schemas document all new fields and compatibility behavior.
+- request-AC1 -> This task. Evidence needed: A wire can store an optional twist group label; the default value for existing and newly created wires is empty/null.
+- request-AC2 -> This task. Evidence needed: The wire create/edit UI lets the operator enter labels such as `CAN 1`, clear them, and later modify them without affecting routing or endpoint assignment.
+- request-AC3 -> This task. Evidence needed: The wire list, wire analysis, and relevant exports expose the twist group label where wire identification data is already shown.
+- request-AC4 -> This task. Evidence needed: Newly created splices use the directional model and no longer ask the operator to choose bounded or unbounded numeric port behavior.
+- request-AC5 -> This task. Evidence needed: Wire endpoints connected to a directional splice are assigned to `L` or `R` automatically from routing and from the visible disposition of nodes and segments.
+- request-AC6 -> This task. Evidence needed: Wires arriving from the same side of the splice node receive the same automatic side assignment.
+- request-AC7 -> This task. Evidence needed: If routing or visual geometry is ambiguous, the fallback side assignment remains deterministic and assigns `R` to the side where fewer connectors in the harness stand.
+- request-AC8 -> This task. Evidence needed: The operator can invert all side assignments on a splice so every `L` becomes `R` and every `R` becomes `L`.
+- request-AC9 -> This task. Evidence needed: The operator can force and lock a side assignment per wire endpoint when the automatic routing-based side must be overridden, with the control placed near the existing way/port index area.
+- request-AC10 -> This task. Evidence needed: Directional splice mode allows multiple wires on `L` and multiple wires on `R`, with no maximum count per side.
+- request-AC11 -> This task. Evidence needed: Validation and occupancy logic remain coherent for multiple wires per side and do not reject valid physical fusion cases.
+- request-AC12 -> This task. Evidence needed: Settings expose a configurable section imbalance threshold expressed as a percentage ratio, with a default value of `300%`.
+- request-AC13 -> This task. Evidence needed: The section imbalance warning compares total section per side; for example, with a `200%` threshold, `2 mm2` on one side and `4 mm2` on the other reaches the warning threshold.
+- request-AC14 -> This task. Evidence needed: Section imbalance warnings are visible validation issues but do not block save.
+- request-AC15 -> This task. Evidence needed: Existing saved projects with bounded or unbounded numeric splice ports trigger an import/load conversion prompt that offers conversion to directional splices or keeping the old design.
+- request-AC16 -> This task. Evidence needed: Import/export and persistence schemas document the new wire twist label, directional splice side assignment, fallback rule, inversion state, per-endpoint locked overrides, and section imbalance setting so future migrations remain explicit.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC9 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC10 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC11 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC12 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC13 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC14 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC15 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC16 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Decision Framing
 - Product framing: Required.

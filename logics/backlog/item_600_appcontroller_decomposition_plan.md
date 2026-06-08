@@ -36,6 +36,8 @@ Deliver the incremental AppController decomposition roadmap defined in `adr_009_
 - request-AC1 -> This backlog slice. Proof: AC1: The request states the bounded need for appcontroller decomposition plan.
 - request-AC2 -> This backlog slice. Proof: AC2: Scope boundaries and operator impact are explicit.
 - request-AC3 -> This backlog slice. Proof: AC3: The request is ready to be promoted into a backlog slice.
+- request-AC4 -> This backlog slice. Evidence needed: After Wave 4, the locked budget for `src/app/AppController.tsx` in `LOCKED_LINE_BUDGETS` is lowered to the new ceiling (rounded up to the next 50-line boundary).
+- request-AC5 -> This backlog slice. Evidence needed: The dual-state invariant (`networkStates[activeNetworkId]` synchronized with root slices) remains covered by `store.reducer.sync-invariant.spec.ts` and continues to pass.
 
 # Decision framing
 - Product framing: Not needed

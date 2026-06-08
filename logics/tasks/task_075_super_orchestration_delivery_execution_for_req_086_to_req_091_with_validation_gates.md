@@ -168,3 +168,56 @@ The queue is cross-cutting across settings/persistence, network-summary renderin
 - `src/app/hooks/useUiPreferences.ts`
 - `src/app/hooks/useAppControllerPreferencesState.ts`
 - `src/app/lib/csv.ts`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: A `wide screen` option is available under `Workspace panels layout` in Settings.
+- request-AC2 -> This task. Evidence needed: Default value is disabled (`false`) when no prior preference exists.
+- request-AC3 -> This task. Evidence needed: When disabled, current app max-width cap behavior is unchanged.
+- request-AC4 -> This task. Evidence needed: When enabled, app-wide max-width cap is not applied.
+- request-AC5 -> This task. Evidence needed: Toggling the option updates UI behavior immediately without requiring app reload.
+- request-AC6 -> This task. Evidence needed: Preference persists and restores correctly across reload/relaunch.
+- request-AC7 -> This task. Evidence needed: `lint`, `typecheck`, and relevant UI tests pass after the change.
+- request-AC1 -> This task. Evidence needed: `Canvas tools preferences` includes a new segment-name visibility option above `Show segment lengths by default`.
+- request-AC2 -> This task. Evidence needed: The new segment-name preference default is `enabled` when no prior stored value exists.
+- request-AC3 -> This task. Evidence needed: Disabling segment names hides segment name/ID labels in the 2D `Network summary`.
+- request-AC4 -> This task. Evidence needed: Disabling segment names does not disable or alter segment-length visibility behavior.
+- request-AC5 -> This task. Evidence needed: Enabling segment lengths while segment names are disabled renders lengths without rendering names.
+- request-AC6 -> This task. Evidence needed: The new segment-name preference is persisted and restored across reload/relaunch.
+- request-AC7 -> This task. Evidence needed: `Apply canvas defaults now` applies the segment-name default consistently with other canvas defaults.
+- request-AC8 -> This task. Evidence needed: `lint`, `typecheck`, and relevant UI tests pass after the change.
+- request-AC1 -> This task. Evidence needed: `Canvas tools preferences` includes an export format selector with `SVG` and `PNG`.
+- request-AC2 -> This task. Evidence needed: Default export format is `SVG` when no prior preference exists.
+- request-AC3 -> This task. Evidence needed: Export action produces an SVG file when `SVG` is selected.
+- request-AC4 -> This task. Evidence needed: Export action produces a PNG file when `PNG` is selected.
+- request-AC5 -> This task. Evidence needed: SVG export output remains visually sharp at high zoom (vector quality; no raster blur from export pipeline).
+- request-AC6 -> This task. Evidence needed: Export format preference persists and restores across reload/relaunch.
+- request-AC7 -> This task. Evidence needed: Existing PNG background inclusion behavior remains functional for PNG mode.
+- request-AC1 -> This task. Evidence needed: Connector/splice callouts render wire info using a table-like layout with explicit columns.
+- request-AC2 -> This task. Evidence needed: A new `Canvas tools preferences` option controls wire-name visibility in callouts.
+- request-AC3 -> This task. Evidence needed: Wire-name visibility option default is disabled when no prior preference exists.
+- request-AC4 -> This task. Evidence needed: When wire-name visibility is disabled, wire names are hidden and length values remain visible.
+- request-AC5 -> This task. Evidence needed: When wire-name visibility is enabled, wire names are shown in the callout table alongside other columns.
+- request-AC6 -> This task. Evidence needed: Wire-name preference persists and restores across reload/relaunch.
+- request-AC7 -> This task. Evidence needed: Existing callout interactions (show/hide toggle, selection linkage, drag behavior) remain non-regressed.
+- request-AC1 -> This task. Evidence needed: A new Canvas setting exists to enable/disable zoom-invariant node shapes.
+- request-AC2 -> This task. Evidence needed: Default value is disabled when no prior preference exists.
+- request-AC3 -> This task. Evidence needed: When enabled, connector/splice/node shapes remain visually stable during zoom in/out compared to current behavior.
+- request-AC4 -> This task. Evidence needed: When disabled, current zoom-coupled shape scaling behavior is unchanged.
+- request-AC5 -> This task. Evidence needed: Enabled mode applies to squares (connectors), diamonds (splices), and circles (nodes).
+- request-AC6 -> This task. Evidence needed: Selection/drag/hit interactions remain non-regressed in both modes, with hitboxes aligned to displayed shape size.
+- request-AC7 -> This task. Evidence needed: Preference persists/restores correctly across reload/relaunch.
+- request-AC8 -> This task. Evidence needed: `lint`, `typecheck`, and relevant UI tests pass after implementation.
+- request-AC1 -> This task. Evidence needed: Accented characters in wire CSV export are preserved correctly (no `Ã©`-style corruption).
+- request-AC2 -> This task. Evidence needed: `Endpoints` column is no longer present in wire CSV exports.
+- request-AC3 -> This task. Evidence needed: Wire CSV exports include explicit `Begin ID`, `Begin pin`, `End ID`, `End pin` columns.
+- request-AC4 -> This task. Evidence needed: Begin/end split values are populated deterministically from wire endpoint A/B metadata, with `pin` values using `C{index}` / `P{index}` convention.
+- request-AC5 -> This task. Evidence needed: Modeling and Analysis wire CSV exports share the same endpoint column schema.
+- request-AC6 -> This task. Evidence needed: Existing CSV formula-injection neutralization remains non-regressed.
+- request-AC7 -> This task. Evidence needed: `lint`, `typecheck`, and relevant tests pass after the change.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

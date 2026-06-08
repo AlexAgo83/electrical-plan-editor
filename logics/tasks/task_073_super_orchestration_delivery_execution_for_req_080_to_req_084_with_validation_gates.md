@@ -127,3 +127,42 @@ The queue is cross-cutting across layout algorithms, settings/persistence contra
 - `logics/request/req_082_import_export_networks_panel_two_column_compaction_and_right_side_selected_export_list.md`
 - `logics/request/req_083_app_wide_mobile_mode_enablement_and_removal_of_global_700px_min_width_constraint.md`
 - `logics/request/req_084_network_scope_recent_changes_persistence_across_app_relaunch.md`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: On the fixed 3-fixture benchmark set, `Generate` produces strictly fewer crossings than baseline on at least `2/3` fixtures and never increases crossings on the remaining fixture.
+- request-AC2 -> This task. Evidence needed: Candidate ranking places crossing count as the highest-priority comparator in layout refinement.
+- request-AC3 -> This task. Evidence needed: A second aggressive untangling pass executes when needed and improves or preserves best score deterministically.
+- request-AC4 -> This task. Evidence needed: Existing layout-related tests and CI quality gates pass after implementation (`lint`, `typecheck`, `test:ci`).
+- request-AC5 -> This task. Evidence needed: New/updated tests explicitly guard against regression for crossing-heavy topologies.
+- request-AC1 -> This task. Evidence needed: A new toggle exists in `Canvas tools preferences` for selected-callout-only visibility and is unchecked by default.
+- request-AC2 -> This task. Evidence needed: The new preference is persisted and restored across remount/reload.
+- request-AC3 -> This task. Evidence needed: Enabling selected-callout-only mode shows at most one callout, bound to current connector/splice selection.
+- request-AC4 -> This task. Evidence needed: In selected-callout-only mode, selecting non-callout entities (for example segment/node/wire) renders no callout.
+- request-AC5 -> This task. Evidence needed: Disabling selected-callout-only restores full callout rendering behavior (subject to existing `Callouts` toggle).
+- request-AC6 -> This task. Evidence needed: `lint`, `typecheck`, and `test:ci` pass with updated callout/settings tests.
+- request-AC1 -> This task. Evidence needed: `Import / Export networks` renders in two columns on desktop/tablet breakpoints.
+- request-AC2 -> This task. Evidence needed: `Selected networks for export` is displayed in the right column.
+- request-AC3 -> This task. Evidence needed: `Import from file` is positioned below the export actions (`Export active`, `Export selected`, `Export all`) in the left column.
+- request-AC4 -> This task. Evidence needed: No regression in import/export actions, selected network export behavior, and import summary/status rendering.
+- request-AC5 -> This task. Evidence needed: On mobile/narrow widths, layout collapses to a readable single-column flow without clipping/overflow.
+- request-AC6 -> This task. Evidence needed: `lint`, `typecheck`, and relevant UI tests pass after the layout change.
+- request-AC1 -> This task. Evidence needed: Global `body` style no longer enforces `min-width: 700px`.
+- request-AC2 -> This task. Evidence needed: Main app flows are usable on narrow viewport widths (baseline profiles: `360x800` and `390x844`) without mandatory horizontal page scroll.
+- request-AC3 -> This task. Evidence needed: Existing responsive components preserve desktop behavior and collapse gracefully on narrow screens.
+- request-AC4 -> This task. Evidence needed: Import/export/settings and network summary controls remain accessible and operable in mobile mode.
+- request-AC5 -> This task. Evidence needed: No critical visual clipping/overlap regressions are introduced in supported themes for targeted screens.
+- request-AC6 -> This task. Evidence needed: `lint`, `typecheck`, and relevant UI/integration tests pass after mobile-mode changes.
+- request-AC7 -> This task. Evidence needed: Mobile breakpoint contract is explicit and consistent between CSS and JS behaviors involved in the shell/navigation flow.
+- request-AC8 -> This task. Evidence needed: Mobile overlay/drawer flows (if present) lock body scroll only while open and always release lock on close/unmount.
+- request-AC1 -> This task. Evidence needed: After creating/updating entities and remounting/reloading, `Recent changes` remains visible for the active network with restored entries.
+- request-AC2 -> This task. Evidence needed: Restored entries keep deterministic ordering (newest first in panel) and existing label/time rendering semantics.
+- request-AC3 -> This task. Evidence needed: Persisted recent-change metadata remains bounded by configured history retention policy.
+- request-AC4 -> This task. Evidence needed: Network-scoped filtering remains correct after reload and network switch.
+- request-AC5 -> This task. Evidence needed: Existing `req_075` panel hide behavior remains unchanged when active-network history is empty.
+- request-AC6 -> This task. Evidence needed: Recent-change metadata is persisted locally only and is not added to network file import/export payload contracts.
+- request-AC7 -> This task. Evidence needed: `lint`, `typecheck`, and relevant tests pass with new persistence coverage.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

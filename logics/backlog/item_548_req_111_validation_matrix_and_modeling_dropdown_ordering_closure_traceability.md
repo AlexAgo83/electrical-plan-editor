@@ -42,6 +42,8 @@ flowchart LR
 - AC2 -> scope boundaries remain explicit. Proof: closure notes mention preserved semantic-order selects.
 - AC3 -> doc chain stays coherent. Proof: request, backlog, and task references align.
 - AC4 -> regression evidence remains durable. Proof: validation commands are captured in the closure record.
+- request-AC5 -> This backlog slice. Evidence needed: Missing selected fallback options, when present for compatibility reasons, remain visible, usable, and pinned above the normal sorted options.
+- request-AC6 -> This backlog slice. Evidence needed: Regression tests cover representative connector, splice, wire, node, and segment modeling dropdown ordering behavior.
 
 # Decision framing
 - Product framing: Not needed

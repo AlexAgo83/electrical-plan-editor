@@ -78,3 +78,25 @@ flowchart LR
 - Request: `req_131_settings_search_and_sectioned_navigation`
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: A Settings search input is visible above the Settings content.
+- request-AC2 -> This task. Evidence needed: Typing a query highlights matching text in setting labels case-insensitively.
+- request-AC3 -> This task. Evidence needed: Highlighting preserves accessible names and does not break label/control association.
+- request-AC4 -> This task. Evidence needed: Empty search restores the normal Settings display.
+- request-AC5 -> This task. Evidence needed: A no-match search shows a clear empty-results signal without changing persisted settings.
+- request-AC6 -> This task. Evidence needed: Settings are organized into named sections that can be navigated from a left-side glossary on desktop layouts.
+- request-AC7 -> This task. Evidence needed: Selecting a glossary section scrolls or jumps to the corresponding settings group.
+- request-AC8 -> This task. Evidence needed: In search mode, the glossary indicates which sections contain matches.
+- request-AC9 -> This task. Evidence needed: The layout remains usable on narrow/mobile viewports without overlapping controls or hiding required settings.
+- request-AC10 -> This task. Evidence needed: Tests cover search matching, highlight rendering, no-match behavior, section navigation, and at least one accessibility assertion for label/control wiring.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC9 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC10 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

@@ -48,6 +48,9 @@ flowchart LR
 - AC3 -> suggestion placement is locked. Proof: rendered helper text appears below `Section (mm²)` when inputs qualify.
 - AC4 -> recommendation remains user-driven. Proof: `Apply` changes the draft only on explicit user action.
 - AC5 -> assisted sizing stays non-destructive. Proof: save/cancel regression tests preserve existing semantics.
+- request-AC8 -> This backlog slice. Evidence needed: When required inputs are missing or invalid, the app does not fabricate a recommendation and existing manual section behavior still works.
+- request-AC9 -> This backlog slice. Evidence needed: Existing persisted/imported networks and wires that lack the new voltage/current/material fields remain loadable and editable.
+- request-AC10 -> This backlog slice. Evidence needed: Regression tests cover recommendation logic, default copper behavior, form semantics, and compatibility paths.
 
 # Decision framing
 - Product framing: Not needed

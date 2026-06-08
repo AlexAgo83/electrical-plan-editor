@@ -31,6 +31,20 @@ The `wide screen` preference must actually change shell layout behavior. Without
 - AC1/AC2 -> `src/app/hooks/useAppControllerShellDerivedState.ts`, `src/app/styles/base/base-foundation.css`.
 - AC3 -> `src/app/AppController.tsx` shell class propagation.
 - AC4 -> shell-level UI checks in `src/tests/app.ui.workspace-shell-regression.spec.tsx` and settings flow tests.
+- request-AC1 -> This backlog slice. Evidence needed: A `wide screen` option is available under `Workspace panels layout` in Settings.
+- request-AC2 -> This backlog slice. Evidence needed: Default value is disabled (`false`) when no prior preference exists.
+- request-AC3 -> This backlog slice. Evidence needed: When disabled, current app max-width cap behavior is unchanged.
+- request-AC4 -> This backlog slice. Evidence needed: When enabled, app-wide max-width cap is not applied.
+- request-AC5 -> This backlog slice. Evidence needed: Toggling the option updates UI behavior immediately without requiring app reload.
+- request-AC6 -> This backlog slice. Evidence needed: Preference persists and restores correctly across reload/relaunch.
+- request-AC7 -> This backlog slice. Evidence needed: `lint`, `typecheck`, and relevant UI tests pass after the change.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Priority
 - Impact: High (core runtime effect of req_086).

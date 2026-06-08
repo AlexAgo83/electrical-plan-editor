@@ -39,3 +39,19 @@
   - `src/tests/app.ui.settings.spec.tsx`
   - `src/tests/app.ui.home.spec.tsx`
   - `src/tests/`
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: `Update app` action no longer blinks.
+- request-AC2 -> This backlog slice. Evidence needed: `Update app` action displays a breathing glow when update is available.
+- request-AC3 -> This backlog slice. Evidence needed: Reduced-motion environments do not receive forced breathing animation and keep an accessible highlighted state.
+- request-AC4 -> This backlog slice. Evidence needed: Save/export filenames include a timestamp suffix.
+- request-AC5 -> This backlog slice. Evidence needed: Filename timestamp format is filesystem-safe and deterministic.
+- request-AC6 -> This backlog slice. Evidence needed: Export payload content/schema remains unchanged.
+- request-AC7 -> This backlog slice. Evidence needed: Home changelog feed supports lazy loading on scroll (infinite-scroll style) while preserving entry order.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

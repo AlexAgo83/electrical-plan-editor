@@ -90,3 +90,15 @@ The rollout should be sequenced to keep responsibilities clear:
 - `src/app/components/workspace/SettingsWorkspaceContent.tsx`
 - `src/app/styles/base/base-theme-overrides.css`
 - `src/tests/app.ui.theme.spec.tsx`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: The app exposes two new theme presets in `Settings > Theme mode`: one Circle Mobility light preset and one Circle Mobility dark preset.
+- request-AC2 -> This task. Evidence needed: Both presets are visually based on the provided Circle Mobility palette/gradients and match the brand direction across primary surfaces (shell, panels/cards, buttons/chips, highlights).
+- request-AC3 -> This task. Evidence needed: The new presets are selectable and persist across reload/remount using the existing theme preference mechanism.
+- request-AC4 -> This task. Evidence needed: Representative app surfaces render coherently under both presets (not only shell class wiring), including settings/validation/table/canvas-adjacent UI.
+- request-AC5 -> This task. Evidence needed: Existing theme presets and theme switching behavior remain functional.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

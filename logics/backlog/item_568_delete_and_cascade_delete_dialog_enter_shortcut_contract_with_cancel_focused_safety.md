@@ -48,6 +48,8 @@ flowchart LR
 - AC5 -> Scope: The key event that opened the dialog cannot immediately auto-confirm the destructive action.. Proof: Covered by the linked implementation task, targeted validation, and closure evidence.
 - AC6 -> Scope: Non-delete confirmation dialogs remain unchanged in V1.. Proof: Covered by the linked implementation task, targeted validation, and closure evidence.
 - AC7 -> Scope: Regression tests cover both direct delete and cascade delete keyboard-confirm paths.. Proof: Covered by the linked implementation task, targeted validation, and closure evidence.
+- request-AC8 -> This backlog slice. Evidence needed: By default, `node`, `segment`, `catalog item`, and `network` blocked deletions remain explanation-only in V1 unless a later explicit expansion is documented.
+- request-AC9 -> This backlog slice. Evidence needed: Regression tests cover representative connector, splice, node, and catalog blocked-delete flows, plus any supported cascade cases.
 
 # Decision framing
 - Product framing: Required

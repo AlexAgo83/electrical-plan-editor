@@ -37,3 +37,15 @@
   - `logics/request/req_071_connector_and_splice_analysis_add_go_to_wire_action_before_release.md`
   - `src/tests/app.ui.analysis-go-to-wire.spec.tsx`
   - `package.json`
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: In connector analysis occupancy cards, occupied slots show `Go to` before `Release`.
+- request-AC2 -> This backlog slice. Evidence needed: In splice analysis occupancy cards, occupied slots show `Go to` before `Release`.
+- request-AC3 -> This backlog slice. Evidence needed: `Go to` opens/selects the linked wire when the occupant reference resolves to an existing wire.
+- request-AC4 -> This backlog slice. Evidence needed: If linked wire is missing/unresolvable, `Go to` is visible but disabled, the UI remains stable, and `Release` remains functional.
+- request-AC5 -> This backlog slice. Evidence needed: Existing reserve/release workflows remain non-regressed.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

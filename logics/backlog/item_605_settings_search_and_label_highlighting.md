@@ -54,6 +54,8 @@ flowchart LR
 - request-AC4 -> This backlog slice. Proof: AC4: Empty search restores the normal Settings display.
 - request-AC5 -> This backlog slice. Proof: AC5: A no-match search shows a clear empty-results signal without changing persisted settings.
 - request-AC10 -> This backlog slice. Proof: Covers the search/highlight and label accessibility portion of request AC10.
+- request-AC8 -> This backlog slice. Evidence needed: In search mode, the glossary indicates which sections contain matches.
+- request-AC9 -> This backlog slice. Evidence needed: The layout remains usable on narrow/mobile viewports without overlapping controls or hiding required settings.
 
 # Decision framing
 - Product framing: Not needed

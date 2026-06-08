@@ -115,3 +115,22 @@ Rationale:
 - `src/tests/app.ui.networks.spec.tsx`
 - `src/tests/app.ui.undo-redo-global.spec.tsx`
 - `src/tests/app.ui.settings.spec.tsx`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: Network Scope screen contains a `Recent changes` panel between `Network Scope` and `Edit network`.
+- request-AC2 -> This task. Evidence needed: Panel lists last `10` tracked mutations for the active network, newest first.
+- request-AC3 -> This task. Evidence needed: Listed entries are derived from Undo-tracked business mutations only (no standalone Undo/Redo rows).
+- request-AC4 -> This task. Evidence needed: If active-network history size is `0`, the `Recent changes` panel is not rendered.
+- request-AC5 -> This task. Evidence needed: Entries display local short time (`HH:mm:ss`) and include identifier-rich labels when available.
+- request-AC6 -> This task. Evidence needed: Undo/Redo operations keep panel content coherent with current history state.
+- request-AC1 -> This task. Evidence needed: Pressing `Ctrl/Cmd+S` does not trigger browser page save.
+- request-AC2 -> This task. Evidence needed: Pressing `Ctrl/Cmd+S` triggers export/download of the active network plan.
+- request-AC3 -> This task. Evidence needed: `Ctrl/Cmd+S` interception applies even when an input/textarea/contenteditable field is focused.
+- request-AC4 -> This task. Evidence needed: If no active network is selected, app shows existing export error feedback only and no browser save occurs.
+- request-AC5 -> This task. Evidence needed: Existing keyboard shortcuts (undo/redo/navigation/issues/view) continue to work.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

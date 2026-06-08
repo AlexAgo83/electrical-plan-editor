@@ -52,6 +52,9 @@ stateDiagram-v2
 # AC Traceability
 - AC1 -> Scope: The export flow can omit selected catalog columns, but the catalog screen still shows the full catalog table.. Proof: capture validation evidence in this doc.
 - AC2 -> Scope: The default catalog export remains compatible with the existing column order and content unless a column toggle is enabled.. Proof: capture validation evidence in this doc.
+- request-AC3 -> This task. Evidence needed: BOM export no longer splits connector, seal, and connection reference data into separate sections; they appear on one common structure with consistent columns.
+- request-AC4 -> This task. Evidence needed: BOM export and wire-by-wire export can be produced as CSV or XLSX in parallel, with XLSX chosen through an explicit option.
+- request-AC5 -> This task. Evidence needed: The BOM XLSX export contains two sheets, one global summary sheet and one connector-grouped sheet with merged connector ID and name cells, correct quantities, and connector-order grouping.
 
 # Decision framing
 - Product framing: Not needed

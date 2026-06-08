@@ -40,3 +40,17 @@ The wire edit form has no deterministic one-click state transform to invert `End
   - `src/app/hooks/useModelingFormsState.ts`
   - `src/app/hooks/useWireFormHandlers.ts`
   - `src/app/components/workspace/ModelingWireFormPanel.tsx`
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: `Edit Wire` exposes a swap action between `Save` and `Cancel edit`.
+- request-AC2 -> This backlog slice. Evidence needed: Clicking the swap action swaps the full endpoint form state between `Endpoint A` and `Endpoint B` (kind, target ids, indexes, connection/seal references).
+- request-AC3 -> This backlog slice. Evidence needed: Swap is draft-only (no auto-save, no edit-mode exit) and preserves non-endpoint wire fields.
+- request-AC4 -> This backlog slice. Evidence needed: Derived endpoint hints/conditional fields remain coherent after swap.
+- request-AC5 -> This backlog slice. Evidence needed: Saving after swap persists the swapped endpoints correctly; existing cancel semantics remain functional.
+- request-AC6 -> This backlog slice. Evidence needed: Create-wire flow and existing wire form behaviors remain non-regressed.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

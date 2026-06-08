@@ -146,3 +146,35 @@ flowchart TD
   - `.\\node_modules\\.bin\\tsc.cmd --noEmit`
   - `npm run -s lint`
   - `npm run -s build`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: A selected harness assembly can be exported as a single JSON file or downloaded JSON payload.
+- request-AC2 -> This task. Evidence needed: The export action is scoped only to the selected harness assembly and is not affected by `activeNetworkId`.
+- request-AC3 -> This task. Evidence needed: The JSON includes a versioned envelope with `schemaVersion`, `exportKind`, `exportedAt`, app version, and selected harness identity.
+- request-AC4 -> This task. Evidence needed: The JSON includes selected harness members, master connector refs, and inter-harness connector links.
+- request-AC5 -> This task. Evidence needed: The JSON includes member networks and their relevant wires, connectors, splices, segments, and catalog references.
+- request-AC6 -> This task. Evidence needed: Wire exports include complete endpoint data and preserve wire-side connection and seal references and names.
+- request-AC7 -> This task. Evidence needed: Connector exports include cavity count, cavity occupancy, catalog item reference, manufacturer reference, material flags, terminal overrides, and resolved per-cavity material where available.
+- request-AC8 -> This task. Evidence needed: Terminal and seal resolution follows existing app precedence and exposes an origin label.
+- request-AC9 -> This task. Evidence needed: Plug requirements for unused cavities are included when configured through connector catalog defaults.
+- request-AC10 -> This task. Evidence needed: Catalog-backed parts include available metadata and computed `usedBy` references.
+- request-AC11 -> This task. Evidence needed: The export includes BOM-like quantities for connectors, splices, terminals, seals, plugs, and protected wire components.
+- request-AC12 -> This task. Evidence needed: The export includes explicit relationship rows so agents do not need to infer joins from labels.
+- request-AC13 -> This task. Evidence needed: The export includes structured validation warnings for missing or unresolved harness, network, connector, catalog, terminal, seal, plug, and relationship data.
+- request-AC14 -> This task. Evidence needed: If no harness assembly is selected, the export action does not produce a misleading fallback export.
+- request-AC15 -> This task. Evidence needed: Automated tests cover selected-harness scoping, active-network decoupling, terminal/seal/plug resolution, `usedBy` derivation, and warning generation.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC9 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC10 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC11 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC12 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC13 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC14 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC15 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

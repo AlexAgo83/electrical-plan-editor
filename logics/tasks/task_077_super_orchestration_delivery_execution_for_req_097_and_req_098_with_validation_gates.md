@@ -64,6 +64,39 @@
 - AC4 (`item_480`) -> Onboarding sequence includes final Settings step with correct ordering/progress.
 - AC5 (`item_481`) -> Final onboarding Settings content/CTA contract is delivered.
 - AC6 (`item_482`) -> Onboarding validation coverage and Logics traceability for req_099 are complete.
+- request-AC1 -> This task. Evidence needed: Every rendered `button` in the app (enabled or disabled) has a non-empty hover description via explicit or computed `title`.
+- request-AC2 -> This task. Evidence needed: Every rendered `select` in the app (enabled or disabled) has a non-empty hover description via explicit or computed `title`.
+- request-AC3 -> This task. Evidence needed: Every rendered `option` in the app (enabled or disabled) has a non-empty hover description via explicit or computed `title`.
+- request-AC4 -> This task. Evidence needed: Explicitly authored `title` values are never overridden by fallback generation.
+- request-AC5 -> This task. Evidence needed: Hover-description coverage holds after dynamic UI transitions (screen switch, modal open/close, drawer open/close, conditional section rendering).
+- request-AC6 -> This task. Evidence needed: Existing a11y/interaction semantics are non-regressed.
+- request-AC7 -> This task. Evidence needed: `logics_lint`, `lint`, `typecheck`, and relevant tests pass.
+- request-AC1 -> This task. Evidence needed: In Settings, `Global preferences` is rendered before `Action bar and shortcuts`.
+- request-AC2 -> This task. Evidence needed: `Global preferences` includes a locale selector with `English` and `Français`.
+- request-AC3 -> This task. Evidence needed: `English` is the default locale for fresh state.
+- request-AC4 -> This task. Evidence needed: Locale selection persists across reload/relaunch.
+- request-AC5 -> This task. Evidence needed: Switching locale updates app UI text across all major screens without restart.
+- request-AC6 -> This task. Evidence needed: French translation coverage is complete for shipped app UI surfaces in scope, excluding changelog and import/export surfaces.
+- request-AC7 -> This task. Evidence needed: Dense table/header surfaces remain readable in French via compact-label strategy where needed.
+- request-AC8 -> This task. Evidence needed: Existing interaction/accessibility semantics are non-regressed after i18n integration.
+- request-AC9 -> This task. Evidence needed: Data-format contracts (number formatting, CSV behavior/schema, IDs) remain unchanged.
+- request-AC10 -> This task. Evidence needed: `logics_lint`, `lint`, `typecheck`, and relevant tests pass.
+- request-AC1 -> This task. Evidence needed: Onboarding includes a new final step dedicated to key Settings guidance.
+- request-AC2 -> This task. Evidence needed: The new Settings step is positioned after the current final step (`wires`).
+- request-AC3 -> This task. Evidence needed: Full-flow progress/count reflects the added step accurately.
+- request-AC4 -> This task. Evidence needed: The final step includes one primary CTA (`Open Settings`) that opens the `Settings` screen.
+- request-AC5 -> This task. Evidence needed: Final-step content covers the fixed shortlist (`Language`, `Theme`, `Keyboard shortcuts`, `Canvas render preferences`, `Global preferences`) in concise onboarding wording.
+- request-AC6 -> This task. Evidence needed: The Settings final slide is part of full flow only and has no contextual single-step entrypoint.
+- request-AC7 -> This task. Evidence needed: Existing onboarding behaviors (auto-open/opt-out/contextual help/focus handling) remain non-regressed.
+- request-AC8 -> This task. Evidence needed: Onboarding copy for this request remains English-only (FR handled by `req_098`).
+- request-AC9 -> This task. Evidence needed: `logics_lint`, `lint`, `typecheck`, and relevant onboarding/UI tests pass.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Validation
 - python3 logics/skills/logics-doc-linter/scripts/logics_lint.py

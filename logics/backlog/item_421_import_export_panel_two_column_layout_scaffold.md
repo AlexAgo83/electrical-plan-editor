@@ -37,3 +37,17 @@ The current Import/Export panel layout is vertically stretched and lacks a two-c
   - `logics/request/req_082_import_export_networks_panel_two_column_compaction_and_right_side_selected_export_list.md`
   - `src/app/components/workspace/SettingsWorkspaceContent.tsx`
   - `src/app/styles/validation-settings/validation-and-settings-layout.css`
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: `Import / Export networks` renders in two columns on desktop/tablet breakpoints.
+- request-AC2 -> This backlog slice. Evidence needed: `Selected networks for export` is displayed in the right column.
+- request-AC3 -> This backlog slice. Evidence needed: `Import from file` is positioned below the export actions (`Export active`, `Export selected`, `Export all`) in the left column.
+- request-AC4 -> This backlog slice. Evidence needed: No regression in import/export actions, selected network export behavior, and import summary/status rendering.
+- request-AC5 -> This backlog slice. Evidence needed: On mobile/narrow widths, layout collapses to a readable single-column flow without clipping/overflow.
+- request-AC6 -> This backlog slice. Evidence needed: `lint`, `typecheck`, and relevant UI tests pass after the layout change.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

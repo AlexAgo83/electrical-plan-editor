@@ -40,3 +40,13 @@ The `Network summary` 2D SVG render can paint text behind nodes/segments dependi
 - References:
   - `logics/request/req_058_network_summary_2d_text_labels_must_render_above_nodes_and_segments.md`
   - `src/app/components/NetworkSummaryPanel.tsx`
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: In the `Network summary` 2D render, text labels are rendered visually above node and segment graphics.
+- request-AC2 -> This backlog slice. Evidence needed: A node or segment (including selected/highlighted styling) does not visually hide text labels in normal usage states.
+- request-AC3 -> This backlog slice. Evidence needed: Existing 2D interactions (click selection, pan/zoom, keyboard focus/activation where applicable) remain functional after the layering fix.
+- request-AC4 -> This backlog slice. Evidence needed: Regression coverage protects the text-layer ordering contract (visual or structural assertions).
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

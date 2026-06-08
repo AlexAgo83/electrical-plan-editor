@@ -53,6 +53,8 @@ stateDiagram-v2
 - AC1 -> Scope: BOM export uses one common row structure for connector, seal, and connection reference data.. Proof: capture validation evidence in this doc.
 - AC2 -> Scope: The old separate wire termination section no longer appears in the exported BOM.. Proof: capture validation evidence in this doc.
 - AC3 -> Scope: The unified export keeps a stable and readable row order.. Proof: capture validation evidence in this doc.
+- request-AC4 -> This task. Evidence needed: BOM export and wire-by-wire export can be produced as CSV or XLSX in parallel, with XLSX chosen through an explicit option.
+- request-AC5 -> This task. Evidence needed: The BOM XLSX export contains two sheets, one global summary sheet and one connector-grouped sheet with merged connector ID and name cells, correct quantities, and connector-order grouping.
 
 # Decision framing
 - Product framing: Not needed

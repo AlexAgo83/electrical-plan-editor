@@ -78,6 +78,21 @@ flowchart LR
 - `req_115` AC1-AC7 -> `item_568`, `item_569`, `item_570`. Proof: destructive dialog keyboard-confirm contract, scoped wiring, and delete-confirmation regression coverage.
 - `req_116` AC1-AC10 -> `item_571`, `item_572`, `item_573`, `item_574`. Proof: explicit batch mode state, checkbox/panel UI, preflight-confirm execution, and batch delete regression coverage.
 - `req_117` AC1-AC10 -> `item_575`, `item_576`, `item_577`, `item_578`. Proof: canvas shift-click selection state, grouped drag persistence, inspector compatibility, and canvas regression coverage.
+- request-AC2 -> This task. Evidence needed: The `Catalog` nav entry is positioned before `Connectors` / `Splices` / other entity sub-screen entries.
+- request-AC3 -> This task. Evidence needed: The `Catalog` workspace screen reuses the expected modeling look-and-feel and includes `Network summary`, `Route preview`, `Catalog`, and `Edit catalog item` panels.
+- request-AC4 -> This task. Evidence needed: The catalog screen does not render the analysis panel/column.
+- request-AC5 -> This task. Evidence needed: `Manufacturer reference` is mandatory to save a catalog item.
+- request-AC6 -> This task. Evidence needed: `Connection count` is mandatory to save a catalog item.
+- request-AC9 -> This task. Evidence needed: Connector/Splice forms use a catalog-backed manufacturer selector instead of free-text manufacturer reference.
+- request-AC11 -> This task. Evidence needed: New connector/splice creation follows a `catalog-first` workflow (catalog item created/selected first), with legacy entities still supported via fallback resolution.
+- request-AC12 -> This task. Evidence needed: Onboarding includes a new `Catalog` step in 2nd position (before the connectors/splices library step) with contextual target action(s) consistent with existing onboarding behavior.
+- request-AC13 -> This task. Evidence needed: Catalog item deletion is blocked while referenced by a connector/splice.
+- request-AC14 -> This task. Evidence needed: Catalog item `connectionCount` reduction is blocked when it would invalidate linked connector/splice way/port usage.
+- request-AC15 -> This task. Evidence needed: Legacy fallback bootstrap behavior is applied consistently on both persisted load and import of older data.
+- request-AC16 -> This task. Evidence needed: (Recommended V1) Catalog supports default sort by `manufacturerReference` and basic filtering on `manufacturerReference`/`name`.
+- request-AC17 -> This task. Evidence needed: (Recommended V1) Catalog can open connector/splice creation flows prefilled from the selected catalog item.
+- request-AC18 -> This task. Evidence needed: When no catalog item exists, connector/splice creation UI provides a clear blocking message and CTA to open/create catalog items.
+- request-AC19 -> This task. Evidence needed: Regression tests cover navigation access/order, required-field validation, legacy fallback bootstrap, connector/splice catalog integration behavior, and onboarding step/order integration.
 
 # Decision framing
 - Product framing: Linked

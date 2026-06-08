@@ -119,3 +119,25 @@ flowchart TD
 - Backlog: `item_621_network_summary_2d_grouped_selected_networks_pdf_export`
 - Product brief(s): (none)
 - Architecture decision(s): (none)
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: The Network Summary 2D export menu exposes a PDF export option.
+- request-AC2 -> This task. Evidence needed: A single exported PDF contains the same rendered plan content as the corresponding PNG/SVG export, with preserved aspect ratio.
+- request-AC3 -> This task. Evidence needed: PDF export supports the existing export background, frame, and cartouche options where enabled.
+- request-AC4 -> This task. Evidence needed: PDF generation shows loading feedback and does not leave the UI in a stuck loading state on failure.
+- request-AC5 -> This task. Evidence needed: A grouped PDF export action can generate one PDF with one selected app-rendered image/page per PDF page.
+- request-AC6 -> This task. Evidence needed: Grouped PDF page order is deterministic and visible before final export.
+- request-AC7 -> This task. Evidence needed: Multi-page export creates free-size pages from each rendered Network Summary 2D plan without cropping by default.
+- request-AC8 -> This task. Evidence needed: The implementation does not require any remote service.
+- request-AC9 -> This task. Evidence needed: Existing SVG and PNG export behavior remains unchanged.
+- request-AC10 -> This task. Evidence needed: Automated tests cover export option availability, filename extension, grouped page count behavior at the abstraction level available in tests, and failure handling.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC9 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC10 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

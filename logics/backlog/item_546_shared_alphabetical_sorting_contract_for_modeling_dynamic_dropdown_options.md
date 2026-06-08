@@ -46,6 +46,7 @@ flowchart LR
 - AC3 -> equal labels remain deterministic. Proof: comparator tests cover stable secondary ordering.
 - AC4 -> compatibility fallback remains safe. Proof: tests cover missing selected options remaining visible and pinned.
 - AC5 -> the scope stays controlled. Proof: static semantic selects are not routed through the shared alphabetical helper.
+- request-AC6 -> This backlog slice. Evidence needed: Regression tests cover representative connector, splice, wire, node, and segment modeling dropdown ordering behavior.
 
 # Decision framing
 - Product framing: Not needed

@@ -31,6 +31,22 @@
 - AC2 -> links to item_449/item_450/item_451 implementation/test outputs.
 - AC3 -> callout rendering test artifacts.
 - AC4 -> updates in `logics/request/req_089_*.md` and related backlog/task docs.
+- request-AC1 -> This backlog slice. Evidence needed: Connector/splice callouts render wire info using a table-like layout with explicit columns.
+- request-AC2 -> This backlog slice. Evidence needed: A new `Canvas tools preferences` option controls wire-name visibility in callouts.
+- request-AC3 -> This backlog slice. Evidence needed: Wire-name visibility option default is disabled when no prior preference exists.
+- request-AC4 -> This backlog slice. Evidence needed: When wire-name visibility is disabled, wire names are hidden and length values remain visible.
+- request-AC5 -> This backlog slice. Evidence needed: When wire-name visibility is enabled, wire names are shown in the callout table alongside other columns.
+- request-AC6 -> This backlog slice. Evidence needed: Wire-name preference persists and restores across reload/relaunch.
+- request-AC7 -> This backlog slice. Evidence needed: Existing callout interactions (show/hide toggle, selection linkage, drag behavior) remain non-regressed.
+- request-AC8 -> This backlog slice. Evidence needed: `lint`, `typecheck`, and relevant UI tests pass after the change.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Priority
 - Impact: High (release confidence for a visible UX change).

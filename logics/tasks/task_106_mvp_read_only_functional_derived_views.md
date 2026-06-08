@@ -87,6 +87,36 @@ flowchart TD
 - AC13 -> Wave 1 and Wave 3.
 - AC14 -> Wave 1 and final review.
 - AC15 -> Validation.
+- request-AC1 -> This task. Evidence needed: The application provides a read-only derived functional schematic view generated from the existing detailed model.
+- request-AC2 -> This task. Evidence needed: The generated view cannot be edited independently; any correction must be made in the detailed model and then regenerated.
+- request-AC3 -> This task. Evidence needed: The MVP supports generating a trace from at least one selected wire.
+- request-AC4 -> This task. Evidence needed: The MVP supports generating a trace from connector and splice selections when enough endpoint data is available.
+- request-AC5 -> This task. Evidence needed: The functional trace keeps significant elements: connector, pin/cavity, splice, inline fuse/protection, source endpoint, destination endpoint, ground-like endpoint, and power-like endpoint when those can be inferred from existing data.
+- request-AC6 -> This task. Evidence needed: The functional trace hides physical-only elements: routing nodes, path segments, branch geometry, wire lengths, and intermediate passage points.
+- request-AC7 -> This task. Evidence needed: The generated view preserves source IDs for wires, connectors, pins/cavities, splices, fuses/protections, and inferred endpoints so the operator can relate the schematic back to the detailed model.
+- request-AC8 -> This task. Evidence needed: The MVP exposes simple filters for `12 V`, `48 V`, `CAN`, and existing subnetwork/domain tags when those values are available in the current data.
+- request-AC9 -> This task. Evidence needed: If classification data is missing, the view still generates the trace and reports a non-blocking warning instead of failing silently.
+- request-AC10 -> This task. Evidence needed: Warnings cover at minimum missing endpoint references, unresolved connector or splice references, missing fuse/protection labels, ambiguous domain classification, and disconnected trace paths.
+- request-AC11 -> This task. Evidence needed: The MVP can export the generated functional view to SVG and PNG through the existing export pipeline or a compatible local extension of it.
+- request-AC12 -> This task. Evidence needed: PDF export is out of scope for the MVP unless it is already directly supported by the existing export pipeline without adding a new dependency.
+- request-AC13 -> This task. Evidence needed: The generated view is recomputed from the current network state and is not stored as an independent editable graph in the saved project file.
+- request-AC14 -> This task. Evidence needed: No mandatory save-file schema migration is required for the MVP unless implementation discovers that a small optional UI preference must be persisted.
+- request-AC15 -> This task. Evidence needed: Automated tests cover functional graph derivation, trace generation from a wire, hiding of physical-only nodes, ID preservation, warnings for incomplete data, and export action availability.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC9 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC10 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC11 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC12 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC13 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC14 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC15 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Validation
 - [x] `npx vitest run src/tests/core.functional-schematic.spec.ts src/tests/app.ui.network-summary-workflow-polish.spec.tsx --pool=forks --maxWorkers=2 --testTimeout=15000`

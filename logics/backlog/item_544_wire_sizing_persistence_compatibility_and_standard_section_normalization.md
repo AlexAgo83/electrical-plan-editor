@@ -47,6 +47,8 @@ flowchart LR
 - AC3 -> voltage defaults stay honest. Proof: normalization tests confirm `undefined` remains `undefined` unless the user sets a value.
 - AC4 -> normalization logic is shared, not drifted. Proof: portability/persistence tests import the same section contract.
 - AC5 -> current import/export features do not break. Proof: existing relevant tests still pass.
+- request-AC6 -> This backlog slice. Evidence needed: Network voltage is editable and persisted at network scope without regressing existing network workflows.
+- request-AC7 -> This backlog slice. Evidence needed: Wire current and material are editable and persisted at wire scope without regressing existing wire workflows.
 
 # Decision framing
 - Product framing: Not needed

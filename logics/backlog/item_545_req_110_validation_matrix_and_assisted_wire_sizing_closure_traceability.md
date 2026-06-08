@@ -42,6 +42,12 @@ flowchart LR
 - AC2 -> doc chain is coherent. Proof: request, backlog, and orchestration task references align.
 - AC3 -> UX contract is not lost in implementation churn. Proof: closure notes record the locked placement and apply semantics.
 - AC4 -> regression confidence is durable. Proof: validation commands are listed in the closure record.
+- request-AC5 -> This backlog slice. Evidence needed: The recommendation is recalculated live from the current draft/context inputs and is not applied automatically.
+- request-AC6 -> This backlog slice. Evidence needed: Network voltage is editable and persisted at network scope without regressing existing network workflows.
+- request-AC7 -> This backlog slice. Evidence needed: Wire current and material are editable and persisted at wire scope without regressing existing wire workflows.
+- request-AC8 -> This backlog slice. Evidence needed: When required inputs are missing or invalid, the app does not fabricate a recommendation and existing manual section behavior still works.
+- request-AC9 -> This backlog slice. Evidence needed: Existing persisted/imported networks and wires that lack the new voltage/current/material fields remain loadable and editable.
+- request-AC10 -> This backlog slice. Evidence needed: Regression tests cover recommendation logic, default copper behavior, form semantics, and compatibility paths.
 
 # Decision framing
 - Product framing: Not needed

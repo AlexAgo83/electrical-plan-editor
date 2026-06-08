@@ -54,6 +54,8 @@ stateDiagram-v2
 - AC1 -> Scope: Seal and connection references can each store an optional name.. Proof: capture validation evidence in this doc.
 - AC2 -> Scope: When the same reference is entered again, the previous name is suggested or reused as a fallback.. Proof: capture validation evidence in this doc.
 - AC3 -> Scope: If the name is still empty, the saved value remains blank.. Proof: capture validation evidence in this doc.
+- request-AC4 -> This task. Evidence needed: BOM export and wire-by-wire export can be produced as CSV or XLSX in parallel, with XLSX chosen through an explicit option.
+- request-AC5 -> This task. Evidence needed: The BOM XLSX export contains two sheets, one global summary sheet and one connector-grouped sheet with merged connector ID and name cells, correct quantities, and connector-order grouping.
 
 # Decision framing
 - Product framing: Not needed

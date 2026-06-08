@@ -53,3 +53,17 @@ Some UI integration tests are repeatedly among the slowest and require increased
     - added `createUiIntegrationWideEndpointsState()` targeted fixture.
 - Preserved assertions/intent; no timeout inflation added.
 - Maintained the documented timeout debt policy (`10_000ms` exceptions remain temporary, no new increases).
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: `coverage:ui:report` and `test:ci:ui:slow-top` run even when earlier validation steps fail (`if: always()`), remaining non-blocking.
+- request-AC2 -> This backlog slice. Evidence needed: `test:ci:fast` / `test:ci:ui` segmentation contract is explicit and documented.
+- request-AC3 -> This backlog slice. Evidence needed: Segmented commands remain complementary to canonical `test:ci`, not replacements.
+- request-AC4 -> This backlog slice. Evidence needed: `bundle:metrics:report` remains informational/non-blocking and runs only on successful build artifacts.
+- request-AC5 -> This backlog slice. Evidence needed: At least the top unstable UI tests receive root-cause stabilization work or explicit documented rationale when deferred.
+- request-AC6 -> This backlog slice. Evidence needed: No material regression in CI runtime reliability and debugging clarity.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

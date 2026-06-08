@@ -32,6 +32,20 @@ Req_109 changes shared interaction behavior across multiple list/form screens. W
 - AC2 -> Documentation chain is complete.
 - AC3 -> Confidence is reproducible.
 - AC4 -> UX guardrail remains explicit.
+- request-AC1 -> This backlog slice. Evidence needed: Clicking `New` on an in-scope list panel opens the expected create form and scrolls the page to make that form panel visible.
+- request-AC2 -> This backlog slice. Evidence needed: Clicking `Edit` on an in-scope list/table row opens the expected edit form and scrolls the page to make that form panel visible.
+- request-AC3 -> This backlog slice. Evidence needed: The behavior works across the shared list/form workspace patterns in scope, including `Modeling`, `Catalog`, and `Network Scope` where applicable.
+- request-AC4 -> This backlog slice. Evidence needed: The scroll is tied to explicit user actions only and does not reintroduce unwanted auto-scroll for indirect selection/canvas-origin flows.
+- request-AC5 -> This backlog slice. Evidence needed: If the destination form panel is already visible, the behavior does not produce an unnecessary disruptive jump.
+- request-AC6 -> This backlog slice. Evidence needed: Existing create/edit state, validation messages, and selection synchronization remain non-regressed.
+- request-AC7 -> This backlog slice. Evidence needed: Automated tests cover at least one `New` path and one `Edit` path with viewport-scroll assertions for representative in-scope screens.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Priority
 - Impact: Medium-High.

@@ -86,3 +86,33 @@ This task centralizes:
 - `src/app/components/workspace/AppHeaderAndStats.tsx`
 - `src/app/styles/base/base-foundation.css`
 - `src/tests/pwa.header-actions.spec.tsx`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: On Home, `Workspace` is displayed under `Quick start` in the left column.
+- request-AC2 -> This task. Evidence needed: A right-column changelog panel is displayed and spans two vertical cells on desktop layout.
+- request-AC3 -> This task. Evidence needed: The changelog panel auto-detects available `CHANGELOGS_*.md` files and renders them in descending version order.
+- request-AC4 -> This task. Evidence needed: The changelog content area is internally scrollable, displays all detected changelogs, and handles long text safely.
+- request-AC5 -> This task. Evidence needed: Home actions and status panels remain functional and non-regressed.
+- request-AC6 -> This task. Evidence needed: Responsive behavior remains usable on tablet/mobile without overflow regressions, with changelog panel positioned after left-column panels.
+- request-AC1 -> This task. Evidence needed: In connector analysis occupancy cards, occupied slots show `Go to` before `Release`.
+- request-AC2 -> This task. Evidence needed: In splice analysis occupancy cards, occupied slots show `Go to` before `Release`.
+- request-AC3 -> This task. Evidence needed: `Go to` opens/selects the linked wire when the occupant reference resolves to an existing wire.
+- request-AC4 -> This task. Evidence needed: If linked wire is missing/unresolvable, `Go to` is visible but disabled, the UI remains stable, and `Release` remains functional.
+- request-AC5 -> This task. Evidence needed: Existing reserve/release workflows remain non-regressed.
+- request-AC1 -> This task. Evidence needed: All current app-level confirmation flows previously using `window.confirm` are replaced by styled in-app dialogs.
+- request-AC2 -> This task. Evidence needed: Confirm/cancel outcomes remain behaviorally identical to current implementation.
+- request-AC3 -> This task. Evidence needed: Dialogs are theme-consistent and visually aligned with onboarding modal design language.
+- request-AC4 -> This task. Evidence needed: Dialogs are accessible (focus trap, Escape cancel, proper ARIA semantics, focus restore).
+- request-AC5 -> This task. Evidence needed: No regression in workspace shell overlays, navigation, and mutation flows.
+- request-AC6 -> This task. Evidence needed: Browser-native prompts that are technically non-stylable are explicitly documented and excluded from this request scope.
+- request-AC1 -> This task. Evidence needed: When update is available and `Update ready` is shown, the button has a visible glowy emphasis.
+- request-AC2 -> This task. Evidence needed: Glow effect is disabled or non-animated under `prefers-reduced-motion: reduce`.
+- request-AC3 -> This task. Evidence needed: Glow remains readable and consistent across supported themes.
+- request-AC4 -> This task. Evidence needed: Clicking `Update ready` keeps existing behavior (apply update flow) with no regression.
+- request-AC5 -> This task. Evidence needed: Header layout remains stable with no visual jump introduced by the effect.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

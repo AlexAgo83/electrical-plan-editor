@@ -47,6 +47,10 @@ flowchart LR
 - AC3 -> sizing logic is deterministic. Proof: unit tests cover valid recommendations and null-result cases.
 - AC4 -> no hidden alternate length contract is introduced. Proof: recommendation inputs consume stored `lengthMm`.
 - AC5 -> section normalization source is unique. Proof: shared core constant/helper is imported by consumers.
+- request-AC6 -> This backlog slice. Evidence needed: Network voltage is editable and persisted at network scope without regressing existing network workflows.
+- request-AC7 -> This backlog slice. Evidence needed: Wire current and material are editable and persisted at wire scope without regressing existing wire workflows.
+- request-AC9 -> This backlog slice. Evidence needed: Existing persisted/imported networks and wires that lack the new voltage/current/material fields remain loadable and editable.
+- request-AC10 -> This backlog slice. Evidence needed: Regression tests cover recommendation logic, default copper behavior, form semantics, and compatibility paths.
 
 # Decision framing
 - Product framing: Not needed

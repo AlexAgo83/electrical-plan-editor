@@ -55,6 +55,7 @@ stateDiagram-v2
 - AC2 -> Scope: The grouped sheet merges the connector ID and connector name cells across the rows in each connector group.. Proof: capture validation evidence in this doc.
 - AC3 -> Scope: The grouped sheet keeps connector-related rows under the right connector and preserves a stable order.. Proof: capture validation evidence in this doc.
 - AC4 -> Scope: Quantity totals are correct in both sheets.. Proof: capture validation evidence in this doc.
+- request-AC5 -> This task. Evidence needed: The BOM XLSX export contains two sheets, one global summary sheet and one connector-grouped sheet with merged connector ID and name cells, correct quantities, and connector-order grouping.
 
 # Decision framing
 - Product framing: Not needed

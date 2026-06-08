@@ -99,3 +99,17 @@ The feature spans:
 - `src/app/components/workspace/AnalysisWireWorkspacePanels.tsx`
 - `src/store/index.ts`
 - `src/app/AppController.tsx`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: A wire can optionally carry a V1 protection payload with `kind: "fuse"`.
+- request-AC2 -> This task. Evidence needed: When fuse mode is enabled, the wire must be linked to a valid catalog item (whose `manufacturerReference` is then used as the fuse reference).
+- request-AC3 -> This task. Evidence needed: Existing wire endpoint/route validation and save/cancel semantics remain non-regressed.
+- request-AC4 -> This task. Evidence needed: Fuse metadata is visible after save in wire-focused UI (list and/or analysis surfaces defined by implementation).
+- request-AC5 -> This task. Evidence needed: Legacy wires without protection metadata remain loadable and editable.
+- request-AC6 -> This task. Evidence needed: Existing catalog CSV and network summary BOM CSV flows remain non-regressed.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

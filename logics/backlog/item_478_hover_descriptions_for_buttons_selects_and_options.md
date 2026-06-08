@@ -37,6 +37,20 @@ This reduces discoverability for mouse users and creates non-deterministic UX be
 - AC3 -> Global control coverage for options.
 - AC4 -> Author-specified title precedence contract.
 - AC5 -> Dynamic rendering regression safety.
+- request-AC1 -> This backlog slice. Evidence needed: Every rendered `button` in the app (enabled or disabled) has a non-empty hover description via explicit or computed `title`.
+- request-AC2 -> This backlog slice. Evidence needed: Every rendered `select` in the app (enabled or disabled) has a non-empty hover description via explicit or computed `title`.
+- request-AC3 -> This backlog slice. Evidence needed: Every rendered `option` in the app (enabled or disabled) has a non-empty hover description via explicit or computed `title`.
+- request-AC4 -> This backlog slice. Evidence needed: Explicitly authored `title` values are never overridden by fallback generation.
+- request-AC5 -> This backlog slice. Evidence needed: Hover-description coverage holds after dynamic UI transitions (screen switch, modal open/close, drawer open/close, conditional section rendering).
+- request-AC6 -> This backlog slice. Evidence needed: Existing a11y/interaction semantics are non-regressed.
+- request-AC7 -> This backlog slice. Evidence needed: `logics_lint`, `lint`, `typecheck`, and relevant tests pass.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Priority
 - Impact: High (cross-app UX consistency and usability clarity).

@@ -47,6 +47,8 @@ flowchart LR
 - AC3 -> unsafe cases fail safe. Proof: tests cover fallback from cascade candidate to explanation-only behavior.
 - AC4 -> destructive state changes remain coherent. Proof: integration tests verify one logical delete operation and intact state afterward.
 - AC5 -> V1 scope remains bounded. Proof: node/segment/catalog/network blocked deletes never offer cascade.
+- request-AC6 -> This backlog slice. Evidence needed: Existing delete confirmation behavior from `req_074` remains non-regressed for normal deletions.
+- request-AC9 -> This backlog slice. Evidence needed: Regression tests cover representative connector, splice, node, and catalog blocked-delete flows, plus any supported cascade cases.
 
 # Decision framing
 - Product framing: Not needed

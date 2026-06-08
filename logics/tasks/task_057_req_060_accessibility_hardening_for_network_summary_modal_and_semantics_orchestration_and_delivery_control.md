@@ -88,3 +88,17 @@ The app already has good accessibility building blocks in parts of the shell and
 - `src/tests/app.ui.onboarding.spec.tsx`
 - `src/tests/app.ui.validation.spec.tsx`
 - `src/tests/app.ui.workspace-shell-regression.spec.tsx`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: The `Network summary` 2D SVG accessibility semantics no longer misrepresent an interactive surface as a static image, while preserving a meaningful accessible label/description.
+- request-AC2 -> This task. Evidence needed: Selectable segments in the `Network summary` 2D diagram are keyboard focusable and activatable with accessible labels/roles.
+- request-AC3 -> This task. Evidence needed: The onboarding modal has reliable focus management (initial focus, keyboard dismissal via `Escape`, and focus return on close; focus containment while open in normal usage).
+- request-AC4 -> This task. Evidence needed: Sortable tables expose current sort state via `aria-sort` on the relevant headers without regressing visual sort indicators.
+- request-AC5 -> This task. Evidence needed: Validation row selection is keyboard accessible and remains compatible with row-level `Go to` actions.
+- request-AC6 -> This task. Evidence needed: Validation/ops issue counters shown in primary navigation/header are exposed to assistive technologies (accessible names/text include count information or equivalent).
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

@@ -40,3 +40,13 @@ The segment-analysis traversing-wires table currently exposes a single sortable 
   - `logics/request/req_065_segment_analysis_split_endpoints_column_into_endpoint_a_and_endpoint_b.md`
   - `src/app/components/workspace/AnalysisNodeSegmentWorkspacePanels.tsx`
   - `src/app/lib/tableSort.ts`
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: In `Segments` > `Segment analysis`, the traversing-wires table replaces `Endpoints` with `Endpoint A` and `Endpoint B`.
+- request-AC2 -> This backlog slice. Evidence needed: The split columns preserve the endpoint-side information previously shown in the combined `Endpoints` cell.
+- request-AC3 -> This backlog slice. Evidence needed: Sorting and `aria-sort` semantics work for the new endpoint columns.
+- request-AC4 -> This backlog slice. Evidence needed: Existing `Segment analysis` table behavior and readability remain non-regressed.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

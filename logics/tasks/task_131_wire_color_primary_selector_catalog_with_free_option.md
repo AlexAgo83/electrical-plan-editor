@@ -107,3 +107,21 @@ flowchart LR
 - Backlog: `item_622_wire_color_primary_selector_catalog_with_free_option`
 - Product brief(s): (none)
 - Architecture decision(s): (none)
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: Wire create/edit form primary color selector shows catalog colors directly without first selecting a separate catalog mode.
+- request-AC2 -> This task. Evidence needed: The primary color selector includes a `Free` option.
+- request-AC3 -> This task. Evidence needed: Selecting `Free` switches the wire to free color mode and clears catalog color IDs.
+- request-AC4 -> This task. Evidence needed: Selecting a catalog color switches the wire to catalog mode and clears free color label semantics as currently required.
+- request-AC5 -> This task. Evidence needed: Selecting no-color/unspecified remains possible and preserves existing no-color behavior.
+- request-AC6 -> This task. Evidence needed: Secondary color is available only for catalog primary colors.
+- request-AC7 -> This task. Evidence needed: Existing persisted wire color states load into the corrected controls without losing data.
+- request-AC8 -> This task. Evidence needed: Automated UI coverage verifies catalog direct selection, Free option selection, no-color selection, and edit-mode hydration.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

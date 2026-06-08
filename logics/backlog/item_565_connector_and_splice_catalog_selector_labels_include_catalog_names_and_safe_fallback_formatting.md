@@ -50,6 +50,17 @@ flowchart LR
 - AC6 -> Scope: Existing create-mode prefills and defaults remain intact after the bottom `New` action is used.. Proof: Covered by the linked implementation task, targeted validation, and closure evidence.
 - AC7 -> Scope: Edit-mode flows remain non-regressed and do not unintentionally gain create-only behavior.. Proof: Covered by the linked implementation task, targeted validation, and closure evidence.
 - AC8 -> Scope: Regression tests cover representative connector/splice catalog label rendering and representative chained create-flow paths for the Modeling bottom `New` action coverage.. Proof: Covered by the linked implementation task, targeted validation, and closure evidence.
+- request-AC9 -> This backlog slice. Evidence needed: Connector/Splice forms use a catalog-backed manufacturer selector instead of free-text manufacturer reference.
+- request-AC10 -> This backlog slice. Evidence needed: Connector `way` count and Splice `port` count are derived from the selected catalog item `connectionCount`.
+- request-AC11 -> This backlog slice. Evidence needed: New connector/splice creation follows a `catalog-first` workflow (catalog item created/selected first), with legacy entities still supported via fallback resolution.
+- request-AC12 -> This backlog slice. Evidence needed: Onboarding includes a new `Catalog` step in 2nd position (before the connectors/splices library step) with contextual target action(s) consistent with existing onboarding behavior.
+- request-AC13 -> This backlog slice. Evidence needed: Catalog item deletion is blocked while referenced by a connector/splice.
+- request-AC14 -> This backlog slice. Evidence needed: Catalog item `connectionCount` reduction is blocked when it would invalidate linked connector/splice way/port usage.
+- request-AC15 -> This backlog slice. Evidence needed: Legacy fallback bootstrap behavior is applied consistently on both persisted load and import of older data.
+- request-AC16 -> This backlog slice. Evidence needed: (Recommended V1) Catalog supports default sort by `manufacturerReference` and basic filtering on `manufacturerReference`/`name`.
+- request-AC17 -> This backlog slice. Evidence needed: (Recommended V1) Catalog can open connector/splice creation flows prefilled from the selected catalog item.
+- request-AC18 -> This backlog slice. Evidence needed: When no catalog item exists, connector/splice creation UI provides a clear blocking message and CTA to open/create catalog items.
+- request-AC19 -> This backlog slice. Evidence needed: Regression tests cover navigation access/order, required-field validation, legacy fallback bootstrap, connector/splice catalog integration behavior, and onboarding step/order integration.
 
 # Decision framing
 - Product framing: Consider

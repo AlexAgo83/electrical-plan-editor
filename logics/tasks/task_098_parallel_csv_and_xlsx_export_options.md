@@ -53,6 +53,8 @@ stateDiagram-v2
 - AC1 -> Scope: The user can explicitly choose CSV or XLSX for BOM export and wire-by-wire export.. Proof: capture validation evidence in this doc.
 - AC2 -> Scope: CSV export remains available and behaves the same when selected.. Proof: capture validation evidence in this doc.
 - AC3 -> Scope: XLSX export is available without forcing a CSV workflow change.. Proof: capture validation evidence in this doc.
+- request-AC4 -> This task. Evidence needed: BOM export and wire-by-wire export can be produced as CSV or XLSX in parallel, with XLSX chosen through an explicit option.
+- request-AC5 -> This task. Evidence needed: The BOM XLSX export contains two sheets, one global summary sheet and one connector-grouped sheet with merged connector ID and name cells, correct quantities, and connector-order grouping.
 
 # Decision framing
 - Product framing: Not needed

@@ -154,3 +154,26 @@ Rationale:
 - `src/tests/pwa.header-actions.spec.tsx`
 - `src/tests/app.ui.settings.spec.tsx`
 - `src/tests/app.ui.home.spec.tsx`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: persistence load path no longer throws when storage read access throws; safe fallback still applies.
+- request-AC2 -> This task. Evidence needed: persisted/exported `appVersion` is synchronized with `package.json` version and no longer drifts.
+- request-AC3 -> This task. Evidence needed: imported malformed network timestamps are normalized/fixed automatically; import succeeds with explicit warning(s).
+- request-AC4 -> This task. Evidence needed: `saveState` preserves `createdAtIso` without requiring a full payload migration parse on each write.
+- request-AC5 -> This task. Evidence needed: CSV export neutralizes formula-leading values to prevent spreadsheet formula execution.
+- request-AC6 -> This task. Evidence needed: JSON export download remains reliable with safe URL revoke timing.
+- request-AC7 -> This task. Evidence needed: all updated tests pass in CI-equivalent local validation.
+- request-AC1 -> This task. Evidence needed: `Update app` action no longer blinks.
+- request-AC2 -> This task. Evidence needed: `Update app` action displays a breathing glow when update is available.
+- request-AC3 -> This task. Evidence needed: Reduced-motion environments do not receive forced breathing animation and keep an accessible highlighted state.
+- request-AC4 -> This task. Evidence needed: Save/export filenames include a timestamp suffix.
+- request-AC5 -> This task. Evidence needed: Filename timestamp format is filesystem-safe and deterministic.
+- request-AC6 -> This task. Evidence needed: Export payload content/schema remains unchanged.
+- request-AC7 -> This task. Evidence needed: Home changelog feed supports lazy loading on scroll (infinite-scroll style) while preserving entry order.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

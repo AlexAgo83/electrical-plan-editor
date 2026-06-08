@@ -90,3 +90,15 @@ The orchestration must keep behavior stable:
 - `src/tests/app.ui.catalog.spec.tsx`
 - `src/tests/app.ui.modeling-actions.spec.tsx`
 - `src/tests/app.ui.networks.spec.tsx`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: Each delete action in UI opens a styled confirmation modal before dispatching delete mutation.
+- request-AC2 -> This task. Evidence needed: Cancel always leaves state unchanged for delete operations.
+- request-AC3 -> This task. Evidence needed: Confirm executes existing delete mutation flow and preserves current guard/error semantics.
+- request-AC4 -> This task. Evidence needed: Delete confirmation modal content is explicit and entity-specific.
+- request-AC5 -> This task. Evidence needed: No `window.confirm` remains in delete-action paths.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

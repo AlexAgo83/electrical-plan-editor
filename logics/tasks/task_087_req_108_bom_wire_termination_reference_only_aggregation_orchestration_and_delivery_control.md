@@ -26,6 +26,20 @@
 
 # AC Traceability
 - AC1 -> Orchestration is explicit. Proof: plan and linked backlog slices are documented.
+- request-AC8 -> This task. Evidence needed: Analysis wire CSV export includes the same four columns in the same schema order.
+- request-AC9 -> This task. Evidence needed: Current wire CSV UTF-8 and CSV-safety behavior remains non-regressed.
+- request-AC10 -> This task. Evidence needed: `Node analysis` associated-segment rows expose a `Go to` action for each segment.
+- request-AC11 -> This task. Evidence needed: Activating `Go to` from an associated-segment row opens the `Segment` analysis sub-screen and selects the targeted segment.
+- request-AC12 -> This task. Evidence needed: Missing-segment edge cases disable the `Go to` action safely instead of failing at runtime.
+- request-AC13 -> This task. Evidence needed: `Segment analysis` traversing-wire rows expose a `Go to` action for each wire.
+- request-AC14 -> This task. Evidence needed: Activating `Go to` from a traversing-wire row opens the `Wire` analysis sub-screen and selects the targeted wire.
+- request-AC15 -> This task. Evidence needed: Missing-wire edge cases disable the `Go to` action safely instead of failing at runtime.
+- request-AC16 -> This task. Evidence needed: Export cartouche identity metadata is no longer unnecessarily truncated for ordinary-length values such as medium-length author names when export size allows readable layout.
+- request-AC17 -> This task. Evidence needed: SVG and PNG exports follow the same cartouche metadata readability behavior.
+- request-AC18 -> This task. Evidence needed: Both new navigation tables use the existing `Actions` column + iconized `Go to` button pattern already used in `Catalog analysis`.
+- request-AC19 -> This task. Evidence needed: On-screen plan rendering increases label distance from the stroke for horizontal and near-horizontal segments.
+- request-AC20 -> This task. Evidence needed: Exported SVG follows the same horizontal/near-horizontal label-offset behavior as the on-screen plan.
+- request-AC21 -> This task. Evidence needed: `logics_lint`, `lint`, `typecheck`, and relevant export/UI tests pass after implementation.
 
 # Request AC Proof Coverage
 - AC1 Proof: item `530`.

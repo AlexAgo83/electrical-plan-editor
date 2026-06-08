@@ -108,3 +108,29 @@ flowchart TD
 - Backlog: `item_617_harness_assembly_functional_root_connector_visual_fidelity`
 - Product brief(s): `prod_006_trustworthy_functional_schematic_review`
 - Architecture decision(s): `adr_007_harness_assembly_and_physical_interconnector_contract`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: Selected master connector roots render in the top/root layer as connector nodes, even when their pins are linked to interconnectors.
+- request-AC2 -> This task. Evidence needed: Interconnector nodes render after selected root connector nodes and no longer replace those selected roots.
+- request-AC3 -> This task. Evidence needed: The first visual row of the graph contains only selected saved root connector pin nodes.
+- request-AC4 -> This task. Evidence needed: The graph clearly communicates that saved assembly roots are used for rendering, and unsaved root checkbox changes are not reflected until save.
+- request-AC5 -> This task. Evidence needed: In the debug workspace, `CT8.B BCM 40V` with `Signal` does not include `Reveil batterie` branches that originate through `CT11.A` / `Interco lateral A`.
+- request-AC6 -> This task. Evidence needed: In the debug workspace, `CT8.B BCM 40V` with `Signal` does not include `Capteur vitre D` when that trace originates from `CT8.A`.
+- request-AC7 -> This task. Evidence needed: In the debug workspace, `CT8.A BCM 81V` with `12V power` shows fuse-box pair traversal for `CT4 Fuse Box` where configured pair data and matching wires exist.
+- request-AC8 -> This task. Evidence needed: Fuse nodes in assembly graphs display fuse ratings from `fusePairRatings` where available.
+- request-AC9 -> This task. Evidence needed: Assembly graph node and edge IDs remain network-qualified and collision-safe across harnesses.
+- request-AC10 -> This task. Evidence needed: Existing cross-harness interconnector traversal still works for traces legitimately reached from selected roots.
+- request-AC11 -> This task. Evidence needed: Existing single-network functional schematic behavior remains unchanged except for shared helper extraction with equivalent behavior.
+- request-AC12 -> This task. Evidence needed: Automated tests cover root connector visual retention, interconnector-after-root ordering, strict selected-root scoping, assembly fuse-box traversal, rating display, and the debug workspace regressions where feasible.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC9 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC10 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC11 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC12 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

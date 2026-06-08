@@ -56,6 +56,7 @@ flowchart TD
 - request-AC9 -> This backlog slice. Proof: AC6.
 - request-AC10 -> This backlog slice. Proof: AC7.
 - request-AC12 -> This backlog slice. Proof: AC8.
+- request-AC11 -> This backlog slice. Evidence needed: Existing single-network functional schematic behavior remains unchanged except for shared helper extraction with equivalent behavior.
 
 # Decision framing
 - Product framing: Captured in `prod_006_trustworthy_functional_schematic_review`.

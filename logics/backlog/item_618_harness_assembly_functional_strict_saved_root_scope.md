@@ -57,6 +57,8 @@ flowchart TD
 - request-AC12 -> This backlog slice. Proof: AC8.
 - prior trace-scope AC1 -> This backlog slice. Proof: AC3, AC4, AC5.
 - prior trace-scope AC5 -> This backlog slice. Proof: AC7.
+- request-AC9 -> This backlog slice. Evidence needed: Assembly graph node and edge IDs remain network-qualified and collision-safe across harnesses.
+- request-AC11 -> This backlog slice. Evidence needed: Existing single-network functional schematic behavior remains unchanged except for shared helper extraction with equivalent behavior.
 
 # Decision framing
 - Product framing: Captured in `prod_006_trustworthy_functional_schematic_review` and the prior trace-scope request.

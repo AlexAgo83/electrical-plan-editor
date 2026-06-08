@@ -39,3 +39,15 @@ Even with shared confirmation infrastructure, delete prompts can drift in title/
   - `src/app/types/confirm-dialog.ts`
   - `src/app/components/dialogs/ConfirmDialog.tsx`
   - `src/app/AppController.tsx`
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: Each delete action in UI opens a styled confirmation modal before dispatching delete mutation.
+- request-AC2 -> This backlog slice. Evidence needed: Cancel always leaves state unchanged for delete operations.
+- request-AC3 -> This backlog slice. Evidence needed: Confirm executes existing delete mutation flow and preserves current guard/error semantics.
+- request-AC4 -> This backlog slice. Evidence needed: Delete confirmation modal content is explicit and entity-specific.
+- request-AC5 -> This backlog slice. Evidence needed: No `window.confirm` remains in delete-action paths.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

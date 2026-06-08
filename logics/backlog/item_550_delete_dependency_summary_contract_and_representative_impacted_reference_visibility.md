@@ -47,6 +47,10 @@ flowchart LR
 - AC3 -> explanations become concrete. Proof: modal content includes sample labels or technical IDs when available.
 - AC4 -> the feature fails safe. Proof: explanation modal still works without requiring full cascade eligibility.
 - AC5 -> summary logic is not duplicated. Proof: both blocked explanation and cascade candidate flows use the same summary contract.
+- request-AC6 -> This backlog slice. Evidence needed: Existing delete confirmation behavior from `req_074` remains non-regressed for normal deletions.
+- request-AC7 -> This backlog slice. Evidence needed: Integrity guards remain enforced for unsupported or unsafe cascade cases.
+- request-AC8 -> This backlog slice. Evidence needed: By default, `node`, `segment`, `catalog item`, and `network` blocked deletions remain explanation-only in V1 unless a later explicit expansion is documented.
+- request-AC9 -> This backlog slice. Evidence needed: Regression tests cover representative connector, splice, node, and catalog blocked-delete flows, plus any supported cascade cases.
 
 # Decision framing
 - Product framing: Not needed

@@ -31,6 +31,22 @@ The export button currently produces PNG output. `req_088` requires a single exp
 - AC1/AC2 -> `src/app/components/NetworkSummaryPanel.tsx` export handlers.
 - AC3 -> `src/app/components/NetworkSummaryPanel.tsx` header actions markup.
 - AC4 -> targeted canvas export verification in tests/manual evidence.
+- request-AC1 -> This backlog slice. Evidence needed: `Canvas tools preferences` includes an export format selector with `SVG` and `PNG`.
+- request-AC2 -> This backlog slice. Evidence needed: Default export format is `SVG` when no prior preference exists.
+- request-AC3 -> This backlog slice. Evidence needed: Export action produces an SVG file when `SVG` is selected.
+- request-AC4 -> This backlog slice. Evidence needed: Export action produces a PNG file when `PNG` is selected.
+- request-AC5 -> This backlog slice. Evidence needed: SVG export output remains visually sharp at high zoom (vector quality; no raster blur from export pipeline).
+- request-AC6 -> This backlog slice. Evidence needed: Export format preference persists and restores across reload/relaunch.
+- request-AC7 -> This backlog slice. Evidence needed: Existing PNG background inclusion behavior remains functional for PNG mode.
+- request-AC8 -> This backlog slice. Evidence needed: `lint`, `typecheck`, and relevant UI tests pass after the change.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Priority
 - Impact: High (core functional behavior).

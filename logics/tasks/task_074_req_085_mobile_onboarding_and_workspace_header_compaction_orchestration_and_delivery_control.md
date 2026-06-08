@@ -100,3 +100,31 @@ The request is cross-surface and requires a strict sequence so shared responsive
 - `src/tests/app.ui.list-ergonomics.spec.tsx`
 - `src/tests/app.ui.catalog.spec.tsx`
 - `src/tests/app.ui.validation.spec.tsx`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: On mobile, onboarding `Close` remains on the same line as icon/title block.
+- request-AC2 -> This task. Evidence needed: On mobile, onboarding `Next` remains on the same line as target action buttons (`Open`/`Scroll`).
+- request-AC3 -> This task. Evidence needed: On mobile, Network Scope action label is `Dup.` and triggers the same duplicate handler/behavior as today.
+- request-AC4 -> This task. Evidence needed: On mobile, `CSV` and `Help` are on the same row as `Network Scope` title and right-aligned.
+- request-AC5 -> This task. Evidence needed: On mobile, `CSV` and `Help` are on the same row as titles for `Catalog`, `Connectors`, `Splices`, `Nodes`, `Segments`, and `Wires`, right-aligned.
+- request-AC6 -> This task. Evidence needed: On mobile, `Route mode` column is hidden in affected wire tables.
+- request-AC7 -> This task. Evidence needed: On mobile, `Occupied` header text is `Occup.` in affected connector/splice tables.
+- request-AC8 -> This task. Evidence needed: On mobile, in `Catalog`, header labels are compacted to `Mnf ref`, `Price`, and `Con.`.
+- request-AC9 -> This task. Evidence needed: On mobile, in `Catalog`, `Import CSV` button label is `Import` and triggers the same import handler/behavior.
+- request-AC10 -> This task. Evidence needed: On mobile, shared table headers are compacted as follows where present: `Reference` -> `Ref.`, `Technical ID` -> `ID`, `Endpoint A/B` -> `End A/B`, `Length (mm)` -> `Len`, `Section (mm2|mm²)` -> `Sec`.
+- request-AC11 -> This task. Evidence needed: On mobile, in `Validation`, `Severity` column is hidden.
+- request-AC12 -> This task. Evidence needed: On mobile, in `Validation`, `CSV` remains on the same row as `Validation center` and right-aligned.
+- request-AC13 -> This task. Evidence needed: `lint`, `typecheck`, and relevant UI tests pass after the responsive compaction changes.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC9 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC10 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC11 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC12 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC13 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

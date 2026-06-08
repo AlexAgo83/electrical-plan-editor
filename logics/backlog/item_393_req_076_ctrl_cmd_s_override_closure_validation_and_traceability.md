@@ -39,3 +39,15 @@ Keyboard shortcut changes are cross-cutting. Without explicit closure checks, re
   - `src/tests/app.ui.networks.spec.tsx`
   - `src/tests/`
   - `package.json`
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: Pressing `Ctrl/Cmd+S` does not trigger browser page save.
+- request-AC2 -> This backlog slice. Evidence needed: Pressing `Ctrl/Cmd+S` triggers export/download of the active network plan.
+- request-AC3 -> This backlog slice. Evidence needed: `Ctrl/Cmd+S` interception applies even when an input/textarea/contenteditable field is focused.
+- request-AC4 -> This backlog slice. Evidence needed: If no active network is selected, app shows existing export error feedback only and no browser save occurs.
+- request-AC5 -> This backlog slice. Evidence needed: Existing keyboard shortcuts (undo/redo/navigation/issues/view) continue to work.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

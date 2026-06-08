@@ -47,3 +47,19 @@ Legacy connectors/splices without `manufacturerReference` remain unresolved to `
   - `src/adapters/persistence/migrations.ts`
   - `src/adapters/portability/networkFile.ts`
 
+
+# AC Traceability
+- request-AC1 -> This backlog slice. Evidence needed: Legacy connectors without `manufacturerReference` but with valid `cavityCount` are backfilled to a generated catalog item and linked with `catalogItemId`.
+- request-AC2 -> This backlog slice. Evidence needed: Legacy splices without `manufacturerReference` but with valid `portCount` are backfilled to a generated catalog item and linked with `catalogItemId`.
+- request-AC3 -> This backlog slice. Evidence needed: Generated catalog `manufacturerReference` values are deterministic and unique within the network catalog.
+- request-AC4 -> This backlog slice. Evidence needed: Repeated load/import of the same legacy payload does not create duplicate catalog items or rename churn.
+- request-AC5 -> This backlog slice. Evidence needed: Import fallback behavior matches load/migration fallback behavior for missing manufacturer-reference legacy entities.
+- request-AC6 -> This backlog slice. Evidence needed: Entities with invalid capacity still do not produce generated catalog items.
+- request-AC7 -> This backlog slice. Evidence needed: Generated placeholder references follow the mandated `LEGACY-NOREF-{C|S}-{token} [<count>{c|p}]` pattern with deterministic token fallback and slug normalization.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`

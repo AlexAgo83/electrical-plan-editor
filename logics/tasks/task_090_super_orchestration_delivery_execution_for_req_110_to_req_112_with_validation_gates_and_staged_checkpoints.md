@@ -76,6 +76,41 @@ flowchart LR
 - Req_111 AC1 to AC6 -> covered by steps 1, 2, and closure item `548`.
 - Req_110 AC1 to AC10 -> covered by steps 3, 4, 5, and closure item `545`.
 - Req_112 AC1 to AC9 -> covered by steps 6, 7, 8, and closure item `552`.
+- request-AC1 -> This task. Evidence needed: Each delete action in UI opens a styled confirmation modal before dispatching delete mutation.
+- request-AC2 -> This task. Evidence needed: Cancel always leaves state unchanged for delete operations.
+- request-AC3 -> This task. Evidence needed: Confirm executes existing delete mutation flow and preserves current guard/error semantics.
+- request-AC4 -> This task. Evidence needed: Delete confirmation modal content is explicit and entity-specific.
+- request-AC5 -> This task. Evidence needed: No `window.confirm` remains in delete-action paths.
+- request-AC1 -> This task. Evidence needed: When a wire has valid current input, valid material input or default copper behavior, valid computed length, and the active network has valid voltage, the app can produce a recommended wire section.
+- request-AC2 -> This task. Evidence needed: The recommended result is normalized to one of the standard supported wire sections used by the product.
+- request-AC3 -> This task. Evidence needed: In the wire create/edit form, the recommendation is shown directly below `Section (mm²)` as helper text with an explicit `Apply` action.
+- request-AC4 -> This task. Evidence needed: `sectionMm2` remains user-editable and the recommendation does not remove manual override capability.
+- request-AC5 -> This task. Evidence needed: The recommendation is recalculated live from the current draft/context inputs and is not applied automatically.
+- request-AC6 -> This task. Evidence needed: Network voltage is editable and persisted at network scope without regressing existing network workflows.
+- request-AC7 -> This task. Evidence needed: Wire current and material are editable and persisted at wire scope without regressing existing wire workflows.
+- request-AC8 -> This task. Evidence needed: When required inputs are missing or invalid, the app does not fabricate a recommendation and existing manual section behavior still works.
+- request-AC9 -> This task. Evidence needed: Existing persisted/imported networks and wires that lack the new voltage/current/material fields remain loadable and editable.
+- request-AC10 -> This task. Evidence needed: Regression tests cover recommendation logic, default copper behavior, form semantics, and compatibility paths.
+- request-AC1 -> This task. Evidence needed: Dynamic dropdowns in the `Modeling` screens that list current entities or catalog items are displayed in alphabetical order by user-visible label.
+- request-AC2 -> This task. Evidence needed: Static semantic dropdowns in `Modeling` keep their deliberate non-alphabetical order.
+- request-AC3 -> This task. Evidence needed: Alphabetical sorting is case-insensitive and based on trimmed visible option labels.
+- request-AC4 -> This task. Evidence needed: Existing create/edit/save behavior remains unchanged apart from option ordering.
+- request-AC5 -> This task. Evidence needed: Missing selected fallback options, when present for compatibility reasons, remain visible, usable, and pinned above the normal sorted options.
+- request-AC6 -> This task. Evidence needed: Regression tests cover representative connector, splice, wire, node, and segment modeling dropdown ordering behavior.
+- request-AC1 -> This task. Evidence needed: A delete action blocked by existing dependencies gives immediate explicit feedback and no longer feels like a silent no-op.
+- request-AC2 -> This task. Evidence needed: The blocked-delete feedback identifies the reason category for the failure, not just that the delete did not occur.
+- request-AC3 -> This task. Evidence needed: Blocked delete feedback is shown in a dedicated modal/dialog tied to the delete attempt and does not depend on the top-level error banner alone.
+- request-AC4 -> This task. Evidence needed: For any entity types that support cascade deletion in V1, the user receives a dedicated impact summary and must explicitly confirm removal of the target plus its listed dependents.
+- request-AC5 -> This task. Evidence needed: Canceling a blocked-delete explanation or cascade-delete confirmation leaves state unchanged.
+- request-AC6 -> This task. Evidence needed: Existing delete confirmation behavior from `req_074` remains non-regressed for normal deletions.
+- request-AC7 -> This task. Evidence needed: Integrity guards remain enforced for unsupported or unsafe cascade cases.
+- request-AC8 -> This task. Evidence needed: By default, `node`, `segment`, `catalog item`, and `network` blocked deletions remain explanation-only in V1 unless a later explicit expansion is documented.
+- request-AC9 -> This task. Evidence needed: Regression tests cover representative connector, splice, node, and catalog blocked-delete flows, plus any supported cascade cases.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Decision framing
 - Product framing: Not needed

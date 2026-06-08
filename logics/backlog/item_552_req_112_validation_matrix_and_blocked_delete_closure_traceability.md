@@ -42,6 +42,11 @@ flowchart LR
 - AC2 -> scope boundaries remain explicit. Proof: closure notes document explanation-only entity types and any delivered cascade matrix.
 - AC3 -> doc chain stays coherent. Proof: request, backlog, and task references align.
 - AC4 -> regression confidence is durable. Proof: validation commands and proof points are recorded at closure.
+- request-AC5 -> This backlog slice. Evidence needed: Canceling a blocked-delete explanation or cascade-delete confirmation leaves state unchanged.
+- request-AC6 -> This backlog slice. Evidence needed: Existing delete confirmation behavior from `req_074` remains non-regressed for normal deletions.
+- request-AC7 -> This backlog slice. Evidence needed: Integrity guards remain enforced for unsupported or unsafe cascade cases.
+- request-AC8 -> This backlog slice. Evidence needed: By default, `node`, `segment`, `catalog item`, and `network` blocked deletions remain explanation-only in V1 unless a later explicit expansion is documented.
+- request-AC9 -> This backlog slice. Evidence needed: Regression tests cover representative connector, splice, node, and catalog blocked-delete flows, plus any supported cascade cases.
 
 # Decision framing
 - Product framing: Not needed

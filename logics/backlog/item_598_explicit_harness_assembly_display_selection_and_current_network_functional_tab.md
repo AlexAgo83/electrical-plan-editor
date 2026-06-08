@@ -77,6 +77,36 @@ flowchart TD
 - request-AC13 -> backlog AC14.
 - request-AC14 -> backlog AC15.
 - request-AC15 -> backlog AC4.
+- request-AC1 -> This backlog slice. Evidence needed: The `Harness assembly` functional graph is selected by an explicit displayed assembly state, not by `activeNetworkId`.
+- request-AC2 -> This backlog slice. Evidence needed: Changing the active network does not change the displayed harness assembly graph.
+- request-AC3 -> This backlog slice. Evidence needed: The operator can select which saved harness assembly is displayed and edited through one shared selector.
+- request-AC4 -> This backlog slice. Evidence needed: If no harness assembly is selected, the assembly workspace shows a clear empty state instead of falling back to the active network graph.
+- request-AC5 -> This backlog slice. Evidence needed: The UI clearly shows which harness assembly currently drives the displayed assembly graph.
+- request-AC6 -> This backlog slice. Evidence needed: The shared assembly selector controls both the edited assembly form and the displayed assembly graph.
+- request-AC7 -> This backlog slice. Evidence needed: Unsaved member/root/link/color changes are visible before save, and a small warning near the modified controls explains that the visualization has not been updated yet.
+- request-AC8 -> This backlog slice. Evidence needed: A separate tab lets the operator view the functional graph of the current active network only.
+- request-AC9 -> This backlog slice. Evidence needed: The current-network functional tab changes when the active network changes, but the harness assembly graph does not.
+- request-AC10 -> This backlog slice. Evidence needed: Existing single-network functional graph behavior remains available through the new current-network tab.
+- request-AC11 -> This backlog slice. Evidence needed: Assembly graph export metadata uses selected assembly metadata where available.
+- request-AC12 -> This backlog slice. Evidence needed: Current-network graph export metadata continues to use active network metadata.
+- request-AC13 -> This backlog slice. Evidence needed: Existing saved harness assemblies load and remain selectable without data loss.
+- request-AC14 -> This backlog slice. Evidence needed: Automated tests cover assembly selection, active-network decoupling, empty state behavior, and current-network tab behavior.
+- request-AC15 -> This backlog slice. Evidence needed: The displayed assembly selection persists after the operator chooses an assembly and reloads the app.
+- request-AC1 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC9 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC10 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC11 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC12 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC13 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC14 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC15 -> This backlog slice. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
 
 # Decision framing
 - Product framing: Not needed

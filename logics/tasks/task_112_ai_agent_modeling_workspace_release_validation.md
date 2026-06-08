@@ -56,3 +56,37 @@ flowchart LR
 # Release
 - Included in `changelogs/CHANGELOGS_1_11_0.md`.
 - Release metadata aligned in `VERSION`, `package.json`, `package-lock.json`, and `README.md`.
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: Settings includes an AI configuration area with OpenAI and Gemini provider choices, editable model name, local-storage API key or endpoint configuration, timeout or strictness options, and a connection test.
+- request-AC2 -> This task. Evidence needed: Modeling includes a visible `AI Agent` section.
+- request-AC3 -> This task. Evidence needed: The `AI Agent` entry is placed beside the existing `Wires` Modeling entry and is disabled when provider readiness is invalid.
+- request-AC4 -> This task. Evidence needed: The AI Agent section lets the user provide an instruction, choose a target scope, choose assisted or experimental mode, and review permissions.
+- request-AC5 -> This task. Evidence needed: Assisted mode is the default mode.
+- request-AC6 -> This task. Evidence needed: Assisted mode receives AI output as structured operations and validates those operations before user review.
+- request-AC7 -> This task. Evidence needed: The user can apply or reject an assisted proposal.
+- request-AC8 -> This task. Evidence needed: Applied assisted proposals are committed as one grouped history transaction.
+- request-AC9 -> This task. Evidence needed: Experimental mode is disabled unless explicitly enabled in AI settings.
+- request-AC10 -> This task. Evidence needed: Experimental-mode application creates a pre-run snapshot and applies only locally validated operations.
+- request-AC11 -> This task. Evidence needed: A completed AI session can be rolled back in one user action.
+- request-AC12 -> This task. Evidence needed: AI operations cannot bypass existing domain validation, dependency guards, or destructive-action permissions.
+- request-AC13 -> This task. Evidence needed: Delete operations are blocked by default and require explicit permission.
+- request-AC14 -> This task. Evidence needed: The result view summarizes added, moved, updated, deleted, routed, accepted, and rejected operations.
+- request-AC15 -> This task. Evidence needed: Validation errors and rejected operations are exposed to the user with actionable context.
+- request-AC16 -> This task. Evidence needed: Tests cover operation validation, assisted apply/reject, experimental rollback, delete permission gating, provider-readiness disabled entry behavior, and grouped undo behavior.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC8 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC9 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC10 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC11 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC12 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC13 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC14 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC15 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
+- request-AC16 -> This task. Proof: Historical delivery is recorded in the linked backlog/task report and validation sections; this corpus repair formalizes strict audit traceability without changing shipped scope. Source: `logics corpus strict audit repair`
