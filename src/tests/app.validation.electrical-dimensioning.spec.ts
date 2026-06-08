@@ -11,6 +11,7 @@ import type {
 } from "../core/entities";
 import { appendElectricalDimensioningIssues, ELECTRICAL_DIMENSIONING_CATEGORY } from "../app/hook-impl/validation/appendElectricalDimensioningIssues";
 import type { ValidationIssue } from "../app/types/app-controller";
+import { createSampleNetworkState } from "../store";
 
 function makeConnector(
   id: string,
@@ -78,6 +79,32 @@ function run(params: {
 }
 
 describe("appendElectricalDimensioningIssues", () => {
+  it("keeps shipped sample networks silent for electrical dimensioning", () => {
+    const state = createSampleNetworkState();
+    const issuesByNetwork = state.networks.allIds.map((networkId) => {
+      const scoped = state.networkStates[networkId];
+      const network = state.networks.byId[networkId] ?? null;
+      const issues = run({
+        connectors: scoped?.connectors.allIds.map((id) => scoped.connectors.byId[id]).filter((entry): entry is Connector => entry !== undefined),
+        splices: scoped?.splices.allIds.map((id) => scoped.splices.byId[id]).filter((entry): entry is Splice => entry !== undefined),
+        wires: scoped?.wires.allIds.map((id) => scoped.wires.byId[id]).filter((entry): entry is Wire => entry !== undefined),
+        catalogItems: scoped?.catalogItems.allIds.map((id) => scoped.catalogItems.byId[id]).filter((entry): entry is CatalogItem => entry !== undefined),
+        network
+      });
+      return {
+        networkId,
+        issueIds: issues.map((issue) => `${issue.severity}:${issue.id}`)
+      };
+    });
+
+    expect(issuesByNetwork).toEqual(
+      state.networks.allIds.map((networkId) => ({
+        networkId,
+        issueIds: []
+      }))
+    );
+  });
+
   it("emits no issue on a passive network", () => {
     const source = makeConnector("C1", 1);
     const consumer = makeConnector("C2", 1);

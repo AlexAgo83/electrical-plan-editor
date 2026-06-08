@@ -3,15 +3,15 @@
 > From version: 1.13.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 94%
-> Confidence: 86%
-> Progress: 45%
+> Understanding: 96%
+> Confidence: 88%
+> Progress: 55%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 
 # Definition of Done (DoD)
 - [ ] Playwright "Pin roles full flow" E2E scenario green.
-- [ ] Shipped sample networks load with zero **Electrical dimensioning** issues.
+- [x] Shipped sample networks load with zero **Electrical dimensioning** issues.
 - [ ] Export/import round-trip preserves `pinElectricalRoles`, catalog defaults, `ampacityOverrides`.
 - [ ] 2D modeling canvas byte-for-byte snapshot unchanged when only pin roles or ampacity overrides are edited.
 - [ ] Permissiveness gate: partial declarations emit zero error-level findings.
@@ -71,4 +71,5 @@ Mirror `item_615` AC1–AC9.
 - Partially covered by 1.14.0 focused validation: data model, ampacity, current-network aggregation, assembly aggregation core, D1-D4 validation, inspector pin roles, and catalog pin roles.
 - Delivered after 1.15.0: onboarding step "Declare pin roles" added to the full onboarding flow and covered by `npm run -s test -- src/tests/app.ui.onboarding.spec.tsx --run`.
 - Delivered after 1.15.0: AI Agent context snapshot coverage asserts pin electrical roles do not add AI context fields or leak role labels; covered by `npm run -s test -- src/tests/ai-agent-context.spec.ts --run` and `npm run -s typecheck`.
-- Remaining: Playwright full-flow, sample-network silence gate, export/import gate, canvas unchanged snapshot, performance budgets, and CI release-gate wiring.
+- Delivered after 1.15.0: sample-network silence gate asserts every shipped sample network emits zero `Electrical dimensioning` issues; covered by `npm run -s test -- src/tests/app.validation.electrical-dimensioning.spec.ts --run`.
+- Remaining: Playwright full-flow, export/import gate, canvas unchanged snapshot, performance budgets, and CI release-gate wiring.
