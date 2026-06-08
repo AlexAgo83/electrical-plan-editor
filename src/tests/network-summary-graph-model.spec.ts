@@ -377,6 +377,64 @@ describe("buildRenderedSegments", () => {
     expect(rendered[0]?.segmentCallout?.values[4]).toBe("80 mm");
     expect(rendered[1]?.segmentCallout).toBeNull();
   });
+
+  it("anchors merged sheath callout leaders to the closest point on the grouped route", () => {
+    const spliceId = asSpliceId("SP-1");
+    const segments: Segment[] = [
+      {
+        id: asSegmentId("SEG-1"),
+        nodeA: asNodeId("N-A"),
+        nodeB: asNodeId("N-S"),
+        lengthMm: 20,
+        sheathType: "Fixed Tube",
+        insulation: "XLPE",
+        lineStyle: "GAF-T2-D9",
+        internalPartReference: "X723061352"
+      },
+      {
+        id: asSegmentId("SEG-2"),
+        nodeA: asNodeId("N-S"),
+        nodeB: asNodeId("N-B"),
+        lengthMm: 60,
+        sheathType: "Fixed Tube",
+        insulation: "XLPE",
+        lineStyle: "GAF-T2-D9",
+        internalPartReference: "X723061352"
+      }
+    ];
+    const nodes: NetworkNode[] = [
+      { id: asNodeId("N-A"), kind: "intermediate", label: "Start" },
+      { id: asNodeId("N-S"), kind: "splice", spliceId },
+      { id: asNodeId("N-B"), kind: "intermediate", label: "End" }
+    ];
+
+    const rendered = buildRenderedSegments({
+      ...emptySegmentRenderContext,
+      segments,
+      nodes,
+      networkNodePositions: {
+        [asNodeId("N-A")]: { x: 0, y: 0 },
+        [asNodeId("N-S")]: { x: 40, y: 0 },
+        [asNodeId("N-B")]: { x: 100, y: 0 }
+      },
+      segmentSubNetworkTagById: new Map(),
+      isSubNetworkFilteringActive: false,
+      activeSubNetworkTagSet: new Set(),
+      selectedWireRouteSegmentIds: new Set(),
+      selectedSegmentId: null,
+      spliceMap: new Map([[spliceId, { id: spliceId, name: "Splice", technicalId: "SP-1", portCount: 2 }]]),
+      autoSegmentLabelRotation: true,
+      labelRotationDegrees: 0,
+      showSegmentNames: false,
+      showSegmentLengths: true,
+      draftSegmentCalloutPositions: {
+        [asSegmentId("SEG-1")]: { x: 10, y: -30 }
+      }
+    });
+
+    expect(rendered[0]?.segmentCallout?.targetX).toBe(10);
+    expect(rendered[0]?.segmentCallout?.targetY).toBe(0);
+  });
 });
 
 describe("buildRenderedNodes", () => {

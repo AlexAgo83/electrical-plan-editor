@@ -26,6 +26,13 @@ export interface SplicePlacementPreviewNodeModel {
   position: NodePosition;
 }
 
+export interface NetworkSummaryCalloutObstacle {
+  centerX: number;
+  centerY: number;
+  width: number;
+  height: number;
+}
+
 interface NetworkSummaryGraphLayersProps {
   networkOffset: NodePosition;
   networkScale: number;
@@ -41,6 +48,7 @@ interface NetworkSummaryGraphLayersProps {
   splicePlacementPreviewSegments?: SplicePlacementPreviewSegmentModel[];
   splicePlacementPreviewNode?: SplicePlacementPreviewNodeModel | null;
   renderedNodes: RenderedNodeModel[];
+  calloutObstacles?: NetworkSummaryCalloutObstacle[];
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
   inverseLabelScale: number;
@@ -88,6 +96,98 @@ function handleNetworkSegmentKeyDown(
   onSelectSegment(segmentId);
 }
 
+function resolveSegmentCalloutLeaderFrameIntersection(
+  deltaX: number,
+  deltaY: number,
+  width: number,
+  height: number
+): NodePosition {
+  const halfWidth = width / 2;
+  const halfHeight = height / 2;
+  const absDeltaX = Math.abs(deltaX);
+  const absDeltaY = Math.abs(deltaY);
+
+  if (absDeltaX < 0.0001 && absDeltaY < 0.0001) {
+    return { x: 0, y: 0 };
+  }
+
+  const scaleX = absDeltaX < 0.0001 ? Number.POSITIVE_INFINITY : halfWidth / absDeltaX;
+  const scaleY = absDeltaY < 0.0001 ? Number.POSITIVE_INFINITY : halfHeight / absDeltaY;
+  const scale = Math.min(scaleX, scaleY);
+
+  return {
+    x: deltaX * scale,
+    y: deltaY * scale
+  };
+}
+
+function resolveLineRectangleIntersectionFromStart(
+  start: NodePosition,
+  end: NodePosition,
+  obstacle: NetworkSummaryCalloutObstacle
+): NodePosition | null {
+  const minX = obstacle.centerX - obstacle.width / 2;
+  const maxX = obstacle.centerX + obstacle.width / 2;
+  const minY = obstacle.centerY - obstacle.height / 2;
+  const maxY = obstacle.centerY + obstacle.height / 2;
+  const deltaX = end.x - start.x;
+  const deltaY = end.y - start.y;
+  const candidates: Array<{ t: number; point: NodePosition }> = [];
+
+  const tryAddCandidate = (t: number, x: number, y: number) => {
+    if (t <= 0.0001 || t >= 0.9999) {
+      return;
+    }
+    if (x < minX - 0.0001 || x > maxX + 0.0001 || y < minY - 0.0001 || y > maxY + 0.0001) {
+      return;
+    }
+    candidates.push({ t, point: { x, y } });
+  };
+
+  if (Math.abs(deltaX) > 0.0001) {
+    const tAtMinX = (minX - start.x) / deltaX;
+    tryAddCandidate(tAtMinX, minX, start.y + deltaY * tAtMinX);
+    const tAtMaxX = (maxX - start.x) / deltaX;
+    tryAddCandidate(tAtMaxX, maxX, start.y + deltaY * tAtMaxX);
+  }
+  if (Math.abs(deltaY) > 0.0001) {
+    const tAtMinY = (minY - start.y) / deltaY;
+    tryAddCandidate(tAtMinY, start.x + deltaX * tAtMinY, minY);
+    const tAtMaxY = (maxY - start.y) / deltaY;
+    tryAddCandidate(tAtMaxY, start.x + deltaX * tAtMaxY, maxY);
+  }
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  candidates.sort((left, right) => left.t - right.t);
+  return candidates[0]?.point ?? null;
+}
+
+function resolveSegmentCalloutLeaderVisibleTarget(
+  frameEdge: NodePosition,
+  target: NodePosition,
+  obstacles: NetworkSummaryCalloutObstacle[]
+): NodePosition {
+  let clippedTarget = target;
+  let bestDistanceSquared = (target.x - frameEdge.x) ** 2 + (target.y - frameEdge.y) ** 2;
+
+  for (const obstacle of obstacles) {
+    const intersection = resolveLineRectangleIntersectionFromStart(frameEdge, target, obstacle);
+    if (intersection === null) {
+      continue;
+    }
+    const distanceSquared = (intersection.x - frameEdge.x) ** 2 + (intersection.y - frameEdge.y) ** 2;
+    if (distanceSquared < bestDistanceSquared) {
+      bestDistanceSquared = distanceSquared;
+      clippedTarget = intersection;
+    }
+  }
+
+  return clippedTarget;
+}
+
 export function NetworkSummaryGraphLayers({
   networkOffset,
   networkScale,
@@ -103,6 +203,7 @@ export function NetworkSummaryGraphLayers({
   splicePlacementPreviewSegments = [],
   splicePlacementPreviewNode = null,
   renderedNodes,
+  calloutObstacles = [],
   showSegmentNames,
   showSegmentLengths,
   inverseLabelScale,
@@ -421,80 +522,110 @@ export function NetworkSummaryGraphLayers({
                 </g>
               ) : null}
               {segmentCallout === null ? null : (
-                <g
-                  className="network-segment-callout-anchor"
-                  transform={`translate(${segmentCallout.anchorX} ${segmentCallout.anchorY}) scale(${inverseLabelScale})`}
-                  onMouseDown={(event) => onSegmentCalloutMouseDown(event, segmentCallout.segmentId)}
-                >
-                  <line
-                    className="network-segment-callout-leader-line"
-                    x1={segmentCallout.targetX - segmentCallout.anchorX}
-                    y1={segmentCallout.targetY - segmentCallout.anchorY}
-                    x2={0}
-                    y2={0}
-                  />
-                  <rect
-                    className="network-segment-callout-frame"
-                    x={-segmentCallout.width / 2}
-                    y={-segmentCallout.height / 2}
-                    width={segmentCallout.width}
-                    height={segmentCallout.height}
-                    rx={5}
-                    ry={5}
-                  />
-                  <line
-                    className="network-segment-callout-table-divider"
-                    x1={-segmentCallout.width / 2}
-                    y1={-segmentCallout.height / 2 + 9}
-                    x2={segmentCallout.width / 2}
-                    y2={-segmentCallout.height / 2 + 9}
-                  />
-                  <line
-                    className="network-segment-callout-table-divider"
-                    x1={-segmentCallout.width / 2}
-                    y1={-segmentCallout.height / 2 + 18}
-                    x2={segmentCallout.width / 2}
-                    y2={-segmentCallout.height / 2 + 18}
-                  />
-                  {[
-                    -segmentCallout.width / 2 + 32,
-                    -segmentCallout.width / 2 + 66,
-                    -segmentCallout.width / 2 + 110,
-                    -segmentCallout.width / 2 + 152
-                  ].map((x, index) => (
-                    <line
-                      key={`${segment.id}-callout-divider-${index}`}
-                      className="network-segment-callout-table-divider"
-                      x1={x}
-                      y1={-segmentCallout.height / 2 + 9}
-                      x2={x}
-                      y2={segmentCallout.height / 2}
-                    />
-                  ))}
-                  <text className="network-segment-callout-text network-segment-callout-route" x={-segmentCallout.width / 2 + 3} y={-6}>
-                    {segmentCallout.routeLabel}
-                  </text>
-                  {segmentCallout.headers.map((header, index) => (
-                    <text
-                      key={`${segment.id}-callout-header-${header}`}
-                      className="network-segment-callout-text network-segment-callout-header"
-                      x={[-segmentCallout.width / 2 + 3, -segmentCallout.width / 2 + 35, -segmentCallout.width / 2 + 69, -segmentCallout.width / 2 + 113, -segmentCallout.width / 2 + 155][index]}
-                      y={3}
+                (() => {
+                  const leaderDeltaX = (segmentCallout.targetX - segmentCallout.anchorX) / inverseLabelScale;
+                  const leaderDeltaY = (segmentCallout.targetY - segmentCallout.anchorY) / inverseLabelScale;
+                  const leaderFrameIntersection = resolveSegmentCalloutLeaderFrameIntersection(
+                    leaderDeltaX,
+                    leaderDeltaY,
+                    segmentCallout.width,
+                    segmentCallout.height
+                  );
+                  const leaderFrameGlobalPoint = {
+                    x: segmentCallout.anchorX + leaderFrameIntersection.x * inverseLabelScale,
+                    y: segmentCallout.anchorY + leaderFrameIntersection.y * inverseLabelScale
+                  };
+                  const leaderTargetGlobalPoint = {
+                    x: segmentCallout.targetX,
+                    y: segmentCallout.targetY
+                  };
+                  const visibleLeaderTargetGlobalPoint = resolveSegmentCalloutLeaderVisibleTarget(
+                    leaderFrameGlobalPoint,
+                    leaderTargetGlobalPoint,
+                    calloutObstacles
+                  );
+                  const visibleLeaderTargetLocalPoint = {
+                    x: (visibleLeaderTargetGlobalPoint.x - segmentCallout.anchorX) / inverseLabelScale,
+                    y: (visibleLeaderTargetGlobalPoint.y - segmentCallout.anchorY) / inverseLabelScale
+                  };
+
+                  return (
+                    <g
+                      className="network-segment-callout-anchor"
+                      transform={`translate(${segmentCallout.anchorX} ${segmentCallout.anchorY}) scale(${inverseLabelScale})`}
+                      onMouseDown={(event) => onSegmentCalloutMouseDown(event, segmentCallout.segmentId)}
                     >
-                      {header}
-                    </text>
-                  ))}
-                  {segmentCallout.values.map((value, index) => (
-                    <text
-                      key={`${segment.id}-callout-value-${index}`}
-                      className="network-segment-callout-text"
-                      x={[-segmentCallout.width / 2 + 3, -segmentCallout.width / 2 + 35, -segmentCallout.width / 2 + 69, -segmentCallout.width / 2 + 113, -segmentCallout.width / 2 + 155][index]}
-                      y={12}
-                    >
-                      {value}
-                    </text>
-                  ))}
-                </g>
+                      <line
+                        className="network-segment-callout-leader-line"
+                        x1={visibleLeaderTargetLocalPoint.x}
+                        y1={visibleLeaderTargetLocalPoint.y}
+                        x2={leaderFrameIntersection.x}
+                        y2={leaderFrameIntersection.y}
+                      />
+                      <rect
+                        className="network-segment-callout-frame"
+                        x={-segmentCallout.width / 2}
+                        y={-segmentCallout.height / 2}
+                        width={segmentCallout.width}
+                        height={segmentCallout.height}
+                        rx={5}
+                        ry={5}
+                      />
+                      <line
+                        className="network-segment-callout-table-divider"
+                        x1={-segmentCallout.width / 2}
+                        y1={-segmentCallout.height / 2 + 9}
+                        x2={segmentCallout.width / 2}
+                        y2={-segmentCallout.height / 2 + 9}
+                      />
+                      <line
+                        className="network-segment-callout-table-divider"
+                        x1={-segmentCallout.width / 2}
+                        y1={-segmentCallout.height / 2 + 18}
+                        x2={segmentCallout.width / 2}
+                        y2={-segmentCallout.height / 2 + 18}
+                      />
+                      {[
+                        -segmentCallout.width / 2 + 32,
+                        -segmentCallout.width / 2 + 66,
+                        -segmentCallout.width / 2 + 110,
+                        -segmentCallout.width / 2 + 152
+                      ].map((x, index) => (
+                        <line
+                          key={`${segment.id}-callout-divider-${index}`}
+                          className="network-segment-callout-table-divider"
+                          x1={x}
+                          y1={-segmentCallout.height / 2 + 9}
+                          x2={x}
+                          y2={segmentCallout.height / 2}
+                        />
+                      ))}
+                      <text className="network-segment-callout-text network-segment-callout-route" x={-segmentCallout.width / 2 + 3} y={-6}>
+                        {segmentCallout.routeLabel}
+                      </text>
+                      {segmentCallout.headers.map((header, index) => (
+                        <text
+                          key={`${segment.id}-callout-header-${header}`}
+                          className="network-segment-callout-text network-segment-callout-header"
+                          x={[-segmentCallout.width / 2 + 3, -segmentCallout.width / 2 + 35, -segmentCallout.width / 2 + 69, -segmentCallout.width / 2 + 113, -segmentCallout.width / 2 + 155][index]}
+                          y={3}
+                        >
+                          {header}
+                        </text>
+                      ))}
+                      {segmentCallout.values.map((value, index) => (
+                        <text
+                          key={`${segment.id}-callout-value-${index}`}
+                          className="network-segment-callout-text"
+                          x={[-segmentCallout.width / 2 + 3, -segmentCallout.width / 2 + 35, -segmentCallout.width / 2 + 69, -segmentCallout.width / 2 + 113, -segmentCallout.width / 2 + 155][index]}
+                          y={12}
+                        >
+                          {value}
+                        </text>
+                      ))}
+                    </g>
+                  );
+                })()
               )}
               {mountingLabels.map((label) => (
                 <g

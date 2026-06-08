@@ -781,6 +781,19 @@ export function NetworkSummaryPanel({
     visibleModelMaxY
   ]);
 
+  const segmentCalloutObstacles = useMemo(
+    () =>
+      renderedCableCallouts
+        .filter(({ isVisibleInViewport }) => isVisibleInViewport)
+        .map(({ callout, layout }) => ({
+          centerX: callout.position.x,
+          centerY: callout.position.y,
+          width: layout.width * inverseLabelScale,
+          height: layout.height * inverseLabelScale
+        })),
+    [renderedCableCallouts, inverseLabelScale]
+  );
+
   const renderedSegments = useMemo(
     () =>
       buildRenderedSegments({
@@ -1043,11 +1056,12 @@ export function NetworkSummaryPanel({
           visibleModelMaxY={visibleModelMaxY}
           renderedCableCallouts={renderedCableCallouts}
           renderedSegments={renderedSegments}
-          splicePlacementPreviewSegments={splicePlacementPreviewSegments}
-          splicePlacementPreviewNode={splicePlacementPreviewNode}
-          renderedNodes={renderedNodes}
-          showSegmentNames={showSegmentNames}
-          showSegmentLengths={showSegmentLengths}
+                splicePlacementPreviewSegments={splicePlacementPreviewSegments}
+                splicePlacementPreviewNode={splicePlacementPreviewNode}
+                renderedNodes={renderedNodes}
+                calloutObstacles={segmentCalloutObstacles}
+                showSegmentNames={showSegmentNames}
+                showSegmentLengths={showSegmentLengths}
           inverseLabelScale={inverseLabelScale}
           labelRotationDegrees={labelRotationDegrees}
           zoomInvariantNodeShapes={zoomInvariantNodeShapes}

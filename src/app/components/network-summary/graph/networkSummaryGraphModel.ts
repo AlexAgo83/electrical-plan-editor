@@ -286,6 +286,60 @@ function resolveCalloutBoundaryNodeIds(
   return [uniqueBoundaryNodeIds[0]!, uniqueBoundaryNodeIds[uniqueBoundaryNodeIds.length - 1]!];
 }
 
+function projectPointOntoSegment(
+  point: NodePosition,
+  start: NodePosition,
+  end: NodePosition
+): { point: NodePosition; distanceSquared: number } {
+  const vectorX = end.x - start.x;
+  const vectorY = end.y - start.y;
+  const lengthSquared = vectorX * vectorX + vectorY * vectorY;
+  if (lengthSquared <= 0.0001) {
+    const deltaX = point.x - start.x;
+    const deltaY = point.y - start.y;
+    return {
+      point: start,
+      distanceSquared: deltaX * deltaX + deltaY * deltaY
+    };
+  }
+
+  const projection =
+    ((point.x - start.x) * vectorX + (point.y - start.y) * vectorY) / lengthSquared;
+  const clampedProjection = Math.min(1, Math.max(0, projection));
+  const projectedPoint = {
+    x: start.x + vectorX * clampedProjection,
+    y: start.y + vectorY * clampedProjection
+  };
+  const deltaX = point.x - projectedPoint.x;
+  const deltaY = point.y - projectedPoint.y;
+  return {
+    point: projectedPoint,
+    distanceSquared: deltaX * deltaX + deltaY * deltaY
+  };
+}
+
+function resolveSegmentCalloutTarget(
+  componentSegments: Segment[],
+  networkNodePositions: Record<NodeId, NodePosition>,
+  anchorPosition: NodePosition
+): NodePosition | null {
+  let closestProjection: { point: NodePosition; distanceSquared: number } | null = null;
+
+  for (const componentSegment of componentSegments) {
+    const start = networkNodePositions[componentSegment.nodeA];
+    const end = networkNodePositions[componentSegment.nodeB];
+    if (start === undefined || end === undefined) {
+      continue;
+    }
+    const projection = projectPointOntoSegment(anchorPosition, start, end);
+    if (closestProjection === null || projection.distanceSquared < closestProjection.distanceSquared) {
+      closestProjection = projection;
+    }
+  }
+
+  return closestProjection?.point ?? null;
+}
+
 export function buildRenderedSegments({
   segments,
   nodes,
@@ -490,13 +544,17 @@ export function buildRenderedSegments({
     const persistedPosition = segmentById.get(anchorSegmentId)?.sheathCalloutPosition;
     const draftPosition = draftSegmentCalloutPositions[anchorSegmentId];
     const position = draftPosition ?? persistedPosition ?? defaultPosition;
+    const calloutTarget = resolveSegmentCalloutTarget(componentSegments, networkNodePositions, position) ?? {
+      x: targetX,
+      y: targetY
+    };
     segmentCalloutById.set(anchorSegmentId, {
       key: `segment-sheath:${anchorSegmentId}`,
       segmentId: anchorSegmentId,
       anchorX: position.x,
       anchorY: position.y,
-      targetX,
-      targetY,
+      targetX: calloutTarget.x,
+      targetY: calloutTarget.y,
       width: SEGMENT_SHEATH_CALLOUT_WIDTH,
       height: SEGMENT_SHEATH_CALLOUT_HEIGHT,
       routeLabel: `Route: ${boundaryLabelA} to ${boundaryLabelB}`,
