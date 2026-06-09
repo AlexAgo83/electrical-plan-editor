@@ -3,6 +3,12 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .connector-modeling-list-actions {
+    grid-template-columns: repeat(5, minmax(max-content, 1fr));
+    overflow-x: auto;
+    align-items: stretch;
+  }
+
   .catalog-modeling-list-actions {
     grid-template-columns: repeat(4, minmax(max-content, 1fr));
     overflow-x: auto;

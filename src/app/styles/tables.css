@@ -366,6 +366,14 @@
   width: 100%;
 }
 
+.connector-modeling-list-actions {
+  grid-template-columns: repeat(5, minmax(max-content, 1fr));
+}
+
+.connector-modeling-list-actions button {
+  white-space: nowrap;
+}
+
 .catalog-modeling-list-actions {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }

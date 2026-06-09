@@ -527,7 +527,7 @@ export function ModelingPrimaryTables({
             <TableEntryCountFooter count={sortedVisibleConnectors.length} />
           </>
         )}
-        <div className="row-actions compact modeling-list-actions">
+        <div className="row-actions compact modeling-list-actions connector-modeling-list-actions">
           {isConnectorBatchMode ? (
             <>
               <button
