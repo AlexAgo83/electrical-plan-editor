@@ -1,11 +1,21 @@
 import type { FormEvent } from "react";
-import type { CatalogItem, Connector, NetworkNode, Splice, WireEndpoint, WireMaterial } from "../../../core/entities";
+import type {
+  CatalogItem,
+  Connector,
+  NetworkNode,
+  Splice,
+  WireEndpoint,
+  WireMaterial,
+} from "../../../core/entities";
 import type { DirectionalSpliceSide } from "../../../core/directionalSplice";
 import type { DeleteDependencySummaryCategory } from "../../../store/deleteImpact";
 import type { SplicePortMode } from "../../../core/splicePortMode";
 import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
 import type { WireEndpointSlotHint } from "../../hooks/wireEndpointFormHelpers";
-import type { ConnectorFusePairOverrideDrafts, ConnectorFusePairRatingDrafts } from "../../hooks/connectorFusePairRatings";
+import type {
+  ConnectorFusePairOverrideDrafts,
+  ConnectorFusePairRatingDrafts,
+} from "../../hooks/connectorFusePairRatings";
 import type { ConnectorPinElectricalRoleDrafts } from "../../hooks/connectorPinElectricalRoles";
 
 export interface ModelingSegmentBatchEditState {
@@ -13,8 +23,12 @@ export interface ModelingSegmentBatchEditState {
   insulation: string;
   lineStyle: string;
   internalPartReference: string;
-  dirtyFields: ReadonlySet<"sheathType" | "insulation" | "lineStyle" | "internalPartReference">;
-  mixedFields: ReadonlySet<"sheathType" | "insulation" | "lineStyle" | "internalPartReference">;
+  dirtyFields: ReadonlySet<
+    "sheathType" | "insulation" | "lineStyle" | "internalPartReference"
+  >;
+  mixedFields: ReadonlySet<
+    "sheathType" | "insulation" | "lineStyle" | "internalPartReference"
+  >;
   error: string | null;
   setSheathType: (value: string) => void;
   setInsulation: (value: string) => void;
@@ -51,14 +65,20 @@ export interface ModelingFormsColumnProps {
   connectorFusePairRatings: ConnectorFusePairRatingDrafts;
   setConnectorFusePairRatings: (value: ConnectorFusePairRatingDrafts) => void;
   connectorFusePairOverrides: ConnectorFusePairOverrideDrafts;
-  setConnectorFusePairOverrides: (value: ConnectorFusePairOverrideDrafts) => void;
+  setConnectorFusePairOverrides: (
+    value: ConnectorFusePairOverrideDrafts,
+  ) => void;
   connectorPinElectricalRoleDrafts: ConnectorPinElectricalRoleDrafts;
-  setConnectorPinElectricalRoleDrafts: (value: ConnectorPinElectricalRoleDrafts) => void;
+  setConnectorPinElectricalRoleDrafts: (
+    value: ConnectorPinElectricalRoleDrafts,
+  ) => void;
   connectorPinElectricalRoleSelection: number[];
   setConnectorPinElectricalRoleSelection: (value: number[]) => void;
   connectorPinRoleCatalogItem: CatalogItem | undefined;
   connectorRearBackshellOverrideEnabled: "inherit" | "enabled" | "disabled";
-  setConnectorRearBackshellOverrideEnabled: (value: "inherit" | "enabled" | "disabled") => void;
+  setConnectorRearBackshellOverrideEnabled: (
+    value: "inherit" | "enabled" | "disabled",
+  ) => void;
   connectorRearBackshellOverrideLengthMm: string;
   setConnectorRearBackshellOverrideLengthMm: (value: string) => void;
   connectorAutoCreateLinkedNode: boolean;
@@ -200,7 +220,9 @@ export interface ModelingFormsColumnProps {
   wireEndpointAPortIndex: string;
   setWireEndpointAPortIndex: (value: string) => void;
   wireEndpointASpliceSideOverride: DirectionalSpliceSide | "auto";
-  setWireEndpointASpliceSideOverride: (value: DirectionalSpliceSide | "auto") => void;
+  setWireEndpointASpliceSideOverride: (
+    value: DirectionalSpliceSide | "auto",
+  ) => void;
   wireEndpointASpliceSideLocked: boolean;
   setWireEndpointASpliceSideLocked: (value: boolean) => void;
   wireEndpointASlotHint: WireEndpointSlotHint | null;
@@ -223,24 +245,26 @@ export interface ModelingFormsColumnProps {
   wireEndpointBPortIndex: string;
   setWireEndpointBPortIndex: (value: string) => void;
   wireEndpointBSpliceSideOverride: DirectionalSpliceSide | "auto";
-  setWireEndpointBSpliceSideOverride: (value: DirectionalSpliceSide | "auto") => void;
+  setWireEndpointBSpliceSideOverride: (
+    value: DirectionalSpliceSide | "auto",
+  ) => void;
   wireEndpointBSpliceSideLocked: boolean;
   setWireEndpointBSpliceSideLocked: (value: boolean) => void;
   wireEndpointBSlotHint: WireEndpointSlotHint | null;
   cancelWireEdit: () => void;
   wireFormError: string | null;
-  modelingBatchSelection:
-    | {
-        scope: ModelingBatchSelectionScope;
-        selectedCount: number;
-        directCount: number;
-        cascadeCount: number;
-        blockedCount: number;
-        summaryCategories: DeleteDependencySummaryCategory[];
-        summaryNote?: string;
-        onDeleteSelected: () => void;
-        onCancelBatchMode: () => void;
-        segmentBatchEdit?: ModelingSegmentBatchEditState;
-      }
-    | null;
+  modelingBatchSelection: {
+    isDialogOpen: boolean;
+    scope: ModelingBatchSelectionScope;
+    selectedCount: number;
+    directCount: number;
+    cascadeCount: number;
+    blockedCount: number;
+    summaryCategories: DeleteDependencySummaryCategory[];
+    summaryNote?: string;
+    onDeleteSelected: () => void;
+    onCancelBatchMode: () => void;
+    onCloseDialog: () => void;
+    segmentBatchEdit?: ModelingSegmentBatchEditState;
+  } | null;
 }

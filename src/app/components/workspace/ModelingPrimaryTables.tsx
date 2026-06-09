@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
-import { focusElementWithoutScroll, sortByTableColumns } from "../../lib/app-utils-shared";
+import {
+  focusElementWithoutScroll,
+  sortByTableColumns,
+} from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import { resolveSplicePortMode } from "../../../core/splicePortMode";
@@ -13,7 +16,7 @@ import type {
   NetworkNode,
   NodeId,
   Splice,
-  SpliceId
+  SpliceId,
 } from "../../../core/entities";
 import type { SortDirection } from "../../types/app-controller";
 import { EntityReferenceButton } from "./EntityReferenceButton";
@@ -27,6 +30,7 @@ export function ModelingPrimaryTables({
   onExitBatchMode,
   onToggleBatchSelection,
   onSetBatchSelectionForVisible,
+  onOpenBatchSelectionDialog,
   onDeleteSelectedInBatchMode,
   isConnectorSubScreen,
   connectorFormMode,
@@ -87,32 +91,62 @@ export function ModelingPrimaryTables({
   describeNode,
   onEditNode,
   onDeleteNode,
-  onOpenNodeOnboardingHelp
+  onOpenNodeOnboardingHelp,
 }: ModelingPrimaryTablesProps): ReactElement {
-  type ConnectorTableSortField = "name" | "technicalId" | "manufacturerReference" | "cavityCount" | "occupiedCount";
-  type SpliceTableSortField = "name" | "technicalId" | "manufacturerReference" | "portCount" | "branchCount";
+  type ConnectorTableSortField =
+    | "name"
+    | "technicalId"
+    | "manufacturerReference"
+    | "cavityCount"
+    | "occupiedCount";
+  type SpliceTableSortField =
+    | "name"
+    | "technicalId"
+    | "manufacturerReference"
+    | "portCount"
+    | "branchCount";
   type NodeTableSortField = "id" | "kind" | "reference" | "linkedSegments";
-  const connectorRowRefs = useRef<Partial<Record<ConnectorId, HTMLTableRowElement | null>>>({});
-  const spliceRowRefs = useRef<Partial<Record<SpliceId, HTMLTableRowElement | null>>>({});
-  const nodeRowRefs = useRef<Partial<Record<NodeId, HTMLTableRowElement | null>>>({});
+  const connectorRowRefs = useRef<
+    Partial<Record<ConnectorId, HTMLTableRowElement | null>>
+  >({});
+  const spliceRowRefs = useRef<
+    Partial<Record<SpliceId, HTMLTableRowElement | null>>
+  >({});
+  const nodeRowRefs = useRef<
+    Partial<Record<NodeId, HTMLTableRowElement | null>>
+  >({});
   const lastAutoFocusedConnectorIdRef = useRef<ConnectorId | null>(null);
   const lastAutoFocusedSpliceIdRef = useRef<SpliceId | null>(null);
   const lastAutoFocusedNodeIdRef = useRef<NodeId | null>(null);
   const isMobileViewport = useIsMobileViewport();
-  const previousConnectorFormModeRef = useRef<typeof connectorFormMode>(connectorFormMode);
-  const previousSpliceFormModeRef = useRef<typeof spliceFormMode>(spliceFormMode);
+  const previousConnectorFormModeRef =
+    useRef<typeof connectorFormMode>(connectorFormMode);
+  const previousSpliceFormModeRef =
+    useRef<typeof spliceFormMode>(spliceFormMode);
   const previousNodeFormModeRef = useRef<typeof nodeFormMode>(nodeFormMode);
   const isConnectorBatchMode = activeBatchScope === "connector";
   const isSpliceBatchMode = activeBatchScope === "splice";
   const isNodeBatchMode = activeBatchScope === "node";
   const focusedConnector =
-    selectedConnectorId === null ? null : (visibleConnectors.find((connector) => connector.id === selectedConnectorId) ?? null);
+    selectedConnectorId === null
+      ? null
+      : (visibleConnectors.find(
+          (connector) => connector.id === selectedConnectorId,
+        ) ?? null);
   const focusedSplice =
-    selectedSpliceId === null ? null : (visibleSplices.find((splice) => splice.id === selectedSpliceId) ?? null);
+    selectedSpliceId === null
+      ? null
+      : (visibleSplices.find((splice) => splice.id === selectedSpliceId) ??
+        null);
   const focusedNode =
-    selectedNodeId === null ? null : (visibleNodes.find((node) => node.id === selectedNodeId) ?? null);
+    selectedNodeId === null
+      ? null
+      : (visibleNodes.find((node) => node.id === selectedNodeId) ?? null);
   const showNodeKindColumn = nodeKindFilter === "all";
-  const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
+  const catalogItemById = useMemo(
+    () => new Map(catalogItems.map((item) => [item.id, item] as const)),
+    [catalogItems],
+  );
   const connectorFilterPlaceholder =
     connectorFilterField === "name"
       ? "Connector name"
@@ -133,17 +167,26 @@ export function ModelingPrimaryTables({
         : nodeFilterField === "reference"
           ? "Reference"
           : "ID, kind, reference...";
-  const [connectorTableSort, setConnectorTableSort] = useState<{ field: ConnectorTableSortField; direction: SortDirection }>({
+  const [connectorTableSort, setConnectorTableSort] = useState<{
+    field: ConnectorTableSortField;
+    direction: SortDirection;
+  }>({
     field: "name",
-    direction: "asc"
+    direction: "asc",
   });
-  const [spliceTableSort, setSpliceTableSort] = useState<{ field: SpliceTableSortField; direction: SortDirection }>({
+  const [spliceTableSort, setSpliceTableSort] = useState<{
+    field: SpliceTableSortField;
+    direction: SortDirection;
+  }>({
     field: "name",
-    direction: "asc"
+    direction: "asc",
   });
-  const [nodeTableSort, setNodeTableSort] = useState<{ field: NodeTableSortField; direction: SortDirection }>({
+  const [nodeTableSort, setNodeTableSort] = useState<{
+    field: NodeTableSortField;
+    direction: SortDirection;
+  }>({
     field: "id",
-    direction: "asc"
+    direction: "asc",
   });
   const [isPinRoleMassEditOpen, setIsPinRoleMassEditOpen] = useState(false);
   const openCreateConnectorAndScroll = () => {
@@ -171,14 +214,18 @@ export function ModelingPrimaryTables({
     scrollToFormPanel(FORM_PANEL_IDS.node);
   };
   useEffect(() => {
-    if (connectorSort.field !== "name" && connectorSort.field !== "technicalId") {
+    if (
+      connectorSort.field !== "name" &&
+      connectorSort.field !== "technicalId"
+    ) {
       return;
     }
     const nextField: ConnectorTableSortField = connectorSort.field;
     setConnectorTableSort((current) =>
-      current.field === nextField && current.direction === connectorSort.direction
+      current.field === nextField &&
+      current.direction === connectorSort.direction
         ? current
-        : { field: nextField, direction: connectorSort.direction }
+        : { field: nextField, direction: connectorSort.direction },
     );
   }, [connectorSort]);
   useEffect(() => {
@@ -189,14 +236,14 @@ export function ModelingPrimaryTables({
     setSpliceTableSort((current) =>
       current.field === nextField && current.direction === spliceSort.direction
         ? current
-        : { field: nextField, direction: spliceSort.direction }
+        : { field: nextField, direction: spliceSort.direction },
     );
   }, [spliceSort]);
   useEffect(() => {
     setNodeTableSort((current) =>
       current.field === "id" && current.direction === nodeIdSortDirection
         ? current
-        : { field: "id", direction: nodeIdSortDirection }
+        : { field: "id", direction: nodeIdSortDirection },
     );
   }, [nodeIdSortDirection]);
   const sortedVisibleConnectors = useMemo(
@@ -207,13 +254,14 @@ export function ModelingPrimaryTables({
         (connector, field) => {
           if (field === "name") return connector.name;
           if (field === "technicalId") return connector.technicalId;
-          if (field === "manufacturerReference") return connector.manufacturerReference;
+          if (field === "manufacturerReference")
+            return connector.manufacturerReference;
           if (field === "cavityCount") return connector.cavityCount;
           return connectorOccupiedCountById.get(connector.id) ?? 0;
         },
-        (connector) => connector.id
+        (connector) => connector.id,
       ),
-    [connectorOccupiedCountById, connectorTableSort, visibleConnectors]
+    [connectorOccupiedCountById, connectorTableSort, visibleConnectors],
   );
   const sortedVisibleSplices = useMemo(
     () =>
@@ -223,13 +271,17 @@ export function ModelingPrimaryTables({
         (splice, field) => {
           if (field === "name") return splice.name;
           if (field === "technicalId") return splice.technicalId;
-          if (field === "manufacturerReference") return splice.manufacturerReference;
-          if (field === "portCount") return resolveSplicePortMode(splice) === "unbounded" ? Number.POSITIVE_INFINITY : splice.portCount;
+          if (field === "manufacturerReference")
+            return splice.manufacturerReference;
+          if (field === "portCount")
+            return resolveSplicePortMode(splice) === "unbounded"
+              ? Number.POSITIVE_INFINITY
+              : splice.portCount;
           return spliceOccupiedCountById.get(splice.id) ?? 0;
         },
-        (splice) => splice.id
+        (splice) => splice.id,
       ),
-    [spliceOccupiedCountById, spliceTableSort, visibleSplices]
+    [spliceOccupiedCountById, spliceTableSort, visibleSplices],
   );
   const sortedVisibleNodes = useMemo(
     () =>
@@ -242,28 +294,54 @@ export function ModelingPrimaryTables({
           if (field === "reference") return describeNode(node);
           return segmentsCountByNodeId.get(node.id) ?? 0;
         },
-        (node) => node.id
+        (node) => node.id,
       ),
-    [describeNode, nodeTableSort, segmentsCountByNodeId, visibleNodes]
+    [describeNode, nodeTableSort, segmentsCountByNodeId, visibleNodes],
   );
-  const visibleConnectorIds = useMemo(() => sortedVisibleConnectors.map((connector) => connector.id), [sortedVisibleConnectors]);
-  const visibleSpliceIds = useMemo(() => sortedVisibleSplices.map((splice) => splice.id), [sortedVisibleSplices]);
-  const visibleNodeIds = useMemo(() => sortedVisibleNodes.map((node) => node.id), [sortedVisibleNodes]);
+  const visibleConnectorIds = useMemo(
+    () => sortedVisibleConnectors.map((connector) => connector.id),
+    [sortedVisibleConnectors],
+  );
+  const visibleSpliceIds = useMemo(
+    () => sortedVisibleSplices.map((splice) => splice.id),
+    [sortedVisibleSplices],
+  );
+  const visibleNodeIds = useMemo(
+    () => sortedVisibleNodes.map((node) => node.id),
+    [sortedVisibleNodes],
+  );
   const allVisibleConnectorsSelected =
-    visibleConnectorIds.length > 0 && visibleConnectorIds.every((connectorId) => batchSelectionIds.has(connectorId));
+    visibleConnectorIds.length > 0 &&
+    visibleConnectorIds.every((connectorId) =>
+      batchSelectionIds.has(connectorId),
+    );
   const allVisibleSplicesSelected =
-    visibleSpliceIds.length > 0 && visibleSpliceIds.every((spliceId) => batchSelectionIds.has(spliceId));
+    visibleSpliceIds.length > 0 &&
+    visibleSpliceIds.every((spliceId) => batchSelectionIds.has(spliceId));
   const allVisibleNodesSelected =
-    visibleNodeIds.length > 0 && visibleNodeIds.every((nodeId) => batchSelectionIds.has(nodeId));
+    visibleNodeIds.length > 0 &&
+    visibleNodeIds.every((nodeId) => batchSelectionIds.has(nodeId));
   const selectedConnectorBatchCount = batchSelectionIds.size;
   const selectedSpliceBatchCount = batchSelectionIds.size;
   const selectedNodeBatchCount = batchSelectionIds.size;
   const connectorSortIndicator = (field: ConnectorTableSortField) =>
-    connectorTableSort.field === field ? (connectorTableSort.direction === "asc" ? "▲" : "▼") : "";
+    connectorTableSort.field === field
+      ? connectorTableSort.direction === "asc"
+        ? "▲"
+        : "▼"
+      : "";
   const spliceSortIndicator = (field: SpliceTableSortField) =>
-    spliceTableSort.field === field ? (spliceTableSort.direction === "asc" ? "▲" : "▼") : "";
+    spliceTableSort.field === field
+      ? spliceTableSort.direction === "asc"
+        ? "▲"
+        : "▼"
+      : "";
   const nodeSortIndicator = (field: NodeTableSortField) =>
-    nodeTableSort.field === field ? (nodeTableSort.direction === "asc" ? "▲" : "▼") : "";
+    nodeTableSort.field === field
+      ? nodeTableSort.direction === "asc"
+        ? "▲"
+        : "▼"
+      : "";
 
   useEffect(() => {
     if (connectorFormMode !== "edit" || selectedConnectorId === null) {
@@ -322,7 +400,11 @@ export function ModelingPrimaryTables({
   useEffect(() => {
     const previousMode = previousConnectorFormModeRef.current;
     previousConnectorFormModeRef.current = connectorFormMode;
-    if (previousMode !== "edit" || connectorFormMode !== "create" || selectedConnectorId === null) {
+    if (
+      previousMode !== "edit" ||
+      connectorFormMode !== "create" ||
+      selectedConnectorId === null
+    ) {
       return;
     }
     if (typeof window === "undefined") {
@@ -337,7 +419,11 @@ export function ModelingPrimaryTables({
   useEffect(() => {
     const previousMode = previousSpliceFormModeRef.current;
     previousSpliceFormModeRef.current = spliceFormMode;
-    if (previousMode !== "edit" || spliceFormMode !== "create" || selectedSpliceId === null) {
+    if (
+      previousMode !== "edit" ||
+      spliceFormMode !== "create" ||
+      selectedSpliceId === null
+    ) {
       return;
     }
     if (typeof window === "undefined") {
@@ -352,7 +438,11 @@ export function ModelingPrimaryTables({
   useEffect(() => {
     const previousMode = previousNodeFormModeRef.current;
     previousNodeFormModeRef.current = nodeFormMode;
-    if (previousMode !== "edit" || nodeFormMode !== "create" || selectedNodeId === null) {
+    if (
+      previousMode !== "edit" ||
+      nodeFormMode !== "create" ||
+      selectedNodeId === null
+    ) {
       return;
     }
     if (typeof window === "undefined") {
@@ -366,7 +456,11 @@ export function ModelingPrimaryTables({
 
   return (
     <>
-      <article className="panel" hidden={!isConnectorSubScreen} data-onboarding-panel="modeling-connectors">
+      <article
+        className="panel"
+        hidden={!isConnectorSubScreen}
+        data-onboarding-panel="modeling-connectors"
+      >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Connectors</h2>
           <div className="list-panel-header-tools">
@@ -383,8 +477,8 @@ export function ModelingPrimaryTables({
                       connector.technicalId,
                       connector.manufacturerReference ?? "",
                       connector.cavityCount,
-                      connectorOccupiedCountById.get(connector.id) ?? 0
-                    ])
+                      connectorOccupiedCountById.get(connector.id) ?? 0,
+                    ]),
                   )
                 }
                 disabled={sortedVisibleConnectors.length === 0}
@@ -398,30 +492,54 @@ export function ModelingPrimaryTables({
                   className="filter-chip onboarding-help-button"
                   onClick={onOpenConnectorOnboardingHelp}
                 >
-                  <span className="action-button-icon is-help" aria-hidden="true" />
+                  <span
+                    className="action-button-icon is-help"
+                    aria-hidden="true"
+                  />
                   <span>Help</span>
                 </button>
               ) : null}
             </div>
             <div className="list-panel-header-tools-row is-filter-row">
-              <div className="chip-group list-panel-filters" role="group" aria-label="Connector occupancy filter">
-                {([
-                  ["all", "All"],
-                  ["occupied", "Occupied"],
-                  ["free", "Free"]
-                ] as const).map(([filterId, label]) => (
-                  <button key={filterId} type="button" className={connectorOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setConnectorOccupancyFilter(filterId)}>{label}</button>
+              <div
+                className="chip-group list-panel-filters"
+                role="group"
+                aria-label="Connector occupancy filter"
+              >
+                {(
+                  [
+                    ["all", "All"],
+                    ["occupied", "Occupied"],
+                    ["free", "Free"],
+                  ] as const
+                ).map(([filterId, label]) => (
+                  <button
+                    key={filterId}
+                    type="button"
+                    className={
+                      connectorOccupancyFilter === filterId
+                        ? "filter-chip is-active"
+                        : "filter-chip"
+                    }
+                    onClick={() => setConnectorOccupancyFilter(filterId)}
+                  >
+                    {label}
+                  </button>
                 ))}
               </div>
               <TableFilterBar
                 label="Filter"
                 fieldLabel="Connector filter field"
                 fieldValue={connectorFilterField}
-                onFieldChange={(value) => setConnectorFilterField(value as "name" | "technicalId" | "any")}
+                onFieldChange={(value) =>
+                  setConnectorFilterField(
+                    value as "name" | "technicalId" | "any",
+                  )
+                }
                 fieldOptions={[
                   { value: "name", label: "Name" },
                   { value: "technicalId", label: "Technical ID" },
-                  { value: "any", label: "Any" }
+                  { value: "any", label: "Any" },
                 ]}
                 queryValue={connectorFilterQuery}
                 onQueryChange={setConnectorFilterQuery}
@@ -434,94 +552,255 @@ export function ModelingPrimaryTables({
           <p className="empty-copy">No connector yet.</p>
         ) : sortedVisibleConnectors.length === 0 ? (
           <>
-            <p className="empty-copy">No connector matches the current filters.</p>
+            <p className="empty-copy">
+              No connector matches the current filters.
+            </p>
             <TableEntryCountFooter count={0} />
           </>
         ) : (
           <>
             <table className="data-table">
               <thead>
-              <tr>
-                {isConnectorBatchMode ? (
-                  <th>
-                    <input
-                      type="checkbox"
-                      aria-label="Select all visible connectors"
-                      checked={allVisibleConnectorsSelected}
-                      onChange={() => onSetBatchSelectionForVisible("connector", visibleConnectorIds)}
-                    />
+                <tr>
+                  {isConnectorBatchMode ? (
+                    <th>
+                      <input
+                        type="checkbox"
+                        aria-label="Select all visible connectors"
+                        checked={allVisibleConnectorsSelected}
+                        onChange={() =>
+                          onSetBatchSelectionForVisible(
+                            "connector",
+                            visibleConnectorIds,
+                          )
+                        }
+                      />
+                    </th>
+                  ) : null}
+                  <th aria-sort={getTableAriaSort(connectorTableSort, "name")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => {
+                        setConnectorTableSort((current) => ({
+                          field: "name",
+                          direction:
+                            current.field === "name" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                        setConnectorSort((current) => ({
+                          field: "name",
+                          direction:
+                            current.field === "name" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                      }}
+                    >
+                      Name{" "}
+                      <span className="sort-indicator">
+                        {connectorSortIndicator("name")}
+                      </span>
+                    </button>
                   </th>
-                ) : null}
-                <th aria-sort={getTableAriaSort(connectorTableSort, "name")}><button type="button" className="sort-header-button" onClick={() => { setConnectorTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); setConnectorSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{connectorSortIndicator("name")}</span></button></th>
-                <th aria-sort={getTableAriaSort(connectorTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setConnectorTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); setConnectorSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{connectorSortIndicator("technicalId")}</span></button></th>
-                <th aria-sort={getTableAriaSort(connectorTableSort, "manufacturerReference")}><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{connectorSortIndicator("manufacturerReference")}</span></button></th>
-                <th aria-sort={getTableAriaSort(connectorTableSort, "cavityCount")}><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "cavityCount", direction: current.field === "cavityCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ways <span className="sort-indicator">{connectorSortIndicator("cavityCount")}</span></button></th>
-                <th aria-sort={getTableAriaSort(connectorTableSort, "occupiedCount")}><button type="button" className="sort-header-button" onClick={() => setConnectorTableSort((current) => ({ field: "occupiedCount", direction: current.field === "occupiedCount" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Occup." : "Occupied"} <span className="sort-indicator">{connectorSortIndicator("occupiedCount")}</span></button></th>
-              </tr>
+                  <th
+                    aria-sort={getTableAriaSort(
+                      connectorTableSort,
+                      "technicalId",
+                    )}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => {
+                        setConnectorTableSort((current) => ({
+                          field: "technicalId",
+                          direction:
+                            current.field === "technicalId" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                        setConnectorSort((current) => ({
+                          field: "technicalId",
+                          direction:
+                            current.field === "technicalId" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                      }}
+                    >
+                      {isMobileViewport ? "ID" : "Technical ID"}{" "}
+                      <span className="sort-indicator">
+                        {connectorSortIndicator("technicalId")}
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-sort={getTableAriaSort(
+                      connectorTableSort,
+                      "manufacturerReference",
+                    )}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setConnectorTableSort((current) => ({
+                          field: "manufacturerReference",
+                          direction:
+                            current.field === "manufacturerReference" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      Mfr Ref{" "}
+                      <span className="sort-indicator">
+                        {connectorSortIndicator("manufacturerReference")}
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-sort={getTableAriaSort(
+                      connectorTableSort,
+                      "cavityCount",
+                    )}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setConnectorTableSort((current) => ({
+                          field: "cavityCount",
+                          direction:
+                            current.field === "cavityCount" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      Ways{" "}
+                      <span className="sort-indicator">
+                        {connectorSortIndicator("cavityCount")}
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-sort={getTableAriaSort(
+                      connectorTableSort,
+                      "occupiedCount",
+                    )}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setConnectorTableSort((current) => ({
+                          field: "occupiedCount",
+                          direction:
+                            current.field === "occupiedCount" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      {isMobileViewport ? "Occup." : "Occupied"}{" "}
+                      <span className="sort-indicator">
+                        {connectorSortIndicator("occupiedCount")}
+                      </span>
+                    </button>
+                  </th>
+                </tr>
               </thead>
               <tbody>
-              {sortedVisibleConnectors.map((connector) => {
-                const occupiedCount = connectorOccupiedCountById.get(connector.id) ?? 0;
-                const isFocused = focusedConnector?.id === connector.id;
-                const isBatchSelected = batchSelectionIds.has(connector.id);
-                const linkedCatalogItemId = connector.catalogItemId;
-                const linkedCatalogItem = linkedCatalogItemId === undefined ? undefined : catalogItemById.get(linkedCatalogItemId);
-                return (
-                  <tr
-                    key={connector.id}
-                    ref={(element) => {
-                      connectorRowRefs.current[connector.id] = element;
-                    }}
-                    className={isConnectorBatchMode ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row` : isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
-                    aria-selected={isConnectorBatchMode ? isBatchSelected : isFocused}
-                    tabIndex={0}
-                    onClick={() =>
-                      isConnectorBatchMode
-                        ? onToggleBatchSelection("connector", connector.id)
-                        : onEditConnector(connector)
-                    }
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        if (isConnectorBatchMode) {
-                          onToggleBatchSelection("connector", connector.id);
-                          return;
-                        }
-                        onEditConnector(connector);
+                {sortedVisibleConnectors.map((connector) => {
+                  const occupiedCount =
+                    connectorOccupiedCountById.get(connector.id) ?? 0;
+                  const isFocused = focusedConnector?.id === connector.id;
+                  const isBatchSelected = batchSelectionIds.has(connector.id);
+                  const linkedCatalogItemId = connector.catalogItemId;
+                  const linkedCatalogItem =
+                    linkedCatalogItemId === undefined
+                      ? undefined
+                      : catalogItemById.get(linkedCatalogItemId);
+                  return (
+                    <tr
+                      key={connector.id}
+                      ref={(element) => {
+                        connectorRowRefs.current[connector.id] = element;
+                      }}
+                      className={
+                        isConnectorBatchMode
+                          ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row`
+                          : isFocused
+                            ? "is-selected is-focusable-row"
+                            : "is-focusable-row"
                       }
-                    }}
-                  >
-                    {isConnectorBatchMode ? (
-                      <td>
-                        <input
-                          type="checkbox"
-                          aria-label={`Select connector ${connector.technicalId}`}
-                          checked={isBatchSelected}
-                          onChange={() => onToggleBatchSelection("connector", connector.id)}
-                          onClick={(event) => event.stopPropagation()}
-                        />
+                      aria-selected={
+                        isConnectorBatchMode ? isBatchSelected : isFocused
+                      }
+                      tabIndex={0}
+                      onClick={() =>
+                        isConnectorBatchMode
+                          ? onToggleBatchSelection("connector", connector.id)
+                          : onEditConnector(connector)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          if (isConnectorBatchMode) {
+                            onToggleBatchSelection("connector", connector.id);
+                            return;
+                          }
+                          onEditConnector(connector);
+                        }
+                      }}
+                    >
+                      {isConnectorBatchMode ? (
+                        <td>
+                          <input
+                            type="checkbox"
+                            aria-label={`Select connector ${connector.technicalId}`}
+                            checked={isBatchSelected}
+                            onChange={() =>
+                              onToggleBatchSelection("connector", connector.id)
+                            }
+                            onClick={(event) => event.stopPropagation()}
+                          />
+                        </td>
+                      ) : null}
+                      <td>{connector.name}</td>
+                      <td className="technical-id">{connector.technicalId}</td>
+                      <td className="technical-id">
+                        {linkedCatalogItemId !== undefined &&
+                        linkedCatalogItem !== undefined ? (
+                          <EntityReferenceButton
+                            className="technical-id"
+                            title={`Open catalog item ${connector.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
+                            onClick={() =>
+                              onSelectCatalogItem(linkedCatalogItemId)
+                            }
+                          >
+                            {connector.manufacturerReference ??
+                              linkedCatalogItem.manufacturerReference}
+                          </EntityReferenceButton>
+                        ) : (
+                          (connector.manufacturerReference ?? "")
+                        )}
                       </td>
-                    ) : null}
-                    <td>{connector.name}</td>
-                    <td className="technical-id">{connector.technicalId}</td>
-                    <td className="technical-id">
-                      {linkedCatalogItemId !== undefined && linkedCatalogItem !== undefined ? (
-                        <EntityReferenceButton
-                          className="technical-id"
-                          title={`Open catalog item ${connector.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
-                          onClick={() => onSelectCatalogItem(linkedCatalogItemId)}
-                        >
-                          {connector.manufacturerReference ?? linkedCatalogItem.manufacturerReference}
-                        </EntityReferenceButton>
-                      ) : (
-                        connector.manufacturerReference ?? ""
-                      )}
-                    </td>
-                    <td>{connector.cavityCount}</td>
-                    <td>{occupiedCount}</td>
-                  </tr>
-                );
-              })}
+                      <td>{connector.cavityCount}</td>
+                      <td>{occupiedCount}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
             <TableEntryCountFooter count={sortedVisibleConnectors.length} />
@@ -532,59 +811,107 @@ export function ModelingPrimaryTables({
             <>
               <button
                 type="button"
+                className="button-with-icon"
+                onClick={onOpenBatchSelectionDialog}
+                disabled={selectedConnectorBatchCount === 0}
+              >
+                Open batch
+                {selectedConnectorBatchCount > 0
+                  ? ` (${selectedConnectorBatchCount})`
+                  : ""}
+              </button>
+              <button
+                type="button"
                 className="modeling-list-action-delete button-with-icon"
                 onClick={onDeleteSelectedInBatchMode}
                 disabled={selectedConnectorBatchCount === 0}
               >
-                <span className="action-button-icon is-delete" aria-hidden="true" />
-                Delete selected{selectedConnectorBatchCount > 0 ? ` (${selectedConnectorBatchCount})` : ""}
+                <span
+                  className="action-button-icon is-delete"
+                  aria-hidden="true"
+                />
+                Delete selected
+                {selectedConnectorBatchCount > 0
+                  ? ` (${selectedConnectorBatchCount})`
+                  : ""}
               </button>
-              <button type="button" className="button-with-icon" onClick={onExitBatchMode}>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={onExitBatchMode}
+              >
                 Cancel selection
               </button>
             </>
           ) : (
             <>
-            <button type="button" className="button-with-icon" onClick={openCreateConnectorAndScroll}>
-            <span className="action-button-icon is-new" aria-hidden="true" />
-            New
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => focusedConnector !== null && openEditConnectorAndScroll(focusedConnector)}
-            disabled={focusedConnector === null}
-          >
-            <span className="action-button-icon is-edit" aria-hidden="true" />
-            Edit
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => onEnterBatchMode("connector")}
-            disabled={sortedVisibleConnectors.length === 0}
-          >
-            <span className="action-button-icon is-multi-select" aria-hidden="true" />
-            {isMobileViewport ? "Select" : "Select multiple"}
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => setIsPinRoleMassEditOpen(true)}
-            disabled={connectors.length === 0}
-          >
-            <span className="action-button-icon is-edit" aria-hidden="true" />
-            Mass edit
-          </button>
-          <button
-            type="button"
-            className="modeling-list-action-delete button-with-icon"
-            onClick={() => focusedConnector !== null && onDeleteConnector(focusedConnector.id)}
-            disabled={focusedConnector === null || connectorFormMode === "create"}
-          >
-            <span className="action-button-icon is-delete" aria-hidden="true" />
-            Delete
-          </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={openCreateConnectorAndScroll}
+              >
+                <span
+                  className="action-button-icon is-new"
+                  aria-hidden="true"
+                />
+                New
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() =>
+                  focusedConnector !== null &&
+                  openEditConnectorAndScroll(focusedConnector)
+                }
+                disabled={focusedConnector === null}
+              >
+                <span
+                  className="action-button-icon is-edit"
+                  aria-hidden="true"
+                />
+                Edit
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() => onEnterBatchMode("connector")}
+                disabled={sortedVisibleConnectors.length === 0}
+              >
+                <span
+                  className="action-button-icon is-multi-select"
+                  aria-hidden="true"
+                />
+                {isMobileViewport ? "Select" : "Select multiple"}
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() => setIsPinRoleMassEditOpen(true)}
+                disabled={connectors.length === 0}
+              >
+                <span
+                  className="action-button-icon is-edit"
+                  aria-hidden="true"
+                />
+                Mass edit
+              </button>
+              <button
+                type="button"
+                className="modeling-list-action-delete button-with-icon"
+                onClick={() =>
+                  focusedConnector !== null &&
+                  onDeleteConnector(focusedConnector.id)
+                }
+                disabled={
+                  focusedConnector === null || connectorFormMode === "create"
+                }
+              >
+                <span
+                  className="action-button-icon is-delete"
+                  aria-hidden="true"
+                />
+                Delete
+              </button>
             </>
           )}
         </div>
@@ -600,7 +927,11 @@ export function ModelingPrimaryTables({
         onClose={() => setIsPinRoleMassEditOpen(false)}
       />
 
-      <article className="panel" hidden={!isSpliceSubScreen} data-onboarding-panel="modeling-splices">
+      <article
+        className="panel"
+        hidden={!isSpliceSubScreen}
+        data-onboarding-panel="modeling-splices"
+      >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Splices</h2>
           <div className="list-panel-header-tools">
@@ -611,15 +942,24 @@ export function ModelingPrimaryTables({
                 onClick={() =>
                   downloadCsvFile(
                     "modeling-splices",
-                    ["Name", "Technical ID", "Mfr Ref", "Port mode", "Ports", "Branches"],
+                    [
+                      "Name",
+                      "Technical ID",
+                      "Mfr Ref",
+                      "Port mode",
+                      "Ports",
+                      "Branches",
+                    ],
                     sortedVisibleSplices.map((splice) => [
                       splice.name,
                       splice.technicalId,
                       splice.manufacturerReference ?? "",
                       resolveSplicePortMode(splice),
-                      resolveSplicePortMode(splice) === "unbounded" ? "" : splice.portCount,
-                      spliceOccupiedCountById.get(splice.id) ?? 0
-                    ])
+                      resolveSplicePortMode(splice) === "unbounded"
+                        ? ""
+                        : splice.portCount,
+                      spliceOccupiedCountById.get(splice.id) ?? 0,
+                    ]),
                   )
                 }
                 disabled={sortedVisibleSplices.length === 0}
@@ -633,30 +973,52 @@ export function ModelingPrimaryTables({
                   className="filter-chip onboarding-help-button"
                   onClick={onOpenSpliceOnboardingHelp}
                 >
-                  <span className="action-button-icon is-help" aria-hidden="true" />
+                  <span
+                    className="action-button-icon is-help"
+                    aria-hidden="true"
+                  />
                   <span>Help</span>
                 </button>
               ) : null}
             </div>
             <div className="list-panel-header-tools-row is-filter-row">
-              <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
-                {([
-                  ["all", "All"],
-                  ["occupied", "Occupied"],
-                  ["free", "Free"]
-                ] as const).map(([filterId, label]) => (
-                  <button key={filterId} type="button" className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSpliceOccupancyFilter(filterId)}>{label}</button>
+              <div
+                className="chip-group list-panel-filters"
+                role="group"
+                aria-label="Splice occupancy filter"
+              >
+                {(
+                  [
+                    ["all", "All"],
+                    ["occupied", "Occupied"],
+                    ["free", "Free"],
+                  ] as const
+                ).map(([filterId, label]) => (
+                  <button
+                    key={filterId}
+                    type="button"
+                    className={
+                      spliceOccupancyFilter === filterId
+                        ? "filter-chip is-active"
+                        : "filter-chip"
+                    }
+                    onClick={() => setSpliceOccupancyFilter(filterId)}
+                  >
+                    {label}
+                  </button>
                 ))}
               </div>
               <TableFilterBar
                 label="Filter"
                 fieldLabel="Splice filter field"
                 fieldValue={spliceFilterField}
-                onFieldChange={(value) => setSpliceFilterField(value as "name" | "technicalId" | "any")}
+                onFieldChange={(value) =>
+                  setSpliceFilterField(value as "name" | "technicalId" | "any")
+                }
                 fieldOptions={[
                   { value: "name", label: "Name" },
                   { value: "technicalId", label: "Technical ID" },
-                  { value: "any", label: "Any" }
+                  { value: "any", label: "Any" },
                 ]}
                 queryValue={spliceFilterQuery}
                 onQueryChange={setSpliceFilterQuery}
@@ -676,87 +1038,241 @@ export function ModelingPrimaryTables({
           <>
             <table className="data-table">
               <thead>
-              <tr>
-                {isSpliceBatchMode ? (
-                  <th>
-                    <input
-                      type="checkbox"
-                      aria-label="Select all visible splices"
-                      checked={allVisibleSplicesSelected}
-                      onChange={() => onSetBatchSelectionForVisible("splice", visibleSpliceIds)}
-                    />
+                <tr>
+                  {isSpliceBatchMode ? (
+                    <th>
+                      <input
+                        type="checkbox"
+                        aria-label="Select all visible splices"
+                        checked={allVisibleSplicesSelected}
+                        onChange={() =>
+                          onSetBatchSelectionForVisible(
+                            "splice",
+                            visibleSpliceIds,
+                          )
+                        }
+                      />
+                    </th>
+                  ) : null}
+                  <th aria-sort={getTableAriaSort(spliceTableSort, "name")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => {
+                        setSpliceTableSort((current) => ({
+                          field: "name",
+                          direction:
+                            current.field === "name" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                        setSpliceSort((current) => ({
+                          field: "name",
+                          direction:
+                            current.field === "name" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                      }}
+                    >
+                      Name{" "}
+                      <span className="sort-indicator">
+                        {spliceSortIndicator("name")}
+                      </span>
+                    </button>
                   </th>
-                ) : null}
-                <th aria-sort={getTableAriaSort(spliceTableSort, "name")}><button type="button" className="sort-header-button" onClick={() => { setSpliceTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); setSpliceSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{spliceSortIndicator("name")}</span></button></th>
-                <th aria-sort={getTableAriaSort(spliceTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setSpliceTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); setSpliceSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{spliceSortIndicator("technicalId")}</span></button></th>
-                <th aria-sort={getTableAriaSort(spliceTableSort, "manufacturerReference")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{spliceSortIndicator("manufacturerReference")}</span></button></th>
-                <th aria-sort={getTableAriaSort(spliceTableSort, "portCount")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "portCount", direction: current.field === "portCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ports <span className="sort-indicator">{spliceSortIndicator("portCount")}</span></button></th>
-                <th aria-sort={getTableAriaSort(spliceTableSort, "branchCount")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "branchCount", direction: current.field === "branchCount" && current.direction === "asc" ? "desc" : "asc" }))}>Branches <span className="sort-indicator">{spliceSortIndicator("branchCount")}</span></button></th>
-              </tr>
+                  <th
+                    aria-sort={getTableAriaSort(spliceTableSort, "technicalId")}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => {
+                        setSpliceTableSort((current) => ({
+                          field: "technicalId",
+                          direction:
+                            current.field === "technicalId" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                        setSpliceSort((current) => ({
+                          field: "technicalId",
+                          direction:
+                            current.field === "technicalId" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                      }}
+                    >
+                      {isMobileViewport ? "ID" : "Technical ID"}{" "}
+                      <span className="sort-indicator">
+                        {spliceSortIndicator("technicalId")}
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-sort={getTableAriaSort(
+                      spliceTableSort,
+                      "manufacturerReference",
+                    )}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setSpliceTableSort((current) => ({
+                          field: "manufacturerReference",
+                          direction:
+                            current.field === "manufacturerReference" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      Mfr Ref{" "}
+                      <span className="sort-indicator">
+                        {spliceSortIndicator("manufacturerReference")}
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-sort={getTableAriaSort(spliceTableSort, "portCount")}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setSpliceTableSort((current) => ({
+                          field: "portCount",
+                          direction:
+                            current.field === "portCount" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      Ports{" "}
+                      <span className="sort-indicator">
+                        {spliceSortIndicator("portCount")}
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-sort={getTableAriaSort(spliceTableSort, "branchCount")}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setSpliceTableSort((current) => ({
+                          field: "branchCount",
+                          direction:
+                            current.field === "branchCount" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      Branches{" "}
+                      <span className="sort-indicator">
+                        {spliceSortIndicator("branchCount")}
+                      </span>
+                    </button>
+                  </th>
+                </tr>
               </thead>
               <tbody>
-              {sortedVisibleSplices.map((splice) => {
-                const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
-                const isFocused = focusedSplice?.id === splice.id;
-                const isBatchSelected = batchSelectionIds.has(splice.id);
-                const linkedCatalogItemId = splice.catalogItemId;
-                const linkedCatalogItem = linkedCatalogItemId === undefined ? undefined : catalogItemById.get(linkedCatalogItemId);
-                return (
-                  <tr
-                    key={splice.id}
-                    ref={(element) => {
-                      spliceRowRefs.current[splice.id] = element;
-                    }}
-                    className={isSpliceBatchMode ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row` : isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
-                    aria-selected={isSpliceBatchMode ? isBatchSelected : isFocused}
-                    tabIndex={0}
-                    onClick={() =>
-                      isSpliceBatchMode
-                        ? onToggleBatchSelection("splice", splice.id)
-                        : onEditSplice(splice)
-                    }
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        if (isSpliceBatchMode) {
-                          onToggleBatchSelection("splice", splice.id);
-                          return;
-                        }
-                        onEditSplice(splice);
+                {sortedVisibleSplices.map((splice) => {
+                  const occupiedCount =
+                    spliceOccupiedCountById.get(splice.id) ?? 0;
+                  const isFocused = focusedSplice?.id === splice.id;
+                  const isBatchSelected = batchSelectionIds.has(splice.id);
+                  const linkedCatalogItemId = splice.catalogItemId;
+                  const linkedCatalogItem =
+                    linkedCatalogItemId === undefined
+                      ? undefined
+                      : catalogItemById.get(linkedCatalogItemId);
+                  return (
+                    <tr
+                      key={splice.id}
+                      ref={(element) => {
+                        spliceRowRefs.current[splice.id] = element;
+                      }}
+                      className={
+                        isSpliceBatchMode
+                          ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row`
+                          : isFocused
+                            ? "is-selected is-focusable-row"
+                            : "is-focusable-row"
                       }
-                    }}
-                  >
-                    {isSpliceBatchMode ? (
-                      <td>
-                        <input
-                          type="checkbox"
-                          aria-label={`Select splice ${splice.technicalId}`}
-                          checked={isBatchSelected}
-                          onChange={() => onToggleBatchSelection("splice", splice.id)}
-                          onClick={(event) => event.stopPropagation()}
-                        />
+                      aria-selected={
+                        isSpliceBatchMode ? isBatchSelected : isFocused
+                      }
+                      tabIndex={0}
+                      onClick={() =>
+                        isSpliceBatchMode
+                          ? onToggleBatchSelection("splice", splice.id)
+                          : onEditSplice(splice)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          if (isSpliceBatchMode) {
+                            onToggleBatchSelection("splice", splice.id);
+                            return;
+                          }
+                          onEditSplice(splice);
+                        }
+                      }}
+                    >
+                      {isSpliceBatchMode ? (
+                        <td>
+                          <input
+                            type="checkbox"
+                            aria-label={`Select splice ${splice.technicalId}`}
+                            checked={isBatchSelected}
+                            onChange={() =>
+                              onToggleBatchSelection("splice", splice.id)
+                            }
+                            onClick={(event) => event.stopPropagation()}
+                          />
+                        </td>
+                      ) : null}
+                      <td>{splice.name}</td>
+                      <td className="technical-id">{splice.technicalId}</td>
+                      <td className="technical-id">
+                        {linkedCatalogItemId !== undefined &&
+                        linkedCatalogItem !== undefined ? (
+                          <EntityReferenceButton
+                            className="technical-id"
+                            title={`Open catalog item ${splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
+                            onClick={() =>
+                              onSelectCatalogItem(linkedCatalogItemId)
+                            }
+                          >
+                            {splice.manufacturerReference ??
+                              linkedCatalogItem.manufacturerReference}
+                          </EntityReferenceButton>
+                        ) : (
+                          (splice.manufacturerReference ?? "")
+                        )}
                       </td>
-                    ) : null}
-                    <td>{splice.name}</td>
-                    <td className="technical-id">{splice.technicalId}</td>
-                    <td className="technical-id">
-                      {linkedCatalogItemId !== undefined && linkedCatalogItem !== undefined ? (
-                        <EntityReferenceButton
-                          className="technical-id"
-                          title={`Open catalog item ${splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
-                          onClick={() => onSelectCatalogItem(linkedCatalogItemId)}
-                        >
-                          {splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}
-                        </EntityReferenceButton>
-                      ) : (
-                        splice.manufacturerReference ?? ""
-                      )}
-                    </td>
-                    <td>{resolveSplicePortMode(splice) === "unbounded" ? "∞" : splice.portCount}</td>
-                    <td>{occupiedCount}</td>
-                  </tr>
-                );
-              })}
+                      <td>
+                        {resolveSplicePortMode(splice) === "unbounded"
+                          ? "∞"
+                          : splice.portCount}
+                      </td>
+                      <td>{occupiedCount}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
             <TableEntryCountFooter count={sortedVisibleSplices.length} />
@@ -767,56 +1283,102 @@ export function ModelingPrimaryTables({
             <>
               <button
                 type="button"
+                className="button-with-icon"
+                onClick={onOpenBatchSelectionDialog}
+                disabled={selectedSpliceBatchCount === 0}
+              >
+                Open batch
+                {selectedSpliceBatchCount > 0
+                  ? ` (${selectedSpliceBatchCount})`
+                  : ""}
+              </button>
+              <button
+                type="button"
                 className="modeling-list-action-delete button-with-icon"
                 onClick={onDeleteSelectedInBatchMode}
                 disabled={selectedSpliceBatchCount === 0}
               >
-                <span className="action-button-icon is-delete" aria-hidden="true" />
-                Delete selected{selectedSpliceBatchCount > 0 ? ` (${selectedSpliceBatchCount})` : ""}
+                <span
+                  className="action-button-icon is-delete"
+                  aria-hidden="true"
+                />
+                Delete selected
+                {selectedSpliceBatchCount > 0
+                  ? ` (${selectedSpliceBatchCount})`
+                  : ""}
               </button>
-              <button type="button" className="button-with-icon" onClick={onExitBatchMode}>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={onExitBatchMode}
+              >
                 Cancel selection
               </button>
             </>
           ) : (
             <>
-            <button type="button" className="button-with-icon" onClick={openCreateSpliceAndScroll}>
-            <span className="action-button-icon is-new" aria-hidden="true" />
-            New
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => focusedSplice !== null && openEditSpliceAndScroll(focusedSplice)}
-            disabled={focusedSplice === null}
-          >
-            <span className="action-button-icon is-edit" aria-hidden="true" />
-            Edit
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => onEnterBatchMode("splice")}
-            disabled={sortedVisibleSplices.length === 0}
-          >
-            <span className="action-button-icon is-multi-select" aria-hidden="true" />
-            {isMobileViewport ? "Select" : "Select multiple"}
-          </button>
-          <button
-            type="button"
-            className="modeling-list-action-delete button-with-icon"
-            onClick={() => focusedSplice !== null && onDeleteSplice(focusedSplice.id)}
-            disabled={focusedSplice === null || spliceFormMode === "create"}
-          >
-            <span className="action-button-icon is-delete" aria-hidden="true" />
-            Delete
-          </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={openCreateSpliceAndScroll}
+              >
+                <span
+                  className="action-button-icon is-new"
+                  aria-hidden="true"
+                />
+                New
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() =>
+                  focusedSplice !== null &&
+                  openEditSpliceAndScroll(focusedSplice)
+                }
+                disabled={focusedSplice === null}
+              >
+                <span
+                  className="action-button-icon is-edit"
+                  aria-hidden="true"
+                />
+                Edit
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() => onEnterBatchMode("splice")}
+                disabled={sortedVisibleSplices.length === 0}
+              >
+                <span
+                  className="action-button-icon is-multi-select"
+                  aria-hidden="true"
+                />
+                {isMobileViewport ? "Select" : "Select multiple"}
+              </button>
+              <button
+                type="button"
+                className="modeling-list-action-delete button-with-icon"
+                onClick={() =>
+                  focusedSplice !== null && onDeleteSplice(focusedSplice.id)
+                }
+                disabled={focusedSplice === null || spliceFormMode === "create"}
+              >
+                <span
+                  className="action-button-icon is-delete"
+                  aria-hidden="true"
+                />
+                Delete
+              </button>
             </>
           )}
         </div>
       </article>
 
-      <article className="panel" hidden={!isNodeSubScreen} data-onboarding-panel="modeling-nodes">
+      <article
+        className="panel"
+        hidden={!isNodeSubScreen}
+        data-onboarding-panel="modeling-nodes"
+      >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Nodes</h2>
           <div className="list-panel-header-tools">
@@ -829,9 +1391,15 @@ export function ModelingPrimaryTables({
                     ? ["ID", "Kind", "Reference", "Linked segments"]
                     : ["ID", "Reference", "Linked segments"];
                   const rows = sortedVisibleNodes.map((node) => {
-                    const linkedSegments = segmentsCountByNodeId.get(node.id) ?? 0;
+                    const linkedSegments =
+                      segmentsCountByNodeId.get(node.id) ?? 0;
                     if (showNodeKindColumn) {
-                      return [node.id, node.kind, describeNode(node), linkedSegments];
+                      return [
+                        node.id,
+                        node.kind,
+                        describeNode(node),
+                        linkedSegments,
+                      ];
                     }
                     return [node.id, describeNode(node), linkedSegments];
                   });
@@ -848,32 +1416,56 @@ export function ModelingPrimaryTables({
                   className="filter-chip onboarding-help-button"
                   onClick={onOpenNodeOnboardingHelp}
                 >
-                  <span className="action-button-icon is-help" aria-hidden="true" />
+                  <span
+                    className="action-button-icon is-help"
+                    aria-hidden="true"
+                  />
                   <span>Help</span>
                 </button>
               ) : null}
             </div>
             <div className="list-panel-header-tools-row is-filter-row">
-              <div className="chip-group list-panel-filters" role="group" aria-label="Node kind filter">
-                {([
-                  ["all", "All"],
-                  ["connector", "Connector"],
-                  ["splice", "Splice"],
-                  ["intermediate", "Intermediate"]
-                ] as const).map(([kindId, label]) => (
-                  <button key={kindId} type="button" className={nodeKindFilter === kindId ? "filter-chip is-active" : "filter-chip"} onClick={() => setNodeKindFilter(kindId)}>{label}</button>
+              <div
+                className="chip-group list-panel-filters"
+                role="group"
+                aria-label="Node kind filter"
+              >
+                {(
+                  [
+                    ["all", "All"],
+                    ["connector", "Connector"],
+                    ["splice", "Splice"],
+                    ["intermediate", "Intermediate"],
+                  ] as const
+                ).map(([kindId, label]) => (
+                  <button
+                    key={kindId}
+                    type="button"
+                    className={
+                      nodeKindFilter === kindId
+                        ? "filter-chip is-active"
+                        : "filter-chip"
+                    }
+                    onClick={() => setNodeKindFilter(kindId)}
+                  >
+                    {label}
+                  </button>
                 ))}
               </div>
               <TableFilterBar
                 label="Filter"
                 fieldLabel="Node filter field"
                 fieldValue={nodeFilterField}
-                onFieldChange={(value) => setNodeFilterField(value as "id" | "kind" | "reference" | "any")}
+                onFieldChange={(value) =>
+                  setNodeFilterField(
+                    value as "id" | "kind" | "reference" | "any",
+                  )
+                }
                 fieldOptions={[
                   { value: "id", label: "Node ID" },
                   { value: "kind", label: "Kind" },
                   { value: "reference", label: "Reference" },
-                  { value: "any", label: "Any" }
+                  { value: "any", label: "Any" },
                 ]}
                 queryValue={nodeFilterQuery}
                 onQueryChange={setNodeFilterQuery}
@@ -893,67 +1485,174 @@ export function ModelingPrimaryTables({
           <>
             <table className="data-table">
               <thead>
-              <tr>
-                {isNodeBatchMode ? (
-                  <th>
-                    <input
-                      type="checkbox"
-                      aria-label="Select all visible nodes"
-                      checked={allVisibleNodesSelected}
-                      onChange={() => onSetBatchSelectionForVisible("node", visibleNodeIds)}
-                    />
+                <tr>
+                  {isNodeBatchMode ? (
+                    <th>
+                      <input
+                        type="checkbox"
+                        aria-label="Select all visible nodes"
+                        checked={allVisibleNodesSelected}
+                        onChange={() =>
+                          onSetBatchSelectionForVisible("node", visibleNodeIds)
+                        }
+                      />
+                    </th>
+                  ) : null}
+                  <th aria-sort={getTableAriaSort(nodeTableSort, "id")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => {
+                        setNodeTableSort((current) => ({
+                          field: "id",
+                          direction:
+                            current.field === "id" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                        setNodeIdSortDirection((current) =>
+                          current === "asc" ? "desc" : "asc",
+                        );
+                      }}
+                    >
+                      ID{" "}
+                      <span className="sort-indicator">
+                        {nodeSortIndicator("id")}
+                      </span>
+                    </button>
                   </th>
-                ) : null}
-                <th aria-sort={getTableAriaSort(nodeTableSort, "id")}><button type="button" className="sort-header-button" onClick={() => { setNodeTableSort((current) => ({ field: "id", direction: current.field === "id" && current.direction === "asc" ? "desc" : "asc" })); setNodeIdSortDirection((current) => current === "asc" ? "desc" : "asc"); }}>ID <span className="sort-indicator">{nodeSortIndicator("id")}</span></button></th>
-                {showNodeKindColumn ? <th aria-sort={getTableAriaSort(nodeTableSort, "kind")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "kind", direction: current.field === "kind" && current.direction === "asc" ? "desc" : "asc" }))}>Kind <span className="sort-indicator">{nodeSortIndicator("kind")}</span></button></th> : null}
-                <th aria-sort={getTableAriaSort(nodeTableSort, "reference")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "reference", direction: current.field === "reference" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Ref." : "Reference"} <span className="sort-indicator">{nodeSortIndicator("reference")}</span></button></th>
-                <th aria-sort={getTableAriaSort(nodeTableSort, "linkedSegments")}><button type="button" className="sort-header-button" onClick={() => setNodeTableSort((current) => ({ field: "linkedSegments", direction: current.field === "linkedSegments" && current.direction === "asc" ? "desc" : "asc" }))}>Linked segments <span className="sort-indicator">{nodeSortIndicator("linkedSegments")}</span></button></th>
-              </tr>
+                  {showNodeKindColumn ? (
+                    <th aria-sort={getTableAriaSort(nodeTableSort, "kind")}>
+                      <button
+                        type="button"
+                        className="sort-header-button"
+                        onClick={() =>
+                          setNodeTableSort((current) => ({
+                            field: "kind",
+                            direction:
+                              current.field === "kind" &&
+                              current.direction === "asc"
+                                ? "desc"
+                                : "asc",
+                          }))
+                        }
+                      >
+                        Kind{" "}
+                        <span className="sort-indicator">
+                          {nodeSortIndicator("kind")}
+                        </span>
+                      </button>
+                    </th>
+                  ) : null}
+                  <th aria-sort={getTableAriaSort(nodeTableSort, "reference")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setNodeTableSort((current) => ({
+                          field: "reference",
+                          direction:
+                            current.field === "reference" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      {isMobileViewport ? "Ref." : "Reference"}{" "}
+                      <span className="sort-indicator">
+                        {nodeSortIndicator("reference")}
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-sort={getTableAriaSort(
+                      nodeTableSort,
+                      "linkedSegments",
+                    )}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setNodeTableSort((current) => ({
+                          field: "linkedSegments",
+                          direction:
+                            current.field === "linkedSegments" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      Linked segments{" "}
+                      <span className="sort-indicator">
+                        {nodeSortIndicator("linkedSegments")}
+                      </span>
+                    </button>
+                  </th>
+                </tr>
               </thead>
               <tbody>
-              {sortedVisibleNodes.map((node) => {
-                const linkedSegments = segmentsCountByNodeId.get(node.id) ?? 0;
-                const isFocused = focusedNode?.id === node.id;
-                const isBatchSelected = batchSelectionIds.has(node.id);
-                return (
-                  <tr
-                    key={node.id}
-                    ref={(element) => {
-                      nodeRowRefs.current[node.id] = element;
-                    }}
-                    className={isNodeBatchMode ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row` : isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
-                    aria-selected={isNodeBatchMode ? isBatchSelected : isFocused}
-                    tabIndex={0}
-                    onClick={() => (isNodeBatchMode ? onToggleBatchSelection("node", node.id) : onEditNode(node))}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        if (isNodeBatchMode) {
-                          onToggleBatchSelection("node", node.id);
-                          return;
-                        }
-                        onEditNode(node);
+                {sortedVisibleNodes.map((node) => {
+                  const linkedSegments =
+                    segmentsCountByNodeId.get(node.id) ?? 0;
+                  const isFocused = focusedNode?.id === node.id;
+                  const isBatchSelected = batchSelectionIds.has(node.id);
+                  return (
+                    <tr
+                      key={node.id}
+                      ref={(element) => {
+                        nodeRowRefs.current[node.id] = element;
+                      }}
+                      className={
+                        isNodeBatchMode
+                          ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row`
+                          : isFocused
+                            ? "is-selected is-focusable-row"
+                            : "is-focusable-row"
                       }
-                    }}
-                  >
-                    {isNodeBatchMode ? (
-                      <td>
-                        <input
-                          type="checkbox"
-                          aria-label={`Select node ${node.id}`}
-                          checked={isBatchSelected}
-                          onChange={() => onToggleBatchSelection("node", node.id)}
-                          onClick={(event) => event.stopPropagation()}
-                        />
-                      </td>
-                    ) : null}
-                    <td className="technical-id">{node.id}</td>
-                    {showNodeKindColumn ? <td>{node.kind}</td> : null}
-                    <td>{describeNode(node)}</td>
-                    <td>{linkedSegments}</td>
-                  </tr>
-                );
-              })}
+                      aria-selected={
+                        isNodeBatchMode ? isBatchSelected : isFocused
+                      }
+                      tabIndex={0}
+                      onClick={() =>
+                        isNodeBatchMode
+                          ? onToggleBatchSelection("node", node.id)
+                          : onEditNode(node)
+                      }
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          if (isNodeBatchMode) {
+                            onToggleBatchSelection("node", node.id);
+                            return;
+                          }
+                          onEditNode(node);
+                        }
+                      }}
+                    >
+                      {isNodeBatchMode ? (
+                        <td>
+                          <input
+                            type="checkbox"
+                            aria-label={`Select node ${node.id}`}
+                            checked={isBatchSelected}
+                            onChange={() =>
+                              onToggleBatchSelection("node", node.id)
+                            }
+                            onClick={(event) => event.stopPropagation()}
+                          />
+                        </td>
+                      ) : null}
+                      <td className="technical-id">{node.id}</td>
+                      {showNodeKindColumn ? <td>{node.kind}</td> : null}
+                      <td>{describeNode(node)}</td>
+                      <td>{linkedSegments}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
             <TableEntryCountFooter count={sortedVisibleNodes.length} />
@@ -964,50 +1663,91 @@ export function ModelingPrimaryTables({
             <>
               <button
                 type="button"
+                className="button-with-icon"
+                onClick={onOpenBatchSelectionDialog}
+                disabled={selectedNodeBatchCount === 0}
+              >
+                Open batch
+                {selectedNodeBatchCount > 0
+                  ? ` (${selectedNodeBatchCount})`
+                  : ""}
+              </button>
+              <button
+                type="button"
                 className="modeling-list-action-delete button-with-icon"
                 onClick={onDeleteSelectedInBatchMode}
                 disabled={selectedNodeBatchCount === 0}
               >
-                <span className="action-button-icon is-delete" aria-hidden="true" />
-                Delete selected{selectedNodeBatchCount > 0 ? ` (${selectedNodeBatchCount})` : ""}
+                <span
+                  className="action-button-icon is-delete"
+                  aria-hidden="true"
+                />
+                Delete selected
+                {selectedNodeBatchCount > 0
+                  ? ` (${selectedNodeBatchCount})`
+                  : ""}
               </button>
-              <button type="button" className="button-with-icon" onClick={onExitBatchMode}>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={onExitBatchMode}
+              >
                 Cancel selection
               </button>
             </>
           ) : (
             <>
-            <button type="button" className="button-with-icon" onClick={openCreateNodeAndScroll}>
-            <span className="action-button-icon is-new" aria-hidden="true" />
-            New
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => focusedNode !== null && openEditNodeAndScroll(focusedNode)}
-            disabled={focusedNode === null}
-          >
-            <span className="action-button-icon is-edit" aria-hidden="true" />
-            Edit
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => onEnterBatchMode("node")}
-            disabled={sortedVisibleNodes.length === 0}
-          >
-            <span className="action-button-icon is-multi-select" aria-hidden="true" />
-            {isMobileViewport ? "Select" : "Select multiple"}
-          </button>
-          <button
-            type="button"
-            className="modeling-list-action-delete button-with-icon"
-            onClick={() => focusedNode !== null && onDeleteNode(focusedNode.id)}
-            disabled={focusedNode === null || nodeFormMode === "create"}
-          >
-            <span className="action-button-icon is-delete" aria-hidden="true" />
-            Delete
-          </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={openCreateNodeAndScroll}
+              >
+                <span
+                  className="action-button-icon is-new"
+                  aria-hidden="true"
+                />
+                New
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() =>
+                  focusedNode !== null && openEditNodeAndScroll(focusedNode)
+                }
+                disabled={focusedNode === null}
+              >
+                <span
+                  className="action-button-icon is-edit"
+                  aria-hidden="true"
+                />
+                Edit
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() => onEnterBatchMode("node")}
+                disabled={sortedVisibleNodes.length === 0}
+              >
+                <span
+                  className="action-button-icon is-multi-select"
+                  aria-hidden="true"
+                />
+                {isMobileViewport ? "Select" : "Select multiple"}
+              </button>
+              <button
+                type="button"
+                className="modeling-list-action-delete button-with-icon"
+                onClick={() =>
+                  focusedNode !== null && onDeleteNode(focusedNode.id)
+                }
+                disabled={focusedNode === null || nodeFormMode === "create"}
+              >
+                <span
+                  className="action-button-icon is-delete"
+                  aria-hidden="true"
+                />
+                Delete
+              </button>
             </>
           )}
         </div>

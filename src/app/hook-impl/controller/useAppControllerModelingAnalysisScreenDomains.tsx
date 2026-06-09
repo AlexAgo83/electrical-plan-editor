@@ -1,11 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ConnectorId, NetworkId, NodeId, SegmentId, SpliceId, WireId } from "../../../core/entities";
+import type {
+  ConnectorId,
+  NetworkId,
+  NodeId,
+  SegmentId,
+  SpliceId,
+  WireId,
+} from "../../../core/entities";
 import { appActions, appReducer, type AppStore } from "../../../store";
 import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
 import {
   analyzeModelingBatchDelete,
   type ModelingBatchSelectionId,
-  type ModelingBatchSelectionScope
+  type ModelingBatchSelectionScope,
 } from "../../lib/modelingBatchDelete";
 import type { EntityListModel } from "../../hooks/useEntityListModel";
 import type { AppControllerFormsStateFlat } from "../../hooks/useAppControllerNamespacedFormsState";
@@ -17,23 +24,27 @@ import { parseConnectorTerminalOverridesDraft } from "../../lib/connectorTermina
 import {
   buildMultiNetworkFunctionalAnalysisModel,
   type MultiNetworkFunctionalAnalysisScope,
-  type MultiNetworkFunctionalAnalysisTarget
+  type MultiNetworkFunctionalAnalysisTarget,
 } from "../../lib/multiNetworkFunctionalAnalysis";
 import {
   buildAnalysisScreenContentSlice,
-  buildModelingScreenContentSlice
+  buildModelingScreenContentSlice,
 } from "./useAppControllerScreenContentSlices";
 import type {
   ConnectorAnalysisView,
-  SpliceAnalysisView
+  SpliceAnalysisView,
 } from "../../components/workspace/AnalysisWorkspaceContent.types";
 
-type SegmentBatchEditableField = "sheathType" | "insulation" | "lineStyle" | "internalPartReference";
+type SegmentBatchEditableField =
+  | "sheathType"
+  | "insulation"
+  | "lineStyle"
+  | "internalPartReference";
 
 function resolveSharedSegmentBatchFieldValue(
   segments: ModelingSliceParams["segments"],
   ids: ReadonlySet<string>,
-  field: SegmentBatchEditableField
+  field: SegmentBatchEditableField,
 ): { value: string; isMixed: boolean } {
   let hasValue = false;
   let firstValue = "";
@@ -56,7 +67,7 @@ function resolveSharedSegmentBatchFieldValue(
 
 function buildSelectedSegmentBatchSourceSignature(
   segments: ModelingSliceParams["segments"],
-  ids: ReadonlySet<string>
+  ids: ReadonlySet<string>,
 ): string {
   return segments
     .filter((segment) => ids.has(segment.id))
@@ -67,26 +78,43 @@ function buildSelectedSegmentBatchSourceSignature(
         segment.sheathType ?? "",
         segment.insulation ?? "",
         segment.lineStyle ?? "",
-        segment.internalPartReference ?? ""
-      ].join("|")
+        segment.internalPartReference ?? "",
+      ].join("|"),
     )
     .join("||");
 }
 
-type ModelingSliceParams = Parameters<typeof buildModelingScreenContentSlice>[0];
-type AnalysisSliceParams = Parameters<typeof buildAnalysisScreenContentSlice>[0];
+type ModelingSliceParams = Parameters<
+  typeof buildModelingScreenContentSlice
+>[0];
+type AnalysisSliceParams = Parameters<
+  typeof buildAnalysisScreenContentSlice
+>[0];
 
 interface UseAppControllerModelingAnalysisScreenDomainsParams {
   components: Pick<
     ModelingSliceParams,
-    "ModelingPrimaryTablesComponent" | "ModelingSecondaryTablesComponent" | "ModelingFormsColumnComponent"
+    | "ModelingPrimaryTablesComponent"
+    | "ModelingSecondaryTablesComponent"
+    | "ModelingFormsColumnComponent"
   > &
     Pick<AnalysisSliceParams, "AnalysisWorkspaceContentComponent">;
   screenFlags: Pick<
     ModelingSliceParams,
-    "isConnectorSubScreen" | "isSpliceSubScreen" | "isNodeSubScreen" | "isSegmentSubScreen" | "isWireSubScreen"
+    | "isConnectorSubScreen"
+    | "isSpliceSubScreen"
+    | "isNodeSubScreen"
+    | "isSegmentSubScreen"
+    | "isWireSubScreen"
   > &
-    Pick<AnalysisSliceParams, "isConnectorSubScreen" | "isSpliceSubScreen" | "isNodeSubScreen" | "isSegmentSubScreen" | "isWireSubScreen">;
+    Pick<
+      AnalysisSliceParams,
+      | "isConnectorSubScreen"
+      | "isSpliceSubScreen"
+      | "isNodeSubScreen"
+      | "isSegmentSubScreen"
+      | "isWireSubScreen"
+    >;
   entities: Pick<
     ModelingSliceParams,
     "catalogItems" | "connectors" | "splices" | "nodes" | "segments" | "wires"
@@ -198,10 +226,17 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   includeModelingContent: boolean;
   includeAnalysisContent: boolean;
   store: AppStore;
-  setActiveSubScreen: (subScreen: "catalog" | "connector" | "splice" | "node" | "segment" | "wire") => void;
-  dispatchAction: (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean }) => void;
+  setActiveSubScreen: (
+    subScreen: "catalog" | "connector" | "splice" | "node" | "segment" | "wire",
+  ) => void;
+  dispatchAction: (
+    action: Parameters<AppStore["dispatch"]>[0],
+    options?: { trackHistory?: boolean },
+  ) => void;
   requestConfirmation: (request: ConfirmDialogRequest) => Promise<boolean>;
-  replaceStateWithHistory: (nextState: ReturnType<AppStore["getState"]>) => void;
+  replaceStateWithHistory: (
+    nextState: ReturnType<AppStore["getState"]>,
+  ) => void;
   openCatalogSubScreen: () => void;
   markSelectionPanelsFromTable?: () => void;
   onboardingHelp?: {
@@ -257,34 +292,61 @@ export function useAppControllerModelingAnalysisScreenDomains({
   replaceStateWithHistory,
   openCatalogSubScreen,
   markSelectionPanelsFromTable,
-  onboardingHelp
+  onboardingHelp,
 }: UseAppControllerModelingAnalysisScreenDomainsParams) {
-  const [connectorAnalysisView, setConnectorAnalysisView] = useState<ConnectorAnalysisView>("ways");
-  const [spliceAnalysisView, setSpliceAnalysisView] = useState<SpliceAnalysisView>("ports");
-  const [multiNetworkFunctionalAnalysisScope, setMultiNetworkFunctionalAnalysisScope] =
-    useState<MultiNetworkFunctionalAnalysisScope>("current");
-  const [multiNetworkFunctionalAnalysisCustomNetworkIds, setMultiNetworkFunctionalAnalysisCustomNetworkIds] =
-    useState<NetworkId[]>([]);
-  const [activeBatchScope, setActiveBatchScope] = useState<ModelingBatchSelectionScope | null>(null);
-  const [batchSelectionIds, setBatchSelectionIds] = useState<ReadonlySet<string>>(new Set());
+  const [connectorAnalysisView, setConnectorAnalysisView] =
+    useState<ConnectorAnalysisView>("ways");
+  const [spliceAnalysisView, setSpliceAnalysisView] =
+    useState<SpliceAnalysisView>("ports");
+  const [
+    multiNetworkFunctionalAnalysisScope,
+    setMultiNetworkFunctionalAnalysisScope,
+  ] = useState<MultiNetworkFunctionalAnalysisScope>("current");
+  const [
+    multiNetworkFunctionalAnalysisCustomNetworkIds,
+    setMultiNetworkFunctionalAnalysisCustomNetworkIds,
+  ] = useState<NetworkId[]>([]);
+  const [activeBatchScope, setActiveBatchScope] =
+    useState<ModelingBatchSelectionScope | null>(null);
+  const [isBatchSelectionDialogOpen, setIsBatchSelectionDialogOpen] =
+    useState(false);
+  const [batchSelectionIds, setBatchSelectionIds] = useState<
+    ReadonlySet<string>
+  >(new Set());
   const [segmentBatchSheathType, setSegmentBatchSheathType] = useState("");
   const [segmentBatchInsulation, setSegmentBatchInsulation] = useState("");
   const [segmentBatchLineStyle, setSegmentBatchLineStyle] = useState("");
-  const [segmentBatchInternalPartReference, setSegmentBatchInternalPartReference] = useState("");
-  const [segmentBatchDirtyFields, setSegmentBatchDirtyFields] = useState<ReadonlySet<SegmentBatchEditableField>>(new Set());
-  const [segmentBatchMixedFields, setSegmentBatchMixedFields] = useState<ReadonlySet<SegmentBatchEditableField>>(new Set());
-  const [segmentBatchEditError, setSegmentBatchEditError] = useState<string | null>(null);
+  const [
+    segmentBatchInternalPartReference,
+    setSegmentBatchInternalPartReference,
+  ] = useState("");
+  const [segmentBatchDirtyFields, setSegmentBatchDirtyFields] = useState<
+    ReadonlySet<SegmentBatchEditableField>
+  >(new Set());
+  const [segmentBatchMixedFields, setSegmentBatchMixedFields] = useState<
+    ReadonlySet<SegmentBatchEditableField>
+  >(new Set());
+  const [segmentBatchEditError, setSegmentBatchEditError] = useState<
+    string | null
+  >(null);
   const selectedBatchSegmentIds = useMemo(
-    () => (activeBatchScope === "segment" ? new Set<SegmentId>([...batchSelectionIds] as SegmentId[]) : new Set<SegmentId>()),
-    [activeBatchScope, batchSelectionIds]
+    () =>
+      activeBatchScope === "segment"
+        ? new Set<SegmentId>([...batchSelectionIds] as SegmentId[])
+        : new Set<SegmentId>(),
+    [activeBatchScope, batchSelectionIds],
   );
   const latestSegmentsRef = useRef(entities.segments);
   const latestSelectedBatchSegmentIdsRef = useRef(selectedBatchSegmentIds);
   latestSegmentsRef.current = entities.segments;
   latestSelectedBatchSegmentIdsRef.current = selectedBatchSegmentIds;
   const selectedSegmentBatchSourceSignature = useMemo(
-    () => buildSelectedSegmentBatchSourceSignature(entities.segments, selectedBatchSegmentIds),
-    [entities.segments, selectedBatchSegmentIds]
+    () =>
+      buildSelectedSegmentBatchSourceSignature(
+        entities.segments,
+        selectedBatchSegmentIds,
+      ),
+    [entities.segments, selectedBatchSegmentIds],
   );
   const appStateSnapshot = store.getState();
   const multiNetworkFunctionalAnalysis = useMemo(
@@ -293,32 +355,52 @@ export function useAppControllerModelingAnalysisScreenDomains({
         activeNetworkId: appStateSnapshot.activeNetworkId,
         networks: appStateSnapshot.networks.allIds
           .map((networkId) => appStateSnapshot.networks.byId[networkId])
-          .filter((network): network is NonNullable<typeof network> => network !== undefined),
+          .filter(
+            (network): network is NonNullable<typeof network> =>
+              network !== undefined,
+          ),
         harnessAssemblies: appStateSnapshot.harnessAssemblies.allIds
-          .map((assemblyId) => appStateSnapshot.harnessAssemblies.byId[assemblyId])
-          .filter((assembly): assembly is NonNullable<typeof assembly> => assembly !== undefined),
+          .map(
+            (assemblyId) => appStateSnapshot.harnessAssemblies.byId[assemblyId],
+          )
+          .filter(
+            (assembly): assembly is NonNullable<typeof assembly> =>
+              assembly !== undefined,
+          ),
         networkStates: appStateSnapshot.networkStates,
         currentNetworkState:
           appStateSnapshot.activeNetworkId === null
             ? null
-            : appStateSnapshot.networkStates[appStateSnapshot.activeNetworkId] ?? null,
+            : (appStateSnapshot.networkStates[
+                appStateSnapshot.activeNetworkId
+              ] ?? null),
         catalogItems: entities.catalogItems,
         scope: multiNetworkFunctionalAnalysisScope,
-        customNetworkIds: multiNetworkFunctionalAnalysisCustomNetworkIds
+        customNetworkIds: multiNetworkFunctionalAnalysisCustomNetworkIds,
       }),
-    [appStateSnapshot, entities.catalogItems, multiNetworkFunctionalAnalysisCustomNetworkIds, multiNetworkFunctionalAnalysisScope]
+    [
+      appStateSnapshot,
+      entities.catalogItems,
+      multiNetworkFunctionalAnalysisCustomNetworkIds,
+      multiNetworkFunctionalAnalysisScope,
+    ],
   );
-  const handleToggleMultiNetworkFunctionalAnalysisCustomNetwork = useCallback((networkId: NetworkId) => {
-    setMultiNetworkFunctionalAnalysisCustomNetworkIds((current) =>
-      current.includes(networkId)
-        ? current.filter((id) => id !== networkId)
-        : [...current, networkId]
-    );
-  }, []);
+  const handleToggleMultiNetworkFunctionalAnalysisCustomNetwork = useCallback(
+    (networkId: NetworkId) => {
+      setMultiNetworkFunctionalAnalysisCustomNetworkIds((current) =>
+        current.includes(networkId)
+          ? current.filter((id) => id !== networkId)
+          : [...current, networkId],
+      );
+    },
+    [],
+  );
   const handleGoToMultiNetworkFunctionalAnalysisFinding = useCallback(
     (target: MultiNetworkFunctionalAnalysisTarget) => {
       if (store.getState().activeNetworkId !== target.networkId) {
-        dispatchAction(appActions.selectNetwork(target.networkId), { trackHistory: false });
+        dispatchAction(appActions.selectNetwork(target.networkId), {
+          trackHistory: false,
+        });
       }
 
       const state = store.getState();
@@ -332,7 +414,10 @@ export function useAppControllerModelingAnalysisScreenDomains({
           modelingHandlers.connector.startConnectorEdit(connector);
           return;
         }
-        dispatchAction(appActions.select({ kind: "connector", id: connectorId }), { trackHistory: false });
+        dispatchAction(
+          appActions.select({ kind: "connector", id: connectorId }),
+          { trackHistory: false },
+        );
         return;
       }
 
@@ -343,7 +428,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
           modelingHandlers.splice.startSpliceEdit(splice);
           return;
         }
-        dispatchAction(appActions.select({ kind: "splice", id: spliceId }), { trackHistory: false });
+        dispatchAction(appActions.select({ kind: "splice", id: spliceId }), {
+          trackHistory: false,
+        });
         return;
       }
 
@@ -354,7 +441,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
           modelingHandlers.node.startNodeEdit(node);
           return;
         }
-        dispatchAction(appActions.select({ kind: "node", id: nodeId }), { trackHistory: false });
+        dispatchAction(appActions.select({ kind: "node", id: nodeId }), {
+          trackHistory: false,
+        });
         return;
       }
 
@@ -365,7 +454,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
           modelingHandlers.segment.startSegmentEdit(segment);
           return;
         }
-        dispatchAction(appActions.select({ kind: "segment", id: segmentId }), { trackHistory: false });
+        dispatchAction(appActions.select({ kind: "segment", id: segmentId }), {
+          trackHistory: false,
+        });
         return;
       }
 
@@ -375,9 +466,17 @@ export function useAppControllerModelingAnalysisScreenDomains({
         modelingHandlers.wire.startWireEdit(wire);
         return;
       }
-      dispatchAction(appActions.select({ kind: "wire", id: wireId }), { trackHistory: false });
+      dispatchAction(appActions.select({ kind: "wire", id: wireId }), {
+        trackHistory: false,
+      });
     },
-    [dispatchAction, markSelectionPanelsFromTable, modelingHandlers, setActiveSubScreen, store]
+    [
+      dispatchAction,
+      markSelectionPanelsFromTable,
+      modelingHandlers,
+      setActiveSubScreen,
+      store,
+    ],
   );
   const activeSubScreenBatchScope = screenFlags.isConnectorSubScreen
     ? "connector"
@@ -399,6 +498,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
 
   const exitBatchMode = useCallback(() => {
     setActiveBatchScope(null);
+    setIsBatchSelectionDialogOpen(false);
     setBatchSelectionIds(new Set());
     setSegmentBatchSheathType("");
     setSegmentBatchInsulation("");
@@ -414,13 +514,17 @@ export function useAppControllerModelingAnalysisScreenDomains({
       clearAllModelingForms();
       dispatchAction(appActions.clearSelection(), { trackHistory: false });
       setActiveBatchScope(scope);
+      setIsBatchSelectionDialogOpen(false);
       setBatchSelectionIds(new Set());
     },
-    [clearAllModelingForms, dispatchAction]
+    [clearAllModelingForms, dispatchAction],
   );
 
   useEffect(() => {
-    if (activeBatchScope !== null && activeBatchScope !== activeSubScreenBatchScope) {
+    if (
+      activeBatchScope !== null &&
+      activeBatchScope !== activeSubScreenBatchScope
+    ) {
       exitBatchMode();
     }
   }, [activeBatchScope, activeSubScreenBatchScope, exitBatchMode]);
@@ -438,13 +542,20 @@ export function useAppControllerModelingAnalysisScreenDomains({
             ? entities.nodes.map((node) => node.id)
             : activeBatchScope === "segment"
               ? entities.segments.map((segment) => segment.id)
-              : entities.wires.map((wire) => wire.id)
+              : entities.wires.map((wire) => wire.id),
     );
     setBatchSelectionIds((current) => {
       const next = [...current].filter((id) => availableIds.has(id));
       return next.length === current.size ? current : new Set(next);
     });
-  }, [activeBatchScope, entities.connectors, entities.nodes, entities.segments, entities.splices, entities.wires]);
+  }, [
+    activeBatchScope,
+    entities.connectors,
+    entities.nodes,
+    entities.segments,
+    entities.splices,
+    entities.wires,
+  ]);
 
   useEffect(() => {
     if (activeBatchScope !== "segment") {
@@ -452,11 +563,28 @@ export function useAppControllerModelingAnalysisScreenDomains({
     }
 
     const currentSegments = latestSegmentsRef.current;
-    const currentSelectedBatchSegmentIds = latestSelectedBatchSegmentIdsRef.current;
-    const sheathTypeState = resolveSharedSegmentBatchFieldValue(currentSegments, currentSelectedBatchSegmentIds, "sheathType");
-    const insulationState = resolveSharedSegmentBatchFieldValue(currentSegments, currentSelectedBatchSegmentIds, "insulation");
-    const lineStyleState = resolveSharedSegmentBatchFieldValue(currentSegments, currentSelectedBatchSegmentIds, "lineStyle");
-    const internalPartReferenceState = resolveSharedSegmentBatchFieldValue(currentSegments, currentSelectedBatchSegmentIds, "internalPartReference");
+    const currentSelectedBatchSegmentIds =
+      latestSelectedBatchSegmentIdsRef.current;
+    const sheathTypeState = resolveSharedSegmentBatchFieldValue(
+      currentSegments,
+      currentSelectedBatchSegmentIds,
+      "sheathType",
+    );
+    const insulationState = resolveSharedSegmentBatchFieldValue(
+      currentSegments,
+      currentSelectedBatchSegmentIds,
+      "insulation",
+    );
+    const lineStyleState = resolveSharedSegmentBatchFieldValue(
+      currentSegments,
+      currentSelectedBatchSegmentIds,
+      "lineStyle",
+    );
+    const internalPartReferenceState = resolveSharedSegmentBatchFieldValue(
+      currentSegments,
+      currentSelectedBatchSegmentIds,
+      "internalPartReference",
+    );
 
     setSegmentBatchSheathType(sheathTypeState.value);
     setSegmentBatchInsulation(insulationState.value);
@@ -469,55 +597,65 @@ export function useAppControllerModelingAnalysisScreenDomains({
           sheathTypeState.isMixed ? "sheathType" : null,
           insulationState.isMixed ? "insulation" : null,
           lineStyleState.isMixed ? "lineStyle" : null,
-          internalPartReferenceState.isMixed ? "internalPartReference" : null
-        ].filter((field): field is SegmentBatchEditableField => field !== null)
-      )
+          internalPartReferenceState.isMixed ? "internalPartReference" : null,
+        ].filter((field): field is SegmentBatchEditableField => field !== null),
+      ),
     );
     setSegmentBatchEditError(null);
   }, [activeBatchScope, selectedSegmentBatchSourceSignature]);
 
-  const toggleBatchSelection = useCallback((scope: ModelingBatchSelectionScope, id: string) => {
-    setBatchSelectionIds((current) => {
-      if (activeBatchScope !== scope) {
-        return current;
-      }
-      const next = new Set(current);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  }, [activeBatchScope]);
-
-  const setBatchSelectionForVisible = useCallback((scope: ModelingBatchSelectionScope, ids: readonly string[]) => {
-    setBatchSelectionIds((current) => {
-      if (activeBatchScope !== scope) {
-        return current;
-      }
-      const next = new Set(current);
-      const allVisibleSelected = ids.length > 0 && ids.every((id) => next.has(id));
-      for (const id of ids) {
-        if (allVisibleSelected) {
+  const toggleBatchSelection = useCallback(
+    (scope: ModelingBatchSelectionScope, id: string) => {
+      setBatchSelectionIds((current) => {
+        if (activeBatchScope !== scope) {
+          return current;
+        }
+        const next = new Set(current);
+        if (next.has(id)) {
           next.delete(id);
         } else {
           next.add(id);
         }
-      }
-      return next;
-    });
-  }, [activeBatchScope]);
+        return next;
+      });
+    },
+    [activeBatchScope],
+  );
 
-  const markSegmentBatchFieldDirty = useCallback((field: SegmentBatchEditableField) => {
-    setSegmentBatchDirtyFields((current) => {
-      if (current.has(field)) {
-        return current;
-      }
-      return new Set([...current, field]);
-    });
-    setSegmentBatchEditError(null);
-  }, []);
+  const setBatchSelectionForVisible = useCallback(
+    (scope: ModelingBatchSelectionScope, ids: readonly string[]) => {
+      setBatchSelectionIds((current) => {
+        if (activeBatchScope !== scope) {
+          return current;
+        }
+        const next = new Set(current);
+        const allVisibleSelected =
+          ids.length > 0 && ids.every((id) => next.has(id));
+        for (const id of ids) {
+          if (allVisibleSelected) {
+            next.delete(id);
+          } else {
+            next.add(id);
+          }
+        }
+        return next;
+      });
+    },
+    [activeBatchScope],
+  );
+
+  const markSegmentBatchFieldDirty = useCallback(
+    (field: SegmentBatchEditableField) => {
+      setSegmentBatchDirtyFields((current) => {
+        if (current.has(field)) {
+          return current;
+        }
+        return new Set([...current, field]);
+      });
+      setSegmentBatchEditError(null);
+    },
+    [],
+  );
 
   const handleApplySegmentBatchEdit = useCallback(() => {
     if (activeBatchScope !== "segment") {
@@ -532,7 +670,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
       return;
     }
 
-    const changes: Partial<Pick<ModelingSliceParams["segments"][number], SegmentBatchEditableField>> = {};
+    const changes: Partial<
+      Pick<ModelingSliceParams["segments"][number], SegmentBatchEditableField>
+    > = {};
     if (segmentBatchDirtyFields.has("sheathType")) {
       changes.sheathType = segmentBatchSheathType;
     }
@@ -546,7 +686,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
       changes.internalPartReference = segmentBatchInternalPartReference;
     }
 
-    dispatchAction(appActions.updateSegmentsBatch([...batchSelectionIds] as never, changes));
+    dispatchAction(
+      appActions.updateSegmentsBatch([...batchSelectionIds] as never, changes),
+    );
   }, [
     activeBatchScope,
     batchSelectionIds,
@@ -555,23 +697,27 @@ export function useAppControllerModelingAnalysisScreenDomains({
     segmentBatchInsulation,
     segmentBatchInternalPartReference,
     segmentBatchLineStyle,
-    segmentBatchSheathType
+    segmentBatchSheathType,
   ]);
 
-  const batchDeleteAnalysisState = useMemo(
-    () => {
-      const entitySnapshotSizes = [
-        entities.connectors.length,
-        entities.splices.length,
-        entities.nodes.length,
-        entities.segments.length,
-        entities.wires.length
-      ];
-      void entitySnapshotSizes;
-      return store.getState();
-    },
-    [entities.connectors, entities.nodes, entities.segments, entities.splices, entities.wires, store]
-  );
+  const batchDeleteAnalysisState = useMemo(() => {
+    const entitySnapshotSizes = [
+      entities.connectors.length,
+      entities.splices.length,
+      entities.nodes.length,
+      entities.segments.length,
+      entities.wires.length,
+    ];
+    void entitySnapshotSizes;
+    return store.getState();
+  }, [
+    entities.connectors,
+    entities.nodes,
+    entities.segments,
+    entities.splices,
+    entities.wires,
+    store,
+  ]);
 
   const batchDeletePreflight = useMemo(() => {
     if (activeBatchScope === null) {
@@ -580,7 +726,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     return analyzeModelingBatchDelete(
       batchDeleteAnalysisState,
       activeBatchScope,
-      [...batchSelectionIds] as ModelingBatchSelectionId[]
+      [...batchSelectionIds] as ModelingBatchSelectionId[],
     );
   }, [activeBatchScope, batchDeleteAnalysisState, batchSelectionIds]);
 
@@ -599,7 +745,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
           intent: "warning",
           variant: "deleteBlocked",
           summaryCategories: batchDeletePreflight.summaryCategories,
-          summaryNote: batchDeletePreflight.summaryNote
+          summaryNote: batchDeletePreflight.summaryNote,
         });
         return;
       }
@@ -617,7 +763,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
         confirmOnEnter: true,
         variant: batchDeletePreflight.confirmationVariant,
         summaryCategories: batchDeletePreflight.summaryCategories,
-        summaryNote: batchDeletePreflight.summaryNote
+        summaryNote: batchDeletePreflight.summaryNote,
       });
       if (!shouldDelete) {
         return;
@@ -627,662 +773,766 @@ export function useAppControllerModelingAnalysisScreenDomains({
       clearAllModelingForms();
       exitBatchMode();
     })();
-  }, [activeBatchScope, batchDeletePreflight, clearAllModelingForms, exitBatchMode, replaceStateWithHistory, requestConfirmation]);
+  }, [
+    activeBatchScope,
+    batchDeletePreflight,
+    clearAllModelingForms,
+    exitBatchMode,
+    replaceStateWithHistory,
+    requestConfirmation,
+  ]);
 
-  const handleSelectCatalogItemReference: ModelingSliceParams["onSelectCatalogItem"] = useCallback(
-    (catalogItemId) => {
-      markSelectionPanelsFromTable?.();
-      openCatalogSubScreen();
-      const catalogItem = store.getState().catalogItems.byId[catalogItemId];
-      if (catalogItem !== undefined) {
-        catalogHandlers.startCatalogEdit(catalogItem);
-        return;
-      }
+  const handleSelectCatalogItemReference: ModelingSliceParams["onSelectCatalogItem"] =
+    useCallback(
+      (catalogItemId) => {
+        markSelectionPanelsFromTable?.();
+        openCatalogSubScreen();
+        const catalogItem = store.getState().catalogItems.byId[catalogItemId];
+        if (catalogItem !== undefined) {
+          catalogHandlers.startCatalogEdit(catalogItem);
+          return;
+        }
 
-      dispatchAction(
-        appActions.select({
-          kind: "catalog",
-          id: catalogItemId
-        })
-      );
-    },
-    [catalogHandlers, dispatchAction, markSelectionPanelsFromTable, openCatalogSubScreen, store]
-  );
-  const handleSaveConnectorPinElectricalRoles: AnalysisSliceParams["onSaveConnectorPinElectricalRoles"] = useCallback(
-    (connectorId, pinElectricalRoles) => {
-      const connector = store.getState().connectors.byId[connectorId];
-      if (connector === undefined) {
-        return;
-      }
-      dispatchAction(
-        appActions.upsertConnector({
-          ...connector,
-          pinElectricalRoles
-        })
-      );
-    },
-    [dispatchAction, store]
-  );
-  const handleApplyPinRoleMassEdit: AnalysisSliceParams["onApplyPinRoleMassEdit"] = useCallback(
-    (updates) => {
-      if (updates.length === 0) {
-        return;
-      }
-      let nextState = store.getState();
-      const updatesByConnectorId = new Map<ConnectorId, typeof updates>();
-      for (const update of updates) {
-        const group = updatesByConnectorId.get(update.connectorId) ?? [];
-        group.push(update);
-        updatesByConnectorId.set(update.connectorId, group);
-      }
-      for (const [connectorId, connectorUpdates] of updatesByConnectorId) {
-        const connector = nextState.connectors.byId[connectorId];
+        dispatchAction(
+          appActions.select({
+            kind: "catalog",
+            id: catalogItemId,
+          }),
+        );
+      },
+      [
+        catalogHandlers,
+        dispatchAction,
+        markSelectionPanelsFromTable,
+        openCatalogSubScreen,
+        store,
+      ],
+    );
+  const handleSaveConnectorPinElectricalRoles: AnalysisSliceParams["onSaveConnectorPinElectricalRoles"] =
+    useCallback(
+      (connectorId, pinElectricalRoles) => {
+        const connector = store.getState().connectors.byId[connectorId];
         if (connector === undefined) {
-          continue;
+          return;
         }
-        const pinElectricalRoles = { ...(connector.pinElectricalRoles ?? {}) };
-        for (const update of connectorUpdates) {
-          if (update.role === null) {
-            delete pinElectricalRoles[update.cavityIndex];
-          } else {
-            pinElectricalRoles[update.cavityIndex] = update.role;
-          }
-        }
-        nextState = appReducer(
-          nextState,
+        dispatchAction(
           appActions.upsertConnector({
             ...connector,
-            pinElectricalRoles: Object.keys(pinElectricalRoles).length > 0 ? pinElectricalRoles : undefined
-          })
+            pinElectricalRoles,
+          }),
         );
-      }
-      replaceStateWithHistory(nextState);
-    },
-    [replaceStateWithHistory, store]
-  );
-  const handleSaveConnectorCatalogMaterialApplication: AnalysisSliceParams["onSaveConnectorCatalogMaterialApplication"] = useCallback(
-    (connectorId, input) => {
-      const connector = store.getState().connectors.byId[connectorId];
-      if (connector === undefined) {
-        return { ok: false, message: "Select a connector first." };
-      }
-      const terminalOverrides = parseConnectorTerminalOverridesDraft(input.terminalOverridesText, connector.cavityCount);
-      if (!terminalOverrides.ok) {
-        return terminalOverrides;
-      }
-      dispatchAction(
-        appActions.upsertConnector({
-          ...connector,
-          applyCatalogPlugs: input.applyCatalogPlugs ? undefined : false,
-          applyCatalogSeals: input.applyCatalogSeals ? undefined : false,
-          terminalOverrides: terminalOverrides.terminalOverrides
-        })
-      );
-      return { ok: true };
-    },
-    [dispatchAction, store]
-  );
-  const handleSelectConnectorReference: ModelingSliceParams["onSelectConnectorReference"] = useCallback(
-    (connectorId) => {
-      markSelectionPanelsFromTable?.();
-      setActiveSubScreen("connector");
-      const connector = store.getState().connectors.byId[connectorId];
-      if (connector !== undefined) {
-        modelingHandlers.connector.startConnectorEdit(connector);
-        return;
-      }
+      },
+      [dispatchAction, store],
+    );
+  const handleApplyPinRoleMassEdit: AnalysisSliceParams["onApplyPinRoleMassEdit"] =
+    useCallback(
+      (updates) => {
+        if (updates.length === 0) {
+          return;
+        }
+        let nextState = store.getState();
+        const updatesByConnectorId = new Map<ConnectorId, typeof updates>();
+        for (const update of updates) {
+          const group = updatesByConnectorId.get(update.connectorId) ?? [];
+          group.push(update);
+          updatesByConnectorId.set(update.connectorId, group);
+        }
+        for (const [connectorId, connectorUpdates] of updatesByConnectorId) {
+          const connector = nextState.connectors.byId[connectorId];
+          if (connector === undefined) {
+            continue;
+          }
+          const pinElectricalRoles = {
+            ...(connector.pinElectricalRoles ?? {}),
+          };
+          for (const update of connectorUpdates) {
+            if (update.role === null) {
+              delete pinElectricalRoles[update.cavityIndex];
+            } else {
+              pinElectricalRoles[update.cavityIndex] = update.role;
+            }
+          }
+          nextState = appReducer(
+            nextState,
+            appActions.upsertConnector({
+              ...connector,
+              pinElectricalRoles:
+                Object.keys(pinElectricalRoles).length > 0
+                  ? pinElectricalRoles
+                  : undefined,
+            }),
+          );
+        }
+        replaceStateWithHistory(nextState);
+      },
+      [replaceStateWithHistory, store],
+    );
+  const handleSaveConnectorCatalogMaterialApplication: AnalysisSliceParams["onSaveConnectorCatalogMaterialApplication"] =
+    useCallback(
+      (connectorId, input) => {
+        const connector = store.getState().connectors.byId[connectorId];
+        if (connector === undefined) {
+          return { ok: false, message: "Select a connector first." };
+        }
+        const terminalOverrides = parseConnectorTerminalOverridesDraft(
+          input.terminalOverridesText,
+          connector.cavityCount,
+        );
+        if (!terminalOverrides.ok) {
+          return terminalOverrides;
+        }
+        dispatchAction(
+          appActions.upsertConnector({
+            ...connector,
+            applyCatalogPlugs: input.applyCatalogPlugs ? undefined : false,
+            applyCatalogSeals: input.applyCatalogSeals ? undefined : false,
+            terminalOverrides: terminalOverrides.terminalOverrides,
+          }),
+        );
+        return { ok: true };
+      },
+      [dispatchAction, store],
+    );
+  const handleSelectConnectorReference: ModelingSliceParams["onSelectConnectorReference"] =
+    useCallback(
+      (connectorId) => {
+        markSelectionPanelsFromTable?.();
+        setActiveSubScreen("connector");
+        const connector = store.getState().connectors.byId[connectorId];
+        if (connector !== undefined) {
+          modelingHandlers.connector.startConnectorEdit(connector);
+          return;
+        }
 
-      dispatchAction(
-        appActions.select({
-          kind: "connector",
-          id: connectorId
-        })
-      );
-    },
-    [dispatchAction, markSelectionPanelsFromTable, modelingHandlers.connector, setActiveSubScreen, store]
-  );
-  const handleSelectSpliceReference: ModelingSliceParams["onSelectSpliceReference"] = useCallback(
-    (spliceId) => {
-      markSelectionPanelsFromTable?.();
-      setActiveSubScreen("splice");
-      const splice = store.getState().splices.byId[spliceId];
-      if (splice !== undefined) {
-        modelingHandlers.splice.startSpliceEdit(splice);
-        return;
-      }
+        dispatchAction(
+          appActions.select({
+            kind: "connector",
+            id: connectorId,
+          }),
+        );
+      },
+      [
+        dispatchAction,
+        markSelectionPanelsFromTable,
+        modelingHandlers.connector,
+        setActiveSubScreen,
+        store,
+      ],
+    );
+  const handleSelectSpliceReference: ModelingSliceParams["onSelectSpliceReference"] =
+    useCallback(
+      (spliceId) => {
+        markSelectionPanelsFromTable?.();
+        setActiveSubScreen("splice");
+        const splice = store.getState().splices.byId[spliceId];
+        if (splice !== undefined) {
+          modelingHandlers.splice.startSpliceEdit(splice);
+          return;
+        }
 
-      dispatchAction(
-        appActions.select({
-          kind: "splice",
-          id: spliceId
-        })
-      );
-    },
-    [dispatchAction, markSelectionPanelsFromTable, modelingHandlers.splice, setActiveSubScreen, store]
-  );
+        dispatchAction(
+          appActions.select({
+            kind: "splice",
+            id: spliceId,
+          }),
+        );
+      },
+      [
+        dispatchAction,
+        markSelectionPanelsFromTable,
+        modelingHandlers.splice,
+        setActiveSubScreen,
+        store,
+      ],
+    );
 
   const modelingSlice = includeModelingContent
     ? buildModelingScreenContentSlice({
-    ModelingPrimaryTablesComponent: components.ModelingPrimaryTablesComponent,
-    ModelingSecondaryTablesComponent: components.ModelingSecondaryTablesComponent,
-    ModelingFormsColumnComponent: components.ModelingFormsColumnComponent,
-    activeBatchScope,
-    batchSelectionIds,
-    onEnterBatchMode: enterBatchMode,
-    onExitBatchMode: exitBatchMode,
-    onToggleBatchSelection: toggleBatchSelection,
-    onSetBatchSelectionForVisible: setBatchSelectionForVisible,
-    onDeleteSelectedInBatchMode: handleDeleteSelectedInBatchMode,
-    catalogItems: entities.catalogItems,
-    openCatalogSubScreen,
-    onSelectCatalogItem: handleSelectCatalogItemReference,
-    onSelectConnectorReference: handleSelectConnectorReference,
-    onSelectSpliceReference: handleSelectSpliceReference,
-    isConnectorSubScreen: screenFlags.isConnectorSubScreen,
-    connectorFormMode: formsState.connectorFormMode,
-    connectorEditAfterCreate: formsState.connectorEditAfterCreate,
-    resetConnectorForm: modelingHandlers.connector.resetConnectorForm,
-    connectorOccupancyFilter: listModel.connectorOccupancyFilter,
-    setConnectorOccupancyFilter: listModel.setConnectorOccupancyFilter,
-    connectorFilterField: listModel.connectorFilterField,
-    setConnectorFilterField: listModel.setConnectorFilterField,
-    connectorFilterQuery: listModel.connectorSearchQuery,
-    setConnectorFilterQuery: listModel.setConnectorSearchQuery,
-    connectors: entities.connectors,
-    visibleConnectors: listModel.visibleConnectors,
-    connectorSort: listModel.connectorSort,
-    setConnectorSort: listModel.setConnectorSort,
-    getSortIndicator: listModel.getSortIndicator,
-    connectorOccupiedCountById: listModel.connectorOccupiedCountById,
-    selectedConnectorId: selection.selectedConnectorId,
-    startConnectorEdit: (connector) => {
-      markSelectionPanelsFromTable?.();
-      modelingHandlers.connector.startConnectorEdit(connector);
-    },
-    handleConnectorDelete: modelingHandlers.connector.handleConnectorDelete,
-    onOpenConnectorOnboardingHelp: onboardingHelp?.openConnectorStep,
-    activeNetwork,
-    onApplyPinRoleMassEdit: handleApplyPinRoleMassEdit,
-    isSpliceSubScreen: screenFlags.isSpliceSubScreen,
-    spliceFormMode: formsState.spliceFormMode,
-    spliceEditAfterCreate: formsState.spliceEditAfterCreate,
-    resetSpliceForm: modelingHandlers.splice.resetSpliceForm,
-    spliceOccupancyFilter: listModel.spliceOccupancyFilter,
-    setSpliceOccupancyFilter: listModel.setSpliceOccupancyFilter,
-    spliceFilterField: listModel.spliceFilterField,
-    setSpliceFilterField: listModel.setSpliceFilterField,
-    spliceFilterQuery: listModel.spliceSearchQuery,
-    setSpliceFilterQuery: listModel.setSpliceSearchQuery,
-    splices: entities.splices,
-    visibleSplices: listModel.visibleSplices,
-    spliceSort: listModel.spliceSort,
-    setSpliceSort: listModel.setSpliceSort,
-    spliceOccupiedCountById: listModel.spliceOccupiedCountById,
-    selectedSpliceId: selection.selectedSpliceId,
-    startSpliceEdit: (splice) => {
-      markSelectionPanelsFromTable?.();
-      modelingHandlers.splice.startSpliceEdit(splice);
-    },
-    handleSpliceDelete: modelingHandlers.splice.handleSpliceDelete,
-    onOpenSpliceOnboardingHelp: onboardingHelp?.openSpliceStep,
-    isNodeSubScreen: screenFlags.isNodeSubScreen,
-    nodeFormMode: formsState.nodeFormMode,
-    nodeEditAfterCreate: formsState.nodeEditAfterCreate,
-    resetNodeForm: modelingHandlers.node.resetNodeForm,
-    nodeKindFilter: listModel.nodeKindFilter,
-    setNodeKindFilter: listModel.setNodeKindFilter,
-    nodeFilterField: listModel.nodeFilterField,
-    setNodeFilterField: listModel.setNodeFilterField,
-    nodeFilterQuery: listModel.nodeSearchQuery,
-    setNodeFilterQuery: listModel.setNodeSearchQuery,
-    nodes: entities.nodes,
-    visibleNodes: listModel.visibleNodes,
-    nodeIdSortDirection: listModel.nodeIdSortDirection,
-    setNodeIdSortDirection: listModel.setNodeIdSortDirection,
-    segmentsCountByNodeId: listModel.segmentsCountByNodeId,
-    selectedNodeId: selection.selectedNodeId,
-    describeNode,
-    startNodeEdit: (node) => {
-      markSelectionPanelsFromTable?.();
-      modelingHandlers.node.startNodeEdit(node);
-    },
-    handleNodeDelete: modelingHandlers.node.handleNodeDelete,
-    onOpenNodeOnboardingHelp: onboardingHelp?.openNodeStep,
-    isSegmentSubScreen: screenFlags.isSegmentSubScreen,
-    segmentFormMode: formsState.segmentFormMode,
-    segmentEditAfterCreate: formsState.segmentEditAfterCreate,
-    resetSegmentForm: modelingHandlers.segment.resetSegmentForm,
-    segmentSubNetworkFilter: listModel.segmentSubNetworkFilter,
-    setSegmentSubNetworkFilter: listModel.setSegmentSubNetworkFilter,
-    segmentFilterField: listModel.segmentFilterField,
-    setSegmentFilterField: listModel.setSegmentFilterField,
-    segmentFilterQuery: listModel.segmentSearchQuery,
-    setSegmentFilterQuery: listModel.setSegmentSearchQuery,
-    segments: entities.segments,
-    visibleSegments: listModel.visibleSegments,
-    segmentIdSortDirection: listModel.segmentIdSortDirection,
-    setSegmentIdSortDirection: listModel.setSegmentIdSortDirection,
-    nodeLabelById,
-    selectedSegmentId: selection.selectedSegmentId,
-    selectedWireRouteSegmentIds: layoutDerived.selectedWireRouteSegmentIds,
-    startSegmentEdit: (segment) => {
-      markSelectionPanelsFromTable?.();
-      modelingHandlers.segment.startSegmentEdit(segment);
-    },
-    handleSegmentDelete: modelingHandlers.segment.handleSegmentDelete,
-    onOpenSegmentOnboardingHelp: onboardingHelp?.openSegmentStep,
-    isWireSubScreen: screenFlags.isWireSubScreen,
-    wireFormMode: formsState.wireFormMode,
-    wireEditAfterCreate: formsState.wireEditAfterCreate,
-    resetWireForm: modelingHandlers.wire.resetWireForm,
-    wireRouteFilter: listModel.wireRouteFilter,
-    wireFunctionalTagFilter: listModel.wireFunctionalTagFilter,
-    setWireFunctionalTagFilter: listModel.setWireFunctionalTagFilter,
-    wireFunctionalTagOptions: listModel.wireFunctionalTagOptions,
-    wireFilterField: listModel.wireFilterField,
-    setWireFilterField: listModel.setWireFilterField,
-    wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,
-    setWireEndpointFilterQuery: listModel.setWireEndpointFilterQuery,
-    tabularExportFormat,
-    wires: entities.wires,
-    visibleWires: listModel.visibleWires,
-    wireSort: listModel.wireSort,
-    setWireSort: listModel.setWireSort,
-    dispatchAction,
-    connectorHandlers: modelingHandlers.connector,
-    segmentHandlers: modelingHandlers.segment,
-    wireHandlers: modelingHandlers.wire,
-    selectedWireId: selection.selectedWireId,
-    describeWireEndpoint: wireDescriptions.describeWireEndpoint,
-    describeWireEndpointCsvParts: wireDescriptions.describeWireEndpointCsvParts,
-    startWireEdit: (wire) => {
-      markSelectionPanelsFromTable?.();
-      modelingHandlers.wire.startWireEdit(wire);
-    },
-    handleWireDelete: modelingHandlers.wire.handleWireDelete,
-    onOpenWireOnboardingHelp: onboardingHelp?.openWireStep,
-    handleConnectorSubmit: modelingHandlers.connector.handleConnectorSubmit,
-    connectorName: formsState.connectorName,
-    setConnectorName: formsState.setConnectorName,
-    connectorTechnicalId: formsState.connectorTechnicalId,
-    setConnectorTechnicalId: formsState.setConnectorTechnicalId,
-    connectorCatalogItemId: formsState.connectorCatalogItemId,
-    setConnectorCatalogItemId:
-      modelingHandlers.connector.syncDerivedConnectorCatalogFields ?? formsState.setConnectorCatalogItemId,
-    connectorManufacturerReference: formsState.connectorManufacturerReference,
-    setConnectorManufacturerReference: formsState.setConnectorManufacturerReference,
-    connectorIsMainHarnessConnector: formsState.connectorIsMainHarnessConnector,
-    setConnectorIsMainHarnessConnector: formsState.setConnectorIsMainHarnessConnector,
-    connectorApplyCatalogPlugs: formsState.connectorApplyCatalogPlugs,
-    setConnectorApplyCatalogPlugs: formsState.setConnectorApplyCatalogPlugs,
-    connectorApplyCatalogSeals: formsState.connectorApplyCatalogSeals,
-    setConnectorApplyCatalogSeals: formsState.setConnectorApplyCatalogSeals,
-    connectorTerminalOverridesText: formsState.connectorTerminalOverridesText,
-    setConnectorTerminalOverridesText: formsState.setConnectorTerminalOverridesText,
-    connectorFusePairRatings: formsState.connectorFusePairRatings,
-    setConnectorFusePairRatings: formsState.setConnectorFusePairRatings,
-    connectorFusePairOverrides: formsState.connectorFusePairOverrides,
-    setConnectorFusePairOverrides: formsState.setConnectorFusePairOverrides,
-    connectorPinElectricalRoleDrafts: formsState.connectorPinElectricalRoleDrafts,
-    setConnectorPinElectricalRoleDrafts: formsState.setConnectorPinElectricalRoleDrafts,
-    connectorPinElectricalRoleSelection: formsState.connectorPinElectricalRoleSelection,
-    setConnectorPinElectricalRoleSelection: formsState.setConnectorPinElectricalRoleSelection,
-    connectorPinRoleCatalogItem:
-      formsState.connectorCatalogItemId.length === 0
-        ? undefined
-        : entities.catalogItems.find((item) => item.id === formsState.connectorCatalogItemId),
-    connectorRearBackshellOverrideEnabled: formsState.connectorRearBackshellOverrideEnabled,
-    setConnectorRearBackshellOverrideEnabled: formsState.setConnectorRearBackshellOverrideEnabled,
-    connectorRearBackshellOverrideLengthMm: formsState.connectorRearBackshellOverrideLengthMm,
-    setConnectorRearBackshellOverrideLengthMm: formsState.setConnectorRearBackshellOverrideLengthMm,
-    connectorAutoCreateLinkedNode: formsState.connectorAutoCreateLinkedNode,
-    setConnectorAutoCreateLinkedNode: formsState.setConnectorAutoCreateLinkedNode,
-    connectorTechnicalIdAlreadyUsed,
-    cavityCount: formsState.cavityCount,
-    setCavityCount: formsState.setCavityCount,
-    cancelConnectorEdit: modelingHandlers.connector.cancelConnectorEdit,
-    connectorFormError: formsState.connectorFormError,
-    handleSpliceSubmit: modelingHandlers.splice.handleSpliceSubmit,
-    handleConvertSpliceToDirectional: modelingHandlers.splice.handleConvertSpliceToDirectional,
-    handleRerouteSpliceConnectedWires: modelingHandlers.splice.handleRerouteSpliceConnectedWires,
-    handleSuggestOptimizedSplicePlacement: modelingHandlers.splice.handleSuggestOptimizedSplicePlacement,
-    spliceName: formsState.spliceName,
-    setSpliceName: formsState.setSpliceName,
-    spliceTechnicalId: formsState.spliceTechnicalId,
-    setSpliceTechnicalId: formsState.setSpliceTechnicalId,
-    spliceCatalogItemId: formsState.spliceCatalogItemId,
-    setSpliceCatalogItemId:
-      modelingHandlers.splice.syncDerivedSpliceCatalogFields ?? formsState.setSpliceCatalogItemId,
-    splicePortMode: formsState.splicePortMode,
-    setSplicePortMode: modelingHandlers.splice.setSpliceCapacityMode ?? formsState.setSplicePortMode,
-    spliceSideInverted: formsState.spliceSideInverted,
-    setSpliceSideInverted: formsState.setSpliceSideInverted,
-    spliceManufacturerReference: formsState.spliceManufacturerReference,
-    setSpliceManufacturerReference: formsState.setSpliceManufacturerReference,
-    spliceAutoCreateLinkedNode: formsState.spliceAutoCreateLinkedNode,
-    setSpliceAutoCreateLinkedNode: formsState.setSpliceAutoCreateLinkedNode,
-    spliceTechnicalIdAlreadyUsed,
-    portCount: formsState.portCount,
-    setPortCount: formsState.setPortCount,
-    spliceFormInfo: formsState.spliceFormInfo,
-    cancelSpliceEdit: modelingHandlers.splice.cancelSpliceEdit,
-    spliceFormError: formsState.spliceFormError,
-    handleNodeSubmit: modelingHandlers.node.handleNodeSubmit,
-    nodeIdInput: formsState.nodeIdInput,
-    setNodeIdInput: formsState.setNodeIdInput,
-    pendingNewNodePosition,
-    nodeKind: formsState.nodeKind,
-    setNodeKind: formsState.setNodeKind,
-    nodeLabel: formsState.nodeLabel,
-    setNodeLabel: formsState.setNodeLabel,
-    nodeConnectorId: formsState.nodeConnectorId,
-    setNodeConnectorId: formsState.setNodeConnectorId,
-    nodeSpliceId: formsState.nodeSpliceId,
-    setNodeSpliceId: formsState.setNodeSpliceId,
-    cancelNodeEdit: modelingHandlers.node.cancelNodeEdit,
-    nodeFormError: formsState.nodeFormError,
-    handleSegmentSubmit: modelingHandlers.segment.handleSegmentSubmit,
-    handleSwapSegmentNodes: modelingHandlers.segment.handleSwapSegmentNodes,
-    segmentIdInput: formsState.segmentIdInput,
-    setSegmentIdInput: formsState.setSegmentIdInput,
-    segmentNodeA: formsState.segmentNodeA,
-    setSegmentNodeA: formsState.setSegmentNodeA,
-    segmentNodeB: formsState.segmentNodeB,
-    setSegmentNodeB: formsState.setSegmentNodeB,
-    segmentLengthMm: formsState.segmentLengthMm,
-    setSegmentLengthMm: formsState.setSegmentLengthMm,
-    segmentSubNetworkTag: formsState.segmentSubNetworkTag,
-    setSegmentSubNetworkTag: formsState.setSegmentSubNetworkTag,
-    segmentSheathType: formsState.segmentSheathType,
-    setSegmentSheathType: formsState.setSegmentSheathType,
-    segmentInsulation: formsState.segmentInsulation,
-    setSegmentInsulation: formsState.setSegmentInsulation,
-    segmentLineStyle: formsState.segmentLineStyle,
-    setSegmentLineStyle: formsState.setSegmentLineStyle,
-    segmentInternalPartReference: formsState.segmentInternalPartReference,
-    setSegmentInternalPartReference: formsState.setSegmentInternalPartReference,
-    segmentMountingLabelsText: formsState.segmentMountingLabelsText,
-    setSegmentMountingLabelsText: formsState.setSegmentMountingLabelsText,
-    cancelSegmentEdit: modelingHandlers.segment.cancelSegmentEdit,
-    segmentFormError: formsState.segmentFormError,
-    handleWireSubmit: modelingHandlers.wire.handleWireSubmit,
-    handleSwapWireEndpoints: modelingHandlers.wire.handleSwapWireEndpoints,
-    wireName: formsState.wireName,
-    setWireName: formsState.setWireName,
-    wireTechnicalId: formsState.wireTechnicalId,
-    setWireTechnicalId: formsState.setWireTechnicalId,
-    wireTwistGroupLabel: formsState.wireTwistGroupLabel,
-    setWireTwistGroupLabel: formsState.setWireTwistGroupLabel,
-    wireFunctionalDomainTag: formsState.wireFunctionalDomainTag,
-    setWireFunctionalDomainTag: formsState.setWireFunctionalDomainTag,
-    wireSectionMm2: formsState.wireSectionMm2,
-    setWireSectionMm2: formsState.setWireSectionMm2,
-    wireCurrentA: formsState.wireCurrentA,
-    setWireCurrentA: formsState.setWireCurrentA,
-    wireMaterial: formsState.wireMaterial,
-    setWireMaterial: formsState.setWireMaterial,
-    recommendedWireSectionMm2: modelingHandlers.wire.recommendedWireSectionMm2,
-    handleApplyRecommendedWireSection: modelingHandlers.wire.handleApplyRecommendedWireSection,
-    wireColorMode: formsState.wireColorMode,
-    setWireColorMode: modelingHandlers.wire.setWireColorModeAndResetIncompatibleValues,
-    wirePrimaryColorId: formsState.wirePrimaryColorId,
-    setWirePrimaryColorId: formsState.setWirePrimaryColorId,
-    wireSecondaryColorId: formsState.wireSecondaryColorId,
-    setWireSecondaryColorId: formsState.setWireSecondaryColorId,
-    wireFreeColorLabel: formsState.wireFreeColorLabel,
-    setWireFreeColorLabel: formsState.setWireFreeColorLabel,
-    wireFuseEnabled: formsState.wireFuseEnabled,
-    setWireFuseEnabled: formsState.setWireFuseEnabled,
-    wireFuseCatalogItemId: formsState.wireFuseCatalogItemId,
-    setWireFuseCatalogItemId: formsState.setWireFuseCatalogItemId,
-    wireTechnicalIdAlreadyUsed,
-    wireEndpointAConnectionReference: formsState.wireEndpointAConnectionReference,
-    setWireEndpointAConnectionReference: formsState.setWireEndpointAConnectionReference,
-    wireEndpointAConnectionName: formsState.wireEndpointAConnectionName,
-    setWireEndpointAConnectionName: formsState.setWireEndpointAConnectionName,
-    wireEndpointASealReference: formsState.wireEndpointASealReference,
-    setWireEndpointASealReference: formsState.setWireEndpointASealReference,
-    wireEndpointASealName: formsState.wireEndpointASealName,
-    setWireEndpointASealName: formsState.setWireEndpointASealName,
-    wireEndpointAKind: formsState.wireEndpointAKind,
-    setWireEndpointAKind: formsState.setWireEndpointAKind,
-    wireEndpointAConnectorId: formsState.wireEndpointAConnectorId,
-    setWireEndpointAConnectorId: formsState.setWireEndpointAConnectorId,
-    wireEndpointACavityIndex: formsState.wireEndpointACavityIndex,
-    setWireEndpointACavityIndex: modelingHandlers.wire.setWireEndpointACavityIndex,
-    wireEndpointASpliceId: formsState.wireEndpointASpliceId,
-    setWireEndpointASpliceId: formsState.setWireEndpointASpliceId,
-    wireEndpointAPortIndex: formsState.wireEndpointAPortIndex,
-    setWireEndpointAPortIndex: modelingHandlers.wire.setWireEndpointAPortIndex,
-    wireEndpointASpliceSideOverride: formsState.wireEndpointASpliceSideOverride,
-    setWireEndpointASpliceSideOverride: formsState.setWireEndpointASpliceSideOverride,
-    wireEndpointASpliceSideLocked: formsState.wireEndpointASpliceSideLocked,
-    setWireEndpointASpliceSideLocked: formsState.setWireEndpointASpliceSideLocked,
-    wireEndpointASlotHint: modelingHandlers.wire.wireEndpointASlotHint,
-    wireEndpointBConnectionReference: formsState.wireEndpointBConnectionReference,
-    setWireEndpointBConnectionReference: formsState.setWireEndpointBConnectionReference,
-    wireEndpointBConnectionName: formsState.wireEndpointBConnectionName,
-    setWireEndpointBConnectionName: formsState.setWireEndpointBConnectionName,
-    wireEndpointBSealReference: formsState.wireEndpointBSealReference,
-    setWireEndpointBSealReference: formsState.setWireEndpointBSealReference,
-    wireEndpointBSealName: formsState.wireEndpointBSealName,
-    setWireEndpointBSealName: formsState.setWireEndpointBSealName,
-    wireEndpointBKind: formsState.wireEndpointBKind,
-    setWireEndpointBKind: formsState.setWireEndpointBKind,
-    wireEndpointBConnectorId: formsState.wireEndpointBConnectorId,
-    setWireEndpointBConnectorId: formsState.setWireEndpointBConnectorId,
-    wireEndpointBCavityIndex: formsState.wireEndpointBCavityIndex,
-    setWireEndpointBCavityIndex: modelingHandlers.wire.setWireEndpointBCavityIndex,
-    wireEndpointBSpliceId: formsState.wireEndpointBSpliceId,
-    setWireEndpointBSpliceId: formsState.setWireEndpointBSpliceId,
-    wireEndpointBPortIndex: formsState.wireEndpointBPortIndex,
-    setWireEndpointBPortIndex: modelingHandlers.wire.setWireEndpointBPortIndex,
-    wireEndpointBSpliceSideOverride: formsState.wireEndpointBSpliceSideOverride,
-    setWireEndpointBSpliceSideOverride: formsState.setWireEndpointBSpliceSideOverride,
-    wireEndpointBSpliceSideLocked: formsState.wireEndpointBSpliceSideLocked,
-    setWireEndpointBSpliceSideLocked: formsState.setWireEndpointBSpliceSideLocked,
-    wireEndpointBSlotHint: modelingHandlers.wire.wireEndpointBSlotHint,
-    cancelWireEdit: modelingHandlers.wire.cancelWireEdit,
-    wireFormError: formsState.wireFormError,
-    modelingBatchSelection:
-      activeBatchScope === null || batchDeletePreflight === null
-        ? null
-        : {
-            scope: activeBatchScope,
-            selectedCount: batchDeletePreflight.selectedCount,
-            directCount: batchDeletePreflight.directCount,
-            cascadeCount: batchDeletePreflight.cascadeCount,
-            blockedCount: batchDeletePreflight.blockedCount,
-            summaryCategories: batchDeletePreflight.summaryCategories,
-            summaryNote: batchDeletePreflight.summaryNote,
-            onDeleteSelected: handleDeleteSelectedInBatchMode,
-            onCancelBatchMode: exitBatchMode,
-            segmentBatchEdit:
-              activeBatchScope !== "segment"
-                ? undefined
-                : {
-                    sheathType: segmentBatchSheathType,
-                    insulation: segmentBatchInsulation,
-                    lineStyle: segmentBatchLineStyle,
-                    internalPartReference: segmentBatchInternalPartReference,
-                    dirtyFields: segmentBatchDirtyFields,
-                    mixedFields: segmentBatchMixedFields,
-                    error: segmentBatchEditError,
-                    setSheathType: (value) => {
-                      markSegmentBatchFieldDirty("sheathType");
-                      setSegmentBatchSheathType(value);
-                    },
-                    setInsulation: (value) => {
-                      markSegmentBatchFieldDirty("insulation");
-                      setSegmentBatchInsulation(value);
-                    },
-                    setLineStyle: (value) => {
-                      markSegmentBatchFieldDirty("lineStyle");
-                      setSegmentBatchLineStyle(value);
-                    },
-                    setInternalPartReference: (value) => {
-                      markSegmentBatchFieldDirty("internalPartReference");
-                      setSegmentBatchInternalPartReference(value);
-                    },
-                    onApply: handleApplySegmentBatchEdit
-                  }
-          }
+        ModelingPrimaryTablesComponent:
+          components.ModelingPrimaryTablesComponent,
+        ModelingSecondaryTablesComponent:
+          components.ModelingSecondaryTablesComponent,
+        ModelingFormsColumnComponent: components.ModelingFormsColumnComponent,
+        activeBatchScope,
+        batchSelectionIds,
+        onEnterBatchMode: enterBatchMode,
+        onExitBatchMode: exitBatchMode,
+        onToggleBatchSelection: toggleBatchSelection,
+        onSetBatchSelectionForVisible: setBatchSelectionForVisible,
+        onOpenBatchSelectionDialog: () => setIsBatchSelectionDialogOpen(true),
+        onDeleteSelectedInBatchMode: handleDeleteSelectedInBatchMode,
+        catalogItems: entities.catalogItems,
+        openCatalogSubScreen,
+        onSelectCatalogItem: handleSelectCatalogItemReference,
+        onSelectConnectorReference: handleSelectConnectorReference,
+        onSelectSpliceReference: handleSelectSpliceReference,
+        isConnectorSubScreen: screenFlags.isConnectorSubScreen,
+        connectorFormMode: formsState.connectorFormMode,
+        connectorEditAfterCreate: formsState.connectorEditAfterCreate,
+        resetConnectorForm: modelingHandlers.connector.resetConnectorForm,
+        connectorOccupancyFilter: listModel.connectorOccupancyFilter,
+        setConnectorOccupancyFilter: listModel.setConnectorOccupancyFilter,
+        connectorFilterField: listModel.connectorFilterField,
+        setConnectorFilterField: listModel.setConnectorFilterField,
+        connectorFilterQuery: listModel.connectorSearchQuery,
+        setConnectorFilterQuery: listModel.setConnectorSearchQuery,
+        connectors: entities.connectors,
+        visibleConnectors: listModel.visibleConnectors,
+        connectorSort: listModel.connectorSort,
+        setConnectorSort: listModel.setConnectorSort,
+        getSortIndicator: listModel.getSortIndicator,
+        connectorOccupiedCountById: listModel.connectorOccupiedCountById,
+        selectedConnectorId: selection.selectedConnectorId,
+        startConnectorEdit: (connector) => {
+          markSelectionPanelsFromTable?.();
+          modelingHandlers.connector.startConnectorEdit(connector);
+        },
+        handleConnectorDelete: modelingHandlers.connector.handleConnectorDelete,
+        onOpenConnectorOnboardingHelp: onboardingHelp?.openConnectorStep,
+        activeNetwork,
+        onApplyPinRoleMassEdit: handleApplyPinRoleMassEdit,
+        isSpliceSubScreen: screenFlags.isSpliceSubScreen,
+        spliceFormMode: formsState.spliceFormMode,
+        spliceEditAfterCreate: formsState.spliceEditAfterCreate,
+        resetSpliceForm: modelingHandlers.splice.resetSpliceForm,
+        spliceOccupancyFilter: listModel.spliceOccupancyFilter,
+        setSpliceOccupancyFilter: listModel.setSpliceOccupancyFilter,
+        spliceFilterField: listModel.spliceFilterField,
+        setSpliceFilterField: listModel.setSpliceFilterField,
+        spliceFilterQuery: listModel.spliceSearchQuery,
+        setSpliceFilterQuery: listModel.setSpliceSearchQuery,
+        splices: entities.splices,
+        visibleSplices: listModel.visibleSplices,
+        spliceSort: listModel.spliceSort,
+        setSpliceSort: listModel.setSpliceSort,
+        spliceOccupiedCountById: listModel.spliceOccupiedCountById,
+        selectedSpliceId: selection.selectedSpliceId,
+        startSpliceEdit: (splice) => {
+          markSelectionPanelsFromTable?.();
+          modelingHandlers.splice.startSpliceEdit(splice);
+        },
+        handleSpliceDelete: modelingHandlers.splice.handleSpliceDelete,
+        onOpenSpliceOnboardingHelp: onboardingHelp?.openSpliceStep,
+        isNodeSubScreen: screenFlags.isNodeSubScreen,
+        nodeFormMode: formsState.nodeFormMode,
+        nodeEditAfterCreate: formsState.nodeEditAfterCreate,
+        resetNodeForm: modelingHandlers.node.resetNodeForm,
+        nodeKindFilter: listModel.nodeKindFilter,
+        setNodeKindFilter: listModel.setNodeKindFilter,
+        nodeFilterField: listModel.nodeFilterField,
+        setNodeFilterField: listModel.setNodeFilterField,
+        nodeFilterQuery: listModel.nodeSearchQuery,
+        setNodeFilterQuery: listModel.setNodeSearchQuery,
+        nodes: entities.nodes,
+        visibleNodes: listModel.visibleNodes,
+        nodeIdSortDirection: listModel.nodeIdSortDirection,
+        setNodeIdSortDirection: listModel.setNodeIdSortDirection,
+        segmentsCountByNodeId: listModel.segmentsCountByNodeId,
+        selectedNodeId: selection.selectedNodeId,
+        describeNode,
+        startNodeEdit: (node) => {
+          markSelectionPanelsFromTable?.();
+          modelingHandlers.node.startNodeEdit(node);
+        },
+        handleNodeDelete: modelingHandlers.node.handleNodeDelete,
+        onOpenNodeOnboardingHelp: onboardingHelp?.openNodeStep,
+        isSegmentSubScreen: screenFlags.isSegmentSubScreen,
+        segmentFormMode: formsState.segmentFormMode,
+        segmentEditAfterCreate: formsState.segmentEditAfterCreate,
+        resetSegmentForm: modelingHandlers.segment.resetSegmentForm,
+        segmentSubNetworkFilter: listModel.segmentSubNetworkFilter,
+        setSegmentSubNetworkFilter: listModel.setSegmentSubNetworkFilter,
+        segmentFilterField: listModel.segmentFilterField,
+        setSegmentFilterField: listModel.setSegmentFilterField,
+        segmentFilterQuery: listModel.segmentSearchQuery,
+        setSegmentFilterQuery: listModel.setSegmentSearchQuery,
+        segments: entities.segments,
+        visibleSegments: listModel.visibleSegments,
+        segmentIdSortDirection: listModel.segmentIdSortDirection,
+        setSegmentIdSortDirection: listModel.setSegmentIdSortDirection,
+        nodeLabelById,
+        selectedSegmentId: selection.selectedSegmentId,
+        selectedWireRouteSegmentIds: layoutDerived.selectedWireRouteSegmentIds,
+        startSegmentEdit: (segment) => {
+          markSelectionPanelsFromTable?.();
+          modelingHandlers.segment.startSegmentEdit(segment);
+        },
+        handleSegmentDelete: modelingHandlers.segment.handleSegmentDelete,
+        onOpenSegmentOnboardingHelp: onboardingHelp?.openSegmentStep,
+        isWireSubScreen: screenFlags.isWireSubScreen,
+        wireFormMode: formsState.wireFormMode,
+        wireEditAfterCreate: formsState.wireEditAfterCreate,
+        resetWireForm: modelingHandlers.wire.resetWireForm,
+        wireRouteFilter: listModel.wireRouteFilter,
+        wireFunctionalTagFilter: listModel.wireFunctionalTagFilter,
+        setWireFunctionalTagFilter: listModel.setWireFunctionalTagFilter,
+        wireFunctionalTagOptions: listModel.wireFunctionalTagOptions,
+        wireFilterField: listModel.wireFilterField,
+        setWireFilterField: listModel.setWireFilterField,
+        wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,
+        setWireEndpointFilterQuery: listModel.setWireEndpointFilterQuery,
+        tabularExportFormat,
+        wires: entities.wires,
+        visibleWires: listModel.visibleWires,
+        wireSort: listModel.wireSort,
+        setWireSort: listModel.setWireSort,
+        dispatchAction,
+        connectorHandlers: modelingHandlers.connector,
+        segmentHandlers: modelingHandlers.segment,
+        wireHandlers: modelingHandlers.wire,
+        selectedWireId: selection.selectedWireId,
+        describeWireEndpoint: wireDescriptions.describeWireEndpoint,
+        describeWireEndpointCsvParts:
+          wireDescriptions.describeWireEndpointCsvParts,
+        startWireEdit: (wire) => {
+          markSelectionPanelsFromTable?.();
+          modelingHandlers.wire.startWireEdit(wire);
+        },
+        handleWireDelete: modelingHandlers.wire.handleWireDelete,
+        onOpenWireOnboardingHelp: onboardingHelp?.openWireStep,
+        handleConnectorSubmit: modelingHandlers.connector.handleConnectorSubmit,
+        connectorName: formsState.connectorName,
+        setConnectorName: formsState.setConnectorName,
+        connectorTechnicalId: formsState.connectorTechnicalId,
+        setConnectorTechnicalId: formsState.setConnectorTechnicalId,
+        connectorCatalogItemId: formsState.connectorCatalogItemId,
+        setConnectorCatalogItemId:
+          modelingHandlers.connector.syncDerivedConnectorCatalogFields ??
+          formsState.setConnectorCatalogItemId,
+        connectorManufacturerReference:
+          formsState.connectorManufacturerReference,
+        setConnectorManufacturerReference:
+          formsState.setConnectorManufacturerReference,
+        connectorIsMainHarnessConnector:
+          formsState.connectorIsMainHarnessConnector,
+        setConnectorIsMainHarnessConnector:
+          formsState.setConnectorIsMainHarnessConnector,
+        connectorApplyCatalogPlugs: formsState.connectorApplyCatalogPlugs,
+        setConnectorApplyCatalogPlugs: formsState.setConnectorApplyCatalogPlugs,
+        connectorApplyCatalogSeals: formsState.connectorApplyCatalogSeals,
+        setConnectorApplyCatalogSeals: formsState.setConnectorApplyCatalogSeals,
+        connectorTerminalOverridesText:
+          formsState.connectorTerminalOverridesText,
+        setConnectorTerminalOverridesText:
+          formsState.setConnectorTerminalOverridesText,
+        connectorFusePairRatings: formsState.connectorFusePairRatings,
+        setConnectorFusePairRatings: formsState.setConnectorFusePairRatings,
+        connectorFusePairOverrides: formsState.connectorFusePairOverrides,
+        setConnectorFusePairOverrides: formsState.setConnectorFusePairOverrides,
+        connectorPinElectricalRoleDrafts:
+          formsState.connectorPinElectricalRoleDrafts,
+        setConnectorPinElectricalRoleDrafts:
+          formsState.setConnectorPinElectricalRoleDrafts,
+        connectorPinElectricalRoleSelection:
+          formsState.connectorPinElectricalRoleSelection,
+        setConnectorPinElectricalRoleSelection:
+          formsState.setConnectorPinElectricalRoleSelection,
+        connectorPinRoleCatalogItem:
+          formsState.connectorCatalogItemId.length === 0
+            ? undefined
+            : entities.catalogItems.find(
+                (item) => item.id === formsState.connectorCatalogItemId,
+              ),
+        connectorRearBackshellOverrideEnabled:
+          formsState.connectorRearBackshellOverrideEnabled,
+        setConnectorRearBackshellOverrideEnabled:
+          formsState.setConnectorRearBackshellOverrideEnabled,
+        connectorRearBackshellOverrideLengthMm:
+          formsState.connectorRearBackshellOverrideLengthMm,
+        setConnectorRearBackshellOverrideLengthMm:
+          formsState.setConnectorRearBackshellOverrideLengthMm,
+        connectorAutoCreateLinkedNode: formsState.connectorAutoCreateLinkedNode,
+        setConnectorAutoCreateLinkedNode:
+          formsState.setConnectorAutoCreateLinkedNode,
+        connectorTechnicalIdAlreadyUsed,
+        cavityCount: formsState.cavityCount,
+        setCavityCount: formsState.setCavityCount,
+        cancelConnectorEdit: modelingHandlers.connector.cancelConnectorEdit,
+        connectorFormError: formsState.connectorFormError,
+        handleSpliceSubmit: modelingHandlers.splice.handleSpliceSubmit,
+        handleConvertSpliceToDirectional:
+          modelingHandlers.splice.handleConvertSpliceToDirectional,
+        handleRerouteSpliceConnectedWires:
+          modelingHandlers.splice.handleRerouteSpliceConnectedWires,
+        handleSuggestOptimizedSplicePlacement:
+          modelingHandlers.splice.handleSuggestOptimizedSplicePlacement,
+        spliceName: formsState.spliceName,
+        setSpliceName: formsState.setSpliceName,
+        spliceTechnicalId: formsState.spliceTechnicalId,
+        setSpliceTechnicalId: formsState.setSpliceTechnicalId,
+        spliceCatalogItemId: formsState.spliceCatalogItemId,
+        setSpliceCatalogItemId:
+          modelingHandlers.splice.syncDerivedSpliceCatalogFields ??
+          formsState.setSpliceCatalogItemId,
+        splicePortMode: formsState.splicePortMode,
+        setSplicePortMode:
+          modelingHandlers.splice.setSpliceCapacityMode ??
+          formsState.setSplicePortMode,
+        spliceSideInverted: formsState.spliceSideInverted,
+        setSpliceSideInverted: formsState.setSpliceSideInverted,
+        spliceManufacturerReference: formsState.spliceManufacturerReference,
+        setSpliceManufacturerReference:
+          formsState.setSpliceManufacturerReference,
+        spliceAutoCreateLinkedNode: formsState.spliceAutoCreateLinkedNode,
+        setSpliceAutoCreateLinkedNode: formsState.setSpliceAutoCreateLinkedNode,
+        spliceTechnicalIdAlreadyUsed,
+        portCount: formsState.portCount,
+        setPortCount: formsState.setPortCount,
+        spliceFormInfo: formsState.spliceFormInfo,
+        cancelSpliceEdit: modelingHandlers.splice.cancelSpliceEdit,
+        spliceFormError: formsState.spliceFormError,
+        handleNodeSubmit: modelingHandlers.node.handleNodeSubmit,
+        nodeIdInput: formsState.nodeIdInput,
+        setNodeIdInput: formsState.setNodeIdInput,
+        pendingNewNodePosition,
+        nodeKind: formsState.nodeKind,
+        setNodeKind: formsState.setNodeKind,
+        nodeLabel: formsState.nodeLabel,
+        setNodeLabel: formsState.setNodeLabel,
+        nodeConnectorId: formsState.nodeConnectorId,
+        setNodeConnectorId: formsState.setNodeConnectorId,
+        nodeSpliceId: formsState.nodeSpliceId,
+        setNodeSpliceId: formsState.setNodeSpliceId,
+        cancelNodeEdit: modelingHandlers.node.cancelNodeEdit,
+        nodeFormError: formsState.nodeFormError,
+        handleSegmentSubmit: modelingHandlers.segment.handleSegmentSubmit,
+        handleSwapSegmentNodes: modelingHandlers.segment.handleSwapSegmentNodes,
+        segmentIdInput: formsState.segmentIdInput,
+        setSegmentIdInput: formsState.setSegmentIdInput,
+        segmentNodeA: formsState.segmentNodeA,
+        setSegmentNodeA: formsState.setSegmentNodeA,
+        segmentNodeB: formsState.segmentNodeB,
+        setSegmentNodeB: formsState.setSegmentNodeB,
+        segmentLengthMm: formsState.segmentLengthMm,
+        setSegmentLengthMm: formsState.setSegmentLengthMm,
+        segmentSubNetworkTag: formsState.segmentSubNetworkTag,
+        setSegmentSubNetworkTag: formsState.setSegmentSubNetworkTag,
+        segmentSheathType: formsState.segmentSheathType,
+        setSegmentSheathType: formsState.setSegmentSheathType,
+        segmentInsulation: formsState.segmentInsulation,
+        setSegmentInsulation: formsState.setSegmentInsulation,
+        segmentLineStyle: formsState.segmentLineStyle,
+        setSegmentLineStyle: formsState.setSegmentLineStyle,
+        segmentInternalPartReference: formsState.segmentInternalPartReference,
+        setSegmentInternalPartReference:
+          formsState.setSegmentInternalPartReference,
+        segmentMountingLabelsText: formsState.segmentMountingLabelsText,
+        setSegmentMountingLabelsText: formsState.setSegmentMountingLabelsText,
+        cancelSegmentEdit: modelingHandlers.segment.cancelSegmentEdit,
+        segmentFormError: formsState.segmentFormError,
+        handleWireSubmit: modelingHandlers.wire.handleWireSubmit,
+        handleSwapWireEndpoints: modelingHandlers.wire.handleSwapWireEndpoints,
+        wireName: formsState.wireName,
+        setWireName: formsState.setWireName,
+        wireTechnicalId: formsState.wireTechnicalId,
+        setWireTechnicalId: formsState.setWireTechnicalId,
+        wireTwistGroupLabel: formsState.wireTwistGroupLabel,
+        setWireTwistGroupLabel: formsState.setWireTwistGroupLabel,
+        wireFunctionalDomainTag: formsState.wireFunctionalDomainTag,
+        setWireFunctionalDomainTag: formsState.setWireFunctionalDomainTag,
+        wireSectionMm2: formsState.wireSectionMm2,
+        setWireSectionMm2: formsState.setWireSectionMm2,
+        wireCurrentA: formsState.wireCurrentA,
+        setWireCurrentA: formsState.setWireCurrentA,
+        wireMaterial: formsState.wireMaterial,
+        setWireMaterial: formsState.setWireMaterial,
+        recommendedWireSectionMm2:
+          modelingHandlers.wire.recommendedWireSectionMm2,
+        handleApplyRecommendedWireSection:
+          modelingHandlers.wire.handleApplyRecommendedWireSection,
+        wireColorMode: formsState.wireColorMode,
+        setWireColorMode:
+          modelingHandlers.wire.setWireColorModeAndResetIncompatibleValues,
+        wirePrimaryColorId: formsState.wirePrimaryColorId,
+        setWirePrimaryColorId: formsState.setWirePrimaryColorId,
+        wireSecondaryColorId: formsState.wireSecondaryColorId,
+        setWireSecondaryColorId: formsState.setWireSecondaryColorId,
+        wireFreeColorLabel: formsState.wireFreeColorLabel,
+        setWireFreeColorLabel: formsState.setWireFreeColorLabel,
+        wireFuseEnabled: formsState.wireFuseEnabled,
+        setWireFuseEnabled: formsState.setWireFuseEnabled,
+        wireFuseCatalogItemId: formsState.wireFuseCatalogItemId,
+        setWireFuseCatalogItemId: formsState.setWireFuseCatalogItemId,
+        wireTechnicalIdAlreadyUsed,
+        wireEndpointAConnectionReference:
+          formsState.wireEndpointAConnectionReference,
+        setWireEndpointAConnectionReference:
+          formsState.setWireEndpointAConnectionReference,
+        wireEndpointAConnectionName: formsState.wireEndpointAConnectionName,
+        setWireEndpointAConnectionName:
+          formsState.setWireEndpointAConnectionName,
+        wireEndpointASealReference: formsState.wireEndpointASealReference,
+        setWireEndpointASealReference: formsState.setWireEndpointASealReference,
+        wireEndpointASealName: formsState.wireEndpointASealName,
+        setWireEndpointASealName: formsState.setWireEndpointASealName,
+        wireEndpointAKind: formsState.wireEndpointAKind,
+        setWireEndpointAKind: formsState.setWireEndpointAKind,
+        wireEndpointAConnectorId: formsState.wireEndpointAConnectorId,
+        setWireEndpointAConnectorId: formsState.setWireEndpointAConnectorId,
+        wireEndpointACavityIndex: formsState.wireEndpointACavityIndex,
+        setWireEndpointACavityIndex:
+          modelingHandlers.wire.setWireEndpointACavityIndex,
+        wireEndpointASpliceId: formsState.wireEndpointASpliceId,
+        setWireEndpointASpliceId: formsState.setWireEndpointASpliceId,
+        wireEndpointAPortIndex: formsState.wireEndpointAPortIndex,
+        setWireEndpointAPortIndex:
+          modelingHandlers.wire.setWireEndpointAPortIndex,
+        wireEndpointASpliceSideOverride:
+          formsState.wireEndpointASpliceSideOverride,
+        setWireEndpointASpliceSideOverride:
+          formsState.setWireEndpointASpliceSideOverride,
+        wireEndpointASpliceSideLocked: formsState.wireEndpointASpliceSideLocked,
+        setWireEndpointASpliceSideLocked:
+          formsState.setWireEndpointASpliceSideLocked,
+        wireEndpointASlotHint: modelingHandlers.wire.wireEndpointASlotHint,
+        wireEndpointBConnectionReference:
+          formsState.wireEndpointBConnectionReference,
+        setWireEndpointBConnectionReference:
+          formsState.setWireEndpointBConnectionReference,
+        wireEndpointBConnectionName: formsState.wireEndpointBConnectionName,
+        setWireEndpointBConnectionName:
+          formsState.setWireEndpointBConnectionName,
+        wireEndpointBSealReference: formsState.wireEndpointBSealReference,
+        setWireEndpointBSealReference: formsState.setWireEndpointBSealReference,
+        wireEndpointBSealName: formsState.wireEndpointBSealName,
+        setWireEndpointBSealName: formsState.setWireEndpointBSealName,
+        wireEndpointBKind: formsState.wireEndpointBKind,
+        setWireEndpointBKind: formsState.setWireEndpointBKind,
+        wireEndpointBConnectorId: formsState.wireEndpointBConnectorId,
+        setWireEndpointBConnectorId: formsState.setWireEndpointBConnectorId,
+        wireEndpointBCavityIndex: formsState.wireEndpointBCavityIndex,
+        setWireEndpointBCavityIndex:
+          modelingHandlers.wire.setWireEndpointBCavityIndex,
+        wireEndpointBSpliceId: formsState.wireEndpointBSpliceId,
+        setWireEndpointBSpliceId: formsState.setWireEndpointBSpliceId,
+        wireEndpointBPortIndex: formsState.wireEndpointBPortIndex,
+        setWireEndpointBPortIndex:
+          modelingHandlers.wire.setWireEndpointBPortIndex,
+        wireEndpointBSpliceSideOverride:
+          formsState.wireEndpointBSpliceSideOverride,
+        setWireEndpointBSpliceSideOverride:
+          formsState.setWireEndpointBSpliceSideOverride,
+        wireEndpointBSpliceSideLocked: formsState.wireEndpointBSpliceSideLocked,
+        setWireEndpointBSpliceSideLocked:
+          formsState.setWireEndpointBSpliceSideLocked,
+        wireEndpointBSlotHint: modelingHandlers.wire.wireEndpointBSlotHint,
+        cancelWireEdit: modelingHandlers.wire.cancelWireEdit,
+        wireFormError: formsState.wireFormError,
+        modelingBatchSelection:
+          activeBatchScope === null || batchDeletePreflight === null
+            ? null
+            : {
+                isDialogOpen: isBatchSelectionDialogOpen,
+                scope: activeBatchScope,
+                selectedCount: batchDeletePreflight.selectedCount,
+                directCount: batchDeletePreflight.directCount,
+                cascadeCount: batchDeletePreflight.cascadeCount,
+                blockedCount: batchDeletePreflight.blockedCount,
+                summaryCategories: batchDeletePreflight.summaryCategories,
+                summaryNote: batchDeletePreflight.summaryNote,
+                onDeleteSelected: handleDeleteSelectedInBatchMode,
+                onCancelBatchMode: exitBatchMode,
+                onCloseDialog: () => setIsBatchSelectionDialogOpen(false),
+                segmentBatchEdit:
+                  activeBatchScope !== "segment"
+                    ? undefined
+                    : {
+                        sheathType: segmentBatchSheathType,
+                        insulation: segmentBatchInsulation,
+                        lineStyle: segmentBatchLineStyle,
+                        internalPartReference:
+                          segmentBatchInternalPartReference,
+                        dirtyFields: segmentBatchDirtyFields,
+                        mixedFields: segmentBatchMixedFields,
+                        error: segmentBatchEditError,
+                        setSheathType: (value) => {
+                          markSegmentBatchFieldDirty("sheathType");
+                          setSegmentBatchSheathType(value);
+                        },
+                        setInsulation: (value) => {
+                          markSegmentBatchFieldDirty("insulation");
+                          setSegmentBatchInsulation(value);
+                        },
+                        setLineStyle: (value) => {
+                          markSegmentBatchFieldDirty("lineStyle");
+                          setSegmentBatchLineStyle(value);
+                        },
+                        setInternalPartReference: (value) => {
+                          markSegmentBatchFieldDirty("internalPartReference");
+                          setSegmentBatchInternalPartReference(value);
+                        },
+                        onApply: handleApplySegmentBatchEdit,
+                      },
+              },
       })
     : null;
 
   const analysisSlice = includeAnalysisContent
     ? (() => {
-      return buildAnalysisScreenContentSlice({
-    AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent,
-    hideWireAnalysisRoutePanel,
-    showMultiNetworkFunctionalAnalysisPanel,
-    isMultiNetworkFunctionalAnalysisOpen,
-    activeNetwork,
-    multiNetworkFunctionalAnalysis,
-    multiNetworkFunctionalAnalysisScope,
-    setMultiNetworkFunctionalAnalysisScope,
-    onToggleMultiNetworkFunctionalAnalysisCustomNetwork: handleToggleMultiNetworkFunctionalAnalysisCustomNetwork,
-    onGoToMultiNetworkFunctionalAnalysisFinding: handleGoToMultiNetworkFunctionalAnalysisFinding,
-    onCloseMultiNetworkFunctionalAnalysis,
-    onApplyPinRoleMassEdit: handleApplyPinRoleMassEdit,
-    isConnectorSubScreen: screenFlags.isConnectorSubScreen,
-    isSpliceSubScreen: screenFlags.isSpliceSubScreen,
-    isNodeSubScreen: screenFlags.isNodeSubScreen,
-    isSegmentSubScreen: screenFlags.isSegmentSubScreen,
-    isWireSubScreen: screenFlags.isWireSubScreen,
-    selectedConnector: selection.selectedConnector,
-    selectedConnectorId: selection.selectedConnectorId,
-    connectorOccupancyFilter: listModel.connectorOccupancyFilter,
-    setConnectorOccupancyFilter: listModel.setConnectorOccupancyFilter,
-    connectorFilterField: listModel.connectorFilterField,
-    setConnectorFilterField: listModel.setConnectorFilterField,
-    connectorFilterQuery: listModel.connectorSearchQuery,
-    setConnectorFilterQuery: listModel.setConnectorSearchQuery,
-    connectors: entities.connectors,
-    visibleConnectors: listModel.visibleConnectors,
-    connectorSort: listModel.connectorSort,
-    setConnectorSort: listModel.setConnectorSort,
-    connectorOccupiedCountById: listModel.connectorOccupiedCountById,
-    onSelectConnector,
-    onSelectCatalogItem: handleSelectCatalogItemReference,
-    onOpenConnectorOnboardingHelp: onboardingHelp?.openConnectorStep,
-    cavityIndexInput: formsState.cavityIndexInput,
-    setCavityIndexInput: formsState.setCavityIndexInput,
-    connectorOccupantRefInput: formsState.connectorOccupantRefInput,
-    setConnectorOccupantRefInput: formsState.setConnectorOccupantRefInput,
-    handleReserveCavity: modelingHandlers.connector.handleReserveCavity,
-    connectorCavityStatuses: selection.connectorCavityStatuses,
-    handleReleaseCavity: modelingHandlers.connector.handleReleaseCavity,
-    sortedConnectorSynthesisRows: listModel.sortedConnectorSynthesisRows,
-    connectorSynthesisSort: listModel.connectorSynthesisSort,
-    setConnectorSynthesisSort: listModel.setConnectorSynthesisSort,
-    getSortIndicator: listModel.getSortIndicator,
-    connectorAnalysisView,
-    setConnectorAnalysisView,
-    connectorApplyCatalogPlugs: formsState.connectorApplyCatalogPlugs,
-    setConnectorApplyCatalogPlugs: formsState.setConnectorApplyCatalogPlugs,
-    connectorApplyCatalogSeals: formsState.connectorApplyCatalogSeals,
-    setConnectorApplyCatalogSeals: formsState.setConnectorApplyCatalogSeals,
-    connectorTerminalOverridesText: formsState.connectorTerminalOverridesText,
-    setConnectorTerminalOverridesText: formsState.setConnectorTerminalOverridesText,
-    onClearConnectorTerminalAndSealOverrides: modelingHandlers.connector.handleClearConnectorTerminalAndSealOverrides,
-    onSaveConnectorCatalogMaterialApplication: handleSaveConnectorCatalogMaterialApplication,
-    onSaveConnectorPinElectricalRoles: handleSaveConnectorPinElectricalRoles,
-    selectedSplice: selection.selectedSplice,
-    selectedSpliceId: selection.selectedSpliceId,
-    spliceOccupancyFilter: listModel.spliceOccupancyFilter,
-    setSpliceOccupancyFilter: listModel.setSpliceOccupancyFilter,
-    spliceFilterField: listModel.spliceFilterField,
-    setSpliceFilterField: listModel.setSpliceFilterField,
-    spliceFilterQuery: listModel.spliceSearchQuery,
-    setSpliceFilterQuery: listModel.setSpliceSearchQuery,
-    splices: entities.splices,
-    visibleSplices: listModel.visibleSplices,
-    spliceSort: listModel.spliceSort,
-    setSpliceSort: listModel.setSpliceSort,
-    spliceOccupiedCountById: listModel.spliceOccupiedCountById,
-    onSelectSplice,
-    onOpenSpliceOnboardingHelp: onboardingHelp?.openSpliceStep,
-    splicePortStatuses: selection.splicePortStatuses,
-    portIndexInput: formsState.portIndexInput,
-    setPortIndexInput: formsState.setPortIndexInput,
-    spliceOccupantRefInput: formsState.spliceOccupantRefInput,
-    setSpliceOccupantRefInput: formsState.setSpliceOccupantRefInput,
-    handleReservePort: modelingHandlers.splice.handleReservePort,
-    handleReleasePort: modelingHandlers.splice.handleReleasePort,
-    sortedSpliceSynthesisRows: listModel.sortedSpliceSynthesisRows,
-    spliceSynthesisSort: listModel.spliceSynthesisSort,
-    setSpliceSynthesisSort: listModel.setSpliceSynthesisSort,
-    spliceAnalysisView,
-    setSpliceAnalysisView,
-    nodeKindFilter: listModel.nodeKindFilter,
-    setNodeKindFilter: listModel.setNodeKindFilter,
-    nodeFilterField: listModel.nodeFilterField,
-    setNodeFilterField: listModel.setNodeFilterField,
-    nodeFilterQuery: listModel.nodeSearchQuery,
-    setNodeFilterQuery: listModel.setNodeSearchQuery,
-    nodes: entities.nodes,
-    visibleNodes: listModel.visibleNodes,
-    segmentsCountByNodeId: listModel.segmentsCountByNodeId,
-    selectedNodeId: selection.selectedNodeId,
-    selectedNode: selection.selectedNode,
-    selectedSegment: selection.selectedSegment,
-    onSelectNode,
-    onOpenNodeOnboardingHelp: onboardingHelp?.openNodeStep,
-    describeNode,
-    nodeLabelById,
-    segmentSubNetworkFilter: listModel.segmentSubNetworkFilter,
-    setSegmentSubNetworkFilter: listModel.setSegmentSubNetworkFilter,
-    segmentFilterField: listModel.segmentFilterField,
-    setSegmentFilterField: listModel.setSegmentFilterField,
-    segmentFilterQuery: listModel.segmentSearchQuery,
-    setSegmentFilterQuery: listModel.setSegmentSearchQuery,
-    segments: entities.segments,
-    visibleSegments: listModel.visibleSegments,
-    selectedSegmentId: selection.selectedSegmentId,
-    onSelectSegment,
-    onOpenSegmentOnboardingHelp: onboardingHelp?.openSegmentStep,
-    wireRouteFilter: listModel.wireRouteFilter,
-    setWireRouteFilter: listModel.setWireRouteFilter,
-    wireFunctionalTagFilter: listModel.wireFunctionalTagFilter,
-    setWireFunctionalTagFilter: listModel.setWireFunctionalTagFilter,
-    wireFunctionalTagOptions: listModel.wireFunctionalTagOptions,
-    wireFilterField: listModel.wireFilterField,
-    setWireFilterField: listModel.setWireFilterField,
-    wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,
-    setWireEndpointFilterQuery: listModel.setWireEndpointFilterQuery,
-    tabularExportFormat,
-    catalogItems: entities.catalogItems,
-    wires: entities.wires,
-    visibleWires: listModel.visibleWires,
-    wireSort: listModel.wireSort,
-    setWireSort: listModel.setWireSort,
-    selectedWireId: selection.selectedWireId,
-    onSelectWire,
-    onGoToSegmentFromAnalysis,
-    onGoToWireFromAnalysis,
-    onOpenSegmentFromAnalysisTable,
-    onOpenWireFromAnalysisTable,
-    onOpenConnectorFromAnalysisTable,
-    onOpenSpliceFromAnalysisTable,
-    onOpenWireOnboardingHelp: onboardingHelp?.openWireStep,
-    selectedWire: selection.selectedWire,
-    describeWireEndpoint: wireDescriptions.describeWireEndpoint,
-    describeWireEndpointCsvParts: wireDescriptions.describeWireEndpointCsvParts,
-    wireForcedRouteInput: formsState.wireForcedRouteInput,
-    setWireForcedRouteInput: formsState.setWireForcedRouteInput,
-    handleLockWireRoute: modelingHandlers.wire.handleLockWireRoute,
-    handleResetWireRoute: modelingHandlers.wire.handleResetWireRoute,
-    wireFormError: formsState.wireFormError
-      });
-    })()
+        return buildAnalysisScreenContentSlice({
+          AnalysisWorkspaceContentComponent:
+            components.AnalysisWorkspaceContentComponent,
+          hideWireAnalysisRoutePanel,
+          showMultiNetworkFunctionalAnalysisPanel,
+          isMultiNetworkFunctionalAnalysisOpen,
+          activeNetwork,
+          multiNetworkFunctionalAnalysis,
+          multiNetworkFunctionalAnalysisScope,
+          setMultiNetworkFunctionalAnalysisScope,
+          onToggleMultiNetworkFunctionalAnalysisCustomNetwork:
+            handleToggleMultiNetworkFunctionalAnalysisCustomNetwork,
+          onGoToMultiNetworkFunctionalAnalysisFinding:
+            handleGoToMultiNetworkFunctionalAnalysisFinding,
+          onCloseMultiNetworkFunctionalAnalysis,
+          onApplyPinRoleMassEdit: handleApplyPinRoleMassEdit,
+          isConnectorSubScreen: screenFlags.isConnectorSubScreen,
+          isSpliceSubScreen: screenFlags.isSpliceSubScreen,
+          isNodeSubScreen: screenFlags.isNodeSubScreen,
+          isSegmentSubScreen: screenFlags.isSegmentSubScreen,
+          isWireSubScreen: screenFlags.isWireSubScreen,
+          selectedConnector: selection.selectedConnector,
+          selectedConnectorId: selection.selectedConnectorId,
+          connectorOccupancyFilter: listModel.connectorOccupancyFilter,
+          setConnectorOccupancyFilter: listModel.setConnectorOccupancyFilter,
+          connectorFilterField: listModel.connectorFilterField,
+          setConnectorFilterField: listModel.setConnectorFilterField,
+          connectorFilterQuery: listModel.connectorSearchQuery,
+          setConnectorFilterQuery: listModel.setConnectorSearchQuery,
+          connectors: entities.connectors,
+          visibleConnectors: listModel.visibleConnectors,
+          connectorSort: listModel.connectorSort,
+          setConnectorSort: listModel.setConnectorSort,
+          connectorOccupiedCountById: listModel.connectorOccupiedCountById,
+          onSelectConnector,
+          onSelectCatalogItem: handleSelectCatalogItemReference,
+          onOpenConnectorOnboardingHelp: onboardingHelp?.openConnectorStep,
+          cavityIndexInput: formsState.cavityIndexInput,
+          setCavityIndexInput: formsState.setCavityIndexInput,
+          connectorOccupantRefInput: formsState.connectorOccupantRefInput,
+          setConnectorOccupantRefInput: formsState.setConnectorOccupantRefInput,
+          handleReserveCavity: modelingHandlers.connector.handleReserveCavity,
+          connectorCavityStatuses: selection.connectorCavityStatuses,
+          handleReleaseCavity: modelingHandlers.connector.handleReleaseCavity,
+          sortedConnectorSynthesisRows: listModel.sortedConnectorSynthesisRows,
+          connectorSynthesisSort: listModel.connectorSynthesisSort,
+          setConnectorSynthesisSort: listModel.setConnectorSynthesisSort,
+          getSortIndicator: listModel.getSortIndicator,
+          connectorAnalysisView,
+          setConnectorAnalysisView,
+          connectorApplyCatalogPlugs: formsState.connectorApplyCatalogPlugs,
+          setConnectorApplyCatalogPlugs:
+            formsState.setConnectorApplyCatalogPlugs,
+          connectorApplyCatalogSeals: formsState.connectorApplyCatalogSeals,
+          setConnectorApplyCatalogSeals:
+            formsState.setConnectorApplyCatalogSeals,
+          connectorTerminalOverridesText:
+            formsState.connectorTerminalOverridesText,
+          setConnectorTerminalOverridesText:
+            formsState.setConnectorTerminalOverridesText,
+          onClearConnectorTerminalAndSealOverrides:
+            modelingHandlers.connector
+              .handleClearConnectorTerminalAndSealOverrides,
+          onSaveConnectorCatalogMaterialApplication:
+            handleSaveConnectorCatalogMaterialApplication,
+          onSaveConnectorPinElectricalRoles:
+            handleSaveConnectorPinElectricalRoles,
+          selectedSplice: selection.selectedSplice,
+          selectedSpliceId: selection.selectedSpliceId,
+          spliceOccupancyFilter: listModel.spliceOccupancyFilter,
+          setSpliceOccupancyFilter: listModel.setSpliceOccupancyFilter,
+          spliceFilterField: listModel.spliceFilterField,
+          setSpliceFilterField: listModel.setSpliceFilterField,
+          spliceFilterQuery: listModel.spliceSearchQuery,
+          setSpliceFilterQuery: listModel.setSpliceSearchQuery,
+          splices: entities.splices,
+          visibleSplices: listModel.visibleSplices,
+          spliceSort: listModel.spliceSort,
+          setSpliceSort: listModel.setSpliceSort,
+          spliceOccupiedCountById: listModel.spliceOccupiedCountById,
+          onSelectSplice,
+          onOpenSpliceOnboardingHelp: onboardingHelp?.openSpliceStep,
+          splicePortStatuses: selection.splicePortStatuses,
+          portIndexInput: formsState.portIndexInput,
+          setPortIndexInput: formsState.setPortIndexInput,
+          spliceOccupantRefInput: formsState.spliceOccupantRefInput,
+          setSpliceOccupantRefInput: formsState.setSpliceOccupantRefInput,
+          handleReservePort: modelingHandlers.splice.handleReservePort,
+          handleReleasePort: modelingHandlers.splice.handleReleasePort,
+          sortedSpliceSynthesisRows: listModel.sortedSpliceSynthesisRows,
+          spliceSynthesisSort: listModel.spliceSynthesisSort,
+          setSpliceSynthesisSort: listModel.setSpliceSynthesisSort,
+          spliceAnalysisView,
+          setSpliceAnalysisView,
+          nodeKindFilter: listModel.nodeKindFilter,
+          setNodeKindFilter: listModel.setNodeKindFilter,
+          nodeFilterField: listModel.nodeFilterField,
+          setNodeFilterField: listModel.setNodeFilterField,
+          nodeFilterQuery: listModel.nodeSearchQuery,
+          setNodeFilterQuery: listModel.setNodeSearchQuery,
+          nodes: entities.nodes,
+          visibleNodes: listModel.visibleNodes,
+          segmentsCountByNodeId: listModel.segmentsCountByNodeId,
+          selectedNodeId: selection.selectedNodeId,
+          selectedNode: selection.selectedNode,
+          selectedSegment: selection.selectedSegment,
+          onSelectNode,
+          onOpenNodeOnboardingHelp: onboardingHelp?.openNodeStep,
+          describeNode,
+          nodeLabelById,
+          segmentSubNetworkFilter: listModel.segmentSubNetworkFilter,
+          setSegmentSubNetworkFilter: listModel.setSegmentSubNetworkFilter,
+          segmentFilterField: listModel.segmentFilterField,
+          setSegmentFilterField: listModel.setSegmentFilterField,
+          segmentFilterQuery: listModel.segmentSearchQuery,
+          setSegmentFilterQuery: listModel.setSegmentSearchQuery,
+          segments: entities.segments,
+          visibleSegments: listModel.visibleSegments,
+          selectedSegmentId: selection.selectedSegmentId,
+          onSelectSegment,
+          onOpenSegmentOnboardingHelp: onboardingHelp?.openSegmentStep,
+          wireRouteFilter: listModel.wireRouteFilter,
+          setWireRouteFilter: listModel.setWireRouteFilter,
+          wireFunctionalTagFilter: listModel.wireFunctionalTagFilter,
+          setWireFunctionalTagFilter: listModel.setWireFunctionalTagFilter,
+          wireFunctionalTagOptions: listModel.wireFunctionalTagOptions,
+          wireFilterField: listModel.wireFilterField,
+          setWireFilterField: listModel.setWireFilterField,
+          wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,
+          setWireEndpointFilterQuery: listModel.setWireEndpointFilterQuery,
+          tabularExportFormat,
+          catalogItems: entities.catalogItems,
+          wires: entities.wires,
+          visibleWires: listModel.visibleWires,
+          wireSort: listModel.wireSort,
+          setWireSort: listModel.setWireSort,
+          selectedWireId: selection.selectedWireId,
+          onSelectWire,
+          onGoToSegmentFromAnalysis,
+          onGoToWireFromAnalysis,
+          onOpenSegmentFromAnalysisTable,
+          onOpenWireFromAnalysisTable,
+          onOpenConnectorFromAnalysisTable,
+          onOpenSpliceFromAnalysisTable,
+          onOpenWireOnboardingHelp: onboardingHelp?.openWireStep,
+          selectedWire: selection.selectedWire,
+          describeWireEndpoint: wireDescriptions.describeWireEndpoint,
+          describeWireEndpointCsvParts:
+            wireDescriptions.describeWireEndpointCsvParts,
+          wireForcedRouteInput: formsState.wireForcedRouteInput,
+          setWireForcedRouteInput: formsState.setWireForcedRouteInput,
+          handleLockWireRoute: modelingHandlers.wire.handleLockWireRoute,
+          handleResetWireRoute: modelingHandlers.wire.handleResetWireRoute,
+          wireFormError: formsState.wireFormError,
+        });
+      })()
     : null;
 
   return {
     modelingLeftColumnContent: modelingSlice?.modelingLeftColumnContent ?? null,
-    modelingFormsColumnContent: modelingSlice?.modelingFormsColumnContent ?? null,
+    modelingFormsColumnContent:
+      modelingSlice?.modelingFormsColumnContent ?? null,
     analysisWorkspaceContent: analysisSlice?.analysisWorkspaceContent ?? null,
     isModelingBatchModeActive: activeBatchScope !== null,
-    selectedBatchSegmentIds
+    selectedBatchSegmentIds,
   };
 }

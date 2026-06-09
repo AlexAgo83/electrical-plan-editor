@@ -1,10 +1,18 @@
-import type { ComponentProps, ComponentType, Dispatch, Ref, SetStateAction } from "react";
+import type {
+  ComponentProps,
+  ComponentType,
+  Dispatch,
+  Ref,
+  SetStateAction,
+} from "react";
 import type { NetworkSummaryPanelHandle } from "../../components/network-summary/NetworkSummaryPanel.types";
 import type { AppStore } from "../../../store";
 import { ModelingController } from "../../components/controller/ModelingController";
 import type { AppControllerModelingHandlersOrchestrator } from "../../hooks/controller/useAppControllerModelingHandlersOrchestrator";
 
-type NetworkSummaryPanelProps = ComponentProps<typeof import("../../components/NetworkSummaryPanel").NetworkSummaryPanel>;
+type NetworkSummaryPanelProps = ComponentProps<
+  typeof import("../../components/NetworkSummaryPanel").NetworkSummaryPanel
+>;
 type NetworkScopeWorkspaceContentProps = ComponentProps<
   typeof import("../../components/workspace/NetworkScopeWorkspaceContent").NetworkScopeWorkspaceContent
 >;
@@ -110,7 +118,11 @@ type ModelingScreenContentSliceParams = Omit<
   > &
   Omit<
     ModelingFormsColumnProps,
-    "openCreateConnectorForm" | "openCreateSpliceForm" | "openCreateNodeForm" | "openCreateSegmentForm" | "openCreateWireForm"
+    | "openCreateConnectorForm"
+    | "openCreateSpliceForm"
+    | "openCreateNodeForm"
+    | "openCreateSegmentForm"
+    | "openCreateWireForm"
   > & {
     ModelingPrimaryTablesComponent: ComponentType<ModelingPrimaryTablesProps>;
     ModelingSecondaryTablesComponent: ComponentType<ModelingSecondaryTablesProps>;
@@ -137,7 +149,7 @@ type ModelingScreenContentSliceParams = Omit<
       action: Parameters<AppStore["dispatch"]>[0],
       options?: {
         trackHistory?: boolean;
-      }
+      },
     ) => void;
     connectorHandlers: AppControllerModelingHandlersOrchestrator["connector"];
     segmentHandlers: AppControllerModelingHandlersOrchestrator["segment"];
@@ -146,7 +158,12 @@ type ModelingScreenContentSliceParams = Omit<
 
 type AnalysisScreenContentSliceParams = Omit<
   AnalysisWorkspaceContentProps,
-  "onSelectConnector" | "onSelectCatalogItem" | "onSelectSplice" | "onSelectNode" | "onSelectSegment" | "onSelectWire"
+  | "onSelectConnector"
+  | "onSelectCatalogItem"
+  | "onSelectSplice"
+  | "onSelectNode"
+  | "onSelectSegment"
+  | "onSelectWire"
 > & {
   AnalysisWorkspaceContentComponent: ComponentType<AnalysisWorkspaceContentProps>;
   onSelectConnector: AnalysisWorkspaceContentProps["onSelectConnector"];
@@ -165,11 +182,13 @@ type SettingsScreenContentSliceParams = SettingsWorkspaceContentProps & {
   SettingsWorkspaceContentComponent: ComponentType<SettingsWorkspaceContentProps>;
 };
 
-export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPanelControllerSliceParams) {
+export function buildNetworkSummaryPanelControllerSlice(
+  params: NetworkSummaryPanelControllerSliceParams,
+) {
   if (params.includeNetworkSummaryPanel === false) {
     return {
       networkSummaryPanelProps: null,
-      networkSummaryPanel: null
+      networkSummaryPanel: null,
     };
   }
 
@@ -211,14 +230,22 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     exportCartoucheLogoUrl: params.exportCartoucheLogoUrl,
     exportCartoucheNotes: params.exportCartoucheNotes,
     showFloatingInspectorPanel: params.showFloatingInspectorPanel,
-    toggleShowNetworkInfoPanels: () => params.setShowNetworkInfoPanels((current: boolean) => !current),
-    toggleShowSegmentLengths: () => params.setShowSegmentLengths((current: boolean) => !current),
-    toggleShowCableCallouts: () => params.setShowCableCallouts((current: boolean) => !current),
-    toggleShowFloatingInspectorPanel: () => params.setShowFloatingInspectorPanel((current: boolean) => !current),
-    openInspectorForCanvasSelection: () => params.setShowFloatingInspectorPanel(true),
-    toggleShowNetworkGrid: () => params.setShowNetworkGrid((current: boolean) => !current),
-    toggleSnapNodesToGrid: () => params.setSnapNodesToGrid((current: boolean) => !current),
-    toggleLockEntityMovement: () => params.setLockEntityMovement((current: boolean) => !current),
+    toggleShowNetworkInfoPanels: () =>
+      params.setShowNetworkInfoPanels((current: boolean) => !current),
+    toggleShowSegmentLengths: () =>
+      params.setShowSegmentLengths((current: boolean) => !current),
+    toggleShowCableCallouts: () =>
+      params.setShowCableCallouts((current: boolean) => !current),
+    toggleShowFloatingInspectorPanel: () =>
+      params.setShowFloatingInspectorPanel((current: boolean) => !current),
+    openInspectorForCanvasSelection: () =>
+      params.setShowFloatingInspectorPanel(true),
+    toggleShowNetworkGrid: () =>
+      params.setShowNetworkGrid((current: boolean) => !current),
+    toggleSnapNodesToGrid: () =>
+      params.setSnapNodesToGrid((current: boolean) => !current),
+    toggleLockEntityMovement: () =>
+      params.setLockEntityMovement((current: boolean) => !current),
     networkScalePercent: params.networkScalePercent,
     routingGraphNodeCount: params.routingGraph.nodeIds.length,
     routingGraphSegmentCount: params.routingGraph.segmentIds.length,
@@ -280,7 +307,8 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     onSelectWireFromConnectorPin: params.onSelectWireFromConnectorPin,
     onPersistConnectorCalloutPosition: params.onPersistConnectorCalloutPosition,
     onPersistSpliceCalloutPosition: params.onPersistSpliceCalloutPosition,
-    onPersistSegmentSheathCalloutPosition: params.onPersistSegmentSheathCalloutPosition,
+    onPersistSegmentSheathCalloutPosition:
+      params.onPersistSegmentSheathCalloutPosition,
     onViewportSizeChange: params.onViewportSizeChange,
     pngExportIncludeBackground: params.pngExportIncludeBackground,
     canExportBomCsv: params.canExportBomCsv,
@@ -288,17 +316,22 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     onExportNetwork: params.onExportNetwork,
     onRegenerateLayout: params.handleRegenerateLayout,
     onOpenCurrentNetworkFunctional: params.onOpenCurrentNetworkFunctional,
-    onOpenMultiNetworkFunctionalAnalysis: params.onOpenMultiNetworkFunctionalAnalysis,
-    imperativeRef: params.networkSummaryPanelRef
+    onOpenMultiNetworkFunctionalAnalysis:
+      params.onOpenMultiNetworkFunctionalAnalysis,
+    imperativeRef: params.networkSummaryPanelRef,
   } satisfies NetworkSummaryPanelProps;
 
   return {
     networkSummaryPanelProps,
-    networkSummaryPanel: <params.NetworkSummaryPanelComponent {...networkSummaryPanelProps} />
+    networkSummaryPanel: (
+      <params.NetworkSummaryPanelComponent {...networkSummaryPanelProps} />
+    ),
   };
 }
 
-export function buildNetworkScopeScreenContentSlice(params: NetworkScopeScreenContentSliceParams) {
+export function buildNetworkScopeScreenContentSlice(
+  params: NetworkScopeScreenContentSliceParams,
+) {
   const networkScopeWorkspaceProps = {
     networks: params.networks,
     networkSort: params.networkSort,
@@ -342,16 +375,22 @@ export function buildNetworkScopeScreenContentSlice(params: NetworkScopeScreenCo
     focusRequestedNetworkId: params.networkFocusRequest.id,
     focusRequestedNetworkToken: params.networkFocusRequest.token,
     onOpenOnboardingHelp: params.onOpenOnboardingHelp,
-    functionalSchematicPanel: params.functionalSchematicPanel
+    functionalSchematicPanel: params.functionalSchematicPanel,
   } satisfies NetworkScopeWorkspaceContentProps;
 
   return {
     networkScopeWorkspaceProps,
-    networkScopeWorkspaceContent: <params.NetworkScopeWorkspaceContentComponent {...networkScopeWorkspaceProps} />
+    networkScopeWorkspaceContent: (
+      <params.NetworkScopeWorkspaceContentComponent
+        {...networkScopeWorkspaceProps}
+      />
+    ),
   };
 }
 
-export function buildModelingScreenContentSlice(params: ModelingScreenContentSliceParams) {
+export function buildModelingScreenContentSlice(
+  params: ModelingScreenContentSliceParams,
+) {
   const modelingPrimaryTablesProps = {
     activeBatchScope: params.activeBatchScope,
     batchSelectionIds: params.batchSelectionIds,
@@ -359,6 +398,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     onExitBatchMode: params.onExitBatchMode,
     onToggleBatchSelection: params.onToggleBatchSelection,
     onSetBatchSelectionForVisible: params.onSetBatchSelectionForVisible,
+    onOpenBatchSelectionDialog: params.onOpenBatchSelectionDialog,
     onDeleteSelectedInBatchMode: params.onDeleteSelectedInBatchMode,
     isConnectorSubScreen: params.isConnectorSubScreen,
     connectorFormMode: params.connectorFormMode,
@@ -420,7 +460,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     describeNode: params.describeNode,
     onEditNode: params.startNodeEdit,
     onDeleteNode: params.handleNodeDelete,
-    onOpenNodeOnboardingHelp: params.onOpenNodeOnboardingHelp
+    onOpenNodeOnboardingHelp: params.onOpenNodeOnboardingHelp,
   } satisfies ModelingPrimaryTablesProps;
   const modelingSecondaryTablesProps = {
     activeBatchScope: params.activeBatchScope,
@@ -429,6 +469,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     onExitBatchMode: params.onExitBatchMode,
     onToggleBatchSelection: params.onToggleBatchSelection,
     onSetBatchSelectionForVisible: params.onSetBatchSelectionForVisible,
+    onOpenBatchSelectionDialog: params.onOpenBatchSelectionDialog,
     onDeleteSelectedInBatchMode: params.onDeleteSelectedInBatchMode,
     isSegmentSubScreen: params.isSegmentSubScreen,
     segmentFormMode: params.segmentFormMode,
@@ -477,7 +518,7 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     onEditWire: params.startWireEdit,
     onDeleteWire: params.handleWireDelete,
     onOpenSegmentOnboardingHelp: params.onOpenSegmentOnboardingHelp,
-    onOpenWireOnboardingHelp: params.onOpenWireOnboardingHelp
+    onOpenWireOnboardingHelp: params.onOpenWireOnboardingHelp,
   } satisfies ModelingSecondaryTablesProps;
   const modelingFormsColumnProps = {
     catalogItems: params.catalogItems,
@@ -497,7 +538,8 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     connectorManufacturerReference: params.connectorManufacturerReference,
     setConnectorManufacturerReference: params.setConnectorManufacturerReference,
     connectorIsMainHarnessConnector: params.connectorIsMainHarnessConnector,
-    setConnectorIsMainHarnessConnector: params.setConnectorIsMainHarnessConnector,
+    setConnectorIsMainHarnessConnector:
+      params.setConnectorIsMainHarnessConnector,
     connectorApplyCatalogPlugs: params.connectorApplyCatalogPlugs,
     setConnectorApplyCatalogPlugs: params.setConnectorApplyCatalogPlugs,
     connectorApplyCatalogSeals: params.connectorApplyCatalogSeals,
@@ -509,14 +551,21 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     connectorFusePairOverrides: params.connectorFusePairOverrides,
     setConnectorFusePairOverrides: params.setConnectorFusePairOverrides,
     connectorPinElectricalRoleDrafts: params.connectorPinElectricalRoleDrafts,
-    setConnectorPinElectricalRoleDrafts: params.setConnectorPinElectricalRoleDrafts,
-    connectorPinElectricalRoleSelection: params.connectorPinElectricalRoleSelection,
-    setConnectorPinElectricalRoleSelection: params.setConnectorPinElectricalRoleSelection,
+    setConnectorPinElectricalRoleDrafts:
+      params.setConnectorPinElectricalRoleDrafts,
+    connectorPinElectricalRoleSelection:
+      params.connectorPinElectricalRoleSelection,
+    setConnectorPinElectricalRoleSelection:
+      params.setConnectorPinElectricalRoleSelection,
     connectorPinRoleCatalogItem: params.connectorPinRoleCatalogItem,
-    connectorRearBackshellOverrideEnabled: params.connectorRearBackshellOverrideEnabled,
-    setConnectorRearBackshellOverrideEnabled: params.setConnectorRearBackshellOverrideEnabled,
-    connectorRearBackshellOverrideLengthMm: params.connectorRearBackshellOverrideLengthMm,
-    setConnectorRearBackshellOverrideLengthMm: params.setConnectorRearBackshellOverrideLengthMm,
+    connectorRearBackshellOverrideEnabled:
+      params.connectorRearBackshellOverrideEnabled,
+    setConnectorRearBackshellOverrideEnabled:
+      params.setConnectorRearBackshellOverrideEnabled,
+    connectorRearBackshellOverrideLengthMm:
+      params.connectorRearBackshellOverrideLengthMm,
+    setConnectorRearBackshellOverrideLengthMm:
+      params.setConnectorRearBackshellOverrideLengthMm,
     connectorAutoCreateLinkedNode: params.connectorAutoCreateLinkedNode,
     setConnectorAutoCreateLinkedNode: params.setConnectorAutoCreateLinkedNode,
     connectorTechnicalIdAlreadyUsed: params.connectorTechnicalIdAlreadyUsed,
@@ -531,7 +580,8 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     handleSpliceSubmit: params.handleSpliceSubmit,
     handleConvertSpliceToDirectional: params.handleConvertSpliceToDirectional,
     handleRerouteSpliceConnectedWires: params.handleRerouteSpliceConnectedWires,
-    handleSuggestOptimizedSplicePlacement: params.handleSuggestOptimizedSplicePlacement,
+    handleSuggestOptimizedSplicePlacement:
+      params.handleSuggestOptimizedSplicePlacement,
     spliceName: params.spliceName,
     setSpliceName: params.setSpliceName,
     spliceTechnicalId: params.spliceTechnicalId,
@@ -638,7 +688,8 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     setWireFuseCatalogItemId: params.setWireFuseCatalogItemId,
     wireTechnicalIdAlreadyUsed: params.wireTechnicalIdAlreadyUsed,
     wireEndpointAConnectionReference: params.wireEndpointAConnectionReference,
-    setWireEndpointAConnectionReference: params.setWireEndpointAConnectionReference,
+    setWireEndpointAConnectionReference:
+      params.setWireEndpointAConnectionReference,
     wireEndpointAConnectionName: params.wireEndpointAConnectionName,
     setWireEndpointAConnectionName: params.setWireEndpointAConnectionName,
     wireEndpointASealReference: params.wireEndpointASealReference,
@@ -656,12 +707,14 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     wireEndpointAPortIndex: params.wireEndpointAPortIndex,
     setWireEndpointAPortIndex: params.setWireEndpointAPortIndex,
     wireEndpointASpliceSideOverride: params.wireEndpointASpliceSideOverride,
-    setWireEndpointASpliceSideOverride: params.setWireEndpointASpliceSideOverride,
+    setWireEndpointASpliceSideOverride:
+      params.setWireEndpointASpliceSideOverride,
     wireEndpointASpliceSideLocked: params.wireEndpointASpliceSideLocked,
     setWireEndpointASpliceSideLocked: params.setWireEndpointASpliceSideLocked,
     wireEndpointASlotHint: params.wireEndpointASlotHint,
     wireEndpointBConnectionReference: params.wireEndpointBConnectionReference,
-    setWireEndpointBConnectionReference: params.setWireEndpointBConnectionReference,
+    setWireEndpointBConnectionReference:
+      params.setWireEndpointBConnectionReference,
     wireEndpointBConnectionName: params.wireEndpointBConnectionName,
     setWireEndpointBConnectionName: params.setWireEndpointBConnectionName,
     wireEndpointBSealReference: params.wireEndpointBSealReference,
@@ -679,13 +732,14 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     wireEndpointBPortIndex: params.wireEndpointBPortIndex,
     setWireEndpointBPortIndex: params.setWireEndpointBPortIndex,
     wireEndpointBSpliceSideOverride: params.wireEndpointBSpliceSideOverride,
-    setWireEndpointBSpliceSideOverride: params.setWireEndpointBSpliceSideOverride,
+    setWireEndpointBSpliceSideOverride:
+      params.setWireEndpointBSpliceSideOverride,
     wireEndpointBSpliceSideLocked: params.wireEndpointBSpliceSideLocked,
     setWireEndpointBSpliceSideLocked: params.setWireEndpointBSpliceSideLocked,
     wireEndpointBSlotHint: params.wireEndpointBSlotHint,
     cancelWireEdit: params.cancelWireEdit,
     wireFormError: params.wireFormError,
-    modelingBatchSelection: params.modelingBatchSelection
+    modelingBatchSelection: params.modelingBatchSelection,
   } satisfies ModelingFormsColumnProps;
 
   return {
@@ -700,8 +754,12 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
         wireHandlers={params.wireHandlers}
       >
         <>
-        <params.ModelingPrimaryTablesComponent {...modelingPrimaryTablesProps} />
-        <params.ModelingSecondaryTablesComponent {...modelingSecondaryTablesProps} />
+          <params.ModelingPrimaryTablesComponent
+            {...modelingPrimaryTablesProps}
+          />
+          <params.ModelingSecondaryTablesComponent
+            {...modelingSecondaryTablesProps}
+          />
         </>
       </ModelingController>
     ),
@@ -714,23 +772,32 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
       >
         <params.ModelingFormsColumnComponent {...modelingFormsColumnProps} />
       </ModelingController>
-    )
+    ),
   };
 }
 
-export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSliceParams) {
+export function buildAnalysisScreenContentSlice(
+  params: AnalysisScreenContentSliceParams,
+) {
   const analysisWorkspaceContentProps = {
     showEntityTables: false,
     hideWireAnalysisRoutePanel: params.hideWireAnalysisRoutePanel,
-    showMultiNetworkFunctionalAnalysisPanel: params.showMultiNetworkFunctionalAnalysisPanel,
-    isMultiNetworkFunctionalAnalysisOpen: params.isMultiNetworkFunctionalAnalysisOpen,
+    showMultiNetworkFunctionalAnalysisPanel:
+      params.showMultiNetworkFunctionalAnalysisPanel,
+    isMultiNetworkFunctionalAnalysisOpen:
+      params.isMultiNetworkFunctionalAnalysisOpen,
     activeNetwork: params.activeNetwork,
     multiNetworkFunctionalAnalysis: params.multiNetworkFunctionalAnalysis,
-    multiNetworkFunctionalAnalysisScope: params.multiNetworkFunctionalAnalysisScope,
-    setMultiNetworkFunctionalAnalysisScope: params.setMultiNetworkFunctionalAnalysisScope,
-    onToggleMultiNetworkFunctionalAnalysisCustomNetwork: params.onToggleMultiNetworkFunctionalAnalysisCustomNetwork,
-    onGoToMultiNetworkFunctionalAnalysisFinding: params.onGoToMultiNetworkFunctionalAnalysisFinding,
-    onCloseMultiNetworkFunctionalAnalysis: params.onCloseMultiNetworkFunctionalAnalysis,
+    multiNetworkFunctionalAnalysisScope:
+      params.multiNetworkFunctionalAnalysisScope,
+    setMultiNetworkFunctionalAnalysisScope:
+      params.setMultiNetworkFunctionalAnalysisScope,
+    onToggleMultiNetworkFunctionalAnalysisCustomNetwork:
+      params.onToggleMultiNetworkFunctionalAnalysisCustomNetwork,
+    onGoToMultiNetworkFunctionalAnalysisFinding:
+      params.onGoToMultiNetworkFunctionalAnalysisFinding,
+    onCloseMultiNetworkFunctionalAnalysis:
+      params.onCloseMultiNetworkFunctionalAnalysis,
     onApplyPinRoleMassEdit: params.onApplyPinRoleMassEdit,
     isConnectorSubScreen: params.isConnectorSubScreen,
     isSpliceSubScreen: params.isSpliceSubScreen,
@@ -772,8 +839,10 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
     setConnectorApplyCatalogSeals: params.setConnectorApplyCatalogSeals,
     connectorTerminalOverridesText: params.connectorTerminalOverridesText,
     setConnectorTerminalOverridesText: params.setConnectorTerminalOverridesText,
-    onClearConnectorTerminalAndSealOverrides: params.onClearConnectorTerminalAndSealOverrides,
-    onSaveConnectorCatalogMaterialApplication: params.onSaveConnectorCatalogMaterialApplication,
+    onClearConnectorTerminalAndSealOverrides:
+      params.onClearConnectorTerminalAndSealOverrides,
+    onSaveConnectorCatalogMaterialApplication:
+      params.onSaveConnectorCatalogMaterialApplication,
     onSaveConnectorPinElectricalRoles: params.onSaveConnectorPinElectricalRoles,
     selectedSplice: params.selectedSplice,
     selectedSpliceId: params.selectedSpliceId,
@@ -860,16 +929,22 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
     setWireForcedRouteInput: params.setWireForcedRouteInput,
     handleLockWireRoute: params.handleLockWireRoute,
     handleResetWireRoute: params.handleResetWireRoute,
-    wireFormError: params.wireFormError
+    wireFormError: params.wireFormError,
   } satisfies AnalysisWorkspaceContentProps;
 
   return {
     analysisWorkspaceContentProps,
-    analysisWorkspaceContent: <params.AnalysisWorkspaceContentComponent {...analysisWorkspaceContentProps} />
+    analysisWorkspaceContent: (
+      <params.AnalysisWorkspaceContentComponent
+        {...analysisWorkspaceContentProps}
+      />
+    ),
   };
 }
 
-export function buildValidationScreenContentSlice(params: ValidationScreenContentSliceParams) {
+export function buildValidationScreenContentSlice(
+  params: ValidationScreenContentSliceParams,
+) {
   const validationWorkspaceContentProps = {
     validationSeverityFilter: params.validationSeverityFilter,
     setValidationSeverityFilter: params.setValidationSeverityFilter,
@@ -888,16 +963,22 @@ export function buildValidationScreenContentSlice(params: ValidationScreenConten
     setValidationIssueCursorFromIssue: params.setValidationIssueCursorFromIssue,
     handleValidationIssueRowGoTo: params.handleValidationIssueRowGoTo,
     validationErrorCount: params.validationErrorCount,
-    validationWarningCount: params.validationWarningCount
+    validationWarningCount: params.validationWarningCount,
   } satisfies ValidationWorkspaceContentProps;
 
   return {
     validationWorkspaceContentProps,
-    validationWorkspaceContent: <params.ValidationWorkspaceContentComponent {...validationWorkspaceContentProps} />
+    validationWorkspaceContent: (
+      <params.ValidationWorkspaceContentComponent
+        {...validationWorkspaceContentProps}
+      />
+    ),
   };
 }
 
-export function buildSettingsScreenContentSlice(params: SettingsScreenContentSliceParams) {
+export function buildSettingsScreenContentSlice(
+  params: SettingsScreenContentSliceParams,
+) {
   const settingsWorkspaceContentProps = {
     isCurrentWorkspaceEmpty: params.isCurrentWorkspaceEmpty,
     hasBuiltInSampleState: params.hasBuiltInSampleState,
@@ -935,13 +1016,16 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     bomTraceabilityLabelsHidden: params.bomTraceabilityLabelsHidden,
     setBomTraceabilityLabelsHidden: params.setBomTraceabilityLabelsHidden,
     bomExportComputedDownstreamLoad: params.bomExportComputedDownstreamLoad,
-    setBomExportComputedDownstreamLoad: params.setBomExportComputedDownstreamLoad,
+    setBomExportComputedDownstreamLoad:
+      params.setBomExportComputedDownstreamLoad,
     defaultWireSectionMm2: params.defaultWireSectionMm2,
     setDefaultWireSectionMm2: params.setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes: params.defaultAutoCreateLinkedNodes,
     setDefaultAutoCreateLinkedNodes: params.setDefaultAutoCreateLinkedNodes,
-    spliceSectionImbalanceRatioPercent: params.spliceSectionImbalanceRatioPercent,
-    setSpliceSectionImbalanceRatioPercent: params.setSpliceSectionImbalanceRatioPercent,
+    spliceSectionImbalanceRatioPercent:
+      params.spliceSectionImbalanceRatioPercent,
+    setSpliceSectionImbalanceRatioPercent:
+      params.setSpliceSectionImbalanceRatioPercent,
     defaultSortField: params.defaultSortField,
     setDefaultSortField: params.setDefaultSortField,
     defaultSortDirection: params.defaultSortDirection,
@@ -953,20 +1037,25 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     canvasDefaultSnapToGrid: params.canvasDefaultSnapToGrid,
     setCanvasDefaultSnapToGrid: params.setCanvasDefaultSnapToGrid,
     canvasDefaultLockEntityMovement: params.canvasDefaultLockEntityMovement,
-    setCanvasDefaultLockEntityMovement: params.setCanvasDefaultLockEntityMovement,
+    setCanvasDefaultLockEntityMovement:
+      params.setCanvasDefaultLockEntityMovement,
     canvasDefaultShowInfoPanels: params.canvasDefaultShowInfoPanels,
     setCanvasDefaultShowInfoPanels: params.setCanvasDefaultShowInfoPanels,
     showSegmentNames: params.showSegmentNames,
     setShowSegmentNames: params.setShowSegmentNames,
     canvasDefaultShowSegmentLengths: params.canvasDefaultShowSegmentLengths,
-    setCanvasDefaultShowSegmentLengths: params.setCanvasDefaultShowSegmentLengths,
+    setCanvasDefaultShowSegmentLengths:
+      params.setCanvasDefaultShowSegmentLengths,
     canvasDefaultShowCableCallouts: params.canvasDefaultShowCableCallouts,
     setCanvasDefaultShowCableCallouts: params.setCanvasDefaultShowCableCallouts,
     canvasDefaultCalloutContentMode: params.canvasDefaultCalloutContentMode,
-    setCanvasDefaultCalloutContentMode: params.setCanvasDefaultCalloutContentMode,
+    setCanvasDefaultCalloutContentMode:
+      params.setCanvasDefaultCalloutContentMode,
     setNetworkCalloutContentMode: params.setNetworkCalloutContentMode,
-    canvasDefaultShowSelectedCalloutOnly: params.canvasDefaultShowSelectedCalloutOnly,
-    setCanvasDefaultShowSelectedCalloutOnly: params.setCanvasDefaultShowSelectedCalloutOnly,
+    canvasDefaultShowSelectedCalloutOnly:
+      params.canvasDefaultShowSelectedCalloutOnly,
+    setCanvasDefaultShowSelectedCalloutOnly:
+      params.setCanvasDefaultShowSelectedCalloutOnly,
     setShowSelectedCalloutOnly: params.setShowSelectedCalloutOnly,
     canvasDefaultLabelStrokeMode: params.canvasDefaultLabelStrokeMode,
     setCanvasDefaultLabelStrokeMode: params.setCanvasDefaultLabelStrokeMode,
@@ -975,17 +1064,25 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     canvasDefaultCalloutTextSize: params.canvasDefaultCalloutTextSize,
     setCanvasDefaultCalloutTextSize: params.setCanvasDefaultCalloutTextSize,
     canvasDefaultLabelRotationDegrees: params.canvasDefaultLabelRotationDegrees,
-    setCanvasDefaultLabelRotationDegrees: params.setCanvasDefaultLabelRotationDegrees,
-    canvasDefaultAutoSegmentLabelRotation: params.canvasDefaultAutoSegmentLabelRotation,
-    setCanvasDefaultAutoSegmentLabelRotation: params.setCanvasDefaultAutoSegmentLabelRotation,
+    setCanvasDefaultLabelRotationDegrees:
+      params.setCanvasDefaultLabelRotationDegrees,
+    canvasDefaultAutoSegmentLabelRotation:
+      params.canvasDefaultAutoSegmentLabelRotation,
+    setCanvasDefaultAutoSegmentLabelRotation:
+      params.setCanvasDefaultAutoSegmentLabelRotation,
     canvasShowCalloutWireNames: params.canvasShowCalloutWireNames,
     setCanvasShowCalloutWireNames: params.setCanvasShowCalloutWireNames,
     canvasConnectorDrawingDisplayMode: params.canvasConnectorDrawingDisplayMode,
-    setCanvasConnectorDrawingDisplayMode: params.setCanvasConnectorDrawingDisplayMode,
-    canvasUseConsistentConnectorLayoutScale: params.canvasUseConsistentConnectorLayoutScale,
-    setCanvasUseConsistentConnectorLayoutScale: params.setCanvasUseConsistentConnectorLayoutScale,
-    canvasCalloutConnectorDrawingScalePercent: params.canvasCalloutConnectorDrawingScalePercent,
-    setCanvasCalloutConnectorDrawingScalePercent: params.setCanvasCalloutConnectorDrawingScalePercent,
+    setCanvasConnectorDrawingDisplayMode:
+      params.setCanvasConnectorDrawingDisplayMode,
+    canvasUseConsistentConnectorLayoutScale:
+      params.canvasUseConsistentConnectorLayoutScale,
+    setCanvasUseConsistentConnectorLayoutScale:
+      params.setCanvasUseConsistentConnectorLayoutScale,
+    canvasCalloutConnectorDrawingScalePercent:
+      params.canvasCalloutConnectorDrawingScalePercent,
+    setCanvasCalloutConnectorDrawingScalePercent:
+      params.setCanvasCalloutConnectorDrawingScalePercent,
     canvasGlobalRenderScalePercent: params.canvasGlobalRenderScalePercent,
     setCanvasGlobalRenderScalePercent: params.setCanvasGlobalRenderScalePercent,
     canvasZoomInvariantNodeShapes: params.canvasZoomInvariantNodeShapes,
@@ -993,7 +1090,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     canvasNodeShapeSizePercent: params.canvasNodeShapeSizePercent,
     setCanvasNodeShapeSizePercent: params.setCanvasNodeShapeSizePercent,
     canvasPngExportIncludeBackground: params.canvasPngExportIncludeBackground,
-    setCanvasPngExportIncludeBackground: params.setCanvasPngExportIncludeBackground,
+    setCanvasPngExportIncludeBackground:
+      params.setCanvasPngExportIncludeBackground,
     canvasExportIncludeFrame: params.canvasExportIncludeFrame,
     setCanvasExportIncludeFrame: params.setCanvasExportIncludeFrame,
     canvasExportIncludeCartouche: params.canvasExportIncludeCartouche,
@@ -1016,13 +1114,16 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setShowRoutePreviewPanel: params.setShowRoutePreviewPanel,
     hideWireAnalysisRoutePanel: params.hideWireAnalysisRoutePanel,
     setHideWireAnalysisRoutePanel: params.setHideWireAnalysisRoutePanel,
-    showMultiNetworkFunctionalAnalysisPanel: params.showMultiNetworkFunctionalAnalysisPanel,
-    setShowMultiNetworkFunctionalAnalysisPanel: params.setShowMultiNetworkFunctionalAnalysisPanel,
+    showMultiNetworkFunctionalAnalysisPanel:
+      params.showMultiNetworkFunctionalAnalysisPanel,
+    setShowMultiNetworkFunctionalAnalysisPanel:
+      params.setShowMultiNetworkFunctionalAnalysisPanel,
     workspacePanelsLayoutMode: params.workspacePanelsLayoutMode,
     setWorkspacePanelsLayoutMode: params.setWorkspacePanelsLayoutMode,
     workspaceWideScreen: params.workspaceWideScreen,
     setWorkspaceWideScreen: params.setWorkspaceWideScreen,
-    resetWorkspacePreferencesToDefaults: params.resetWorkspacePreferencesToDefaults,
+    resetWorkspacePreferencesToDefaults:
+      params.resetWorkspacePreferencesToDefaults,
     importOverwriteDialog: params.importOverwriteDialog,
     handleExportGroupedBom: params.handleExportGroupedBom,
     handleExportGroupedPdf: params.handleExportGroupedPdf,
@@ -1039,19 +1140,26 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     openLinkedWorkspaceFile: params.openLinkedWorkspaceFile,
     openResumableWorkspaceFile: params.openResumableWorkspaceFile,
     loadLinkedFileVersion: params.loadLinkedFileVersion,
-    keepLocalWorkspaceVersion: params.keepLocalWorkspaceVersion
+    keepLocalWorkspaceVersion: params.keepLocalWorkspaceVersion,
   } satisfies SettingsWorkspaceContentProps;
 
   return {
     settingsWorkspaceContentProps,
-    settingsWorkspaceContent: <params.SettingsWorkspaceContentComponent {...settingsWorkspaceContentProps} />
+    settingsWorkspaceContent: (
+      <params.SettingsWorkspaceContentComponent
+        {...settingsWorkspaceContentProps}
+      />
+    ),
   };
 }
 
 // Compatibility aliases retained while downstream modules migrate from `use*` naming.
-export const useNetworkScopeScreenContentSlice = buildNetworkScopeScreenContentSlice;
+export const useNetworkScopeScreenContentSlice =
+  buildNetworkScopeScreenContentSlice;
 export const useModelingScreenContentSlice = buildModelingScreenContentSlice;
 export const useAnalysisScreenContentSlice = buildAnalysisScreenContentSlice;
-export const useValidationScreenContentSlice = buildValidationScreenContentSlice;
+export const useValidationScreenContentSlice =
+  buildValidationScreenContentSlice;
 export const useSettingsScreenContentSlice = buildSettingsScreenContentSlice;
-export const useNetworkSummaryPanelControllerSlice = buildNetworkSummaryPanelControllerSlice;
+export const useNetworkSummaryPanelControllerSlice =
+  buildNetworkSummaryPanelControllerSlice;

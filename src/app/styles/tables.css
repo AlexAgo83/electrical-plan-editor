@@ -263,6 +263,9 @@
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--theme-primary, currentColor) 24%, transparent);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 12%, transparent);
+  color: inherit;
   padding: 0.15rem 0.45rem;
   font-size: 0.8em;
   font-weight: 700;
@@ -305,9 +308,9 @@
   display: grid;
   gap: 0.3rem;
   padding: 0.7rem 0.8rem;
-  border: 1px solid #d7e4ee;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
   border-radius: 0.65rem;
-  background: #f8fbfd;
+  background: color-mix(in srgb, currentColor 6%, transparent);
 }
 
 .delete-impact-category-header {
@@ -319,8 +322,9 @@
 
 .delete-impact-references {
   margin: 0;
-  color: #4d677a;
+  color: inherit;
   font-size: 0.82rem;
+  opacity: 0.82;
 }
 
 .data-table tr.is-selected,

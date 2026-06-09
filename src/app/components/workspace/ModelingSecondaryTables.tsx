@@ -2,12 +2,22 @@ import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { getWireColorSortValue } from "../../../core/cableColors";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
-import { focusElementWithoutScroll, sortByTableColumns } from "../../lib/app-utils-shared";
+import {
+  focusElementWithoutScroll,
+  sortByTableColumns,
+} from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { normalizeFileNamePart } from "../../lib/exportFileName";
-import { downloadTabularCsvOrXlsxFile, downloadTabularWorkbookFile, type TabularWorksheetExport } from "../../lib/tabularExport";
+import {
+  downloadTabularCsvOrXlsxFile,
+  downloadTabularWorkbookFile,
+  type TabularWorksheetExport,
+} from "../../lib/tabularExport";
 import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
-import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireColorPresentation";
+import {
+  getWireColorCsvValue,
+  renderWireColorCellValue,
+} from "../../lib/wireColorPresentation";
 import { TabularExportPreviewDialog } from "../dialogs/TabularExportPreviewDialog";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
@@ -23,10 +33,15 @@ import type {
   SpliceId,
   WireEndpoint,
   Wire,
-  WireId
+  WireId,
 } from "../../../core/entities";
 import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
-import type { SegmentSubNetworkFilter, SortDirection, SortState, TabularExportFormat } from "../../types/app-controller";
+import type {
+  SegmentSubNetworkFilter,
+  SortDirection,
+  SortState,
+  TabularExportFormat,
+} from "../../types/app-controller";
 import { EntityReferenceButton } from "./EntityReferenceButton";
 
 interface ModelingSecondaryTablesProps {
@@ -34,8 +49,15 @@ interface ModelingSecondaryTablesProps {
   batchSelectionIds: ReadonlySet<string>;
   onEnterBatchMode: (scope: ModelingBatchSelectionScope) => void;
   onExitBatchMode: () => void;
-  onToggleBatchSelection: (scope: ModelingBatchSelectionScope, id: string) => void;
-  onSetBatchSelectionForVisible: (scope: ModelingBatchSelectionScope, ids: readonly string[]) => void;
+  onToggleBatchSelection: (
+    scope: ModelingBatchSelectionScope,
+    id: string,
+  ) => void;
+  onSetBatchSelectionForVisible: (
+    scope: ModelingBatchSelectionScope,
+    ids: readonly string[],
+  ) => void;
+  onOpenBatchSelectionDialog: () => void;
   onDeleteSelectedInBatchMode: () => void;
   isSegmentSubScreen: boolean;
   segmentFormMode: "idle" | "create" | "edit";
@@ -43,13 +65,17 @@ interface ModelingSecondaryTablesProps {
   segmentSubNetworkFilter: SegmentSubNetworkFilter;
   setSegmentSubNetworkFilter: (value: SegmentSubNetworkFilter) => void;
   segmentFilterField: "id" | "nodeA" | "nodeB" | "subNetwork" | "any";
-  setSegmentFilterField: (value: "id" | "nodeA" | "nodeB" | "subNetwork" | "any") => void;
+  setSegmentFilterField: (
+    value: "id" | "nodeA" | "nodeB" | "subNetwork" | "any",
+  ) => void;
   segmentFilterQuery: string;
   setSegmentFilterQuery: (value: string) => void;
   segments: Segment[];
   visibleSegments: Segment[];
   segmentIdSortDirection: SortDirection;
-  setSegmentIdSortDirection: (value: SortDirection | ((current: SortDirection) => SortDirection)) => void;
+  setSegmentIdSortDirection: (
+    value: SortDirection | ((current: SortDirection) => SortDirection),
+  ) => void;
   nodeLabelById: Map<NodeId, string>;
   selectedSegmentId: SegmentId | null;
   selectedWireRouteSegmentIds: Set<SegmentId>;
@@ -64,7 +90,9 @@ interface ModelingSecondaryTablesProps {
   setWireFunctionalTagFilter: (value: string) => void;
   wireFunctionalTagOptions: string[];
   wireFilterField: "endpoints" | "name" | "technicalId" | "any";
-  setWireFilterField: (value: "endpoints" | "name" | "technicalId" | "any") => void;
+  setWireFilterField: (
+    value: "endpoints" | "name" | "technicalId" | "any",
+  ) => void;
   wireEndpointFilterQuery: string;
   setWireEndpointFilterQuery: (value: string) => void;
   tabularExportFormat: TabularExportFormat;
@@ -81,7 +109,10 @@ interface ModelingSecondaryTablesProps {
   onSelectConnectorReference: (connectorId: ConnectorId) => void;
   onSelectSpliceReference: (spliceId: SpliceId) => void;
   describeWireEndpoint: (endpoint: Wire["endpointA"]) => string;
-  describeWireEndpointCsvParts: (endpoint: Wire["endpointA"]) => { endpointId: string; pin: string };
+  describeWireEndpointCsvParts: (endpoint: Wire["endpointA"]) => {
+    endpointId: string;
+    pin: string;
+  };
   onEditWire: (wire: Wire) => void;
   onDeleteWire: (wireId: WireId) => void;
   onOpenWireOnboardingHelp?: () => void;
@@ -94,6 +125,7 @@ export function ModelingSecondaryTables({
   onExitBatchMode,
   onToggleBatchSelection,
   onSetBatchSelectionForVisible,
+  onOpenBatchSelectionDialog,
   onDeleteSelectedInBatchMode,
   isSegmentSubScreen,
   segmentFormMode,
@@ -142,26 +174,50 @@ export function ModelingSecondaryTables({
   describeWireEndpointCsvParts,
   onEditWire,
   onDeleteWire,
-  onOpenWireOnboardingHelp
+  onOpenWireOnboardingHelp,
 }: ModelingSecondaryTablesProps): ReactElement {
   void _getSortIndicator;
-  type SegmentTableSortField = "id" | "nodeA" | "nodeB" | "lengthMm" | "subNetwork";
-  type WireTableSortField = "name" | "technicalId" | "sectionMm2" | "color" | "endpointA" | "endpointB" | "lengthMm" | "routeMode";
-  const segmentRowRefs = useRef<Partial<Record<SegmentId, HTMLTableRowElement | null>>>({});
-  const wireRowRefs = useRef<Partial<Record<WireId, HTMLTableRowElement | null>>>({});
+  type SegmentTableSortField =
+    | "id"
+    | "nodeA"
+    | "nodeB"
+    | "lengthMm"
+    | "subNetwork";
+  type WireTableSortField =
+    | "name"
+    | "technicalId"
+    | "sectionMm2"
+    | "color"
+    | "endpointA"
+    | "endpointB"
+    | "lengthMm"
+    | "routeMode";
+  const segmentRowRefs = useRef<
+    Partial<Record<SegmentId, HTMLTableRowElement | null>>
+  >({});
+  const wireRowRefs = useRef<
+    Partial<Record<WireId, HTMLTableRowElement | null>>
+  >({});
   const lastAutoFocusedSegmentIdRef = useRef<SegmentId | null>(null);
   const lastAutoFocusedWireIdRef = useRef<WireId | null>(null);
   const isMobileViewport = useIsMobileViewport();
-  const previousSegmentFormModeRef = useRef<typeof segmentFormMode>(segmentFormMode);
+  const previousSegmentFormModeRef =
+    useRef<typeof segmentFormMode>(segmentFormMode);
   const previousWireFormModeRef = useRef<typeof wireFormMode>(wireFormMode);
   const isSegmentBatchMode = activeBatchScope === "segment";
   const isWireBatchMode = activeBatchScope === "wire";
   const focusedSegment =
-    selectedSegmentId === null ? null : (visibleSegments.find((segment) => segment.id === selectedSegmentId) ?? null);
+    selectedSegmentId === null
+      ? null
+      : (visibleSegments.find((segment) => segment.id === selectedSegmentId) ??
+        null);
   const focusedWire =
-    selectedWireId === null ? null : (visibleWires.find((wire) => wire.id === selectedWireId) ?? null);
+    selectedWireId === null
+      ? null
+      : (visibleWires.find((wire) => wire.id === selectedWireId) ?? null);
   const showSegmentSubNetworkColumn = segmentSubNetworkFilter !== "default";
-  const showWireRouteModeColumn = wireRouteFilter === "all" && !isMobileViewport;
+  const showWireRouteModeColumn =
+    wireRouteFilter === "all" && !isMobileViewport;
   const segmentFilterPlaceholder =
     segmentFilterField === "id"
       ? "Segment ID"
@@ -180,13 +236,19 @@ export function ModelingSecondaryTables({
         : wireFilterField === "technicalId"
           ? "Technical ID"
           : "Name, technical ID, endpoint...";
-  const [segmentTableSort, setSegmentTableSort] = useState<{ field: SegmentTableSortField; direction: "asc" | "desc" }>({
+  const [segmentTableSort, setSegmentTableSort] = useState<{
+    field: SegmentTableSortField;
+    direction: "asc" | "desc";
+  }>({
     field: "id",
-    direction: "asc"
+    direction: "asc",
   });
-  const [wireTableSort, setWireTableSort] = useState<{ field: WireTableSortField; direction: "asc" | "desc" }>({
+  const [wireTableSort, setWireTableSort] = useState<{
+    field: WireTableSortField;
+    direction: "asc" | "desc";
+  }>({
     field: "name",
-    direction: "asc"
+    direction: "asc",
   });
   const [wireExportPreview, setWireExportPreview] = useState<{
     filenameBase: string;
@@ -214,26 +276,41 @@ export function ModelingSecondaryTables({
   const openEditWire = (wire: Wire) => {
     onEditWire(wire);
   };
-  const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
-  const connectorById = useMemo(() => new Map(connectors.map((connector) => [connector.id, connector] as const)), [connectors]);
-  const spliceById = useMemo(() => new Map(splices.map((splice) => [splice.id, splice] as const)), [splices]);
+  const catalogItemById = useMemo(
+    () => new Map(catalogItems.map((item) => [item.id, item] as const)),
+    [catalogItems],
+  );
+  const connectorById = useMemo(
+    () =>
+      new Map(
+        connectors.map((connector) => [connector.id, connector] as const),
+      ),
+    [connectors],
+  );
+  const spliceById = useMemo(
+    () => new Map(splices.map((splice) => [splice.id, splice] as const)),
+    [splices],
+  );
   useEffect(() => {
     setSegmentTableSort((current) =>
       current.field === "id" && current.direction === _segmentIdSortDirection
         ? current
-        : { field: "id", direction: _segmentIdSortDirection }
+        : { field: "id", direction: _segmentIdSortDirection },
     );
   }, [_segmentIdSortDirection]);
   useEffect(() => {
-    if (_wireSort.field !== "name" && _wireSort.field !== "technicalId" && _wireSort.field !== "lengthMm") {
+    if (
+      _wireSort.field !== "name" &&
+      _wireSort.field !== "technicalId" &&
+      _wireSort.field !== "lengthMm"
+    ) {
       return;
     }
-    const field =
-      _wireSort.field === "lengthMm" ? "lengthMm" : _wireSort.field;
+    const field = _wireSort.field === "lengthMm" ? "lengthMm" : _wireSort.field;
     setWireTableSort((current) =>
       current.field === field && current.direction === _wireSort.direction
         ? current
-        : { field, direction: _wireSort.direction }
+        : { field, direction: _wireSort.direction },
     );
   }, [_wireSort]);
   const sortedVisibleSegments = useMemo(
@@ -251,9 +328,9 @@ export function ModelingSecondaryTables({
           if (field === "lengthMm") return segment.lengthMm;
           return subNetwork;
         },
-        (segment) => segment.id
+        (segment) => segment.id,
       ),
-    [nodeLabelById, segmentTableSort, visibleSegments]
+    [nodeLabelById, segmentTableSort, visibleSegments],
   );
   const sortedVisibleWires = useMemo(
     () =>
@@ -272,29 +349,50 @@ export function ModelingSecondaryTables({
           if (field === "lengthMm") return wire.lengthMm;
           return wire.isRouteLocked ? "Locked" : "Auto";
         },
-        (wire) => wire.id
+        (wire) => wire.id,
       ),
-    [describeWireEndpoint, visibleWires, wireTableSort]
+    [describeWireEndpoint, visibleWires, wireTableSort],
   );
-  const visibleSegmentIds = useMemo(() => sortedVisibleSegments.map((segment) => segment.id), [sortedVisibleSegments]);
-  const visibleWireIds = useMemo(() => sortedVisibleWires.map((wire) => wire.id), [sortedVisibleWires]);
+  const visibleSegmentIds = useMemo(
+    () => sortedVisibleSegments.map((segment) => segment.id),
+    [sortedVisibleSegments],
+  );
+  const visibleWireIds = useMemo(
+    () => sortedVisibleWires.map((wire) => wire.id),
+    [sortedVisibleWires],
+  );
   const allVisibleSegmentsSelected =
-    visibleSegmentIds.length > 0 && visibleSegmentIds.every((segmentId) => batchSelectionIds.has(segmentId));
+    visibleSegmentIds.length > 0 &&
+    visibleSegmentIds.every((segmentId) => batchSelectionIds.has(segmentId));
   const allVisibleWiresSelected =
-    visibleWireIds.length > 0 && visibleWireIds.every((wireId) => batchSelectionIds.has(wireId));
+    visibleWireIds.length > 0 &&
+    visibleWireIds.every((wireId) => batchSelectionIds.has(wireId));
   const selectedSegmentBatchCount = batchSelectionIds.size;
   const selectedWireBatchCount = batchSelectionIds.size;
   const segmentSortIndicator = (field: SegmentTableSortField) =>
-    segmentTableSort.field === field ? (segmentTableSort.direction === "asc" ? "▲" : "▼") : "";
+    segmentTableSort.field === field
+      ? segmentTableSort.direction === "asc"
+        ? "▲"
+        : "▼"
+      : "";
   const wireSortIndicator = (field: WireTableSortField) =>
-    wireTableSort.field === field ? (wireTableSort.direction === "asc" ? "▲" : "▼") : "";
+    wireTableSort.field === field
+      ? wireTableSort.direction === "asc"
+        ? "▲"
+        : "▼"
+      : "";
   const getWireFuseManufacturerReference = (wire: Wire): string | null => {
     if (wire.protection?.kind !== "fuse") {
       return null;
     }
-    return catalogItemById.get(wire.protection.catalogItemId)?.manufacturerReference ?? "(missing catalog item)";
+    return (
+      catalogItemById.get(wire.protection.catalogItemId)
+        ?.manufacturerReference ?? "(missing catalog item)"
+    );
   };
-  const renderWireEndpointReference = (endpoint: WireEndpoint): ReactElement => {
+  const renderWireEndpointReference = (
+    endpoint: WireEndpoint,
+  ): ReactElement => {
     const label = describeWireEndpoint(endpoint);
     if (endpoint.kind === "connectorCavity") {
       const connector = connectorById.get(endpoint.connectorId);
@@ -302,7 +400,10 @@ export function ModelingSecondaryTables({
         return <>{label}</>;
       }
       return (
-        <EntityReferenceButton title={`Open connector ${connector.technicalId}`} onClick={() => onSelectConnectorReference(endpoint.connectorId)}>
+        <EntityReferenceButton
+          title={`Open connector ${connector.technicalId}`}
+          onClick={() => onSelectConnectorReference(endpoint.connectorId)}
+        >
           {label}
         </EntityReferenceButton>
       );
@@ -313,7 +414,10 @@ export function ModelingSecondaryTables({
       return <>{label}</>;
     }
     return (
-      <EntityReferenceButton title={`Open splice ${splice.technicalId}`} onClick={() => onSelectSpliceReference(endpoint.spliceId)}>
+      <EntityReferenceButton
+        title={`Open splice ${splice.technicalId}`}
+        onClick={() => onSelectSpliceReference(endpoint.spliceId)}
+      >
         {label}
       </EntityReferenceButton>
     );
@@ -358,7 +462,11 @@ export function ModelingSecondaryTables({
   useEffect(() => {
     const previousMode = previousSegmentFormModeRef.current;
     previousSegmentFormModeRef.current = segmentFormMode;
-    if (previousMode !== "edit" || segmentFormMode !== "create" || selectedSegmentId === null) {
+    if (
+      previousMode !== "edit" ||
+      segmentFormMode !== "create" ||
+      selectedSegmentId === null
+    ) {
       return;
     }
     if (typeof window === "undefined") {
@@ -373,7 +481,11 @@ export function ModelingSecondaryTables({
   useEffect(() => {
     const previousMode = previousWireFormModeRef.current;
     previousWireFormModeRef.current = wireFormMode;
-    if (previousMode !== "edit" || wireFormMode !== "create" || selectedWireId === null) {
+    if (
+      previousMode !== "edit" ||
+      wireFormMode !== "create" ||
+      selectedWireId === null
+    ) {
       return;
     }
     if (typeof window === "undefined") {
@@ -387,7 +499,11 @@ export function ModelingSecondaryTables({
 
   return (
     <>
-      <article className="panel" hidden={!isSegmentSubScreen} data-onboarding-panel="modeling-segments">
+      <article
+        className="panel"
+        hidden={!isSegmentSubScreen}
+        data-onboarding-panel="modeling-segments"
+      >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Segments</h2>
           <div className="list-panel-header-tools">
@@ -400,10 +516,18 @@ export function ModelingSecondaryTables({
                     ? ["ID", "Node A", "Node B", "Length (mm)", "Sub-network"]
                     : ["ID", "Node A", "Node B", "Length (mm)"];
                   const rows = sortedVisibleSegments.map((segment) => {
-                    const nodeA = nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
-                    const nodeB = nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
+                    const nodeA =
+                      nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
+                    const nodeB =
+                      nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
                     if (showSegmentSubNetworkColumn) {
-                      return [segment.id, nodeA, nodeB, segment.lengthMm, segment.subNetworkTag?.trim() || ""];
+                      return [
+                        segment.id,
+                        nodeA,
+                        nodeB,
+                        segment.lengthMm,
+                        segment.subNetworkTag?.trim() || "",
+                      ];
                     }
                     return [segment.id, nodeA, nodeB, segment.lengthMm];
                   });
@@ -420,32 +544,56 @@ export function ModelingSecondaryTables({
                   className="filter-chip onboarding-help-button"
                   onClick={onOpenSegmentOnboardingHelp}
                 >
-                  <span className="action-button-icon is-help" aria-hidden="true" />
+                  <span
+                    className="action-button-icon is-help"
+                    aria-hidden="true"
+                  />
                   <span>Help</span>
                 </button>
               ) : null}
             </div>
             <div className="list-panel-header-tools-row is-filter-row">
-              <div className="chip-group list-panel-filters" role="group" aria-label="Segment sub-network filter">
-                {([
-                  ["all", "All"],
-                  ["default", "Default"],
-                  ["tagged", "Tagged"]
-                ] as const).map(([filterId, label]) => (
-                  <button key={filterId} type="button" className={segmentSubNetworkFilter === filterId ? "filter-chip is-active" : "filter-chip"} onClick={() => setSegmentSubNetworkFilter(filterId)}>{label}</button>
+              <div
+                className="chip-group list-panel-filters"
+                role="group"
+                aria-label="Segment sub-network filter"
+              >
+                {(
+                  [
+                    ["all", "All"],
+                    ["default", "Default"],
+                    ["tagged", "Tagged"],
+                  ] as const
+                ).map(([filterId, label]) => (
+                  <button
+                    key={filterId}
+                    type="button"
+                    className={
+                      segmentSubNetworkFilter === filterId
+                        ? "filter-chip is-active"
+                        : "filter-chip"
+                    }
+                    onClick={() => setSegmentSubNetworkFilter(filterId)}
+                  >
+                    {label}
+                  </button>
                 ))}
               </div>
               <TableFilterBar
                 label="Filter"
                 fieldLabel="Segment filter field"
                 fieldValue={segmentFilterField}
-                onFieldChange={(value) => setSegmentFilterField(value as "id" | "nodeA" | "nodeB" | "subNetwork" | "any")}
+                onFieldChange={(value) =>
+                  setSegmentFilterField(
+                    value as "id" | "nodeA" | "nodeB" | "subNetwork" | "any",
+                  )
+                }
                 fieldOptions={[
                   { value: "id", label: "Segment ID" },
                   { value: "nodeA", label: "Node A" },
                   { value: "nodeB", label: "Node B" },
                   { value: "subNetwork", label: "Sub-network" },
-                  { value: "any", label: "Any" }
+                  { value: "any", label: "Any" },
                 ]}
                 queryValue={segmentFilterQuery}
                 onQueryChange={setSegmentFilterQuery}
@@ -458,7 +606,9 @@ export function ModelingSecondaryTables({
           <p className="empty-copy">No segment yet.</p>
         ) : sortedVisibleSegments.length === 0 ? (
           <>
-            <p className="empty-copy">No segment matches the current filters.</p>
+            <p className="empty-copy">
+              No segment matches the current filters.
+            </p>
             <TableEntryCountFooter count={0} />
           </>
         ) : (
@@ -472,23 +622,144 @@ export function ModelingSecondaryTables({
                         type="checkbox"
                         aria-label="Select all visible segments"
                         checked={allVisibleSegmentsSelected}
-                        onChange={() => onSetBatchSelectionForVisible("segment", visibleSegmentIds)}
+                        onChange={() =>
+                          onSetBatchSelectionForVisible(
+                            "segment",
+                            visibleSegmentIds,
+                          )
+                        }
                       />
                     </th>
                   ) : null}
-                  <th aria-sort={getTableAriaSort(segmentTableSort, "id")}><button type="button" className="sort-header-button" onClick={() => { setSegmentTableSort((current) => ({ field: "id", direction: current.field === "id" && current.direction === "asc" ? "desc" : "asc" })); _setSegmentIdSortDirection((current) => current === "asc" ? "desc" : "asc"); }}>ID <span className="sort-indicator">{segmentSortIndicator("id")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(segmentTableSort, "nodeA")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "nodeA", direction: current.field === "nodeA" && current.direction === "asc" ? "desc" : "asc" }))}>Node A <span className="sort-indicator">{segmentSortIndicator("nodeA")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(segmentTableSort, "nodeB")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "nodeB", direction: current.field === "nodeB" && current.direction === "asc" ? "desc" : "asc" }))}>Node B <span className="sort-indicator">{segmentSortIndicator("nodeB")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(segmentTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{segmentSortIndicator("lengthMm")}</span></button></th>
-                  {showSegmentSubNetworkColumn ? <th aria-sort={getTableAriaSort(segmentTableSort, "subNetwork")}><button type="button" className="sort-header-button" onClick={() => setSegmentTableSort((current) => ({ field: "subNetwork", direction: current.field === "subNetwork" && current.direction === "asc" ? "desc" : "asc" }))}>Sub-network <span className="sort-indicator">{segmentSortIndicator("subNetwork")}</span></button></th> : null}
+                  <th aria-sort={getTableAriaSort(segmentTableSort, "id")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => {
+                        setSegmentTableSort((current) => ({
+                          field: "id",
+                          direction:
+                            current.field === "id" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                        _setSegmentIdSortDirection((current) =>
+                          current === "asc" ? "desc" : "asc",
+                        );
+                      }}
+                    >
+                      ID{" "}
+                      <span className="sort-indicator">
+                        {segmentSortIndicator("id")}
+                      </span>
+                    </button>
+                  </th>
+                  <th aria-sort={getTableAriaSort(segmentTableSort, "nodeA")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setSegmentTableSort((current) => ({
+                          field: "nodeA",
+                          direction:
+                            current.field === "nodeA" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      Node A{" "}
+                      <span className="sort-indicator">
+                        {segmentSortIndicator("nodeA")}
+                      </span>
+                    </button>
+                  </th>
+                  <th aria-sort={getTableAriaSort(segmentTableSort, "nodeB")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setSegmentTableSort((current) => ({
+                          field: "nodeB",
+                          direction:
+                            current.field === "nodeB" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      Node B{" "}
+                      <span className="sort-indicator">
+                        {segmentSortIndicator("nodeB")}
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-sort={getTableAriaSort(segmentTableSort, "lengthMm")}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setSegmentTableSort((current) => ({
+                          field: "lengthMm",
+                          direction:
+                            current.field === "lengthMm" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      {isMobileViewport ? "Len" : "Length (mm)"}{" "}
+                      <span className="sort-indicator">
+                        {segmentSortIndicator("lengthMm")}
+                      </span>
+                    </button>
+                  </th>
+                  {showSegmentSubNetworkColumn ? (
+                    <th
+                      aria-sort={getTableAriaSort(
+                        segmentTableSort,
+                        "subNetwork",
+                      )}
+                    >
+                      <button
+                        type="button"
+                        className="sort-header-button"
+                        onClick={() =>
+                          setSegmentTableSort((current) => ({
+                            field: "subNetwork",
+                            direction:
+                              current.field === "subNetwork" &&
+                              current.direction === "asc"
+                                ? "desc"
+                                : "asc",
+                          }))
+                        }
+                      >
+                        Sub-network{" "}
+                        <span className="sort-indicator">
+                          {segmentSortIndicator("subNetwork")}
+                        </span>
+                      </button>
+                    </th>
+                  ) : null}
                 </tr>
               </thead>
               <tbody>
                 {sortedVisibleSegments.map((segment) => {
-                  const nodeA = nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
-                  const nodeB = nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
+                  const nodeA =
+                    nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
+                  const nodeB =
+                    nodeLabelById.get(segment.nodeB) ?? segment.nodeB;
                   const isFocused = focusedSegment?.id === segment.id;
-                  const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
+                  const isWireHighlighted = selectedWireRouteSegmentIds.has(
+                    segment.id,
+                  );
                   const isBatchSelected = batchSelectionIds.has(segment.id);
                   const rowClassName = `${isSegmentBatchMode ? (isBatchSelected ? "is-selected " : "") : isFocused ? "is-selected " : ""}${isWireHighlighted ? "is-wire-highlighted " : ""}is-focusable-row`;
                   return (
@@ -498,7 +769,9 @@ export function ModelingSecondaryTables({
                         segmentRowRefs.current[segment.id] = element;
                       }}
                       className={rowClassName}
-                      aria-selected={isSegmentBatchMode ? isBatchSelected : isFocused}
+                      aria-selected={
+                        isSegmentBatchMode ? isBatchSelected : isFocused
+                      }
                       tabIndex={0}
                       onClick={() =>
                         isSegmentBatchMode
@@ -522,7 +795,9 @@ export function ModelingSecondaryTables({
                             type="checkbox"
                             aria-label={`Select segment ${segment.id}`}
                             checked={isBatchSelected}
-                            onChange={() => onToggleBatchSelection("segment", segment.id)}
+                            onChange={() =>
+                              onToggleBatchSelection("segment", segment.id)
+                            }
                             onClick={(event) => event.stopPropagation()}
                           />
                         </td>
@@ -532,7 +807,13 @@ export function ModelingSecondaryTables({
                       <td>{nodeB}</td>
                       <td>{segment.lengthMm}</td>
                       {showSegmentSubNetworkColumn ? (
-                        <td>{(segment.subNetworkTag?.trim().length ?? 0) > 0 ? <span className="subnetwork-chip">{segment.subNetworkTag?.trim()}</span> : null}</td>
+                        <td>
+                          {(segment.subNetworkTag?.trim().length ?? 0) > 0 ? (
+                            <span className="subnetwork-chip">
+                              {segment.subNetworkTag?.trim()}
+                            </span>
+                          ) : null}
+                        </td>
                       ) : null}
                     </tr>
                   );
@@ -547,56 +828,104 @@ export function ModelingSecondaryTables({
             <>
               <button
                 type="button"
+                className="button-with-icon"
+                onClick={onOpenBatchSelectionDialog}
+                disabled={selectedSegmentBatchCount === 0}
+              >
+                Open batch
+                {selectedSegmentBatchCount > 0
+                  ? ` (${selectedSegmentBatchCount})`
+                  : ""}
+              </button>
+              <button
+                type="button"
                 className="modeling-list-action-delete button-with-icon"
                 onClick={onDeleteSelectedInBatchMode}
                 disabled={selectedSegmentBatchCount === 0}
               >
-                <span className="action-button-icon is-delete" aria-hidden="true" />
-                Delete selected{selectedSegmentBatchCount > 0 ? ` (${selectedSegmentBatchCount})` : ""}
+                <span
+                  className="action-button-icon is-delete"
+                  aria-hidden="true"
+                />
+                Delete selected
+                {selectedSegmentBatchCount > 0
+                  ? ` (${selectedSegmentBatchCount})`
+                  : ""}
               </button>
-              <button type="button" className="button-with-icon" onClick={onExitBatchMode}>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={onExitBatchMode}
+              >
                 Cancel selection
               </button>
             </>
           ) : (
             <>
-            <button type="button" className="button-with-icon" onClick={openCreateSegmentAndScroll}>
-            <span className="action-button-icon is-new" aria-hidden="true" />
-            New
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => focusedSegment !== null && openEditSegmentAndScroll(focusedSegment)}
-            disabled={focusedSegment === null}
-          >
-            <span className="action-button-icon is-edit" aria-hidden="true" />
-            Edit
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => onEnterBatchMode("segment")}
-            disabled={sortedVisibleSegments.length === 0}
-          >
-            <span className="action-button-icon is-multi-select" aria-hidden="true" />
-            {isMobileViewport ? "Select" : "Select multiple"}
-          </button>
-          <button
-            type="button"
-            className="modeling-list-action-delete button-with-icon"
-            onClick={() => focusedSegment !== null && onDeleteSegment(focusedSegment.id)}
-            disabled={focusedSegment === null || segmentFormMode === "create"}
-          >
-            <span className="action-button-icon is-delete" aria-hidden="true" />
-            Delete
-          </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={openCreateSegmentAndScroll}
+              >
+                <span
+                  className="action-button-icon is-new"
+                  aria-hidden="true"
+                />
+                New
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() =>
+                  focusedSegment !== null &&
+                  openEditSegmentAndScroll(focusedSegment)
+                }
+                disabled={focusedSegment === null}
+              >
+                <span
+                  className="action-button-icon is-edit"
+                  aria-hidden="true"
+                />
+                Edit
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() => onEnterBatchMode("segment")}
+                disabled={sortedVisibleSegments.length === 0}
+              >
+                <span
+                  className="action-button-icon is-multi-select"
+                  aria-hidden="true"
+                />
+                {isMobileViewport ? "Select" : "Select multiple"}
+              </button>
+              <button
+                type="button"
+                className="modeling-list-action-delete button-with-icon"
+                onClick={() =>
+                  focusedSegment !== null && onDeleteSegment(focusedSegment.id)
+                }
+                disabled={
+                  focusedSegment === null || segmentFormMode === "create"
+                }
+              >
+                <span
+                  className="action-button-icon is-delete"
+                  aria-hidden="true"
+                />
+                Delete
+              </button>
             </>
           )}
         </div>
       </article>
 
-      <article className="panel" hidden={!isWireSubScreen} data-onboarding-panel="modeling-wires">
+      <article
+        className="panel"
+        hidden={!isWireSubScreen}
+        data-onboarding-panel="modeling-wires"
+      >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Wires</h2>
           <div className="list-panel-header-tools">
@@ -621,7 +950,7 @@ export function ModelingSecondaryTables({
                         "End seal ref",
                         "Section (mm²)",
                         "Length (mm)",
-                        "Route mode"
+                        "Route mode",
                       ]
                     : [
                         "Name",
@@ -636,8 +965,8 @@ export function ModelingSecondaryTables({
                         "End connection ref",
                         "End seal ref",
                         "Section (mm²)",
-                        "Length (mm)"
-                    ];
+                        "Length (mm)",
+                      ];
                   const rows = sortedVisibleWires.map((wire) => {
                     const begin = describeWireEndpointCsvParts(wire.endpointA);
                     const end = describeWireEndpointCsvParts(wire.endpointB);
@@ -658,7 +987,7 @@ export function ModelingSecondaryTables({
                         wire.endpointBSealReference ?? "",
                         wire.sectionMm2,
                         wire.lengthMm,
-                        wire.isRouteLocked ? "Locked" : "Auto"
+                        wire.isRouteLocked ? "Locked" : "Auto",
                       ];
                     }
                     return [
@@ -675,19 +1004,30 @@ export function ModelingSecondaryTables({
                       wire.endpointBConnectionReference ?? "",
                       wire.endpointBSealReference ?? "",
                       wire.sectionMm2,
-                      wire.lengthMm
+                      wire.lengthMm,
                     ];
                   });
-                  const sheet = { name: "Modeling Wires", headers, rows, freezeHeaderRow: true, autoFilter: true } satisfies TabularWorksheetExport;
+                  const sheet = {
+                    name: "Modeling Wires",
+                    headers,
+                    rows,
+                    freezeHeaderRow: true,
+                    autoFilter: true,
+                  } satisfies TabularWorksheetExport;
                   const filenameBase = `wire-list-${normalizeFileNamePart(focusedWire?.technicalId) ?? "modeling"}`;
                   if (tabularExportFormat === "xlsx") {
                     setWireExportPreview({
                       filenameBase,
-                      sheets: [sheet]
+                      sheets: [sheet],
                     });
                     return;
                   }
-                  void downloadTabularCsvOrXlsxFile(filenameBase, tabularExportFormat, sheet, { includeUtf8Bom: true });
+                  void downloadTabularCsvOrXlsxFile(
+                    filenameBase,
+                    tabularExportFormat,
+                    sheet,
+                    { includeUtf8Bom: true },
+                  );
                 }}
                 disabled={sortedVisibleWires.length === 0}
               >
@@ -700,44 +1040,53 @@ export function ModelingSecondaryTables({
                   className="filter-chip onboarding-help-button"
                   onClick={onOpenWireOnboardingHelp}
                 >
-                  <span className="action-button-icon is-help" aria-hidden="true" />
+                  <span
+                    className="action-button-icon is-help"
+                    aria-hidden="true"
+                  />
                   <span>Help</span>
                 </button>
               ) : null}
             </div>
-              <div className="list-panel-header-tools-row is-filter-row is-wire-filter-row">
-                <label className="list-inline-number-filter wire-tag-filter">
-                  <span>Tag</span>
-                  <select
-                    className="list-inline-table-filter-select"
-                    aria-label="Wire tag filter"
-                    value={wireFunctionalTagFilter}
-                    onChange={(event) => setWireFunctionalTagFilter(event.target.value)}
-                  >
-                    <option value="all">Any</option>
-                    {wireFunctionalTagOptions.map((label) => (
-                      <option key={label} value={label}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <TableFilterBar
-                  label="Filter"
-                  fieldLabel="Wire filter field"
-                  fieldValue={wireFilterField}
-                  onFieldChange={(value) => setWireFilterField(value as "endpoints" | "name" | "technicalId" | "any")}
-                  fieldOptions={[
-                    { value: "endpoints", label: "Endpoints" },
-                    { value: "name", label: "Wire name" },
-                    { value: "technicalId", label: "Technical ID" },
-                    { value: "any", label: "Any" }
-                  ]}
-                  queryValue={wireEndpointFilterQuery}
-                  onQueryChange={setWireEndpointFilterQuery}
-                  placeholder={wireFilterPlaceholder}
-                />
-              </div>
+            <div className="list-panel-header-tools-row is-filter-row is-wire-filter-row">
+              <label className="list-inline-number-filter wire-tag-filter">
+                <span>Tag</span>
+                <select
+                  className="list-inline-table-filter-select"
+                  aria-label="Wire tag filter"
+                  value={wireFunctionalTagFilter}
+                  onChange={(event) =>
+                    setWireFunctionalTagFilter(event.target.value)
+                  }
+                >
+                  <option value="all">Any</option>
+                  {wireFunctionalTagOptions.map((label) => (
+                    <option key={label} value={label}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <TableFilterBar
+                label="Filter"
+                fieldLabel="Wire filter field"
+                fieldValue={wireFilterField}
+                onFieldChange={(value) =>
+                  setWireFilterField(
+                    value as "endpoints" | "name" | "technicalId" | "any",
+                  )
+                }
+                fieldOptions={[
+                  { value: "endpoints", label: "Endpoints" },
+                  { value: "name", label: "Wire name" },
+                  { value: "technicalId", label: "Technical ID" },
+                  { value: "any", label: "Any" },
+                ]}
+                queryValue={wireEndpointFilterQuery}
+                onQueryChange={setWireEndpointFilterQuery}
+                placeholder={wireFilterPlaceholder}
+              />
+            </div>
           </div>
         </header>
         {wires.length === 0 ? (
@@ -758,27 +1107,199 @@ export function ModelingSecondaryTables({
                         type="checkbox"
                         aria-label="Select all visible wires"
                         checked={allVisibleWiresSelected}
-                        onChange={() => onSetBatchSelectionForVisible("wire", visibleWireIds)}
+                        onChange={() =>
+                          onSetBatchSelectionForVisible("wire", visibleWireIds)
+                        }
                       />
                     </th>
                   ) : null}
-                  <th aria-sort={getTableAriaSort(wireTableSort, "name")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" })); }}>Name <span className="sort-indicator">{wireSortIndicator("name")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(wireTableSort, "technicalId")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{wireSortIndicator("technicalId")}</span></button></th>
+                  <th aria-sort={getTableAriaSort(wireTableSort, "name")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => {
+                        setWireTableSort((current) => ({
+                          field: "name",
+                          direction:
+                            current.field === "name" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                        _setWireSort((current) => ({
+                          field: "name",
+                          direction:
+                            current.field === "name" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                      }}
+                    >
+                      Name{" "}
+                      <span className="sort-indicator">
+                        {wireSortIndicator("name")}
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-sort={getTableAriaSort(wireTableSort, "technicalId")}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => {
+                        setWireTableSort((current) => ({
+                          field: "technicalId",
+                          direction:
+                            current.field === "technicalId" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                        _setWireSort((current) => ({
+                          field: "technicalId",
+                          direction:
+                            current.field === "technicalId" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                      }}
+                    >
+                      {isMobileViewport ? "ID" : "Technical ID"}{" "}
+                      <span className="sort-indicator">
+                        {wireSortIndicator("technicalId")}
+                      </span>
+                    </button>
+                  </th>
                   <th>{isMobileViewport ? "Func tag" : "Functional tag"}</th>
                   <th>{isMobileViewport ? "Twist" : "Twist group"}</th>
-                  <th aria-sort={getTableAriaSort(wireTableSort, "color")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "color", direction: current.field === "color" && current.direction === "asc" ? "desc" : "asc" }))}>Color <span className="sort-indicator">{wireSortIndicator("color")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(wireTableSort, "endpointA")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "endpointA", direction: current.field === "endpointA" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "End A" : "Endpoint A"} <span className="sort-indicator">{wireSortIndicator("endpointA")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(wireTableSort, "endpointB")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "endpointB", direction: current.field === "endpointB" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "End B" : "Endpoint B"} <span className="sort-indicator">{wireSortIndicator("endpointB")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(wireTableSort, "sectionMm2")}><button type="button" className="sort-header-button" onClick={() => setWireTableSort((current) => ({ field: "sectionMm2", direction: current.field === "sectionMm2" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Sec" : "Section (mm²)"} <span className="sort-indicator">{wireSortIndicator("sectionMm2")}</span></button></th>
-                  <th aria-sort={getTableAriaSort(wireTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => { setWireTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" })); _setWireSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" })); }}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{wireSortIndicator("lengthMm")}</span></button></th>
+                  <th aria-sort={getTableAriaSort(wireTableSort, "color")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setWireTableSort((current) => ({
+                          field: "color",
+                          direction:
+                            current.field === "color" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      Color{" "}
+                      <span className="sort-indicator">
+                        {wireSortIndicator("color")}
+                      </span>
+                    </button>
+                  </th>
+                  <th aria-sort={getTableAriaSort(wireTableSort, "endpointA")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setWireTableSort((current) => ({
+                          field: "endpointA",
+                          direction:
+                            current.field === "endpointA" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      {isMobileViewport ? "End A" : "Endpoint A"}{" "}
+                      <span className="sort-indicator">
+                        {wireSortIndicator("endpointA")}
+                      </span>
+                    </button>
+                  </th>
+                  <th aria-sort={getTableAriaSort(wireTableSort, "endpointB")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setWireTableSort((current) => ({
+                          field: "endpointB",
+                          direction:
+                            current.field === "endpointB" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      {isMobileViewport ? "End B" : "Endpoint B"}{" "}
+                      <span className="sort-indicator">
+                        {wireSortIndicator("endpointB")}
+                      </span>
+                    </button>
+                  </th>
+                  <th aria-sort={getTableAriaSort(wireTableSort, "sectionMm2")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setWireTableSort((current) => ({
+                          field: "sectionMm2",
+                          direction:
+                            current.field === "sectionMm2" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      {isMobileViewport ? "Sec" : "Section (mm²)"}{" "}
+                      <span className="sort-indicator">
+                        {wireSortIndicator("sectionMm2")}
+                      </span>
+                    </button>
+                  </th>
+                  <th aria-sort={getTableAriaSort(wireTableSort, "lengthMm")}>
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() => {
+                        setWireTableSort((current) => ({
+                          field: "lengthMm",
+                          direction:
+                            current.field === "lengthMm" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                        _setWireSort((current) => ({
+                          field: "lengthMm",
+                          direction:
+                            current.field === "lengthMm" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }));
+                      }}
+                    >
+                      {isMobileViewport ? "Len" : "Length (mm)"}{" "}
+                      <span className="sort-indicator">
+                        {wireSortIndicator("lengthMm")}
+                      </span>
+                    </button>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {sortedVisibleWires.map((wire) => {
                   const isFocused = focusedWire?.id === wire.id;
-                  const fuseManufacturerReference = getWireFuseManufacturerReference(wire);
+                  const fuseManufacturerReference =
+                    getWireFuseManufacturerReference(wire);
                   const fuseCatalogItemId = wire.protection?.catalogItemId;
-                  const fuseCatalogItem = fuseCatalogItemId === undefined ? undefined : catalogItemById.get(fuseCatalogItemId);
+                  const fuseCatalogItem =
+                    fuseCatalogItemId === undefined
+                      ? undefined
+                      : catalogItemById.get(fuseCatalogItemId);
                   const isBatchSelected = batchSelectionIds.has(wire.id);
                   return (
                     <tr
@@ -786,10 +1307,22 @@ export function ModelingSecondaryTables({
                       ref={(element) => {
                         wireRowRefs.current[wire.id] = element;
                       }}
-                      className={isWireBatchMode ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row` : isFocused ? "is-selected is-focusable-row" : "is-focusable-row"}
-                      aria-selected={isWireBatchMode ? isBatchSelected : isFocused}
+                      className={
+                        isWireBatchMode
+                          ? `${isBatchSelected ? "is-selected " : ""}is-focusable-row`
+                          : isFocused
+                            ? "is-selected is-focusable-row"
+                            : "is-focusable-row"
+                      }
+                      aria-selected={
+                        isWireBatchMode ? isBatchSelected : isFocused
+                      }
                       tabIndex={0}
-                      onClick={() => (isWireBatchMode ? onToggleBatchSelection("wire", wire.id) : openEditWire(wire))}
+                      onClick={() =>
+                        isWireBatchMode
+                          ? onToggleBatchSelection("wire", wire.id)
+                          : openEditWire(wire)
+                      }
                       onKeyDown={(event) => {
                         if (event.key === "Enter" || event.key === " ") {
                           event.preventDefault();
@@ -807,7 +1340,9 @@ export function ModelingSecondaryTables({
                             type="checkbox"
                             aria-label={`Select wire ${wire.technicalId}`}
                             checked={isBatchSelected}
-                            onChange={() => onToggleBatchSelection("wire", wire.id)}
+                            onChange={() =>
+                              onToggleBatchSelection("wire", wire.id)
+                            }
                             onClick={(event) => event.stopPropagation()}
                           />
                         </td>
@@ -816,17 +1351,24 @@ export function ModelingSecondaryTables({
                         <div>{wire.name}</div>
                         {fuseManufacturerReference !== null ? (
                           <div className="wire-fuse-inline">
-                            <span className="status-chip wire-fuse-chip">Fuse</span>
-                            {fuseCatalogItemId !== undefined && fuseCatalogItem !== undefined ? (
+                            <span className="status-chip wire-fuse-chip">
+                              Fuse
+                            </span>
+                            {fuseCatalogItemId !== undefined &&
+                            fuseCatalogItem !== undefined ? (
                               <EntityReferenceButton
                                 className="technical-id"
                                 title={`Open catalog item ${fuseManufacturerReference}`}
-                                onClick={() => onSelectCatalogItem(fuseCatalogItemId)}
+                                onClick={() =>
+                                  onSelectCatalogItem(fuseCatalogItemId)
+                                }
                               >
                                 {fuseManufacturerReference}
                               </EntityReferenceButton>
                             ) : (
-                              <span className="technical-id">{fuseManufacturerReference}</span>
+                              <span className="technical-id">
+                                {fuseManufacturerReference}
+                              </span>
                             )}
                           </div>
                         ) : null}
@@ -852,50 +1394,91 @@ export function ModelingSecondaryTables({
             <>
               <button
                 type="button"
+                className="button-with-icon"
+                onClick={onOpenBatchSelectionDialog}
+                disabled={selectedWireBatchCount === 0}
+              >
+                Open batch
+                {selectedWireBatchCount > 0
+                  ? ` (${selectedWireBatchCount})`
+                  : ""}
+              </button>
+              <button
+                type="button"
                 className="modeling-list-action-delete button-with-icon"
                 onClick={onDeleteSelectedInBatchMode}
                 disabled={selectedWireBatchCount === 0}
               >
-                <span className="action-button-icon is-delete" aria-hidden="true" />
-                Delete selected{selectedWireBatchCount > 0 ? ` (${selectedWireBatchCount})` : ""}
+                <span
+                  className="action-button-icon is-delete"
+                  aria-hidden="true"
+                />
+                Delete selected
+                {selectedWireBatchCount > 0
+                  ? ` (${selectedWireBatchCount})`
+                  : ""}
               </button>
-              <button type="button" className="button-with-icon" onClick={onExitBatchMode}>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={onExitBatchMode}
+              >
                 Cancel selection
               </button>
             </>
           ) : (
             <>
-            <button type="button" className="button-with-icon" onClick={openCreateWireAndScroll}>
-            <span className="action-button-icon is-new" aria-hidden="true" />
-            New
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => focusedWire !== null && openEditWireAndScroll(focusedWire)}
-            disabled={focusedWire === null}
-          >
-            <span className="action-button-icon is-edit" aria-hidden="true" />
-            Edit
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={() => onEnterBatchMode("wire")}
-            disabled={sortedVisibleWires.length === 0}
-          >
-            <span className="action-button-icon is-multi-select" aria-hidden="true" />
-            {isMobileViewport ? "Select" : "Select multiple"}
-          </button>
-          <button
-            type="button"
-            className="modeling-list-action-delete button-with-icon"
-            onClick={() => focusedWire !== null && onDeleteWire(focusedWire.id)}
-            disabled={focusedWire === null || wireFormMode === "create"}
-          >
-            <span className="action-button-icon is-delete" aria-hidden="true" />
-            Delete
-          </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={openCreateWireAndScroll}
+              >
+                <span
+                  className="action-button-icon is-new"
+                  aria-hidden="true"
+                />
+                New
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() =>
+                  focusedWire !== null && openEditWireAndScroll(focusedWire)
+                }
+                disabled={focusedWire === null}
+              >
+                <span
+                  className="action-button-icon is-edit"
+                  aria-hidden="true"
+                />
+                Edit
+              </button>
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() => onEnterBatchMode("wire")}
+                disabled={sortedVisibleWires.length === 0}
+              >
+                <span
+                  className="action-button-icon is-multi-select"
+                  aria-hidden="true"
+                />
+                {isMobileViewport ? "Select" : "Select multiple"}
+              </button>
+              <button
+                type="button"
+                className="modeling-list-action-delete button-with-icon"
+                onClick={() =>
+                  focusedWire !== null && onDeleteWire(focusedWire.id)
+                }
+                disabled={focusedWire === null || wireFormMode === "create"}
+              >
+                <span
+                  className="action-button-icon is-delete"
+                  aria-hidden="true"
+                />
+                Delete
+              </button>
             </>
           )}
         </div>
@@ -908,7 +1491,10 @@ export function ModelingSecondaryTables({
           filenameLabel={`${wireExportPreview.filenameBase}.xlsx`}
           sheets={wireExportPreview.sheets}
           onConfirm={() => {
-            void downloadTabularWorkbookFile(wireExportPreview.filenameBase, wireExportPreview.sheets);
+            void downloadTabularWorkbookFile(
+              wireExportPreview.filenameBase,
+              wireExportPreview.sheets,
+            );
             setWireExportPreview(null);
           }}
           onCancel={() => setWireExportPreview(null)}

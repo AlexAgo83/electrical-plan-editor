@@ -188,10 +188,24 @@
 
 .workspace-tool-dialog > .panel,
 .workspace-tool-dialog > .pin-role-mass-edit-panel,
-.workspace-tool-dialog > .multi-network-functional-analysis-panel {
+.workspace-tool-dialog > .multi-network-functional-analysis-panel,
+.workspace-tool-dialog > .modeling-batch-context-content {
   min-height: 0;
   overflow: auto;
   box-shadow: none;
+}
+
+.modeling-batch-context-dialog {
+  width: min(100%, 42rem);
+}
+
+.modeling-batch-context-content {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.modeling-batch-context-content .network-form-header h3 {
+  margin: 0;
 }
 
 .bom-preview-dialog-header {

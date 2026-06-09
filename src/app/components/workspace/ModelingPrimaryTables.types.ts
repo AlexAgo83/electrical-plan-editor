@@ -8,10 +8,14 @@ import type {
   NodeId,
   Splice,
   SpliceId,
-  Wire
+  Wire,
 } from "../../../core/entities";
 import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
-import type { OccupancyFilter, SortDirection, SortState } from "../../types/app-controller";
+import type {
+  OccupancyFilter,
+  SortDirection,
+  SortState,
+} from "../../types/app-controller";
 import type { PinRoleMassEditUpdate } from "./PinRoleMassEditPanel";
 
 export interface ModelingPrimaryTablesProps {
@@ -19,8 +23,15 @@ export interface ModelingPrimaryTablesProps {
   batchSelectionIds: ReadonlySet<string>;
   onEnterBatchMode: (scope: ModelingBatchSelectionScope) => void;
   onExitBatchMode: () => void;
-  onToggleBatchSelection: (scope: ModelingBatchSelectionScope, id: string) => void;
-  onSetBatchSelectionForVisible: (scope: ModelingBatchSelectionScope, ids: readonly string[]) => void;
+  onToggleBatchSelection: (
+    scope: ModelingBatchSelectionScope,
+    id: string,
+  ) => void;
+  onSetBatchSelectionForVisible: (
+    scope: ModelingBatchSelectionScope,
+    ids: readonly string[],
+  ) => void;
+  onOpenBatchSelectionDialog: () => void;
   onDeleteSelectedInBatchMode: () => void;
   isConnectorSubScreen: boolean;
   connectorFormMode: "idle" | "create" | "edit";
@@ -35,7 +46,9 @@ export interface ModelingPrimaryTablesProps {
   connectors: Connector[];
   visibleConnectors: Connector[];
   connectorSort: SortState;
-  setConnectorSort: (value: SortState | ((current: SortState) => SortState)) => void;
+  setConnectorSort: (
+    value: SortState | ((current: SortState) => SortState),
+  ) => void;
   getSortIndicator: (sortState: SortState, field: SortState["field"]) => string;
   connectorOccupiedCountById: Map<ConnectorId, number>;
   selectedConnectorId: ConnectorId | null;
@@ -58,7 +71,9 @@ export interface ModelingPrimaryTablesProps {
   splices: Splice[];
   visibleSplices: Splice[];
   spliceSort: SortState;
-  setSpliceSort: (value: SortState | ((current: SortState) => SortState)) => void;
+  setSpliceSort: (
+    value: SortState | ((current: SortState) => SortState),
+  ) => void;
   spliceOccupiedCountById: Map<SpliceId, number>;
   selectedSpliceId: SpliceId | null;
   onEditSplice: (splice: Splice) => void;
@@ -76,7 +91,9 @@ export interface ModelingPrimaryTablesProps {
   nodes: NetworkNode[];
   visibleNodes: NetworkNode[];
   nodeIdSortDirection: SortDirection;
-  setNodeIdSortDirection: (value: SortDirection | ((current: SortDirection) => SortDirection)) => void;
+  setNodeIdSortDirection: (
+    value: SortDirection | ((current: SortDirection) => SortDirection),
+  ) => void;
   segmentsCountByNodeId: Map<NodeId, number>;
   selectedNodeId: NodeId | null;
   describeNode: (node: NetworkNode) => string;
