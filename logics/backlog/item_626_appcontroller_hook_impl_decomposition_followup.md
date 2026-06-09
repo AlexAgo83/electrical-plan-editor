@@ -1,9 +1,9 @@
 ## item_626_appcontroller_hook_impl_decomposition_followup - AppController hook-impl decomposition follow-up
-> From version: 1.15.4
+> From version: 1.15.0
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 90%
-> Confidence: 86%
+> Understanding: 94%
+> Confidence: 88%
 > Progress: 0%
 > Complexity: High
 > Theme: Architecture
@@ -58,4 +58,4 @@ flowchart LR
 - Urgency: Medium
 
 # Tasks
-- (none yet)
+- `task_136_appcontroller_hook_impl_decomposition_follow_up`

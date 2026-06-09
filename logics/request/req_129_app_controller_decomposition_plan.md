@@ -1,10 +1,10 @@
 ## req_129_app_controller_decomposition_plan - AppController decomposition plan
 
-> From version: 1.15.4
+> From version: 1.15.0
 > Schema version: 1.0
 > Status: In progress
-> Understanding: 99%
-> Confidence: 92%
+> Understanding: 100%
+> Confidence: 93%
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -79,4 +79,5 @@ flowchart LR
 - Evidence checked: `src/app/AppController.tsx` shrank from the audited 1089 lines to 1077 lines by extracting `useAppControllerWorkspaceRuntime`, preserving the public `<AppController store={...} />` contract.
 - Evidence checked: controller-boundary coverage was added in `src/tests/app-controller-workspace-runtime.hook.spec.tsx`; affected UI tests and modularization gates passed.
 - Evidence checked: `quality:hooks-modularization` still passes. `quality:ui-modularization` now records explicit exceptions for two pre-existing oversize UI files while keeping the AppController locked budget unchanged at 1100.
+- Second-wave task prepared on 2026-06-09 in `task_136_appcontroller_hook_impl_decomposition_follow_up`. The task records current line counts and recommends `useAppControllerModelingAnalysisScreenDomains.tsx` as the next extraction target.
 - Remaining work is still pertinent: the large implementation bodies under `src/app/hook-impl/controller/` (`useAppControllerScreenContentSlices.tsx`, `useAppControllerModelingAnalysisScreenDomains.tsx`, `useAppControllerNetworkSummaryPanelDomain.tsx`) remain concentrated and should be handled in follow-up decomposition waves before this request is closed.
