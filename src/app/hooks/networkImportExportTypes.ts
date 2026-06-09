@@ -35,6 +35,7 @@ export interface GroupedBomPreferences {
   workspaceTaxRatePercent?: number;
   bomExportCompactColumns?: boolean;
   bomTraceabilityLabelsHidden?: boolean;
+  bomExportComputedDownstreamLoad?: boolean;
 }
 
 export interface UseNetworkImportExportParams {

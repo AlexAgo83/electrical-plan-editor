@@ -120,7 +120,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const preferencesState = useAppControllerPreferencesState();
   const { locale, themeMode, tableDensity, tableFontSize, workspaceCurrencyCode, workspaceTaxEnabled, workspaceTaxRatePercent } =
     preferencesState;
-  const { tabularExportFormat, bomExportCompactColumns, bomTraceabilityLabelsHidden, defaultWireSectionMm2 } = preferencesState;
+  const { tabularExportFormat, bomExportCompactColumns, bomTraceabilityLabelsHidden, bomExportComputedDownstreamLoad } = preferencesState;
+  const { defaultWireSectionMm2 } = preferencesState;
   const { defaultAutoCreateLinkedNodes, spliceSectionImbalanceRatioPercent, networkSort, setNetworkSort } = preferencesState;
   const { canvasDefaultShowGrid, canvasDefaultSnapToGrid, canvasDefaultLockEntityMovement, canvasDefaultShowInfoPanels } =
     preferencesState;
@@ -149,6 +150,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     tabularExportFormat,
     bomExportCompactColumns,
     bomTraceabilityLabelsHidden,
+    bomExportComputedDownstreamLoad,
     connectorCavityOccupancy: state.connectorCavityOccupancy
   });
   const { effectiveNetworkViewWidth, effectiveNetworkViewHeight, handleNetworkSummaryViewportSizeChange } = useAppControllerNetworkViewportState({ canvasResizeBehaviorMode });

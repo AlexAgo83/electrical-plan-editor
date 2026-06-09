@@ -247,6 +247,7 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Previous / next validation issue": "Issue de validation précédente / suivante",
   "Currency (Catalog/BOM)": "Devise (Catalogue/BOM)",
   "Enable tax / VAT (TVA)": "Activer la taxe / TVA",
+  "Computed downstream load (A)": "Charge aval calculée (A)",
   "Tax rate (%)": "Taux de taxe (%)",
   "Show floating inspector panel on supported screens": "Afficher le panneau inspecteur flottant sur les écrans compatibles",
   "Workspace panels layout": "Disposition des panneaux",

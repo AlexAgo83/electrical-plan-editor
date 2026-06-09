@@ -20,6 +20,7 @@ interface UseAppControllerBomExportHandlersParams {
   tabularExportFormat: TabularExportFormat;
   bomExportCompactColumns: boolean;
   bomTraceabilityLabelsHidden: boolean;
+  bomExportComputedDownstreamLoad: boolean;
   connectorCavityOccupancy?: ConnectorCavityOccupancyMap;
 }
 
@@ -51,6 +52,7 @@ export function useAppControllerBomExportHandlers({
   tabularExportFormat,
   bomExportCompactColumns,
   bomTraceabilityLabelsHidden,
+  bomExportComputedDownstreamLoad,
   connectorCavityOccupancy
 }: UseAppControllerBomExportHandlersParams) {
   const [activeBomPreview, setActiveBomPreview] = useState<ActiveBomPreviewState | null>(null);
@@ -70,11 +72,13 @@ export function useAppControllerBomExportHandlers({
         bomExportCompactColumns,
         {
           connectorCavityOccupancy,
-          showTraceabilityLabels: !bomTraceabilityLabelsHidden
+          showTraceabilityLabels: !bomTraceabilityLabelsHidden,
+          includeComputedDownstreamLoad: bomExportComputedDownstreamLoad
         }
       ),
     [
       bomExportCompactColumns,
+      bomExportComputedDownstreamLoad,
       bomTraceabilityLabelsHidden,
       catalogItems,
       connectorCavityOccupancy,
@@ -123,7 +127,8 @@ export function useAppControllerBomExportHandlers({
           bomExportCompactColumns,
           {
             connectorCavityOccupancy,
-            showTraceabilityLabels: !bomTraceabilityLabelsHidden
+            showTraceabilityLabels: !bomTraceabilityLabelsHidden,
+            includeComputedDownstreamLoad: bomExportComputedDownstreamLoad
           }
         );
 
@@ -156,6 +161,7 @@ export function useAppControllerBomExportHandlers({
     }, 0);
   }, [
     bomExportCompactColumns,
+    bomExportComputedDownstreamLoad,
     bomTraceabilityLabelsHidden,
     canExportBomCsv,
     catalogItems,

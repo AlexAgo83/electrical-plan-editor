@@ -70,7 +70,15 @@ export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
   {
     id: "settings-catalog-bom",
     title: "Catalog & BOM setup",
-    labels: ["Currency (Catalog/BOM)", "Enable tax / VAT (TVA)", "Tabular export format", "Compact BOM export columns", "Hide BOM traceability labels", "Tax rate (%)"]
+    labels: [
+      "Currency (Catalog/BOM)",
+      "Enable tax / VAT (TVA)",
+      "Tabular export format",
+      "Compact BOM export columns",
+      "Hide BOM traceability labels",
+      "Computed downstream load (A)",
+      "Tax rate (%)"
+    ]
   },
   {
     id: "settings-import-export",

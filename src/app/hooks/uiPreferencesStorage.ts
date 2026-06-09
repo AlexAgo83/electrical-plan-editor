@@ -15,7 +15,7 @@ import type {
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 14;
+const UI_PREFERENCES_SCHEMA_VERSION = 15;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 type TableDensity = "comfortable" | "compact";
@@ -36,6 +36,7 @@ export interface UiPreferencesPayload {
   tabularExportFormat: TabularExportFormat;
   bomExportCompactColumns: boolean;
   bomTraceabilityLabelsHidden: boolean;
+  bomExportComputedDownstreamLoad: boolean;
   defaultWireSectionMm2: number;
   defaultAutoCreateLinkedNodes: boolean;
   spliceSectionImbalanceRatioPercent: number;
@@ -205,6 +206,17 @@ function migrateUiPreferencesFromV13(candidate: Record<string, unknown>): Record
   };
 }
 
+function migrateUiPreferencesFromV14(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    bomExportComputedDownstreamLoad:
+      typeof candidate.bomExportComputedDownstreamLoad === "boolean"
+        ? candidate.bomExportComputedDownstreamLoad
+        : false,
+    schemaVersion: 15
+  };
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -285,6 +297,11 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
     if (version === 13) {
       migrated = migrateUiPreferencesFromV13(migrated);
       version = 14;
+      continue;
+    }
+    if (version === 14) {
+      migrated = migrateUiPreferencesFromV14(migrated);
+      version = 15;
       continue;
     }
     return null;

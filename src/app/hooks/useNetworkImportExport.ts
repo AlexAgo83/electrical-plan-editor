@@ -358,7 +358,8 @@ export function useNetworkImportExport({
           prefs.bomExportCompactColumns ?? false,
           {
             connectorCavityOccupancy,
-            showTraceabilityLabels: !(prefs.bomTraceabilityLabelsHidden ?? false)
+            showTraceabilityLabels: !(prefs.bomTraceabilityLabelsHidden ?? false),
+            includeComputedDownstreamLoad: prefs.bomExportComputedDownstreamLoad ?? false
           }
         );
 

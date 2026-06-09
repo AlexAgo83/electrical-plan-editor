@@ -5,7 +5,7 @@
 > Status: In progress
 > Understanding: 100%
 > Confidence: 92%
-> Progress: 60%
+> Progress: 70%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 
@@ -15,7 +15,7 @@
 - [x] Bulk "Apply role to selected pins" + "Reset to catalog default"; one history entry per bulk operation.
 - [x] Catalog-vs-override badge per row.
 - [ ] New cross-connector mass-edit view: filters, bulk apply, CSV-style copy/paste.
-- [ ] Optional BOM column "Computed downstream load (A)" on fuse rows, off by default.
+- [x] Optional BOM column "Computed downstream load (A)" on fuse rows, off by default.
 - [ ] Component tests cover all DoD items.
 
 # Backlog
@@ -74,5 +74,6 @@ Mirror `item_612` AC1–AC10.
 # Progress Report
 - Delivered in 1.14.0: connector inspector editing, catalog defaults editing, override/catalog/default badges, bulk inspector apply/reset, and focused inspector/catalog tests.
 - Real-status audit on 2026-06-09: no cross-connector mass-edit view, CSV paste, or optional BOM downstream-load export column was found in `src/` or `src/tests/`.
-- Remaining: cross-connector mass-edit view, filters, CSV paste, optional BOM downstream-load column, and complete component coverage for the deferred surfaces.
-- Pertinence: keep open. Inspector/catalog editing covers small/manual workflows; the mass-edit view remains relevant for large connector tables. The BOM column is a lower-priority optional export enhancement.
+- Delivered on 2026-06-09: optional BOM export setting `Computed downstream load (A)` is off by default and adds fuse rows with computed downstream load when enabled; covered by `npm run -s test -- src/tests/network-summary-bom-csv.spec.ts --run`, `npm run -s test -- src/tests/app.ui.network-summary-bom-export.spec.tsx --run`, and `npm run -s typecheck`.
+- Remaining: cross-connector mass-edit view, filters, CSV paste, and complete component coverage for the deferred mass-edit surface.
+- Pertinence: keep open. Inspector/catalog editing covers small/manual workflows; the mass-edit view remains relevant for large connector tables.

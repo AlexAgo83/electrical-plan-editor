@@ -173,6 +173,77 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     expect(exported.rows).toEqual([["Catalog item", "REF-A", "Compact item", 2, 1]]);
   });
 
+  it("adds optional computed downstream load on fuse rows when enabled", () => {
+    const fuseCatalogItem: CatalogItem = {
+      id: asCatalogItemId("FUSE-10"),
+      manufacturerReference: "FUSE-10A",
+      name: "10A fuse",
+      connectionCount: 1,
+      unitPriceExclTax: 1.5
+    };
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("C-SRC"),
+        name: "Source",
+        technicalId: "C-SRC",
+        cavityCount: 1,
+        pinElectricalRoles: { 1: { role: "source", currentA: 12 } }
+      },
+      {
+        id: asConnectorId("C-LOAD"),
+        name: "Load",
+        technicalId: "C-LOAD",
+        cavityCount: 1,
+        pinElectricalRoles: { 1: { role: "consumer", currentA: 12 } }
+      }
+    ];
+    const wires: Wire[] = [
+      {
+        id: asWireId("W-FUSE"),
+        name: "Fuse protected wire",
+        technicalId: "W-FUSE",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-SRC"), cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-LOAD"), cavityIndex: 1 },
+        protection: { kind: "fuse", catalogItemId: fuseCatalogItem.id },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 10,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
+
+    const exported = buildNetworkSummaryBomCsvExport(
+      [fuseCatalogItem],
+      connectors,
+      [],
+      wires,
+      "EUR",
+      true,
+      20,
+      false,
+      { includeComputedDownstreamLoad: true }
+    );
+
+    expect(exported.headers).toContain("Computed downstream load (A)");
+    expect(exported.rows.find((row) => row[0] === "Fuse")).toEqual([
+      "Fuse",
+      "FUSE-10A",
+      "10A fuse",
+      "",
+      "",
+      "",
+      1,
+      "12.0",
+      "1.50",
+      "1.50",
+      "1.80",
+      ""
+    ]);
+    expect(exported.itemRowCount).toBe(1);
+  });
+
   it("builds a two-sheet workbook structure for xlsx export", () => {
     const connectors: Connector[] = [
       {

@@ -66,6 +66,8 @@ interface SettingsWorkspaceContentProps {
   setBomExportCompactColumns: (value: boolean) => void;
   bomTraceabilityLabelsHidden: boolean;
   setBomTraceabilityLabelsHidden: (value: boolean) => void;
+  bomExportComputedDownstreamLoad: boolean;
+  setBomExportComputedDownstreamLoad: (value: boolean) => void;
   defaultWireSectionMm2: number;
   setDefaultWireSectionMm2: (value: number) => void;
   defaultAutoCreateLinkedNodes: boolean;
@@ -206,6 +208,8 @@ export function SettingsWorkspaceContent({
   setBomExportCompactColumns,
   bomTraceabilityLabelsHidden,
   setBomTraceabilityLabelsHidden,
+  bomExportComputedDownstreamLoad,
+  setBomExportComputedDownstreamLoad,
   defaultWireSectionMm2,
   setDefaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
@@ -1335,6 +1339,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setBomTraceabilityLabelsHidden(event.target.checked)}
             />
             {renderSettingLabel("Hide BOM traceability labels")}
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={bomExportComputedDownstreamLoad}
+              onChange={(event) => setBomExportComputedDownstreamLoad(event.target.checked)}
+            />
+            {renderSettingLabel("Computed downstream load (A)")}
           </label>
           <label className="settings-field">
             {renderSettingLabel("Tax rate (%)")}

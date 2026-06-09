@@ -1,4 +1,5 @@
 import type { CatalogItem, Connector, Splice, Wire, WireEndpoint } from "../../core/entities";
+import { computePinElectricalLoad } from "../../core/pinElectricalLoad";
 import {
   type BomMaterialOrigin,
   type ConnectorCavityOccupancyMap,
@@ -88,10 +89,19 @@ function buildBomHeaders(
   workspaceCurrencyCode: WorkspaceCurrencyCode,
   normalizedTaxEnabled: boolean,
   compactColumns: boolean,
-  includeTraceability: boolean
+  includeTraceability: boolean,
+  includeComputedDownstreamLoad: boolean
 ): string[] {
   const headers = compactColumns
-    ? ["Type", "Manufacturer reference", "Name", "Connection count", "Connector quantity", ...(includeTraceability ? ["Origin"] : [])]
+    ? [
+        "Type",
+        "Manufacturer reference",
+        "Name",
+        "Connection count",
+        "Connector quantity",
+        ...(includeComputedDownstreamLoad ? ["Computed downstream load (A)"] : []),
+        ...(includeTraceability ? ["Origin"] : [])
+      ]
     : [
         "Type",
         "Manufacturer reference",
@@ -100,6 +110,7 @@ function buildBomHeaders(
         "Connector quantity",
         "Splice quantity",
         "Component quantity",
+        ...(includeComputedDownstreamLoad ? ["Computed downstream load (A)"] : []),
         ...(includeTraceability ? ["Origin"] : []),
         `Unit price (excl. tax, ${workspaceCurrencyCode})`,
         `Line total (excl. tax, ${workspaceCurrencyCode})`,
@@ -119,6 +130,7 @@ function createBomRow(
     connectorQuantity: CsvCellValue;
     spliceQuantity?: CsvCellValue;
     componentQuantity?: CsvCellValue;
+    computedDownstreamLoadA?: CsvCellValue;
     origin?: CsvCellValue;
     unitPriceExclTax?: CsvCellValue;
     lineTotalExclTax?: CsvCellValue;
@@ -132,7 +144,8 @@ function createBomRow(
       values.manufacturerReference,
       values.name,
       values.connectionCount,
-      values.connectorQuantity
+      values.connectorQuantity,
+      ...(values.computedDownstreamLoadA !== undefined ? [values.computedDownstreamLoadA] : [])
     ];
     if (values.origin !== undefined) {
       row.push(values.origin);
@@ -148,6 +161,7 @@ function createBomRow(
     values.connectorQuantity,
     values.spliceQuantity ?? "",
     values.componentQuantity ?? "",
+    ...(values.computedDownstreamLoadA !== undefined ? [values.computedDownstreamLoadA] : []),
     ...(values.origin !== undefined ? [values.origin] : []),
     values.unitPriceExclTax ?? "",
     values.lineTotalExclTax ?? "",
@@ -332,6 +346,7 @@ function buildNetworkSummaryBomExportData(
   options: {
     connectorCavityOccupancy?: ConnectorCavityOccupancyMap;
     showTraceabilityLabels?: boolean;
+    includeComputedDownstreamLoad?: boolean;
   } = {}
 ): NetworkSummaryBomExportData {
   const normalizedTaxEnabled = workspaceTaxEnabled === true;
@@ -347,6 +362,7 @@ function buildNetworkSummaryBomExportData(
   const wireReferenceNameLookup = buildWireEndpointReferenceNameLookup(wires);
   const warnings: string[] = [];
   const includeTraceability = options.showTraceabilityLabels === true;
+  const includeComputedDownstreamLoad = options.includeComputedDownstreamLoad === true;
 
   const ensureAggregate = (catalogItem: CatalogItem): BomAggregateRow => {
     const existing = aggregates.get(catalogItem.id);
@@ -583,10 +599,19 @@ function buildNetworkSummaryBomExportData(
     left.connectorTechnicalId.localeCompare(right.connectorTechnicalId, undefined, { sensitivity: "base" })
   );
 
-  const headers = buildBomHeaders(workspaceCurrencyCode, normalizedTaxEnabled, compactColumns, includeTraceability);
+  const headers = buildBomHeaders(
+    workspaceCurrencyCode,
+    normalizedTaxEnabled,
+    compactColumns,
+    includeTraceability,
+    includeComputedDownstreamLoad
+  );
   const rows: CsvCellValue[][] = [];
   const groupedSheetRows: CsvCellValue[][] = [];
   const groupedSheetMergeRanges: Array<{ startRow: number; endRow: number }> = [];
+  const electricalLoad = includeComputedDownstreamLoad
+    ? computePinElectricalLoad({ connectors, splices, wires, catalogItemsById: catalogById })
+    : null;
 
   let pricedRowsTotal = 0;
   let pricedRowsTotalInclTax = 0;
@@ -613,6 +638,7 @@ function buildNetworkSummaryBomExportData(
           connectorQuantity,
           spliceQuantity,
           componentQuantity,
+          computedDownstreamLoadA: includeComputedDownstreamLoad ? "" : undefined,
           origin: includeTraceability ? "catalog default" : undefined,
           unitPriceExclTax: formatOptionalMoney(unitPrice),
           lineTotalExclTax: formatRowMoney(componentQuantity, unitPrice),
@@ -634,6 +660,7 @@ function buildNetworkSummaryBomExportData(
           name: "",
           connectionCount: "",
           connectorQuantity: "",
+          computedDownstreamLoadA: includeComputedDownstreamLoad ? "" : undefined,
           origin: includeTraceability ? "" : undefined,
           lineTotalExclTax: pricedRowsTotal.toFixed(2)
         }),
@@ -649,6 +676,7 @@ function buildNetworkSummaryBomExportData(
           name: "",
           connectionCount: "",
           connectorQuantity: "",
+          computedDownstreamLoadA: includeComputedDownstreamLoad ? "" : undefined,
           origin: includeTraceability ? "" : undefined,
           lineTotalInclTax: pricedRowsTotalInclTax.toFixed(2)
         }),
@@ -664,6 +692,7 @@ function buildNetworkSummaryBomExportData(
           name: "Currency",
           connectionCount: workspaceCurrencyCode,
           connectorQuantity: "",
+          computedDownstreamLoadA: includeComputedDownstreamLoad ? "" : undefined,
           origin: includeTraceability ? "" : undefined
         }),
         headers.length
@@ -677,6 +706,7 @@ function buildNetworkSummaryBomExportData(
           name: "Tax enabled",
           connectionCount: normalizedTaxEnabled ? "true" : "false",
           connectorQuantity: "",
+          computedDownstreamLoadA: includeComputedDownstreamLoad ? "" : undefined,
           origin: includeTraceability ? "" : undefined
         }),
         headers.length
@@ -690,6 +720,7 @@ function buildNetworkSummaryBomExportData(
           name: "Tax rate (%)",
           connectionCount: normalizedTaxRatePercent.toFixed(2),
           connectorQuantity: "",
+          computedDownstreamLoadA: includeComputedDownstreamLoad ? "" : undefined,
           origin: includeTraceability ? "" : undefined
         }),
         headers.length
@@ -707,6 +738,7 @@ function buildNetworkSummaryBomExportData(
           connectionCount: "",
           connectorQuantity: quantity,
           componentQuantity: quantity,
+          computedDownstreamLoadA: includeComputedDownstreamLoad ? "" : undefined,
           origin: includeTraceability ? origin : undefined
         }),
         headers.length
@@ -714,7 +746,45 @@ function buildNetworkSummaryBomExportData(
     );
   }
 
-  const itemRowCount = orderedRows.length + orderedWireTerminationRows.length;
+  let fuseRowCount = 0;
+  if (includeComputedDownstreamLoad) {
+    for (const wire of wires) {
+      if (wire.protection?.kind !== "fuse") {
+        continue;
+      }
+      const catalogItem = catalogById.get(wire.protection.catalogItemId);
+      if (catalogItem === undefined) {
+        continue;
+      }
+      const computedLoad = electricalLoad?.fuseProtectedLoad.get(`wireFuse:${wire.id}`)?.continuousA ?? 0;
+      rows.push(
+        padRow(
+          createBomRow(compactColumns, {
+            type: "Fuse",
+            manufacturerReference: catalogItem.manufacturerReference,
+            name: catalogItem.name ?? `Fuse for ${wire.technicalId}`,
+            connectionCount: "",
+            connectorQuantity: compactColumns ? 1 : "",
+            spliceQuantity: "",
+            componentQuantity: 1,
+            computedDownstreamLoadA: computedLoad > 0 ? computedLoad.toFixed(1) : "",
+            origin: includeTraceability ? "wire protection" : undefined,
+            unitPriceExclTax: formatOptionalMoney(catalogItem.unitPriceExclTax),
+            lineTotalExclTax: formatRowMoney(1, catalogItem.unitPriceExclTax),
+            lineTotalInclTax:
+              normalizedTaxEnabled && catalogItem.unitPriceExclTax !== undefined && Number.isFinite(catalogItem.unitPriceExclTax)
+                ? (catalogItem.unitPriceExclTax * taxMultiplier).toFixed(2)
+                : undefined,
+            url: catalogItem.url ?? ""
+          }),
+          headers.length
+        )
+      );
+      fuseRowCount += 1;
+    }
+  }
+
+  const itemRowCount = orderedRows.length + orderedWireTerminationRows.length + fuseRowCount;
   for (const group of groupedConnectorRows) {
     const connector = connectors.find((candidate) => candidate.technicalId === group.connectorTechnicalId);
     const catalogItem = connector?.catalogItemId === undefined ? undefined : catalogById.get(connector.catalogItemId);
@@ -817,6 +887,7 @@ export function buildNetworkSummaryBomCsvExport(
   options?: {
     connectorCavityOccupancy?: ConnectorCavityOccupancyMap;
     showTraceabilityLabels?: boolean;
+    includeComputedDownstreamLoad?: boolean;
   }
 ): NetworkSummaryBomCsvExport {
   const exportData = buildNetworkSummaryBomExportData(
@@ -851,6 +922,7 @@ export function buildNetworkSummaryBomWorkbookSheets(
   options?: {
     connectorCavityOccupancy?: ConnectorCavityOccupancyMap;
     showTraceabilityLabels?: boolean;
+    includeComputedDownstreamLoad?: boolean;
   }
 ): TabularWorksheetExport[] {
   const exportData = buildNetworkSummaryBomExportData(

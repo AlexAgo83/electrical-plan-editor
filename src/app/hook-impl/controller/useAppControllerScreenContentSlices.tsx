@@ -917,6 +917,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setBomExportCompactColumns: params.setBomExportCompactColumns,
     bomTraceabilityLabelsHidden: params.bomTraceabilityLabelsHidden,
     setBomTraceabilityLabelsHidden: params.setBomTraceabilityLabelsHidden,
+    bomExportComputedDownstreamLoad: params.bomExportComputedDownstreamLoad,
+    setBomExportComputedDownstreamLoad: params.setBomExportComputedDownstreamLoad,
     defaultWireSectionMm2: params.defaultWireSectionMm2,
     setDefaultWireSectionMm2: params.setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes: params.defaultAutoCreateLinkedNodes,

@@ -5,7 +5,7 @@
 > Status: In progress
 > Understanding: 100%
 > Confidence: 90%
-> Progress: 65%
+> Progress: 75%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -93,9 +93,10 @@ flowchart LR
 - Partially covered by the 1.14.0 focused unit/UI validation, but the release-gate slice is not complete.
 - Delivered evidence: focused type/lint/vitest coverage for data model, ampacity, current-network and assembly aggregation, D1-D4 validation, inspector pin roles, and catalog pin roles.
 - Delivered after 1.15.0: onboarding step "Declare pin roles", AI Agent context snapshot, sample-network silence gate, and export/import preservation of connector `pinElectricalRoles`, catalog default `pinElectricalRoles`, and `ampacityOverrides`.
-- Real-status audit on 2026-06-09: no Playwright full-flow, canvas-unchanged snapshot, performance budget scripts/gates, or CI release-gate wiring specific to this release were found.
-- Remaining and pertinent: Playwright full-flow after mass-edit/overlay/multi-network view exist, canvas unchanged snapshot, permissiveness gate for partial declarations, performance budgets, and CI release-gate wiring.
-- Relevance assessment: keep this item open, but do not treat the Playwright full-flow or multi-network view performance budget as actionable until the deferred UI surfaces are implemented. The canvas snapshot and partial-declaration permissiveness checks can be implemented independently and are still valuable.
+- Delivered on 2026-06-09: partial-declaration permissiveness gate and byte-for-byte 2D canvas unchanged snapshot for pin-role/ampacity-only edits.
+- Real-status audit on 2026-06-09: no Playwright full-flow, performance budget scripts/gates, or CI release-gate wiring specific to this release were found.
+- Remaining and pertinent: Playwright full-flow after mass-edit/overlay/multi-network view exist, performance budgets, and CI release-gate wiring.
+- Relevance assessment: keep this item open, but do not treat the Playwright full-flow or multi-network view performance budget as actionable until the deferred UI surfaces are implemented.
 
 # AI Context
 - Summary: Release-gate slice for the pin-level source/consumer release. End-to-end Playwright, permissiveness assertions, modeling-canvas-unchanged snapshot, AI-Agent-untouched snapshot, performance budgets, onboarding step.

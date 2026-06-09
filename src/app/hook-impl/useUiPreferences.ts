@@ -120,6 +120,7 @@ interface UseUiPreferencesOptions {
   tabularExportFormat: TabularExportFormat;
   bomExportCompactColumns: boolean;
   bomTraceabilityLabelsHidden: boolean;
+  bomExportComputedDownstreamLoad: boolean;
   defaultWireSectionMm2: number;
   defaultAutoCreateLinkedNodes: boolean;
   spliceSectionImbalanceRatioPercent: number;
@@ -172,6 +173,7 @@ interface UseUiPreferencesOptions {
   setTabularExportFormat: (value: TabularExportFormat) => void;
   setBomExportCompactColumns: (value: boolean) => void;
   setBomTraceabilityLabelsHidden: (value: boolean) => void;
+  setBomExportComputedDownstreamLoad: (value: boolean) => void;
   setDefaultWireSectionMm2: (value: number) => void;
   setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
   setSpliceSectionImbalanceRatioPercent: (value: number) => void;
@@ -356,6 +358,7 @@ export function useUiPreferences({
   tabularExportFormat,
   bomExportCompactColumns,
   bomTraceabilityLabelsHidden,
+  bomExportComputedDownstreamLoad,
   defaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
   spliceSectionImbalanceRatioPercent,
@@ -408,6 +411,7 @@ export function useUiPreferences({
   setTabularExportFormat,
   setBomExportCompactColumns,
   setBomTraceabilityLabelsHidden,
+  setBomExportComputedDownstreamLoad,
   setDefaultWireSectionMm2,
   setDefaultAutoCreateLinkedNodes,
   setSpliceSectionImbalanceRatioPercent,
@@ -546,6 +550,7 @@ export function useUiPreferences({
       setTabularExportFormat(preferences.tabularExportFormat === "xlsx" ? "xlsx" : "csv");
       setBomExportCompactColumns(preferences.bomExportCompactColumns === true);
       setBomTraceabilityLabelsHidden(preferences.bomTraceabilityLabelsHidden === true);
+      setBomExportComputedDownstreamLoad(preferences.bomExportComputedDownstreamLoad === true);
       setDefaultWireSectionMm2(defaultWireSectionMm2Value);
       setDefaultAutoCreateLinkedNodes(defaultAutoCreateLinkedNodesValue);
       setSpliceSectionImbalanceRatioPercent(spliceSectionImbalanceRatioPercentValue);
@@ -714,6 +719,7 @@ export function useUiPreferences({
     setTabularExportFormat,
     setBomExportCompactColumns,
     setBomTraceabilityLabelsHidden,
+    setBomExportComputedDownstreamLoad,
     setWorkspaceCurrencyCode,
     setWorkspaceTaxEnabled,
     setWorkspaceTaxRatePercent,
@@ -741,6 +747,7 @@ export function useUiPreferences({
       tabularExportFormat,
       bomExportCompactColumns,
       bomTraceabilityLabelsHidden,
+      bomExportComputedDownstreamLoad,
       defaultWireSectionMm2,
       defaultAutoCreateLinkedNodes,
       spliceSectionImbalanceRatioPercent,
@@ -830,6 +837,7 @@ export function useUiPreferences({
     workspaceTaxRatePercent,
     tabularExportFormat,
     bomExportCompactColumns,
+    bomExportComputedDownstreamLoad,
     bomTraceabilityLabelsHidden,
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,

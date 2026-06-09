@@ -113,7 +113,8 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
       workspaceTaxEnabled: ui.preferencesState.workspaceTaxEnabled,
       workspaceTaxRatePercent: ui.preferencesState.workspaceTaxRatePercent,
       bomExportCompactColumns: ui.preferencesState.bomExportCompactColumns,
-      bomTraceabilityLabelsHidden: ui.preferencesState.bomTraceabilityLabelsHidden
+      bomTraceabilityLabelsHidden: ui.preferencesState.bomTraceabilityLabelsHidden,
+      bomExportComputedDownstreamLoad: ui.preferencesState.bomExportComputedDownstreamLoad
     },
     networkSummaryPanelRef,
     ensureNetworkPlanScreen: () => navigation.setActiveScreen("modeling")

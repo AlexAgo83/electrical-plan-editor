@@ -31,6 +31,7 @@ export function useAppControllerPreferencesState() {
   const [tabularExportFormat, setTabularExportFormat] = useState<TabularExportFormat>("csv");
   const [bomExportCompactColumns, setBomExportCompactColumns] = useState(false);
   const [bomTraceabilityLabelsHidden, setBomTraceabilityLabelsHidden] = useState(false);
+  const [bomExportComputedDownstreamLoad, setBomExportComputedDownstreamLoad] = useState(false);
   const [defaultWireSectionMm2, setDefaultWireSectionMm2] = useState(0.5);
   const [defaultAutoCreateLinkedNodes, setDefaultAutoCreateLinkedNodes] = useState(true);
   const [spliceSectionImbalanceRatioPercent, setSpliceSectionImbalanceRatioPercent] = useState(300);
@@ -99,6 +100,8 @@ export function useAppControllerPreferencesState() {
     setBomExportCompactColumns,
     bomTraceabilityLabelsHidden,
     setBomTraceabilityLabelsHidden,
+    bomExportComputedDownstreamLoad,
+    setBomExportComputedDownstreamLoad,
     defaultWireSectionMm2,
     setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,

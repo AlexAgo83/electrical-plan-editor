@@ -198,6 +198,8 @@ export function useAppControllerAuxScreenContentDomains({
     setBomExportCompactColumns: settings.prefs.setBomExportCompactColumns,
     bomTraceabilityLabelsHidden: settings.prefs.bomTraceabilityLabelsHidden,
     setBomTraceabilityLabelsHidden: settings.prefs.setBomTraceabilityLabelsHidden,
+    bomExportComputedDownstreamLoad: settings.prefs.bomExportComputedDownstreamLoad,
+    setBomExportComputedDownstreamLoad: settings.prefs.setBomExportComputedDownstreamLoad,
     defaultWireSectionMm2: settings.prefs.defaultWireSectionMm2,
     setDefaultWireSectionMm2: settings.prefs.setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes: settings.prefs.defaultAutoCreateLinkedNodes,

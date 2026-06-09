@@ -4,7 +4,7 @@
 > Schema version: 1.0
 > Status: In progress
 > Understanding: 100%
-> Confidence: 93%
+> Confidence: 94%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -207,7 +207,7 @@ flowchart LR
 
 # Delivery Status
 - Partially delivered in 1.14.0, with additional validation coverage delivered after 1.15.0.
-- Delivered and still evidenced in code: pin electrical role data model, catalog defaults, ampacity overrides, current-network aggregation engine, assembly aggregation core, D1-D4 validation category, connector inspector pin-role editor, catalog pin-role editor, bulk inspector apply/reset, sample-network silence gate, export/import preservation, onboarding step, and AI Agent context non-expansion.
-- Not found in code as of the 2026-06-09 audit: cross-connector mass-edit view with filters and CSV paste, BOM "Computed downstream load (A)" export column, functional schematic electrical overlay/toggle, read-only multi-network functional analysis view UX, view-level L1 surfacing, Playwright full-flow, canvas-unchanged snapshot, and performance/release-gate wiring.
-- Relevance assessment: the remaining work is still valid but no longer all equally blocking. The multi-network view is the highest-value remainder because the assembly engine and L1 logic exist but have no dedicated user-facing surface. The mass-edit view remains useful for large harnesses but the inspector/catalog editors provide a workable manual path. The functional schematic overlay and BOM column are useful read/export improvements, not prerequisites for the shipped validation center. Full Playwright/performance gates should wait until the remaining UI surfaces exist.
+- Delivered and still evidenced in code: pin electrical role data model, catalog defaults, ampacity overrides, current-network aggregation engine, assembly aggregation core, D1-D4 validation category, connector inspector pin-role editor, catalog pin-role editor, bulk inspector apply/reset, optional BOM computed downstream-load export, sample-network silence gate, export/import preservation, onboarding step, AI Agent context non-expansion, partial-declaration permissiveness gate, and 2D canvas unchanged snapshot for pin-role/ampacity-only edits.
+- Not found in code as of the 2026-06-09 audit: cross-connector mass-edit view with filters and CSV paste, functional schematic electrical overlay/toggle, read-only multi-network functional analysis view UX, view-level L1 surfacing, Playwright full-flow, and performance/release-gate wiring.
+- Relevance assessment: the remaining work is still valid but no longer all equally blocking. The multi-network view is the highest-value remainder because the assembly engine and L1 logic exist but have no dedicated user-facing surface. The mass-edit view remains useful for large harnesses but the inspector/catalog editors provide a workable manual path. The functional schematic overlay is a useful read/review improvement, not a prerequisite for the shipped validation center. Full Playwright/performance gates should wait until the remaining UI surfaces exist.
 - Source evidence: `changelogs/CHANGELOGS_1_14_0.md`, `src/core/pinElectricalLoad*.ts`, `src/app/hook-impl/validation/appendElectricalDimensioningIssues.ts`, `src/app/components/workspace/PinElectricalRolesEditor.tsx`, `src/app/lib/onboarding.ts`, `src/tests/core.pin-electrical-load*.spec.ts`, `src/tests/app.validation.electrical-dimensioning.spec.ts`, `src/tests/app.ui.inspector-pin-roles.spec.tsx`, `src/tests/app.ui.catalog-pin-roles.spec.tsx`, `src/tests/portability.network-file.spec.ts`, and `src/tests/ai-agent-context.spec.ts`.
