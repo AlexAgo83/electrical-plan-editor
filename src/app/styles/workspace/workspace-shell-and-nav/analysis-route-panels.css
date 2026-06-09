@@ -126,6 +126,27 @@
   margin: 0;
 }
 
+.multi-network-functional-analysis-panel {
+  display: grid;
+  gap: 0.65rem;
+  min-height: 0;
+}
+
+.multi-network-functional-analysis-section {
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  border-radius: 0.55rem;
+  background: color-mix(in srgb, currentColor 3%, transparent);
+  padding: 0.6rem;
+}
+
+.multi-network-functional-analysis-summary {
+  justify-content: flex-start;
+}
+
+.multi-network-functional-analysis-table {
+  min-width: 58rem;
+}
+
 .analysis-wire-identity {
   border: 1px solid #c5d7e5;
   border-radius: 0.6rem;

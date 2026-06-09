@@ -102,9 +102,9 @@ test("pin roles full flow covers mass edit and multi-network analysis surfaces",
   });
   await networkSummary.getByRole("button", { name: "Functional" }).click();
   await networkSummary.getByRole("button", { name: "Analysis" }).click();
-  const multiNetworkPanel = page.getByRole("dialog", { name: "Multi-network functional analysis" }).locator("section.panel").filter({
-    has: page.getByRole("heading", { name: "Multi-network functional analysis" })
-  });
+  const multiNetworkPanel = page
+    .getByRole("dialog", { name: "Multi-network functional analysis" })
+    .locator(".multi-network-functional-analysis-panel");
   await expect(multiNetworkPanel).toBeVisible();
   await multiNetworkPanel.getByRole("button", { name: /Active assembly/ }).click();
   await expect(multiNetworkPanel).toContainText("Union graph:");

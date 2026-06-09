@@ -29,44 +29,41 @@ export function MultiNetworkFunctionalAnalysisPanel({
     : model.selectedNetworkLabels[0] ?? "Current network";
 
   return (
-    <section className="panel">
-      <header className="list-panel-header">
-        <h2>Multi-network functional analysis</h2>
-        <div className="list-panel-header-tools">
-          <div className="chip-group list-panel-filters" role="group" aria-label="Functional analysis scope">
-            <button
-              type="button"
-              className={scope === "current" ? "filter-chip is-active" : "filter-chip"}
-              aria-pressed={scope === "current"}
-              onClick={() => setScope("current")}
-            >
-              Current network
-            </button>
-            <button
-              type="button"
-              className={scope === "assembly" ? "filter-chip is-active" : "filter-chip"}
-              aria-pressed={scope === "assembly"}
-              disabled={assemblyDisabled}
-              onClick={() => setScope("assembly")}
-            >
-              Active assembly
-              <span className="filter-chip-count">{model.availableNetworkCount}</span>
-            </button>
-            <button
-              type="button"
-              className={scope === "custom" ? "filter-chip is-active" : "filter-chip"}
-              aria-pressed={scope === "custom"}
-              disabled={assemblyDisabled}
-              onClick={() => setScope("custom")}
-            >
-              Custom
-              <span className="filter-chip-count">{model.networkOptions.filter((option) => option.selected).length}</span>
-            </button>
-          </div>
+    <div className="multi-network-functional-analysis-panel">
+      <div className="multi-network-functional-analysis-section">
+        <div className="chip-group list-panel-filters" role="group" aria-label="Functional analysis scope">
+          <button
+            type="button"
+            className={scope === "current" ? "filter-chip is-active" : "filter-chip"}
+            aria-pressed={scope === "current"}
+            onClick={() => setScope("current")}
+          >
+            Current network
+          </button>
+          <button
+            type="button"
+            className={scope === "assembly" ? "filter-chip is-active" : "filter-chip"}
+            aria-pressed={scope === "assembly"}
+            disabled={assemblyDisabled}
+            onClick={() => setScope("assembly")}
+          >
+            Active assembly
+            <span className="filter-chip-count">{model.availableNetworkCount}</span>
+          </button>
+          <button
+            type="button"
+            className={scope === "custom" ? "filter-chip is-active" : "filter-chip"}
+            aria-pressed={scope === "custom"}
+            disabled={assemblyDisabled}
+            onClick={() => setScope("custom")}
+          >
+            Custom
+            <span className="filter-chip-count">{model.networkOptions.filter((option) => option.selected).length}</span>
+          </button>
         </div>
-      </header>
+      </div>
 
-      <div className="chip-group list-panel-filters" aria-label="Functional analysis summary">
+      <div className="chip-group list-panel-filters multi-network-functional-analysis-summary" aria-label="Functional analysis summary">
         <span className="status-chip is-error">Errors {model.summary.errors}</span>
         <span className="status-chip is-warning">Warnings {model.summary.warnings}</span>
         <span className="status-chip">Info {model.summary.info}</span>
@@ -80,7 +77,7 @@ export function MultiNetworkFunctionalAnalysisPanel({
       </p>
 
       {scope === "custom" && model.networkOptions.length > 0 ? (
-        <div className="chip-group list-panel-filters" aria-label="Custom functional analysis networks">
+        <div className="chip-group list-panel-filters multi-network-functional-analysis-section" aria-label="Custom functional analysis networks">
           {model.networkOptions.map((option) => (
             <label key={option.id} className="filter-chip">
               <input
@@ -95,7 +92,7 @@ export function MultiNetworkFunctionalAnalysisPanel({
       ) : null}
 
       {model.schematic !== null ? (
-        <p className="empty-copy">
+        <p className="empty-copy multi-network-functional-analysis-section">
           Union graph: {model.schematic.nodeCount} nodes, {model.schematic.edgeCount} edges.
           {model.schematic.warnings.length > 0 ? ` ${model.schematic.warnings.join(" ")}` : ""}
         </p>
@@ -105,26 +102,28 @@ export function MultiNetworkFunctionalAnalysisPanel({
         <p className="empty-copy">No functional analysis findings for this scope.</p>
       ) : (
         <>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Severity</th>
-                <th>Family</th>
-                <th>Scope</th>
-                <th>Finding</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {model.findings.map((finding) => (
-                <FindingRow key={finding.id} finding={finding} onGoToFinding={onGoToFinding} />
-              ))}
-            </tbody>
-          </table>
+          <div className="table-scroll-container">
+            <table className="data-table multi-network-functional-analysis-table">
+              <thead>
+                <tr>
+                  <th>Severity</th>
+                  <th>Family</th>
+                  <th>Scope</th>
+                  <th>Finding</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {model.findings.map((finding) => (
+                  <FindingRow key={finding.id} finding={finding} onGoToFinding={onGoToFinding} />
+                ))}
+              </tbody>
+            </table>
+          </div>
           <TableEntryCountFooter count={model.findings.length} />
         </>
       )}
-    </section>
+    </div>
   );
 }
 

@@ -81,9 +81,8 @@ describe("MultiNetworkFunctionalAnalysisPanel", () => {
   it("renders themed scope controls, summary chips, and L1 findings", () => {
     render(<Harness />);
 
-    const heading = screen.getByRole("heading", { name: "Multi-network functional analysis" });
-    const panel = heading.closest("section");
-    expect(panel).not.toBeNull();
+    const panel = document.querySelector(".multi-network-functional-analysis-panel");
+    expect(panel).toBeInstanceOf(HTMLElement);
     const scopePanel = panel as HTMLElement;
 
     expect(within(scopePanel).getByRole("button", { name: "Current network" })).toHaveClass("filter-chip", "is-active");
