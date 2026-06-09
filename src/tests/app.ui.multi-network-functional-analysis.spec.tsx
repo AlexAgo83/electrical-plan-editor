@@ -1,12 +1,13 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import type { ReactElement } from "react";
 import { useState } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { MultiNetworkFunctionalAnalysisPanel } from "../app/components/workspace/MultiNetworkFunctionalAnalysisPanel";
 import type {
   MultiNetworkFunctionalAnalysisModel,
   MultiNetworkFunctionalAnalysisScope
 } from "../app/lib/multiNetworkFunctionalAnalysis";
+import type { NetworkId } from "../core/entities";
 
 const model: MultiNetworkFunctionalAnalysisModel = {
   scope: "assembly",
@@ -19,7 +20,13 @@ const model: MultiNetworkFunctionalAnalysisModel = {
       severity: "warning",
       family: "L1",
       networkLabel: "Front harness -> Door harness",
-      message: "Link 'Front to door' cavity 1: source 10 A vs source 8 A."
+      message: "Link 'Front to door' cavity 1: source 10 A vs source 8 A.",
+      target: {
+        networkId: "network-front" as NetworkId,
+        subScreen: "connector",
+        selectionKind: "connector",
+        selectionId: "C-front"
+      }
     }
   ],
   summary: {
@@ -31,13 +38,18 @@ const model: MultiNetworkFunctionalAnalysisModel = {
   }
 };
 
-function Harness(): ReactElement {
+function Harness({
+  onGoToFinding = vi.fn()
+}: {
+  onGoToFinding?: Parameters<typeof MultiNetworkFunctionalAnalysisPanel>[0]["onGoToFinding"];
+}): ReactElement {
   const [scope, setScope] = useState<MultiNetworkFunctionalAnalysisScope>("current");
   return (
     <MultiNetworkFunctionalAnalysisPanel
       model={model}
       scope={scope}
       setScope={setScope}
+      onGoToFinding={onGoToFinding}
     />
   );
 }
@@ -60,5 +72,19 @@ describe("MultiNetworkFunctionalAnalysisPanel", () => {
     expect(scopePanel).toHaveTextContent("Front to door");
     expect(scopePanel).toHaveTextContent("Warnings 1");
     expect(scopePanel).toHaveTextContent("L1 1");
+  });
+
+  it("calls the Go to handler with the finding target", () => {
+    const onGoToFinding = vi.fn();
+    render(<Harness onGoToFinding={onGoToFinding} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Go to" }));
+
+    expect(onGoToFinding).toHaveBeenCalledWith({
+      networkId: "network-front",
+      subScreen: "connector",
+      selectionKind: "connector",
+      selectionId: "C-front"
+    });
   });
 });

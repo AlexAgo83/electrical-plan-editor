@@ -129,6 +129,12 @@ describe("buildMultiNetworkFunctionalAnalysisModel", () => {
     expect(model.findings).toHaveLength(1);
     expect(model.findings[0]?.family).toBe("D1-D4");
     expect(model.findings[0]?.message).toContain("no declared source");
+    expect(model.findings[0]?.target).toEqual({
+      networkId: netA.id,
+      subScreen: "wire",
+      selectionKind: "wire",
+      selectionId: loadWire.id
+    });
     expect(model.summary.warnings).toBe(1);
   });
 
@@ -181,6 +187,12 @@ describe("buildMultiNetworkFunctionalAnalysisModel", () => {
     expect(model.availableNetworkCount).toBe(2);
     expect(model.selectedNetworkLabels).toEqual(["Front harness", "Door harness"]);
     expect(model.findings.some((finding) => finding.family === "L1" && finding.message.includes("Front to door"))).toBe(true);
+    expect(model.findings.find((finding) => finding.family === "L1")?.target).toEqual({
+      networkId: netA.id,
+      subScreen: "connector",
+      selectionKind: "connector",
+      selectionId: portA.id
+    });
     expect(model.summary.l1).toBe(1);
   });
 });
