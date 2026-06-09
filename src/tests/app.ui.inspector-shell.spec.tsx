@@ -65,7 +65,6 @@ describe("App integration UI - inspector floating shell", () => {
       return;
     }
 
-    expect(screen.queryByRole("heading", { name: "Connector analysis" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Edit Connector" })).not.toBeInTheDocument();
   });
 

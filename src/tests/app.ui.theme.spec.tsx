@@ -220,7 +220,6 @@ describe("App integration UI - theme mode", () => {
 
     switchScreen("analysis");
     switchSubScreenDrawerAware("connector");
-    expect(within(document.body).queryByRole("heading", { name: "Connector analysis" })).toBeNull();
     expect(within(document.body).queryByRole("heading", { name: "Route preview" })).toBeNull();
     const connectorsPanel = within(document.body).getByRole("heading", { name: "Connectors" }).closest(".panel");
     expect(connectorsPanel).not.toBeNull();

@@ -203,7 +203,7 @@ describe("App integration UI - workspace shell regression", () => {
     expect(document.querySelector(".workspace-nav-row.secondary")).not.toBeNull();
   });
 
-  it("keeps a single Modeling primary entry and hides form/analysis panels until selection", () => {
+  it("keeps a single Modeling primary entry and hides form panels until selection", () => {
     renderAppWithState(createUiIntegrationState());
 
     const primaryNavRowBefore = document.querySelector(".workspace-nav-row");
@@ -216,7 +216,6 @@ describe("App integration UI - workspace shell regression", () => {
     const modelingTab = within(primaryNavRowAfter as HTMLElement).getByRole("button", { name: /Modeling/i, hidden: true });
     expect(modelingTab).toHaveClass("is-active");
     expect(screen.getAllByRole("heading", { name: "Connectors" })).toHaveLength(1);
-    expect(screen.queryByRole("heading", { name: "Connector analysis" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "Connector form" })).toBeNull();
 
     const connectorsPanel = screen.getByRole("heading", { name: "Connectors" }).closest(".panel");
@@ -260,7 +259,7 @@ describe("App integration UI - workspace shell regression", () => {
     expect(screen.getByRole("textbox", { name: "Connector filter field query" })).toHaveValue("C-1");
   });
 
-  it("hides form and analysis columns when switching to another sub-screen without matching table selection", () => {
+  it("hides form columns when switching to another sub-screen without matching table selection", () => {
     renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("modeling");
@@ -272,7 +271,6 @@ describe("App integration UI - workspace shell regression", () => {
 
     switchSubScreenDrawerAware("wire");
 
-    expect(screen.queryByRole("heading", { name: "Wire analysis" })).toBeNull();
     expect(screen.queryByRole("heading", { name: "Wire form" })).toBeNull();
   });
 });

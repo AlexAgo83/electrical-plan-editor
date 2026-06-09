@@ -123,6 +123,7 @@ describe("App integration UI - onboarding", () => {
     const actions = within(harnessFunctionalPanel).getByRole("group", { name: "Functional schematic actions" });
     expect(within(actions).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
       "Grid",
+      "Electrical roles",
       "Export"
     ]);
     fireEvent.click(within(actions).getByRole("button", { name: "Export" }));
