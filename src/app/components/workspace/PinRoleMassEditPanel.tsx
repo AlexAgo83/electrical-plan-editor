@@ -318,10 +318,11 @@ export function PinRoleMassEditPanel({
           Label
           <input type="text" value={bulkLabel} onChange={(event) => setBulkLabel(event.target.value)} />
         </label>
-        <button type="button" className="button-with-icon" onClick={applyBulk} disabled={selectedVisibleRows.length === 0}>
+        <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={applyBulk} disabled={selectedVisibleRows.length === 0}>
+          <span className="action-button-icon is-save" aria-hidden="true" />
           Apply to selected
         </button>
-        <button type="button" className="button-with-icon" onClick={resetSelected} disabled={selectedVisibleRows.length === 0}>
+        <button type="button" className="confirm-dialog-cancel" onClick={resetSelected} disabled={selectedVisibleRows.length === 0}>
           Reset selected
         </button>
       </div>

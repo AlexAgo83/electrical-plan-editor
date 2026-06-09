@@ -278,6 +278,7 @@ describe("App integration UI - list ergonomics", () => {
       "New",
       "Edit",
       "Select multiple",
+      "Mass edit",
       "Delete"
     ]);
     expect(

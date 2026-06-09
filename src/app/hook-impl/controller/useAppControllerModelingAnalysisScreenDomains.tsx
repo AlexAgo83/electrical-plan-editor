@@ -647,6 +647,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     },
     handleConnectorDelete: modelingHandlers.connector.handleConnectorDelete,
     onOpenConnectorOnboardingHelp: onboardingHelp?.openConnectorStep,
+    activeNetwork,
+    onApplyPinRoleMassEdit: handleApplyPinRoleMassEdit,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
     spliceFormMode: formsState.spliceFormMode,
     spliceEditAfterCreate: formsState.spliceEditAfterCreate,

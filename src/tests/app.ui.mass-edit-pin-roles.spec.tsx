@@ -17,7 +17,8 @@ describe("App integration UI - pin role mass edit", () => {
     const { store } = renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("modeling");
-    const panel = getPanelByHeading("Pin role mass edit");
+    fireEvent.click(within(getPanelByHeading("Connectors")).getByRole("button", { name: "Mass edit" }));
+    const panel = screen.getByRole("dialog", { name: "Pin role mass edit" });
     expect(panel).toBeInTheDocument();
     expect(within(panel).getAllByText("C-1").length).toBeGreaterThan(0);
 
@@ -32,7 +33,7 @@ describe("App integration UI - pin role mass edit", () => {
       label: "SUPPLY"
     });
 
-    const refreshedPanel = getPanelByHeading("Pin role mass edit");
+    const refreshedPanel = screen.getByRole("dialog", { name: "Pin role mass edit" });
     fireEvent.change(within(refreshedPanel).getByLabelText("CSV paste"), {
       target: { value: "missing,2,consumer,1,LOAD" }
     });

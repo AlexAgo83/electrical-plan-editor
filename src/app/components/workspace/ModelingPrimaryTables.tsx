@@ -18,6 +18,7 @@ import type {
 import type { SortDirection } from "../../types/app-controller";
 import { EntityReferenceButton } from "./EntityReferenceButton";
 import type { ModelingPrimaryTablesProps } from "./ModelingPrimaryTables.types";
+import { PinRoleMassEditDialog } from "./PinRoleMassEditDialog";
 
 export function ModelingPrimaryTables({
   activeBatchScope,
@@ -47,6 +48,9 @@ export function ModelingPrimaryTables({
   onSelectCatalogItem,
   onDeleteConnector,
   onOpenConnectorOnboardingHelp,
+  activeNetwork,
+  wires,
+  onApplyPinRoleMassEdit,
   isSpliceSubScreen,
   spliceFormMode,
   onOpenCreateSplice,
@@ -141,6 +145,7 @@ export function ModelingPrimaryTables({
     field: "id",
     direction: "asc"
   });
+  const [isPinRoleMassEditOpen, setIsPinRoleMassEditOpen] = useState(false);
   const openCreateConnectorAndScroll = () => {
     onOpenCreateConnector();
     scrollToFormPanel(FORM_PANEL_IDS.connector);
@@ -564,6 +569,15 @@ export function ModelingPrimaryTables({
           </button>
           <button
             type="button"
+            className="button-with-icon"
+            onClick={() => setIsPinRoleMassEditOpen(true)}
+            disabled={connectors.length === 0}
+          >
+            <span className="action-button-icon is-edit" aria-hidden="true" />
+            Mass edit
+          </button>
+          <button
+            type="button"
             className="modeling-list-action-delete button-with-icon"
             onClick={() => focusedConnector !== null && onDeleteConnector(focusedConnector.id)}
             disabled={focusedConnector === null || connectorFormMode === "create"}
@@ -575,6 +589,16 @@ export function ModelingPrimaryTables({
           )}
         </div>
       </article>
+      <PinRoleMassEditDialog
+        isOpen={isPinRoleMassEditOpen}
+        activeNetwork={activeNetwork}
+        connectors={connectors}
+        splices={splices}
+        wires={wires}
+        catalogItems={catalogItems}
+        onApplyPinRoleMassEdit={onApplyPinRoleMassEdit}
+        onClose={() => setIsPinRoleMassEditOpen(false)}
+      />
 
       <article className="panel" hidden={!isSpliceSubScreen} data-onboarding-panel="modeling-splices">
         <header className="list-panel-header list-panel-header-mobile-inline-tools">

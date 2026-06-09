@@ -3,13 +3,16 @@ import type {
   CatalogItemId,
   Connector,
   ConnectorId,
+  Network,
   NetworkNode,
   NodeId,
   Splice,
-  SpliceId
+  SpliceId,
+  Wire
 } from "../../../core/entities";
 import type { ModelingBatchSelectionScope } from "../../lib/modelingBatchDelete";
 import type { OccupancyFilter, SortDirection, SortState } from "../../types/app-controller";
+import type { PinRoleMassEditUpdate } from "./PinRoleMassEditPanel";
 
 export interface ModelingPrimaryTablesProps {
   activeBatchScope: ModelingBatchSelectionScope | null;
@@ -40,6 +43,9 @@ export interface ModelingPrimaryTablesProps {
   onSelectCatalogItem: (catalogItemId: CatalogItemId) => void;
   onDeleteConnector: (connectorId: ConnectorId) => void;
   onOpenConnectorOnboardingHelp?: () => void;
+  activeNetwork: Network | null;
+  wires: Wire[];
+  onApplyPinRoleMassEdit: (updates: PinRoleMassEditUpdate[]) => void;
   isSpliceSubScreen: boolean;
   spliceFormMode: "idle" | "create" | "edit";
   onOpenCreateSplice: () => void;
