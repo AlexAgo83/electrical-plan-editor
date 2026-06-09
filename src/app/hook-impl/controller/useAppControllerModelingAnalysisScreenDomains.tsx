@@ -50,6 +50,8 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   tabularExportFormat: ModelingSliceParams["tabularExportFormat"];
   hideWireAnalysisRoutePanel: AnalysisSliceParams["hideWireAnalysisRoutePanel"];
   showMultiNetworkFunctionalAnalysisPanel: AnalysisSliceParams["showMultiNetworkFunctionalAnalysisPanel"];
+  isMultiNetworkFunctionalAnalysisOpen: AnalysisSliceParams["isMultiNetworkFunctionalAnalysisOpen"];
+  onCloseMultiNetworkFunctionalAnalysis: AnalysisSliceParams["onCloseMultiNetworkFunctionalAnalysis"];
   formsState: AppControllerFormsStateFlat;
   modelingHandlers: AppControllerModelingHandlersOrchestrator;
   catalogHandlers: Pick<CatalogHandlersModel, "startCatalogEdit">;
@@ -188,6 +190,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
   tabularExportFormat,
   hideWireAnalysisRoutePanel,
   showMultiNetworkFunctionalAnalysisPanel,
+  isMultiNetworkFunctionalAnalysisOpen,
+  onCloseMultiNetworkFunctionalAnalysis,
   onSelectConnector,
   onSelectSplice,
   onSelectNode,
@@ -953,12 +957,14 @@ export function useAppControllerModelingAnalysisScreenDomains({
     AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent,
     hideWireAnalysisRoutePanel,
     showMultiNetworkFunctionalAnalysisPanel,
+    isMultiNetworkFunctionalAnalysisOpen,
     activeNetwork,
     multiNetworkFunctionalAnalysis,
     multiNetworkFunctionalAnalysisScope,
     setMultiNetworkFunctionalAnalysisScope,
     onToggleMultiNetworkFunctionalAnalysisCustomNetwork: handleToggleMultiNetworkFunctionalAnalysisCustomNetwork,
     onGoToMultiNetworkFunctionalAnalysisFinding: handleGoToMultiNetworkFunctionalAnalysisFinding,
+    onCloseMultiNetworkFunctionalAnalysis,
     onApplyPinRoleMassEdit: handleApplyPinRoleMassEdit,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,

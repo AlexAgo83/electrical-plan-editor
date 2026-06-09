@@ -271,6 +271,7 @@ describe("App integration UI - network summary workflow polish", () => {
       "Export"
     ]);
     fireEvent.click(within(networkSummaryActions).getByRole("button", { name: "Functional" }));
+    fireEvent.click(within(networkSummaryActions).getByRole("button", { name: "Harness assembly" }));
     expect(getCurrentNetworkFunctionalPanel("Main network (Sample)")).toBeInTheDocument();
   });
 

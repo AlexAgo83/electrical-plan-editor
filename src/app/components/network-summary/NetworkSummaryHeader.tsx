@@ -2,6 +2,7 @@ import type { ChangeEvent, ReactElement } from "react";
 import type { Network, NetworkId } from "../../../core/entities";
 import { NetworkSummaryEditMenu } from "./NetworkSummaryEditMenu";
 import { NetworkSummaryExportMenu } from "./NetworkSummaryExportMenu";
+import { NetworkSummaryFunctionalMenu } from "./NetworkSummaryFunctionalMenu";
 import { NetworkSummaryViewMenu } from "./NetworkSummaryViewMenu";
 
 interface NetworkSummaryHeaderProps {
@@ -29,6 +30,7 @@ interface NetworkSummaryHeaderProps {
   toggleShowCableCallouts: () => void;
   onRegenerateLayout: () => void;
   onOpenCurrentNetworkFunctional?: () => void;
+  onOpenMultiNetworkFunctionalAnalysis?: () => void;
   onExportSvg: () => void;
   onExportPng: () => void;
   onExportPdf: () => void;
@@ -61,6 +63,7 @@ export function NetworkSummaryHeader({
   toggleShowCableCallouts,
   onRegenerateLayout,
   onOpenCurrentNetworkFunctional,
+  onOpenMultiNetworkFunctionalAnalysis,
   onExportSvg,
   onExportPng,
   onExportPdf,
@@ -129,10 +132,10 @@ export function NetworkSummaryHeader({
           toggleShowCableCallouts={toggleShowCableCallouts}
         />
         {onOpenCurrentNetworkFunctional === undefined ? null : (
-          <button type="button" className="workspace-tab" onClick={onOpenCurrentNetworkFunctional}>
-            <span className="action-button-icon is-harness-assembly" aria-hidden="true" />
-            Functional
-          </button>
+          <NetworkSummaryFunctionalMenu
+            onOpenHarnessAssembly={onOpenCurrentNetworkFunctional}
+            onOpenAnalysis={onOpenMultiNetworkFunctionalAnalysis}
+          />
         )}
         <NetworkSummaryExportMenu
           canExportSvg={canExportSvg}

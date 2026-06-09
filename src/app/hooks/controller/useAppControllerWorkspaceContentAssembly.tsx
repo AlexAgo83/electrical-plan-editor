@@ -19,7 +19,7 @@ import type { AppControllerWorkspaceNetworkDomainAssemblyModel } from "./useAppC
 import type { AppControllerCatalogAnalysisActionsModel } from "./useAppControllerCatalogAnalysisActions";
 import type { AppControllerSelectionHandlersDomainAssemblyModel } from "./useAppControllerSelectionHandlersDomainAssembly";
 import type { AppControllerCanvasInteractionDomainAssemblyModel } from "./useAppControllerCanvasInteractionDomainAssembly";
-import type { ComponentType } from "react";
+import { useCallback, useState, type ComponentType } from "react";
 import { useAppControllerHomeWorkspaceContent } from "./useAppControllerHomeWorkspaceContent";
 import { useAppControllerNetworkSummaryPanelDomain } from "./useAppControllerNetworkSummaryPanelDomain";
 import { useAppControllerModelingAnalysisDomainAssembly } from "./useAppControllerModelingAnalysisDomainAssembly";
@@ -177,6 +177,14 @@ export function useAppControllerWorkspaceContentAssembly({
   domains,
   handlers
 }: AppControllerWorkspaceContentAssemblyParams) {
+  const [isMultiNetworkFunctionalAnalysisOpen, setIsMultiNetworkFunctionalAnalysisOpen] = useState(false);
+  const openMultiNetworkFunctionalAnalysis = useCallback(() => {
+    setIsMultiNetworkFunctionalAnalysisOpen(true);
+  }, []);
+  const closeMultiNetworkFunctionalAnalysis = useCallback(() => {
+    setIsMultiNetworkFunctionalAnalysisOpen(false);
+  }, []);
+
   const { homeWorkspaceContent } = useAppControllerHomeWorkspaceContent({
     HomeWorkspaceContentComponent: components.HomeWorkspaceContentComponent,
     hasActiveNetwork: state.hasActiveNetwork,
@@ -280,7 +288,8 @@ export function useAppControllerWorkspaceContentAssembly({
       canvasPngExportIncludeBackground: models.preferencesState.canvasPngExportIncludeBackground,
       showFloatingInspectorPanel: models.preferencesState.showFloatingInspectorPanel,
       setShowFloatingInspectorPanel: models.preferencesState.setShowFloatingInspectorPanel,
-      showRoutePreviewPanel: models.preferencesState.showRoutePreviewPanel
+      showRoutePreviewPanel: models.preferencesState.showRoutePreviewPanel,
+      showMultiNetworkFunctionalAnalysisPanel: models.preferencesState.showMultiNetworkFunctionalAnalysisPanel
     },
     selection: {
       selectedSegmentId: entities.selectedSegmentId,
@@ -317,6 +326,7 @@ export function useAppControllerWorkspaceContentAssembly({
     markDetailPanelsSelectionSourceAsTable: handlers.markDetailPanelsSelectionSourceAsTable,
     startWireEdit: models.modelingHandlers.wire.startWireEdit,
     onOpenHarnessAssemblyOnboardingHelp: () => handlers.openSingleStepOnboarding("harnessAssembly"),
+    onOpenMultiNetworkFunctionalAnalysis: openMultiNetworkFunctionalAnalysis,
     dispatchAction: handlers.dispatchAction,
     store: handlers.store
   });
@@ -348,6 +358,8 @@ export function useAppControllerWorkspaceContentAssembly({
       tabularExportFormat: models.preferencesState.tabularExportFormat,
       hideWireAnalysisRoutePanel: models.preferencesState.hideWireAnalysisRoutePanel,
       showMultiNetworkFunctionalAnalysisPanel: models.preferencesState.showMultiNetworkFunctionalAnalysisPanel,
+      isMultiNetworkFunctionalAnalysisOpen,
+      onCloseMultiNetworkFunctionalAnalysis: closeMultiNetworkFunctionalAnalysis,
       formsState: models.formsState,
       modelingHandlers: models.modelingHandlers,
       catalogHandlers: models.catalogHandlers,

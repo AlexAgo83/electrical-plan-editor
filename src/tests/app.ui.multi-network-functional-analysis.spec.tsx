@@ -124,11 +124,19 @@ describe("MultiNetworkFunctionalAnalysisPanel", () => {
     expect(onToggleCustomNetwork).toHaveBeenCalledWith("network-door");
   });
 
-  it("is visible in Modeling without row selection and can be hidden from global preferences", () => {
+  it("opens from Modeling without row selection and can be hidden from global preferences", () => {
     const firstRender = renderAppWithState(createUiIntegrationState());
 
     switchScreenDrawerAware("modeling");
-    expect(screen.getByRole("heading", { name: "Multi-network functional analysis" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Multi-network functional analysis" })).not.toBeInTheDocument();
+    const networkSummaryActions = within(getPanelByHeading("Network summary")).getByRole("group", {
+      name: "Network summary display options"
+    });
+    fireEvent.click(within(networkSummaryActions).getByRole("button", { name: "Functional" }));
+    fireEvent.click(within(networkSummaryActions).getByRole("button", { name: "Analysis" }));
+    const analysisDialog = screen.getByRole("dialog", { name: "Multi-network functional analysis" });
+    expect(analysisDialog).toBeInTheDocument();
+    fireEvent.click(within(analysisDialog).getByRole("button", { name: "Close" }));
 
     switchScreenDrawerAware("settings");
     const globalPreferencesPanel = getPanelByHeading("Global preferences");
@@ -140,7 +148,11 @@ describe("MultiNetworkFunctionalAnalysisPanel", () => {
     expect(panelVisibilityCheckbox).not.toBeChecked();
 
     switchScreenDrawerAware("modeling");
-    expect(screen.queryByRole("heading", { name: "Multi-network functional analysis" })).not.toBeInTheDocument();
+    const updatedNetworkSummaryActions = within(getPanelByHeading("Network summary")).getByRole("group", {
+      name: "Network summary display options"
+    });
+    fireEvent.click(within(updatedNetworkSummaryActions).getByRole("button", { name: "Functional" }));
+    expect(within(updatedNetworkSummaryActions).queryByRole("button", { name: "Analysis" })).not.toBeInTheDocument();
 
     firstRender.unmount();
 

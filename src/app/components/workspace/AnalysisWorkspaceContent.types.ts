@@ -50,12 +50,14 @@ export interface AnalysisWorkspaceContentProps {
   showEntityTables?: boolean;
   hideWireAnalysisRoutePanel?: boolean;
   showMultiNetworkFunctionalAnalysisPanel?: boolean;
+  isMultiNetworkFunctionalAnalysisOpen: boolean;
   activeNetwork: Network | null;
   multiNetworkFunctionalAnalysis: MultiNetworkFunctionalAnalysisModel;
   multiNetworkFunctionalAnalysisScope: MultiNetworkFunctionalAnalysisScope;
   setMultiNetworkFunctionalAnalysisScope: (value: MultiNetworkFunctionalAnalysisScope) => void;
   onToggleMultiNetworkFunctionalAnalysisCustomNetwork: (networkId: NetworkId) => void;
   onGoToMultiNetworkFunctionalAnalysisFinding: (target: MultiNetworkFunctionalAnalysisTarget) => void;
+  onCloseMultiNetworkFunctionalAnalysis: () => void;
   onApplyPinRoleMassEdit: (updates: PinRoleMassEditUpdate[]) => void;
   isConnectorSubScreen: boolean;
   isSpliceSubScreen: boolean;

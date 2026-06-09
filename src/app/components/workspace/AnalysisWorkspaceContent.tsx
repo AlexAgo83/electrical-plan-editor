@@ -4,7 +4,7 @@ import { AnalysisNodeSegmentWorkspacePanels } from "./AnalysisNodeSegmentWorkspa
 import { AnalysisSpliceWorkspacePanels } from "./AnalysisSpliceWorkspacePanels";
 import { AnalysisWireWorkspacePanels } from "./AnalysisWireWorkspacePanels";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
-import { MultiNetworkFunctionalAnalysisPanel } from "./MultiNetworkFunctionalAnalysisPanel";
+import { MultiNetworkFunctionalAnalysisDialog } from "./MultiNetworkFunctionalAnalysisDialog";
 
 export type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 
@@ -12,12 +12,14 @@ export function AnalysisWorkspaceContent(props: AnalysisWorkspaceContentProps): 
   return (
     <section className="panel-grid analysis-panel-grid">
       {props.showMultiNetworkFunctionalAnalysisPanel !== false ? (
-        <MultiNetworkFunctionalAnalysisPanel
+        <MultiNetworkFunctionalAnalysisDialog
+          isOpen={props.isMultiNetworkFunctionalAnalysisOpen}
           model={props.multiNetworkFunctionalAnalysis}
           scope={props.multiNetworkFunctionalAnalysisScope}
           setScope={props.setMultiNetworkFunctionalAnalysisScope}
           onToggleCustomNetwork={props.onToggleMultiNetworkFunctionalAnalysisCustomNetwork}
           onGoToFinding={props.onGoToMultiNetworkFunctionalAnalysisFinding}
+          onClose={props.onCloseMultiNetworkFunctionalAnalysis}
         />
       ) : null}
       <AnalysisConnectorWorkspacePanels {...props} />

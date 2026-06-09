@@ -84,7 +84,9 @@ test("pin roles full flow covers mass edit and multi-network analysis surfaces",
   await dismissOnboardingIfVisible(page);
 
   await switchMainScreen(page, "Modeling");
-  const massEditPanel = page.locator("section.pin-role-mass-edit-panel");
+  await page.getByRole("button", { name: "Mass edit" }).click();
+  const massEditDialog = page.getByRole("dialog", { name: "Pin role mass edit" });
+  const massEditPanel = massEditDialog.locator("section.pin-role-mass-edit-panel");
   await expect(massEditPanel.getByRole("heading", { name: "Pin role mass edit" })).toBeVisible();
   await massEditPanel.getByLabel("CSV paste").fill("CONN-SRC-01,1,consumer,4,E2E_CONSUMER");
   await massEditPanel.getByRole("button", { name: "Apply CSV" }).click();
@@ -93,8 +95,14 @@ test("pin roles full flow covers mass edit and multi-network analysis surfaces",
   await massEditPanel.getByRole("button", { name: "Apply CSV" }).click();
   await expect(massEditPanel).toContainText("E2E_SOURCE");
   await expect(massEditPanel).toContainText("Source");
+  await massEditDialog.getByRole("button", { name: "Close" }).click();
 
-  const multiNetworkPanel = page.locator("section.panel").filter({
+  const networkSummary = page.locator("section.panel").filter({
+    has: page.getByRole("heading", { name: "Network summary" })
+  });
+  await networkSummary.getByRole("button", { name: "Functional" }).click();
+  await networkSummary.getByRole("button", { name: "Analysis" }).click();
+  const multiNetworkPanel = page.getByRole("dialog", { name: "Multi-network functional analysis" }).locator("section.panel").filter({
     has: page.getByRole("heading", { name: "Multi-network functional analysis" })
   });
   await expect(multiNetworkPanel).toBeVisible();
