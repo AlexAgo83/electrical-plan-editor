@@ -187,7 +187,7 @@
 }
 
 .workspace-tool-dialog > .panel,
-.workspace-tool-dialog .pin-role-mass-edit-panel {
+.workspace-tool-dialog > .pin-role-mass-edit-panel {
   min-height: 0;
   overflow: auto;
   box-shadow: none;

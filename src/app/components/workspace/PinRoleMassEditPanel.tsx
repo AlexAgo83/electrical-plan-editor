@@ -258,73 +258,77 @@ export function PinRoleMassEditPanel({
   }
 
   return (
-    <section className="panel pin-role-mass-edit-panel">
-      <header className="analysis-wire-route-header">
-        <h2>Pin role mass edit</h2>
+    <div className="pin-role-mass-edit-panel">
+      <div className="pin-role-mass-edit-summary" aria-live="polite">
         <span className="analysis-wire-mode-chip">{filteredRows.length} pins</span>
-      </header>
-      <div className="pin-role-mass-edit-toolbar">
-        <label className="stack-label">
-          Connector
-          <select value={connectorFilter} onChange={(event) => setConnectorFilter(event.target.value as ConnectorId | "all")}>
-            <option value="all">All connectors</option>
-            {connectors.map((connector) => (
-              <option key={connector.id} value={connector.id}>
-                {connector.technicalId}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="stack-label">
-          Role
-          <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value as RoleFilter)}>
-            <option value="all">All roles</option>
-            {PIN_ELECTRICAL_ROLE_KINDS.map((role) => (
-              <option key={role} value={role}>
-                {ROLE_LABELS[role]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="stack-label">
-          Declaration
-          <select value={declarationFilter} onChange={(event) => setDeclarationFilter(event.target.value as DeclarationFilter)}>
-            <option value="all">All pins</option>
-            <option value="declared">Declared</option>
-            <option value="notDeclared">Not declared</option>
-          </select>
-        </label>
-        <label className="settings-checkbox pin-role-mass-edit-overloaded">
-          <input type="checkbox" checked={overLoadedOnly} onChange={(event) => setOverLoadedOnly(event.target.checked)} />
-          <span>Over-loaded</span>
-        </label>
+        <span>{selectedVisibleRows.length} selected</span>
       </div>
-      <div className="pin-role-mass-edit-toolbar">
-        <label className="stack-label">
-          Bulk role
-          <select value={bulkRole} onChange={(event) => setBulkRole(event.target.value as PinElectricalRoleKind)}>
-            {PIN_ELECTRICAL_ROLE_KINDS.map((role) => (
-              <option key={role} value={role}>
-                {ROLE_LABELS[role]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="stack-label">
-          Current (A)
-          <input type="number" min={0} step={0.1} value={bulkCurrentA} onChange={(event) => setBulkCurrentA(event.target.value)} />
-        </label>
-        <label className="stack-label">
-          Label
-          <input type="text" value={bulkLabel} onChange={(event) => setBulkLabel(event.target.value)} />
-        </label>
-        <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={applyBulk} disabled={selectedVisibleRows.length === 0}>
-          <span className="action-button-icon is-save" aria-hidden="true" />
-          Apply to selected
-        </button>
-        <button type="button" className="confirm-dialog-cancel" onClick={resetSelected} disabled={selectedVisibleRows.length === 0}>
-          Reset selected
-        </button>
+      <div className="pin-role-mass-edit-section">
+        <div className="pin-role-mass-edit-toolbar">
+          <label className="stack-label">
+            Connector
+            <select value={connectorFilter} onChange={(event) => setConnectorFilter(event.target.value as ConnectorId | "all")}>
+              <option value="all">All connectors</option>
+              {connectors.map((connector) => (
+                <option key={connector.id} value={connector.id}>
+                  {connector.technicalId}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="stack-label">
+            Role
+            <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value as RoleFilter)}>
+              <option value="all">All roles</option>
+              {PIN_ELECTRICAL_ROLE_KINDS.map((role) => (
+                <option key={role} value={role}>
+                  {ROLE_LABELS[role]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="stack-label">
+            Declaration
+            <select value={declarationFilter} onChange={(event) => setDeclarationFilter(event.target.value as DeclarationFilter)}>
+              <option value="all">All pins</option>
+              <option value="declared">Declared</option>
+              <option value="notDeclared">Not declared</option>
+            </select>
+          </label>
+          <label className="settings-checkbox pin-role-mass-edit-overloaded">
+            <input type="checkbox" checked={overLoadedOnly} onChange={(event) => setOverLoadedOnly(event.target.checked)} />
+            <span>Over-loaded</span>
+          </label>
+        </div>
+      </div>
+      <div className="pin-role-mass-edit-section">
+        <div className="pin-role-mass-edit-toolbar pin-role-mass-edit-toolbar--actions">
+          <label className="stack-label">
+            Bulk role
+            <select value={bulkRole} onChange={(event) => setBulkRole(event.target.value as PinElectricalRoleKind)}>
+              {PIN_ELECTRICAL_ROLE_KINDS.map((role) => (
+                <option key={role} value={role}>
+                  {ROLE_LABELS[role]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="stack-label">
+            Current (A)
+            <input type="number" min={0} step={0.1} value={bulkCurrentA} onChange={(event) => setBulkCurrentA(event.target.value)} />
+          </label>
+          <label className="stack-label">
+            Label
+            <input type="text" value={bulkLabel} onChange={(event) => setBulkLabel(event.target.value)} />
+          </label>
+          <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={applyBulk} disabled={selectedVisibleRows.length === 0}>
+            <span className="action-button-icon is-save" aria-hidden="true" />
+            Apply to selected
+          </button>
+          <button type="button" className="confirm-dialog-cancel" onClick={resetSelected} disabled={selectedVisibleRows.length === 0}>
+            Reset selected
+          </button>
+        </div>
       </div>
       <div className="table-scroll-container">
         <table className="data-table pin-role-mass-edit-table">
@@ -363,19 +367,21 @@ export function PinRoleMassEditPanel({
           </tbody>
         </table>
       </div>
-      <label className="stack-label pin-role-mass-edit-csv">
-        CSV paste
-        <textarea
-          value={csvText}
-          onChange={(event) => setCsvText(event.target.value)}
-          placeholder="connector,pin,role,currentA,label"
-          rows={4}
-        />
-      </label>
-      <div className="row-actions compact">
-        <button type="button" className="button-with-icon" onClick={applyCsvPaste} disabled={csvText.trim().length === 0}>
-          Apply CSV
-        </button>
+      <div className="pin-role-mass-edit-section pin-role-mass-edit-csv-section">
+        <label className="stack-label pin-role-mass-edit-csv">
+          CSV paste
+          <textarea
+            value={csvText}
+            onChange={(event) => setCsvText(event.target.value)}
+            placeholder="connector,pin,role,currentA,label"
+            rows={4}
+          />
+        </label>
+        <div className="row-actions compact">
+          <button type="button" className="button-with-icon" onClick={applyCsvPaste} disabled={csvText.trim().length === 0}>
+            Apply CSV
+          </button>
+        </div>
       </div>
       {csvErrors.length > 0 ? (
         <div className="inline-error pin-role-mass-edit-errors" role="alert">
@@ -384,6 +390,6 @@ export function PinRoleMassEditPanel({
           ))}
         </div>
       ) : null}
-    </section>
+    </div>
   );
 }

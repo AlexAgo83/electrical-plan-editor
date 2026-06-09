@@ -86,8 +86,8 @@ test("pin roles full flow covers mass edit and multi-network analysis surfaces",
   await switchMainScreen(page, "Modeling");
   await page.getByRole("button", { name: "Mass edit" }).click();
   const massEditDialog = page.getByRole("dialog", { name: "Pin role mass edit" });
-  const massEditPanel = massEditDialog.locator("section.pin-role-mass-edit-panel");
-  await expect(massEditPanel.getByRole("heading", { name: "Pin role mass edit" })).toBeVisible();
+  const massEditPanel = massEditDialog.locator(".pin-role-mass-edit-panel");
+  await expect(massEditPanel).toBeVisible();
   await massEditPanel.getByLabel("CSV paste").fill("CONN-SRC-01,1,consumer,4,E2E_CONSUMER");
   await massEditPanel.getByRole("button", { name: "Apply CSV" }).click();
   await expect(massEditPanel).toContainText("E2E_CONSUMER");
