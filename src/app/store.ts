@@ -1,4 +1,4 @@
-import { loadState, saveState, type SaveStateResult } from "../adapters/persistence";
+import { loadState, saveState, saveStateSync, type SaveStateResult } from "../adapters/persistence";
 import { appActions, createAppStore, getAppErrorMessage, type AppStore } from "../store";
 
 export const PERSISTENCE_WRITE_FAILURE_MESSAGE =
@@ -10,6 +10,7 @@ export const PERSISTENCE_STORAGE_WARNING_MESSAGE =
 
 interface AttachPersistenceSyncOptions {
   save?: (state: ReturnType<AppStore["getState"]>) => SaveStateResult | Promise<SaveStateResult>;
+  saveSync?: (state: ReturnType<AppStore["getState"]>) => SaveStateResult;
   debounceMs?: number;
 }
 
@@ -41,10 +42,48 @@ function isPersistenceFeedbackMessage(message: string | null): boolean {
 
 export function attachPersistenceSync(store: AppStore, options?: AttachPersistenceSyncOptions): () => void {
   const save = options?.save ?? saveState;
+  const saveSync = options?.saveSync ?? saveStateSync;
   const debounceMs = options?.debounceMs ?? DEFAULT_PERSISTENCE_DEBOUNCE_MS;
   let isApplyingPersistenceFeedback = false;
   let saveSequence = 0;
   let pendingTimerId: ReturnType<typeof setTimeout> | null = null;
+
+  function applyPersistenceFeedback(saveResult: SaveStateResult): void {
+    const nextState = store.getState();
+    const currentMessage = getAppErrorMessage(nextState.ui.lastError);
+    const nextMessage = mapPersistenceResultToMessage(saveResult);
+    const isPersistenceMessageVisible = isPersistenceFeedbackMessage(currentMessage);
+
+    if (nextMessage !== null) {
+      if (currentMessage === nextMessage) {
+        return;
+      }
+
+      isApplyingPersistenceFeedback = true;
+      store.dispatch(appActions.setError(nextMessage));
+      isApplyingPersistenceFeedback = false;
+      return;
+    }
+
+    if (!isPersistenceMessageVisible) {
+      return;
+    }
+
+    isApplyingPersistenceFeedback = true;
+    store.dispatch(appActions.clearError());
+    isApplyingPersistenceFeedback = false;
+  }
+
+  function applyWriteFailureFeedback(): void {
+    const nextState = store.getState();
+    if (getAppErrorMessage(nextState.ui.lastError) === PERSISTENCE_WRITE_FAILURE_MESSAGE) {
+      return;
+    }
+
+    isApplyingPersistenceFeedback = true;
+    store.dispatch(appActions.setError(PERSISTENCE_WRITE_FAILURE_MESSAGE));
+    isApplyingPersistenceFeedback = false;
+  }
 
   function flushPendingSave(): void {
     pendingTimerId = null;
@@ -58,44 +97,37 @@ export function attachPersistenceSync(store: AppStore, options?: AttachPersisten
           return;
         }
 
-        const nextState = store.getState();
-        const currentMessage = getAppErrorMessage(nextState.ui.lastError);
-        const nextMessage = mapPersistenceResultToMessage(saveResult);
-        const isPersistenceMessageVisible = isPersistenceFeedbackMessage(currentMessage);
-
-        if (nextMessage !== null) {
-          if (currentMessage === nextMessage) {
-            return;
-          }
-
-          isApplyingPersistenceFeedback = true;
-          store.dispatch(appActions.setError(nextMessage));
-          isApplyingPersistenceFeedback = false;
-          return;
-        }
-
-        if (!isPersistenceMessageVisible) {
-          return;
-        }
-
-        isApplyingPersistenceFeedback = true;
-        store.dispatch(appActions.clearError());
-        isApplyingPersistenceFeedback = false;
+        applyPersistenceFeedback(saveResult);
       })
       .catch(() => {
         if (currentSequence !== saveSequence) {
           return;
         }
 
-        const nextState = store.getState();
-        if (getAppErrorMessage(nextState.ui.lastError) === PERSISTENCE_WRITE_FAILURE_MESSAGE) {
-          return;
-        }
-
-        isApplyingPersistenceFeedback = true;
-        store.dispatch(appActions.setError(PERSISTENCE_WRITE_FAILURE_MESSAGE));
-        isApplyingPersistenceFeedback = false;
+        applyWriteFailureFeedback();
       });
+  }
+
+  // Synchronous flush for page-lifecycle transitions and detach. A pending
+  // debounced write would otherwise be dropped when the tab is hidden/closed or
+  // the subscription is torn down before the trailing timer fires. The write
+  // must be synchronous because the page can be discarded before any awaited
+  // microtask runs.
+  function flushPendingSaveSync(): void {
+    if (pendingTimerId === null) {
+      return;
+    }
+
+    clearTimeout(pendingTimerId);
+    pendingTimerId = null;
+    // Invalidate any in-flight async save so its late feedback cannot clobber this one.
+    saveSequence += 1;
+
+    try {
+      applyPersistenceFeedback(saveSync(store.getState()));
+    } catch {
+      applyWriteFailureFeedback();
+    }
   }
 
   const unsubscribe = store.subscribe(() => {
@@ -114,10 +146,32 @@ export function attachPersistenceSync(store: AppStore, options?: AttachPersisten
     pendingTimerId = setTimeout(flushPendingSave, debounceMs);
   });
 
+  const supportsDomLifecycle = typeof window !== "undefined" && typeof document !== "undefined";
+
+  function handlePageHide(): void {
+    flushPendingSaveSync();
+  }
+
+  function handleVisibilityChange(): void {
+    if (document.visibilityState === "hidden") {
+      flushPendingSaveSync();
+    }
+  }
+
+  if (supportsDomLifecycle) {
+    window.addEventListener("pagehide", handlePageHide);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+  }
+
   return () => {
+    flushPendingSaveSync();
     if (pendingTimerId !== null) {
       clearTimeout(pendingTimerId);
       pendingTimerId = null;
+    }
+    if (supportsDomLifecycle) {
+      window.removeEventListener("pagehide", handlePageHide);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     }
     unsubscribe();
   };

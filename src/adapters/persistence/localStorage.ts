@@ -370,26 +370,58 @@ function resolveCreatedAtIso(
   }
 }
 
-export async function saveState(
+function writeStateSnapshot(
   state: AppState,
-  storage: StorageLike | null = getDefaultStorage(),
-  nowProvider: IsoNowProvider = getNowIso
-): Promise<SaveStateResult> {
+  storage: StorageLike | null,
+  nowProvider: IsoNowProvider
+): { result: SaveStateResult; serializedSnapshot: string | null } {
   if (storage === null) {
-    return { ok: false, reason: "storage-unavailable" };
+    return { result: { ok: false, reason: "storage-unavailable" }, serializedSnapshot: null };
   }
 
   const updatedAtIso = nowProvider();
   const snapshot = buildSnapshot(state, storage, updatedAtIso);
   const serializedSnapshot = JSON.stringify(snapshot);
-  const warning = await estimateStoragePressure(serializedSnapshot);
 
   try {
     storage.setItem(STORAGE_KEY, serializedSnapshot);
     createdAtIsoCache.set(storage, snapshot.createdAtIso);
-    return warning === undefined ? { ok: true } : { ok: true, warning };
+    return { result: { ok: true }, serializedSnapshot };
   } catch (error) {
     // Ignore storage write failures to keep reducer flow deterministic.
-    return { ok: false, reason: isQuotaExceededError(error) ? "quota-exceeded" : "write-failed" };
+    return {
+      result: { ok: false, reason: isQuotaExceededError(error) ? "quota-exceeded" : "write-failed" },
+      serializedSnapshot: null
+    };
   }
+}
+
+/**
+ * Synchronous persistence write. Performs the localStorage `setItem` immediately
+ * without awaiting storage-pressure estimation, so it is safe to call from page
+ * lifecycle handlers (`pagehide` / `visibilitychange`) where the page can tear
+ * down before any awaited microtask would run.
+ */
+export function saveStateSync(
+  state: AppState,
+  storage: StorageLike | null = getDefaultStorage(),
+  nowProvider: IsoNowProvider = getNowIso
+): SaveStateResult {
+  return writeStateSnapshot(state, storage, nowProvider).result;
+}
+
+export async function saveState(
+  state: AppState,
+  storage: StorageLike | null = getDefaultStorage(),
+  nowProvider: IsoNowProvider = getNowIso
+): Promise<SaveStateResult> {
+  const { result, serializedSnapshot } = writeStateSnapshot(state, storage, nowProvider);
+  if (!result.ok || serializedSnapshot === null) {
+    return result;
+  }
+
+  // The durable write already succeeded; the storage-pressure estimate only
+  // augments the result with a non-blocking near-quota warning.
+  const warning = await estimateStoragePressure(serializedSnapshot);
+  return warning === undefined ? result : { ok: true, warning };
 }
