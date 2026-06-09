@@ -4,6 +4,7 @@ import type {
   CatalogItemId,
   Connector,
   ConnectorId,
+  NetworkId,
   NetworkNode,
   NodeId,
   PinElectricalRole,
@@ -49,6 +50,7 @@ export interface AnalysisWorkspaceContentProps {
   multiNetworkFunctionalAnalysis: MultiNetworkFunctionalAnalysisModel;
   multiNetworkFunctionalAnalysisScope: MultiNetworkFunctionalAnalysisScope;
   setMultiNetworkFunctionalAnalysisScope: (value: MultiNetworkFunctionalAnalysisScope) => void;
+  onToggleMultiNetworkFunctionalAnalysisCustomNetwork: (networkId: NetworkId) => void;
   onGoToMultiNetworkFunctionalAnalysisFinding: (target: MultiNetworkFunctionalAnalysisTarget) => void;
   isConnectorSubScreen: boolean;
   isSpliceSubScreen: boolean;

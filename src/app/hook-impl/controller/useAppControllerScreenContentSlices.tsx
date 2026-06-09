@@ -718,6 +718,7 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
     multiNetworkFunctionalAnalysis: params.multiNetworkFunctionalAnalysis,
     multiNetworkFunctionalAnalysisScope: params.multiNetworkFunctionalAnalysisScope,
     setMultiNetworkFunctionalAnalysisScope: params.setMultiNetworkFunctionalAnalysisScope,
+    onToggleMultiNetworkFunctionalAnalysisCustomNetwork: params.onToggleMultiNetworkFunctionalAnalysisCustomNetwork,
     onGoToMultiNetworkFunctionalAnalysisFinding: params.onGoToMultiNetworkFunctionalAnalysisFinding,
     isConnectorSubScreen: params.isConnectorSubScreen,
     isSpliceSubScreen: params.isSpliceSubScreen,

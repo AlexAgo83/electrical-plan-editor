@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import type { NetworkId } from "../../../core/entities";
 import type {
   MultiNetworkFunctionalAnalysisFinding,
   MultiNetworkFunctionalAnalysisModel,
@@ -11,6 +12,7 @@ interface MultiNetworkFunctionalAnalysisPanelProps {
   model: MultiNetworkFunctionalAnalysisModel;
   scope: MultiNetworkFunctionalAnalysisScope;
   setScope: (value: MultiNetworkFunctionalAnalysisScope) => void;
+  onToggleCustomNetwork: (networkId: NetworkId) => void;
   onGoToFinding: (target: MultiNetworkFunctionalAnalysisTarget) => void;
 }
 
@@ -18,6 +20,7 @@ export function MultiNetworkFunctionalAnalysisPanel({
   model,
   scope,
   setScope,
+  onToggleCustomNetwork,
   onGoToFinding
 }: MultiNetworkFunctionalAnalysisPanelProps): ReactElement {
   const assemblyDisabled = model.activeAssemblyName === null;
@@ -49,6 +52,16 @@ export function MultiNetworkFunctionalAnalysisPanel({
               Active assembly
               <span className="filter-chip-count">{model.availableNetworkCount}</span>
             </button>
+            <button
+              type="button"
+              className={scope === "custom" ? "filter-chip is-active" : "filter-chip"}
+              aria-pressed={scope === "custom"}
+              disabled={assemblyDisabled}
+              onClick={() => setScope("custom")}
+            >
+              Custom
+              <span className="filter-chip-count">{model.networkOptions.filter((option) => option.selected).length}</span>
+            </button>
           </div>
         </div>
       </header>
@@ -58,12 +71,30 @@ export function MultiNetworkFunctionalAnalysisPanel({
         <span className="status-chip is-warning">Warnings {model.summary.warnings}</span>
         <span className="status-chip">Info {model.summary.info}</span>
         <span className="status-chip">L1 {model.summary.l1}</span>
+        <span className="status-chip">Loops {model.summary.loops}</span>
       </div>
 
       <p className="empty-copy">
         Scope: {activeScopeLabel}
         {model.selectedNetworkLabels.length > 1 ? ` (${model.selectedNetworkLabels.join(", ")})` : ""}
       </p>
+
+      {scope === "custom" && model.networkOptions.length > 0 ? (
+        <div className="chip-group list-panel-filters" aria-label="Custom functional analysis networks">
+          {model.networkOptions.map((option) => (
+            <label key={option.id} className="filter-chip">
+              <input
+                type="checkbox"
+                checked={option.selected}
+                onChange={() => onToggleCustomNetwork(option.id)}
+              />
+              {option.label}
+            </label>
+          ))}
+        </div>
+      ) : null}
+
+      {model.schematic !== null ? <UnionSchematicPreview schematic={model.schematic} /> : null}
 
       {model.findings.length === 0 ? (
         <p className="empty-copy">No functional analysis findings for this scope.</p>
@@ -89,6 +120,72 @@ export function MultiNetworkFunctionalAnalysisPanel({
         </>
       )}
     </section>
+  );
+}
+
+function UnionSchematicPreview({
+  schematic
+}: {
+  schematic: NonNullable<MultiNetworkFunctionalAnalysisModel["schematic"]>;
+}): ReactElement {
+  const width = 760;
+  const height = 180;
+  const nodeCount = Math.max(schematic.nodes.length, 1);
+  const positionById = new Map<string, { x: number; y: number }>();
+  schematic.nodes.forEach((node, index) => {
+    const column = index % 6;
+    const row = Math.floor(index / 6);
+    positionById.set(node.id, {
+      x: 70 + column * 120,
+      y: 45 + row * 58
+    });
+  });
+  const rows = Math.max(1, Math.ceil(nodeCount / 6));
+  const viewHeight = Math.max(height, 45 + rows * 58);
+
+  return (
+    <div className="network-canvas-shell functional-schematic-canvas-shell">
+      {schematic.nodes.length === 0 ? (
+        <p className="empty-copy">No union functional schematic nodes for this scope.</p>
+      ) : (
+        <svg
+          className="functional-schematic-svg"
+          aria-label="Multi-network union functional schematic"
+          viewBox={`0 0 ${width} ${viewHeight}`}
+        >
+          {schematic.edges.map((edge) => {
+            const from = positionById.get(edge.fromNodeId);
+            const to = positionById.get(edge.toNodeId);
+            if (from === undefined || to === undefined) {
+              return null;
+            }
+            return (
+              <g key={edge.id} className="functional-edge">
+                <path d={`M ${from.x} ${from.y} L ${to.x} ${to.y}`} />
+                <text x={(from.x + to.x) / 2} y={(from.y + to.y) / 2 - 4}>
+                  {edge.label}
+                </text>
+              </g>
+            );
+          })}
+          {schematic.nodes.map((node) => {
+            const position = positionById.get(node.id)!;
+            return (
+              <g key={node.id} className={`functional-node--${node.kind}`} transform={`translate(${position.x} ${position.y})`}>
+                <rect className="functional-node-shape" x="-48" y="-18" width="96" height="36" rx="6" />
+                <text className="functional-node-label" textAnchor="middle" y="-2">{node.label}</text>
+                <text className="functional-node-detail" textAnchor="middle" y="12">{node.detail}</text>
+              </g>
+            );
+          })}
+        </svg>
+      )}
+      {schematic.warnings.length > 0 ? (
+        <div className="functional-schematic-warnings" role="status" aria-label="Multi-network schematic warnings">
+          {schematic.warnings.map((warning) => <p key={warning}>{warning}</p>)}
+        </div>
+      ) : null}
+    </div>
   );
 }
 

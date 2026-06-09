@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../../core/entities";
+import type { ConnectorId, NetworkId, NodeId, SegmentId, SpliceId, WireId } from "../../../core/entities";
 import { appActions, type AppStore } from "../../../store";
 import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
 import {
@@ -210,6 +210,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
   const [spliceAnalysisView, setSpliceAnalysisView] = useState<SpliceAnalysisView>("ports");
   const [multiNetworkFunctionalAnalysisScope, setMultiNetworkFunctionalAnalysisScope] =
     useState<MultiNetworkFunctionalAnalysisScope>("current");
+  const [multiNetworkFunctionalAnalysisCustomNetworkIds, setMultiNetworkFunctionalAnalysisCustomNetworkIds] =
+    useState<NetworkId[]>([]);
   const [activeBatchScope, setActiveBatchScope] = useState<ModelingBatchSelectionScope | null>(null);
   const [batchSelectionIds, setBatchSelectionIds] = useState<ReadonlySet<string>>(new Set());
   const appStateSnapshot = store.getState();
@@ -229,10 +231,18 @@ export function useAppControllerModelingAnalysisScreenDomains({
             ? null
             : appStateSnapshot.networkStates[appStateSnapshot.activeNetworkId] ?? null,
         catalogItems: entities.catalogItems,
-        scope: multiNetworkFunctionalAnalysisScope
+        scope: multiNetworkFunctionalAnalysisScope,
+        customNetworkIds: multiNetworkFunctionalAnalysisCustomNetworkIds
       }),
-    [appStateSnapshot, entities.catalogItems, multiNetworkFunctionalAnalysisScope]
+    [appStateSnapshot, entities.catalogItems, multiNetworkFunctionalAnalysisCustomNetworkIds, multiNetworkFunctionalAnalysisScope]
   );
+  const handleToggleMultiNetworkFunctionalAnalysisCustomNetwork = useCallback((networkId: NetworkId) => {
+    setMultiNetworkFunctionalAnalysisCustomNetworkIds((current) =>
+      current.includes(networkId)
+        ? current.filter((id) => id !== networkId)
+        : [...current, networkId]
+    );
+  }, []);
   const handleGoToMultiNetworkFunctionalAnalysisFinding = useCallback(
     (target: MultiNetworkFunctionalAnalysisTarget) => {
       if (store.getState().activeNetworkId !== target.networkId) {
@@ -902,6 +912,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     multiNetworkFunctionalAnalysis,
     multiNetworkFunctionalAnalysisScope,
     setMultiNetworkFunctionalAnalysisScope,
+    onToggleMultiNetworkFunctionalAnalysisCustomNetwork: handleToggleMultiNetworkFunctionalAnalysisCustomNetwork,
     onGoToMultiNetworkFunctionalAnalysisFinding: handleGoToMultiNetworkFunctionalAnalysisFinding,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,

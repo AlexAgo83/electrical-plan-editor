@@ -3,9 +3,19 @@ import type {
   CatalogItemId,
   HarnessAssembly,
   Network,
-  NetworkId
+  NetworkId,
+  Wire
 } from "../../core/entities";
 import { aggregateAssembly, type AssemblyNetworkSlice } from "../../core/pinElectricalLoadAssembly";
+import {
+  buildHarnessAssemblyFunctionalSchematicGraph,
+  FUNCTIONAL_FILTER_ALL,
+  type HarnessFunctionalNetworkBundle,
+  type FunctionalSchematicGraph
+} from "../../core/functionalSchematic";
+import type { BranchLoad, FuseProtectedLoadEntry } from "../../core/pinElectricalLoad";
+import { resolveAmpacityA } from "../../core/wireAmpacity";
+import { resolveWireMaterial } from "../../core/wireSizing";
 import type { NetworkScopedState } from "../../store";
 import {
   appendElectricalDimensioningIssues,
@@ -13,7 +23,7 @@ import {
 } from "../hook-impl/validation/appendElectricalDimensioningIssues";
 import type { ValidationIssue } from "../types/app-controller";
 
-export type MultiNetworkFunctionalAnalysisScope = "current" | "assembly";
+export type MultiNetworkFunctionalAnalysisScope = "current" | "assembly" | "custom";
 export type MultiNetworkFunctionalAnalysisSeverity = "error" | "warning" | "info";
 export type MultiNetworkFunctionalAnalysisTarget = {
   networkId: NetworkId;
@@ -31,18 +41,33 @@ export interface MultiNetworkFunctionalAnalysisFinding {
   target?: MultiNetworkFunctionalAnalysisTarget;
 }
 
+export interface MultiNetworkFunctionalAnalysisNetworkOption {
+  id: NetworkId;
+  label: string;
+  selected: boolean;
+}
+
+export interface MultiNetworkFunctionalAnalysisSchematic {
+  nodes: Array<{ id: string; label: string; detail: string; kind: string }>;
+  edges: Array<{ id: string; fromNodeId: string; toNodeId: string; label: string }>;
+  warnings: string[];
+}
+
 export interface MultiNetworkFunctionalAnalysisModel {
   scope: MultiNetworkFunctionalAnalysisScope;
   activeAssemblyName: string | null;
   availableNetworkCount: number;
   selectedNetworkLabels: string[];
+  networkOptions: MultiNetworkFunctionalAnalysisNetworkOption[];
   findings: MultiNetworkFunctionalAnalysisFinding[];
+  schematic: MultiNetworkFunctionalAnalysisSchematic | null;
   summary: {
     errors: number;
     warnings: number;
     info: number;
     l1: number;
     skippedBridges: number;
+    loops: number;
   };
 }
 
@@ -54,6 +79,7 @@ export interface BuildMultiNetworkFunctionalAnalysisModelParams {
   currentNetworkState: NetworkScopedState | null;
   catalogItems: readonly CatalogItem[];
   scope: MultiNetworkFunctionalAnalysisScope;
+  customNetworkIds?: readonly NetworkId[];
 }
 
 export function buildMultiNetworkFunctionalAnalysisModel({
@@ -63,18 +89,26 @@ export function buildMultiNetworkFunctionalAnalysisModel({
   networkStates,
   currentNetworkState,
   catalogItems,
-  scope
+  scope,
+  customNetworkIds = []
 }: BuildMultiNetworkFunctionalAnalysisModelParams): MultiNetworkFunctionalAnalysisModel {
   const networkById = new Map(networks.map((network) => [network.id, network]));
   const activeAssembly = findActiveAssembly(activeNetworkId, harnessAssemblies);
   const catalogItemsById = buildCatalogItemsById(catalogItems, networkStates);
   const findings: MultiNetworkFunctionalAnalysisFinding[] = [];
 
-  if (scope === "assembly" && activeAssembly !== null) {
-    const selectedNetworkIds = activeAssembly.members
+  if ((scope === "assembly" || scope === "custom") && activeAssembly !== null) {
+    const assemblyNetworkIds = activeAssembly.members
       .map((member) => member.networkId)
       .filter((networkId) => networkStates[networkId] !== undefined);
-    const slices: AssemblyNetworkSlice[] = selectedNetworkIds.map((networkId) => {
+    const customSet = new Set(customNetworkIds);
+    const selectedNetworkIds = scope === "custom"
+      ? assemblyNetworkIds.filter((networkId) => customSet.has(networkId))
+      : assemblyNetworkIds;
+    const effectiveSelectedNetworkIds = selectedNetworkIds.length > 0 ? selectedNetworkIds : [activeNetworkId ?? assemblyNetworkIds[0]].filter(
+      (networkId): networkId is NetworkId => networkId !== undefined && networkId !== null && assemblyNetworkIds.includes(networkId)
+    );
+    const slices: AssemblyNetworkSlice[] = effectiveSelectedNetworkIds.map((networkId) => {
       const scoped = networkStates[networkId]!;
       return {
         networkId,
@@ -84,12 +118,8 @@ export function buildMultiNetworkFunctionalAnalysisModel({
       };
     });
 
-    for (const networkId of selectedNetworkIds) {
-      const scoped = networkStates[networkId]!;
-      appendScopedDimensioningFindings(findings, scoped, catalogItemsById, networkById.get(networkId) ?? null);
-    }
-
-    const aggregation = aggregateAssembly(activeAssembly, slices, selectedNetworkIds, catalogItemsById);
+    const aggregation = aggregateAssembly(activeAssembly, slices, effectiveSelectedNetworkIds, catalogItemsById);
+    appendAssemblyDimensioningFindings(findings, aggregation, networkById, catalogItemsById);
     for (const entry of aggregation.l1Mismatches) {
       const sourceLabel = networkLabel(networkById.get(entry.sourceNetworkId), entry.sourceNetworkId);
       const targetLabel = networkLabel(networkById.get(entry.targetNetworkId), entry.targetNetworkId);
@@ -116,13 +146,30 @@ export function buildMultiNetworkFunctionalAnalysisModel({
         message: `Link '${entry.linkId}' was not aggregated because one side is outside the selected assembly scope.`
       });
     }
+    for (const warning of aggregation.load.warnings) {
+      findings.push({
+        id: `assembly-warning-${warning.code}-${findings.length}`,
+        severity: "warning",
+        family: "Assembly",
+        networkLabel: activeAssembly.name,
+        message: warning.message
+      });
+    }
+    const selectedNetworkSet = new Set(effectiveSelectedNetworkIds);
+    const schematic = buildAssemblySchematic(activeAssembly, networkById, networkStates, catalogItemsById, selectedNetworkSet);
 
     return summarize({
       scope,
       activeAssemblyName: activeAssembly.name,
-      availableNetworkCount: selectedNetworkIds.length,
-      selectedNetworkLabels: selectedNetworkIds.map((networkId) => networkLabel(networkById.get(networkId), networkId)),
-      findings
+      availableNetworkCount: assemblyNetworkIds.length,
+      selectedNetworkLabels: effectiveSelectedNetworkIds.map((networkId) => networkLabel(networkById.get(networkId), networkId)),
+      networkOptions: assemblyNetworkIds.map((networkId) => ({
+        id: networkId,
+        label: networkLabel(networkById.get(networkId), networkId),
+        selected: selectedNetworkSet.has(networkId)
+      })),
+      findings,
+      schematic
     });
   }
 
@@ -140,8 +187,194 @@ export function buildMultiNetworkFunctionalAnalysisModel({
     activeAssemblyName: activeAssembly?.name ?? null,
     availableNetworkCount: activeNetworkId === null ? 0 : 1,
     selectedNetworkLabels: activeNetworkId === null ? [] : [networkLabel(networkById.get(activeNetworkId), activeNetworkId)],
-    findings
+    networkOptions: activeNetworkId === null
+      ? []
+      : [{ id: activeNetworkId, label: networkLabel(networkById.get(activeNetworkId), activeNetworkId), selected: true }],
+    findings,
+    schematic: null
   });
+}
+
+function appendAssemblyDimensioningFindings(
+  findings: MultiNetworkFunctionalAnalysisFinding[],
+  aggregation: ReturnType<typeof aggregateAssembly>,
+  networkById: ReadonlyMap<NetworkId, Network>,
+  catalogItemsById: ReadonlyMap<CatalogItemId, CatalogItem>
+): void {
+  for (const [prefixedWireId, branch] of aggregation.load.branchLoadByWire) {
+    const origin = aggregation.wireOriginByPrefixedId.get(prefixedWireId);
+    if (origin === undefined) {
+      continue;
+    }
+    appendAssemblyD1Finding(findings, origin.networkId, origin.wire, branch, networkById);
+    appendAssemblyD4Finding(findings, origin.networkId, origin.wire, branch, networkById);
+  }
+  for (const [key, entry] of aggregation.load.fuseProtectedLoad) {
+    appendAssemblyD2Finding(findings, key, entry, aggregation, networkById, catalogItemsById);
+  }
+}
+
+function appendAssemblyD1Finding(
+  findings: MultiNetworkFunctionalAnalysisFinding[],
+  networkId: NetworkId,
+  wire: Wire,
+  branch: BranchLoad,
+  networkById: ReadonlyMap<NetworkId, Network>
+): void {
+  const manualCurrent = typeof wire.currentA === "number" && wire.currentA > 0 ? wire.currentA : 0;
+  const effective = Math.max(branch.continuousA, manualCurrent);
+  if (effective <= 0) {
+    return;
+  }
+  const material = resolveWireMaterial(wire.material);
+  const ampacity = resolveAmpacityA(wire.sectionMm2, material, networkById.get(networkId));
+  if (ampacity === undefined) {
+    return;
+  }
+  const ratio = effective / ampacity;
+  if (ratio < 0.8) {
+    return;
+  }
+  findings.push({
+    id: `assembly-d1-${networkId}-${wire.id}`,
+    severity: ratio > 1 ? "error" : "warning",
+    family: "D1-D4",
+    networkLabel: networkLabel(networkById.get(networkId), networkId),
+    message: `Assembly D1: wire '${wire.name}' carries ${effective.toFixed(1)} A in the selected union but its ${wire.sectionMm2} mm² ${material} section is rated for ${ampacity} A (ratio ${(ratio * 100).toFixed(0)}%).`,
+    target: {
+      networkId,
+      subScreen: "wire",
+      selectionKind: "wire",
+      selectionId: wire.id
+    }
+  });
+}
+
+function appendAssemblyD2Finding(
+  findings: MultiNetworkFunctionalAnalysisFinding[],
+  key: string,
+  entry: FuseProtectedLoadEntry,
+  aggregation: ReturnType<typeof aggregateAssembly>,
+  networkById: ReadonlyMap<NetworkId, Network>,
+  catalogItemsById: ReadonlyMap<CatalogItemId, CatalogItem>
+): void {
+  if (entry.kind !== "wireFuse" || entry.continuousA <= 0) {
+    return;
+  }
+  const prefixedWireId = key.slice("wireFuse:".length) as Wire["id"];
+  const origin = aggregation.wireOriginByPrefixedId.get(prefixedWireId);
+  if (origin === undefined || origin.wire.protection?.kind !== "fuse") {
+    return;
+  }
+  const rating = extractFuseRatingA(catalogItemsById.get(origin.wire.protection.catalogItemId));
+  if (rating === undefined) {
+    findings.push({
+      id: `assembly-d2-missing-${origin.networkId}-${origin.wire.id}`,
+      severity: "warning",
+      family: "D1-D4",
+      networkLabel: networkLabel(networkById.get(origin.networkId), origin.networkId),
+      message: `Assembly D2: wire '${origin.wire.name}' is fuse-protected but the fuse rating is unknown while selected-union downstream load is ${entry.continuousA.toFixed(1)} A.`,
+      target: { networkId: origin.networkId, subScreen: "wire", selectionKind: "wire", selectionId: origin.wire.id }
+    });
+    return;
+  }
+  if (entry.continuousA <= 0 || entry.continuousA / rating < 0.8) {
+    return;
+  }
+  findings.push({
+    id: `assembly-d2-${origin.networkId}-${origin.wire.id}`,
+    severity: entry.continuousA > rating ? "error" : "warning",
+    family: "D1-D4",
+    networkLabel: networkLabel(networkById.get(origin.networkId), origin.networkId),
+    message: `Assembly D2: fuse on wire '${origin.wire.name}' is rated ${rating} A while selected-union downstream load is ${entry.continuousA.toFixed(1)} A.`,
+    target: { networkId: origin.networkId, subScreen: "wire", selectionKind: "wire", selectionId: origin.wire.id }
+  });
+}
+
+function appendAssemblyD4Finding(
+  findings: MultiNetworkFunctionalAnalysisFinding[],
+  networkId: NetworkId,
+  wire: Wire,
+  branch: BranchLoad,
+  networkById: ReadonlyMap<NetworkId, Network>
+): void {
+  if (branch.sourceRefs.length < 2) {
+    return;
+  }
+  findings.push({
+    id: `assembly-d4-facing-sources-${networkId}-${wire.id}`,
+    severity: "warning",
+    family: "D1-D4",
+    networkLabel: networkLabel(networkById.get(networkId), networkId),
+    message: `Assembly D4: wire '${wire.name}' is reached by ${branch.sourceRefs.length} declared sources in the selected union, suggesting a conflict.`,
+    target: { networkId, subScreen: "wire", selectionKind: "wire", selectionId: wire.id }
+  });
+}
+
+function buildAssemblySchematic(
+  assembly: HarnessAssembly,
+  networkById: ReadonlyMap<NetworkId, Network>,
+  networkStates: Record<NetworkId, NetworkScopedState>,
+  catalogItemsById: ReadonlyMap<CatalogItemId, CatalogItem>,
+  selectedNetworkIds: ReadonlySet<NetworkId>
+): MultiNetworkFunctionalAnalysisSchematic {
+  const scopedAssembly: HarnessAssembly = {
+    ...assembly,
+    members: assembly.members.filter((member) => selectedNetworkIds.has(member.networkId)),
+    masterConnectorRefs: assembly.masterConnectorRefs.filter((ref) => selectedNetworkIds.has(ref.networkId)),
+    connectorLinks: assembly.connectorLinks.filter(
+      (link) => selectedNetworkIds.has(link.sourceNetworkId) && selectedNetworkIds.has(link.targetNetworkId)
+    )
+  };
+  const networksById = new Map<NetworkId, HarnessFunctionalNetworkBundle>();
+  for (const networkId of selectedNetworkIds) {
+    const scoped = networkStates[networkId];
+    const network = networkById.get(networkId);
+    if (scoped === undefined || network === undefined) {
+      continue;
+    }
+    networksById.set(networkId, {
+      network,
+      wires: values(scoped.wires),
+      segments: values(scoped.segments),
+      connectorMap: new Map(values(scoped.connectors).map((connector) => [connector.id, connector] as const)),
+      spliceMap: new Map(values(scoped.splices).map((splice) => [splice.id, splice] as const)),
+      catalogItemMap: new Map([...catalogItemsById])
+    });
+  }
+  const graph: FunctionalSchematicGraph = buildHarnessAssemblyFunctionalSchematicGraph({
+    assembly: scopedAssembly,
+    networksById,
+    activeFilter: FUNCTIONAL_FILTER_ALL,
+    rootConnectorRefs: scopedAssembly.masterConnectorRefs
+  });
+  return {
+    nodes: graph.nodes.slice(0, 24).map((node) => ({
+      id: node.id,
+      label: node.label,
+      detail: node.detail,
+      kind: node.kind
+    })),
+    edges: graph.edges.slice(0, 32).map((edge) => ({
+      id: edge.id,
+      fromNodeId: edge.fromNodeId,
+      toNodeId: edge.toNodeId,
+      label: edge.label
+    })),
+    warnings: graph.warnings.map((warning) => warning.message)
+  };
+}
+
+function extractFuseRatingA(catalogItem: CatalogItem | undefined): number | undefined {
+  if (!catalogItem) {
+    return undefined;
+  }
+  const match = /(\d+(?:\.\d+)?)\s*A/i.exec(catalogItem.manufacturerReference);
+  if (match?.[1] === undefined) {
+    return undefined;
+  }
+  const value = Number(match[1]);
+  return Number.isFinite(value) && value > 0 ? value : undefined;
 }
 
 function appendScopedDimensioningFindings(
@@ -196,6 +429,7 @@ function summarize(
   let info = 0;
   let l1 = 0;
   let skippedBridges = 0;
+  let loops = 0;
   for (const finding of input.findings) {
     if (finding.severity === "error") {
       errors += 1;
@@ -210,6 +444,9 @@ function summarize(
     if (finding.id.startsWith("assembly-skipped-")) {
       skippedBridges += 1;
     }
+    if (finding.id.startsWith("assembly-warning-loop-")) {
+      loops += 1;
+    }
   }
   return {
     ...input,
@@ -218,7 +455,8 @@ function summarize(
       warnings,
       info,
       l1,
-      skippedBridges
+      skippedBridges,
+      loops
     }
   };
 }

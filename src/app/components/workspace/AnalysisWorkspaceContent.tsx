@@ -15,6 +15,7 @@ export function AnalysisWorkspaceContent(props: AnalysisWorkspaceContentProps): 
         model={props.multiNetworkFunctionalAnalysis}
         scope={props.multiNetworkFunctionalAnalysisScope}
         setScope={props.setMultiNetworkFunctionalAnalysisScope}
+        onToggleCustomNetwork={props.onToggleMultiNetworkFunctionalAnalysisCustomNetwork}
         onGoToFinding={props.onGoToMultiNetworkFunctionalAnalysisFinding}
       />
       <AnalysisConnectorWorkspacePanels {...props} />
