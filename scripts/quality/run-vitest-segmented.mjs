@@ -9,6 +9,7 @@ const UI_LANE_TEST_FILES = [
   "src/tests/app.ui.catalog-layout.spec.tsx",
   "src/tests/app.ui.catalog-navigation.spec.tsx",
   "src/tests/app.ui.catalog-pin-roles.spec.tsx",
+  "src/tests/app.ui.catalog-rear-backshell-defaults.spec.tsx",
   "src/tests/app.ui.catalog-scroll.spec.tsx",
   "src/tests/app.ui.catalog-wire-endpoint-reference-renames.spec.tsx",
   "src/tests/app.ui.catalog.spec.tsx",
