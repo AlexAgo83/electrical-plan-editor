@@ -168,14 +168,24 @@ function appendScopedDimensioningFindings(
       family: "D1-D4",
       networkLabel: networkLabel(network, network?.id ?? null),
       message: issue.message,
-      target: network === null ? undefined : {
-        networkId: network.id,
-        subScreen: issue.subScreen,
-        selectionKind: issue.selectionKind,
-        selectionId: issue.selectionId
-      }
+      target: network === null ? undefined : navigationTargetFromIssue(network.id, issue)
     });
   }
+}
+
+function navigationTargetFromIssue(
+  networkId: NetworkId,
+  issue: ValidationIssue
+): MultiNetworkFunctionalAnalysisTarget | undefined {
+  if (issue.selectionKind === "catalog" || issue.subScreen === "catalog") {
+    return undefined;
+  }
+  return {
+    networkId,
+    subScreen: issue.subScreen,
+    selectionKind: issue.selectionKind,
+    selectionId: issue.selectionId
+  };
 }
 
 function summarize(
