@@ -5,6 +5,7 @@ import { AnalysisSpliceWorkspacePanels } from "./AnalysisSpliceWorkspacePanels";
 import { AnalysisWireWorkspacePanels } from "./AnalysisWireWorkspacePanels";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 import { MultiNetworkFunctionalAnalysisPanel } from "./MultiNetworkFunctionalAnalysisPanel";
+import { PinRoleMassEditPanel } from "./PinRoleMassEditPanel";
 
 export type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 
@@ -20,6 +21,14 @@ export function AnalysisWorkspaceContent(props: AnalysisWorkspaceContentProps): 
           onGoToFinding={props.onGoToMultiNetworkFunctionalAnalysisFinding}
         />
       ) : null}
+      <PinRoleMassEditPanel
+        activeNetwork={props.activeNetwork}
+        connectors={props.connectors}
+        splices={props.splices}
+        wires={props.wires}
+        catalogItems={props.catalogItems}
+        onApplyPinRoleMassEdit={props.onApplyPinRoleMassEdit}
+      />
       <AnalysisConnectorWorkspacePanels {...props} />
       <AnalysisSpliceWorkspacePanels {...props} />
       <AnalysisNodeSegmentWorkspacePanels {...props} />

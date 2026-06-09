@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ConnectorId, NetworkId, NodeId, SegmentId, SpliceId, WireId } from "../../../core/entities";
-import { appActions, type AppStore } from "../../../store";
+import { appActions, appReducer, type AppStore } from "../../../store";
 import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
 import {
   analyzeModelingBatchDelete,
@@ -46,6 +46,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
     ModelingSliceParams,
     "catalogItems" | "connectors" | "splices" | "nodes" | "segments" | "wires"
   >;
+  activeNetwork: AnalysisSliceParams["activeNetwork"];
   tabularExportFormat: ModelingSliceParams["tabularExportFormat"];
   hideWireAnalysisRoutePanel: AnalysisSliceParams["hideWireAnalysisRoutePanel"];
   showMultiNetworkFunctionalAnalysisPanel: AnalysisSliceParams["showMultiNetworkFunctionalAnalysisPanel"];
@@ -170,6 +171,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   components,
   screenFlags,
   entities,
+  activeNetwork,
   formsState,
   modelingHandlers,
   catalogHandlers,
@@ -506,6 +508,43 @@ export function useAppControllerModelingAnalysisScreenDomains({
       );
     },
     [dispatchAction, store]
+  );
+  const handleApplyPinRoleMassEdit: AnalysisSliceParams["onApplyPinRoleMassEdit"] = useCallback(
+    (updates) => {
+      if (updates.length === 0) {
+        return;
+      }
+      let nextState = store.getState();
+      const updatesByConnectorId = new Map<ConnectorId, typeof updates>();
+      for (const update of updates) {
+        const group = updatesByConnectorId.get(update.connectorId) ?? [];
+        group.push(update);
+        updatesByConnectorId.set(update.connectorId, group);
+      }
+      for (const [connectorId, connectorUpdates] of updatesByConnectorId) {
+        const connector = nextState.connectors.byId[connectorId];
+        if (connector === undefined) {
+          continue;
+        }
+        const pinElectricalRoles = { ...(connector.pinElectricalRoles ?? {}) };
+        for (const update of connectorUpdates) {
+          if (update.role === null) {
+            delete pinElectricalRoles[update.cavityIndex];
+          } else {
+            pinElectricalRoles[update.cavityIndex] = update.role;
+          }
+        }
+        nextState = appReducer(
+          nextState,
+          appActions.upsertConnector({
+            ...connector,
+            pinElectricalRoles: Object.keys(pinElectricalRoles).length > 0 ? pinElectricalRoles : undefined
+          })
+        );
+      }
+      replaceStateWithHistory(nextState);
+    },
+    [replaceStateWithHistory, store]
   );
   const handleSaveConnectorCatalogMaterialApplication: AnalysisSliceParams["onSaveConnectorCatalogMaterialApplication"] = useCallback(
     (connectorId, input) => {
@@ -912,11 +951,13 @@ export function useAppControllerModelingAnalysisScreenDomains({
     AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent,
     hideWireAnalysisRoutePanel,
     showMultiNetworkFunctionalAnalysisPanel,
+    activeNetwork,
     multiNetworkFunctionalAnalysis,
     multiNetworkFunctionalAnalysisScope,
     setMultiNetworkFunctionalAnalysisScope,
     onToggleMultiNetworkFunctionalAnalysisCustomNetwork: handleToggleMultiNetworkFunctionalAnalysisCustomNetwork,
     onGoToMultiNetworkFunctionalAnalysisFinding: handleGoToMultiNetworkFunctionalAnalysisFinding,
+    onApplyPinRoleMassEdit: handleApplyPinRoleMassEdit,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
     isNodeSubScreen: screenFlags.isNodeSubScreen,

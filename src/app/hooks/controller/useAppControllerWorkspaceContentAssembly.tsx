@@ -344,6 +344,7 @@ export function useAppControllerWorkspaceContentAssembly({
         segments: entities.segments,
         wires: entities.wires
       },
+      activeNetwork: state.activeNetwork,
       tabularExportFormat: models.preferencesState.tabularExportFormat,
       hideWireAnalysisRoutePanel: models.preferencesState.hideWireAnalysisRoutePanel,
       showMultiNetworkFunctionalAnalysisPanel: models.preferencesState.showMultiNetworkFunctionalAnalysisPanel,

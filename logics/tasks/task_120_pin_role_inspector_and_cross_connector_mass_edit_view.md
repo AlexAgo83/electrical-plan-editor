@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 100%
 > Confidence: 92%
-> Progress: 70%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 
@@ -14,9 +14,9 @@
 - [x] Catalog item editor exposes the same table for `CatalogItem.connectorDefaults.pinElectricalRoles`.
 - [x] Bulk "Apply role to selected pins" + "Reset to catalog default"; one history entry per bulk operation.
 - [x] Catalog-vs-override badge per row.
-- [ ] New cross-connector mass-edit view: filters, bulk apply, CSV-style copy/paste.
+- [x] New cross-connector mass-edit view: filters, bulk apply, CSV-style copy/paste.
 - [x] Optional BOM column "Computed downstream load (A)" on fuse rows, off by default.
-- [ ] Component tests cover all DoD items.
+- [x] Component tests cover all DoD items.
 
 # Backlog
 - `item_612_pin_role_inspector_and_cross_connector_mass_edit_view`
@@ -24,7 +24,7 @@
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|pin-role-inspector-mass-edit-view|item-612-pin-role-inspector-and-cross-co|1-confirm-scope|run-the-relevant-automated-tests-before
+%% logics-signature: task|pin-role-inspector-mass-edit-view|item-612-pin-role-inspector-and-cross-co|1-confirm-scope|2026-06-09-rtk-npm-run-s-test
 flowchart TD
     Backlog[Backlog item] --> Build[Implementation]
     Build --> Validate[Validation]
@@ -75,5 +75,9 @@ Mirror `item_612` AC1–AC10.
 - Delivered in 1.14.0: connector inspector editing, catalog defaults editing, override/catalog/default badges, bulk inspector apply/reset, and focused inspector/catalog tests.
 - Real-status audit on 2026-06-09: no cross-connector mass-edit view, CSV paste, or optional BOM downstream-load export column was found in `src/` or `src/tests/`.
 - Delivered on 2026-06-09: optional BOM export setting `Computed downstream load (A)` is off by default and adds fuse rows with computed downstream load when enabled; covered by `npm run -s test -- src/tests/network-summary-bom-csv.spec.ts --run`, `npm run -s test -- src/tests/app.ui.network-summary-bom-export.spec.tsx --run`, and `npm run -s typecheck`.
-- Remaining: cross-connector mass-edit view, filters, CSV paste, and complete component coverage for the deferred mass-edit surface.
-- Pertinence: keep open. Inspector/catalog editing covers small/manual workflows; the mass-edit view remains relevant for large connector tables.
+- Delivered on 2026-06-09: cross-connector `Pin role mass edit` panel in the Modeling/Analysis column. It lists every connector pin, filters by connector, role, declaration status, and overloaded rows, supports bulk apply/reset, and accepts CSV paste with inline validation errors.
+- Delivery status: done for `item_612`.
+
+# Validation
+- 2026-06-09: `rtk npm run -s test -- src/tests/app.ui.mass-edit-pin-roles.spec.tsx src/tests/app.ui.inspector-pin-roles.spec.tsx src/tests/app.ui.catalog-pin-roles.spec.tsx src/tests/network-summary-bom-csv.spec.ts src/tests/app.ui.network-summary-bom-export.spec.tsx --run` passed (5 files, 32 tests). Covers inspector/catalog pin roles, mass-edit bulk apply, CSV paste error handling, valid CSV apply, and BOM downstream-load export.
+- 2026-06-09: `rtk npm run -s typecheck` passed.

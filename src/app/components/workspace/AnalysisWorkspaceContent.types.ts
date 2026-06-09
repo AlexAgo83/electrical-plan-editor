@@ -8,6 +8,7 @@ import type {
   NetworkNode,
   NodeId,
   PinElectricalRole,
+  Network,
   Segment,
   SegmentId,
   Splice,
@@ -27,6 +28,7 @@ import type {
   MultiNetworkFunctionalAnalysisScope,
   MultiNetworkFunctionalAnalysisTarget
 } from "../../lib/multiNetworkFunctionalAnalysis";
+import type { PinRoleMassEditUpdate } from "./PinRoleMassEditPanel";
 
 interface OccupancyStatus {
   isOccupied: boolean;
@@ -48,11 +50,13 @@ export interface AnalysisWorkspaceContentProps {
   showEntityTables?: boolean;
   hideWireAnalysisRoutePanel?: boolean;
   showMultiNetworkFunctionalAnalysisPanel?: boolean;
+  activeNetwork: Network | null;
   multiNetworkFunctionalAnalysis: MultiNetworkFunctionalAnalysisModel;
   multiNetworkFunctionalAnalysisScope: MultiNetworkFunctionalAnalysisScope;
   setMultiNetworkFunctionalAnalysisScope: (value: MultiNetworkFunctionalAnalysisScope) => void;
   onToggleMultiNetworkFunctionalAnalysisCustomNetwork: (networkId: NetworkId) => void;
   onGoToMultiNetworkFunctionalAnalysisFinding: (target: MultiNetworkFunctionalAnalysisTarget) => void;
+  onApplyPinRoleMassEdit: (updates: PinRoleMassEditUpdate[]) => void;
   isConnectorSubScreen: boolean;
   isSpliceSubScreen: boolean;
   isNodeSubScreen: boolean;
