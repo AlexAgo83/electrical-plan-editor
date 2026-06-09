@@ -23,7 +23,8 @@ import type {
 } from "../../types/app-controller";
 import type {
   MultiNetworkFunctionalAnalysisModel,
-  MultiNetworkFunctionalAnalysisScope
+  MultiNetworkFunctionalAnalysisScope,
+  MultiNetworkFunctionalAnalysisTarget
 } from "../../lib/multiNetworkFunctionalAnalysis";
 
 interface OccupancyStatus {
@@ -48,6 +49,7 @@ export interface AnalysisWorkspaceContentProps {
   multiNetworkFunctionalAnalysis: MultiNetworkFunctionalAnalysisModel;
   multiNetworkFunctionalAnalysisScope: MultiNetworkFunctionalAnalysisScope;
   setMultiNetworkFunctionalAnalysisScope: (value: MultiNetworkFunctionalAnalysisScope) => void;
+  onGoToMultiNetworkFunctionalAnalysisFinding: (target: MultiNetworkFunctionalAnalysisTarget) => void;
   isConnectorSubScreen: boolean;
   isSpliceSubScreen: boolean;
   isNodeSubScreen: boolean;

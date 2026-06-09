@@ -2,7 +2,8 @@ import type { ReactElement } from "react";
 import type {
   MultiNetworkFunctionalAnalysisFinding,
   MultiNetworkFunctionalAnalysisModel,
-  MultiNetworkFunctionalAnalysisScope
+  MultiNetworkFunctionalAnalysisScope,
+  MultiNetworkFunctionalAnalysisTarget
 } from "../../lib/multiNetworkFunctionalAnalysis";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 
@@ -10,12 +11,14 @@ interface MultiNetworkFunctionalAnalysisPanelProps {
   model: MultiNetworkFunctionalAnalysisModel;
   scope: MultiNetworkFunctionalAnalysisScope;
   setScope: (value: MultiNetworkFunctionalAnalysisScope) => void;
+  onGoToFinding: (target: MultiNetworkFunctionalAnalysisTarget) => void;
 }
 
 export function MultiNetworkFunctionalAnalysisPanel({
   model,
   scope,
-  setScope
+  setScope,
+  onGoToFinding
 }: MultiNetworkFunctionalAnalysisPanelProps): ReactElement {
   const assemblyDisabled = model.activeAssemblyName === null;
   const activeScopeLabel = scope === "assembly" && model.activeAssemblyName !== null
@@ -73,11 +76,12 @@ export function MultiNetworkFunctionalAnalysisPanel({
                 <th>Family</th>
                 <th>Scope</th>
                 <th>Finding</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {model.findings.map((finding) => (
-                <FindingRow key={finding.id} finding={finding} />
+                <FindingRow key={finding.id} finding={finding} onGoToFinding={onGoToFinding} />
               ))}
             </tbody>
           </table>
@@ -88,7 +92,13 @@ export function MultiNetworkFunctionalAnalysisPanel({
   );
 }
 
-function FindingRow({ finding }: { finding: MultiNetworkFunctionalAnalysisFinding }): ReactElement {
+function FindingRow({
+  finding,
+  onGoToFinding
+}: {
+  finding: MultiNetworkFunctionalAnalysisFinding;
+  onGoToFinding: (target: MultiNetworkFunctionalAnalysisTarget) => void;
+}): ReactElement {
   const chipClass = finding.severity === "error"
     ? "status-chip is-error"
     : finding.severity === "warning"
@@ -102,6 +112,24 @@ function FindingRow({ finding }: { finding: MultiNetworkFunctionalAnalysisFindin
       <td>{finding.family}</td>
       <td>{finding.networkLabel}</td>
       <td>{finding.message}</td>
+      <td>
+        {finding.target === undefined ? (
+          <span className="empty-copy">-</span>
+        ) : (
+          <button
+            type="button"
+            className="validation-row-go-to-button button-with-icon"
+            onClick={() => {
+              if (finding.target !== undefined) {
+                onGoToFinding(finding.target);
+              }
+            }}
+          >
+            <span className="action-button-icon is-open" aria-hidden="true" />
+            Go to
+          </button>
+        )}
+      </td>
     </tr>
   );
 }

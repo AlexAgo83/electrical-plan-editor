@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../../../core/entities";
 import { appActions, type AppStore } from "../../../store";
 import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
 import {
@@ -15,7 +16,8 @@ import type { AppControllerModelingHandlersOrchestrator } from "../../hooks/cont
 import { parseConnectorTerminalOverridesDraft } from "../../lib/connectorTerminalOverridesDraft";
 import {
   buildMultiNetworkFunctionalAnalysisModel,
-  type MultiNetworkFunctionalAnalysisScope
+  type MultiNetworkFunctionalAnalysisScope,
+  type MultiNetworkFunctionalAnalysisTarget
 } from "../../lib/multiNetworkFunctionalAnalysis";
 import {
   buildAnalysisScreenContentSlice,
@@ -230,6 +232,70 @@ export function useAppControllerModelingAnalysisScreenDomains({
         scope: multiNetworkFunctionalAnalysisScope
       }),
     [appStateSnapshot, entities.catalogItems, multiNetworkFunctionalAnalysisScope]
+  );
+  const handleGoToMultiNetworkFunctionalAnalysisFinding = useCallback(
+    (target: MultiNetworkFunctionalAnalysisTarget) => {
+      if (store.getState().activeNetworkId !== target.networkId) {
+        dispatchAction(appActions.selectNetwork(target.networkId), { trackHistory: false });
+      }
+
+      const state = store.getState();
+      markSelectionPanelsFromTable?.();
+      setActiveSubScreen(target.subScreen);
+
+      if (target.selectionKind === "connector") {
+        const connectorId = target.selectionId as ConnectorId;
+        const connector = state.connectors.byId[connectorId];
+        if (connector !== undefined) {
+          modelingHandlers.connector.startConnectorEdit(connector);
+          return;
+        }
+        dispatchAction(appActions.select({ kind: "connector", id: connectorId }), { trackHistory: false });
+        return;
+      }
+
+      if (target.selectionKind === "splice") {
+        const spliceId = target.selectionId as SpliceId;
+        const splice = state.splices.byId[spliceId];
+        if (splice !== undefined) {
+          modelingHandlers.splice.startSpliceEdit(splice);
+          return;
+        }
+        dispatchAction(appActions.select({ kind: "splice", id: spliceId }), { trackHistory: false });
+        return;
+      }
+
+      if (target.selectionKind === "node") {
+        const nodeId = target.selectionId as NodeId;
+        const node = state.nodes.byId[nodeId];
+        if (node !== undefined) {
+          modelingHandlers.node.startNodeEdit(node);
+          return;
+        }
+        dispatchAction(appActions.select({ kind: "node", id: nodeId }), { trackHistory: false });
+        return;
+      }
+
+      if (target.selectionKind === "segment") {
+        const segmentId = target.selectionId as SegmentId;
+        const segment = state.segments.byId[segmentId];
+        if (segment !== undefined) {
+          modelingHandlers.segment.startSegmentEdit(segment);
+          return;
+        }
+        dispatchAction(appActions.select({ kind: "segment", id: segmentId }), { trackHistory: false });
+        return;
+      }
+
+      const wireId = target.selectionId as WireId;
+      const wire = state.wires.byId[wireId];
+      if (wire !== undefined) {
+        modelingHandlers.wire.startWireEdit(wire);
+        return;
+      }
+      dispatchAction(appActions.select({ kind: "wire", id: wireId }), { trackHistory: false });
+    },
+    [dispatchAction, markSelectionPanelsFromTable, modelingHandlers, setActiveSubScreen, store]
   );
   const activeSubScreenBatchScope = screenFlags.isConnectorSubScreen
     ? "connector"
@@ -836,6 +902,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     multiNetworkFunctionalAnalysis,
     multiNetworkFunctionalAnalysisScope,
     setMultiNetworkFunctionalAnalysisScope,
+    onGoToMultiNetworkFunctionalAnalysisFinding: handleGoToMultiNetworkFunctionalAnalysisFinding,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
     isNodeSubScreen: screenFlags.isNodeSubScreen,
