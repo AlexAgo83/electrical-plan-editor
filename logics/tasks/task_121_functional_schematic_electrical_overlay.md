@@ -3,8 +3,8 @@
 > From version: 1.13.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 95%
-> Confidence: 90%
+> Understanding: 100%
+> Confidence: 92%
 > Progress: 0%
 > Complexity: Small
 > Theme: Electrical analysis / Diagnostics
@@ -59,3 +59,5 @@ Mirror `item_613` AC1–AC8.
 
 # Progress Report
 - Not delivered yet. The 1.14.0 changelog explicitly deferred the functional schematic electrical overlay and on-by-default toggle.
+- Real-status audit on 2026-06-09: no overlay preference/toggle, functional-schematic pin-current labels, propagated wire-current labels, fuse protected-load labels, or overlay snapshots were found.
+- Pertinence: keep open as a visualization follow-up. It is not blocking the shipped validation center because D1-D4 diagnostics already exist without the schematic overlay.

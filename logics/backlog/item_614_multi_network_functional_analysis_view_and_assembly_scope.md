@@ -3,9 +3,9 @@
 > From version: 1.13.1
 > Schema version: 1.0
 > Status: In progress
-> Understanding: 95%
-> Confidence: 88%
-> Progress: 55%
+> Understanding: 100%
+> Confidence: 92%
+> Progress: 60%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -99,7 +99,9 @@ flowchart LR
 # Delivery Status
 - Partially delivered in 1.14.0.
 - Delivered: assembly-scope aggregation core in `src/core/pinElectricalLoadAssembly.ts`, inter-harness link traversal, shared master connector bridge handling, L1 mismatch computation, loop safety, and core assembly tests.
-- Remaining: read-only multi-network functional analysis view, scope picker UX, D1-D4/L1 finding list in that view, skipped-bridge/view diagnostics, and `Go to` behavior that switches active network before focusing the entity.
+- Real-status audit on 2026-06-09: no read-only multi-network functional analysis view, scope picker UI, view-level D1-D4/L1 finding list, or `Go to` network-switching UI was found. Core assembly behavior remains covered by `src/tests/core.pin-electrical-load-assembly.spec.ts`.
+- Remaining and pertinent: read-only multi-network functional analysis view, scope picker UX, D1-D4/L1 finding list in that view, skipped-bridge/view diagnostics, and `Go to` behavior that switches active network before focusing the entity.
+- Relevance assessment: keep this item open and prioritize it above the overlay/BOM follow-ups. The assembly aggregation and L1 engine are shipped but mostly invisible without the dedicated view, so this is real unfinished product surface rather than optional polish.
 
 # AI Context
 - Summary: Adds the multi-network analysis view (read-only, scope picker) and the assembly-scope aggregation that traverses inter-network bridges. New L1 link mismatch warning lives here.

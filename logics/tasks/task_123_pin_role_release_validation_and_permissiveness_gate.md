@@ -2,9 +2,9 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 97%
-> Confidence: 89%
+> Status: In progress
+> Understanding: 100%
+> Confidence: 90%
 > Progress: 65%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
@@ -73,4 +73,6 @@ Mirror `item_615` AC1–AC9.
 - Delivered after 1.15.0: AI Agent context snapshot coverage asserts pin electrical roles do not add AI context fields or leak role labels; covered by `npm run -s test -- src/tests/ai-agent-context.spec.ts --run` and `npm run -s typecheck`.
 - Delivered after 1.15.0: sample-network silence gate asserts every shipped sample network emits zero `Electrical dimensioning` issues; covered by `npm run -s test -- src/tests/app.validation.electrical-dimensioning.spec.ts --run`.
 - Delivered after 1.15.0: network export/import round-trip preserves connector `pinElectricalRoles`, catalog default `pinElectricalRoles`, and network `ampacityOverrides`; covered by `npm run -s test -- src/tests/portability.network-file.spec.ts --run` and `npm run -s typecheck`.
-- Remaining: Playwright full-flow, canvas unchanged snapshot, performance budgets, and CI release-gate wiring.
+- Real-status audit on 2026-06-09: no Playwright full-flow, canvas-unchanged snapshot, performance budget script/gate, or CI release-gate wiring specific to the pin-role release was found.
+- Remaining: Playwright full-flow, canvas unchanged snapshot, partial-declaration permissiveness gate, performance budgets, and CI release-gate wiring.
+- Pertinence: keep open. Playwright full-flow and multi-network view-open performance should wait until mass-edit/overlay/multi-network view surfaces exist; canvas snapshot and partial-declaration permissiveness checks are independently actionable.

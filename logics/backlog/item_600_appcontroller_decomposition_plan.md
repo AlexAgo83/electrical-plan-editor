@@ -2,8 +2,8 @@
 > From version: 1.10.4
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 100%
+> Confidence: 88%
 > Progress: 0%
 > Complexity: High
 > Theme: Operator workflow and runtime integration
@@ -11,7 +11,7 @@
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|appcontroller-decomposition-plan|deliver-the-incremental-decomposition-roadmap|ac1-each-wave-shrinks-allowed-hooks-oversize
+%% logics-signature: backlog|appcontroller-decomposition-plan|req-129-app-controller-decomposition-pla|deliver-the-incremental-appcontroller-de|ac1-wave-1-is-re-scoped-against
 flowchart LR
     Source[req_129 source] --> Slice[item_600 bounded slice]
     Slice --> Task[task_111 first delivery wave]
@@ -28,16 +28,18 @@ Deliver the incremental AppController decomposition roadmap defined in `adr_009_
   - unrelated sibling slices that should stay in separate backlog items instead of widening this doc
 
 # Acceptance criteria
-- AC1: The request states the bounded need for appcontroller decomposition plan.
-- AC2: Scope boundaries and operator impact are explicit.
-- AC3: The request is ready to be promoted into a backlog slice.
+- AC1: Wave 1 is re-scoped against the current controller layout (`src/app/hooks/controller/*` wrappers plus `src/app/hook-impl/controller/*` implementation bodies).
+- AC2: The first delivery wave removes or materially shrinks at least one of the large controller implementation bodies without changing the public `<AppController store={...} />` contract.
+- AC3: The corresponding controller-boundary tests are added or extended, and the relevant `app.ui.*` tests remain green.
+- AC4: The hooks and UI modularization gates remain green after the wave, with any stale or misleading allowlist/budget entries updated.
+- AC5: The request/backlog/task chain records which ADR-009 wave was delivered and what remains.
 
 # AC Traceability
-- request-AC1 -> This backlog slice. Proof: AC1: The request states the bounded need for appcontroller decomposition plan.
-- request-AC2 -> This backlog slice. Proof: AC2: Scope boundaries and operator impact are explicit.
-- request-AC3 -> This backlog slice. Proof: AC3: The request is ready to be promoted into a backlog slice.
-- request-AC4 -> This backlog slice. Evidence needed: After Wave 4, the locked budget for `src/app/AppController.tsx` in `LOCKED_LINE_BUDGETS` is lowered to the new ceiling (rounded up to the next 50-line boundary).
-- request-AC5 -> This backlog slice. Evidence needed: The dual-state invariant (`networkStates[activeNetworkId]` synchronized with root slices) remains covered by `store.reducer.sync-invariant.spec.ts` and continues to pass.
+- request-AC1 -> This backlog slice. Evidence needed: a concrete task/follow-up exists for the current Wave 1 scope before implementation starts.
+- request-AC2 -> This backlog slice. Evidence needed: at least one large controller implementation body is removed from the active refactor target or materially shrunk, and the gate output stays green.
+- request-AC3 -> This backlog slice. Evidence needed: controller-boundary coverage is added or extended and the affected `app.ui.*` specs pass.
+- request-AC4 -> This backlog slice. Evidence needed: only after Waves 1-4, the locked AppController budget is lowered from 1100 to the new measured ceiling.
+- request-AC5 -> This backlog slice. Evidence needed: `store.reducer.sync-invariant.spec.ts` continues to pass after each wave that touches controller state assembly.
 
 # Decision framing
 - Product framing: Not needed
@@ -67,6 +69,7 @@ Deliver the incremental AppController decomposition roadmap defined in `adr_009_
 - Hybrid rationale: Derived from request `req_129_app_controller_decomposition_plan` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_129_app_controller_decomposition_plan.md`.
 - Generated locally by logics-manager.
+- Real-status audit on 2026-06-09: the generated backlog framing was not sufficient as implementation scope. No ADR-009 wave can be considered delivered from current evidence. Keep this item open and re-scope the first wave before coding.
 
 # Tasks
 - `task_111_appcontroller_decomposition_plan`

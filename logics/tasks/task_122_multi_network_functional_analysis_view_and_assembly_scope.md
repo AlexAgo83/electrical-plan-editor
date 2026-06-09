@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 95%
-> Confidence: 88%
-> Progress: 55%
+> Status: In progress
+> Understanding: 100%
+> Confidence: 92%
+> Progress: 60%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 
@@ -69,4 +69,6 @@ Mirror `item_614` AC1–AC14.
 
 # Progress Report
 - Delivered in 1.14.0: assembly-scope aggregation core, bridge traversal, shared master connector bridge behavior, loop safety, skipped-bridge diagnostics, L1 mismatch computation, and core assembly tests.
+- Real-status audit on 2026-06-09: no read-only multi-network functional analysis view, scope picker, view-level D1-D4/L1 findings panel, or active-network-switching `Go to` UI was found.
 - Remaining: read-only multi-network functional analysis view, scope picker UI, view-level D1-D4/L1 findings list, active-network switching for `Go to`, and component coverage.
+- Pertinence: keep open and prioritize before overlay/BOM polish because the shipped assembly engine and L1 mismatch logic need a user-facing surface.

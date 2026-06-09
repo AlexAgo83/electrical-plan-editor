@@ -2,8 +2,8 @@
 
 > From version: 1.10.4
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 95%
+> Status: Ready
+> Understanding: 100%
 > Confidence: 90%
 > Complexity: High
 > Theme: Architecture
@@ -11,7 +11,7 @@
 
 ```mermaid
 %% logics-kind: request
-%% logics-signature: request|app-controller-decomposition-plan|decompose-appcontroller-into-screen-controllers|ac1-each-wave-has-a-task-or-follow-up-doc
+%% logics-signature: request|appcontroller-decomposition-plan|decompose-src-app-appcontroller-tsx-from|ac1-each-wave-defined-in-adr-009
 flowchart LR
     Shell[AppController shell] --> Wave1[Wave 1 NetworkSummaryScreenController]
     Shell --> Wave2[Wave 2 Modeling and Analysis controllers]
@@ -72,3 +72,10 @@ flowchart LR
 
 # Backlog
 - `item_600_appcontroller_decomposition_plan`
+
+# Delivery Status
+- Real-status audit on 2026-06-09: this request is ready and still relevant, but the ADR-009 wave plan has not been delivered as scoped.
+- Evidence checked: `src/app/AppController.tsx` is 1089 lines against the current locked budget of 1100; `LOCKED_LINE_BUDGETS["src/app/AppController.tsx"]` remains 1100 in `scripts/quality/ui-modularization-gate-core.mjs`.
+- Evidence checked: the original oversized implementation bodies still exist under `src/app/hook-impl/controller/` (`useAppControllerScreenContentSlices.tsx`, `useAppControllerModelingAnalysisScreenDomains.tsx`, `useAppControllerNetworkSummaryPanelDomain.tsx`), while thin re-export wrappers under `src/app/hooks/controller/` keep the public import surface small.
+- Evidence checked: `ALLOWED_HOOKS_OVERSIZE` no longer lists the original ADR-009 hook names, but this is mostly a gate-scope/path change rather than proof that the wave targets were retired.
+- Remaining work is pertinent as maintainability debt because AppController has only 11 lines of headroom under the locked budget and the large controller implementation bodies remain concentrated. The next useful step is to re-scope Wave 1 around the current `hook-impl` layout before implementation.

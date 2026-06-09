@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 95%
-> Confidence: 88%
-> Progress: 55%
+> Status: In progress
+> Understanding: 100%
+> Confidence: 92%
+> Progress: 60%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 
@@ -73,4 +73,6 @@ Mirror `item_612` AC1–AC10.
 
 # Progress Report
 - Delivered in 1.14.0: connector inspector editing, catalog defaults editing, override/catalog/default badges, bulk inspector apply/reset, and focused inspector/catalog tests.
-- Remaining: cross-connector mass-edit view, filters, CSV paste, optional BOM downstream-load column, 2D-canvas unchanged regression, and complete component coverage for the deferred surfaces.
+- Real-status audit on 2026-06-09: no cross-connector mass-edit view, CSV paste, or optional BOM downstream-load export column was found in `src/` or `src/tests/`.
+- Remaining: cross-connector mass-edit view, filters, CSV paste, optional BOM downstream-load column, and complete component coverage for the deferred surfaces.
+- Pertinence: keep open. Inspector/catalog editing covers small/manual workflows; the mass-edit view remains relevant for large connector tables. The BOM column is a lower-priority optional export enhancement.

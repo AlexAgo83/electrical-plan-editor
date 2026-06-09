@@ -3,8 +3,8 @@
 > From version: 1.13.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 95%
-> Confidence: 90%
+> Understanding: 100%
+> Confidence: 92%
 > Progress: 0%
 > Complexity: Small
 > Theme: Electrical analysis / Diagnostics
@@ -85,6 +85,8 @@ flowchart LR
 
 # Delivery Status
 - Not delivered yet. The 1.14.0 release explicitly deferred the functional schematic electrical overlay and canvas toggle.
+- Real-status audit on 2026-06-09: no `showElectricalRoles` preference, functional-schematic pin-current overlay, overlay toggle, or overlay snapshots were found in `src/` or `src/tests/`.
+- Relevance assessment: keep this item open, but treat it as a visualization follow-up rather than a validation blocker. The validation center already exposes D1-D4 without the overlay; the overlay remains pertinent for schematic readability and review workflows.
 
 # AI Context
 - Summary: Adds a functional schematic overlay showing pin directions, pin currents, wire-derived currents, and fuse-protected sums. On by default with a canvas toggle.

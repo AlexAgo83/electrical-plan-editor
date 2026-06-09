@@ -2,8 +2,8 @@
 > From version: 1.10.4
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 100%
+> Confidence: 88%
 > Progress: 0%
 > Complexity: Medium
 > Theme: Implementation delivery
@@ -11,7 +11,7 @@
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|appcontroller-decomposition-plan|deliver-wave-1-networksummary-screen-controller|dod-quality-hooks-modularization-shrinks
+%% logics-signature: task|appcontroller-decomposition-plan|item-600-appcontroller-decomposition-pla|1-confirm-scope|run-python3-m-logics-manager-lint-requi
 flowchart LR
     Start[Task start] --> Wave1[Wave 1 NetworkSummaryScreenController]
     Wave1 --> Allowlist[Update ALLOWED_HOOKS_OVERSIZE]
@@ -20,24 +20,29 @@ flowchart LR
 ```
 
 # Definition of Done (DoD)
-- [ ] The backlog scope is implemented.
-- [ ] Acceptance criteria are covered.
-- [ ] Validation passes.
+- [ ] Current Wave 1 scope is re-confirmed against `src/app/hooks/controller/` wrappers and `src/app/hook-impl/controller/` implementation bodies.
+- [ ] At least one large controller implementation body is removed from the active refactor target or materially shrunk.
+- [ ] Controller-boundary tests are added or extended.
+- [ ] `quality:hooks-modularization`, `quality:ui-modularization`, and affected `app.ui.*` tests pass.
+- [ ] Linked request/backlog docs are updated with delivered wave evidence and remaining waves.
 
 # Backlog
 - `item_600_appcontroller_decomposition_plan`
 
 # Acceptance criteria
-- AC1: The request states the bounded need for appcontroller decomposition plan.
-- AC2: Scope boundaries and operator impact are explicit.
-- AC3: The request is ready to be promoted into a backlog slice.
+- AC1: Wave 1 is re-scoped against the current controller file layout.
+- AC2: The first wave removes or materially shrinks a large controller implementation body while preserving `<AppController store={...} />`.
+- AC3: Controller-boundary coverage is added or extended.
+- AC4: Modularization gates and affected `app.ui.*` specs remain green.
+- AC5: The request/backlog/task chain records delivered wave evidence and remaining work.
 
 # Validation
 - Run `python3 -m logics_manager lint --require-status`.
 - Run `python3 -m logics_manager flow finish task task_111_appcontroller_decomposition_plan.md` after implementation.
 
 # Report
-- Implementation complete.
+- Real-status audit on 2026-06-09: implementation is not complete. `src/app/AppController.tsx` is 1089 lines with the locked budget still at 1100, and the large implementation bodies under `src/app/hook-impl/controller/` still exist. Thin wrappers under `src/app/hooks/controller/` make some gate paths look smaller but do not complete the ADR-009 decomposition target.
+- Remaining work is still pertinent as maintainability debt, but this task should start with a re-scope of Wave 1 against the current file layout.
 
 # AI Context
 - Summary: Implement appcontroller decomposition plan.

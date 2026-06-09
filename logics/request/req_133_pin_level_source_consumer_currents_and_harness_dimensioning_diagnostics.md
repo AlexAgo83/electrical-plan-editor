@@ -1,10 +1,10 @@
 ## req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics - Pin-level Source/Consumer Currents and Harness Dimensioning Diagnostics
 
-> From version: 1.13.1
+> From version: 1.15.0
 > Schema version: 1.0
 > Status: In progress
 > Understanding: 100%
-> Confidence: 92%
+> Confidence: 93%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -206,7 +206,8 @@ flowchart LR
 - `item_615_pin_role_release_validation_and_permissiveness_gate`
 
 # Delivery Status
-- Partially delivered in 1.14.0.
-- Delivered: pin electrical role data model, catalog defaults, ampacity overrides, current-network aggregation engine, assembly aggregation core, D1-D4 validation category, connector inspector pin-role editor, catalog pin-role editor, bulk inspector apply/reset, and focused validation coverage.
-- Remaining follow-up scope: cross-connector mass-edit view with filters and CSV paste, BOM "Computed downstream load (A)" export column, functional schematic electrical overlay, multi-network analysis view UX, L1 view surfacing, and the final permissiveness/release gate.
-- Source evidence: `changelogs/CHANGELOGS_1_14_0.md` records the delivered 1.14.0 slices and the deferred remainder.
+- Partially delivered in 1.14.0, with additional validation coverage delivered after 1.15.0.
+- Delivered and still evidenced in code: pin electrical role data model, catalog defaults, ampacity overrides, current-network aggregation engine, assembly aggregation core, D1-D4 validation category, connector inspector pin-role editor, catalog pin-role editor, bulk inspector apply/reset, sample-network silence gate, export/import preservation, onboarding step, and AI Agent context non-expansion.
+- Not found in code as of the 2026-06-09 audit: cross-connector mass-edit view with filters and CSV paste, BOM "Computed downstream load (A)" export column, functional schematic electrical overlay/toggle, read-only multi-network functional analysis view UX, view-level L1 surfacing, Playwright full-flow, canvas-unchanged snapshot, and performance/release-gate wiring.
+- Relevance assessment: the remaining work is still valid but no longer all equally blocking. The multi-network view is the highest-value remainder because the assembly engine and L1 logic exist but have no dedicated user-facing surface. The mass-edit view remains useful for large harnesses but the inspector/catalog editors provide a workable manual path. The functional schematic overlay and BOM column are useful read/export improvements, not prerequisites for the shipped validation center. Full Playwright/performance gates should wait until the remaining UI surfaces exist.
+- Source evidence: `changelogs/CHANGELOGS_1_14_0.md`, `src/core/pinElectricalLoad*.ts`, `src/app/hook-impl/validation/appendElectricalDimensioningIssues.ts`, `src/app/components/workspace/PinElectricalRolesEditor.tsx`, `src/app/lib/onboarding.ts`, `src/tests/core.pin-electrical-load*.spec.ts`, `src/tests/app.validation.electrical-dimensioning.spec.ts`, `src/tests/app.ui.inspector-pin-roles.spec.tsx`, `src/tests/app.ui.catalog-pin-roles.spec.tsx`, `src/tests/portability.network-file.spec.ts`, and `src/tests/ai-agent-context.spec.ts`.

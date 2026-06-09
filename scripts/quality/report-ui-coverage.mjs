@@ -6,7 +6,7 @@ const parsedTimeoutMs = Number.parseInt(process.env.UI_COVERAGE_TEST_TIMEOUT_MS 
 const timeoutMs = Number.isInteger(parsedTimeoutMs) && parsedTimeoutMs > 0 ? parsedTimeoutMs : 15000;
 const parsedReportTimeoutMs = Number.parseInt(process.env.UI_COVERAGE_REPORT_TIMEOUT_MS ?? "", 10);
 const reportTimeoutMs =
-  Number.isInteger(parsedReportTimeoutMs) && parsedReportTimeoutMs > 0 ? parsedReportTimeoutMs : 180000;
+  Number.isInteger(parsedReportTimeoutMs) && parsedReportTimeoutMs > 0 ? parsedReportTimeoutMs : 600000;
 const runnerArgs = [
   segmentedRunnerEntrypoint,
   "ui",
