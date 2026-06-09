@@ -1,6 +1,7 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  asConnectorId,
   asCatalogItemId,
   asNodeId,
   asSegmentId,
@@ -293,6 +294,60 @@ describe("App integration UI - navigation and canvas", () => {
     const diagram = within(networkSummaryPanel).getByLabelText("2D network diagram");
     expect(diagram.tagName.toLowerCase()).toBe("svg");
     expect(diagram).not.toHaveAttribute("role", "img");
+  });
+
+  it("keeps the 2D diagram snapshot unchanged when only pin roles and ampacity overrides change", () => {
+    const baseState = createUiIntegrationState();
+    const firstRender = renderAppWithState(baseState);
+    switchScreenDrawerAware("analysis");
+    const baseNetworkSummaryPanel = getPanelByHeading("Network summary");
+    const baseDiagramMarkup = within(baseNetworkSummaryPanel).getByLabelText("2D network diagram").outerHTML;
+
+    expect(baseDiagramMarkup).toMatchSnapshot("2d diagram without electrical role data");
+    firstRender.unmount();
+
+    const connector = baseState.connectors.byId[asConnectorId("C1")];
+    const activeNetworkId = baseState.activeNetworkId;
+    if (connector === undefined || activeNetworkId === null) {
+      throw new Error("Expected base integration state to include connector C1 and an active network.");
+    }
+    const activeNetwork = baseState.networks.byId[activeNetworkId];
+    if (activeNetwork === undefined) {
+      throw new Error("Expected active network metadata in base integration state.");
+    }
+    const withPinRoles = appReducer(
+      baseState,
+      appActions.upsertConnector({
+        ...connector,
+        pinElectricalRoles: {
+          1: { role: "source", currentA: 12, label: "KL30" },
+          2: { role: "consumer", currentA: 4, label: "LOAD" }
+        }
+      })
+    );
+    const withElectricalDataOnly = {
+      ...withPinRoles,
+      networks: {
+        ...withPinRoles.networks,
+        byId: {
+          ...withPinRoles.networks.byId,
+          [activeNetworkId]: {
+            ...activeNetwork,
+            ampacityOverrides: {
+              0.5: 9,
+              1: 20
+            }
+          }
+        }
+      }
+    };
+
+    renderAppWithState(withElectricalDataOnly);
+    switchScreenDrawerAware("analysis");
+    const updatedNetworkSummaryPanel = getPanelByHeading("Network summary");
+    const updatedDiagramMarkup = within(updatedNetworkSummaryPanel).getByLabelText("2D network diagram").outerHTML;
+
+    expect(updatedDiagramMarkup).toBe(baseDiagramMarkup);
   });
 
   it("hides default sub-network toggle and supports enable-all restore for tagged subnetworks", () => {
