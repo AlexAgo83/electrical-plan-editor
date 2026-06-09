@@ -92,6 +92,12 @@
   fill: var(--network-segment-length-label-color, var(--network-segment-label-color, #547086));
 }
 
+.functional-edge-current-label {
+  font-size: 8px;
+  font-weight: 900;
+  fill: var(--network-selection-color);
+}
+
 .functional-edge-color-swatch {
   opacity: 0;
   stroke-width: 4;
@@ -212,6 +218,28 @@
   paint-order: stroke fill;
   stroke: var(--network-label-stroke-color, rgba(246, 251, 255, 0.96));
   stroke-width: 1.6px;
+  stroke-linejoin: round;
+}
+
+.functional-electrical-overlay-layer {
+  pointer-events: none;
+}
+
+.functional-pin-role-marker rect,
+.functional-fuse-load-marker rect {
+  fill: color-mix(in srgb, var(--network-label-stroke-color) 88%, transparent);
+  stroke: color-mix(in srgb, var(--network-selection-color) 64%, transparent);
+  stroke-width: 1.2;
+}
+
+.functional-pin-role-marker text,
+.functional-fuse-load-marker text {
+  fill: var(--network-selection-color);
+  font-size: 8px;
+  font-weight: 900;
+  paint-order: stroke fill;
+  stroke: var(--network-label-stroke-color);
+  stroke-width: 1.8px;
   stroke-linejoin: round;
 }
 

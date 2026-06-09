@@ -9,6 +9,7 @@ import {
   type FunctionalTraceSeed
 } from "../../../core/functionalSchematic";
 import { CABLE_COLOR_BY_ID, getWireColorCode, getWireColorLabel } from "../../../core/cableColors";
+import { computePinElectricalLoad } from "../../../core/pinElectricalLoad";
 import type { ThemeMode } from "../../../store";
 import { getThemeClassNames } from "../../lib/themeModes";
 import { PreviewLoadingDialog } from "../dialogs/PreviewLoadingDialog";
@@ -101,12 +102,27 @@ interface FunctionalEdgeRenderModel {
   labelBoxHeight: number;
   wireName: string;
   wireTechnicalId: string;
+  currentLabel: string | null;
   title: string;
   traceColor: string | null;
   wireColorStyle: {
     primary: string | null;
     secondary: string | null;
   };
+}
+
+interface FunctionalElectricalPinOverlay {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+}
+
+interface FunctionalElectricalFuseOverlay {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
 }
 
 const FUNCTIONAL_LAYOUT_MARGIN_X = 92;
@@ -122,10 +138,43 @@ const FUNCTIONAL_NODE_HALF_HEIGHT = 26;
 const FUNCTIONAL_EDGE_LABEL_GAP = 12;
 const FUNCTIONAL_EDGE_LABEL_BOX_MIN_WIDTH = 72;
 const FUNCTIONAL_EDGE_LABEL_BOX_HEIGHT = 28;
+const FUNCTIONAL_EDGE_LABEL_BOX_HEIGHT_WITH_CURRENT = 42;
 const FUNCTIONAL_EDGE_LABEL_BOX_GAP = 6;
 const FUNCTIONAL_EDGE_LABEL_BOX_TOP_OFFSET = 15;
 const FUNCTIONAL_EDGE_LABEL_MAX_ACCEPTABLE_OVERLAP_RATIO = 0.04;
 const FUNCTIONAL_EDGE_LABEL_CANDIDATE_STEPS = [0.5, 0.44, 0.56, 0.38, 0.62, 0.32, 0.68] as const;
+const FUNCTIONAL_SCHEMATIC_ELECTRICAL_ROLES_STORAGE_KEY =
+  "electrical-plan-editor.functional-schematic.showElectricalRoles";
+
+function readDefaultShowElectricalRoles(): boolean {
+  if (typeof window === "undefined") {
+    return true;
+  }
+  return window.localStorage.getItem(FUNCTIONAL_SCHEMATIC_ELECTRICAL_ROLES_STORAGE_KEY) !== "false";
+}
+
+function formatElectricalCurrent(currentA: number): string {
+  const rounded = Math.round(currentA * 10) / 10;
+  return `${Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(1)} A`;
+}
+
+function getPinRoleNodeId(connectorId: ConnectorId, cavityIndex: number): string {
+  return `connector:${connectorId}:pin:${cavityIndex}`;
+}
+
+function getCurrentNetworkFuseProtectedKey(node: FunctionalSchematicNode): string | null {
+  const currentNetworkFuseBoxMatch = /^fuse-box:(.+):pair(\d+)$/.exec(node.id);
+  if (currentNetworkFuseBoxMatch !== null) {
+    const [, connectorId, pairIndex] = currentNetworkFuseBoxMatch;
+    return connectorId === undefined || pairIndex === undefined ? null : `fuseBoxPair:${connectorId}:${pairIndex}`;
+  }
+  const inlineFuseMatch = /^fuse:(.+)$/.exec(node.id);
+  if (inlineFuseMatch !== null) {
+    const [, wireId] = inlineFuseMatch;
+    return wireId === undefined ? null : `wireFuse:${wireId}`;
+  }
+  return null;
+}
 
 function resolveSeed({
   selectedWireId,
@@ -533,8 +582,8 @@ function getFunctionalEdgeWireColorInput(edge: FunctionalSchematicEdge, wire: Wi
   };
 }
 
-function estimateFunctionalEdgeLabelBoxWidth(wireName: string, wireTechnicalId: string): number {
-  const longestLabelLength = Math.max(wireName.length, wireTechnicalId.length);
+function estimateFunctionalEdgeLabelBoxWidth(wireName: string, wireTechnicalId: string, currentLabel: string | null): number {
+  const longestLabelLength = Math.max(wireName.length, wireTechnicalId.length, currentLabel?.length ?? 0);
   return Math.max(FUNCTIONAL_EDGE_LABEL_BOX_MIN_WIDTH, longestLabelLength * 5.4 + 18);
 }
 
@@ -688,6 +737,7 @@ export function FunctionalSchematicPanel({
   const [activeFilter, setActiveFilter] = useState<FunctionalDomainFilter>("all");
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null);
   const [showGrid, setShowGrid] = useState(true);
+  const [showElectricalRoles, setShowElectricalRoles] = useState(readDefaultShowElectricalRoles);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const shellRef = useRef<HTMLDivElement | null>(null);
   const seed = useMemo(
@@ -706,6 +756,32 @@ export function FunctionalSchematicPanel({
     [connectorMap, rootConnectorIds]
   );
   const wireMap = useMemo(() => new Map(wires.map((wire) => [wire.id, wire])), [wires]);
+  const electricalLoad = useMemo(
+    () =>
+      computePinElectricalLoad(
+        {
+          connectors: Array.from(connectorMap.values()),
+          splices: Array.from(spliceMap.values()),
+          wires,
+          catalogItemsById: catalogItemMap
+        },
+        { kind: "currentNetwork" }
+      ),
+    [catalogItemMap, connectorMap, spliceMap, wires]
+  );
+  const getEdgeCurrentLabel = useCallback(
+    (edge: FunctionalSchematicEdge): string | null => {
+      const currentA = edge.sourceWireIds.reduce((maxCurrentA, wireId) => {
+        const branchLoad = electricalLoad.branchLoadByWire.get(wireId);
+        if (branchLoad === undefined || branchLoad.continuousA <= 0) {
+          return maxCurrentA;
+        }
+        return Math.max(maxCurrentA, branchLoad.continuousA);
+      }, 0);
+      return currentA > 0 ? formatElectricalCurrent(currentA) : null;
+    },
+    [electricalLoad]
+  );
   const graph = useMemo(
     () =>
       assemblyGraph ??
@@ -751,6 +827,7 @@ export function FunctionalSchematicPanel({
       const wireColorInput = getFunctionalEdgeWireColorInput(edge, wire);
       const wireColorCode = wireColorInput === null ? "" : getWireColorCode(wireColorInput);
       const wireColorLabel = getFunctionalWireColorTitleLabel(wireColorInput);
+      const currentLabel = showElectricalRoles ? getEdgeCurrentLabel(edge) : null;
       return [
         {
           id: edge.id,
@@ -768,24 +845,81 @@ export function FunctionalSchematicPanel({
             : getFunctionalEdgeLabelCandidates(from, to),
           labelCurveFrom: from,
           labelCurveTo: to,
-          labelBoxWidth: estimateFunctionalEdgeLabelBoxWidth(wireName, wireTechnicalId),
-          labelBoxHeight: FUNCTIONAL_EDGE_LABEL_BOX_HEIGHT,
+          labelBoxWidth: estimateFunctionalEdgeLabelBoxWidth(wireName, wireTechnicalId, currentLabel),
+          labelBoxHeight: currentLabel === null ? FUNCTIONAL_EDGE_LABEL_BOX_HEIGHT : FUNCTIONAL_EDGE_LABEL_BOX_HEIGHT_WITH_CURRENT,
           wireName,
           wireTechnicalId,
+          currentLabel,
           title: `${wireName} ${wireTechnicalId}${wireColorCode.length > 0 ? ` ${wireColorCode}` : ""}${
             wireColorLabel !== null ? ` - ${wireColorLabel}` : ""
-          }`,
+          }${currentLabel !== null ? ` - ${currentLabel}` : ""}`,
           traceColor: edge.harnessColor ?? null,
           wireColorStyle: getFunctionalEdgeColorStyle(wireColorInput)
         }
       ];
     });
     return resolveFunctionalEdgeLabelPositions(baseEdgeRenderModels, nodeCollisionBoxes);
-  }, [graph.edges, nodeCollisionBoxes, nodePositions, wireMap]);
+  }, [getEdgeCurrentLabel, graph.edges, nodeCollisionBoxes, nodePositions, showElectricalRoles, wireMap]);
   const svgHeight = Math.max(
     baseSvgHeight,
     ...edgeRenderModels.map((edge) => edge.labelY + edge.labelBoxHeight / 2 + FUNCTIONAL_LAYOUT_MARGIN_TOP)
   );
+  const electricalPinOverlays = useMemo<FunctionalElectricalPinOverlay[]>(() => {
+    if (!showElectricalRoles) {
+      return [];
+    }
+    return Array.from(electricalLoad.pinLoadByConnectorPin.values()).flatMap((pinLoad) => {
+      if (typeof pinLoad.currentA !== "number" || (pinLoad.role !== "source" && pinLoad.role !== "consumer")) {
+        return [];
+      }
+      const position = nodePositions.get(getPinRoleNodeId(pinLoad.connectorId, pinLoad.cavityIndex));
+      if (position === undefined) {
+        return [];
+      }
+      return [
+        {
+          id: `${pinLoad.connectorId}:${pinLoad.cavityIndex}`,
+          label: `${pinLoad.role === "source" ? "→" : "←"} ${formatElectricalCurrent(pinLoad.currentA)}`,
+          x: position.x + 56,
+          y: position.y - 28
+        }
+      ];
+    });
+  }, [electricalLoad.pinLoadByConnectorPin, nodePositions, showElectricalRoles]);
+  const electricalFuseOverlays = useMemo<FunctionalElectricalFuseOverlay[]>(() => {
+    if (!showElectricalRoles) {
+      return [];
+    }
+    return graph.nodes.flatMap((node) => {
+      if (node.kind !== "fuse") {
+        return [];
+      }
+      const protectedKey = getCurrentNetworkFuseProtectedKey(node);
+      const protectedLoad = protectedKey === null ? undefined : electricalLoad.fuseProtectedLoad.get(protectedKey);
+      if (protectedLoad === undefined || protectedLoad.continuousA <= 0) {
+        return [];
+      }
+      const position = nodePositions.get(node.id);
+      if (position === undefined) {
+        return [];
+      }
+      return [
+        {
+          id: node.id,
+          label: formatElectricalCurrent(protectedLoad.continuousA),
+          x: position.x,
+          y: position.y + 42
+        }
+      ];
+    });
+  }, [electricalLoad.fuseProtectedLoad, graph.nodes, nodePositions, showElectricalRoles]);
+  const handleToggleElectricalRoles = useCallback(() => {
+    setShowElectricalRoles((current) => {
+      const next = !current;
+      window.localStorage.setItem(FUNCTIONAL_SCHEMATIC_ELECTRICAL_ROLES_STORAGE_KEY, String(next));
+      return next;
+    });
+  }, []);
   const {
     activeSvgPreview,
     createPngPreview,
@@ -850,10 +984,20 @@ export function FunctionalSchematicPanel({
           <button
             type="button"
             className={showGrid ? "workspace-tab is-active" : "workspace-tab"}
+            aria-pressed={showGrid}
             onClick={() => setShowGrid((current) => !current)}
           >
             <span className="network-summary-grid-icon" aria-hidden="true" />
             Grid
+          </button>
+          <button
+            type="button"
+            className={showElectricalRoles ? "workspace-tab is-active" : "workspace-tab"}
+            aria-pressed={showElectricalRoles}
+            onClick={handleToggleElectricalRoles}
+          >
+            <span className="action-button-icon is-analysis" aria-hidden="true" />
+            Electrical roles
           </button>
           {onOpenActiveNetworkInModeling === undefined ? null : (
             <button
@@ -950,17 +1094,34 @@ export function FunctionalSchematicPanel({
                   return null;
                 }
                 return (
-                  <g
-                    key={node.id}
-                  className={getFunctionalNodeClassName(node)}
-                  >
+                  <g key={node.id} className={getFunctionalNodeClassName(node)}>
                     <title>{`${node.label} ${node.detail}${node.ratingLabel === undefined ? "" : ` ${node.ratingLabel}`}`}</title>
-                  {renderFunctionalNodeShape(node, position)}
-                  {renderFunctionalNodeText(node, position)}
+                    {renderFunctionalNodeShape(node, position)}
+                    {renderFunctionalNodeText(node, position)}
                   </g>
                 );
               })}
             </g>
+            {showElectricalRoles && (electricalPinOverlays.length > 0 || electricalFuseOverlays.length > 0) ? (
+              <g className="functional-electrical-overlay-layer">
+                {electricalPinOverlays.map((overlay) => (
+                  <g key={`pin-role-${overlay.id}`} className="functional-pin-role-marker">
+                    <rect x={overlay.x - 28} y={overlay.y - 12} width={56} height={18} rx={4} />
+                    <text x={overlay.x} y={overlay.y} textAnchor="middle">
+                      {overlay.label}
+                    </text>
+                  </g>
+                ))}
+                {electricalFuseOverlays.map((overlay) => (
+                  <g key={`fuse-load-${overlay.id}`} className="functional-fuse-load-marker">
+                    <rect x={overlay.x - 26} y={overlay.y - 12} width={52} height={18} rx={4} />
+                    <text x={overlay.x} y={overlay.y} textAnchor="middle">
+                      {overlay.label}
+                    </text>
+                  </g>
+                ))}
+              </g>
+            ) : null}
             <g className="functional-edge-label-layer">
               {edgeRenderModels.map((edge) => (
                 <g
@@ -988,6 +1149,11 @@ export function FunctionalSchematicPanel({
                   <text className="functional-edge-tech-label" x={edge.labelX} y={edge.labelY + FUNCTIONAL_EDGE_LABEL_GAP} textAnchor="middle">
                     {edge.wireTechnicalId}
                   </text>
+                  {edge.currentLabel === null ? null : (
+                    <text className="functional-edge-current-label" x={edge.labelX} y={edge.labelY + 22} textAnchor="middle">
+                      {edge.currentLabel}
+                    </text>
+                  )}
                 </g>
               ))}
             </g>

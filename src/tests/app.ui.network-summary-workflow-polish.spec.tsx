@@ -197,14 +197,43 @@ describe("App integration UI - network summary workflow polish", () => {
         endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 }
       })
     );
-    const connector = withWire.connectors.byId[asConnectorId("C1")];
+    const withConsumerConnector = appReducer(
+      withWire,
+      appActions.upsertConnector({
+        id: asConnectorId("C2"),
+        name: "Connector 2",
+        technicalId: "C-2",
+        cavityCount: 1,
+        pinElectricalRoles: { 1: { role: "consumer", currentA: 2.5 } }
+      })
+    );
+    const withConsumerWire = appReducer(
+      withConsumerConnector,
+      appActions.saveWire({
+        id: asWireId("W2"),
+        name: "Wire 2",
+        technicalId: "W-2",
+        colorMode: "catalog",
+        primaryColorId: "BK",
+        endpointA: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 2 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C2"), cavityIndex: 1 }
+      })
+    );
+    const connector = withConsumerWire.connectors.byId[asConnectorId("C1")];
     expect(connector).toBeDefined();
     const state =
       connector === undefined
-        ? withWire
-        : appReducer(withWire, appActions.upsertConnector({ ...connector, isMainHarnessConnector: true }));
+        ? withConsumerWire
+        : appReducer(
+            withConsumerWire,
+            appActions.upsertConnector({
+              ...connector,
+              isMainHarnessConnector: true,
+              pinElectricalRoles: { 1: { role: "source", currentA: 2.5 } }
+            })
+          );
 
-    renderAppWithState(state);
+    const rendered = renderAppWithState(state);
     switchScreenDrawerAware("modeling");
     expect(screen.queryByRole("heading", { name: "Functional schematic" })).not.toBeInTheDocument();
     switchScreenDrawerAware("harnessAssembly");
@@ -222,6 +251,7 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(functionalPanel).toHaveTextContent("F12");
     expect(functionalPanel).toHaveTextContent("Wire 1");
     expect(functionalPanel).toHaveTextContent("W-1");
+    expect(functionalPanel).toHaveTextContent("→ 2.5 A");
     expect(functionalPanel).not.toHaveTextContent("SEG-A");
     expect(functionalSvg.querySelector(".functional-edge-color-swatch")).not.toBeNull();
     const functionalEdgePath = functionalSvg.querySelector(".functional-edge path");
@@ -232,9 +262,26 @@ describe("App integration UI - network summary workflow polish", () => {
     const functionalActions = within(functionalPanel).getByRole("group", { name: "Functional schematic actions" });
     expect(within(functionalActions).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
       "Grid",
+      "Electrical roles",
       "Active network",
       "Export"
     ]);
+    const electricalRolesButton = within(functionalActions).getByRole("button", { name: "Electrical roles" });
+    expect(electricalRolesButton).toHaveAttribute("aria-pressed", "true");
+    expect(functionalSvg.querySelector(".functional-pin-role-marker")).not.toBeNull();
+    expect(functionalSvg.querySelector(".functional-edge-current-label")).not.toBeNull();
+    expect(functionalSvg.querySelector(".functional-fuse-load-marker")).not.toBeNull();
+    const connectorsBeforeToggle = rendered.store.getState().connectors.byId;
+    fireEvent.click(electricalRolesButton);
+    expect(electricalRolesButton).toHaveAttribute("aria-pressed", "false");
+    expect(functionalPanel).not.toHaveTextContent("→ 2.5 A");
+    expect(functionalSvg.querySelector(".functional-pin-role-marker")).toBeNull();
+    expect(functionalSvg.querySelector(".functional-edge-current-label")).toBeNull();
+    expect(functionalSvg.querySelector(".functional-fuse-load-marker")).toBeNull();
+    expect(rendered.store.getState().connectors.byId).toBe(connectorsBeforeToggle);
+    expect(localStorage.getItem("electrical-plan-editor.functional-schematic.showElectricalRoles")).toBe("false");
+    fireEvent.click(electricalRolesButton);
+    expect(electricalRolesButton).toHaveAttribute("aria-pressed", "true");
     const exportSvgButton = within(functionalPanel).getByRole("button", { name: "Export" });
     expect(exportSvgButton).toBeEnabled();
     fireEvent.click(exportSvgButton);
