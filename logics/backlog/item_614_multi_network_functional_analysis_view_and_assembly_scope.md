@@ -1,10 +1,10 @@
 ## item_614_multi_network_functional_analysis_view_and_assembly_scope - Multi-network functional analysis view and assembly-scope aggregation
 
-> From version: 1.15.3
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 100%
-> Confidence: 94%
+> Understanding: 95%
+> Confidence: 95%
 > Progress: 100%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
@@ -81,7 +81,7 @@ flowchart LR
 - request-AC26 -> This backlog slice. Evidence needed: Test coverage adds: pin-role normalization unit tests, aggregation engine unit tests for both scopes (linear chain, splice fan-out, fuse-box pair, ECU asymmetric device, two-network link, three-network harness assembly, loop), D1–D4 issue emission tests, L1 mismatch test, multi-network view component tests, cross-connector mass edit view test (including CSV paste), schematic overlay snapshot test (on by default), and ampacity-override persistence test.
 
 # Decision framing
-- Product framing: Captured in `docs/pin-level-source-consumer-currents-product-brief.md` (Inter-network analysis section).
+- Product framing: Captured in `logics/product/prod_011_pin_level_current_dimensioning.md` (Inter-network analysis section).
 - Product signals: Read-only view; opt-in; cross-network propagation never leaks into the in-network surfaces.
 - Architecture framing:
   - Engine extension: keep the public API surface; the `scope` discriminated union absorbs the new case.
@@ -91,7 +91,7 @@ flowchart LR
 - Architecture follow-up: Consider a small ADR for the bridge-traversal semantics if the merge with `item_610` produces a non-trivial generic dispatch; otherwise document in the task plan.
 
 # Links
-- Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
+- Product brief(s): `logics/product/prod_011_pin_level_current_dimensioning.md`
 - Architecture decision(s): `adr_010_inter_network_current_bridge_semantics`
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
 - Primary task(s): `task_122_multi_network_functional_analysis_view_and_assembly_scope`

@@ -1,9 +1,9 @@
 ## item_610_in_network_pin_load_aggregation_engine - In-network pin load aggregation engine
 
-> From version: 1.13.1
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 100%
+> Understanding: 95%
 > Confidence: 95%
 > Progress: 100%
 > Complexity: Large
@@ -79,7 +79,7 @@ flowchart LR
 - request-AC26 -> This backlog slice. Evidence needed: Test coverage adds: pin-role normalization unit tests, aggregation engine unit tests for both scopes (linear chain, splice fan-out, fuse-box pair, ECU asymmetric device, two-network link, three-network harness assembly, loop), D1–D4 issue emission tests, L1 mismatch test, multi-network view component tests, cross-connector mass edit view test (including CSV paste), schematic overlay snapshot test (on by default), and ampacity-override persistence test.
 
 # Decision framing
-- Product framing: Captured in `docs/pin-level-source-consumer-currents-product-brief.md` (Aggregation engine section).
+- Product framing: Captured in `logics/product/prod_011_pin_level_current_dimensioning.md` (Aggregation engine section).
 - Architecture framing:
   - Pure module, no store dependency. Inputs are normalized data, outputs are plain maps.
   - Scope discriminated union lets `item_614` extend without rewriting the API surface.
@@ -88,7 +88,7 @@ flowchart LR
 - Architecture follow-up: Consider a small ADR if the engine ends up exposing more than five public symbols; otherwise document in the task plan.
 
 # Links
-- Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
+- Product brief(s): `logics/product/prod_011_pin_level_current_dimensioning.md`
 - Architecture decision(s): `adr_010_inter_network_current_bridge_semantics`
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
 - Primary task(s): `task_118_in_network_pin_load_aggregation_engine`

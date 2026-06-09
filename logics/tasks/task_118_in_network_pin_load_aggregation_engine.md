@@ -1,9 +1,9 @@
 ## task_118_in_network_pin_load_aggregation_engine - In-network pin load aggregation engine
 
-> From version: 1.13.1
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 100%
+> Understanding: 95%
 > Confidence: 95%
 > Progress: 100%
 > Complexity: Large
@@ -120,7 +120,7 @@ See `item_610_in_network_pin_load_aggregation_engine` AC1–AC10. The task mirro
 
 # Links
 - Request: `req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics`
-- Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
+- Product brief(s): `logics/product/prod_011_pin_level_current_dimensioning.md`
 - Architecture decision(s): `adr_010_inter_network_current_bridge_semantics`
 
 # AC Traceability

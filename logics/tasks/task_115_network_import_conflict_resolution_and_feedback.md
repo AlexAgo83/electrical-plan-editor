@@ -1,10 +1,10 @@
 ## task_115_network_import_conflict_resolution_and_feedback - Network import conflict resolution and explicit feedback
 
-> From version: 1.12.5
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 95%
+> Confidence: 95%
 > Progress: 100%
 > Complexity: Medium
 > Theme: Import/Export
@@ -139,7 +139,7 @@ flowchart LR
 
 # Links
 - Request: `req_132_network_import_conflict_resolution_and_feedback`
-- Product brief(s): `docs/network-import-conflict-product-brief.md`
+- Product brief(s): `logics/product/prod_009_network_import_conflict_resolution.md`
 - Architecture decision(s): (none yet)
 
 # AC Traceability

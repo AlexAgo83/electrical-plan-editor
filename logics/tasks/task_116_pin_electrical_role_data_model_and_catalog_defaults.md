@@ -1,10 +1,10 @@
 ## task_116_pin_electrical_role_data_model_and_catalog_defaults - Pin electrical role data model and catalog defaults
 
-> From version: 1.13.1
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 100%
-> Confidence: 96%
+> Understanding: 95%
+> Confidence: 95%
 > Progress: 100%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
@@ -117,7 +117,7 @@ flowchart LR
 
 # Links
 - Request: `req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics`
-- Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
+- Product brief(s): `logics/product/prod_011_pin_level_current_dimensioning.md`
 - Architecture decision(s): `adr_010_inter_network_current_bridge_semantics` (downstream — informs the engine API surface but not this task directly)
 
 # AC Traceability

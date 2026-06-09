@@ -1,10 +1,10 @@
 ## item_608_pin_electrical_role_data_model_and_catalog_defaults - Pin electrical role data model and catalog defaults
 
-> From version: 1.13.1
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 100%
-> Confidence: 96%
+> Understanding: 95%
+> Confidence: 95%
 > Progress: 100%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
@@ -74,7 +74,7 @@ flowchart LR
 - request-AC26 -> This backlog slice. Evidence needed: Test coverage adds: pin-role normalization unit tests, aggregation engine unit tests for both scopes (linear chain, splice fan-out, fuse-box pair, ECU asymmetric device, two-network link, three-network harness assembly, loop), D1–D4 issue emission tests, L1 mismatch test, multi-network view component tests, cross-connector mass edit view test (including CSV paste), schematic overlay snapshot test (on by default), and ampacity-override persistence test.
 
 # Decision framing
-- Product framing: Captured in `docs/pin-level-source-consumer-currents-product-brief.md` (Pin electrical role model section).
+- Product framing: Captured in `logics/product/prod_011_pin_level_current_dimensioning.md` (Pin electrical role model section).
 - Product signals: Optional fields, default `passive`, no mode/duty/peak fields. Static role per pin.
 - Architecture framing:
   - Pure data-model change. No new module yet — types live in `src/core/entities.ts`, normalization helper next to `wireSizing.ts` (`pinElectricalRole.ts` or extension of an existing helper file).
@@ -83,7 +83,7 @@ flowchart LR
 - Architecture follow-up: No ADR required; capture the chosen helper location in the task implementation plan.
 
 # Links
-- Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
+- Product brief(s): `logics/product/prod_011_pin_level_current_dimensioning.md`
 - Architecture decision(s): (none)
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
 - Primary task(s): `task_116_pin_electrical_role_data_model_and_catalog_defaults`

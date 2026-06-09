@@ -1,10 +1,10 @@
 ## task_125_statistics_workspace_tab_ui_design_and_validation - Statistics workspace tab UI, design, and validation
 
-> From version: 1.14.3
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 86%
-> Confidence: 80%
+> Understanding: 95%
+> Confidence: 95%
 > Progress: 100%
 > Complexity: Medium
 > Theme: Statistics / Reporting
@@ -160,7 +160,7 @@ flowchart LR
 # Links
 - Request: `req_135_network_statistics_dashboard_for_one_or_multiple_networks`
 - Backlog: `item_616_network_statistics_dashboard_for_one_or_multiple_networks`
-- Product brief(s): `docs/network-statistics-dashboard-product-brief.md`
+- Product brief(s): `logics/product/prod_010_network_statistics_dashboard.md`
 - Architecture decision(s): (none)
 
 # AC Traceability

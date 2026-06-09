@@ -1,11 +1,11 @@
 ## item_611_electrical_dimensioning_validation_category - Electrical dimensioning validation category (D1–D4)
 
-> From version: 1.14.0
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 100%
+> Understanding: 95%
 > Confidence: 95%
-> Progress: 100% (delivered)
+> Progress: 100%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -87,7 +87,7 @@ flowchart LR
 - request-AC26 -> This backlog slice. Evidence needed: Test coverage adds: pin-role normalization unit tests, aggregation engine unit tests for both scopes (linear chain, splice fan-out, fuse-box pair, ECU asymmetric device, two-network link, three-network harness assembly, loop), D1–D4 issue emission tests, L1 mismatch test, multi-network view component tests, cross-connector mass edit view test (including CSV paste), schematic overlay snapshot test (on by default), and ampacity-override persistence test.
 
 # Decision framing
-- Product framing: Captured in `docs/pin-level-source-consumer-currents-product-brief.md` (Diagnostic surfacing section).
+- Product framing: Captured in `logics/product/prod_011_pin_level_current_dimensioning.md` (Diagnostic surfacing section).
 - Product signals: D3 is `warning` only, D4 never blocks. The category is mute-able.
 - Architecture framing:
   - All four families live in `buildValidationIssues.ts` next to the existing categories, but the heavy lifting (load computation) stays in `item_610`'s engine.
@@ -100,7 +100,7 @@ flowchart LR
 - D1-D4 issue families, current-network scoping, category muting, Go to targets, and regression coverage are tracked in the linked task DoD.
 
 # Links
-- Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
+- Product brief(s): `logics/product/prod_011_pin_level_current_dimensioning.md`
 - Architecture decision(s): (none)
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
 - Primary task(s): `logics/tasks/task_119_electrical_dimensioning_validation_category.md`

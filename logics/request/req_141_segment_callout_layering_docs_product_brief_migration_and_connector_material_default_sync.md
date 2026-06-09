@@ -2,8 +2,8 @@
 > From version: 1.15.2
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 94%
-> Confidence: 90%
+> Understanding: 95%
+> Confidence: 95%
 > Complexity: High
 > Theme: Network summary callouts, product docs, and catalog defaults
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -159,10 +159,10 @@ flowchart TD
 - `src/app/components/network-summary/graph/NetworkSummaryGraphLayers.tsx`
 - `src/app/components/network-summary/callouts/calloutLayout.ts`
 - `src/app/components/workspace/ModelingCatalogFormPanel.tsx`
-- `docs/fuse-box-functional-schematic-product-brief.md`
-- `docs/network-import-conflict-product-brief.md`
-- `docs/network-statistics-dashboard-product-brief.md`
-- `docs/pin-level-source-consumer-currents-product-brief.md`
+- `logics/product/prod_008_fuse_box_functional_schematic.md`
+- `logics/product/prod_009_network_import_conflict_resolution.md`
+- `logics/product/prod_010_network_statistics_dashboard.md`
+- `logics/product/prod_011_pin_level_current_dimensioning.md`
 
 # AI Context
 - Summary: Follow-up after segment callouts and rear-backshell defaults shipped: align segment callout layering and dotted leaders with node callouts, migrate legacy docs into Logics Product Briefs, and fix Rear backshell helper-only catalog material default synchronization.

@@ -1,9 +1,9 @@
 ## item_615_pin_role_release_validation_and_permissiveness_gate - Pin role release validation and permissiveness gate
 
-> From version: 1.13.1
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 100%
+> Understanding: 95%
 > Confidence: 95%
 > Progress: 100%
 > Complexity: Medium
@@ -76,7 +76,7 @@ flowchart LR
 - request-AC24 -> This backlog slice. Evidence needed: The shipped ampacity table is overridable per project under Settings → Electrical and the override is persisted with the network. Without an override, the shipped defaults are used.
 
 # Decision framing
-- Product framing: Captured in `docs/pin-level-source-consumer-currents-product-brief.md` (Permissiveness Contract + Acceptance Criteria sections).
+- Product framing: Captured in `logics/product/prod_011_pin_level_current_dimensioning.md` (Permissiveness Contract + Acceptance Criteria sections).
 - Product signals: Permissiveness must be measurable; modeling canvas must be untouched; AI Agent surface untouched.
 - Architecture framing:
   - Performance baselines captured by an existing benchmark hook if available; otherwise add a small benchmark utility under `scripts/`.
@@ -84,7 +84,7 @@ flowchart LR
 - Architecture follow-up: No ADR required.
 
 # Links
-- Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
+- Product brief(s): `logics/product/prod_011_pin_level_current_dimensioning.md`
 - Architecture decision(s): (none)
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
 - Primary task(s): `task_123_pin_role_release_validation_and_permissiveness_gate`

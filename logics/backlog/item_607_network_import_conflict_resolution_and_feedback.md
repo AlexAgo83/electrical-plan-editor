@@ -1,10 +1,10 @@
 ## item_607_network_import_conflict_resolution_and_feedback - Network import conflict resolution and explicit feedback
 
-> From version: 1.12.5
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 95%
+> Confidence: 95%
 > Progress: 100%
 > Complexity: Medium
 > Theme: Import/Export
@@ -74,7 +74,7 @@ flowchart LR
 - request-AC16 -> This backlog slice. Proof: AC12 (test coverage).
 
 # Decision framing
-- Product framing: Captured in `docs/network-import-conflict-product-brief.md`.
+- Product framing: Captured in `logics/product/prod_009_network_import_conflict_resolution.md`.
 - Product signals: explicit user choice over silent rename; bulk row UX shortcut; toast + failure-dialog parity for every outcome.
 - Product follow-up: No further brief expected unless follow-up UX testing requires sub-network merge or per-entity overrides.
 - Architecture framing: Lightweight. Two architectural points:
@@ -83,7 +83,7 @@ flowchart LR
 - Architecture follow-up: No formal ADR expected; capture the chosen shape in the task implementation plan.
 
 # Links
-- Product brief(s): `docs/network-import-conflict-product-brief.md`
+- Product brief(s): `logics/product/prod_009_network_import_conflict_resolution.md`
 - Architecture decision(s): (none yet)
 - Request: `logics/request/req_132_network_import_conflict_resolution_and_feedback.md`
 - Primary task(s): `task_115_network_import_conflict_resolution_and_feedback`

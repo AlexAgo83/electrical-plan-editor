@@ -1,10 +1,10 @@
 ## item_613_functional_schematic_electrical_overlay - Functional schematic electrical overlay
 
-> From version: 1.13.1
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 100%
-> Confidence: 92%
+> Understanding: 95%
+> Confidence: 95%
 > Progress: 100%
 > Complexity: Small
 > Theme: Electrical analysis / Diagnostics
@@ -69,7 +69,7 @@ flowchart LR
 - request-AC26 -> This backlog slice. Evidence needed: Test coverage adds: pin-role normalization unit tests, aggregation engine unit tests for both scopes (linear chain, splice fan-out, fuse-box pair, ECU asymmetric device, two-network link, three-network harness assembly, loop), D1–D4 issue emission tests, L1 mismatch test, multi-network view component tests, cross-connector mass edit view test (including CSV paste), schematic overlay snapshot test (on by default), and ampacity-override persistence test.
 
 # Decision framing
-- Product framing: Captured in `docs/pin-level-source-consumer-currents-product-brief.md` (Editing surfaces section — overlay).
+- Product framing: Captured in `logics/product/prod_011_pin_level_current_dimensioning.md` (Editing surfaces section — overlay).
 - Product signals: Overlay on by default; minimal visual clutter when data is absent.
 - Architecture framing:
   - Rendering lives next to the existing functional schematic renderer (`src/core/functionalSchematic.ts` for data, app-layer for SVG/Canvas painting).
@@ -78,7 +78,7 @@ flowchart LR
 - Architecture follow-up: No ADR required.
 
 # Links
-- Product brief(s): `docs/pin-level-source-consumer-currents-product-brief.md`
+- Product brief(s): `logics/product/prod_011_pin_level_current_dimensioning.md`
 - Architecture decision(s): (none)
 - Request: `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
 - Primary task(s): `task_121_functional_schematic_electrical_overlay`

@@ -1,10 +1,10 @@
 ## req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics - Pin-level Source/Consumer Currents and Harness Dimensioning Diagnostics
 
-> From version: 1.15.4
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 99%
-> Confidence: 100%
+> Understanding: 95%
+> Confidence: 95%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -177,8 +177,8 @@ flowchart LR
 - [x] No AI Agent integration in this release.
 
 # Companion Docs
-- Product brief: `docs/pin-level-source-consumer-currents-product-brief.md`.
-- Related catalog & fuse material: `docs/fuse-box-functional-schematic-product-brief.md`, `src/core/wireSizing.ts`, `src/core/functionalSchematic.ts`.
+- Product brief: `logics/product/prod_011_pin_level_current_dimensioning.md`.
+- Related catalog & fuse material: `logics/product/prod_008_fuse_box_functional_schematic.md`, `src/core/wireSizing.ts`, `src/core/functionalSchematic.ts`.
 
 # References
 - `src/core/entities.ts` (`Connector`, `CatalogItem.connectorDefaults`, `Wire`, `FuseBoxConfig`)

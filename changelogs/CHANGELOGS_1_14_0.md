@@ -12,7 +12,7 @@
 
 ### Logics planning (req_133)
 
-- Promoted request `req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics` with companion product brief `docs/pin-level-source-consumer-currents-product-brief.md`.
+- Promoted request `req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics` with companion product brief `logics/product/prod_011_pin_level_current_dimensioning.md`.
 - Added eight backlog items (`item_608` through `item_615`) and eight tasks (`task_116` through `task_123`).
 - Added ADR `adr_010_inter_network_current_bridge_semantics` covering inter-network propagation rules and loop safety.
 

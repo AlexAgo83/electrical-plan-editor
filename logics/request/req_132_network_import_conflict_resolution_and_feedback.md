@@ -1,10 +1,10 @@
 ## req_132_network_import_conflict_resolution_and_feedback - Network Import Conflict Resolution and Explicit Feedback
 
-> From version: 1.12.5
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 95%
+> Confidence: 95%
 > Complexity: Medium
 > Theme: Import/Export
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -110,7 +110,7 @@ flowchart LR
 - [x] Acceptance criteria are testable.
 
 # Companion Docs
-- Product brief: `docs/network-import-conflict-product-brief.md`.
+- Product brief: `logics/product/prod_009_network_import_conflict_resolution.md`.
 - Source discussion: user request after `1.12.5` release, reporting that overwrite during import no longer surfaces and that the only workaround is to delete the target network first.
 - Related backlog: `item_027_import_conflict_resolution_and_id_deduplication` (foundation).
 

@@ -1,12 +1,12 @@
 ## adr_010_inter_network_current_bridge_semantics - Inter-network current bridge semantics for pin-load aggregation
 
-> Date: 2026-06-02
-> Status: Proposed
-> Drivers: pin-level electrical roles, harness assembly cross-cutting analysis, permissive diagnostics, deterministic aggregation, multi-network functional analysis view
-> Related request: `req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics`
-> Related backlog: `item_608_pin_electrical_role_data_model_and_catalog_defaults`, `item_610_in_network_pin_load_aggregation_engine`, `item_611_electrical_dimensioning_validation_category`, `item_614_multi_network_functional_analysis_view_and_assembly_scope`
-> Related task: `task_116_pin_electrical_role_data_model_and_catalog_defaults`
-> Reminder: Update status, linked refs, decision rationale, consequences, migration plan, and follow-up work when you edit this doc.
+> Date: 2026-06-09
+> Status: Accepted
+> Drivers: pin-level electrical roles, harness assembly cross-cutting analysis, permissive diagnostics, deterministic aggregation, multi-network functional analysis view, Product Brief migration
+> Related request: `req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics`, `req_141_segment_callout_layering_docs_product_brief_migration_and_connector_material_default_sync`
+> Related backlog: `item_608_pin_electrical_role_data_model_and_catalog_defaults`, `item_610_in_network_pin_load_aggregation_engine`, `item_611_electrical_dimensioning_validation_category`, `item_614_multi_network_functional_analysis_view_and_assembly_scope`, `item_627_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
+> Related task: `task_116_pin_electrical_role_data_model_and_catalog_defaults`, `task_137_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
+> Reminder: Update status, linked refs, Product Brief references, decision rationale, consequences, migration plan, and follow-up work when you edit this doc.
 
 # Overview
 Define how the pin-load aggregation engine treats inter-network constructs — `InterHarnessConnectorLink` and master connector references inside a `HarnessAssembly` — when propagating declared currents across linked networks.
@@ -129,7 +129,7 @@ For a fixed input `(networks, scope, ampacity table, options)`, the engine retur
 
 # References
 - `logics/request/req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics.md`
-- `docs/pin-level-source-consumer-currents-product-brief.md`
+- `logics/product/prod_011_pin_level_current_dimensioning.md`
 - `src/core/harnessAssembly.ts` (link + master connector references)
 - `src/core/entities.ts` (`HarnessAssembly`, `InterHarnessConnectorLink`, `Connector`)
 - `logics/architecture/adr_007_harness_assembly_and_physical_interconnector_contract.md` (harness assembly contract foundation)

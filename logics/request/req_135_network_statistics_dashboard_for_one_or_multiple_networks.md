@@ -1,10 +1,10 @@
 ## req_135_network_statistics_dashboard_for_one_or_multiple_networks - Network Statistics Dashboard For One Or Multiple Networks
 
-> From version: 1.14.3
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 86%
-> Confidence: 82%
+> Understanding: 95%
+> Confidence: 95%
 > Complexity: Medium
 > Theme: Statistics / Reporting
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -182,7 +182,7 @@ flowchart LR
 - [x] CSV export, pricing, and charts are explicitly deferred.
 
 # Companion Docs
-- Product brief: `docs/network-statistics-dashboard-product-brief.md`.
+- Product brief: `logics/product/prod_010_network_statistics_dashboard.md`.
 - Source discussion: user request on 2026-06-03 asking for a statistics tab covering one or several networks, including connector, splice, wire, and wire-length counts.
 
 # Delivery Notes

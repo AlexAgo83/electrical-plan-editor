@@ -1,10 +1,10 @@
 ## item_616_network_statistics_dashboard_for_one_or_multiple_networks - Network statistics dashboard for one or multiple networks
 
-> From version: 1.14.3
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: Done
-> Understanding: 86%
-> Confidence: 82%
+> Understanding: 95%
+> Confidence: 95%
 > Progress: 100%
 > Complexity: Medium
 > Theme: Statistics / Reporting
@@ -114,7 +114,7 @@ flowchart LR
 - request-AC24 -> This backlog slice. Proof: AC24 (UI tests).
 
 # Decision framing
-- Product framing: Captured in `docs/network-statistics-dashboard-product-brief.md`.
+- Product framing: Captured in `logics/product/prod_010_network_statistics_dashboard.md`.
 - Product signals:
   - **Statistics** is a top-level workspace tab, not an Analysis sub-tab.
   - First release is read-only and English-labeled.
@@ -129,7 +129,7 @@ flowchart LR
 - Architecture follow-up: No ADR expected for this slice.
 
 # Links
-- Product brief(s): `docs/network-statistics-dashboard-product-brief.md`
+- Product brief(s): `logics/product/prod_010_network_statistics_dashboard.md`
 - Architecture decision(s): (none)
 - Request: `logics/request/req_135_network_statistics_dashboard_for_one_or_multiple_networks.md`
 - Primary task(s):
@@ -148,7 +148,7 @@ flowchart LR
 
 # Notes
 - Source request: `logics/request/req_135_network_statistics_dashboard_for_one_or_multiple_networks.md`.
-- Product brief: `docs/network-statistics-dashboard-product-brief.md`.
+- Product brief: `logics/product/prod_010_network_statistics_dashboard.md`.
 - Created by hand because `python3 -m logics_manager` is not installed in the current shell; local `logics-manager` wrapper is available for lint/audit.
 - Implemented on 2026-06-03 via `task_124` and `task_125`.
 - Validation passed: lint, typecheck, focused calculator/UI tests, UI segmentation contract, UI/store/hooks modularization, UI timeout governance, and ExcelJS boundary.
