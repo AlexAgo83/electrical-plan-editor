@@ -95,7 +95,8 @@ function hasConnectorMaterialDefaults(item: CatalogItem): boolean {
     defaults.allSameTerminals === true ||
     defaults.defaultTerminal !== undefined ||
     defaults.terminalOverrides !== undefined ||
-    (defaults.plugs?.length ?? 0) > 0
+    (defaults.plugs?.length ?? 0) > 0 ||
+    defaults.rearBackshell !== undefined
   );
 }
 
