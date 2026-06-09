@@ -1,9 +1,9 @@
 ## req_141_segment_callout_layering_docs_product_brief_migration_and_connector_material_default_sync - Segment Callout Layering, Product Brief Migration, and Connector Material Default Sync
 > From version: 1.15.2
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 95%
-> Confidence: 95%
+> Status: Done
+> Understanding: 100%
+> Confidence: 100%
 > Complexity: High
 > Theme: Network summary callouts, product docs, and catalog defaults
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -147,8 +147,8 @@ flowchart TD
 - The Rear backshell helper sync bug may share code paths with other catalog material defaults; the implementation should verify no related defaults regress.
 
 # Companion docs
-- Product brief(s): `prod_007_segment_callout_parity_and_product_brief_migration`; additional migrated Product Briefs required for each current `docs/` file during implementation
-- Architecture decision(s): recommended if segment and node callouts need a shared rendering/layering contract
+- Product brief(s): `prod_007_segment_callout_parity_and_product_brief_migration`, `prod_008_fuse_box_functional_schematic`, `prod_009_network_import_conflict_resolution`, `prod_010_network_statistics_dashboard`, `prod_011_pin_level_current_dimensioning`
+- Architecture decision(s): not added; the implementation aligned segment callouts with the existing node callout class/layering contract and did not introduce a new architecture-level rendering contract.
 
 # References
 - `logics/product/prod_007_segment_callout_parity_and_product_brief_migration.md`
@@ -163,6 +163,41 @@ flowchart TD
 - `logics/product/prod_009_network_import_conflict_resolution.md`
 - `logics/product/prod_010_network_statistics_dashboard.md`
 - `logics/product/prod_011_pin_level_current_dimensioning.md`
+
+# Delivery status
+- Done.
+- Segment callouts were moved into a dedicated top-level callout layer that renders after graph node layers, which aligns their Z-depth with node callouts and prevents segment group hierarchy from hiding them.
+- Segment callout leader clipping against callout obstacles was removed, so dotted leaders remain visible when crossing other plan content.
+- Segment callout dotted leaders and frames now share node callout styling classes while retaining segment-specific classes for targeting and export assertions.
+- Faded segment callouts were classified as a bug caused by inherited entity-group deemphasis opacity; the dedicated callout layer fixes that behavior.
+- Segment callout position reset was classified as a bug risk and covered with a drag/rerender regression for stable moved callout positions.
+- Rear backshell helper-only Connector material defaults synchronization now works because `rearBackshell` participates in material defaults detection, and regression coverage verifies store and Edit catalog item state.
+- Legacy product-facing docs were migrated into managed Product Briefs `prod_008` through `prod_011`, references were updated, and `docs/` was removed.
+
+# Acceptance evidence
+- AC1: Segment callouts render in `network-graph-layer-segment-callouts` after nodes.
+- AC2: Segment callout leader obstacle clipping was removed.
+- AC3: Segment leaders and frames use shared node callout classes including `network-callout-leader-line` and `network-callout-frame`.
+- AC4: The four legacy docs were migrated into individual managed Product Briefs.
+- AC5: Legacy `docs/...` references were updated to Product Brief refs or paths.
+- AC6: The repository no longer has a `docs/` folder.
+- AC7: Rear backshell helper-only defaults now keep Connector material defaults enabled in Edit catalog item.
+- AC8: Rear backshell helper-only sync has focused UI regression coverage.
+- AC9: Faded segment callouts were investigated and classified as a bug.
+- AC10: The unintended opacity inheritance was fixed by moving segment callouts out of deemphasized entity groups.
+- AC11: Segment callout position reset was investigated and treated as a persistence/reconciliation bug risk.
+- AC12: Moved segment callout stability is covered across rerender via the network summary callout viewport regression.
+
+# Validation evidence
+- `npm run -s test -- src/tests/app.ui.network-summary-layering.spec.tsx src/tests/app.ui.network-summary-callouts-viewport.spec.tsx src/tests/network-summary-graph-model.spec.ts` passed.
+- `npm run -s test -- src/tests/app.ui.catalog-rear-backshell-defaults.spec.tsx` passed.
+- `npm run -s test -- src/tests/app.ui.navigation-canvas.spec.tsx -u` passed.
+- `npm run -s test -- src/tests/app.ui.network-summary-svg-export.spec.tsx` passed.
+- `npm run -s lint` passed.
+- `npm run -s typecheck` passed.
+- `logics-manager lint --require-status` passed.
+- `logics-manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability` passed.
+- `npm run -s ci:blocking` passed.
 
 # AI Context
 - Summary: Follow-up after segment callouts and rear-backshell defaults shipped: align segment callout layering and dotted leaders with node callouts, migrate legacy docs into Logics Product Briefs, and fix Rear backshell helper-only catalog material default synchronization.

@@ -1,9 +1,9 @@
 ## prod_011_pin_level_current_dimensioning - Pin-Level Current Dimensioning
 > Date: 2026-06-09
 > Status: Validated
-> Related request: `req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics`
-> Related backlog: `item_608_pin_electrical_role_data_model_and_catalog_defaults`, `item_610_in_network_pin_load_aggregation_engine`, `item_611_electrical_dimensioning_validation_category`, `item_612_pin_role_inspector_and_cross_connector_mass_edit_view`, `item_613_functional_schematic_electrical_overlay`, `item_614_multi_network_functional_analysis_view_and_assembly_scope`, `item_615_pin_role_release_validation_and_permissiveness_gate`
-> Related task: `task_116_pin_electrical_role_data_model_and_catalog_defaults`, `task_117_automotive_ampacity_reference_table_and_project_override`, `task_118_in_network_pin_load_aggregation_engine`, `task_119_electrical_dimensioning_validation_category`
+> Related request: `req_141_segment_callout_layering_docs_product_brief_migration_and_connector_material_default_sync`
+> Related backlog: `item_627_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
+> Related task: `task_137_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
 > Related architecture: `adr_010_inter_network_current_bridge_semantics`
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
 
@@ -101,3 +101,5 @@ The user usually knows the source pins and consumer pins first; the app should d
 - Task: `logics/tasks/task_118_in_network_pin_load_aggregation_engine.md`
 - Task: `logics/tasks/task_119_electrical_dimensioning_validation_category.md`
 - Architecture: `logics/architecture/adr_010_inter_network_current_bridge_semantics.md`
+- Product back-reference: `item_627_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
+- Task back-reference: `task_137_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`

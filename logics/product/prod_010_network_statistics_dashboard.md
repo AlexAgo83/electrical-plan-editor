@@ -1,9 +1,9 @@
 ## prod_010_network_statistics_dashboard - Network Statistics Dashboard
 > Date: 2026-06-09
 > Status: Validated
-> Related request: `req_135_network_statistics_dashboard_for_one_or_multiple_networks`
-> Related backlog: `item_616_network_statistics_dashboard_for_one_or_multiple_networks`
-> Related task: `task_124_network_statistics_calculator_and_scope_contract`, `task_125_statistics_workspace_tab_ui_design_and_validation`
+> Related request: `req_141_segment_callout_layering_docs_product_brief_migration_and_connector_material_default_sync`
+> Related backlog: `item_627_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
+> Related task: `task_137_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
 
@@ -67,3 +67,5 @@ Before this dashboard, connector counts, splice counts, wire counts, total wire 
 - Backlog: `logics/backlog/item_616_network_statistics_dashboard_for_one_or_multiple_networks.md`
 - Task: `logics/tasks/task_124_network_statistics_calculator_and_scope_contract.md`
 - Task: `logics/tasks/task_125_statistics_workspace_tab_ui_design_and_validation.md`
+- Product back-reference: `item_627_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
+- Task back-reference: `task_137_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`

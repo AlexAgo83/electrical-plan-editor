@@ -1,9 +1,9 @@
 ## prod_009_network_import_conflict_resolution - Network Import Conflict Resolution
 > Date: 2026-06-09
 > Status: Validated
-> Related request: `req_132_network_import_conflict_resolution_and_feedback`
-> Related backlog: `item_607_network_import_conflict_resolution_and_feedback`
-> Related task: `task_115_network_import_conflict_resolution_and_feedback`
+> Related request: `req_141_segment_callout_layering_docs_product_brief_migration_and_connector_material_default_sync`
+> Related backlog: `item_627_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
+> Related task: `task_137_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
 
@@ -65,3 +65,5 @@ Collision paths include raw `id`, `technicalId`, `name`, and suffix variants suc
 - Request: `logics/request/req_132_network_import_conflict_resolution_and_feedback.md`
 - Backlog: `logics/backlog/item_607_network_import_conflict_resolution_and_feedback.md`
 - Task: `logics/tasks/task_115_network_import_conflict_resolution_and_feedback.md`
+- Product back-reference: `item_627_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
+- Task back-reference: `task_137_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
