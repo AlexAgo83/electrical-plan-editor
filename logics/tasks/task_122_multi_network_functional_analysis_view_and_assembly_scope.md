@@ -5,7 +5,7 @@
 > Status: In progress
 > Understanding: 100%
 > Confidence: 92%
-> Progress: 60%
+> Progress: 72%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 
@@ -15,10 +15,12 @@
 - [x] Cycle-safe traversal keyed by `(networkId, connectorId, cavityIndex)`.
 - [x] L1 link declaration mismatch emitted as `warning` with `max(currentA)` continuation per ADR.
 - [x] Out-of-assembly networks excluded; bridges with far end outside the selected `networkIds` reported in `skippedBridges`.
-- [ ] New top-level "Multi-network functional analysis" view, read-only, with scope picker (current network only / active assembly / custom subset).
-- [ ] D1–D4 + L1 + loop / skipped-bridge diagnostics listed inside the view.
+- [x] Read-only "Multi-network functional analysis" Analysis panel with current-network / active-assembly scope picker.
+- [x] Current-network D1–D4 findings plus active-assembly L1 and skipped-bridge diagnostics listed in the view.
+- [ ] Custom subset scope, union functional schematic, and assembly-grade D1–D4 findings listed inside the view.
 - [ ] `Go to` switches active network before focusing the entity.
-- [ ] Tests cover assembly aggregation, bridge mismatch, loop, scope picker, out-of-assembly exclusion.
+- [x] Tests cover assembly aggregation, L1 bridge mismatch, current-scope findings, and component scope picker / finding list rendering.
+- [ ] Tests cover custom subset, union schematic rendering, loop display, and active-network-switching `Go to`.
 
 # Backlog
 - `item_614_multi_network_functional_analysis_view_and_assembly_scope`
@@ -60,15 +62,17 @@ Mirror `item_614` AC1–AC14.
 - `Go to` action that dispatches the network switch and focus.
 
 ## Step 5 — Tests
-- `src/tests/core.pin-electrical-load.assembly.spec.ts` — two-network link, three-network assembly, loop, L1 cases.
-- `src/tests/app.ui.multi-network-analysis-view.spec.tsx` — scope picker, finding list, navigation.
+- `src/tests/core.pin-electrical-load-assembly.spec.ts` — two-network link, skipped bridge, L1 cases.
+- `src/tests/app.lib.multi-network-functional-analysis.spec.ts` — current-scope D1-D4 mapping and active-assembly L1 model.
+- `src/tests/app.ui.multi-network-functional-analysis.spec.tsx` — scope picker, themed status chips, finding list.
 
 # Links
 - Request: `req_133`
 - Architecture decision(s): `adr_010_inter_network_current_bridge_semantics`
 
 # Progress Report
-- Delivered in 1.14.0: assembly-scope aggregation core, bridge traversal, shared master connector bridge behavior, loop safety, skipped-bridge diagnostics, L1 mismatch computation, and core assembly tests.
+- Delivered in 1.14.0: assembly-scope aggregation core for `InterHarnessConnectorLink`, bridge traversal, skipped-bridge diagnostics, L1 mismatch computation, and core assembly tests.
 - Real-status audit on 2026-06-09: no read-only multi-network functional analysis view, scope picker, view-level D1-D4/L1 findings panel, or active-network-switching `Go to` UI was found.
-- Remaining: read-only multi-network functional analysis view, scope picker UI, view-level D1-D4/L1 findings list, active-network switching for `Go to`, and component coverage.
-- Pertinence: keep open and prioritize before overlay/BOM polish because the shipped assembly engine and L1 mismatch logic need a user-facing surface.
+- Implemented after the audit on 2026-06-09: `buildMultiNetworkFunctionalAnalysisModel`, read-only Analysis panel, current-network / active-assembly scope picker, current-network D1-D4 finding projection, active-assembly L1 and skipped-bridge surfacing, plus model/component tests.
+- Remaining: custom subset selection, union functional schematic, assembly-grade D1-D4 projection from the union graph, master-connector-ref aggregation parity if not already covered elsewhere, loop display in the panel, active-network switching for `Go to`, and broader integration coverage.
+- Pertinence: keep open, but reduce urgency from "invisible engine" to "MVP shipped, depth missing". The next useful increment is assembly-grade D1/D2 projection or `Go to`, not another shell-level panel.

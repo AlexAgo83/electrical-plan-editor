@@ -5,7 +5,7 @@
 > Status: In progress
 > Understanding: 100%
 > Confidence: 92%
-> Progress: 60%
+> Progress: 72%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -97,11 +97,10 @@ flowchart LR
 - Primary task(s): `task_122_multi_network_functional_analysis_view_and_assembly_scope`
 
 # Delivery Status
-- Partially delivered in 1.14.0.
-- Delivered: assembly-scope aggregation core in `src/core/pinElectricalLoadAssembly.ts`, inter-harness link traversal, shared master connector bridge handling, L1 mismatch computation, loop safety, and core assembly tests.
-- Real-status audit on 2026-06-09: no read-only multi-network functional analysis view, scope picker UI, view-level D1-D4/L1 finding list, or `Go to` network-switching UI was found. Core assembly behavior remains covered by `src/tests/core.pin-electrical-load-assembly.spec.ts`.
-- Remaining and pertinent: read-only multi-network functional analysis view, scope picker UX, D1-D4/L1 finding list in that view, skipped-bridge/view diagnostics, and `Go to` behavior that switches active network before focusing the entity.
-- Relevance assessment: keep this item open and prioritize it above the overlay/BOM follow-ups. The assembly aggregation and L1 engine are shipped but mostly invisible without the dedicated view, so this is real unfinished product surface rather than optional polish.
+- Partially delivered in 1.14.0, with MVP user-facing panel added after the 2026-06-09 audit.
+- Delivered: assembly-scope aggregation core in `src/core/pinElectricalLoadAssembly.ts` for `InterHarnessConnectorLink`, inter-harness link traversal, skipped-bridge diagnostics, L1 mismatch computation, core assembly tests, read-only Analysis panel, current-network / active-assembly scope picker, current-network D1-D4 finding projection, active-assembly L1/skipped-bridge surfacing, and model/component coverage.
+- Still not complete: custom subset scope, union functional schematic rendering, assembly-grade D1-D4 findings computed from the union graph, active-network-switching `Go to`, master connector reference aggregation parity if not already covered by another surface, loop display in the panel, and full integration coverage.
+- Relevance assessment: keep this item open, but the highest-risk gap changed. The shipped MVP makes the L1 engine visible; the next valuable work is either assembly-grade D1/D2 projection or `Go to` navigation, while custom subset and schematic rendering are useful but less urgent.
 
 # AI Context
 - Summary: Adds the multi-network analysis view (read-only, scope picker) and the assembly-scope aggregation that traverses inter-network bridges. New L1 link mismatch warning lives here.
