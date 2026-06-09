@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { SegmentId } from "../../../core/entities";
 import { appActions, type AppStore } from "../../../store";
 import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
 import {
@@ -25,6 +26,51 @@ import type {
   ConnectorAnalysisView,
   SpliceAnalysisView
 } from "../../components/workspace/AnalysisWorkspaceContent.types";
+
+type SegmentBatchEditableField = "sheathType" | "insulation" | "lineStyle" | "internalPartReference";
+
+function resolveSharedSegmentBatchFieldValue(
+  segments: ModelingSliceParams["segments"],
+  ids: ReadonlySet<string>,
+  field: SegmentBatchEditableField
+): { value: string; isMixed: boolean } {
+  let hasValue = false;
+  let firstValue = "";
+  for (const segment of segments) {
+    if (!ids.has(segment.id)) {
+      continue;
+    }
+    const value = segment[field] ?? "";
+    if (!hasValue) {
+      firstValue = value;
+      hasValue = true;
+      continue;
+    }
+    if (value !== firstValue) {
+      return { value: "", isMixed: true };
+    }
+  }
+  return { value: hasValue ? firstValue : "", isMixed: false };
+}
+
+function buildSelectedSegmentBatchSourceSignature(
+  segments: ModelingSliceParams["segments"],
+  ids: ReadonlySet<string>
+): string {
+  return segments
+    .filter((segment) => ids.has(segment.id))
+    .sort((left, right) => left.id.localeCompare(right.id))
+    .map((segment) =>
+      [
+        segment.id,
+        segment.sheathType ?? "",
+        segment.insulation ?? "",
+        segment.lineStyle ?? "",
+        segment.internalPartReference ?? ""
+      ].join("|")
+    )
+    .join("||");
+}
 
 type ModelingSliceParams = Parameters<typeof buildModelingScreenContentSlice>[0];
 type AnalysisSliceParams = Parameters<typeof buildAnalysisScreenContentSlice>[0];
@@ -210,6 +256,25 @@ export function useAppControllerModelingAnalysisScreenDomains({
     useState<MultiNetworkFunctionalAnalysisScope>("current");
   const [activeBatchScope, setActiveBatchScope] = useState<ModelingBatchSelectionScope | null>(null);
   const [batchSelectionIds, setBatchSelectionIds] = useState<ReadonlySet<string>>(new Set());
+  const [segmentBatchSheathType, setSegmentBatchSheathType] = useState("");
+  const [segmentBatchInsulation, setSegmentBatchInsulation] = useState("");
+  const [segmentBatchLineStyle, setSegmentBatchLineStyle] = useState("");
+  const [segmentBatchInternalPartReference, setSegmentBatchInternalPartReference] = useState("");
+  const [segmentBatchDirtyFields, setSegmentBatchDirtyFields] = useState<ReadonlySet<SegmentBatchEditableField>>(new Set());
+  const [segmentBatchMixedFields, setSegmentBatchMixedFields] = useState<ReadonlySet<SegmentBatchEditableField>>(new Set());
+  const [segmentBatchEditError, setSegmentBatchEditError] = useState<string | null>(null);
+  const selectedBatchSegmentIds = useMemo(
+    () => (activeBatchScope === "segment" ? new Set<SegmentId>([...batchSelectionIds] as SegmentId[]) : new Set<SegmentId>()),
+    [activeBatchScope, batchSelectionIds]
+  );
+  const latestSegmentsRef = useRef(entities.segments);
+  const latestSelectedBatchSegmentIdsRef = useRef(selectedBatchSegmentIds);
+  latestSegmentsRef.current = entities.segments;
+  latestSelectedBatchSegmentIdsRef.current = selectedBatchSegmentIds;
+  const selectedSegmentBatchSourceSignature = useMemo(
+    () => buildSelectedSegmentBatchSourceSignature(entities.segments, selectedBatchSegmentIds),
+    [entities.segments, selectedBatchSegmentIds]
+  );
   const appStateSnapshot = store.getState();
   const multiNetworkFunctionalAnalysis = useMemo(
     () =>
@@ -252,6 +317,13 @@ export function useAppControllerModelingAnalysisScreenDomains({
   const exitBatchMode = useCallback(() => {
     setActiveBatchScope(null);
     setBatchSelectionIds(new Set());
+    setSegmentBatchSheathType("");
+    setSegmentBatchInsulation("");
+    setSegmentBatchLineStyle("");
+    setSegmentBatchInternalPartReference("");
+    setSegmentBatchDirtyFields(new Set());
+    setSegmentBatchMixedFields(new Set());
+    setSegmentBatchEditError(null);
   }, []);
 
   const enterBatchMode = useCallback(
@@ -291,6 +363,36 @@ export function useAppControllerModelingAnalysisScreenDomains({
     });
   }, [activeBatchScope, entities.connectors, entities.nodes, entities.segments, entities.splices, entities.wires]);
 
+  useEffect(() => {
+    if (activeBatchScope !== "segment") {
+      return;
+    }
+
+    const currentSegments = latestSegmentsRef.current;
+    const currentSelectedBatchSegmentIds = latestSelectedBatchSegmentIdsRef.current;
+    const sheathTypeState = resolveSharedSegmentBatchFieldValue(currentSegments, currentSelectedBatchSegmentIds, "sheathType");
+    const insulationState = resolveSharedSegmentBatchFieldValue(currentSegments, currentSelectedBatchSegmentIds, "insulation");
+    const lineStyleState = resolveSharedSegmentBatchFieldValue(currentSegments, currentSelectedBatchSegmentIds, "lineStyle");
+    const internalPartReferenceState = resolveSharedSegmentBatchFieldValue(currentSegments, currentSelectedBatchSegmentIds, "internalPartReference");
+
+    setSegmentBatchSheathType(sheathTypeState.value);
+    setSegmentBatchInsulation(insulationState.value);
+    setSegmentBatchLineStyle(lineStyleState.value);
+    setSegmentBatchInternalPartReference(internalPartReferenceState.value);
+    setSegmentBatchDirtyFields(new Set());
+    setSegmentBatchMixedFields(
+      new Set<SegmentBatchEditableField>(
+        [
+          sheathTypeState.isMixed ? "sheathType" : null,
+          insulationState.isMixed ? "insulation" : null,
+          lineStyleState.isMixed ? "lineStyle" : null,
+          internalPartReferenceState.isMixed ? "internalPartReference" : null
+        ].filter((field): field is SegmentBatchEditableField => field !== null)
+      )
+    );
+    setSegmentBatchEditError(null);
+  }, [activeBatchScope, selectedSegmentBatchSourceSignature]);
+
   const toggleBatchSelection = useCallback((scope: ModelingBatchSelectionScope, id: string) => {
     setBatchSelectionIds((current) => {
       if (activeBatchScope !== scope) {
@@ -323,6 +425,55 @@ export function useAppControllerModelingAnalysisScreenDomains({
       return next;
     });
   }, [activeBatchScope]);
+
+  const markSegmentBatchFieldDirty = useCallback((field: SegmentBatchEditableField) => {
+    setSegmentBatchDirtyFields((current) => {
+      if (current.has(field)) {
+        return current;
+      }
+      return new Set([...current, field]);
+    });
+    setSegmentBatchEditError(null);
+  }, []);
+
+  const handleApplySegmentBatchEdit = useCallback(() => {
+    if (activeBatchScope !== "segment") {
+      return;
+    }
+    if (batchSelectionIds.size === 0) {
+      setSegmentBatchEditError("Select at least one segment.");
+      return;
+    }
+    if (segmentBatchDirtyFields.size === 0) {
+      setSegmentBatchEditError("Edit at least one field before applying.");
+      return;
+    }
+
+    const changes: Partial<Pick<ModelingSliceParams["segments"][number], SegmentBatchEditableField>> = {};
+    if (segmentBatchDirtyFields.has("sheathType")) {
+      changes.sheathType = segmentBatchSheathType;
+    }
+    if (segmentBatchDirtyFields.has("insulation")) {
+      changes.insulation = segmentBatchInsulation;
+    }
+    if (segmentBatchDirtyFields.has("lineStyle")) {
+      changes.lineStyle = segmentBatchLineStyle;
+    }
+    if (segmentBatchDirtyFields.has("internalPartReference")) {
+      changes.internalPartReference = segmentBatchInternalPartReference;
+    }
+
+    dispatchAction(appActions.updateSegmentsBatch([...batchSelectionIds] as never, changes));
+  }, [
+    activeBatchScope,
+    batchSelectionIds,
+    dispatchAction,
+    segmentBatchDirtyFields,
+    segmentBatchInsulation,
+    segmentBatchInternalPartReference,
+    segmentBatchLineStyle,
+    segmentBatchSheathType
+  ]);
 
   const batchDeleteAnalysisState = useMemo(
     () => {
@@ -823,7 +974,36 @@ export function useAppControllerModelingAnalysisScreenDomains({
             summaryCategories: batchDeletePreflight.summaryCategories,
             summaryNote: batchDeletePreflight.summaryNote,
             onDeleteSelected: handleDeleteSelectedInBatchMode,
-            onCancelBatchMode: exitBatchMode
+            onCancelBatchMode: exitBatchMode,
+            segmentBatchEdit:
+              activeBatchScope !== "segment"
+                ? undefined
+                : {
+                    sheathType: segmentBatchSheathType,
+                    insulation: segmentBatchInsulation,
+                    lineStyle: segmentBatchLineStyle,
+                    internalPartReference: segmentBatchInternalPartReference,
+                    dirtyFields: segmentBatchDirtyFields,
+                    mixedFields: segmentBatchMixedFields,
+                    error: segmentBatchEditError,
+                    setSheathType: (value) => {
+                      markSegmentBatchFieldDirty("sheathType");
+                      setSegmentBatchSheathType(value);
+                    },
+                    setInsulation: (value) => {
+                      markSegmentBatchFieldDirty("insulation");
+                      setSegmentBatchInsulation(value);
+                    },
+                    setLineStyle: (value) => {
+                      markSegmentBatchFieldDirty("lineStyle");
+                      setSegmentBatchLineStyle(value);
+                    },
+                    setInternalPartReference: (value) => {
+                      markSegmentBatchFieldDirty("internalPartReference");
+                      setSegmentBatchInternalPartReference(value);
+                    },
+                    onApply: handleApplySegmentBatchEdit
+                  }
           }
       })
     : null;
@@ -973,6 +1153,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
     modelingLeftColumnContent: modelingSlice?.modelingLeftColumnContent ?? null,
     modelingFormsColumnContent: modelingSlice?.modelingFormsColumnContent ?? null,
     analysisWorkspaceContent: analysisSlice?.analysisWorkspaceContent ?? null,
-    isModelingBatchModeActive: activeBatchScope !== null
+    isModelingBatchModeActive: activeBatchScope !== null,
+    selectedBatchSegmentIds
   };
 }

@@ -440,7 +440,7 @@ describe("App integration UI - network summary SVG export", () => {
       const exportedSvg = await readBlobAsText(capturedSvgBlob);
       expect(exportedSvg).toContain('class="network-segment-callout-frame"');
       expect(exportedSvg).toContain("Route:");
-      expect(exportedSvg).toContain("Sheath");
+      expect(exportedSvg).toContain("Layer");
       expect(exportedSvg).toContain("CT5");
       expect(exportedSvg).toContain("Insulation");
       expect(exportedSvg).toContain("XLPE");

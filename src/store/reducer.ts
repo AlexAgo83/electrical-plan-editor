@@ -112,6 +112,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     }
 
     case "segment/upsert":
+    case "segment/updateBatch":
     case "segment/rename":
     case "segment/remove": {
       return runScopedDomainReducer(state, action, handleSegmentActions);

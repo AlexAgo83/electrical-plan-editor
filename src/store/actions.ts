@@ -126,6 +126,13 @@ export type AppAction =
   | { type: "node/rename"; payload: { fromId: NodeId; toId: NodeId } }
   | { type: "node/remove"; payload: { id: NodeId } }
   | { type: "segment/upsert"; payload: Segment }
+  | {
+      type: "segment/updateBatch";
+      payload: {
+        ids: SegmentId[];
+        changes: Partial<Pick<Segment, "sheathType" | "insulation" | "lineStyle" | "internalPartReference">>;
+      };
+    }
   | { type: "segment/rename"; payload: { fromId: SegmentId; toId: SegmentId } }
   | { type: "segment/remove"; payload: { id: SegmentId } }
   | { type: "mountingLabel/upsert"; payload: { segmentId: SegmentId; label: MountingLabel } }
@@ -305,6 +312,13 @@ export const appActions = {
   removeNode: (id: NodeId): AppAction => ({ type: "node/remove", payload: { id } }),
 
   upsertSegment: (payload: Segment): AppAction => ({ type: "segment/upsert", payload }),
+  updateSegmentsBatch: (
+    ids: SegmentId[],
+    changes: Partial<Pick<Segment, "sheathType" | "insulation" | "lineStyle" | "internalPartReference">>
+  ): AppAction => ({
+    type: "segment/updateBatch",
+    payload: { ids, changes }
+  }),
   renameSegment: (fromId: SegmentId, toId: SegmentId): AppAction => ({ type: "segment/rename", payload: { fromId, toId } }),
   removeSegment: (id: SegmentId): AppAction => ({ type: "segment/remove", payload: { id } }),
   upsertMountingLabel: (segmentId: SegmentId, label: MountingLabel): AppAction => ({

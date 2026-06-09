@@ -297,6 +297,12 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
         getLabel: getSegmentLabel,
         nextState
       });
+    case "segment/updateBatch":
+      return {
+        title: "Segments updated",
+        message: `${action.payload.ids.length} segment${action.payload.ids.length === 1 ? "" : "s"}`,
+        variant: "success"
+      };
     case "segment/rename":
       return {
         title: "Segment updated",

@@ -330,6 +330,32 @@ describe("App integration UI - delete confirmations", () => {
     expect(store.getState().connectors.byId[asConnectorId("C-CASCADE")]).toBeDefined();
   });
 
+  it("allows multi-editing segment layer parameters while segment batch selection is active", async () => {
+    const { store } = openModelingDeleteScenario();
+
+    switchSubScreenDrawerAware("segment");
+    const segmentsPanel = getPanelByHeading("Segments");
+    fireEvent.click(within(segmentsPanel).getByRole("button", { name: "Select multiple" }));
+    fireEvent.click(within(segmentsPanel).getByText("SEG-A"));
+    fireEvent.click(within(segmentsPanel).getByText("SEG-B"));
+
+    const batchPanel = screen.getByTestId("modeling-batch-context-panel");
+    const layerInput = within(batchPanel).getByLabelText("Layer (optional)");
+    fireEvent.change(layerInput, { target: { value: "C" } });
+    expect(layerInput).toHaveValue("C");
+    fireEvent.change(layerInput, { target: { value: "CT5" } });
+    expect(layerInput).toHaveValue("CT5");
+    fireEvent.change(within(batchPanel).getByLabelText("Insulation (optional)"), { target: { value: "XLPE" } });
+    fireEvent.click(within(batchPanel).getByRole("button", { name: "Apply to selected (2)" }));
+
+    await waitFor(() => {
+      expect(store.getState().segments.byId[asSegmentId("SEG-A")]?.sheathType).toBe("CT5");
+      expect(store.getState().segments.byId[asSegmentId("SEG-B")]?.sheathType).toBe("CT5");
+      expect(store.getState().segments.byId[asSegmentId("SEG-A")]?.insulation).toBe("XLPE");
+      expect(store.getState().segments.byId[asSegmentId("SEG-B")]?.insulation).toBe("XLPE");
+    });
+  });
+
   it("deletes multiple wires as one undoable batch operation", async () => {
     const { store } = openModelingDeleteScenario();
 

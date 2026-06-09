@@ -201,6 +201,68 @@ export function useAppControllerWorkspaceContentAssembly({
     handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange
   });
 
+  const {
+    modelingLeftColumnContent,
+    modelingFormsColumnContent,
+    analysisWorkspaceContent,
+    isModelingBatchModeActive,
+    selectedBatchSegmentIds
+  } =
+    useAppControllerModelingAnalysisDomainAssembly({
+      components: {
+        ModelingPrimaryTablesComponent: components.ModelingPrimaryTablesComponent,
+        ModelingSecondaryTablesComponent: components.ModelingSecondaryTablesComponent,
+        ModelingFormsColumnComponent: components.ModelingFormsColumnComponent,
+        AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent
+      },
+      screenFlags: {
+        isConnectorSubScreen: state.isConnectorSubScreen,
+        isSpliceSubScreen: state.isSpliceSubScreen,
+        isNodeSubScreen: state.isNodeSubScreen,
+        isSegmentSubScreen: state.isSegmentSubScreen,
+        isWireSubScreen: state.isWireSubScreen
+      },
+      entities: {
+        catalogItems: entities.catalogItems,
+        connectors: entities.connectors,
+        splices: entities.splices,
+        nodes: entities.nodes,
+        segments: entities.segments,
+        wires: entities.wires
+      },
+      tabularExportFormat: models.preferencesState.tabularExportFormat,
+      hideWireAnalysisRoutePanel: models.preferencesState.hideWireAnalysisRoutePanel,
+      formsState: models.formsState,
+      modelingHandlers: models.modelingHandlers,
+      catalogHandlers: models.catalogHandlers,
+      listModel: models.entityListModel,
+      selection: models.selectionEntities,
+      layoutDerived: {
+        selectedWireRouteSegmentIds: entities.selectedWireRouteSegmentIds
+      },
+      pendingNewNodePosition: handlers.pendingNewNodePosition,
+      wireDescriptions: {
+        describeWireEndpoint: handlers.describeWireEndpoint,
+        describeWireEndpointId: handlers.describeWireEndpointId,
+        describeWireEndpointCsvParts: handlers.describeWireEndpointCsvParts
+      },
+      describeNode: handlers.describeNode,
+      nodeLabelById: handlers.nodeLabelById,
+      connectorTechnicalIdAlreadyUsed: handlers.connectorTechnicalIdAlreadyUsed,
+      spliceTechnicalIdAlreadyUsed: handlers.spliceTechnicalIdAlreadyUsed,
+      wireTechnicalIdAlreadyUsed: handlers.wireTechnicalIdAlreadyUsed,
+      includeModelingContent: state.hasActiveNetwork && state.isModelingScreen,
+      includeAnalysisContent: state.hasActiveNetwork && (state.isAnalysisScreen || state.isModelingScreen),
+      store: handlers.store,
+      dispatchAction: handlers.dispatchAction,
+      requestConfirmation: handlers.requestConfirmation,
+      replaceStateWithHistory: handlers.replaceStateWithHistory,
+      setActiveSubScreen: handlers.setActiveSubScreen,
+      handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange,
+      openSingleStepOnboarding: handlers.openSingleStepOnboarding,
+      markSelectionPanelsFromTable: handlers.markDetailPanelsSelectionSourceAsTable
+    });
+
   const { networkSummaryPanel, networkFunctionalSchematicPanel, headerHarnessAssemblyFunctionalScopeNavigation, selectedHarnessAssemblyId } = useAppControllerNetworkSummaryPanelDomain({
     NetworkSummaryPanelComponent: components.NetworkSummaryPanelComponent,
     networkSummaryPanelRef: domains.workspaceNetworkDomain.networkSummaryPanelRef,
@@ -229,6 +291,7 @@ export function useAppControllerWorkspaceContentAssembly({
     totalEdgeEntries: entities.totalEdgeEntries,
     networkNodePositions: entities.networkNodePositions,
     selectedWireRouteSegmentIds: entities.selectedWireRouteSegmentIds,
+    selectedBatchSegmentIds,
     splicePlacementPreview: entities.splicePlacementPreview,
     canvasState: {
       isPanningNetwork: models.canvasState.isPanningNetwork,
@@ -320,62 +383,6 @@ export function useAppControllerWorkspaceContentAssembly({
     dispatchAction: handlers.dispatchAction,
     store: handlers.store
   });
-
-  const { modelingLeftColumnContent, modelingFormsColumnContent, analysisWorkspaceContent, isModelingBatchModeActive } =
-    useAppControllerModelingAnalysisDomainAssembly({
-      components: {
-        ModelingPrimaryTablesComponent: components.ModelingPrimaryTablesComponent,
-        ModelingSecondaryTablesComponent: components.ModelingSecondaryTablesComponent,
-        ModelingFormsColumnComponent: components.ModelingFormsColumnComponent,
-        AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent
-      },
-      screenFlags: {
-        isConnectorSubScreen: state.isConnectorSubScreen,
-        isSpliceSubScreen: state.isSpliceSubScreen,
-        isNodeSubScreen: state.isNodeSubScreen,
-        isSegmentSubScreen: state.isSegmentSubScreen,
-        isWireSubScreen: state.isWireSubScreen
-      },
-      entities: {
-        catalogItems: entities.catalogItems,
-        connectors: entities.connectors,
-        splices: entities.splices,
-        nodes: entities.nodes,
-        segments: entities.segments,
-        wires: entities.wires
-      },
-      tabularExportFormat: models.preferencesState.tabularExportFormat,
-      hideWireAnalysisRoutePanel: models.preferencesState.hideWireAnalysisRoutePanel,
-      formsState: models.formsState,
-      modelingHandlers: models.modelingHandlers,
-      catalogHandlers: models.catalogHandlers,
-      listModel: models.entityListModel,
-      selection: models.selectionEntities,
-      layoutDerived: {
-        selectedWireRouteSegmentIds: entities.selectedWireRouteSegmentIds
-      },
-      pendingNewNodePosition: handlers.pendingNewNodePosition,
-      wireDescriptions: {
-        describeWireEndpoint: handlers.describeWireEndpoint,
-        describeWireEndpointId: handlers.describeWireEndpointId,
-        describeWireEndpointCsvParts: handlers.describeWireEndpointCsvParts
-      },
-      describeNode: handlers.describeNode,
-      nodeLabelById: handlers.nodeLabelById,
-      connectorTechnicalIdAlreadyUsed: handlers.connectorTechnicalIdAlreadyUsed,
-      spliceTechnicalIdAlreadyUsed: handlers.spliceTechnicalIdAlreadyUsed,
-      wireTechnicalIdAlreadyUsed: handlers.wireTechnicalIdAlreadyUsed,
-      includeModelingContent: state.hasActiveNetwork && state.isModelingScreen,
-      includeAnalysisContent: state.hasActiveNetwork && (state.isAnalysisScreen || state.isModelingScreen),
-      store: handlers.store,
-      dispatchAction: handlers.dispatchAction,
-      requestConfirmation: handlers.requestConfirmation,
-      replaceStateWithHistory: handlers.replaceStateWithHistory,
-      setActiveSubScreen: handlers.setActiveSubScreen,
-      handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange,
-      openSingleStepOnboarding: handlers.openSingleStepOnboarding,
-      markSelectionPanelsFromTable: handlers.markDetailPanelsSelectionSourceAsTable
-    });
 
   const {
     modelingLeftColumnContentForSubScreen,

@@ -8,6 +8,21 @@ import type { WireEndpointSlotHint } from "../../hooks/wireEndpointFormHelpers";
 import type { ConnectorFusePairOverrideDrafts, ConnectorFusePairRatingDrafts } from "../../hooks/connectorFusePairRatings";
 import type { ConnectorPinElectricalRoleDrafts } from "../../hooks/connectorPinElectricalRoles";
 
+export interface ModelingSegmentBatchEditState {
+  sheathType: string;
+  insulation: string;
+  lineStyle: string;
+  internalPartReference: string;
+  dirtyFields: ReadonlySet<"sheathType" | "insulation" | "lineStyle" | "internalPartReference">;
+  mixedFields: ReadonlySet<"sheathType" | "insulation" | "lineStyle" | "internalPartReference">;
+  error: string | null;
+  setSheathType: (value: string) => void;
+  setInsulation: (value: string) => void;
+  setLineStyle: (value: string) => void;
+  setInternalPartReference: (value: string) => void;
+  onApply: () => void;
+}
+
 export interface ModelingFormsColumnProps {
   catalogItems: CatalogItem[];
   openCatalogSubScreen: () => void;
@@ -225,6 +240,7 @@ export interface ModelingFormsColumnProps {
         summaryNote?: string;
         onDeleteSelected: () => void;
         onCancelBatchMode: () => void;
+        segmentBatchEdit?: ModelingSegmentBatchEditState;
       }
     | null;
 }

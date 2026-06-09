@@ -22,6 +22,7 @@ export function ModelingFormsColumn(props: ModelingFormsColumnProps): ReactEleme
         summaryNote={props.modelingBatchSelection.summaryNote}
         onDeleteSelected={props.modelingBatchSelection.onDeleteSelected}
         onCancelBatchMode={props.modelingBatchSelection.onCancelBatchMode}
+        segmentBatchEdit={props.modelingBatchSelection.segmentBatchEdit}
       />
     );
   }

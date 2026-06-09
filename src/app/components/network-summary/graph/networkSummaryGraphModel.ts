@@ -77,6 +77,7 @@ interface BuildRenderedSegmentsParams {
   activeSubNetworkTagSet: ReadonlySet<string>;
   selectedWireRouteSegmentIds: ReadonlySet<SegmentId>;
   selectedSegmentId: SegmentId | null;
+  selectedBatchSegmentIds?: ReadonlySet<SegmentId>;
   connectorMap: ReadonlyMap<ConnectorId, Connector>;
   catalogItems: CatalogItem[];
   connectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
@@ -109,7 +110,7 @@ const CONNECTOR_NODE_WIDTH = 46;
 const CONNECTOR_NODE_HEIGHT = 30;
 const SPLICE_DIAMOND_SIZE = 30;
 const INTERMEDIATE_NODE_RADIUS = 17;
-const SEGMENT_SHEATH_CALLOUT_HEADERS = ["Sheath", "Insulation", "Line Style", "Int Part", "Quantity"] as const;
+const SEGMENT_SHEATH_CALLOUT_HEADERS = ["Layer", "Insulation", "Line Style", "Int Part", "Quantity"] as const;
 const SEGMENT_SHEATH_CALLOUT_WIDTH = 192;
 const SEGMENT_SHEATH_CALLOUT_HEIGHT = 28;
 const SEGMENT_SHEATH_CALLOUT_OFFSET = 26;
@@ -286,44 +287,12 @@ function resolveCalloutBoundaryNodeIds(
   return [uniqueBoundaryNodeIds[0]!, uniqueBoundaryNodeIds[uniqueBoundaryNodeIds.length - 1]!];
 }
 
-function projectPointOntoSegment(
-  point: NodePosition,
-  start: NodePosition,
-  end: NodePosition
-): { point: NodePosition; distanceSquared: number } {
-  const vectorX = end.x - start.x;
-  const vectorY = end.y - start.y;
-  const lengthSquared = vectorX * vectorX + vectorY * vectorY;
-  if (lengthSquared <= 0.0001) {
-    const deltaX = point.x - start.x;
-    const deltaY = point.y - start.y;
-    return {
-      point: start,
-      distanceSquared: deltaX * deltaX + deltaY * deltaY
-    };
-  }
-
-  const projection =
-    ((point.x - start.x) * vectorX + (point.y - start.y) * vectorY) / lengthSquared;
-  const clampedProjection = Math.min(1, Math.max(0, projection));
-  const projectedPoint = {
-    x: start.x + vectorX * clampedProjection,
-    y: start.y + vectorY * clampedProjection
-  };
-  const deltaX = point.x - projectedPoint.x;
-  const deltaY = point.y - projectedPoint.y;
-  return {
-    point: projectedPoint,
-    distanceSquared: deltaX * deltaX + deltaY * deltaY
-  };
-}
-
 function resolveSegmentCalloutTarget(
   componentSegments: Segment[],
   networkNodePositions: Record<NodeId, NodePosition>,
   anchorPosition: NodePosition
 ): NodePosition | null {
-  let closestProjection: { point: NodePosition; distanceSquared: number } | null = null;
+  let closestSegmentMidpoint: { point: NodePosition; distanceSquared: number } | null = null;
 
   for (const componentSegment of componentSegments) {
     const start = networkNodePositions[componentSegment.nodeA];
@@ -331,13 +300,23 @@ function resolveSegmentCalloutTarget(
     if (start === undefined || end === undefined) {
       continue;
     }
-    const projection = projectPointOntoSegment(anchorPosition, start, end);
-    if (closestProjection === null || projection.distanceSquared < closestProjection.distanceSquared) {
-      closestProjection = projection;
+
+    const midpoint = {
+      x: (start.x + end.x) / 2,
+      y: (start.y + end.y) / 2
+    };
+    const deltaX = anchorPosition.x - midpoint.x;
+    const deltaY = anchorPosition.y - midpoint.y;
+    const distanceSquared = deltaX * deltaX + deltaY * deltaY;
+    if (closestSegmentMidpoint === null || distanceSquared < closestSegmentMidpoint.distanceSquared) {
+      closestSegmentMidpoint = {
+        point: midpoint,
+        distanceSquared
+      };
     }
   }
 
-  return closestProjection?.point ?? null;
+  return closestSegmentMidpoint?.point ?? null;
 }
 
 export function buildRenderedSegments({
@@ -349,6 +328,7 @@ export function buildRenderedSegments({
   activeSubNetworkTagSet,
   selectedWireRouteSegmentIds,
   selectedSegmentId,
+  selectedBatchSegmentIds = new Set<SegmentId>(),
   connectorMap,
   catalogItems,
   connectorDrawingDisplayMode,
@@ -584,7 +564,7 @@ export function buildRenderedSegments({
     const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
     const isSubNetworkDeemphasized = isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentSubNetworkTag);
     const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
-    const isSelectedSegment = selectedSegmentId === segment.id;
+    const isSelectedSegment = selectedSegmentId === segment.id || selectedBatchSegmentIds.has(segment.id);
     const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
       isSelectedSegment ? " is-selected" : ""
     }`;

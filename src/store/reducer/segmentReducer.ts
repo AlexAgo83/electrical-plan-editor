@@ -106,6 +106,58 @@ export function handleSegmentActions(state: AppState, action: AppAction): AppSta
       });
     }
 
+    case "segment/updateBatch": {
+      if (action.payload.ids.length === 0) {
+        return clearLastError(state);
+      }
+
+      let nextSegments = state.segments;
+      let changed = false;
+      for (const segmentId of new Set(action.payload.ids)) {
+        const segment = nextSegments.byId[segmentId];
+        if (segment === undefined) {
+          continue;
+        }
+
+        const nextSegment = {
+          ...segment,
+          ...(Object.prototype.hasOwnProperty.call(action.payload.changes, "sheathType")
+            ? { sheathType: normalizeOptionalSegmentText(action.payload.changes.sheathType) }
+            : {}),
+          ...(Object.prototype.hasOwnProperty.call(action.payload.changes, "insulation")
+            ? { insulation: normalizeOptionalSegmentText(action.payload.changes.insulation) }
+            : {}),
+          ...(Object.prototype.hasOwnProperty.call(action.payload.changes, "lineStyle")
+            ? { lineStyle: normalizeOptionalSegmentText(action.payload.changes.lineStyle) }
+            : {}),
+          ...(Object.prototype.hasOwnProperty.call(action.payload.changes, "internalPartReference")
+            ? { internalPartReference: normalizeOptionalSegmentText(action.payload.changes.internalPartReference) }
+            : {})
+        };
+
+        if (
+          nextSegment.sheathType === segment.sheathType &&
+          nextSegment.insulation === segment.insulation &&
+          nextSegment.lineStyle === segment.lineStyle &&
+          nextSegment.internalPartReference === segment.internalPartReference
+        ) {
+          continue;
+        }
+
+        nextSegments = upsertEntity(nextSegments, nextSegment);
+        changed = true;
+      }
+
+      if (!changed) {
+        return clearLastError(state);
+      }
+
+      return bumpRevision({
+        ...clearLastError(state),
+        segments: nextSegments
+      });
+    }
+
     case "segment/rename": {
       const rawFromId = action.payload.fromId;
       const rawToId = action.payload.toId;

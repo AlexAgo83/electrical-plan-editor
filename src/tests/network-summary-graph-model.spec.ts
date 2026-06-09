@@ -31,7 +31,8 @@ const emptySegmentRenderContext = {
   connectorDrawingScale: 1,
   useConsistentConnectorLayoutScale: true,
   zoomInvariantNodeShapes: false,
-  inverseLabelScale: 1
+  inverseLabelScale: 1,
+  selectedBatchSegmentIds: new Set<SegmentId>()
 };
 
 describe("buildRenderedSegments", () => {
@@ -78,6 +79,36 @@ describe("buildRenderedSegments", () => {
     expect(Math.abs(renderedHorizontal?.segmentLengthLabelY ?? 0)).toBeGreaterThan(
       Math.abs(renderedDiagonal?.segmentLengthLabelY ?? 0)
     );
+  });
+
+  it("marks batch-selected segments as selected in the rendered graph model", () => {
+    const segment: Segment = {
+      id: asSegmentId("SEG-BATCH"),
+      nodeA: asNodeId("N-A"),
+      nodeB: asNodeId("N-B"),
+      lengthMm: 50
+    };
+
+    const rendered = buildRenderedSegments({
+      segments: [segment],
+      networkNodePositions: {
+        [asNodeId("N-A")]: { x: 0, y: 0 },
+        [asNodeId("N-B")]: { x: 100, y: 0 }
+      },
+      segmentSubNetworkTagById: new Map(),
+      isSubNetworkFilteringActive: false,
+      activeSubNetworkTagSet: new Set(),
+      selectedWireRouteSegmentIds: new Set(),
+      selectedSegmentId: null,
+      ...emptySegmentRenderContext,
+      selectedBatchSegmentIds: new Set([segment.id]),
+      autoSegmentLabelRotation: true,
+      labelRotationDegrees: 0,
+      showSegmentNames: false,
+      showSegmentLengths: true
+    });
+
+    expect(rendered[0]?.segmentClassName).toContain("is-selected");
   });
 
   it("centers labels in the visible gap between node shapes", () => {
@@ -378,7 +409,7 @@ describe("buildRenderedSegments", () => {
     expect(rendered[1]?.segmentCallout).toBeNull();
   });
 
-  it("anchors merged sheath callout leaders to the closest point on the grouped route", () => {
+  it("anchors merged sheath callout leaders to the midpoint of the closest grouped segment", () => {
     const spliceId = asSpliceId("SP-1");
     const segments: Segment[] = [
       {
@@ -432,7 +463,7 @@ describe("buildRenderedSegments", () => {
       }
     });
 
-    expect(rendered[0]?.segmentCallout?.targetX).toBe(10);
+    expect(rendered[0]?.segmentCallout?.targetX).toBe(20);
     expect(rendered[0]?.segmentCallout?.targetY).toBe(0);
   });
 });

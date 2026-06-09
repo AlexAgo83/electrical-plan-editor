@@ -108,6 +108,7 @@ export interface NetworkSummaryPanelProps {
   networkNodePositions: Record<NodeId, NodePosition>;
   selectedWireRouteSegmentIds: Set<SegmentId>;
   selectedSegmentId: SegmentId | null;
+  selectedBatchSegmentIds: ReadonlySet<SegmentId>;
   selectedWireId: Wire["id"] | null;
   handleNetworkSegmentClick: (segmentId: SegmentId) => void;
   selectedCanvasNodeIds: ReadonlySet<NodeId>;
