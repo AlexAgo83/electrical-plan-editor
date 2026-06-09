@@ -48,8 +48,8 @@ export interface MultiNetworkFunctionalAnalysisNetworkOption {
 }
 
 export interface MultiNetworkFunctionalAnalysisSchematic {
-  nodes: Array<{ id: string; label: string; detail: string; kind: string }>;
-  edges: Array<{ id: string; fromNodeId: string; toNodeId: string; label: string }>;
+  nodeCount: number;
+  edgeCount: number;
   warnings: string[];
 }
 
@@ -371,18 +371,8 @@ function buildAssemblySchematic(
     rootConnectorRefs: scopedAssembly.masterConnectorRefs
   });
   return {
-    nodes: graph.nodes.slice(0, 24).map((node) => ({
-      id: node.id,
-      label: node.label,
-      detail: node.detail,
-      kind: node.kind
-    })),
-    edges: graph.edges.slice(0, 32).map((edge) => ({
-      id: edge.id,
-      fromNodeId: edge.fromNodeId,
-      toNodeId: edge.toNodeId,
-      label: edge.label
-    })),
+    nodeCount: graph.nodes.length,
+    edgeCount: graph.edges.length,
     warnings: graph.warnings.map((warning) => warning.message)
   };
 }

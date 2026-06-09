@@ -42,11 +42,8 @@ const model: MultiNetworkFunctionalAnalysisModel = {
     loops: 1
   },
   schematic: {
-    nodes: [
-      { id: "n1", label: "Front", detail: "C-front pin 1", kind: "connector" },
-      { id: "n2", label: "Door", detail: "C-door pin 1", kind: "interconnector" }
-    ],
-    edges: [{ id: "e1", fromNodeId: "n1", toNodeId: "n2", label: "W-1" }],
+    nodeCount: 2,
+    edgeCount: 1,
     warnings: ["Trace warning"]
   }
 };
@@ -89,7 +86,7 @@ describe("MultiNetworkFunctionalAnalysisPanel", () => {
     expect(scopePanel).toHaveTextContent("Warnings 1");
     expect(scopePanel).toHaveTextContent("L1 1");
     expect(scopePanel).toHaveTextContent("Loops 1");
-    expect(within(scopePanel).getByLabelText("Multi-network union functional schematic")).toBeInTheDocument();
+    expect(scopePanel).toHaveTextContent("Union graph: 2 nodes, 1 edges.");
     expect(scopePanel).toHaveTextContent("Trace warning");
   });
 

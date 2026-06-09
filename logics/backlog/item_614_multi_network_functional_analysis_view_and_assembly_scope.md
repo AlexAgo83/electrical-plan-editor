@@ -1,10 +1,10 @@
 ## item_614_multi_network_functional_analysis_view_and_assembly_scope - Multi-network functional analysis view and assembly-scope aggregation
 
-> From version: 1.13.1
+> From version: 1.15.3
 > Schema version: 1.0
 > Status: Done
 > Understanding: 100%
-> Confidence: 92%
+> Confidence: 94%
 > Progress: 100%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
@@ -98,7 +98,7 @@ flowchart LR
 
 # Delivery Status
 - Done on 2026-06-09.
-- Delivered: assembly-scope aggregation core in `src/core/pinElectricalLoadAssembly.ts` for `InterHarnessConnectorLink` and shared master connector refs, inter-harness traversal, skipped-bridge diagnostics, L1 mismatch computation, loop warnings, read-only Analysis panel, current-network / active-assembly / custom subset scope picker, union functional schematic preview, assembly-grade D1-D4 findings computed from the selected union graph, active-network-switching `Go to`, and focused model/component/core coverage.
+- Delivered: assembly-scope aggregation core in `src/core/pinElectricalLoadAssembly.ts` for `InterHarnessConnectorLink` and shared master connector refs, inter-harness traversal, skipped-bridge diagnostics, L1 mismatch computation, loop warnings, read-only Analysis panel, current-network / active-assembly / custom subset scope picker, union graph summary, assembly-grade D1-D4 findings computed from the selected union graph, active-network-switching `Go to`, and focused model/component/core coverage. The dedicated Harness assembly functional schematic view remains the owner of full schematic rendering.
 - Validation: `rtk npm run -s lint`, `rtk npm run -s typecheck`, and `rtk npm run -s test -- src/tests/core.pin-electrical-load-assembly.spec.ts src/tests/app.lib.multi-network-functional-analysis.spec.ts src/tests/app.ui.multi-network-functional-analysis.spec.tsx --run` passed on 2026-06-09.
 
 # AI Context

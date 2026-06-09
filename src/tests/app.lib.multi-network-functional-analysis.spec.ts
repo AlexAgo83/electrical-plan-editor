@@ -271,7 +271,7 @@ describe("buildMultiNetworkFunctionalAnalysisModel", () => {
     expect(model.findings.some((finding) => finding.id === `assembly-d2-${netA.id}-${protectedWire.id}`)).toBe(true);
     expect(model.findings.some((finding) => finding.id === `assembly-d3-${netA.id}-${source.id}`)).toBe(true);
     expect(model.findings.some((finding) => finding.id.includes("d4-no-source"))).toBe(false);
-    expect(model.schematic?.nodes.length).toBeGreaterThan(0);
+    expect(model.schematic?.nodeCount).toBeGreaterThan(0);
   });
 
   it("limits custom scope to selected assembly networks", () => {
