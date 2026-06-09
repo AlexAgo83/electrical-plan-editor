@@ -1,11 +1,7 @@
 import { type ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import appPackageMetadata from "../../package.json";
 import type { CatalogItemId } from "../core/entities";
-import {
-  appActions,
-  hasSampleNetworkSignature,
-  isWorkspaceEmpty
-} from "../store";
+import { appActions } from "../store";
 import { appStore } from "./store";
 import { appUiModules, preloadNetworkSummaryWorkspaceUiModules } from "./components/appUiModules";
 import { AppShellLayout } from "./components/layout/AppShellLayout";
@@ -33,14 +29,13 @@ import { useAppControllerHeaderOffsetState } from "./hooks/controller/useAppCont
 import { useAppControllerCanvasStateSyncEffects } from "./hooks/controller/useAppControllerCanvasStateSyncEffects";
 import { useConfirmDialogController } from "./hooks/controller/useConfirmDialogController";
 import { useChoiceDialogController } from "./hooks/controller/useChoiceDialogController";
-import { useAppControllerHistoryDispatch } from "./hooks/controller/useAppControllerHistoryDispatch";
 import { useAppControllerBomPreviewNavigation } from "./hooks/controller/useAppControllerBomPreviewNavigation";
 import { useNetworkSummaryViewStateSync } from "./hooks/controller/useNetworkSummaryViewStateSync";
 import { useOnboardingController } from "./hooks/controller/useOnboardingController";
-import { useAppControllerPersistenceHealth } from "./hooks/controller/useAppControllerPersistenceHealth";
 import { useAppControllerWorkspaceContentAssembly } from "./hooks/controller/useAppControllerWorkspaceContentAssembly";
 import { useAppControllerUniquenessFlags } from "./hooks/controller/useAppControllerUniquenessFlags";
 import { useAppControllerRefs } from "./hooks/controller/useAppControllerRefs";
+import { useAppControllerWorkspaceRuntime } from "./hooks/controller/useAppControllerWorkspaceRuntime";
 import { scrollToAiAgentPanel } from "./lib/aiAgentPanelScroll";
 import {
   useAppControllerActionRefsSyncEffect,
@@ -60,9 +55,7 @@ import { useWorkspaceShellChrome } from "./hooks/useWorkspaceShellChrome";
 import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
 import { useAppLocaleDomTranslation } from "./hooks/useAppLocaleDomTranslation";
 import { useHoverDescriptionTitles } from "./hooks/useHoverDescriptionTitles";
-import { useToastNotifications } from "./hooks/useToastNotifications";
 import { useAiSettings } from "./hooks/useAiSettings";
-import { useWorkspaceFileStorage } from "./hooks/useWorkspaceFileStorage";
 import { useAppControllerUiPreferencesBindings } from "./hooks/controller/useAppControllerUiPreferencesBindings";
 import { buildAppControllerNamespacedCanvasState } from "./hooks/useAppControllerNamespacedCanvasState";
 import { buildAppControllerNamespacedFormsState } from "./hooks/useAppControllerNamespacedFormsState";
@@ -407,10 +400,12 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       preloadNetworkSummaryWorkspaceUiModules();
     }
   }, [hasActiveNetwork, isAnalysisScreen, isModelingScreen]);
-  const isCurrentWorkspaceEmpty = isWorkspaceEmpty(state);
-  const hasBuiltInSampleState = hasSampleNetworkSignature(state);
-  const { toasts, notifyToast, dismissToast } = useToastNotifications();
   const {
+    isCurrentWorkspaceEmpty,
+    hasBuiltInSampleState,
+    toasts,
+    notifyToast,
+    dismissToast,
     saveStatus,
     isUndoAvailable,
     isRedoAvailable,
@@ -418,30 +413,21 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     dispatchAction,
     handleUndo,
     handleRedo,
-    replaceStateWithHistory
-  } = useAppControllerHistoryDispatch({
+    replaceStateWithHistory,
+    lastError,
+    bootRecoveryMessage,
+    clearPersistenceHealth,
+    commitBootRecovery,
+    workspaceFileStorage
+  } = useAppControllerWorkspaceRuntime({
     store,
+    state,
     restoreViewportOnUndo,
     setPendingNewNodePosition,
     setActiveScreen,
     setActiveSubScreen,
     setInteractionMode,
-    notifyToast
-  });
-  const {
-    lastError,
-    bootRecoveryMessage,
-    clearPersistenceHealth,
-    commitBootRecovery
-  } = useAppControllerPersistenceHealth({
-    state,
-    dispatchAction
-  });
-  const workspaceFileStorage = useWorkspaceFileStorage({
-    store,
-    replaceStateWithHistory,
-    requestConfirmation,
-    notifyToast
+    requestConfirmation
   });
 
   const catalogHandlers = useCatalogHandlers({

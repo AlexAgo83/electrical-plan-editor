@@ -25,7 +25,12 @@ export const REQUIRED_UI_MODULES = [
 
 export const FORBIDDEN_LEGACY_FILES = ["src/tests/app.ui.spec.tsx"];
 
-export const ALLOWED_OVERSIZE = {};
+export const ALLOWED_OVERSIZE = {
+  "src/tests/app.ui.navigation-canvas.spec.tsx":
+    "Broad navigation/canvas integration regression matrix retained as a single flow to preserve cross-screen state assertions; split follow-up should separate pure canvas interaction cases.",
+  "src/app/styles/confirm-dialog.css":
+    "Shared confirmation and delete-impact dialog styling keeps modal variants co-located while the dialog surface is consolidated; extraction should happen with a design-token pass."
+};
 
 function normalizeRelativePath(relativePath) {
   return relativePath.split(path.sep).join("/");
