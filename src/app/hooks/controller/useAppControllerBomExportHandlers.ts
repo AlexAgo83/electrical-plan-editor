@@ -198,7 +198,9 @@ export function useAppControllerBomExportHandlers({
     setActiveBomPreview(null);
     setIsBomPreviewLoading(false);
     if (preview.format === "xlsx") {
-      void downloadTabularWorkbookFile(`bom-${bomExportBaseName}`, preview.workbookSheets);
+      void downloadTabularWorkbookFile(`bom-${bomExportBaseName}`, preview.workbookSheets).catch((error: unknown) => {
+        console.error("Failed to export BOM workbook", error);
+      });
       return;
     }
 

@@ -1494,7 +1494,9 @@ export function ModelingSecondaryTables({
             void downloadTabularWorkbookFile(
               wireExportPreview.filenameBase,
               wireExportPreview.sheets,
-            );
+            ).catch((error: unknown) => {
+              console.error("Failed to export modeling wires workbook", error);
+            });
             setWireExportPreview(null);
           }}
           onCancel={() => setWireExportPreview(null)}

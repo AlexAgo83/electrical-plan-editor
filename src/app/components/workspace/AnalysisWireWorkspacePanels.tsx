@@ -493,7 +493,9 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
       filenameLabel={`${wireExportPreview.filenameBase}.xlsx`}
       sheets={wireExportPreview.sheets}
       onConfirm={() => {
-        void downloadTabularWorkbookFile(wireExportPreview.filenameBase, wireExportPreview.sheets);
+        void downloadTabularWorkbookFile(wireExportPreview.filenameBase, wireExportPreview.sheets).catch((error: unknown) => {
+          console.error("Failed to export analysis wires workbook", error);
+        });
         setWireExportPreview(null);
       }}
       onCancel={() => setWireExportPreview(null)}
