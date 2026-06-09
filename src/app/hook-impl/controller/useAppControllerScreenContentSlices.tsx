@@ -715,6 +715,9 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
   const analysisWorkspaceContentProps = {
     showEntityTables: false,
     hideWireAnalysisRoutePanel: params.hideWireAnalysisRoutePanel,
+    multiNetworkFunctionalAnalysis: params.multiNetworkFunctionalAnalysis,
+    multiNetworkFunctionalAnalysisScope: params.multiNetworkFunctionalAnalysisScope,
+    setMultiNetworkFunctionalAnalysisScope: params.setMultiNetworkFunctionalAnalysisScope,
     isConnectorSubScreen: params.isConnectorSubScreen,
     isSpliceSubScreen: params.isSpliceSubScreen,
     isNodeSubScreen: params.isNodeSubScreen,

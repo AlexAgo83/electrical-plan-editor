@@ -4,12 +4,18 @@ import { AnalysisNodeSegmentWorkspacePanels } from "./AnalysisNodeSegmentWorkspa
 import { AnalysisSpliceWorkspacePanels } from "./AnalysisSpliceWorkspacePanels";
 import { AnalysisWireWorkspacePanels } from "./AnalysisWireWorkspacePanels";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
+import { MultiNetworkFunctionalAnalysisPanel } from "./MultiNetworkFunctionalAnalysisPanel";
 
 export type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 
 export function AnalysisWorkspaceContent(props: AnalysisWorkspaceContentProps): ReactElement {
   return (
     <section className="panel-grid analysis-panel-grid">
+      <MultiNetworkFunctionalAnalysisPanel
+        model={props.multiNetworkFunctionalAnalysis}
+        scope={props.multiNetworkFunctionalAnalysisScope}
+        setScope={props.setMultiNetworkFunctionalAnalysisScope}
+      />
       <AnalysisConnectorWorkspacePanels {...props} />
       <AnalysisSpliceWorkspacePanels {...props} />
       <AnalysisNodeSegmentWorkspacePanels {...props} />

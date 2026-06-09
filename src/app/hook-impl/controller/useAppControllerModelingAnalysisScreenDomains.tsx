@@ -14,6 +14,10 @@ import type { WireEndpointDescriptions } from "../../hooks/useWireEndpointDescri
 import type { AppControllerModelingHandlersOrchestrator } from "../../hooks/controller/useAppControllerModelingHandlersOrchestrator";
 import { parseConnectorTerminalOverridesDraft } from "../../lib/connectorTerminalOverridesDraft";
 import {
+  buildMultiNetworkFunctionalAnalysisModel,
+  type MultiNetworkFunctionalAnalysisScope
+} from "../../lib/multiNetworkFunctionalAnalysis";
+import {
   buildAnalysisScreenContentSlice,
   buildModelingScreenContentSlice
 } from "./useAppControllerScreenContentSlices";
@@ -202,8 +206,31 @@ export function useAppControllerModelingAnalysisScreenDomains({
 }: UseAppControllerModelingAnalysisScreenDomainsParams) {
   const [connectorAnalysisView, setConnectorAnalysisView] = useState<ConnectorAnalysisView>("ways");
   const [spliceAnalysisView, setSpliceAnalysisView] = useState<SpliceAnalysisView>("ports");
+  const [multiNetworkFunctionalAnalysisScope, setMultiNetworkFunctionalAnalysisScope] =
+    useState<MultiNetworkFunctionalAnalysisScope>("current");
   const [activeBatchScope, setActiveBatchScope] = useState<ModelingBatchSelectionScope | null>(null);
   const [batchSelectionIds, setBatchSelectionIds] = useState<ReadonlySet<string>>(new Set());
+  const appStateSnapshot = store.getState();
+  const multiNetworkFunctionalAnalysis = useMemo(
+    () =>
+      buildMultiNetworkFunctionalAnalysisModel({
+        activeNetworkId: appStateSnapshot.activeNetworkId,
+        networks: appStateSnapshot.networks.allIds
+          .map((networkId) => appStateSnapshot.networks.byId[networkId])
+          .filter((network): network is NonNullable<typeof network> => network !== undefined),
+        harnessAssemblies: appStateSnapshot.harnessAssemblies.allIds
+          .map((assemblyId) => appStateSnapshot.harnessAssemblies.byId[assemblyId])
+          .filter((assembly): assembly is NonNullable<typeof assembly> => assembly !== undefined),
+        networkStates: appStateSnapshot.networkStates,
+        currentNetworkState:
+          appStateSnapshot.activeNetworkId === null
+            ? null
+            : appStateSnapshot.networkStates[appStateSnapshot.activeNetworkId] ?? null,
+        catalogItems: entities.catalogItems,
+        scope: multiNetworkFunctionalAnalysisScope
+      }),
+    [appStateSnapshot, entities.catalogItems, multiNetworkFunctionalAnalysisScope]
+  );
   const activeSubScreenBatchScope = screenFlags.isConnectorSubScreen
     ? "connector"
     : screenFlags.isSpliceSubScreen
@@ -806,6 +833,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
       return buildAnalysisScreenContentSlice({
     AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent,
     hideWireAnalysisRoutePanel,
+    multiNetworkFunctionalAnalysis,
+    multiNetworkFunctionalAnalysisScope,
+    setMultiNetworkFunctionalAnalysisScope,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
     isNodeSubScreen: screenFlags.isNodeSubScreen,

@@ -21,6 +21,10 @@ import type {
   SpliceSynthesisRow,
   TabularExportFormat
 } from "../../types/app-controller";
+import type {
+  MultiNetworkFunctionalAnalysisModel,
+  MultiNetworkFunctionalAnalysisScope
+} from "../../lib/multiNetworkFunctionalAnalysis";
 
 interface OccupancyStatus {
   isOccupied: boolean;
@@ -41,6 +45,9 @@ export type SpliceAnalysisView = "ports" | "synthesis";
 export interface AnalysisWorkspaceContentProps {
   showEntityTables?: boolean;
   hideWireAnalysisRoutePanel?: boolean;
+  multiNetworkFunctionalAnalysis: MultiNetworkFunctionalAnalysisModel;
+  multiNetworkFunctionalAnalysisScope: MultiNetworkFunctionalAnalysisScope;
+  setMultiNetworkFunctionalAnalysisScope: (value: MultiNetworkFunctionalAnalysisScope) => void;
   isConnectorSubScreen: boolean;
   isSpliceSubScreen: boolean;
   isNodeSubScreen: boolean;
