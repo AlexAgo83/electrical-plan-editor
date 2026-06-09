@@ -212,6 +212,28 @@ function appendAssemblyDimensioningFindings(
   for (const [key, entry] of aggregation.load.fuseProtectedLoad) {
     appendAssemblyD2Finding(findings, key, entry, aggregation, networkById, catalogItemsById);
   }
+  for (const [prefixedConnectorId, balance] of aggregation.load.deviceBalance) {
+    const origin = aggregation.connectorOriginByPrefixedId.get(prefixedConnectorId);
+    if (origin === undefined || balance.supplyPins.length === 0 || balance.totalSourceA === 0 || balance.totalConsumerA === 0) {
+      continue;
+    }
+    if (balance.totalConsumerA >= balance.totalSourceA) {
+      continue;
+    }
+    findings.push({
+      id: `assembly-d3-${origin.networkId}-${origin.connector.id}`,
+      severity: "warning",
+      family: "D1-D4",
+      networkLabel: networkLabel(networkById.get(origin.networkId), origin.networkId),
+      message: `Assembly D3: supply pins on '${origin.connector.name}' declared at ${balance.totalConsumerA.toFixed(1)} A are under-rated vs. selected-union output sum of ${balance.totalSourceA.toFixed(1)} A.`,
+      target: {
+        networkId: origin.networkId,
+        subScreen: "connector",
+        selectionKind: "connector",
+        selectionId: origin.connector.id
+      }
+    });
+  }
 }
 
 function appendAssemblyD1Finding(
