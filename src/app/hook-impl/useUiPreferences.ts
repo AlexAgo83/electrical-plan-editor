@@ -160,6 +160,7 @@ interface UseUiPreferencesOptions {
   showFloatingInspectorPanel: boolean;
   showRoutePreviewPanel: boolean;
   hideWireAnalysisRoutePanel: boolean;
+  showMultiNetworkFunctionalAnalysisPanel: boolean;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
   workspaceWideScreen: boolean;
   preferencesHydrated: boolean;
@@ -237,6 +238,7 @@ interface UseUiPreferencesOptions {
   setShowFloatingInspectorPanel: (value: boolean) => void;
   setShowRoutePreviewPanel: (value: boolean) => void;
   setHideWireAnalysisRoutePanel: (value: boolean) => void;
+  setShowMultiNetworkFunctionalAnalysisPanel: (value: boolean) => void;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutPreference) => void;
   setWorkspaceWideScreen: (value: boolean) => void;
   setPreferencesHydrated: (value: boolean) => void;
@@ -398,6 +400,7 @@ export function useUiPreferences({
   showFloatingInspectorPanel,
   showRoutePreviewPanel,
   hideWireAnalysisRoutePanel,
+  showMultiNetworkFunctionalAnalysisPanel,
   workspacePanelsLayoutMode,
   workspaceWideScreen,
   preferencesHydrated,
@@ -475,6 +478,7 @@ export function useUiPreferences({
   setShowFloatingInspectorPanel,
   setShowRoutePreviewPanel,
   setHideWireAnalysisRoutePanel,
+  setShowMultiNetworkFunctionalAnalysisPanel,
   setWorkspacePanelsLayoutMode,
   setWorkspaceWideScreen,
   setPreferencesHydrated
@@ -644,6 +648,11 @@ export function useUiPreferences({
       setHideWireAnalysisRoutePanel(
         typeof preferences.hideWireAnalysisRoutePanel === "boolean" ? preferences.hideWireAnalysisRoutePanel : false
       );
+      setShowMultiNetworkFunctionalAnalysisPanel(
+        typeof preferences.showMultiNetworkFunctionalAnalysisPanel === "boolean"
+          ? preferences.showMultiNetworkFunctionalAnalysisPanel
+          : true
+      );
       setWorkspacePanelsLayoutMode(normalizeWorkspacePanelsLayoutMode(preferences.workspacePanelsLayoutMode));
       setWorkspaceWideScreen(typeof preferences.workspaceWideScreen === "boolean" ? preferences.workspaceWideScreen : false);
     }
@@ -700,6 +709,7 @@ export function useUiPreferences({
     setShowFloatingInspectorPanel,
     setShowRoutePreviewPanel,
     setHideWireAnalysisRoutePanel,
+    setShowMultiNetworkFunctionalAnalysisPanel,
     setShowShortcutHints,
     setShowSegmentLengths,
     setShowCableCallouts,
@@ -787,6 +797,7 @@ export function useUiPreferences({
       showFloatingInspectorPanel,
       showRoutePreviewPanel,
       hideWireAnalysisRoutePanel,
+      showMultiNetworkFunctionalAnalysisPanel,
       workspacePanelsLayoutMode,
       workspaceWideScreen
     };
@@ -829,6 +840,7 @@ export function useUiPreferences({
     showFloatingInspectorPanel,
     showRoutePreviewPanel,
     hideWireAnalysisRoutePanel,
+    showMultiNetworkFunctionalAnalysisPanel,
     showShortcutHints,
     tableDensity,
     tableFontSize,

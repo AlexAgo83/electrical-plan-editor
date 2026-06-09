@@ -134,6 +134,7 @@ export interface UseWorkspaceHandlersParams {
   setShowFloatingInspectorPanel: (value: boolean) => void;
   setShowRoutePreviewPanel: (value: boolean) => void;
   setHideWireAnalysisRoutePanel: (value: boolean) => void;
+  setShowMultiNetworkFunctionalAnalysisPanel: (value: boolean) => void;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutMode) => void;
   setWorkspaceWideScreen: (value: boolean) => void;
   confirmAction: (request: ConfirmDialogRequest) => Promise<boolean>;

@@ -715,6 +715,7 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
   const analysisWorkspaceContentProps = {
     showEntityTables: false,
     hideWireAnalysisRoutePanel: params.hideWireAnalysisRoutePanel,
+    showMultiNetworkFunctionalAnalysisPanel: params.showMultiNetworkFunctionalAnalysisPanel,
     multiNetworkFunctionalAnalysis: params.multiNetworkFunctionalAnalysis,
     multiNetworkFunctionalAnalysisScope: params.multiNetworkFunctionalAnalysisScope,
     setMultiNetworkFunctionalAnalysisScope: params.setMultiNetworkFunctionalAnalysisScope,
@@ -1004,6 +1005,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setShowRoutePreviewPanel: params.setShowRoutePreviewPanel,
     hideWireAnalysisRoutePanel: params.hideWireAnalysisRoutePanel,
     setHideWireAnalysisRoutePanel: params.setHideWireAnalysisRoutePanel,
+    showMultiNetworkFunctionalAnalysisPanel: params.showMultiNetworkFunctionalAnalysisPanel,
+    setShowMultiNetworkFunctionalAnalysisPanel: params.setShowMultiNetworkFunctionalAnalysisPanel,
     workspacePanelsLayoutMode: params.workspacePanelsLayoutMode,
     setWorkspacePanelsLayoutMode: params.setWorkspacePanelsLayoutMode,
     workspaceWideScreen: params.workspaceWideScreen,

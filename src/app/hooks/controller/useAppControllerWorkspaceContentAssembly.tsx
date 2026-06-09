@@ -346,6 +346,7 @@ export function useAppControllerWorkspaceContentAssembly({
       },
       tabularExportFormat: models.preferencesState.tabularExportFormat,
       hideWireAnalysisRoutePanel: models.preferencesState.hideWireAnalysisRoutePanel,
+      showMultiNetworkFunctionalAnalysisPanel: models.preferencesState.showMultiNetworkFunctionalAnalysisPanel,
       formsState: models.formsState,
       modelingHandlers: models.modelingHandlers,
       catalogHandlers: models.catalogHandlers,
@@ -489,7 +490,8 @@ export function useAppControllerWorkspaceContentAssembly({
     aiAgentWorkspaceContent,
     modelingLeftColumnContentForSubScreen,
     modelingFormsColumnContentForSubScreen,
-    analysisWorkspaceContentForSubScreen
+    analysisWorkspaceContentForSubScreen,
+    showMultiNetworkFunctionalAnalysisPanel: models.preferencesState.showMultiNetworkFunctionalAnalysisPanel
   });
 
   return {

@@ -121,6 +121,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setShowFloatingInspectorPanel"
     | "setShowRoutePreviewPanel"
     | "setHideWireAnalysisRoutePanel"
+    | "setShowMultiNetworkFunctionalAnalysisPanel"
     | "setWorkspacePanelsLayoutMode"
     | "setWorkspaceWideScreen"
   >;

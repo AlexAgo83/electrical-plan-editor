@@ -11,13 +11,15 @@ export type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.t
 export function AnalysisWorkspaceContent(props: AnalysisWorkspaceContentProps): ReactElement {
   return (
     <section className="panel-grid analysis-panel-grid">
-      <MultiNetworkFunctionalAnalysisPanel
-        model={props.multiNetworkFunctionalAnalysis}
-        scope={props.multiNetworkFunctionalAnalysisScope}
-        setScope={props.setMultiNetworkFunctionalAnalysisScope}
-        onToggleCustomNetwork={props.onToggleMultiNetworkFunctionalAnalysisCustomNetwork}
-        onGoToFinding={props.onGoToMultiNetworkFunctionalAnalysisFinding}
-      />
+      {props.showMultiNetworkFunctionalAnalysisPanel !== false ? (
+        <MultiNetworkFunctionalAnalysisPanel
+          model={props.multiNetworkFunctionalAnalysis}
+          scope={props.multiNetworkFunctionalAnalysisScope}
+          setScope={props.setMultiNetworkFunctionalAnalysisScope}
+          onToggleCustomNetwork={props.onToggleMultiNetworkFunctionalAnalysisCustomNetwork}
+          onGoToFinding={props.onGoToMultiNetworkFunctionalAnalysisFinding}
+        />
+      ) : null}
       <AnalysisConnectorWorkspacePanels {...props} />
       <AnalysisSpliceWorkspacePanels {...props} />
       <AnalysisNodeSegmentWorkspacePanels {...props} />

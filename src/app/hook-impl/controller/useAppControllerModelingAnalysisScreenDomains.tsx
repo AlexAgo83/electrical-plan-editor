@@ -48,6 +48,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   >;
   tabularExportFormat: ModelingSliceParams["tabularExportFormat"];
   hideWireAnalysisRoutePanel: AnalysisSliceParams["hideWireAnalysisRoutePanel"];
+  showMultiNetworkFunctionalAnalysisPanel: AnalysisSliceParams["showMultiNetworkFunctionalAnalysisPanel"];
   formsState: AppControllerFormsStateFlat;
   modelingHandlers: AppControllerModelingHandlersOrchestrator;
   catalogHandlers: Pick<CatalogHandlersModel, "startCatalogEdit">;
@@ -184,6 +185,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   wireTechnicalIdAlreadyUsed,
   tabularExportFormat,
   hideWireAnalysisRoutePanel,
+  showMultiNetworkFunctionalAnalysisPanel,
   onSelectConnector,
   onSelectSplice,
   onSelectNode,
@@ -909,6 +911,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
       return buildAnalysisScreenContentSlice({
     AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent,
     hideWireAnalysisRoutePanel,
+    showMultiNetworkFunctionalAnalysisPanel,
     multiNetworkFunctionalAnalysis,
     multiNetworkFunctionalAnalysisScope,
     setMultiNetworkFunctionalAnalysisScope,

@@ -121,6 +121,7 @@ export function useWorkspaceHandlers({
   setShowFloatingInspectorPanel,
   setShowRoutePreviewPanel,
   setHideWireAnalysisRoutePanel,
+  setShowMultiNetworkFunctionalAnalysisPanel,
   setWorkspacePanelsLayoutMode,
   setWorkspaceWideScreen,
   confirmAction
@@ -470,6 +471,7 @@ export function useWorkspaceHandlers({
     setShowFloatingInspectorPanel(true);
     setShowRoutePreviewPanel(false);
     setHideWireAnalysisRoutePanel(false);
+    setShowMultiNetworkFunctionalAnalysisPanel(true);
     setWorkspacePanelsLayoutMode("singleColumn");
     setWorkspaceWideScreen(false);
   }

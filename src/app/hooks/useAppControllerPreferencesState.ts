@@ -75,6 +75,7 @@ export function useAppControllerPreferencesState() {
   const [showFloatingInspectorPanel, setShowFloatingInspectorPanel] = useState(true);
   const [showRoutePreviewPanel, setShowRoutePreviewPanel] = useState(false);
   const [hideWireAnalysisRoutePanel, setHideWireAnalysisRoutePanel] = useState(false);
+  const [showMultiNetworkFunctionalAnalysisPanel, setShowMultiNetworkFunctionalAnalysisPanel] = useState(true);
   const [workspacePanelsLayoutMode, setWorkspacePanelsLayoutMode] = useState<WorkspacePanelsLayoutMode>("singleColumn");
   const [workspaceWideScreen, setWorkspaceWideScreen] = useState(false);
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
@@ -180,6 +181,8 @@ export function useAppControllerPreferencesState() {
     setShowRoutePreviewPanel,
     hideWireAnalysisRoutePanel,
     setHideWireAnalysisRoutePanel,
+    showMultiNetworkFunctionalAnalysisPanel,
+    setShowMultiNetworkFunctionalAnalysisPanel,
     workspacePanelsLayoutMode,
     setWorkspacePanelsLayoutMode,
     workspaceWideScreen,

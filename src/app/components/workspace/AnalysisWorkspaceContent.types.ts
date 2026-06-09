@@ -47,6 +47,7 @@ export type SpliceAnalysisView = "ports" | "synthesis";
 export interface AnalysisWorkspaceContentProps {
   showEntityTables?: boolean;
   hideWireAnalysisRoutePanel?: boolean;
+  showMultiNetworkFunctionalAnalysisPanel?: boolean;
   multiNetworkFunctionalAnalysis: MultiNetworkFunctionalAnalysisModel;
   multiNetworkFunctionalAnalysisScope: MultiNetworkFunctionalAnalysisScope;
   setMultiNetworkFunctionalAnalysisScope: (value: MultiNetworkFunctionalAnalysisScope) => void;
