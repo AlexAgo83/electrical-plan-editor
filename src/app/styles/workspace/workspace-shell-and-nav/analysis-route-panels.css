@@ -89,8 +89,8 @@
   min-height: 2.25rem;
 }
 
-.pin-role-mass-edit-action {
-  width: 100%;
+.pin-role-mass-edit-bulk-actions {
+  align-self: end;
 }
 
 .pin-role-mass-edit-overloaded {

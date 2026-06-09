@@ -321,14 +321,16 @@ export function PinRoleMassEditPanel({
             Label
             <input type="text" value={bulkLabel} onChange={(event) => setBulkLabel(event.target.value)} />
           </label>
-          <button type="button" className="button-with-icon pin-role-mass-edit-action" onClick={applyBulk} disabled={selectedVisibleRows.length === 0}>
-            <span className="action-button-icon is-save" aria-hidden="true" />
-            Apply to selected
-          </button>
-          <button type="button" className="button-with-icon pin-role-mass-edit-action" onClick={resetSelected} disabled={selectedVisibleRows.length === 0}>
-            <span className="action-button-icon is-cancel" aria-hidden="true" />
-            Reset selected
-          </button>
+          <div className="row-actions compact pin-role-mass-edit-bulk-actions">
+            <button type="button" className="button-with-icon" onClick={applyBulk} disabled={selectedVisibleRows.length === 0}>
+              <span className="action-button-icon is-save" aria-hidden="true" />
+              Apply to selected
+            </button>
+            <button type="button" className="button-with-icon" onClick={resetSelected} disabled={selectedVisibleRows.length === 0}>
+              <span className="action-button-icon is-cancel" aria-hidden="true" />
+              Reset selected
+            </button>
+          </div>
         </div>
       </div>
       <div className="table-scroll-container">
