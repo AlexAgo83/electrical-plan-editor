@@ -19,6 +19,7 @@
     "quality:store-modularization": "node scripts/quality/check-store-modularization.mjs",
     "quality:exceljs-boundary": "node scripts/quality/check-exceljs-boundary.mjs",
     "quality:dependency-audit": "node scripts/quality/check-npm-audit-allowlist.mjs",
+    "quality:pin-role-release-gate": "node scripts/quality/check-pin-role-release-gate.mjs",
     "quality:pwa": "node scripts/quality/check-pwa-build-artifacts.mjs",
     "coverage:ui:report": "node scripts/quality/report-ui-coverage.mjs",
     "coverage:full:report": "node scripts/quality/report-full-coverage.mjs",
@@ -32,7 +33,7 @@
     "test:ci:slow-top": "node scripts/quality/report-slowest-tests.mjs --top=10",
     "test:ci:ui:slow-top": "node scripts/quality/run-vitest-segmented.mjs ui-slow-top --top=10",
     "test:e2e": "node scripts/quality/run-playwright-e2e.mjs",
-    "ci:blocking": "python3 -m logics_manager lint --require-status && python3 -m logics_manager sync close-eligible-requests && git diff --exit-code -- logics/request && python3 -m logics_manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability && npm run -s lint && npm run -s typecheck && npm run -s quality:dependency-audit && npm run -s test:ci:segmentation:check && npm run -s quality:ui-modularization && npm run -s quality:ui-timeout-governance && npm run -s quality:hooks-modularization && npm run -s quality:store-modularization && npm run -s quality:exceljs-boundary && npm run -s test:ci:fast -- --coverage && npm run -s test:ci:ui && npm run -s test:e2e && npm run -s build:vite && npm run -s quality:pwa",
+    "ci:blocking": "python3 -m logics_manager lint --require-status && python3 -m logics_manager sync close-eligible-requests && git diff --exit-code -- logics/request && python3 -m logics_manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability && npm run -s lint && npm run -s typecheck && npm run -s quality:dependency-audit && npm run -s test:ci:segmentation:check && npm run -s quality:ui-modularization && npm run -s quality:ui-timeout-governance && npm run -s quality:hooks-modularization && npm run -s quality:store-modularization && npm run -s quality:exceljs-boundary && npm run -s quality:pin-role-release-gate && npm run -s test:ci:fast -- --coverage && npm run -s test:ci:ui && npm run -s test:e2e && npm run -s build:vite && npm run -s quality:pwa",
     "ci:local": "npm run -s ci:blocking"
   },
   "dependencies": {
