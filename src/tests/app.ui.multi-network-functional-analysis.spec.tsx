@@ -14,6 +14,10 @@ const model: MultiNetworkFunctionalAnalysisModel = {
   activeAssemblyName: "Vehicle harness",
   availableNetworkCount: 2,
   selectedNetworkLabels: ["Front harness", "Door harness"],
+  networkOptions: [
+    { id: "network-front" as NetworkId, label: "Front harness", selected: true },
+    { id: "network-door" as NetworkId, label: "Door harness", selected: true }
+  ],
   findings: [
     {
       id: "l1-link-front-door-1",
@@ -34,14 +38,25 @@ const model: MultiNetworkFunctionalAnalysisModel = {
     warnings: 1,
     info: 0,
     l1: 1,
-    skippedBridges: 0
+    skippedBridges: 0,
+    loops: 0
+  },
+  schematic: {
+    nodes: [
+      { id: "n1", label: "Front", detail: "C-front pin 1", kind: "connector" },
+      { id: "n2", label: "Door", detail: "C-door pin 1", kind: "interconnector" }
+    ],
+    edges: [{ id: "e1", fromNodeId: "n1", toNodeId: "n2", label: "W-1" }],
+    warnings: ["Trace warning"]
   }
 };
 
 function Harness({
-  onGoToFinding = vi.fn()
+  onGoToFinding = vi.fn(),
+  onToggleCustomNetwork = vi.fn()
 }: {
   onGoToFinding?: Parameters<typeof MultiNetworkFunctionalAnalysisPanel>[0]["onGoToFinding"];
+  onToggleCustomNetwork?: Parameters<typeof MultiNetworkFunctionalAnalysisPanel>[0]["onToggleCustomNetwork"];
 }): ReactElement {
   const [scope, setScope] = useState<MultiNetworkFunctionalAnalysisScope>("current");
   return (
@@ -49,6 +64,7 @@ function Harness({
       model={model}
       scope={scope}
       setScope={setScope}
+      onToggleCustomNetwork={onToggleCustomNetwork}
       onGoToFinding={onGoToFinding}
     />
   );
@@ -72,6 +88,8 @@ describe("MultiNetworkFunctionalAnalysisPanel", () => {
     expect(scopePanel).toHaveTextContent("Front to door");
     expect(scopePanel).toHaveTextContent("Warnings 1");
     expect(scopePanel).toHaveTextContent("L1 1");
+    expect(within(scopePanel).getByLabelText("Multi-network union functional schematic")).toBeInTheDocument();
+    expect(scopePanel).toHaveTextContent("Trace warning");
   });
 
   it("calls the Go to handler with the finding target", () => {
@@ -86,5 +104,15 @@ describe("MultiNetworkFunctionalAnalysisPanel", () => {
       selectionKind: "connector",
       selectionId: "C-front"
     });
+  });
+
+  it("supports custom network selection controls", () => {
+    const onToggleCustomNetwork = vi.fn();
+    render(<Harness onToggleCustomNetwork={onToggleCustomNetwork} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Custom\s*2/ }));
+    fireEvent.click(screen.getByLabelText("Door harness"));
+
+    expect(onToggleCustomNetwork).toHaveBeenCalledWith("network-door");
   });
 });

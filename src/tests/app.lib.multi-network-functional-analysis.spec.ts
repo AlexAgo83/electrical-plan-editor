@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type {
+  CatalogItem,
+  CatalogItemId,
   Connector,
   ConnectorId,
   HarnessAssembly,
@@ -63,7 +65,8 @@ function splice(id: string): Splice {
 function wire(
   id: string,
   endpointA: Wire["endpointA"],
-  endpointB: Wire["endpointB"]
+  endpointB: Wire["endpointB"],
+  extras: Partial<Wire> = {}
 ): Wire {
   return {
     id: asWireId(id),
@@ -76,7 +79,8 @@ function wire(
     endpointB,
     routeSegmentIds: [],
     lengthMm: 0,
-    isRouteLocked: false
+    isRouteLocked: false,
+    ...extras
   };
 }
 
@@ -194,5 +198,114 @@ describe("buildMultiNetworkFunctionalAnalysisModel", () => {
       selectionId: portA.id
     });
     expect(model.summary.l1).toBe(1);
+  });
+
+  it("computes assembly-grade D1 and D2 findings across selected networks", () => {
+    const netA = network("net-a", "Front harness");
+    const netB = network("net-b", "Door harness");
+    const fuseCatalog: CatalogItem = {
+      id: "fuse-8a" as CatalogItemId,
+      manufacturerReference: "FUSE-8A",
+      name: "Fuse 8A",
+      connectionCount: 2
+    };
+    const source = connector("C-source", {
+      pinElectricalRoles: { 1: { role: "source", currentA: 12 } }
+    });
+    const portA = connector("C-front");
+    const portB = connector("C-door");
+    const consumer = connector("C-load", {
+      pinElectricalRoles: { 1: { role: "consumer", currentA: 12 } }
+    });
+    const protectedWire = wire(
+      "W-front",
+      { kind: "connectorCavity", connectorId: source.id, cavityIndex: 1 },
+      { kind: "connectorCavity", connectorId: portA.id, cavityIndex: 1 },
+      { sectionMm2: 0.5, protection: { kind: "fuse", catalogItemId: fuseCatalog.id } }
+    );
+    const loadWire = wire(
+      "W-door",
+      { kind: "connectorCavity", connectorId: portB.id, cavityIndex: 1 },
+      { kind: "connectorCavity", connectorId: consumer.id, cavityIndex: 1 }
+    );
+    const scopedA = scopedState({ connectors: [source, portA], wires: [protectedWire] });
+    const scopedB = scopedState({ connectors: [portB, consumer], wires: [loadWire] });
+    const assembly: HarnessAssembly = {
+      id: "asm-main" as HarnessAssemblyId,
+      name: "Vehicle harness",
+      technicalId: "ASM-MAIN",
+      members: [
+        { networkId: netA.id, color: "#2f6bff" },
+        { networkId: netB.id, color: "#e05c2f" }
+      ],
+      masterConnectorRefs: [{ networkId: netA.id, connectorId: portA.id }],
+      connectorLinks: [
+        {
+          id: "link-front-door" as InterHarnessConnectorLinkId,
+          name: "Front to door",
+          sourceNetworkId: netA.id,
+          sourceConnectorId: portA.id,
+          targetNetworkId: netB.id,
+          targetConnectorId: portB.id
+        }
+      ],
+      createdAt: "2026-06-09T00:00:00.000Z",
+      updatedAt: "2026-06-09T00:00:00.000Z"
+    };
+
+    const model = buildMultiNetworkFunctionalAnalysisModel({
+      activeNetworkId: netA.id,
+      networks: [netA, netB],
+      harnessAssemblies: [assembly],
+      networkStates: { [netA.id]: scopedA, [netB.id]: scopedB },
+      currentNetworkState: scopedA,
+      catalogItems: [fuseCatalog],
+      scope: "assembly"
+    });
+
+    expect(model.findings.some((finding) => finding.id === `assembly-d1-${netA.id}-${protectedWire.id}`)).toBe(true);
+    expect(model.findings.some((finding) => finding.id === `assembly-d2-${netA.id}-${protectedWire.id}`)).toBe(true);
+    expect(model.findings.some((finding) => finding.id.includes("d4-no-source"))).toBe(false);
+    expect(model.schematic?.nodes.length).toBeGreaterThan(0);
+  });
+
+  it("limits custom scope to selected assembly networks", () => {
+    const netA = network("net-a", "Front harness");
+    const netB = network("net-b", "Door harness");
+    const portA = connector("C-front");
+    const portB = connector("C-door");
+    const scopedA = scopedState({ connectors: [portA] });
+    const scopedB = scopedState({ connectors: [portB] });
+    const assembly: HarnessAssembly = {
+      id: "asm-main" as HarnessAssemblyId,
+      name: "Vehicle harness",
+      technicalId: "ASM-MAIN",
+      members: [
+        { networkId: netA.id, color: "#2f6bff" },
+        { networkId: netB.id, color: "#e05c2f" }
+      ],
+      masterConnectorRefs: [],
+      connectorLinks: [],
+      createdAt: "2026-06-09T00:00:00.000Z",
+      updatedAt: "2026-06-09T00:00:00.000Z"
+    };
+
+    const model = buildMultiNetworkFunctionalAnalysisModel({
+      activeNetworkId: netA.id,
+      networks: [netA, netB],
+      harnessAssemblies: [assembly],
+      networkStates: { [netA.id]: scopedA, [netB.id]: scopedB },
+      currentNetworkState: scopedA,
+      catalogItems: [],
+      scope: "custom",
+      customNetworkIds: [netB.id]
+    });
+
+    expect(model.scope).toBe("custom");
+    expect(model.selectedNetworkLabels).toEqual(["Door harness"]);
+    expect(model.networkOptions).toEqual([
+      { id: netA.id, label: "Front harness", selected: false },
+      { id: netB.id, label: "Door harness", selected: true }
+    ]);
   });
 });
