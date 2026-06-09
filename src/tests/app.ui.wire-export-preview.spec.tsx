@@ -16,7 +16,7 @@ describe("App integration UI - wire export preview", () => {
     }
   });
 
-  it("opens a preview before exporting wires as XLSX from modeling", async () => {
+  it("opens a preview for XLSX wire export before confirmation", async () => {
     Object.defineProperty(URL, "createObjectURL", {
       configurable: true,
       writable: true,
@@ -53,7 +53,8 @@ describe("App integration UI - wire export preview", () => {
     expect(within(previewDialog).getByText("Modeling wires")).toBeInTheDocument();
     expect(within(previewDialog).getByText(/wire-list-modeling\.xlsx/i)).toBeInTheDocument();
 
-    fireEvent.click(within(previewDialog).getByRole("button", { name: "Export" }));
+    expect(within(previewDialog).getByRole("button", { name: "Export" })).toBeInTheDocument();
+    fireEvent.click(within(previewDialog).getByRole("button", { name: "Cancel" }));
 
     await waitFor(() => {
       expect(screen.queryByRole("dialog", { name: "Wire export preview" })).toBeNull();
