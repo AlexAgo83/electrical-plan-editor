@@ -248,6 +248,30 @@ describe("aggregateAssembly", () => {
     expect(result.wireOriginByPrefixedId.get(wireBEntry![0])?.networkId).toBe(asNetworkId("net-b"));
   });
 
+  it("reports cyclic branches as loop warnings", () => {
+    const source = makeConnector("C-src", 1, {
+      pinElectricalRoles: { 1: { role: "source", currentA: 4 } }
+    });
+    const passA = makeConnector("C-a", 1);
+    const passB = makeConnector("C-b", 1);
+    const slices: AssemblyNetworkSlice[] = [
+      {
+        networkId: asNetworkId("net-a"),
+        connectors: [source, passA, passB],
+        splices: [],
+        wires: [
+          makeWire("W1", { kind: "connectorCavity", connectorId: source.id, cavityIndex: 1 }, { kind: "connectorCavity", connectorId: passA.id, cavityIndex: 1 }),
+          makeWire("W2", { kind: "connectorCavity", connectorId: passA.id, cavityIndex: 1 }, { kind: "connectorCavity", connectorId: passB.id, cavityIndex: 1 }),
+          makeWire("W3", { kind: "connectorCavity", connectorId: passB.id, cavityIndex: 1 }, { kind: "connectorCavity", connectorId: source.id, cavityIndex: 1 })
+        ]
+      }
+    ];
+
+    const result = aggregateAssembly(makeAssembly([]), slices, [asNetworkId("net-a")], new Map());
+
+    expect(result.load.warnings.some((warning) => warning.code === "loop")).toBe(true);
+  });
+
   it("does not emit L1 when one side is passive or undeclared", () => {
     const portA = makeConnector("CA", 1, {
       pinElectricalRoles: { 1: { role: "source", currentA: 5 } }

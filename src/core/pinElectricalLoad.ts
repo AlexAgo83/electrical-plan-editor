@@ -229,16 +229,26 @@ function propagateFromSource(
     loops: []
   };
   const visited = new Set<string>([keyOf(startEndpoint)]);
-  const queue: WireEndpointKey[] = [startEndpoint];
+  const queue: Array<{ endpoint: WireEndpointKey; parentKey: string | null }> = [
+    { endpoint: startEndpoint, parentKey: null }
+  ];
   while (queue.length > 0) {
-    const current = queue.shift()!;
+    const currentEntry = queue.shift()!;
+    const current = currentEntry.endpoint;
     const currentKey = keyOf(current);
     const neighbors = adjacency.get(currentKey) ?? [];
     for (const neighbor of neighbors) {
       const toKey = keyOf(neighbor.to);
       if (visited.has(toKey)) {
-        if (neighbor.wireId === undefined && current.kind === "connectorCavity" && neighbor.to.kind === "connectorCavity") {
-          // Loop within a fuse-box pair on the same connector — note once
+        if (toKey !== currentEntry.parentKey) {
+          const participants = [current, neighbor.to]
+            .filter((endpoint): endpoint is Extract<WireEndpointKey, { kind: "connectorCavity" }> =>
+              endpoint.kind === "connectorCavity"
+            )
+            .map((endpoint) => ({ connectorId: endpoint.connectorId, cavityIndex: endpoint.cavityIndex }));
+          if (participants.length > 0) {
+            result.loops.push(participants);
+          }
         }
         continue;
       }
@@ -299,7 +309,7 @@ function propagateFromSource(
           }
         }
       }
-      queue.push(neighbor.to);
+      queue.push({ endpoint: neighbor.to, parentKey: currentKey });
     }
   }
   return result;
@@ -396,6 +406,13 @@ function computeCurrentNetwork(input: PinElectricalLoadInput): PinElectricalLoad
       result.pinLoadByConnectorPin,
       fuseBoxPairsByConnector
     );
+    for (const loop of propagation.loops) {
+      result.warnings.push({
+        code: "loop",
+        message: "Inter-network aggregation did not converge for a cyclic branch; branch aggregation continued with visited-pin guards.",
+        participants: loop
+      });
+    }
 
     const sourceRef: ConnectorPinRef = {
       connectorId: source.connectorId,

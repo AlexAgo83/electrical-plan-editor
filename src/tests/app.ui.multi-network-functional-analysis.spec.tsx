@@ -39,7 +39,7 @@ const model: MultiNetworkFunctionalAnalysisModel = {
     info: 0,
     l1: 1,
     skippedBridges: 0,
-    loops: 0
+    loops: 1
   },
   schematic: {
     nodes: [
@@ -88,6 +88,7 @@ describe("MultiNetworkFunctionalAnalysisPanel", () => {
     expect(scopePanel).toHaveTextContent("Front to door");
     expect(scopePanel).toHaveTextContent("Warnings 1");
     expect(scopePanel).toHaveTextContent("L1 1");
+    expect(scopePanel).toHaveTextContent("Loops 1");
     expect(within(scopePanel).getByLabelText("Multi-network union functional schematic")).toBeInTheDocument();
     expect(scopePanel).toHaveTextContent("Trace warning");
   });
