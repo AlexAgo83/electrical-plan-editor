@@ -359,6 +359,13 @@ describe("App integration UI - network summary callouts and viewport persistence
     expect(movedSegmentCallout).not.toBeNull();
     const transformAfterDrag = (movedSegmentCallout as SVGGElement).getAttribute("transform") ?? "";
     expect(transformAfterDrag).not.toBe(transformBeforeDrag);
+
+    switchScreenDrawerAware("settings");
+    switchScreenDrawerAware("modeling");
+
+    const restoredSegmentCallout = getPanelByHeading("Network summary").querySelector(".network-segment-callout-anchor");
+    expect(restoredSegmentCallout).not.toBeNull();
+    expect((restoredSegmentCallout as SVGGElement).getAttribute("transform")).toBe(transformAfterDrag);
   });
 
 });

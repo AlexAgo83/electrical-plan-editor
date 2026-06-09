@@ -11,7 +11,6 @@ import { NetworkSummaryCalloutLeaders, NetworkSummaryCalloutsLayer } from "./cal
 import type { CableCalloutViewModel, CalloutTargetKey, RenderedCableCallout } from "./callouts/calloutLayout";
 import {
   NetworkSummaryGraphLayers,
-  type NetworkSummaryCalloutObstacle,
   type SplicePlacementPreviewNodeModel,
   type SplicePlacementPreviewSegmentModel
 } from "./graph/NetworkSummaryGraphLayers";
@@ -63,7 +62,6 @@ interface NetworkSummaryCanvasPanelProps {
   splicePlacementPreviewSegments: SplicePlacementPreviewSegmentModel[];
   splicePlacementPreviewNode: SplicePlacementPreviewNodeModel | null;
   renderedNodes: RenderedNodeModel[];
-  calloutObstacles: NetworkSummaryCalloutObstacle[];
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
   inverseLabelScale: number;
@@ -134,7 +132,6 @@ export function NetworkSummaryCanvasPanel({
   splicePlacementPreviewSegments,
   splicePlacementPreviewNode,
   renderedNodes,
-  calloutObstacles,
   showSegmentNames,
   showSegmentLengths,
   inverseLabelScale,
@@ -213,7 +210,6 @@ export function NetworkSummaryCanvasPanel({
                 splicePlacementPreviewSegments={splicePlacementPreviewSegments}
                 splicePlacementPreviewNode={splicePlacementPreviewNode}
                 renderedNodes={renderedNodes}
-                calloutObstacles={calloutObstacles}
                 showSegmentNames={showSegmentNames}
                 showSegmentLengths={showSegmentLengths}
                 inverseLabelScale={inverseLabelScale}

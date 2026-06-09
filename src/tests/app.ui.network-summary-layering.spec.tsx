@@ -1,5 +1,6 @@
 import { fireEvent, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
+import { appActions, appReducer } from "../store";
 import {
   createUiIntegrationState,
   getPanelByHeading,
@@ -75,6 +76,52 @@ describe("App integration UI - network summary layering", () => {
     expect(nodeLabelLayer?.querySelector(".network-segment-label")).toBeNull();
     expect(segmentLabelLayer?.querySelector(".network-segment")).toBeNull();
     expect(nodeLabelLayer?.querySelector(".network-node")).toBeNull();
+  });
+
+  it("renders segment callouts in the callout hierarchy above graph nodes", () => {
+    const baseState = createUiIntegrationState();
+    const firstSegmentId = baseState.segments.allIds[0];
+    const segment = firstSegmentId === undefined ? undefined : baseState.segments.byId[firstSegmentId];
+    if (segment === undefined) {
+      throw new Error("Expected at least one segment in base integration state.");
+    }
+    const stateWithSheath = appReducer(
+      baseState,
+      appActions.upsertSegment({
+        ...segment,
+        sheathType: "Fixed Tube",
+        insulation: "XLPE",
+        lineStyle: "GAF-T2-D9",
+        internalPartReference: "X723061352"
+      })
+    );
+
+    renderAppWithState(stateWithSheath);
+    switchScreenDrawerAware("analysis");
+
+    const networkSummaryPanel = getPanelByHeading("Network summary");
+    const diagram = within(networkSummaryPanel).getByLabelText("2D network diagram");
+    const nodeLayer = diagram.querySelector(".network-graph-layer-nodes");
+    const physicalConnectorNodeLayer = diagram.querySelector(".network-graph-layer-physical-connector-nodes");
+    const segmentCalloutLayer = diagram.querySelector(".network-graph-layer-segment-callouts");
+    const segmentCallout = diagram.querySelector(".network-segment-callout-anchor");
+    const segmentCalloutLeader = diagram.querySelector(".network-segment-callout-leader-line");
+    const segmentLabelLayer = diagram.querySelector(".network-graph-layer-segment-labels");
+
+    expect(nodeLayer).not.toBeNull();
+    expect(physicalConnectorNodeLayer).not.toBeNull();
+    expect(segmentCalloutLayer).not.toBeNull();
+    expect(segmentCallout).not.toBeNull();
+    expect(segmentCalloutLeader).not.toBeNull();
+    expect(segmentCalloutLeader?.classList.contains("network-callout-leader-line")).toBe(true);
+    expect(segmentLabelLayer?.querySelector(".network-segment-callout-anchor")).toBeNull();
+    expect(segmentCallout?.closest(".network-entity-group.is-deemphasized")).toBeNull();
+
+    const topLevelGroups = Array.from(diagram.children);
+    expect(topLevelGroups.indexOf(segmentCalloutLayer as Element)).toBeGreaterThan(topLevelGroups.indexOf(nodeLayer as Element));
+    expect(topLevelGroups.indexOf(segmentCalloutLayer as Element)).toBeGreaterThan(
+      topLevelGroups.indexOf(physicalConnectorNodeLayer as Element)
+    );
   });
 
   it("keeps 2D labels zoom-invariant using inverse-scale label anchors", () => {
