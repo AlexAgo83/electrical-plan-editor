@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 100%
 > Confidence: 92%
-> Progress: 72%
+> Progress: 100%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -97,10 +97,9 @@ flowchart LR
 - Primary task(s): `task_122_multi_network_functional_analysis_view_and_assembly_scope`
 
 # Delivery Status
-- Partially delivered in 1.14.0, with MVP user-facing panel added after the 2026-06-09 audit.
-- Delivered: assembly-scope aggregation core in `src/core/pinElectricalLoadAssembly.ts` for `InterHarnessConnectorLink`, inter-harness link traversal, skipped-bridge diagnostics, L1 mismatch computation, core assembly tests, read-only Analysis panel, current-network / active-assembly scope picker, current-network D1-D4 finding projection, active-assembly L1/skipped-bridge surfacing, and model/component coverage.
-- Still not complete: custom subset scope, union functional schematic rendering, assembly-grade D1-D4 findings computed from the union graph, active-network-switching `Go to`, master connector reference aggregation parity if not already covered by another surface, loop display in the panel, and full integration coverage.
-- Relevance assessment: keep this item open, but the highest-risk gap changed. The shipped MVP makes the L1 engine visible; the next valuable work is either assembly-grade D1/D2 projection or `Go to` navigation, while custom subset and schematic rendering are useful but less urgent.
+- Done on 2026-06-09.
+- Delivered: assembly-scope aggregation core in `src/core/pinElectricalLoadAssembly.ts` for `InterHarnessConnectorLink` and shared master connector refs, inter-harness traversal, skipped-bridge diagnostics, L1 mismatch computation, loop warnings, read-only Analysis panel, current-network / active-assembly / custom subset scope picker, union functional schematic preview, assembly-grade D1-D4 findings computed from the selected union graph, active-network-switching `Go to`, and focused model/component/core coverage.
+- Validation: `rtk npm run -s lint`, `rtk npm run -s typecheck`, and `rtk npm run -s test -- src/tests/core.pin-electrical-load-assembly.spec.ts src/tests/app.lib.multi-network-functional-analysis.spec.ts src/tests/app.ui.multi-network-functional-analysis.spec.tsx --run` passed on 2026-06-09.
 
 # AI Context
 - Summary: Adds the multi-network analysis view (read-only, scope picker) and the assembly-scope aggregation that traverses inter-network bridges. New L1 link mismatch warning lives here.

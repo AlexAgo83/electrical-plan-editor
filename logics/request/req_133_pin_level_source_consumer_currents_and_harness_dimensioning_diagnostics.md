@@ -1,10 +1,10 @@
 ## req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics - Pin-level Source/Consumer Currents and Harness Dimensioning Diagnostics
 
-> From version: 1.15.1
+> From version: 1.15.2
 > Schema version: 1.0
 > Status: In progress
-> Understanding: 99%
-> Confidence: 95%
+> Understanding: 100%
+> Confidence: 96%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -206,8 +206,8 @@ flowchart LR
 - `item_615_pin_role_release_validation_and_permissiveness_gate`
 
 # Delivery Status
-- Partially delivered in 1.14.0, with additional validation coverage and the first multi-network analysis MVP delivered after 1.15.0.
-- Delivered and still evidenced in code: pin electrical role data model, catalog defaults, ampacity overrides, current-network aggregation engine, assembly aggregation core, D1-D4 validation category, connector inspector pin-role editor, catalog pin-role editor, bulk inspector apply/reset, optional BOM computed downstream-load export, sample-network silence gate, export/import preservation, onboarding step, AI Agent context non-expansion, partial-declaration permissiveness gate, 2D canvas unchanged snapshot for pin-role/ampacity-only edits, and read-only Analysis panel surfacing current-network D1-D4 plus active-assembly L1/skipped-bridge findings.
-- Still incomplete: cross-connector mass-edit view with filters and CSV paste, functional schematic electrical overlay/toggle, multi-network custom subset scope, union functional schematic, assembly-grade D1-D4 findings from the union graph, multi-network `Go to` network switching, Playwright full-flow, and performance/release-gate wiring.
-- Relevance assessment: the remaining work is still valid but no longer all equally blocking. The multi-network view now has an MVP surface, so the highest-value next increments are assembly-grade D1/D2 projection and `Go to` navigation. The mass-edit view remains useful for large harnesses but the inspector/catalog editors provide a workable manual path. The functional schematic overlay is a useful read/review improvement, not a prerequisite for the shipped validation center. Full Playwright/performance gates should wait until the remaining UI surfaces are closer to final.
+- Partially delivered in 1.14.0, with additional validation coverage and the full multi-network analysis view delivered after 1.15.0.
+- Delivered and still evidenced in code: pin electrical role data model, catalog defaults, ampacity overrides, current-network aggregation engine, assembly aggregation core, D1-D4 validation category, connector inspector pin-role editor, catalog pin-role editor, bulk inspector apply/reset, optional BOM computed downstream-load export, sample-network silence gate, export/import preservation, onboarding step, AI Agent context non-expansion, partial-declaration permissiveness gate, 2D canvas unchanged snapshot for pin-role/ampacity-only edits, and read-only Analysis panel surfacing current-network D1-D4 plus active-assembly/custom-scope L1, skipped-bridge, loop, union schematic, assembly-grade D1-D4, and `Go to` findings.
+- Still incomplete: cross-connector mass-edit view with filters and CSV paste, functional schematic electrical overlay/toggle, Playwright full-flow, and performance/release-gate wiring.
+- Relevance assessment: the remaining work is still valid but no longer all equally blocking. The mass-edit view remains useful for large harnesses but the inspector/catalog editors provide a workable manual path. The functional schematic overlay is a useful read/review improvement, not a prerequisite for the shipped validation center or the completed multi-network analysis view. Full Playwright/performance gates should wait until the remaining UI surfaces are closer to final.
 - Source evidence: `changelogs/CHANGELOGS_1_14_0.md`, `src/core/pinElectricalLoad*.ts`, `src/app/lib/multiNetworkFunctionalAnalysis.ts`, `src/app/components/workspace/MultiNetworkFunctionalAnalysisPanel.tsx`, `src/app/hook-impl/validation/appendElectricalDimensioningIssues.ts`, `src/app/components/workspace/PinElectricalRolesEditor.tsx`, `src/app/lib/onboarding.ts`, `src/tests/core.pin-electrical-load*.spec.ts`, `src/tests/app.lib.multi-network-functional-analysis.spec.ts`, `src/tests/app.ui.multi-network-functional-analysis.spec.tsx`, `src/tests/app.validation.electrical-dimensioning.spec.ts`, `src/tests/app.ui.inspector-pin-roles.spec.tsx`, `src/tests/app.ui.catalog-pin-roles.spec.tsx`, `src/tests/portability.network-file.spec.ts`, and `src/tests/ai-agent-context.spec.ts`.

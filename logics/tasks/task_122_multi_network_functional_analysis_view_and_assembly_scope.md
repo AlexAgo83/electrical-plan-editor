@@ -2,10 +2,10 @@
 
 > From version: 1.15.1
 > Schema version: 1.0
-> Status: In progress
-> Understanding: 99%
-> Confidence: 94%
-> Progress: 78%
+> Status: Done
+> Understanding: 100%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 
@@ -17,10 +17,10 @@
 - [x] Out-of-assembly networks excluded; bridges with far end outside the selected `networkIds` reported in `skippedBridges`.
 - [x] Read-only "Multi-network functional analysis" Analysis panel with current-network / active-assembly scope picker.
 - [x] Current-network D1–D4 findings plus active-assembly L1 and skipped-bridge diagnostics listed in the view.
-- [ ] Custom subset scope, union functional schematic, and assembly-grade D1–D4 findings listed inside the view.
+- [x] Custom subset scope, union functional schematic, and assembly-grade D1–D4 findings listed inside the view.
 - [x] `Go to` switches active network before focusing the entity.
 - [x] Tests cover assembly aggregation, L1 bridge mismatch, current-scope findings, and component scope picker / finding list rendering.
-- [ ] Tests cover custom subset, union schematic rendering, and loop display.
+- [x] Tests cover custom subset, union schematic rendering, and loop display.
 - [x] Tests cover active-network-switching `Go to` target construction and component dispatch.
 
 # Backlog
@@ -74,13 +74,14 @@ Mirror `item_614` AC1–AC14.
 # Progress Report
 - Delivered in 1.14.0: assembly-scope aggregation core for `InterHarnessConnectorLink`, bridge traversal, skipped-bridge diagnostics, L1 mismatch computation, and core assembly tests.
 - Real-status audit on 2026-06-09: no read-only multi-network functional analysis view, scope picker, view-level D1-D4/L1 findings panel, or active-network-switching `Go to` UI was found.
-- Implemented after the audit on 2026-06-09: `buildMultiNetworkFunctionalAnalysisModel`, read-only Analysis panel, current-network / active-assembly scope picker, current-network D1-D4 finding projection, active-assembly L1 and skipped-bridge surfacing, active-network-switching `Go to`, plus model/component tests.
-- Remaining: custom subset selection, union functional schematic, assembly-grade D1-D4 projection from the union graph, master-connector-ref aggregation parity if not already covered elsewhere, loop display in the panel, and broader integration coverage.
-- Pertinence: keep open, but reduce urgency from "invisible engine" to "MVP shipped, depth missing". The next useful increment is assembly-grade D1/D2 projection, not another shell-level panel.
+- Completed on 2026-06-09: custom subset selection, union functional schematic preview, assembly-grade D1-D4 findings from the selected union, master-connector-ref aggregation parity, loop warnings surfaced in the panel, and active-network-switching `Go to`.
+- Delivery status: done for `item_614`; broader `req_133` remains open for other backlog slices.
 
 # Validation
 - 2026-06-09: `rtk npm run -s test -- src/tests/app.lib.multi-network-functional-analysis.spec.ts src/tests/app.ui.multi-network-functional-analysis.spec.tsx --run` passed (2 files, 3 tests). Covers the delivered model and component MVP: current-scope D1-D4 projection, active-assembly L1/skipped-bridge surfacing, and scope picker/finding-list rendering.
 - 2026-06-09: `rtk npm run -s lint` passed.
 - 2026-06-09: `rtk npm run -s typecheck` passed.
 - 2026-06-09: `rtk npm run -s test -- src/tests/app.lib.multi-network-functional-analysis.spec.ts src/tests/app.ui.multi-network-functional-analysis.spec.tsx --run` passed (2 files, 4 tests). Adds coverage for D1-D4/L1 navigation targets and the component `Go to` callback.
-- Not yet covered here: custom subset scope, union schematic rendering, and loop display; those remain open DoD items.
+- 2026-06-09: `rtk npm run -s test -- src/tests/core.pin-electrical-load-assembly.spec.ts src/tests/app.lib.multi-network-functional-analysis.spec.ts src/tests/app.ui.multi-network-functional-analysis.spec.tsx --run` passed (3 files, 14 tests). Covers master connector refs, loop warnings, custom subset scope, union schematic preview, assembly-grade D1-D4 findings, L1, skipped-bridge surfacing, and `Go to` target dispatch.
+- 2026-06-09: `rtk npm run -s lint` passed.
+- 2026-06-09: `rtk npm run -s typecheck` passed.
