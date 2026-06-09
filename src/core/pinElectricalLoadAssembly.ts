@@ -44,6 +44,8 @@ export interface AssemblyAggregationResult {
   load: PinElectricalLoadResult;
   l1Mismatches: L1LinkMismatchEntry[];
   skippedBridges: SkippedBridgeEntry[];
+  wireOriginByPrefixedId: Map<WireId, { networkId: NetworkId; wire: Wire }>;
+  connectorOriginByPrefixedId: Map<ConnectorId, { networkId: NetworkId; connector: Connector }>;
 }
 
 function isIncompatible(a: PinElectricalRole, b: PinElectricalRole): boolean {
@@ -115,10 +117,11 @@ export function aggregateAssembly(
   const mergedSplices: Splice[] = [];
   const mergedWires: Wire[] = [];
 
-  const originalConnectorByPrefixed = new Map<
+  const connectorOriginByPrefixedId = new Map<
     ConnectorId,
     { networkId: NetworkId; connector: Connector }
   >();
+  const wireOriginByPrefixedId = new Map<WireId, { networkId: NetworkId; wire: Wire }>();
 
   for (const slice of selectedSlices) {
     const ids = makePrefix(slice.networkId);
@@ -126,20 +129,24 @@ export function aggregateAssembly(
     for (const connector of slice.connectors) {
       const prefixed = prefixConnector(connector, ids);
       mergedConnectors.push(prefixed);
-      originalConnectorByPrefixed.set(prefixed.id, { networkId: slice.networkId, connector });
+      connectorOriginByPrefixedId.set(prefixed.id, { networkId: slice.networkId, connector });
     }
     mergedSplices.push(...slice.splices); // splice IDs already unique by branding; safe enough
     for (const wire of slice.wires) {
-      mergedWires.push(prefixWire(wire, sliceConnectorIds, ids));
+      const prefixed = prefixWire(wire, sliceConnectorIds, ids);
+      mergedWires.push(prefixed);
+      wireOriginByPrefixedId.set(prefixed.id, { networkId: slice.networkId, wire });
     }
   }
 
   const l1Mismatches: L1LinkMismatchEntry[] = [];
   const skippedBridges: SkippedBridgeEntry[] = [];
 
+  const bridgeLinks: InterHarnessConnectorLink[] = [...assembly.connectorLinks, ...buildMasterConnectorBridgeLinks(assembly)];
+
   // For each connector link in the assembly, evaluate L1 + add bridge wires between the
   // two prefixed connectors at matching cavities.
-  for (const link of assembly.connectorLinks) {
+  for (const link of bridgeLinks) {
     if (!selectedSet.has(link.sourceNetworkId) || !selectedSet.has(link.targetNetworkId)) {
       skippedBridges.push({ linkId: link.id, reason: "far-end-out-of-scope" });
       continue;
@@ -235,7 +242,33 @@ export function aggregateAssembly(
     catalogItemsById
   };
   const load = computePinElectricalLoad(input);
-  return { load, l1Mismatches, skippedBridges };
+  return { load, l1Mismatches, skippedBridges, wireOriginByPrefixedId, connectorOriginByPrefixedId };
+}
+
+function buildMasterConnectorBridgeLinks(assembly: HarnessAssembly): InterHarnessConnectorLink[] {
+  const refsByConnectorId = new Map<ConnectorId, Array<{ networkId: NetworkId; connectorId: ConnectorId }>>();
+  for (const ref of assembly.masterConnectorRefs) {
+    const refs = refsByConnectorId.get(ref.connectorId) ?? [];
+    refs.push(ref);
+    refsByConnectorId.set(ref.connectorId, refs);
+  }
+  const links: InterHarnessConnectorLink[] = [];
+  for (const [connectorId, refs] of refsByConnectorId) {
+    const sortedRefs = [...refs].sort((left, right) => String(left.networkId).localeCompare(String(right.networkId)));
+    for (let index = 1; index < sortedRefs.length; index += 1) {
+      const previous = sortedRefs[index - 1]!;
+      const current = sortedRefs[index]!;
+      links.push({
+        id: `master:${connectorId}:${previous.networkId}:${current.networkId}` as InterHarnessConnectorLink["id"],
+        name: `Master ${connectorId}`,
+        sourceNetworkId: previous.networkId,
+        sourceConnectorId: previous.connectorId,
+        targetNetworkId: current.networkId,
+        targetConnectorId: current.connectorId
+      });
+    }
+  }
+  return links;
 }
 
 function roleDescriptor(role: PinElectricalRole): string {

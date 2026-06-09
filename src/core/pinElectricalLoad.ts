@@ -284,14 +284,17 @@ function propagateFromSource(
         // Passive / bidirectional connector pin: continue (treat as pass-through if it's
         // really a connector pin that bridges via fuse-box, otherwise stop at the leaf).
         if (!isPassThroughEndpoint(neighborTo)) {
-          // If this connector pin has no fuse-box pair bridge edge attached, it's a leaf and we stop.
-          const hasBridge = (adjacency.get(toKey) ?? []).some(
+          // If this connector pin has no fuse-box pair bridge edge and no additional
+          // physical continuation, it is a leaf and propagation stops.
+          const nextEdges = adjacency.get(toKey) ?? [];
+          const hasBridge = nextEdges.some(
             (n) =>
               n.wireId === undefined &&
               n.to.kind === "connectorCavity" &&
               n.to.connectorId === targetConnectorId
           );
-          if (!hasBridge) {
+          const hasPhysicalContinuation = nextEdges.length > 1;
+          if (!hasBridge && !hasPhysicalContinuation) {
             continue;
           }
         }
