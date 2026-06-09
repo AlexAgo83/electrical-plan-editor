@@ -1,6 +1,7 @@
 import type {
   CatalogItem,
   CatalogItemId,
+  Connector,
   HarnessAssembly,
   Network,
   NetworkId,
@@ -123,12 +124,15 @@ export function buildMultiNetworkFunctionalAnalysisModel({
     for (const entry of aggregation.l1Mismatches) {
       const sourceLabel = networkLabel(networkById.get(entry.sourceNetworkId), entry.sourceNetworkId);
       const targetLabel = networkLabel(networkById.get(entry.targetNetworkId), entry.targetNetworkId);
+      const sourceConnectorLabel = connectorLabel(networkStates, entry.sourceNetworkId, entry.sourceConnectorId);
+      const targetConnectorLabel = connectorLabel(networkStates, entry.targetNetworkId, entry.targetConnectorId);
+      const linkLabel = entry.linkName?.trim() || `${sourceConnectorLabel} -> ${targetConnectorLabel}`;
       findings.push({
         id: `l1-${entry.linkId}-${entry.cavityIndex}`,
         severity: "warning",
         family: "L1",
         networkLabel: `${sourceLabel} -> ${targetLabel}`,
-        message: entry.message,
+        message: `Link '${linkLabel}' cavity ${entry.cavityIndex}: ${sourceConnectorLabel} ${roleDescriptor(entry.sourceRole)} ↔ ${targetConnectorLabel} ${roleDescriptor(entry.targetRole)}; declarations conflict and aggregation uses max(${formatCurrent(entry.maxCurrentA)}).`,
         target: {
           networkId: entry.sourceNetworkId,
           subScreen: "connector",
@@ -138,12 +142,13 @@ export function buildMultiNetworkFunctionalAnalysisModel({
       });
     }
     for (const entry of aggregation.skippedBridges) {
+      const linkLabel = assemblyLinkLabel(activeAssembly, networkStates, entry.linkId);
       findings.push({
         id: `assembly-skipped-${entry.linkId}`,
         severity: "info",
         family: "Assembly",
         networkLabel: activeAssembly.name,
-        message: `Link '${entry.linkId}' was not aggregated because one side is outside the selected assembly scope.`
+        message: `Link '${linkLabel}' was not aggregated because one side is outside the selected assembly scope.`
       });
     }
     for (const warning of aggregation.load.warnings) {
@@ -225,7 +230,7 @@ function appendAssemblyDimensioningFindings(
       severity: "warning",
       family: "D1-D4",
       networkLabel: networkLabel(networkById.get(origin.networkId), origin.networkId),
-      message: `Assembly D3: supply pins on '${origin.connector.name}' declared at ${balance.totalConsumerA.toFixed(1)} A are under-rated vs. selected-union output sum of ${balance.totalSourceA.toFixed(1)} A.`,
+      message: `Assembly D3: supply pins on '${entityLabel(origin.connector)}' declared at ${balance.totalConsumerA.toFixed(1)} A are under-rated vs. selected-union output sum of ${balance.totalSourceA.toFixed(1)} A.`,
       target: {
         networkId: origin.networkId,
         subScreen: "connector",
@@ -262,7 +267,7 @@ function appendAssemblyD1Finding(
     severity: ratio > 1 ? "error" : "warning",
     family: "D1-D4",
     networkLabel: networkLabel(networkById.get(networkId), networkId),
-    message: `Assembly D1: wire '${wire.name}' carries ${effective.toFixed(1)} A in the selected union but its ${wire.sectionMm2} mm² ${material} section is rated for ${ampacity} A (ratio ${(ratio * 100).toFixed(0)}%).`,
+    message: `Assembly D1: wire '${entityLabel(wire)}' carries ${effective.toFixed(1)} A in the selected union but its ${wire.sectionMm2} mm² ${material} section is rated for ${ampacity} A (ratio ${(ratio * 100).toFixed(0)}%).`,
     target: {
       networkId,
       subScreen: "wire",
@@ -295,7 +300,7 @@ function appendAssemblyD2Finding(
       severity: "warning",
       family: "D1-D4",
       networkLabel: networkLabel(networkById.get(origin.networkId), origin.networkId),
-      message: `Assembly D2: wire '${origin.wire.name}' is fuse-protected but the fuse rating is unknown while selected-union downstream load is ${entry.continuousA.toFixed(1)} A.`,
+      message: `Assembly D2: wire '${entityLabel(origin.wire)}' is fuse-protected but the fuse rating is unknown while selected-union downstream load is ${entry.continuousA.toFixed(1)} A.`,
       target: { networkId: origin.networkId, subScreen: "wire", selectionKind: "wire", selectionId: origin.wire.id }
     });
     return;
@@ -308,7 +313,7 @@ function appendAssemblyD2Finding(
     severity: entry.continuousA > rating ? "error" : "warning",
     family: "D1-D4",
     networkLabel: networkLabel(networkById.get(origin.networkId), origin.networkId),
-    message: `Assembly D2: fuse on wire '${origin.wire.name}' is rated ${rating} A while selected-union downstream load is ${entry.continuousA.toFixed(1)} A.`,
+    message: `Assembly D2: fuse on wire '${entityLabel(origin.wire)}' is rated ${rating} A while selected-union downstream load is ${entry.continuousA.toFixed(1)} A.`,
     target: { networkId: origin.networkId, subScreen: "wire", selectionKind: "wire", selectionId: origin.wire.id }
   });
 }
@@ -328,7 +333,7 @@ function appendAssemblyD4Finding(
     severity: "warning",
     family: "D1-D4",
     networkLabel: networkLabel(networkById.get(networkId), networkId),
-    message: `Assembly D4: wire '${wire.name}' is reached by ${branch.sourceRefs.length} declared sources in the selected union, suggesting a conflict.`,
+    message: `Assembly D4: wire '${entityLabel(wire)}' is reached by ${branch.sourceRefs.length} declared sources in the selected union, suggesting a conflict.`,
     target: { networkId, subScreen: "wire", selectionKind: "wire", selectionId: wire.id }
   });
 }
@@ -506,5 +511,46 @@ function values<T, Id extends string>(state: { byId: Record<Id, T>; allIds: Id[]
 }
 
 function networkLabel(network: Network | null | undefined, fallbackId: NetworkId | null): string {
-  return network?.name ?? fallbackId ?? "Current network";
+  if (network === null || network === undefined) {
+    return fallbackId ?? "Current network";
+  }
+  return `${network.name} (${network.technicalId})`;
+}
+
+function entityLabel(entity: { name: string; technicalId: string }): string {
+  return `${entity.name} (${entity.technicalId})`;
+}
+
+function connectorLabel(
+  networkStates: Record<NetworkId, NetworkScopedState>,
+  networkId: NetworkId,
+  connectorId: Connector["id"]
+): string {
+  const connector = networkStates[networkId]?.connectors.byId[connectorId];
+  return connector === undefined ? String(connectorId) : entityLabel(connector);
+}
+
+function assemblyLinkLabel(
+  assembly: HarnessAssembly,
+  networkStates: Record<NetworkId, NetworkScopedState>,
+  linkId: string
+): string {
+  const directLink = assembly.connectorLinks.find((link) => link.id === linkId);
+  if (directLink !== undefined) {
+    return directLink.name?.trim()
+      || `${connectorLabel(networkStates, directLink.sourceNetworkId, directLink.sourceConnectorId)} -> ${connectorLabel(networkStates, directLink.targetNetworkId, directLink.targetConnectorId)}`;
+  }
+  const masterMatch = /^master:(.+):([^:]+):([^:]+)$/.exec(linkId);
+  if (masterMatch?.[1] === undefined || masterMatch[2] === undefined || masterMatch[3] === undefined) {
+    return linkId;
+  }
+  return `Master ${connectorLabel(networkStates, masterMatch[2] as NetworkId, masterMatch[1] as Connector["id"])}`;
+}
+
+function roleDescriptor(role: { role: string; currentA?: number }): string {
+  return typeof role.currentA === "number" ? `${role.role} ${role.currentA} A` : role.role;
+}
+
+function formatCurrent(value: number | undefined): string {
+  return typeof value === "number" ? `${value} A` : "unknown A";
 }

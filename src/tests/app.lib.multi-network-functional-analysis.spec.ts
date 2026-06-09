@@ -189,8 +189,9 @@ describe("buildMultiNetworkFunctionalAnalysisModel", () => {
     expect(model.scope).toBe("assembly");
     expect(model.activeAssemblyName).toBe("Vehicle harness");
     expect(model.availableNetworkCount).toBe(2);
-    expect(model.selectedNetworkLabels).toEqual(["Front harness", "Door harness"]);
+    expect(model.selectedNetworkLabels).toEqual(["Front harness (NET-A)", "Door harness (NET-B)"]);
     expect(model.findings.some((finding) => finding.family === "L1" && finding.message.includes("Front to door"))).toBe(true);
+    expect(model.findings.some((finding) => finding.family === "L1" && finding.message.includes("C-front"))).toBe(true);
     expect(model.findings.find((finding) => finding.family === "L1")?.target).toEqual({
       networkId: netA.id,
       subScreen: "connector",
@@ -307,10 +308,10 @@ describe("buildMultiNetworkFunctionalAnalysisModel", () => {
     });
 
     expect(model.scope).toBe("custom");
-    expect(model.selectedNetworkLabels).toEqual(["Door harness"]);
+    expect(model.selectedNetworkLabels).toEqual(["Door harness (NET-B)"]);
     expect(model.networkOptions).toEqual([
-      { id: netA.id, label: "Front harness", selected: false },
-      { id: netB.id, label: "Door harness", selected: true }
+      { id: netA.id, label: "Front harness (NET-A)", selected: false },
+      { id: netB.id, label: "Door harness (NET-B)", selected: true }
     ]);
   });
 });

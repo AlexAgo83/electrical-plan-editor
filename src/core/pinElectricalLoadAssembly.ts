@@ -27,12 +27,15 @@ export interface AssemblyNetworkSlice {
 
 export interface L1LinkMismatchEntry {
   linkId: InterHarnessConnectorLink["id"];
+  linkName?: string;
   cavityIndex: number;
   sourceNetworkId: NetworkId;
   sourceConnectorId: ConnectorId;
+  sourceRole: PinElectricalRole;
   targetNetworkId: NetworkId;
   targetConnectorId: ConnectorId;
-  message: string;
+  targetRole: PinElectricalRole;
+  maxCurrentA?: number;
 }
 
 export interface SkippedBridgeEntry {
@@ -180,12 +183,15 @@ export function aggregateAssembly(
       if (isIncompatible(sourceRole, targetRole)) {
         l1Mismatches.push({
           linkId: link.id,
+          linkName: link.name,
           cavityIndex,
           sourceNetworkId: link.sourceNetworkId,
           sourceConnectorId: link.sourceConnectorId,
+          sourceRole,
           targetNetworkId: link.targetNetworkId,
           targetConnectorId: link.targetConnectorId,
-          message: `Link '${link.name ?? link.id}' cavity ${cavityIndex}: ${roleDescriptor(sourceRole)} ↔ ${roleDescriptor(targetRole)} — declarations conflict; aggregation uses max(${formatCurrent(maxDeclaredCurrent(sourceRole, targetRole))}).`
+          targetRole,
+          maxCurrentA: maxDeclaredCurrent(sourceRole, targetRole)
         });
       }
 
@@ -269,15 +275,4 @@ function buildMasterConnectorBridgeLinks(assembly: HarnessAssembly): InterHarnes
     }
   }
   return links;
-}
-
-function roleDescriptor(role: PinElectricalRole): string {
-  if (typeof role.currentA === "number") {
-    return `${role.role} ${role.currentA} A`;
-  }
-  return role.role;
-}
-
-function formatCurrent(value: number | undefined): string {
-  return typeof value === "number" ? `${value} A` : "unknown A";
 }
