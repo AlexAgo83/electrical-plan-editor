@@ -106,6 +106,7 @@ describe("FunctionalSchematicPanel electrical overlay", () => {
     expect(sourcePanel).toHaveTextContent("← 2.5 A");
     expect(svg.querySelector(".functional-edge-current-label")).not.toBeNull();
     expect(svg.querySelector(".functional-fuse-load-marker")).not.toBeNull();
+    expect(svg.querySelector(".functional-electrical-overlay-layer")?.outerHTML).toMatchSnapshot("overlay on");
 
     const connectorsBeforeToggle = [sourceConnector.pinElectricalRoles, consumerConnector.pinElectricalRoles];
     const toggle = within(sourcePanel).getByRole("button", { name: "Electrical roles" });
@@ -115,6 +116,7 @@ describe("FunctionalSchematicPanel electrical overlay", () => {
     expect(sourcePanel).not.toHaveTextContent("→ 2.5 A");
     expect(sourcePanel).not.toHaveTextContent("← 2.5 A");
     expect(svg.querySelector(".functional-edge-current-label")).toBeNull();
+    expect(svg.querySelector(".functional-electrical-overlay-layer")?.outerHTML ?? null).toMatchSnapshot("overlay off");
     expect(sourceConnector.pinElectricalRoles).toBe(connectorsBeforeToggle[0]);
     expect(consumerConnector.pinElectricalRoles).toBe(connectorsBeforeToggle[1]);
   });
@@ -147,5 +149,6 @@ describe("FunctionalSchematicPanel electrical overlay", () => {
     expect(svg.querySelector(".functional-pin-role-marker")).toBeNull();
     expect(svg.querySelector(".functional-edge-current-label")).toBeNull();
     expect(svg.querySelector(".functional-fuse-load-marker")).toBeNull();
+    expect(svg.querySelector(".functional-electrical-overlay-layer")?.outerHTML ?? null).toMatchSnapshot("no pin roles");
   });
 });

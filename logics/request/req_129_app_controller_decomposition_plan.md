@@ -1,10 +1,10 @@
 ## req_129_app_controller_decomposition_plan - AppController decomposition plan
 
-> From version: 1.10.4
+> From version: 1.15.4
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 100%
-> Confidence: 90%
+> Status: In progress
+> Understanding: 99%
+> Confidence: 92%
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -72,10 +72,11 @@ flowchart LR
 
 # Backlog
 - `item_600_appcontroller_decomposition_plan`
+- `item_626_appcontroller_hook_impl_decomposition_followup`
 
 # Delivery Status
-- Real-status audit on 2026-06-09: this request is ready and still relevant, but the ADR-009 wave plan has not been delivered as scoped.
-- Evidence checked: `src/app/AppController.tsx` is 1089 lines against the current locked budget of 1100; `LOCKED_LINE_BUDGETS["src/app/AppController.tsx"]` remains 1100 in `scripts/quality/ui-modularization-gate-core.mjs`.
-- Evidence checked: the original oversized implementation bodies still exist under `src/app/hook-impl/controller/` (`useAppControllerScreenContentSlices.tsx`, `useAppControllerModelingAnalysisScreenDomains.tsx`, `useAppControllerNetworkSummaryPanelDomain.tsx`), while thin re-export wrappers under `src/app/hooks/controller/` keep the public import surface small.
-- Evidence checked: `ALLOWED_HOOKS_OVERSIZE` no longer lists the original ADR-009 hook names, but this is mostly a gate-scope/path change rather than proof that the wave targets were retired.
-- Remaining work is pertinent as maintainability debt because AppController has only 11 lines of headroom under the locked budget and the large controller implementation bodies remain concentrated. The next useful step is to re-scope Wave 1 around the current `hook-impl` layout before implementation.
+- First delivery wave shipped on 2026-06-09 in `task_111_appcontroller_decomposition_plan`.
+- Evidence checked: `src/app/AppController.tsx` shrank from the audited 1089 lines to 1077 lines by extracting `useAppControllerWorkspaceRuntime`, preserving the public `<AppController store={...} />` contract.
+- Evidence checked: controller-boundary coverage was added in `src/tests/app-controller-workspace-runtime.hook.spec.tsx`; affected UI tests and modularization gates passed.
+- Evidence checked: `quality:hooks-modularization` still passes. `quality:ui-modularization` now records explicit exceptions for two pre-existing oversize UI files while keeping the AppController locked budget unchanged at 1100.
+- Remaining work is still pertinent: the large implementation bodies under `src/app/hook-impl/controller/` (`useAppControllerScreenContentSlices.tsx`, `useAppControllerModelingAnalysisScreenDomains.tsx`, `useAppControllerNetworkSummaryPanelDomain.tsx`) remain concentrated and should be handled in follow-up decomposition waves before this request is closed.

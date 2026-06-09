@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 92%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Small
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -84,9 +84,20 @@ flowchart LR
 - Primary task(s): `task_121_functional_schematic_electrical_overlay`
 
 # Delivery Status
-- Not delivered yet. The 1.14.0 release explicitly deferred the functional schematic electrical overlay and canvas toggle.
-- Real-status audit on 2026-06-09: no `showElectricalRoles` preference, functional-schematic pin-current overlay, overlay toggle, or overlay snapshots were found in `src/` or `src/tests/`.
-- Relevance assessment: keep this item open, but treat it as a visualization follow-up rather than a validation blocker. The validation center already exposes D1-D4 without the overlay; the overlay remains pertinent for schematic readability and review workflows.
+- Delivered on 2026-06-09.
+- Evidence:
+  - AC1: `FunctionalSchematicPanel` renders `→` and `←` pin-current markers from current-network pin roles.
+  - AC2: non-zero engine-derived branch current is rendered as an additional wire-label line.
+  - AC3: non-zero fuse protected load is rendered next to fuse symbols, including current-network fuse-box pair keys and inline fuse keys.
+  - AC4: the "Electrical roles" toggle defaults on and persists explicit user changes.
+  - AC5: no-pin-role networks produce no overlay marker layer.
+  - AC6: overlay styles use functional schematic CSS classes and theme tokens; no inline color literals were added for the overlay.
+  - AC7: overlay on/off/no-role snapshots live in `src/tests/__snapshots__/app.ui.functional-schematic-electrical-overlay.spec.tsx.snap`.
+  - AC8: the toggle test verifies connector pin-role objects are not mutated.
+- Validation:
+  - `npm run -s typecheck`
+  - `npm run -s lint`
+  - `npm run -s test -- src/tests/app.ui.functional-schematic-electrical-overlay.spec.tsx src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
 
 # AI Context
 - Summary: Adds a functional schematic overlay showing pin directions, pin currents, wire-derived currents, and fuse-protected sums. On by default with a canvas toggle.

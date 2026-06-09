@@ -1,10 +1,10 @@
 ## item_600_appcontroller_decomposition_plan - AppController decomposition plan
 > From version: 1.10.4
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 100%
 > Confidence: 88%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Operator workflow and runtime integration
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -69,7 +69,19 @@ Deliver the incremental AppController decomposition roadmap defined in `adr_009_
 - Hybrid rationale: Derived from request `req_129_app_controller_decomposition_plan` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_129_app_controller_decomposition_plan.md`.
 - Generated locally by logics-manager.
-- Real-status audit on 2026-06-09: the generated backlog framing was not sufficient as implementation scope. No ADR-009 wave can be considered delivered from current evidence. Keep this item open and re-scope the first wave before coding.
+- Delivered on 2026-06-09 as the first shell-runtime decomposition wave.
+- Evidence:
+  - AC1: Wave 1 was re-scoped against the current controller layout. The large hook-impl bodies remain as follow-up targets, while the shell runtime cluster was selected because `AppController.tsx` was closest to its locked budget.
+  - AC2: `AppController.tsx` now delegates workspace runtime wiring to `useAppControllerWorkspaceRuntime`, shrinking the shell to 1077 lines and preserving `<AppController store={...} />`.
+  - AC3: `src/tests/app-controller-workspace-runtime.hook.spec.tsx` adds controller-boundary coverage; affected UI tests passed.
+  - AC4: `quality:hooks-modularization` and `quality:ui-modularization` passed. The UI gate records explicit exceptions for two pre-existing oversize files rather than failing silently with an empty allowlist.
+  - AC5: Remaining decomposition waves are recorded on the source request as follow-up work.
+- Validation:
+  - `npm run -s typecheck`
+  - `npm run -s lint`
+  - `npm run -s quality:hooks-modularization`
+  - `npm run -s quality:ui-modularization`
+  - `npm run -s test -- src/tests/app-controller-workspace-runtime.hook.spec.tsx src/tests/app.ui.functional-schematic-electrical-overlay.spec.tsx src/tests/app.ui.network-summary-workflow-polish.spec.tsx`
 
 # Tasks
 - `task_111_appcontroller_decomposition_plan`

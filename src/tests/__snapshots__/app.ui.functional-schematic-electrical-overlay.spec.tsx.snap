@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FunctionalSchematicPanel electrical overlay > does not render overlay artifacts when pins do not declare electrical roles > no pin roles 1`] = `null`;
+
+exports[`FunctionalSchematicPanel electrical overlay > shows current-network electrical roles by default and hides them without mutating network data > overlay off 1`] = `null`;
+
+exports[`FunctionalSchematicPanel electrical overlay > shows current-network electrical roles by default and hides them without mutating network data > overlay on 1`] = `"<g class="functional-electrical-overlay-layer"><g class="functional-pin-role-marker"><rect x="171.15" y="406" width="56" height="18" rx="4"></rect><text x="199.15" y="418" text-anchor="middle">← 2.5 A</text></g><g class="functional-pin-role-marker"><rect x="171.15" y="34" width="56" height="18" rx="4"></rect><text x="199.15" y="46" text-anchor="middle">→ 2.5 A</text></g><g class="functional-fuse-load-marker"><rect x="117.15" y="228" width="52" height="18" rx="4"></rect><text x="143.15" y="240" text-anchor="middle">2.5 A</text></g></g>"`;

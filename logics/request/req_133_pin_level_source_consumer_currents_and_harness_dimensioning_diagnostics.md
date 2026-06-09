@@ -1,10 +1,10 @@
 ## req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics - Pin-level Source/Consumer Currents and Harness Dimensioning Diagnostics
 
-> From version: 1.15.3
+> From version: 1.15.4
 > Schema version: 1.0
-> Status: In progress
-> Understanding: 100%
-> Confidence: 99%
+> Status: Done
+> Understanding: 99%
+> Confidence: 100%
 > Complexity: Large
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -207,7 +207,7 @@ flowchart LR
 
 # Delivery Status
 - Partially delivered in 1.14.0, with additional validation coverage and the full multi-network analysis view delivered after 1.15.0.
-- Delivered and still evidenced in code: pin electrical role data model, catalog defaults, ampacity overrides, current-network aggregation engine, assembly aggregation core, D1-D4 validation category, connector inspector pin-role editor, catalog pin-role editor, bulk inspector apply/reset, cross-connector mass-edit view with filters and CSV paste, optional BOM computed downstream-load export, sample-network silence gate, export/import preservation, onboarding step, AI Agent context non-expansion, partial-declaration permissiveness gate, 2D canvas unchanged snapshot for pin-role/ampacity-only edits, pin-role Playwright full-flow coverage for the available mass-edit + multi-network path, in-network and multi-network analysis performance budgets, release-gate CI wiring, and read-only Analysis panel surfacing current-network D1-D4 plus active-assembly/custom-scope L1, skipped-bridge, loop, union graph summary, assembly-grade D1-D4, and `Go to` findings. Full schematic rendering stays in the Harness assembly functional schematic view.
-- Still incomplete: functional schematic electrical overlay/toggle.
-- Relevance assessment: the remaining work is still valid but no longer all equally blocking. The mass-edit view remains useful for large harnesses but the inspector/catalog editors provide a workable manual path. The functional schematic overlay is a useful read/review improvement, not a prerequisite for the shipped validation center or the completed multi-network analysis view. Full Playwright/performance gates should wait until the remaining UI surfaces are closer to final.
+- Delivered and still evidenced in code: pin electrical role data model, catalog defaults, ampacity overrides, current-network aggregation engine, assembly aggregation core, D1-D4 validation category, connector inspector pin-role editor, catalog pin-role editor, bulk inspector apply/reset, cross-connector mass-edit view with filters and CSV paste, optional BOM computed downstream-load export, sample-network silence gate, export/import preservation, onboarding step, AI Agent context non-expansion, partial-declaration permissiveness gate, 2D canvas unchanged snapshot for pin-role/ampacity-only edits, pin-role Playwright full-flow coverage for the available mass-edit + multi-network path, in-network and multi-network analysis performance budgets, release-gate CI wiring, read-only Analysis panel surfacing current-network D1-D4 plus active-assembly/custom-scope L1, skipped-bridge, loop, union graph summary, assembly-grade D1-D4, and `Go to` findings, plus the functional schematic electrical overlay/toggle delivered on 2026-06-09.
+- Functional schematic overlay evidence: `FunctionalSchematicPanel` uses `computePinElectricalLoad` in `currentNetwork` scope for pin arrows, wire current labels, and fuse protected-load labels; the "Electrical roles" toggle defaults on and persists explicit user changes; overlay on/off/no-pin-role snapshots are recorded in `src/tests/__snapshots__/app.ui.functional-schematic-electrical-overlay.spec.tsx.snap`.
+- Relevance assessment: remaining work is still valid but no longer all equally blocking. The mass-edit view remains useful for large harnesses but the inspector/catalog editors provide a workable manual path. Full Playwright/performance gates should wait until any remaining UI surfaces are closer to final.
 - Source evidence: `changelogs/CHANGELOGS_1_14_0.md`, `src/core/pinElectricalLoad*.ts`, `src/app/lib/multiNetworkFunctionalAnalysis.ts`, `src/app/components/workspace/MultiNetworkFunctionalAnalysisPanel.tsx`, `src/app/components/workspace/PinRoleMassEditPanel.tsx`, `src/app/hook-impl/validation/appendElectricalDimensioningIssues.ts`, `src/app/components/workspace/PinElectricalRolesEditor.tsx`, `src/app/lib/onboarding.ts`, `scripts/quality/check-pin-role-release-gate.mjs`, `tests/e2e/pin-roles-full-flow.spec.ts`, `src/tests/pin-role-release-gate.spec.ts`, `src/tests/core.pin-electrical-load*.spec.ts`, `src/tests/app.lib.multi-network-functional-analysis.spec.ts`, `src/tests/app.ui.multi-network-functional-analysis.spec.tsx`, `src/tests/app.validation.electrical-dimensioning.spec.ts`, `src/tests/app.ui.inspector-pin-roles.spec.tsx`, `src/tests/app.ui.catalog-pin-roles.spec.tsx`, `src/tests/app.ui.mass-edit-pin-roles.spec.tsx`, `src/tests/portability.network-file.spec.ts`, and `src/tests/ai-agent-context.spec.ts`.
