@@ -15,6 +15,12 @@ import type { ValidationIssue } from "../types/app-controller";
 
 export type MultiNetworkFunctionalAnalysisScope = "current" | "assembly";
 export type MultiNetworkFunctionalAnalysisSeverity = "error" | "warning" | "info";
+export type MultiNetworkFunctionalAnalysisTarget = {
+  networkId: NetworkId;
+  subScreen: "connector" | "splice" | "node" | "segment" | "wire";
+  selectionKind: "connector" | "splice" | "node" | "segment" | "wire";
+  selectionId: string;
+};
 
 export interface MultiNetworkFunctionalAnalysisFinding {
   id: string;
@@ -22,6 +28,7 @@ export interface MultiNetworkFunctionalAnalysisFinding {
   family: "D1-D4" | "L1" | "Assembly";
   networkLabel: string;
   message: string;
+  target?: MultiNetworkFunctionalAnalysisTarget;
 }
 
 export interface MultiNetworkFunctionalAnalysisModel {
@@ -91,7 +98,13 @@ export function buildMultiNetworkFunctionalAnalysisModel({
         severity: "warning",
         family: "L1",
         networkLabel: `${sourceLabel} -> ${targetLabel}`,
-        message: entry.message
+        message: entry.message,
+        target: {
+          networkId: entry.sourceNetworkId,
+          subScreen: "connector",
+          selectionKind: "connector",
+          selectionId: entry.sourceConnectorId
+        }
       });
     }
     for (const entry of aggregation.skippedBridges) {
@@ -154,7 +167,13 @@ function appendScopedDimensioningFindings(
       severity: issue.severity,
       family: "D1-D4",
       networkLabel: networkLabel(network, network?.id ?? null),
-      message: issue.message
+      message: issue.message,
+      target: network === null ? undefined : {
+        networkId: network.id,
+        subScreen: issue.subScreen,
+        selectionKind: issue.selectionKind,
+        selectionId: issue.selectionId
+      }
     });
   }
 }
