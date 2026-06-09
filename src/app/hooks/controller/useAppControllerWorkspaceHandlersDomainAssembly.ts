@@ -154,6 +154,7 @@ export function useAppControllerWorkspaceHandlersDomainAssembly({
       setShowFloatingInspectorPanel: preferencesState.setShowFloatingInspectorPanel,
       setShowRoutePreviewPanel: preferencesState.setShowRoutePreviewPanel,
       setHideWireAnalysisRoutePanel: preferencesState.setHideWireAnalysisRoutePanel,
+      setShowMultiNetworkFunctionalAnalysisPanel: preferencesState.setShowMultiNetworkFunctionalAnalysisPanel,
       setWorkspacePanelsLayoutMode: preferencesState.setWorkspacePanelsLayoutMode,
       setWorkspaceWideScreen: preferencesState.setWorkspaceWideScreen
     }

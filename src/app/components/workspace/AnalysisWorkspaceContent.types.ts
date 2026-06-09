@@ -4,9 +4,11 @@ import type {
   CatalogItemId,
   Connector,
   ConnectorId,
+  NetworkId,
   NetworkNode,
   NodeId,
   PinElectricalRole,
+  Network,
   Segment,
   SegmentId,
   Splice,
@@ -23,8 +25,10 @@ import type {
 } from "../../types/app-controller";
 import type {
   MultiNetworkFunctionalAnalysisModel,
-  MultiNetworkFunctionalAnalysisScope
+  MultiNetworkFunctionalAnalysisScope,
+  MultiNetworkFunctionalAnalysisTarget
 } from "../../lib/multiNetworkFunctionalAnalysis";
+import type { PinRoleMassEditUpdate } from "./PinRoleMassEditPanel";
 
 interface OccupancyStatus {
   isOccupied: boolean;
@@ -45,9 +49,16 @@ export type SpliceAnalysisView = "ports" | "synthesis";
 export interface AnalysisWorkspaceContentProps {
   showEntityTables?: boolean;
   hideWireAnalysisRoutePanel?: boolean;
+  showMultiNetworkFunctionalAnalysisPanel?: boolean;
+  isMultiNetworkFunctionalAnalysisOpen: boolean;
+  activeNetwork: Network | null;
   multiNetworkFunctionalAnalysis: MultiNetworkFunctionalAnalysisModel;
   multiNetworkFunctionalAnalysisScope: MultiNetworkFunctionalAnalysisScope;
   setMultiNetworkFunctionalAnalysisScope: (value: MultiNetworkFunctionalAnalysisScope) => void;
+  onToggleMultiNetworkFunctionalAnalysisCustomNetwork: (networkId: NetworkId) => void;
+  onGoToMultiNetworkFunctionalAnalysisFinding: (target: MultiNetworkFunctionalAnalysisTarget) => void;
+  onCloseMultiNetworkFunctionalAnalysis: () => void;
+  onApplyPinRoleMassEdit: (updates: PinRoleMassEditUpdate[]) => void;
   isConnectorSubScreen: boolean;
   isSpliceSubScreen: boolean;
   isNodeSubScreen: boolean;

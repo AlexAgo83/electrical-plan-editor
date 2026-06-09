@@ -54,6 +54,7 @@ export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
       "Show floating inspector panel on supported screens",
       "Show route preview panel",
       "Hide Wire analysis auto route panel",
+      "Show multi-network functional analysis panel",
       "Workspace panels layout",
       "Wide screen (remove app max width cap)",
       "Default wire section (mm²)",

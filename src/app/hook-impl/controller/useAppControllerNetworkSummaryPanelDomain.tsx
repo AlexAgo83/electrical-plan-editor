@@ -144,6 +144,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
     | "showFloatingInspectorPanel"
     | "setShowFloatingInspectorPanel"
     | "showRoutePreviewPanel"
+    | "showMultiNetworkFunctionalAnalysisPanel"
   >;
   selection: Pick<
     AppControllerSelectionEntitiesModel,
@@ -181,6 +182,7 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   markDetailPanelsSelectionSourceAsTable: () => void;
   startWireEdit: (wire: Wire) => void;
   onOpenHarnessAssemblyOnboardingHelp: () => void;
+  onOpenMultiNetworkFunctionalAnalysis?: () => void;
   dispatchAction: (action: AppAction, options?: { trackHistory?: boolean }) => void;
   store: AppStore;
 }
@@ -247,6 +249,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
   markDetailPanelsSelectionSourceAsTable,
   startWireEdit,
   onOpenHarnessAssemblyOnboardingHelp,
+  onOpenMultiNetworkFunctionalAnalysis,
   dispatchAction,
   store
 }: UseAppControllerNetworkSummaryPanelDomainParams) {
@@ -466,6 +469,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
     onExportNetwork,
     handleRegenerateLayout,
         onOpenCurrentNetworkFunctional: handleOpenCurrentNetworkFunctional,
+        onOpenMultiNetworkFunctionalAnalysis:
+          preferencesState.showMultiNetworkFunctionalAnalysisPanel === false ? undefined : onOpenMultiNetworkFunctionalAnalysis,
         showFunctionalSchematic: false
       }).networkSummaryPanel
     : null;

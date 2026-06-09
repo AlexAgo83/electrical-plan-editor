@@ -153,6 +153,7 @@ export function NetworkSummaryPanel({
   onExportNetwork,
   onRegenerateLayout,
   onOpenCurrentNetworkFunctional,
+  onOpenMultiNetworkFunctionalAnalysis,
   activeNetwork,
   networks,
   onSelectActiveNetwork,
@@ -811,6 +812,7 @@ export function NetworkSummaryPanel({
           toggleShowCableCallouts={toggleShowCableCallouts}
           onRegenerateLayout={onRegenerateLayout}
           onOpenCurrentNetworkFunctional={onOpenCurrentNetworkFunctional}
+          onOpenMultiNetworkFunctionalAnalysis={onOpenMultiNetworkFunctionalAnalysis}
           onExportSvg={() => {
             void handleExportPlanAsSvg();
           }}

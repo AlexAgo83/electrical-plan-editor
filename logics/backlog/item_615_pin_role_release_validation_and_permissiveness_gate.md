@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 100%
-> Confidence: 90%
-> Progress: 75%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -90,13 +90,13 @@ flowchart LR
 - Primary task(s): `task_123_pin_role_release_validation_and_permissiveness_gate`
 
 # Delivery Status
-- Partially covered by the 1.14.0 focused unit/UI validation, but the release-gate slice is not complete.
+- Covered by focused unit/UI validation plus explicit release-gate wiring.
 - Delivered evidence: focused type/lint/vitest coverage for data model, ampacity, current-network and assembly aggregation, D1-D4 validation, inspector pin roles, and catalog pin roles.
 - Delivered after 1.15.0: onboarding step "Declare pin roles", AI Agent context snapshot, sample-network silence gate, and export/import preservation of connector `pinElectricalRoles`, catalog default `pinElectricalRoles`, and `ampacityOverrides`.
 - Delivered on 2026-06-09: partial-declaration permissiveness gate and byte-for-byte 2D canvas unchanged snapshot for pin-role/ampacity-only edits.
 - Real-status audit on 2026-06-09: no Playwright full-flow, performance budget scripts/gates, or CI release-gate wiring specific to this release were found.
-- Remaining and pertinent: Playwright full-flow after mass-edit/overlay/multi-network view exist, performance budgets, and CI release-gate wiring.
-- Relevance assessment: keep this item open, but do not treat the Playwright full-flow or multi-network view performance budget as actionable until the deferred UI surfaces are implemented.
+- Delivered on 2026-06-09: Playwright pin-role full-flow coverage for the available mass-edit + multi-network analysis path, explicit in-network and multi-network performance ratio budgets, and `quality:pin-role-release-gate` wired into `ci:blocking`.
+- Delivery status: done. Functional schematic overlay/toggle coverage remains in the dedicated overlay slice, not this release-gate wiring slice.
 
 # AI Context
 - Summary: Release-gate slice for the pin-level source/consumer release. End-to-end Playwright, permissiveness assertions, modeling-canvas-unchanged snapshot, AI-Agent-untouched snapshot, performance budgets, onboarding step.

@@ -280,6 +280,8 @@ export function useAppControllerAuxScreenContentDomains({
     setShowRoutePreviewPanel: settings.prefs.setShowRoutePreviewPanel,
     hideWireAnalysisRoutePanel: settings.prefs.hideWireAnalysisRoutePanel,
     setHideWireAnalysisRoutePanel: settings.prefs.setHideWireAnalysisRoutePanel,
+    showMultiNetworkFunctionalAnalysisPanel: settings.prefs.showMultiNetworkFunctionalAnalysisPanel,
+    setShowMultiNetworkFunctionalAnalysisPanel: settings.prefs.setShowMultiNetworkFunctionalAnalysisPanel,
     workspacePanelsLayoutMode: settings.prefs.workspacePanelsLayoutMode,
     setWorkspacePanelsLayoutMode: settings.prefs.setWorkspacePanelsLayoutMode,
     workspaceWideScreen: settings.prefs.workspaceWideScreen,

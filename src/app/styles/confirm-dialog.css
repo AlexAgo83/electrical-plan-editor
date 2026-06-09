@@ -169,6 +169,30 @@
   grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
 }
 
+.workspace-tool-dialog {
+  width: min(100%, 78rem);
+  max-height: min(46rem, calc(100vh - 2rem));
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.workspace-tool-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.workspace-tool-dialog-header h2 {
+  margin: 0;
+}
+
+.workspace-tool-dialog > .panel,
+.workspace-tool-dialog > .pin-role-mass-edit-panel {
+  min-height: 0;
+  overflow: auto;
+  box-shadow: none;
+}
+
 .bom-preview-dialog-header {
   display: grid;
   gap: 0.55rem;

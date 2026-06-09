@@ -49,6 +49,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   | "routingGraphSegmentCount"
   | "onRegenerateLayout"
   | "onOpenCurrentNetworkFunctional"
+  | "onOpenMultiNetworkFunctionalAnalysis"
 > & {
   NetworkSummaryPanelComponent: ComponentType<NetworkSummaryPanelProps>;
   networkSummaryPanelRef?: Ref<NetworkSummaryPanelHandle>;
@@ -72,6 +73,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   };
   handleRegenerateLayout: NetworkSummaryPanelProps["onRegenerateLayout"];
   onOpenCurrentNetworkFunctional?: NetworkSummaryPanelProps["onOpenCurrentNetworkFunctional"];
+  onOpenMultiNetworkFunctionalAnalysis?: NetworkSummaryPanelProps["onOpenMultiNetworkFunctionalAnalysis"];
 };
 
 type NetworkScopeScreenContentSliceParams = Omit<
@@ -286,6 +288,7 @@ export function buildNetworkSummaryPanelControllerSlice(params: NetworkSummaryPa
     onExportNetwork: params.onExportNetwork,
     onRegenerateLayout: params.handleRegenerateLayout,
     onOpenCurrentNetworkFunctional: params.onOpenCurrentNetworkFunctional,
+    onOpenMultiNetworkFunctionalAnalysis: params.onOpenMultiNetworkFunctionalAnalysis,
     imperativeRef: params.networkSummaryPanelRef
   } satisfies NetworkSummaryPanelProps;
 
@@ -378,6 +381,9 @@ export function buildModelingScreenContentSlice(params: ModelingScreenContentSli
     onSelectCatalogItem: params.onSelectCatalogItem,
     onDeleteConnector: params.handleConnectorDelete,
     onOpenConnectorOnboardingHelp: params.onOpenConnectorOnboardingHelp,
+    activeNetwork: params.activeNetwork,
+    wires: params.wires,
+    onApplyPinRoleMassEdit: params.onApplyPinRoleMassEdit,
     isSpliceSubScreen: params.isSpliceSubScreen,
     spliceFormMode: params.spliceFormMode,
     onOpenCreateSplice: params.resetSpliceForm,
@@ -716,9 +722,16 @@ export function buildAnalysisScreenContentSlice(params: AnalysisScreenContentSli
   const analysisWorkspaceContentProps = {
     showEntityTables: false,
     hideWireAnalysisRoutePanel: params.hideWireAnalysisRoutePanel,
+    showMultiNetworkFunctionalAnalysisPanel: params.showMultiNetworkFunctionalAnalysisPanel,
+    isMultiNetworkFunctionalAnalysisOpen: params.isMultiNetworkFunctionalAnalysisOpen,
+    activeNetwork: params.activeNetwork,
     multiNetworkFunctionalAnalysis: params.multiNetworkFunctionalAnalysis,
     multiNetworkFunctionalAnalysisScope: params.multiNetworkFunctionalAnalysisScope,
     setMultiNetworkFunctionalAnalysisScope: params.setMultiNetworkFunctionalAnalysisScope,
+    onToggleMultiNetworkFunctionalAnalysisCustomNetwork: params.onToggleMultiNetworkFunctionalAnalysisCustomNetwork,
+    onGoToMultiNetworkFunctionalAnalysisFinding: params.onGoToMultiNetworkFunctionalAnalysisFinding,
+    onCloseMultiNetworkFunctionalAnalysis: params.onCloseMultiNetworkFunctionalAnalysis,
+    onApplyPinRoleMassEdit: params.onApplyPinRoleMassEdit,
     isConnectorSubScreen: params.isConnectorSubScreen,
     isSpliceSubScreen: params.isSpliceSubScreen,
     isNodeSubScreen: params.isNodeSubScreen,
@@ -1003,6 +1016,8 @@ export function buildSettingsScreenContentSlice(params: SettingsScreenContentSli
     setShowRoutePreviewPanel: params.setShowRoutePreviewPanel,
     hideWireAnalysisRoutePanel: params.hideWireAnalysisRoutePanel,
     setHideWireAnalysisRoutePanel: params.setHideWireAnalysisRoutePanel,
+    showMultiNetworkFunctionalAnalysisPanel: params.showMultiNetworkFunctionalAnalysisPanel,
+    setShowMultiNetworkFunctionalAnalysisPanel: params.setShowMultiNetworkFunctionalAnalysisPanel,
     workspacePanelsLayoutMode: params.workspacePanelsLayoutMode,
     setWorkspacePanelsLayoutMode: params.setWorkspacePanelsLayoutMode,
     workspaceWideScreen: params.workspaceWideScreen,

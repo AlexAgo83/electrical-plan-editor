@@ -210,6 +210,68 @@ describe("aggregateAssembly", () => {
     expect(result.skippedBridges[0]!.linkId).toBe(link.id);
   });
 
+  it("propagates through shared master connector references", () => {
+    const sourceA = makeConnector("MASTER", 1, {
+      pinElectricalRoles: { 1: { role: "source", currentA: 6 } }
+    });
+    const masterB = makeConnector("MASTER", 1);
+    const consumerB = makeConnector("CON-B", 1, {
+      pinElectricalRoles: { 1: { role: "consumer", currentA: 6 } }
+    });
+    const wireB = makeWire(
+      "WB",
+      { kind: "connectorCavity", connectorId: masterB.id, cavityIndex: 1 },
+      { kind: "connectorCavity", connectorId: consumerB.id, cavityIndex: 1 }
+    );
+
+    const slices: AssemblyNetworkSlice[] = [
+      { networkId: asNetworkId("net-a"), connectors: [sourceA], splices: [], wires: [] },
+      { networkId: asNetworkId("net-b"), connectors: [masterB, consumerB], splices: [], wires: [wireB] }
+    ];
+    const assembly = {
+      ...makeAssembly([]),
+      masterConnectorRefs: [
+        { networkId: asNetworkId("net-a"), connectorId: sourceA.id },
+        { networkId: asNetworkId("net-b"), connectorId: masterB.id }
+      ]
+    };
+
+    const result = aggregateAssembly(
+      assembly,
+      slices,
+      [asNetworkId("net-a"), asNetworkId("net-b")],
+      new Map()
+    );
+
+    const wireBEntry = [...result.load.branchLoadByWire.entries()].find(([id]) => id.endsWith("WB"));
+    expect(wireBEntry?.[1].continuousA).toBe(6);
+    expect(result.wireOriginByPrefixedId.get(wireBEntry![0])?.networkId).toBe(asNetworkId("net-b"));
+  });
+
+  it("reports cyclic branches as loop warnings", () => {
+    const source = makeConnector("C-src", 1, {
+      pinElectricalRoles: { 1: { role: "source", currentA: 4 } }
+    });
+    const passA = makeConnector("C-a", 1);
+    const passB = makeConnector("C-b", 1);
+    const slices: AssemblyNetworkSlice[] = [
+      {
+        networkId: asNetworkId("net-a"),
+        connectors: [source, passA, passB],
+        splices: [],
+        wires: [
+          makeWire("W1", { kind: "connectorCavity", connectorId: source.id, cavityIndex: 1 }, { kind: "connectorCavity", connectorId: passA.id, cavityIndex: 1 }),
+          makeWire("W2", { kind: "connectorCavity", connectorId: passA.id, cavityIndex: 1 }, { kind: "connectorCavity", connectorId: passB.id, cavityIndex: 1 }),
+          makeWire("W3", { kind: "connectorCavity", connectorId: passB.id, cavityIndex: 1 }, { kind: "connectorCavity", connectorId: source.id, cavityIndex: 1 })
+        ]
+      }
+    ];
+
+    const result = aggregateAssembly(makeAssembly([]), slices, [asNetworkId("net-a")], new Map());
+
+    expect(result.load.warnings.some((warning) => warning.code === "loop")).toBe(true);
+  });
+
   it("does not emit L1 when one side is passive or undeclared", () => {
     const portA = makeConnector("CA", 1, {
       pinElectricalRoles: { 1: { role: "source", currentA: 5 } }

@@ -148,6 +148,8 @@ interface SettingsWorkspaceContentProps {
   setShowRoutePreviewPanel: (value: boolean) => void;
   hideWireAnalysisRoutePanel: boolean;
   setHideWireAnalysisRoutePanel: (value: boolean) => void;
+  showMultiNetworkFunctionalAnalysisPanel: boolean;
+  setShowMultiNetworkFunctionalAnalysisPanel: (value: boolean) => void;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutMode;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutMode) => void;
   workspaceWideScreen: boolean;
@@ -288,6 +290,8 @@ export function SettingsWorkspaceContent({
   setShowRoutePreviewPanel,
   hideWireAnalysisRoutePanel,
   setHideWireAnalysisRoutePanel,
+  showMultiNetworkFunctionalAnalysisPanel,
+  setShowMultiNetworkFunctionalAnalysisPanel,
   workspacePanelsLayoutMode,
   setWorkspacePanelsLayoutMode,
   workspaceWideScreen,
@@ -1162,6 +1166,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setHideWireAnalysisRoutePanel(event.target.checked)}
             />
             {renderSettingLabel("Hide Wire analysis auto route panel")}
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={showMultiNetworkFunctionalAnalysisPanel}
+              onChange={(event) => setShowMultiNetworkFunctionalAnalysisPanel(event.target.checked)}
+            />
+            {renderSettingLabel("Show multi-network functional analysis panel")}
           </label>
           <label className="settings-field">
             {renderSettingLabel("Workspace panels layout")}

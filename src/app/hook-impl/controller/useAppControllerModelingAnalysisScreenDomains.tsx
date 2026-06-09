@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { SegmentId } from "../../../core/entities";
-import { appActions, type AppStore } from "../../../store";
+import type { ConnectorId, NetworkId, NodeId, SegmentId, SpliceId, WireId } from "../../../core/entities";
+import { appActions, appReducer, type AppStore } from "../../../store";
 import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
 import {
   analyzeModelingBatchDelete,
@@ -16,7 +16,8 @@ import type { AppControllerModelingHandlersOrchestrator } from "../../hooks/cont
 import { parseConnectorTerminalOverridesDraft } from "../../lib/connectorTerminalOverridesDraft";
 import {
   buildMultiNetworkFunctionalAnalysisModel,
-  type MultiNetworkFunctionalAnalysisScope
+  type MultiNetworkFunctionalAnalysisScope,
+  type MultiNetworkFunctionalAnalysisTarget
 } from "../../lib/multiNetworkFunctionalAnalysis";
 import {
   buildAnalysisScreenContentSlice,
@@ -90,8 +91,12 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
     ModelingSliceParams,
     "catalogItems" | "connectors" | "splices" | "nodes" | "segments" | "wires"
   >;
+  activeNetwork: AnalysisSliceParams["activeNetwork"];
   tabularExportFormat: ModelingSliceParams["tabularExportFormat"];
   hideWireAnalysisRoutePanel: AnalysisSliceParams["hideWireAnalysisRoutePanel"];
+  showMultiNetworkFunctionalAnalysisPanel: AnalysisSliceParams["showMultiNetworkFunctionalAnalysisPanel"];
+  isMultiNetworkFunctionalAnalysisOpen: AnalysisSliceParams["isMultiNetworkFunctionalAnalysisOpen"];
+  onCloseMultiNetworkFunctionalAnalysis: AnalysisSliceParams["onCloseMultiNetworkFunctionalAnalysis"];
   formsState: AppControllerFormsStateFlat;
   modelingHandlers: AppControllerModelingHandlersOrchestrator;
   catalogHandlers: Pick<CatalogHandlersModel, "startCatalogEdit">;
@@ -213,6 +218,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   components,
   screenFlags,
   entities,
+  activeNetwork,
   formsState,
   modelingHandlers,
   catalogHandlers,
@@ -228,6 +234,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
   wireTechnicalIdAlreadyUsed,
   tabularExportFormat,
   hideWireAnalysisRoutePanel,
+  showMultiNetworkFunctionalAnalysisPanel,
+  isMultiNetworkFunctionalAnalysisOpen,
+  onCloseMultiNetworkFunctionalAnalysis,
   onSelectConnector,
   onSelectSplice,
   onSelectNode,
@@ -254,6 +263,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
   const [spliceAnalysisView, setSpliceAnalysisView] = useState<SpliceAnalysisView>("ports");
   const [multiNetworkFunctionalAnalysisScope, setMultiNetworkFunctionalAnalysisScope] =
     useState<MultiNetworkFunctionalAnalysisScope>("current");
+  const [multiNetworkFunctionalAnalysisCustomNetworkIds, setMultiNetworkFunctionalAnalysisCustomNetworkIds] =
+    useState<NetworkId[]>([]);
   const [activeBatchScope, setActiveBatchScope] = useState<ModelingBatchSelectionScope | null>(null);
   const [batchSelectionIds, setBatchSelectionIds] = useState<ReadonlySet<string>>(new Set());
   const [segmentBatchSheathType, setSegmentBatchSheathType] = useState("");
@@ -292,9 +303,81 @@ export function useAppControllerModelingAnalysisScreenDomains({
             ? null
             : appStateSnapshot.networkStates[appStateSnapshot.activeNetworkId] ?? null,
         catalogItems: entities.catalogItems,
-        scope: multiNetworkFunctionalAnalysisScope
+        scope: multiNetworkFunctionalAnalysisScope,
+        customNetworkIds: multiNetworkFunctionalAnalysisCustomNetworkIds
       }),
-    [appStateSnapshot, entities.catalogItems, multiNetworkFunctionalAnalysisScope]
+    [appStateSnapshot, entities.catalogItems, multiNetworkFunctionalAnalysisCustomNetworkIds, multiNetworkFunctionalAnalysisScope]
+  );
+  const handleToggleMultiNetworkFunctionalAnalysisCustomNetwork = useCallback((networkId: NetworkId) => {
+    setMultiNetworkFunctionalAnalysisCustomNetworkIds((current) =>
+      current.includes(networkId)
+        ? current.filter((id) => id !== networkId)
+        : [...current, networkId]
+    );
+  }, []);
+  const handleGoToMultiNetworkFunctionalAnalysisFinding = useCallback(
+    (target: MultiNetworkFunctionalAnalysisTarget) => {
+      if (store.getState().activeNetworkId !== target.networkId) {
+        dispatchAction(appActions.selectNetwork(target.networkId), { trackHistory: false });
+      }
+
+      const state = store.getState();
+      markSelectionPanelsFromTable?.();
+      setActiveSubScreen(target.subScreen);
+
+      if (target.selectionKind === "connector") {
+        const connectorId = target.selectionId as ConnectorId;
+        const connector = state.connectors.byId[connectorId];
+        if (connector !== undefined) {
+          modelingHandlers.connector.startConnectorEdit(connector);
+          return;
+        }
+        dispatchAction(appActions.select({ kind: "connector", id: connectorId }), { trackHistory: false });
+        return;
+      }
+
+      if (target.selectionKind === "splice") {
+        const spliceId = target.selectionId as SpliceId;
+        const splice = state.splices.byId[spliceId];
+        if (splice !== undefined) {
+          modelingHandlers.splice.startSpliceEdit(splice);
+          return;
+        }
+        dispatchAction(appActions.select({ kind: "splice", id: spliceId }), { trackHistory: false });
+        return;
+      }
+
+      if (target.selectionKind === "node") {
+        const nodeId = target.selectionId as NodeId;
+        const node = state.nodes.byId[nodeId];
+        if (node !== undefined) {
+          modelingHandlers.node.startNodeEdit(node);
+          return;
+        }
+        dispatchAction(appActions.select({ kind: "node", id: nodeId }), { trackHistory: false });
+        return;
+      }
+
+      if (target.selectionKind === "segment") {
+        const segmentId = target.selectionId as SegmentId;
+        const segment = state.segments.byId[segmentId];
+        if (segment !== undefined) {
+          modelingHandlers.segment.startSegmentEdit(segment);
+          return;
+        }
+        dispatchAction(appActions.select({ kind: "segment", id: segmentId }), { trackHistory: false });
+        return;
+      }
+
+      const wireId = target.selectionId as WireId;
+      const wire = state.wires.byId[wireId];
+      if (wire !== undefined) {
+        modelingHandlers.wire.startWireEdit(wire);
+        return;
+      }
+      dispatchAction(appActions.select({ kind: "wire", id: wireId }), { trackHistory: false });
+    },
+    [dispatchAction, markSelectionPanelsFromTable, modelingHandlers, setActiveSubScreen, store]
   );
   const activeSubScreenBatchScope = screenFlags.isConnectorSubScreen
     ? "connector"
@@ -580,6 +663,43 @@ export function useAppControllerModelingAnalysisScreenDomains({
     },
     [dispatchAction, store]
   );
+  const handleApplyPinRoleMassEdit: AnalysisSliceParams["onApplyPinRoleMassEdit"] = useCallback(
+    (updates) => {
+      if (updates.length === 0) {
+        return;
+      }
+      let nextState = store.getState();
+      const updatesByConnectorId = new Map<ConnectorId, typeof updates>();
+      for (const update of updates) {
+        const group = updatesByConnectorId.get(update.connectorId) ?? [];
+        group.push(update);
+        updatesByConnectorId.set(update.connectorId, group);
+      }
+      for (const [connectorId, connectorUpdates] of updatesByConnectorId) {
+        const connector = nextState.connectors.byId[connectorId];
+        if (connector === undefined) {
+          continue;
+        }
+        const pinElectricalRoles = { ...(connector.pinElectricalRoles ?? {}) };
+        for (const update of connectorUpdates) {
+          if (update.role === null) {
+            delete pinElectricalRoles[update.cavityIndex];
+          } else {
+            pinElectricalRoles[update.cavityIndex] = update.role;
+          }
+        }
+        nextState = appReducer(
+          nextState,
+          appActions.upsertConnector({
+            ...connector,
+            pinElectricalRoles: Object.keys(pinElectricalRoles).length > 0 ? pinElectricalRoles : undefined
+          })
+        );
+      }
+      replaceStateWithHistory(nextState);
+    },
+    [replaceStateWithHistory, store]
+  );
   const handleSaveConnectorCatalogMaterialApplication: AnalysisSliceParams["onSaveConnectorCatalogMaterialApplication"] = useCallback(
     (connectorId, input) => {
       const connector = store.getState().connectors.byId[connectorId];
@@ -681,6 +801,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
     },
     handleConnectorDelete: modelingHandlers.connector.handleConnectorDelete,
     onOpenConnectorOnboardingHelp: onboardingHelp?.openConnectorStep,
+    activeNetwork,
+    onApplyPinRoleMassEdit: handleApplyPinRoleMassEdit,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
     spliceFormMode: formsState.spliceFormMode,
     spliceEditAfterCreate: formsState.spliceEditAfterCreate,
@@ -1013,9 +1135,16 @@ export function useAppControllerModelingAnalysisScreenDomains({
       return buildAnalysisScreenContentSlice({
     AnalysisWorkspaceContentComponent: components.AnalysisWorkspaceContentComponent,
     hideWireAnalysisRoutePanel,
+    showMultiNetworkFunctionalAnalysisPanel,
+    isMultiNetworkFunctionalAnalysisOpen,
+    activeNetwork,
     multiNetworkFunctionalAnalysis,
     multiNetworkFunctionalAnalysisScope,
     setMultiNetworkFunctionalAnalysisScope,
+    onToggleMultiNetworkFunctionalAnalysisCustomNetwork: handleToggleMultiNetworkFunctionalAnalysisCustomNetwork,
+    onGoToMultiNetworkFunctionalAnalysisFinding: handleGoToMultiNetworkFunctionalAnalysisFinding,
+    onCloseMultiNetworkFunctionalAnalysis,
+    onApplyPinRoleMassEdit: handleApplyPinRoleMassEdit,
     isConnectorSubScreen: screenFlags.isConnectorSubScreen,
     isSpliceSubScreen: screenFlags.isSpliceSubScreen,
     isNodeSubScreen: screenFlags.isNodeSubScreen,

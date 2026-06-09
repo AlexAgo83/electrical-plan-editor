@@ -229,16 +229,26 @@ function propagateFromSource(
     loops: []
   };
   const visited = new Set<string>([keyOf(startEndpoint)]);
-  const queue: WireEndpointKey[] = [startEndpoint];
+  const queue: Array<{ endpoint: WireEndpointKey; parentKey: string | null }> = [
+    { endpoint: startEndpoint, parentKey: null }
+  ];
   while (queue.length > 0) {
-    const current = queue.shift()!;
+    const currentEntry = queue.shift()!;
+    const current = currentEntry.endpoint;
     const currentKey = keyOf(current);
     const neighbors = adjacency.get(currentKey) ?? [];
     for (const neighbor of neighbors) {
       const toKey = keyOf(neighbor.to);
       if (visited.has(toKey)) {
-        if (neighbor.wireId === undefined && current.kind === "connectorCavity" && neighbor.to.kind === "connectorCavity") {
-          // Loop within a fuse-box pair on the same connector — note once
+        if (toKey !== currentEntry.parentKey) {
+          const participants = [current, neighbor.to]
+            .filter((endpoint): endpoint is Extract<WireEndpointKey, { kind: "connectorCavity" }> =>
+              endpoint.kind === "connectorCavity"
+            )
+            .map((endpoint) => ({ connectorId: endpoint.connectorId, cavityIndex: endpoint.cavityIndex }));
+          if (participants.length > 0) {
+            result.loops.push(participants);
+          }
         }
         continue;
       }
@@ -284,19 +294,22 @@ function propagateFromSource(
         // Passive / bidirectional connector pin: continue (treat as pass-through if it's
         // really a connector pin that bridges via fuse-box, otherwise stop at the leaf).
         if (!isPassThroughEndpoint(neighborTo)) {
-          // If this connector pin has no fuse-box pair bridge edge attached, it's a leaf and we stop.
-          const hasBridge = (adjacency.get(toKey) ?? []).some(
+          // If this connector pin has no fuse-box pair bridge edge and no additional
+          // physical continuation, it is a leaf and propagation stops.
+          const nextEdges = adjacency.get(toKey) ?? [];
+          const hasBridge = nextEdges.some(
             (n) =>
               n.wireId === undefined &&
               n.to.kind === "connectorCavity" &&
               n.to.connectorId === targetConnectorId
           );
-          if (!hasBridge) {
+          const hasPhysicalContinuation = nextEdges.length > 1;
+          if (!hasBridge && !hasPhysicalContinuation) {
             continue;
           }
         }
       }
-      queue.push(neighbor.to);
+      queue.push({ endpoint: neighbor.to, parentKey: currentKey });
     }
   }
   return result;
@@ -393,6 +406,13 @@ function computeCurrentNetwork(input: PinElectricalLoadInput): PinElectricalLoad
       result.pinLoadByConnectorPin,
       fuseBoxPairsByConnector
     );
+    for (const loop of propagation.loops) {
+      result.warnings.push({
+        code: "loop",
+        message: "Inter-network aggregation did not converge for a cyclic branch; branch aggregation continued with visited-pin guards.",
+        participants: loop
+      });
+    }
 
     const sourceRef: ConnectorPinRef = {
       connectorId: source.connectorId,

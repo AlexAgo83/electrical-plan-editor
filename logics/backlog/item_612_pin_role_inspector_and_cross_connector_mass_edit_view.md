@@ -2,10 +2,10 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 100%
 > Confidence: 92%
-> Progress: 70%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -95,8 +95,8 @@ flowchart LR
 - Delivered: connector inspector pin-role editor, catalog defaults editor, catalog/override/default badges, inspector bulk apply, reset to catalog default, and focused UI tests for inspector/catalog workflows.
 - Real-status audit on 2026-06-09: no implementation or tests were found for a cross-connector pin-role mass-edit view or CSV paste. The 1.14.0 changelog also lists both as deferred.
 - Delivered on 2026-06-09: optional BOM "Computed downstream load (A)" column on fuse rows, off by default.
-- Remaining and pertinent: cross-connector mass-edit view with filters and CSV paste, and full component coverage for that deferred surface.
-- Relevance assessment: keep this item open. The mass-edit view is not a blocker for small networks because the inspector/catalog editor is shipped, but it remains pertinent for large connector sets where per-pin inspector edits are too slow.
+- Delivered on 2026-06-09: cross-connector `Pin role mass edit` panel in the Modeling/Analysis column with connector/role/declaration/overload filters, bulk apply/reset, CSV paste, inline CSV errors, and focused UI coverage.
+- Delivery status: done.
 - Moved out of this slice for clarity: the 2D-canvas unchanged regression belongs to the release-gate item (`item_615`), not to the editing-surface item.
 
 # AI Context

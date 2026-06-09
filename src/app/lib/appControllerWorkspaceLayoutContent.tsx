@@ -14,6 +14,7 @@ interface BuildWorkspaceLayoutContentParams {
   modelingLeftColumnContentForSubScreen: ReactNode;
   modelingFormsColumnContentForSubScreen: ReactNode;
   analysisWorkspaceContentForSubScreen: ReactNode;
+  showMultiNetworkFunctionalAnalysisPanel: boolean;
 }
 
 export function buildWorkspaceLayoutContent({
@@ -22,7 +23,8 @@ export function buildWorkspaceLayoutContent({
   aiAgentWorkspaceContent,
   modelingLeftColumnContentForSubScreen,
   modelingFormsColumnContentForSubScreen,
-  analysisWorkspaceContentForSubScreen
+  analysisWorkspaceContentForSubScreen,
+  showMultiNetworkFunctionalAnalysisPanel
 }: BuildWorkspaceLayoutContentParams) {
   const modelingLeftColumnContentForActiveMode = state.isAiAgentModelingOpen
     ? aiAgentWorkspaceContent
@@ -41,7 +43,9 @@ export function buildWorkspaceLayoutContent({
     ? null
     : state.isCatalogSubScreen
     ? analysisWorkspaceContentForSubScreen
-    : state.hasTableSelectionForActiveSubScreen || (state.isModelingScreen && state.hasInspectableSelectionForActiveSubScreen)
+    : showMultiNetworkFunctionalAnalysisPanel ||
+        state.hasTableSelectionForActiveSubScreen ||
+        (state.isModelingScreen && state.hasInspectableSelectionForActiveSubScreen)
       ? analysisWorkspaceContentForSubScreen
       : null;
 

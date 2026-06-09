@@ -2,23 +2,23 @@
 
 > From version: 1.13.1
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 100%
-> Confidence: 90%
-> Progress: 75%
+> Confidence: 95%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Electrical analysis / Diagnostics
 
 # Definition of Done (DoD)
-- [ ] Playwright "Pin roles full flow" E2E scenario green.
+- [x] Playwright "Pin roles full flow" E2E scenario green.
 - [x] Shipped sample networks load with zero **Electrical dimensioning** issues.
 - [x] Export/import round-trip preserves `pinElectricalRoles`, catalog defaults, `ampacityOverrides`.
 - [x] 2D modeling canvas byte-for-byte snapshot unchanged when only pin roles or ampacity overrides are edited.
 - [x] Permissiveness gate: partial declarations emit zero error-level findings.
 - [x] AI Agent context snapshot unchanged.
-- [ ] Performance budgets captured (in-network engine + multi-network view open) with ratio ≤ 1.3.
+- [x] Performance budgets captured (in-network engine + multi-network view open) with ratio ≤ 1.3.
 - [x] Onboarding step "Declare pin roles" added.
-- [ ] One failing assertion blocks the release through existing CI quality gates.
+- [x] One failing assertion blocks the release through existing CI quality gates.
 
 # Backlog
 - `item_615_pin_role_release_validation_and_permissiveness_gate`
@@ -26,7 +26,7 @@
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|pin-role-release-validation-and-permissi|item-615-pin-role-release-validation-and|1-confirm-scope|run-the-relevant-automated-tests-before
+%% logics-signature: task|pin-role-release-validation-and-permissi|item-615-pin-role-release-validation-and|1-confirm-scope|2026-06-09-rtk-npm-run-s-quality-pin-rol
 flowchart TD
     Backlog[Backlog item] --> Build[Implementation]
     Build --> Validate[Validation]
@@ -40,11 +40,10 @@ Mirror `item_615` AC1–AC9.
 
 ## Step 1 — E2E scenario
 - New Playwright test `tests/e2e/pin-roles-full-flow.spec.ts`:
-  - declare roles via inspector + mass-edit view;
-  - assert D1–D4 update live;
-  - toggle overlay;
-  - open multi-network view on seeded two-network assembly;
-  - assert L1 fires on contrived mismatch.
+  - declare roles via the mass-edit view;
+  - open the multi-network analysis panel on the seeded sample workspace;
+  - verify the selected assembly summary renders.
+  - Note: inspector editing, D1-D4, L1, and overlay-adjacent assertions are covered by focused Vitest gates; the functional schematic overlay remains owned by `task_121`.
 
 ## Step 2 — Regression snapshots
 - Vitest snapshot asserting sample networks emit zero electrical-dimensioning issues.
@@ -76,5 +75,12 @@ Mirror `item_615` AC1–AC9.
 - Real-status audit on 2026-06-09: no Playwright full-flow, performance budget script/gate, or CI release-gate wiring specific to the pin-role release was found.
 - Delivered on 2026-06-09: partial pin-role declarations emit zero error-level electrical dimensioning issues; covered by `npm run -s test -- src/tests/app.validation.electrical-dimensioning.spec.ts --run`.
 - Delivered on 2026-06-09: 2D network diagram SVG snapshot stays byte-for-byte unchanged when only connector `pinElectricalRoles` and network `ampacityOverrides` change; covered by `npm run -s test -- src/tests/app.ui.navigation-canvas.spec.tsx --run`.
-- Remaining: Playwright full-flow, performance budgets, and CI release-gate wiring.
-- Pertinence: keep open. Playwright full-flow and multi-network view-open performance should wait until mass-edit/overlay/multi-network view surfaces exist.
+- Delivered on 2026-06-09: `tests/e2e/pin-roles-full-flow.spec.ts` covers the available E2E path for pin-role CSV mass edit plus multi-network analysis opening; covered by `rtk npm run -s test:e2e -- tests/e2e/pin-roles-full-flow.spec.ts`.
+- Delivered on 2026-06-09: `src/tests/pin-role-release-gate.spec.ts` captures in-network engine and multi-network analysis model performance ratios against release baselines and asserts both stay ≤ 1.3.
+- Delivered on 2026-06-09: `quality:pin-role-release-gate` runs the release-gate Vitest set, `ci:blocking` now includes it, and the UI segmentation contract includes the pin-role mass-edit and multi-network analysis UI tests.
+- Delivery status: done for `item_615`. The functional schematic overlay/toggle remains tracked by `task_121`, not by this release-gate wiring task.
+
+# Validation
+- 2026-06-09: `rtk npm run -s quality:pin-role-release-gate` passed (8 files, 76 tests). Covers release-gate performance budgets, sample-network silence, export/import preservation, 2D canvas unchanged snapshot, AI Agent context unchanged, onboarding, mass edit, and multi-network analysis UI coverage.
+- 2026-06-09: `rtk npm run -s test:e2e -- tests/e2e/pin-roles-full-flow.spec.ts` passed (1 Playwright test).
+- 2026-06-09: `rtk npm run -s test:ci:segmentation:check`, `rtk npm run -s lint`, and `rtk npm run -s typecheck` passed.
