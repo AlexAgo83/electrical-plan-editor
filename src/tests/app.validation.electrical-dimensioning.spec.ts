@@ -228,6 +228,25 @@ describe("appendElectricalDimensioningIssues", () => {
     expect(issues.filter((i) => i.id.startsWith("electrical-d3-"))).toEqual([]);
   });
 
+  it("partial pin-role declarations never emit error-level electrical dimensioning issues", () => {
+    const source = makeConnector("C1", 1, {
+      pinElectricalRoles: { 1: { role: "source", label: "KL30" } }
+    });
+    const consumer = makeConnector("C2", 1, {
+      pinElectricalRoles: { 1: { role: "consumer", label: "LOAD" } }
+    });
+    const wire = makeWire(
+      "W1",
+      { kind: "connectorCavity", connectorId: source.id, cavityIndex: 1 },
+      { kind: "connectorCavity", connectorId: consumer.id, cavityIndex: 1 },
+      { sectionMm2: 0.5 }
+    );
+
+    const issues = run({ connectors: [source, consumer], wires: [wire] });
+
+    expect(issues.filter((i) => i.severity === "error")).toEqual([]);
+  });
+
   it("D4 — branch with consumer and no reachable source emits a warning", () => {
     const consumer = makeConnector("C1", 1, {
       pinElectricalRoles: { 1: { role: "consumer", currentA: 5 } }
