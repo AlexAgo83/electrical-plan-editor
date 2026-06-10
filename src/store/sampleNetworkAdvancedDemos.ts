@@ -82,19 +82,12 @@ export function buildAdvancedSampleNetworkDemoActions(): AppAction[] {
       cavityCount: 2,
       catalogItemId: doorDemoCatalogIds.speaker2Way
     }),
-    appActions.upsertSplice({
-      id: asSpliceId("D-S-GND"),
-      name: "Door Ground Splice",
-      technicalId: "D-SPL-GND",
-      portCount: 6,
-      catalogItemId: doorDemoCatalogIds.doorSplice6Port
-    }),
     appActions.upsertNode({ id: asNodeId("D-N-BODY"), kind: "connector", connectorId: asConnectorId("D-C-BODY") }),
     appActions.upsertNode({ id: asNodeId("D-N-MOD"), kind: "connector", connectorId: asConnectorId("D-C-MOD") }),
     appActions.upsertNode({ id: asNodeId("D-N-MOTOR"), kind: "connector", connectorId: asConnectorId("D-C-MOTOR") }),
     appActions.upsertNode({ id: asNodeId("D-N-MIRROR"), kind: "connector", connectorId: asConnectorId("D-C-MIRROR") }),
     appActions.upsertNode({ id: asNodeId("D-N-SPEAKER"), kind: "connector", connectorId: asConnectorId("D-C-SPEAKER") }),
-    appActions.upsertNode({ id: asNodeId("D-N-GND"), kind: "splice", spliceId: asSpliceId("D-S-GND") }),
+    appActions.upsertNode({ id: asNodeId("D-N-GND"), kind: "intermediate", label: "Door ground point" }),
     appActions.upsertNode({ id: asNodeId("D-N-HINGE"), kind: "intermediate", label: "Door hinge boot" }),
     appActions.upsertNode({ id: asNodeId("D-N-MIRROR-J"), kind: "intermediate", label: "Mirror branch" }),
     appActions.upsertSegment({ id: asSegmentId("D-SEG-001"), nodeA: asNodeId("D-N-BODY"), nodeB: asNodeId("D-N-HINGE"), lengthMm: 45, subNetworkTag: "DOOR_FEED" }),
@@ -104,6 +97,19 @@ export function buildAdvancedSampleNetworkDemoActions(): AppAction[] {
     appActions.upsertSegment({ id: asSegmentId("D-SEG-005"), nodeA: asNodeId("D-N-MIRROR-J"), nodeB: asNodeId("D-N-MIRROR"), lengthMm: 24, subNetworkTag: "MIRROR" }),
     appActions.upsertSegment({ id: asSegmentId("D-SEG-006"), nodeA: asNodeId("D-N-MOD"), nodeB: asNodeId("D-N-GND"), lengthMm: 12, subNetworkTag: "GROUND" }),
     appActions.upsertSegment({ id: asSegmentId("D-SEG-007"), nodeA: asNodeId("D-N-MOD"), nodeB: asNodeId("D-N-SPEAKER"), lengthMm: 32, subNetworkTag: "AUDIO" }),
+    appActions.upsertSplice({
+      id: asSpliceId("D-S-GND"),
+      name: "Door Ground Splice",
+      technicalId: "D-SPL-GND",
+      portCount: 6,
+      catalogItemId: doorDemoCatalogIds.doorSplice6Port,
+      placement: {
+        kind: "segmentOffset",
+        segmentId: asSegmentId("D-SEG-006"),
+        fromNodeId: asNodeId("D-N-GND"),
+        offsetMm: 0
+      }
+    }),
     appActions.saveWire({
       id: asWireId("D-W-001"),
       name: "Door Module Feed",
@@ -190,25 +196,29 @@ export function buildAdvancedSampleNetworkDemoActions(): AppAction[] {
       cavityCount: 4,
       catalogItemId: chargingDemoCatalogIds.serviceDisconnect4Way
     }),
+    appActions.upsertNode({ id: asNodeId("H-N-INLET"), kind: "connector", connectorId: asConnectorId("H-C-INLET") }),
+    appActions.upsertNode({ id: asNodeId("H-N-OBC"), kind: "connector", connectorId: asConnectorId("H-C-OBC") }),
+    appActions.upsertNode({ id: asNodeId("H-N-DCDC"), kind: "connector", connectorId: asConnectorId("H-C-DCDC") }),
+    appActions.upsertNode({ id: asNodeId("H-N-SERVICE"), kind: "connector", connectorId: asConnectorId("H-C-SERVICE") }),
+    appActions.upsertNode({ id: asNodeId("H-N-TRUNK"), kind: "intermediate", label: "Charge trunk" }),
+    appActions.upsertSegment({ id: asSegmentId("H-SEG-001"), nodeA: asNodeId("H-N-INLET"), nodeB: asNodeId("H-N-TRUNK"), lengthMm: 60, subNetworkTag: "AC_INPUT" }),
+    appActions.upsertSegment({ id: asSegmentId("H-SEG-002"), nodeA: asNodeId("H-N-TRUNK"), nodeB: asNodeId("H-N-OBC"), lengthMm: 36, subNetworkTag: "AC_INPUT" }),
+    appActions.upsertSegment({ id: asSegmentId("H-SEG-003"), nodeA: asNodeId("H-N-OBC"), nodeB: asNodeId("H-N-DCDC"), lengthMm: 42, subNetworkTag: "LV_SUPPLY" }),
+    appActions.upsertSegment({ id: asSegmentId("H-SEG-004"), nodeA: asNodeId("H-N-OBC"), nodeB: asNodeId("H-N-SERVICE"), lengthMm: 46, subNetworkTag: "HVIL" }),
     appActions.upsertSplice({
       id: asSpliceId("H-S-HVIL"),
       name: "HVIL Splice",
       technicalId: "H-SPL-HVIL",
       portCount: 4,
       portMode: "directional",
-      catalogItemId: chargingDemoCatalogIds.hvInterlockSplice4Port
+      catalogItemId: chargingDemoCatalogIds.hvInterlockSplice4Port,
+      placement: {
+        kind: "segmentOffset",
+        segmentId: asSegmentId("H-SEG-004"),
+        fromNodeId: asNodeId("H-N-OBC"),
+        offsetMm: 20
+      }
     }),
-    appActions.upsertNode({ id: asNodeId("H-N-INLET"), kind: "connector", connectorId: asConnectorId("H-C-INLET") }),
-    appActions.upsertNode({ id: asNodeId("H-N-OBC"), kind: "connector", connectorId: asConnectorId("H-C-OBC") }),
-    appActions.upsertNode({ id: asNodeId("H-N-DCDC"), kind: "connector", connectorId: asConnectorId("H-C-DCDC") }),
-    appActions.upsertNode({ id: asNodeId("H-N-SERVICE"), kind: "connector", connectorId: asConnectorId("H-C-SERVICE") }),
-    appActions.upsertNode({ id: asNodeId("H-N-HVIL"), kind: "splice", spliceId: asSpliceId("H-S-HVIL") }),
-    appActions.upsertNode({ id: asNodeId("H-N-TRUNK"), kind: "intermediate", label: "Charge trunk" }),
-    appActions.upsertSegment({ id: asSegmentId("H-SEG-001"), nodeA: asNodeId("H-N-INLET"), nodeB: asNodeId("H-N-TRUNK"), lengthMm: 60, subNetworkTag: "AC_INPUT" }),
-    appActions.upsertSegment({ id: asSegmentId("H-SEG-002"), nodeA: asNodeId("H-N-TRUNK"), nodeB: asNodeId("H-N-OBC"), lengthMm: 36, subNetworkTag: "AC_INPUT" }),
-    appActions.upsertSegment({ id: asSegmentId("H-SEG-003"), nodeA: asNodeId("H-N-OBC"), nodeB: asNodeId("H-N-DCDC"), lengthMm: 42, subNetworkTag: "LV_SUPPLY" }),
-    appActions.upsertSegment({ id: asSegmentId("H-SEG-004"), nodeA: asNodeId("H-N-OBC"), nodeB: asNodeId("H-N-HVIL"), lengthMm: 20, subNetworkTag: "HVIL" }),
-    appActions.upsertSegment({ id: asSegmentId("H-SEG-005"), nodeA: asNodeId("H-N-HVIL"), nodeB: asNodeId("H-N-SERVICE"), lengthMm: 26, subNetworkTag: "HVIL" }),
     appActions.saveWire({
       id: asWireId("H-W-001"),
       name: "AC Pilot",
@@ -243,6 +253,6 @@ export function buildAdvancedSampleNetworkDemoActions(): AppAction[] {
       endpointA: { kind: "splicePort", spliceId: asSpliceId("H-S-HVIL"), portIndex: 1 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("H-C-SERVICE"), cavityIndex: 1 }
     }),
-    appActions.lockWireRoute(asWireId("H-W-004"), [asSegmentId("H-SEG-005")])
+    appActions.lockWireRoute(asWireId("H-W-004"), [asSegmentId("H-SEG-004")])
   ];
 }

@@ -642,6 +642,79 @@ function computeDerivedEdgeLengthMm(
   return state.segments.byId[segmentId]?.lengthMm ?? 0;
 }
 
+export interface ComputedWireRoute {
+  routeSegmentIds: SegmentId[];
+  lengthMm: number;
+  detailA?: WireRouteEndpointDetail;
+  detailB?: WireRouteEndpointDetail;
+  exitNodeIdHintA: NodeId | null;
+  exitNodeIdHintB: NodeId | null;
+}
+
+export function computeShortestWireRoute(
+  state: AppState,
+  anchorA: WireEndpointAnchor,
+  anchorB: WireEndpointAnchor
+): ComputedWireRoute | null {
+  const graph = buildDerivedRoutingGraph(state, [anchorA, anchorB]);
+  const startNodeId = getAnchorGraphNodeId(anchorA);
+  const endNodeId = getAnchorGraphNodeId(anchorB);
+  const shortestRoute = findShortestRoute(graph, startNodeId, endNodeId);
+  if (shortestRoute === null) {
+    return null;
+  }
+
+  if (shortestRoute.segmentIds.length === 0 && anchorA.kind === "virtual") {
+    // Same resolved point for both endpoints: keep the host segment visible
+    // in the route summary instead of an empty route.
+    return {
+      routeSegmentIds: [anchorA.placement.segmentId],
+      lengthMm: 0,
+      detailA: { segmentId: anchorA.placement.segmentId, coveredLengthMm: 0 },
+      detailB: { segmentId: anchorA.placement.segmentId, coveredLengthMm: 0 },
+      exitNodeIdHintA: null,
+      exitNodeIdHintB: null
+    };
+  }
+
+  let detailA: WireRouteEndpointDetail | undefined;
+  let detailB: WireRouteEndpointDetail | undefined;
+  let exitNodeIdHintA: NodeId | null = null;
+  let exitNodeIdHintB: NodeId | null = null;
+
+  if (anchorA.kind === "virtual" && shortestRoute.segmentIds.length > 0) {
+    const firstSegmentId = shortestRoute.segmentIds[0];
+    const nextNodeId = shortestRoute.nodeIds[1];
+    if (firstSegmentId !== undefined && nextNodeId !== undefined) {
+      detailA = {
+        segmentId: firstSegmentId,
+        coveredLengthMm: computeDerivedEdgeLengthMm(anchorA, anchorB, state, startNodeId, nextNodeId, firstSegmentId)
+      };
+      exitNodeIdHintA = nextNodeId === endNodeId && anchorB.kind === "virtual" ? null : nextNodeId;
+    }
+  }
+  if (anchorB.kind === "virtual" && shortestRoute.segmentIds.length > 0) {
+    const lastSegmentId = shortestRoute.segmentIds[shortestRoute.segmentIds.length - 1];
+    const previousNodeId = shortestRoute.nodeIds[shortestRoute.nodeIds.length - 2];
+    if (lastSegmentId !== undefined && previousNodeId !== undefined) {
+      detailB = {
+        segmentId: lastSegmentId,
+        coveredLengthMm: computeDerivedEdgeLengthMm(anchorA, anchorB, state, previousNodeId, endNodeId, lastSegmentId)
+      };
+      exitNodeIdHintB = previousNodeId === startNodeId && anchorA.kind === "virtual" ? null : previousNodeId;
+    }
+  }
+
+  return {
+    routeSegmentIds: dedupeConsecutiveSegmentIds(shortestRoute.segmentIds),
+    lengthMm: shortestRoute.totalLengthMm,
+    detailA,
+    detailB,
+    exitNodeIdHintA,
+    exitNodeIdHintB
+  };
+}
+
 export function recomputeWireRouteAndDirectionalEndpoints(
   state: AppState,
   wire: Wire
@@ -673,48 +746,17 @@ export function recomputeWireRouteAndDirectionalEndpoints(
     routeEndpointDetailA = forced.detailA;
     routeEndpointDetailB = forced.detailB;
   } else {
-    const graph = buildDerivedRoutingGraph(state, [anchorA, anchorB]);
-    const startNodeId = getAnchorGraphNodeId(anchorA);
-    const endNodeId = getAnchorGraphNodeId(anchorB);
-    const shortestRoute = findShortestRoute(graph, startNodeId, endNodeId);
-    if (shortestRoute === null) {
+    const computedRoute = computeShortestWireRoute(state, anchorA, anchorB);
+    if (computedRoute === null) {
       return { error: `No route found for wire '${wire.technicalId}'.` };
     }
 
-    if (shortestRoute.segmentIds.length === 0 && anchorA.kind === "virtual") {
-      // Same resolved point for both endpoints: keep the host segment visible
-      // in the route summary instead of an empty route.
-      routeSegmentIds = [anchorA.placement.segmentId];
-      routeEndpointDetailA = { segmentId: anchorA.placement.segmentId, coveredLengthMm: 0 };
-      routeEndpointDetailB = { segmentId: anchorA.placement.segmentId, coveredLengthMm: 0 };
-      lengthMm = 0;
-    } else {
-      routeSegmentIds = dedupeConsecutiveSegmentIds(shortestRoute.segmentIds);
-      lengthMm = shortestRoute.totalLengthMm;
-
-      if (anchorA.kind === "virtual" && shortestRoute.segmentIds.length > 0) {
-        const firstSegmentId = shortestRoute.segmentIds[0];
-        const nextNodeId = shortestRoute.nodeIds[1];
-        if (firstSegmentId !== undefined && nextNodeId !== undefined) {
-          routeEndpointDetailA = {
-            segmentId: firstSegmentId,
-            coveredLengthMm: computeDerivedEdgeLengthMm(anchorA, anchorB, state, startNodeId, nextNodeId, firstSegmentId)
-          };
-          exitNodeIdHintA = nextNodeId === endNodeId && anchorB.kind === "virtual" ? null : nextNodeId;
-        }
-      }
-      if (anchorB.kind === "virtual" && shortestRoute.segmentIds.length > 0) {
-        const lastSegmentId = shortestRoute.segmentIds[shortestRoute.segmentIds.length - 1];
-        const previousNodeId = shortestRoute.nodeIds[shortestRoute.nodeIds.length - 2];
-        if (lastSegmentId !== undefined && previousNodeId !== undefined) {
-          routeEndpointDetailB = {
-            segmentId: lastSegmentId,
-            coveredLengthMm: computeDerivedEdgeLengthMm(anchorA, anchorB, state, previousNodeId, endNodeId, lastSegmentId)
-          };
-          exitNodeIdHintB = previousNodeId === startNodeId && anchorA.kind === "virtual" ? null : previousNodeId;
-        }
-      }
-    }
+    routeSegmentIds = computedRoute.routeSegmentIds;
+    lengthMm = computedRoute.lengthMm;
+    routeEndpointDetailA = computedRoute.detailA;
+    routeEndpointDetailB = computedRoute.detailB;
+    exitNodeIdHintA = computedRoute.exitNodeIdHintA;
+    exitNodeIdHintB = computedRoute.exitNodeIdHintB;
     isRouteLocked = false;
   }
 
