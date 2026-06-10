@@ -57,13 +57,13 @@ function buildLegacyDegreeTwoActions(options?: {
       cavityCount: 4,
       primaryColorId: null,
       secondaryColorId: null
-    } as never),
+    }),
     appActions.upsertConnector({
       id: asConnectorId("C-B"),
       name: "Connector B",
       technicalId: "CONN-B",
       cavityCount: 4
-    } as never),
+    }),
     appActions.upsertSplice({
       id: asSpliceId("S-MID"),
       name: "Mid Splice",
@@ -187,7 +187,7 @@ describe("legacy splice node migration", () => {
         name: "Connector C",
         technicalId: "CONN-C",
         cavityCount: 4
-      } as never),
+      }),
       appActions.upsertNode({ id: asNodeId("N-C"), kind: "connector", connectorId: asConnectorId("C-C") }),
       appActions.upsertSegment({
         id: asSegmentId("SEG-THIRD"),
@@ -225,7 +225,7 @@ describe("legacy splice node migration", () => {
         name: "Connector A",
         technicalId: "CONN-A",
         cavityCount: 4
-      } as never),
+      }),
       appActions.upsertSplice({
         id: asSpliceId("S-END"),
         name: "End Splice",

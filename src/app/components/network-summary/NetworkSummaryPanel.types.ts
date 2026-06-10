@@ -138,6 +138,7 @@ export interface NetworkSummaryPanelProps {
   onOpenAiAgent?: () => void;
   onSelectConnectorFromCallout: (connectorId: ConnectorId) => void;
   onSelectSpliceFromCallout: (spliceId: SpliceId) => void;
+  onActivateFloatingSplice: (spliceId: SpliceId) => void;
   onSelectWireFromConnectorPin: (wireId: Wire["id"]) => void;
   onPersistConnectorCalloutPosition: (connectorId: ConnectorId, position: NodePosition) => void;
   onPersistSpliceCalloutPosition: (spliceId: SpliceId, position: NodePosition) => void;

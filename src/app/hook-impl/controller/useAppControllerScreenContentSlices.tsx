@@ -304,6 +304,7 @@ export function buildNetworkSummaryPanelControllerSlice(
     onOpenAiAgent: params.onOpenAiAgent,
     onSelectConnectorFromCallout: params.onSelectConnectorFromCallout,
     onSelectSpliceFromCallout: params.onSelectSpliceFromCallout,
+    onActivateFloatingSplice: params.onActivateFloatingSplice,
     onSelectWireFromConnectorPin: params.onSelectWireFromConnectorPin,
     onPersistConnectorCalloutPosition: params.onPersistConnectorCalloutPosition,
     onPersistSpliceCalloutPosition: params.onPersistSpliceCalloutPosition,

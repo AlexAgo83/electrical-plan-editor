@@ -201,7 +201,7 @@ describe("persistence migrations", () => {
     vi.restoreAllMocks();
   });
 
-  it("keeps the current v3 versioned fixture unchanged", () => {
+  it("migrates legacy splice topology even in the current versioned fixture", () => {
     const fixtureState = createMigrationFixtureState();
     const fixture = buildCurrentVersionedFixture(fixtureState);
 
@@ -209,10 +209,10 @@ describe("persistence migrations", () => {
 
     expect(result.ok).toBe(true);
     if (!result.ok) {
-      throw new Error("Expected current fixture to remain valid.");
+      throw new Error("Expected current fixture to migrate cleanly.");
     }
-    expect(result.wasMigrated).toBe(false);
-    expect(result.snapshot).toEqual(fixture);
+    expect(result.wasMigrated).toBe(true);
+    expectPreservedUserFields(result.snapshot.state);
   });
 
   it("migrates the pre-timestamp v1 fixture and preserves user-authored fields", () => {
