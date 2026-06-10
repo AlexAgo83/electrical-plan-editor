@@ -1,9 +1,9 @@
 ## req_144_floating_splice_placements_decoupled_from_network_topology - Floating splice placements decoupled from network topology
-> From version: 1.15.6 (ADR, backlog, and task companions linked on 2026-06-10)
+> From version: 1.15.6 (ADR, backlog, and task companions linked on 2026-06-10; amended 2026-06-10 after pre-implementation review)
 > Schema version: 1.0
 > Status: Ready
 > Understanding: 98% (request refined with ADR, backlog, and implementation task links)
-> Confidence: 92% (workflow docs now capture the routing, migration, rendering, validation, and delivery contract)
+> Confidence: 94% (amendment resolves migration safety, determinism, visibility, and feedback-channel questions; AC21-AC30 added)
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -14,6 +14,8 @@
 - Make every connectable splice placement segment-based: a splice must be located on a segment at a measured offset in millimeters from one segment endpoint before any wire can connect to it.
 - Automatically migrate existing workspaces that use `NetworkNode.kind === "splice"` into the new placement model at load time.
 - Keep floating splices visible, selectable, and callout-capable in Network Summary with the same visual style as current splice nodes.
+- Keep every migrated splice individually visible: a floating splice marker must never be hidden under a node or another splice marker, even when its resolved position looks unusual after migration.
+- Surface every structural migration action to the user: distinguishable reserved names for constructed nodes and a load-time migration report.
 
 # Context
 - Current data model couples splices to the routing graph: `Splice` is an electrical entity, `WireEndpoint.kind === "splicePort"` references splice ports, and `NetworkNode.kind === "splice"` gives the splice a routing node.
@@ -53,6 +55,16 @@ flowchart TD
 - AC18: Connector-to-floating-splice and connector-to-floating-splice-to-connector routes remain deterministic using the current segment-ID tie-break behavior.
 - AC19: Analysis views and splice tables expose host segment, distance from node, and partial length information needed to understand routed wires.
 - AC20: Local persisted workspaces and network export files are supported at equal priority.
+- AC21: Migration rewrites `routeSegmentIds` for ALL wires affected by segment fusion (locked and unlocked), deduplicating consecutive surviving IDs; no persisted route is left referencing a removed segment ID, and unfixable routes stay loadable with diagnostics.
+- AC22: Degree-2 fusion happens only under the safe-fusion predicate (distinct far endpoints, no `rearBackshellLink` involvement, identical `subNetworkTag`/`sheathType`/`insulation`/`lineStyle`/`internalPartReference`); otherwise migration falls back to a structural intermediate node with a `0 mm` placement.
+- AC23: Fusion outcomes are deterministic: the surviving segment ID is the lexicographically smaller, `fromNodeId` is the surviving segment's non-junction endpoint, `offsetMm` is the surviving segment's pre-fusion length, and chains of adjacent degree-2 splice nodes are processed in lexicographic node ID order.
+- AC24: Degree-1 legacy splice nodes migrate to an intermediate node with a `0 mm` placement on the single adjacent segment; degree-0 legacy splice nodes become unplaced drafts with a validation diagnostic.
+- AC25: Every node created or converted by migration carries a clearly distinguishable reserved label (`MIG-SPLICE-<spliceTechnicalId>`, numeric suffix on collision) and is listed in the migration report.
+- AC26: A single modal migration report with explicit dismissal is shown after any migrating load or import, on both load paths, listing created/converted nodes, fused segments, rewritten routes, clamped/unresolved placements, unplaced splices, locked-route conversion failures, metadata-divergence fallbacks, and directional L/R side changes.
+- AC27: Anti-superposition rendering: a floating splice marker is never hidden under a node or another splice; coinciding resolved positions get a deterministic render-only offset with a visible anchor tick, including `0 mm` placements and same-offset splices, without altering persisted `offsetMm`.
+- AC28: Zero-length routes are represented as `routeSegmentIds = [hostSegmentId]` with `0 mm` partial detail — never as an empty route — and validation accepts them as valid.
+- AC29: Placement removal is blocked while wires are connected to the splice; placement moves recompute routes and are blocked when they would invalidate a locked route.
+- AC30: Offset clamping and relative-position feedback use a non-blocking warning channel (action succeeds, warning surfaced) distinct from blocking errors; migration-time clamps are reported in the migration report.
 
 # Definition of Ready (DoR)
 - [x] Problem statement is explicit and user impact is clear.
@@ -99,11 +111,22 @@ type SplicePlacement = {
 - Segment deletion should consult splice placements and block deletion when any splice is hosted on the segment.
 - Segment length edits should preserve absolute `offsetMm`; if the relative position changes from one percentage to another, show feedback. If the edit makes the offset invalid, clamp and report the adjustment.
 - Multiple splices at the same host segment offset are valid.
+- Insert virtual splice points only for the endpoints of the wire being routed; synthetic sub-edge IDs never leak into tie-breaks or `routeSegmentIds`, consecutive duplicate host IDs are deduplicated, and zero-length sub-edges are valid in the derived graph.
+- The term "placement" is reserved for the physical segment-offset model: rename the existing canvas-position optimization naming (`splicePlacementReducer.ts`, `splice/applyOptimizedPlacement`) to canvas-layout wording.
+- Known `NetworkNode.kind === "splice"` touchpoints beyond the references below must be inventoried and converted: `FunctionalSchematicPanel.tsx`, `functionalSchematicNodeRendering.tsx`, `networkStatistics.ts` (length statistics must use partial endpoint detail), `aiAgentPlanDiff.ts` (AI agent plan contract), `useEntityRelationshipMaps.ts`, `useCanvasInteractionHandlers.ts`, `useNodeHandlers.ts`, and `wireListExport.ts` (BOM lengths).
+- The non-blocking warning channel for clamp/relative-position feedback is new infrastructure: the store currently only exposes a blocking `lastError` path.
+- Migration is implemented once and invoked from both the workspace persistence pipeline (schema v3 -> v4) and network file import normalization (file schema v3 -> v4); it also cleans orphan `nodePositions` and rewrites both state copies (root mirror and `networkStates`).
 
 # Migration strategy
-- Run migration on load for local storage and network file import.
-- Degree-2 legacy splice node: merge the two adjacent structural segments into a single host segment when safe, then set the splice placement to `segmentOffset` using the previous adjacent length as the offset. Preserve existing segment IDs where possible.
-- Degree greater than 2 legacy splice node: replace the splice node with a structural intermediate node, preserve all branch segments against that intermediate node, and place the splice on a deterministic adjacent segment at `0 mm` from the intermediate node.
+- Run migration on load for local storage and network file import, implemented once and invoked from both paths (workspace pipeline v3 -> v4 with the existing pre-migration backup; network file schema v3 -> v4), with parity tests.
+- Process legacy splice nodes in deterministic lexicographic node ID order, re-evaluating adjacency after each conversion so chains of adjacent degree-2 splice nodes converge.
+- Degree-2 legacy splice node: merge the two adjacent structural segments into a single host segment only when the safe-fusion predicate holds (distinct far endpoints — never a self-loop; no `rearBackshellLink`; identical `subNetworkTag`/`sheathType`/`insulation`/`lineStyle`/`internalPartReference`). The surviving segment ID is the lexicographically smaller; `fromNodeId` is the surviving segment's non-junction endpoint; `offsetMm` is the surviving segment's pre-fusion length; lengths sum; `mountingLabels` union. When the predicate fails, fall back to the intermediate-node conversion instead of fusing.
+- Segment fusion rewrites `routeSegmentIds` for ALL wires referencing the fused segments (locked and unlocked), deduplicating consecutive surviving IDs and preserving wire lengths; unfixable unlocked routes are recomputed, unfixable locked routes stay loadable with route-lock diagnostics.
+- Degree greater than 2 legacy splice node: replace the splice node with a structural intermediate node, preserve all branch segments against that intermediate node, and place the splice on a deterministic adjacent segment (lexicographically smallest segment ID) at `0 mm` from the intermediate node.
+- Degree-1 legacy splice node: convert to a structural intermediate node with the splice placed at `0 mm` on its single adjacent segment. Degree-0: remove the node and keep the splice as an unplaced draft with a diagnostic.
+- Constructed or converted nodes get reserved distinguishable labels (`MIG-SPLICE-<spliceTechnicalId>`, numeric suffix on collision).
+- Show a single modal migration report (explicit dismissal) after any migrating load/import, listing all migration actions including directional L/R side changes (sides are re-inferred, not locked; manual locks are preserved).
+- Clean orphan `nodePositions` for removed nodes and rewrite both state copies (root mirror and `networkStates`) consistently.
 - Missing or ambiguous legacy topology: keep the workspace loadable, prevent wire connections to unresolved splices, and emit validation diagnostics.
 - Locked routes: convert automatically to the new route representation where possible; otherwise keep the route loadable and report a clear route-lock validation issue.
 - Import/export: bump the relevant workspace and network file schema versions only when the canonical payload shape changes.
@@ -124,6 +147,15 @@ type SplicePlacement = {
 - Segment length edit preserves `offsetMm`, reports relative percentage change, and clamps/reports when the offset would exceed the new length.
 - Form-based placement editing can set segment, reference node, and offset.
 - Analysis/table views expose host segment, distance from node, and relevant partial length information.
+- Segment fusion rewrites locked and unlocked wire routes referencing the fused pair and never leaves a route referencing a removed segment ID.
+- Fusion falls back to an intermediate node on metadata divergence, self-loop topology, or `rearBackshellLink` adjacency.
+- Degree-1 and degree-0 legacy splice nodes migrate to the specified fallback representations.
+- Constructed nodes carry reserved `MIG-SPLICE-*` labels and appear in the migration report.
+- The migration report lists fused segments, rewritten routes, created nodes, clamps, unplaced splices, and directional side changes for both load paths.
+- A floating splice marker overlapping a node or another splice receives a deterministic render-only offset and stays individually selectable.
+- A zero-length route is represented with its host segment ID and `0 mm` partial detail and passes validation.
+- Removing the placement of a connected splice is blocked; moving a placement that would invalidate a locked route is blocked.
+- Offset clamping surfaces a non-blocking warning while the edit succeeds.
 
 # Companion docs
 - Product brief(s): (none yet)
@@ -141,6 +173,12 @@ type SplicePlacement = {
 - `src/app/components/network-summary/callouts/calloutModel.ts`
 - `src/adapters/persistence/migrations.ts`
 - `src/adapters/portability/networkFile.ts`
+- `src/app/components/network-summary/FunctionalSchematicPanel.tsx`
+- `src/app/lib/networkStatistics.ts`
+- `src/app/lib/wireListExport.ts`
+- `src/app/lib/aiAgentPlanDiff.ts`
+- `src/app/hooks/useEntityRelationshipMaps.ts`
+- `src/store/reducer/splicePlacementReducer.ts`
 
 # AI Context
 - Summary: Decouple splices from structural network nodes by making placed splices segment-offset electrical contact points, adding derived routing support for virtual splice points, rendering them in Network Summary, and migrating legacy splice-node workspaces on load.

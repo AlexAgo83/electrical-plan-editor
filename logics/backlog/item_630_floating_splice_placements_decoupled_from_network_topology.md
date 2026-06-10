@@ -1,9 +1,9 @@
 ## item_630_floating_splice_placements_decoupled_from_network_topology - Floating splice placements decoupled from network topology
-> From version: 1.15.6 (ADR companion linked on 2026-06-10)
+> From version: 1.15.6 (ADR companion linked on 2026-06-10; amended 2026-06-10 after pre-implementation review)
 > Schema version: 1.0
 > Status: Ready
 > Understanding: 96% (single coordinated implementation slice scoped from req_144 and adr_012)
-> Confidence: 90% (scope is broad but explicit across data model, routing, UI, validation, migration, and tests)
+> Confidence: 92% (amendment resolves migration safety, determinism, visibility, and feedback-channel questions; AC21-AC30 added)
 > Progress: 0%
 > Complexity: High
 > Theme: Architecture
@@ -27,6 +27,10 @@ Keep floating splices visible, selectable, and callout-capable in Network Summar
   - guarded host-segment deletion and segment-length feedback/clamping behavior.
   - local persistence and network file import/export schema updates.
   - targeted reducer, core, persistence, portability, and UI regression coverage.
+  - load-time migration report modal and reserved `MIG-SPLICE-*` naming for constructed nodes.
+  - non-blocking warning feedback channel for offset clamping and relative-position changes.
+  - anti-superposition render-only offset so floating splices never hide under nodes or other splices.
+  - global wire route rewriting (locked and unlocked) for fused segments during migration.
 - Out:
   - canvas drag-to-place or drag-to-move behavior.
   - ratio-based placement persistence.
@@ -63,6 +67,16 @@ flowchart TD
 - AC18: Connector-to-floating-splice and connector-to-floating-splice-to-connector routes remain deterministic using the current segment-ID tie-break behavior.
 - AC19: Analysis views and splice tables expose host segment, distance from node, and partial length information needed to understand routed wires.
 - AC20: Local persisted workspaces and network export files are supported at equal priority.
+- AC21: Migration rewrites `routeSegmentIds` for ALL wires affected by segment fusion (locked and unlocked), deduplicating consecutive surviving IDs; no persisted route is left referencing a removed segment ID, and unfixable routes stay loadable with diagnostics.
+- AC22: Degree-2 fusion happens only under the safe-fusion predicate (distinct far endpoints, no `rearBackshellLink` involvement, identical `subNetworkTag`/`sheathType`/`insulation`/`lineStyle`/`internalPartReference`); otherwise migration falls back to a structural intermediate node with a `0 mm` placement.
+- AC23: Fusion outcomes are deterministic: the surviving segment ID is the lexicographically smaller, `fromNodeId` is the surviving segment's non-junction endpoint, `offsetMm` is the surviving segment's pre-fusion length, and chains of adjacent degree-2 splice nodes are processed in lexicographic node ID order.
+- AC24: Degree-1 legacy splice nodes migrate to an intermediate node with a `0 mm` placement on the single adjacent segment; degree-0 legacy splice nodes become unplaced drafts with a validation diagnostic.
+- AC25: Every node created or converted by migration carries a clearly distinguishable reserved label (`MIG-SPLICE-<spliceTechnicalId>`, numeric suffix on collision) and is listed in the migration report.
+- AC26: A single modal migration report with explicit dismissal is shown after any migrating load or import, on both load paths, listing created/converted nodes, fused segments, rewritten routes, clamped/unresolved placements, unplaced splices, locked-route conversion failures, metadata-divergence fallbacks, and directional L/R side changes.
+- AC27: Anti-superposition rendering: a floating splice marker is never hidden under a node or another splice; coinciding resolved positions get a deterministic render-only offset with a visible anchor tick, including `0 mm` placements and same-offset splices, without altering persisted `offsetMm`.
+- AC28: Zero-length routes are represented as `routeSegmentIds = [hostSegmentId]` with `0 mm` partial detail — never as an empty route — and validation accepts them as valid.
+- AC29: Placement removal is blocked while wires are connected to the splice; placement moves recompute routes and are blocked when they would invalidate a locked route.
+- AC30: Offset clamping and relative-position feedback use a non-blocking warning channel (action succeeds, warning surfaced) distinct from blocking errors; migration-time clamps are reported in the migration report.
 
 # AC Traceability
 - request-AC1 -> This backlog slice. Proof: AC1: `Splice` supports a canonical segment placement model using `segmentId`, `fromNodeId`, and `offsetMm`; `0 mm` and `lengthMm` offsets are allowed and must be displayed explicitly.
@@ -85,6 +99,16 @@ flowchart TD
 - request-AC18 -> This backlog slice. Proof: AC18: Connector-to-floating-splice and connector-to-floating-splice-to-connector routes remain deterministic using the current segment-ID tie-break behavior.
 - request-AC19 -> This backlog slice. Proof: AC19: Analysis views and splice tables expose host segment, distance from node, and partial length information needed to understand routed wires.
 - request-AC20 -> This backlog slice. Proof: AC20: Local persisted workspaces and network export files are supported at equal priority.
+- request-AC21 -> This backlog slice. Proof: AC21: Migration rewrites `routeSegmentIds` for ALL wires affected by segment fusion (locked and unlocked), deduplicating consecutive surviving IDs; no persisted route is left referencing a removed segment ID, and unfixable routes stay loadable with diagnostics.
+- request-AC22 -> This backlog slice. Proof: AC22: Degree-2 fusion happens only under the safe-fusion predicate (distinct far endpoints, no `rearBackshellLink` involvement, identical `subNetworkTag`/`sheathType`/`insulation`/`lineStyle`/`internalPartReference`); otherwise migration falls back to a structural intermediate node with a `0 mm` placement.
+- request-AC23 -> This backlog slice. Proof: AC23: Fusion outcomes are deterministic: the surviving segment ID is the lexicographically smaller, `fromNodeId` is the surviving segment's non-junction endpoint, `offsetMm` is the surviving segment's pre-fusion length, and chains of adjacent degree-2 splice nodes are processed in lexicographic node ID order.
+- request-AC24 -> This backlog slice. Proof: AC24: Degree-1 legacy splice nodes migrate to an intermediate node with a `0 mm` placement on the single adjacent segment; degree-0 legacy splice nodes become unplaced drafts with a validation diagnostic.
+- request-AC25 -> This backlog slice. Proof: AC25: Every node created or converted by migration carries a clearly distinguishable reserved label (`MIG-SPLICE-<spliceTechnicalId>`, numeric suffix on collision) and is listed in the migration report.
+- request-AC26 -> This backlog slice. Proof: AC26: A single modal migration report with explicit dismissal is shown after any migrating load or import, on both load paths, listing created/converted nodes, fused segments, rewritten routes, clamped/unresolved placements, unplaced splices, locked-route conversion failures, metadata-divergence fallbacks, and directional L/R side changes.
+- request-AC27 -> This backlog slice. Proof: AC27: Anti-superposition rendering: a floating splice marker is never hidden under a node or another splice; coinciding resolved positions get a deterministic render-only offset with a visible anchor tick, including `0 mm` placements and same-offset splices, without altering persisted `offsetMm`.
+- request-AC28 -> This backlog slice. Proof: AC28: Zero-length routes are represented as `routeSegmentIds = [hostSegmentId]` with `0 mm` partial detail — never as an empty route — and validation accepts them as valid.
+- request-AC29 -> This backlog slice. Proof: AC29: Placement removal is blocked while wires are connected to the splice; placement moves recompute routes and are blocked when they would invalidate a locked route.
+- request-AC30 -> This backlog slice. Proof: AC30: Offset clamping and relative-position feedback use a non-blocking warning channel (action succeeds, warning surfaced) distinct from blocking errors; migration-time clamps are reported in the migration report.
 
 # Decision framing
 - Product framing: Not needed
@@ -104,6 +128,10 @@ flowchart TD
 - Analysis and tables: surface host segment, reference node, distance, and partial length details where operators inspect splices and routed wires.
 - Validation and feedback: add explicit diagnostics for invalid placement states and user-facing feedback for blocked deletion and offset clamping.
 - Regression coverage: cover core resolver/routing, reducers, persistence migrations, network import/export, validation, and representative UI rendering.
+- Migration safety: process legacy splice nodes in deterministic order, enforce the safe-fusion predicate with intermediate-node fallback, rewrite all affected wire routes (locked and unlocked), and cover degree-0/1 cases.
+- Migration visibility: reserved `MIG-SPLICE-*` labels for constructed nodes, modal migration report on both load paths, and informational directional side-change reporting.
+- Feedback infrastructure: add the non-blocking warning channel used by offset clamping and relative-position feedback.
+- Rendering safety: deterministic anti-superposition render-only offset for coinciding splice/node and splice/splice positions.
 
 # Links
 - Product brief(s): (none yet)
@@ -125,6 +153,7 @@ flowchart TD
 - Hybrid rationale: Derived from request `req_144_floating_splice_placements_decoupled_from_network_topology` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_144_floating_splice_placements_decoupled_from_network_topology.md`.
 - Generated locally by logics-manager.
+- Amended 2026-06-10 after pre-implementation review: migration safety/determinism contract, visibility-first rendering, migration report modal, and non-blocking warning channel added (AC21-AC30). Accepted trade-offs: migrated splices may render displaced (never hidden), and directional L/R sides are re-inferred rather than locked.
 
 # Tasks
 - `task_139_floating_splice_placements_decoupled_from_network_topology`
