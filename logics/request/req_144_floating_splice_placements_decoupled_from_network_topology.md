@@ -1,9 +1,9 @@
 ## req_144_floating_splice_placements_decoupled_from_network_topology - Floating splice placements decoupled from network topology
-> From version: 1.15.6 (ADR companion linked on 2026-06-10)
+> From version: 1.15.6 (ADR, backlog, and task companions linked on 2026-06-10)
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 97% (request refined with explicit ADR link and segment-offset architecture)
-> Confidence: 91% (architecture companion records the routing, migration, rendering, and validation contract)
+> Understanding: 98% (request refined with ADR, backlog, and implementation task links)
+> Confidence: 92% (workflow docs now capture the routing, migration, rendering, validation, and delivery contract)
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -149,4 +149,4 @@ type SplicePlacement = {
 - Skip when: The work only changes splice catalog metadata, port occupancy semantics, or unrelated connector/node/segment UI behavior.
 
 # Backlog
-- none
+- `item_630_floating_splice_placements_decoupled_from_network_topology`
