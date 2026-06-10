@@ -528,4 +528,85 @@ describe("buildRenderedNodes", () => {
     expect(rendered).toHaveLength(1);
     expect(rendered[0]?.labelOffsetY).toBe(0);
   });
+
+  it("prefers backshell helper node labels over synthetic connector suffixes", () => {
+    const connectorId = asConnectorId("C-BS");
+    const node: NetworkNode = {
+      id: asNodeId("AR-N21"),
+      kind: "connectorBackshellHelper",
+      connectorId,
+      label: "AR-N21"
+    };
+
+    const rendered = buildRenderedNodes({
+      nodes: [node],
+      networkNodePositions: {
+        [node.id]: { x: 120, y: 80 }
+      },
+      isSubNetworkFilteringActive: false,
+      nodeHasActiveSubNetworkConnection: new Map(),
+      selectedCanvasNodeIds: new Set(),
+      selectedNodeId: null,
+      selectedConnectorId: null,
+      selectedSpliceId: null,
+      connectorMap: new Map([
+        [
+          connectorId,
+          {
+            id: connectorId,
+            name: "Connector rear",
+            technicalId: "AR-CT2G",
+            cavityCount: 2
+          }
+        ]
+      ]),
+      catalogItems: [],
+      connectorDrawingDisplayMode: "disabled",
+      connectorCalloutGroupsById: new Map(),
+      selectedWireId: null,
+      spliceMap: new Map()
+    });
+
+    expect(rendered[0]?.nodeLabel).toBe("AR-N21");
+  });
+
+  it("falls back to the backshell helper node id before using a synthetic connector suffix", () => {
+    const connectorId = asConnectorId("C-BS");
+    const node: NetworkNode = {
+      id: asNodeId("LAT-N10.1"),
+      kind: "connectorBackshellHelper",
+      connectorId
+    };
+
+    const rendered = buildRenderedNodes({
+      nodes: [node],
+      networkNodePositions: {
+        [node.id]: { x: 120, y: 80 }
+      },
+      isSubNetworkFilteringActive: false,
+      nodeHasActiveSubNetworkConnection: new Map(),
+      selectedCanvasNodeIds: new Set(),
+      selectedNodeId: null,
+      selectedConnectorId: null,
+      selectedSpliceId: null,
+      connectorMap: new Map([
+        [
+          connectorId,
+          {
+            id: connectorId,
+            name: "Connector rear",
+            technicalId: "AR-CT2G",
+            cavityCount: 2
+          }
+        ]
+      ]),
+      catalogItems: [],
+      connectorDrawingDisplayMode: "disabled",
+      connectorCalloutGroupsById: new Map(),
+      selectedWireId: null,
+      spliceMap: new Map()
+    });
+
+    expect(rendered[0]?.nodeLabel).toBe("LAT-N10.1");
+  });
 });

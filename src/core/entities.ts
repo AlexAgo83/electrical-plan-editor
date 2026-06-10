@@ -225,6 +225,7 @@ export type NetworkNode =
       id: NodeId;
       kind: "connectorBackshellHelper";
       connectorId: ConnectorId;
+      label?: string;
     }
   | {
       id: NodeId;

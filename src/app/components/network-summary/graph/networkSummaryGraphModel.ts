@@ -21,6 +21,7 @@ import {
   getHighlightedConnectorCavityIndexes
 } from "../callouts/NetworkSummaryCalloutsLayer";
 import { normalizeReadableSegmentLabelAngle } from "../callouts/calloutLayout";
+import { resolveBackshellHelperNodeReference } from "../../../lib/backshellHelperNodeReference";
 
 export interface RenderedSegmentModel {
   segment: Segment;
@@ -694,7 +695,7 @@ export function buildRenderedNodes({
       node.kind === "intermediate"
         ? node.id
         : node.kind === "connectorBackshellHelper"
-          ? `${connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId}-BS`
+          ? resolveBackshellHelperNodeReference(node, connectorMap)
         : node.kind === "connector"
           ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
           : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);

@@ -1,5 +1,6 @@
 import type { AppAction } from "../actions";
 import type { AppState } from "../types";
+import { normalizeOptionalNodeLabel } from "../../app/lib/backshellHelperNodeReference";
 import { applyRearBackshellTopologyToConnector } from "./helpers/rearBackshell";
 import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
 
@@ -95,6 +96,12 @@ export function handleNodeActions(state: AppState, action: AppAction): AppState 
               id: normalizedNodeId,
               label: action.payload.label.trim()
             }
+          : action.payload.kind === "connectorBackshellHelper"
+            ? {
+                ...action.payload,
+                id: normalizedNodeId,
+                label: normalizeOptionalNodeLabel(action.payload.label)
+              }
           : {
               ...action.payload,
               id: normalizedNodeId

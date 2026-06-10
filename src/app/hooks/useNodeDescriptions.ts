@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 import type { Connector, ConnectorId, NetworkNode, NodeId, Splice, SpliceId } from "../../core/entities";
+import { resolveBackshellHelperNodeReference } from "../lib/backshellHelperNodeReference";
 
 export function useNodeDescriptions(
   nodes: NetworkNode[],
@@ -20,10 +21,7 @@ export function useNodeDescriptions(
     }
 
     if (node.kind === "connectorBackshellHelper") {
-      const connector = connectorMap.get(node.connectorId);
-      return connector === undefined
-        ? `Backshell helper (${node.connectorId})`
-        : `Backshell helper (${connector.technicalId})`;
+      return `Backshell helper (${resolveBackshellHelperNodeReference(node, connectorMap)})`;
     }
 
     const splice = spliceMap.get(node.spliceId);
