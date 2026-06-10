@@ -20,6 +20,7 @@ export interface FileFeedbackDialogModel {
 export interface PendingOverwriteImport {
   payload: NetworkFilePayloadV1;
   candidates: OverwriteCandidate[];
+  spliceMigrationReport: string[];
   resetInput: () => void;
 }
 
@@ -44,6 +45,7 @@ export interface UseNetworkImportExportParams {
   activeNetworkId: NetworkId | null;
   dispatchAction: (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean }) => void;
   notifyToast?: NotifyToast;
+  showSpliceMigrationReport?: (entries: string[]) => void;
   groupedBomPreferences?: GroupedBomPreferences;
   networkSummaryPanelRef?: RefObject<NetworkSummaryPanelHandle | null>;
   ensureNetworkPlanScreen?: () => void;

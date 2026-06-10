@@ -1,4 +1,5 @@
 import { type ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import { consumeLastSpliceMigrationReport } from "../../adapters/persistence";
 import { type Network, type NetworkId } from "../../core/entities";
 import { buildNetworkSummaryBomWorkbookSheets } from "../lib/networkSummaryBomCsv";
 import { buildWireListSheet } from "../lib/wireListExport";
@@ -74,6 +75,7 @@ export function useNetworkImportExport({
   activeNetworkId,
   dispatchAction,
   notifyToast,
+  showSpliceMigrationReport,
   groupedBomPreferences,
   networkSummaryPanelRef,
   ensureNetworkPlanScreen
@@ -207,6 +209,7 @@ export function useNetworkImportExport({
   const proceedWithImport = useCallback(
     (
       payload: NetworkFilePayloadV1,
+      spliceMigrationReport: string[],
       decisions: ImportDecisionMap,
       resetInput: () => void
     ): void => {
@@ -293,9 +296,12 @@ export function useNetworkImportExport({
         message: formatImportSummaryMessage(resolved.summary),
         variant: importStatusKind === "success" ? "success" : "warning"
       });
+      if (spliceMigrationReport.length > 0) {
+        showSpliceMigrationReport?.(spliceMigrationReport);
+      }
       resetInput();
     },
-    [store, dispatchAction, notifyToast]
+    [store, dispatchAction, notifyToast, showSpliceMigrationReport]
   );
 
   function handleExportGroupedBom(networkIds: NetworkId[]): void {
@@ -534,6 +540,7 @@ export function useNetworkImportExport({
       resetInput();
       return;
     }
+    const spliceMigrationReport = consumeLastSpliceMigrationReport().map((entry) => entry.message);
 
     const currentState = store.getState();
     const existingNetworks = currentState.networks.allIds
@@ -542,11 +549,11 @@ export function useNetworkImportExport({
     const candidates = detectOverwriteCandidates(parsed.payload, existingNetworks);
 
     if (candidates.length > 0) {
-      setPendingOverwriteImport({ payload: parsed.payload, candidates, resetInput });
+      setPendingOverwriteImport({ payload: parsed.payload, candidates, spliceMigrationReport, resetInput });
       return;
     }
 
-    proceedWithImport(parsed.payload, new Map(), resetInput);
+    proceedWithImport(parsed.payload, spliceMigrationReport, new Map(), resetInput);
   }
 
   const importOverwriteDialog: ImportOverwriteDialogModel | null =
@@ -569,7 +576,12 @@ export function useNetworkImportExport({
               }
             }
             setPendingOverwriteImport(null);
-            void proceedWithImport(pendingOverwriteImport.payload, decisions, pendingOverwriteImport.resetInput);
+            void proceedWithImport(
+              pendingOverwriteImport.payload,
+              pendingOverwriteImport.spliceMigrationReport,
+              decisions,
+              pendingOverwriteImport.resetInput
+            );
           },
           onCancel: () => {
             pendingOverwriteImport.resetInput();
