@@ -1,9 +1,9 @@
 ## req_144_floating_splice_placements_decoupled_from_network_topology - Floating splice placements decoupled from network topology
-> From version: 1.15.6
+> From version: 1.15.6 (ADR companion linked on 2026-06-10)
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 96%
-> Confidence: 90%
+> Understanding: 97% (request refined with explicit ADR link and segment-offset architecture)
+> Confidence: 91% (architecture companion records the routing, migration, rendering, and validation contract)
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -127,7 +127,7 @@ type SplicePlacement = {
 
 # Companion docs
 - Product brief(s): (none yet)
-- Architecture decision(s): required before implementation because this changes the routing data model, persistence contract, and rendering contract.
+- Architecture decision(s): `logics/architecture/adr_012_floating_splice_placement_architecture.md`
 
 # References
 - `src/core/entities.ts`
