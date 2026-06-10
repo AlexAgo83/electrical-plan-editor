@@ -436,7 +436,7 @@ export function useSpliceHandlers({
     }
 
     dispatchAction(
-      appActions.applyOptimizedSplicePlacement(
+      appActions.applyOptimizedSpliceCanvasLayout(
         optimizedLengthSuggestion.spliceId,
         optimizedLengthSuggestion.spliceNodeId,
         optimizedLengthSuggestion.segmentLengths,

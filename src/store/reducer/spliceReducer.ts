@@ -7,7 +7,7 @@ import {
 import type { SegmentId, Wire, WireEndpoint, WireId } from "../../core/entities";
 import { recomputeWireRouteAndDirectionalEndpoints, resolveDirectionalSpliceEndpointSide } from "./helpers/wireTransitions";
 import type { AppState, EntityState } from "../types";
-import { applyOptimizedSplicePlacement } from "./splicePlacementReducer";
+import { applyOptimizedSpliceCanvasLayout } from "./spliceCanvasLayoutReducer";
 import {
   DIRECTIONAL_SPLICE_PORT_COUNT,
   normalizeSplicePortMode,
@@ -330,8 +330,8 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
       });
     }
 
-    case "splice/applyOptimizedPlacement": {
-      return applyOptimizedSplicePlacement(state, action);
+    case "splice/applyOptimizedCanvasLayout": {
+      return applyOptimizedSpliceCanvasLayout(state, action);
     }
 
     case "splice/remove": {

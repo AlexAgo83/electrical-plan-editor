@@ -186,7 +186,7 @@ describe("splice placement optimizer", () => {
 
     const next = appReducer(
       state,
-      appActions.applyOptimizedSplicePlacement(
+      appActions.applyOptimizedSpliceCanvasLayout(
         result.suggestion.spliceId,
         result.suggestion.spliceNodeId,
         result.suggestion.segmentLengths
@@ -224,7 +224,7 @@ describe("splice placement optimizer", () => {
 
     const next = appReducer(
       state,
-      appActions.applyOptimizedSplicePlacement(
+      appActions.applyOptimizedSpliceCanvasLayout(
         result.suggestion.spliceId,
         result.suggestion.spliceNodeId,
         result.suggestion.segmentLengths,

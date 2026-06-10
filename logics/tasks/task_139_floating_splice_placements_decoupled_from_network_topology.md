@@ -1,10 +1,10 @@
 ## task_139_floating_splice_placements_decoupled_from_network_topology - Floating splice placements decoupled from network topology
 > From version: 1.15.6 (ADR companion linked on 2026-06-10; amended 2026-06-10 after pre-implementation review)
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 96% (task scopes one coordinated implementation of req_144/item_630/adr_012)
 > Confidence: 90% (amendment resolves migration safety, determinism, visibility, and feedback-channel questions; AC21-AC30 added)
-> Progress: 0%
+> Progress: 5%
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.

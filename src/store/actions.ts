@@ -105,7 +105,7 @@ export type AppAction =
   | { type: "splice/convertToDirectional"; payload: { id: SpliceId } }
   | { type: "splice/rerouteConnectedWires"; payload: { id: SpliceId } }
   | {
-      type: "splice/applyOptimizedPlacement";
+      type: "splice/applyOptimizedCanvasLayout";
       payload: {
         id: SpliceId;
         nodeId: NodeId;
@@ -285,7 +285,7 @@ export const appActions = {
     type: "splice/rerouteConnectedWires",
     payload: { id }
   }),
-  applyOptimizedSplicePlacement: (
+  applyOptimizedSpliceCanvasLayout: (
     id: SpliceId,
     nodeId: NodeId,
     segmentLengths: Record<SegmentId, number>,
@@ -293,7 +293,7 @@ export const appActions = {
     removedSegmentIds?: SegmentId[],
     nodePosition?: { x: number; y: number } | null
   ): AppAction => ({
-    type: "splice/applyOptimizedPlacement",
+    type: "splice/applyOptimizedCanvasLayout",
     payload: { id, nodeId, segmentLengths, segments, removedSegmentIds, nodePosition }
   }),
   removeSplice: (id: SpliceId): AppAction => ({ type: "splice/remove", payload: { id } }),
