@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import type { CatalogItemId, Splice, SpliceId } from "../../core/entities";
+import type { CatalogItemId, Splice, SpliceId, SplicePlacement } from "../../core/entities";
 import {
   DEFAULT_NEW_SPLICE_PORT_MODE,
   normalizeSplicePortMode,
@@ -13,7 +13,7 @@ import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-s
 import { scrollNetworkPlanIntoView } from "../lib/networkPlanScroll";
 import { suggestAutoSpliceNodeId, suggestNextSpliceTechnicalId } from "../lib/technical-id-suggestions";
 import { hasSpliceOccupancyIndexAboveLimit, hasSpliceWireEndpointIndexAboveLimit } from "./spliceCapacityGuards";
-import { toCatalogItemId, type UseSpliceHandlersParams } from "./spliceHandlerTypes";
+import { toCatalogItemId, toNodeId, toSegmentId, type UseSpliceHandlersParams } from "./spliceHandlerTypes";
 import { buildSplicePlacementSuggestion, type PendingSpliceLengthSuggestion } from "./splicePlacementSuggestion";
 
 export type { PendingSpliceLengthSuggestion } from "./splicePlacementSuggestion";
@@ -44,6 +44,12 @@ export function useSpliceHandlers({
   setSpliceManufacturerReference,
   spliceAutoCreateLinkedNode,
   setSpliceAutoCreateLinkedNode,
+  splicePlacementSegmentId,
+  setSplicePlacementSegmentId,
+  splicePlacementFromNodeId,
+  setSplicePlacementFromNodeId,
+  splicePlacementOffsetMm,
+  setSplicePlacementOffsetMm,
   defaultAutoCreateLinkedNodes,
   portCount: _portCount,
   setPortCount,
@@ -127,6 +133,9 @@ export function useSpliceHandlers({
     setSpliceSideInverted(false);
     setSpliceManufacturerReference("");
     setSpliceAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
+    setSplicePlacementSegmentId("");
+    setSplicePlacementFromNodeId("");
+    setSplicePlacementOffsetMm("0");
     setPortCount("4");
     setSpliceFormError(null);
     setSpliceFormInfo(null);
@@ -143,6 +152,9 @@ export function useSpliceHandlers({
     setSplicePortMode("bounded");
     setSpliceManufacturerReference("");
     setSpliceAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
+    setSplicePlacementSegmentId("");
+    setSplicePlacementFromNodeId("");
+    setSplicePlacementOffsetMm("0");
     setPortCount("4");
     setSpliceFormError(null);
     setSpliceFormInfo(null);
@@ -175,6 +187,11 @@ export function useSpliceHandlers({
       setSpliceManufacturerReference(splice.manufacturerReference ?? "");
       setPortCount(String(splice.portCount));
     }
+    setSplicePlacementSegmentId(splice.placement?.segmentId ?? "");
+    setSplicePlacementFromNodeId(splice.placement?.fromNodeId ?? "");
+    setSplicePlacementOffsetMm(
+      splice.placement === undefined ? "0" : String(splice.placement.offsetMm)
+    );
     setSpliceSideInverted(splice.sideInverted === true);
     setSpliceAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
     setSpliceFormError(null);
@@ -212,6 +229,39 @@ export function useSpliceHandlers({
       setSpliceFormError("Bounded splice port count must be an integer >= 1.");
       return;
     }
+    const selectedPlacementSegmentId = toSegmentId(splicePlacementSegmentId);
+    const selectedPlacementFromNodeId = toNodeId(splicePlacementFromNodeId);
+    let nextPlacement: SplicePlacement | undefined;
+    if (selectedPlacementSegmentId !== null) {
+      const hostSegment = store.getState().segments.byId[selectedPlacementSegmentId];
+      if (hostSegment === undefined) {
+        setSpliceFormError("Selected splice host segment is invalid.");
+        return;
+      }
+      if (selectedPlacementFromNodeId === null) {
+        setSpliceFormError("Select a reference node for the splice placement.");
+        return;
+      }
+      if (
+        selectedPlacementFromNodeId !== hostSegment.nodeA &&
+        selectedPlacementFromNodeId !== hostSegment.nodeB
+      ) {
+        setSpliceFormError("Splice reference node must be one endpoint of the host segment.");
+        return;
+      }
+      const offsetMm = Number(splicePlacementOffsetMm);
+      if (!Number.isFinite(offsetMm) || offsetMm < 0) {
+        setSpliceFormError("Splice placement offset must be a finite value >= 0 mm.");
+        return;
+      }
+      nextPlacement = {
+        kind: "segmentOffset",
+        segmentId: selectedPlacementSegmentId,
+        fromNodeId: selectedPlacementFromNodeId,
+        offsetMm
+      };
+    }
+
     setSpliceFormError(null);
     setSpliceFormInfo(null);
 
@@ -235,6 +285,7 @@ export function useSpliceHandlers({
         catalogItemId: selectedCatalogItem?.id,
         portMode: normalizedPortMode,
         sideInverted: spliceSideInverted,
+        placement: nextPlacement,
         manufacturerReference:
           selectedCatalogItem?.manufacturerReference ??
           (spliceManufacturerReference.trim().length === 0 ? undefined : spliceManufacturerReference.trim()),
@@ -243,6 +294,11 @@ export function useSpliceHandlers({
     );
 
     const nextState = store.getState();
+    const nextError = nextState.ui.lastError?.message ?? null;
+    if (nextError !== null) {
+      setSpliceFormError(nextError);
+      return;
+    }
     const savedSplice = nextState.splices.byId[spliceId];
     if (savedSplice !== undefined) {
       if (wasCreateMode) {
