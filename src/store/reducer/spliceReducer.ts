@@ -6,6 +6,8 @@ import {
 } from "../../core/directionalSplice";
 import type { SegmentId, Wire, WireEndpoint, WireId } from "../../core/entities";
 import { recomputeWireRouteAndDirectionalEndpoints, resolveDirectionalSpliceEndpointSide } from "./helpers/wireTransitions";
+import { isSameSplicePlacement } from "../../core/splicePlacement";
+import { getSplicePlacementValidationError } from "./helpers/splicePlacement";
 import type { AppState, EntityState } from "../types";
 import { applyOptimizedSpliceCanvasLayout } from "./spliceCanvasLayoutReducer";
 import {
@@ -199,6 +201,24 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
         return withError(state, `Splice technical ID '${normalizedTechnicalId}' is already used.`);
       }
 
+      const previousSplice = state.splices.byId[action.payload.id];
+      const nextPlacement = action.payload.placement;
+      if (nextPlacement !== undefined) {
+        const placementError = getSplicePlacementValidationError(state, nextPlacement);
+        if (placementError !== null) {
+          return withError(state, placementError);
+        }
+      }
+      const placementChanged = !isSameSplicePlacement(previousSplice?.placement, nextPlacement);
+      if (
+        placementChanged &&
+        nextPlacement === undefined &&
+        previousSplice?.placement !== undefined &&
+        hasWireEndpointReferenceOnSplice(state, action.payload.id)
+      ) {
+        return withError(state, "Cannot remove splice placement while wire endpoints reference the splice.");
+      }
+
       if (portMode === "bounded") {
         const occupancy = state.splicePortOccupancy[action.payload.id];
         if (occupancy !== undefined) {
@@ -217,42 +237,68 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
           return withError(state, "Splice portCount cannot be reduced below wire endpoint port indexes.");
         }
       }
+      const upsertedSplice = {
+        ...action.payload,
+        name: normalizedName,
+        technicalId: normalizedTechnicalId,
+        portMode,
+        portCount,
+        sideInverted: action.payload.sideInverted === true,
+        placement: nextPlacement,
+        manufacturerReference:
+          linkedCatalogItem !== undefined
+            ? linkedCatalogItem.manufacturerReference
+            : normalizeManufacturerReference(action.payload.manufacturerReference)
+      };
+
+      let nextSplicePortOccupancy = state.splicePortOccupancy;
       if (portMode === "directional") {
-        const nextSplicePortOccupancy = { ...state.splicePortOccupancy };
+        nextSplicePortOccupancy = { ...state.splicePortOccupancy };
         delete nextSplicePortOccupancy[action.payload.id];
-        return bumpRevision({
-          ...clearLastError(state),
-          splicePortOccupancy: nextSplicePortOccupancy,
-          splices: upsertEntity(state.splices, {
-            ...action.payload,
-            name: normalizedName,
-            technicalId: normalizedTechnicalId,
-            portMode,
-            portCount,
-            sideInverted: action.payload.sideInverted === true,
-            manufacturerReference:
-              linkedCatalogItem !== undefined
-                ? linkedCatalogItem.manufacturerReference
-                : normalizeManufacturerReference(action.payload.manufacturerReference)
-          })
-        });
       }
 
-      return bumpRevision({
+      let stateAfterUpsert: AppState = {
         ...clearLastError(state),
-        splices: upsertEntity(state.splices, {
-          ...action.payload,
-          name: normalizedName,
-          technicalId: normalizedTechnicalId,
-          portMode,
-          portCount,
-          sideInverted: action.payload.sideInverted === true,
-          manufacturerReference:
-            linkedCatalogItem !== undefined
-              ? linkedCatalogItem.manufacturerReference
-              : normalizeManufacturerReference(action.payload.manufacturerReference)
-        })
-      });
+        splicePortOccupancy: nextSplicePortOccupancy,
+        splices: upsertEntity(state.splices, upsertedSplice)
+      };
+
+      if (placementChanged && previousSplice !== undefined) {
+        const nextWiresById = { ...stateAfterUpsert.wires.byId };
+        let touchedWireCount = 0;
+        for (const wireId of stateAfterUpsert.wires.allIds) {
+          const wire = stateAfterUpsert.wires.byId[wireId];
+          if (
+            wire === undefined ||
+            !(
+              (wire.endpointA.kind === "splicePort" && wire.endpointA.spliceId === action.payload.id) ||
+              (wire.endpointB.kind === "splicePort" && wire.endpointB.spliceId === action.payload.id)
+            )
+          ) {
+            continue;
+          }
+
+          const recomputed = recomputeWireRouteAndDirectionalEndpoints(stateAfterUpsert, wire);
+          if (!("wire" in recomputed)) {
+            return withError(state, recomputed.error);
+          }
+
+          nextWiresById[wireId] = recomputed.wire;
+          touchedWireCount += 1;
+        }
+
+        if (touchedWireCount > 0) {
+          stateAfterUpsert = {
+            ...stateAfterUpsert,
+            wires: {
+              ...stateAfterUpsert.wires,
+              byId: nextWiresById
+            }
+          };
+        }
+      }
+
+      return bumpRevision(stateAfterUpsert);
     }
 
     case "splice/convertToDirectional": {

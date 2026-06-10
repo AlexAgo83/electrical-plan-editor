@@ -166,6 +166,7 @@ export interface AppState {
   ui: {
     selected: SelectionState | null;
     lastError: AppError | null;
+    lastWarning?: AppError | null;
     themeMode: ThemeMode;
     lastImportRejections?: ImportRejection[] | null;
   };

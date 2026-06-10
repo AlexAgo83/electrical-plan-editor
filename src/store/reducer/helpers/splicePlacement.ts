@@ -1,10 +1,32 @@
-import type { NodeId, SpliceId } from "../../../core/entities";
+import type { NodeId, SpliceId, SplicePlacement } from "../../../core/entities";
 import {
   resolveSplicePlacementFromEntities,
   type ResolvedSplicePlacement,
   type UnresolvedSplicePlacement
 } from "../../../core/splicePlacement";
 import type { AppState } from "../../types";
+
+export function getSplicePlacementValidationError(state: AppState, placement: SplicePlacement): string | null {
+  if (!Number.isFinite(placement.offsetMm) || placement.offsetMm < 0) {
+    return "Splice placement offset must be a finite value >= 0 mm.";
+  }
+
+  const segment = state.segments.byId[placement.segmentId];
+  if (segment === undefined) {
+    return "Splice placement references an unknown segment.";
+  }
+  if (segment.role === "rearBackshellLink") {
+    return "Splice placement cannot target a rear backshell link segment.";
+  }
+  if (placement.fromNodeId !== segment.nodeA && placement.fromNodeId !== segment.nodeB) {
+    return "Splice placement reference node must be an endpoint of the host segment.";
+  }
+  if (placement.offsetMm > segment.lengthMm) {
+    return "Splice placement offset exceeds the host segment length.";
+  }
+
+  return null;
+}
 
 export type StoreSplicePlacementResolution =
   | ResolvedSplicePlacement

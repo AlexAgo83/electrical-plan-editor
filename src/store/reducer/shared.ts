@@ -53,7 +53,7 @@ export function shouldClearSelection(selected: SelectionState | null, kind: Sele
 }
 
 export function clearLastError(state: AppState): AppState {
-  if (state.ui.lastError === null) {
+  if (state.ui.lastError === null && (state.ui.lastWarning ?? null) === null) {
     return state;
   }
 
@@ -61,7 +61,22 @@ export function clearLastError(state: AppState): AppState {
     ...state,
     ui: {
       ...state.ui,
-      lastError: null
+      lastError: null,
+      lastWarning: null
+    }
+  };
+}
+
+/**
+ * Non-blocking warning channel: the action succeeds while the warning is
+ * surfaced to the user (clamped offsets, relative position shifts, ...).
+ */
+export function withWarning(state: AppState, warning: string | AppError): AppState {
+  return {
+    ...state,
+    ui: {
+      ...state.ui,
+      lastWarning: normalizeAppError(warning)
     }
   };
 }
