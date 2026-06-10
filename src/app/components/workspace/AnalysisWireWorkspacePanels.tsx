@@ -7,6 +7,7 @@ import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { normalizeFileNamePart } from "../../lib/exportFileName";
 import { downloadTabularCsvOrXlsxFile, downloadTabularWorkbookFile, type TabularWorksheetExport } from "../../lib/tabularExport";
 import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireColorPresentation";
+import { resolveWireExportEndpointMaterials } from "../../lib/wireListExport";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 import { TabularExportPreviewDialog } from "../dialogs/TabularExportPreviewDialog";
 import { EntityReferenceButton } from "./EntityReferenceButton";
@@ -222,6 +223,8 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
               const begin = describeWireEndpointCsvParts(wire.endpointA);
               const end = describeWireEndpointCsvParts(wire.endpointB);
               const colorCode = getWireColorCsvValue(wire);
+              const beginMaterials = resolveWireExportEndpointMaterials(wire, "A", connectorById, catalogItemById);
+              const endMaterials = resolveWireExportEndpointMaterials(wire, "B", connectorById, catalogItemById);
               if (showWireRouteModeColumn) {
                 return [
                   wire.name,
@@ -230,12 +233,12 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   colorCode,
                   begin.endpointId,
                   begin.pin,
-                  wire.endpointAConnectionReference ?? "",
-                  wire.endpointASealReference ?? "",
+                  beginMaterials.connectionRef,
+                  beginMaterials.sealRef,
                   end.endpointId,
                   end.pin,
-                  wire.endpointBConnectionReference ?? "",
-                  wire.endpointBSealReference ?? "",
+                  endMaterials.connectionRef,
+                  endMaterials.sealRef,
                   wire.sectionMm2,
                   wire.lengthMm,
                   wire.isRouteLocked ? "Locked" : "Auto"
@@ -248,12 +251,12 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 colorCode,
                 begin.endpointId,
                 begin.pin,
-                wire.endpointAConnectionReference ?? "",
-                wire.endpointASealReference ?? "",
+                beginMaterials.connectionRef,
+                beginMaterials.sealRef,
                 end.endpointId,
                 end.pin,
-                wire.endpointBConnectionReference ?? "",
-                wire.endpointBSealReference ?? "",
+                endMaterials.connectionRef,
+                endMaterials.sealRef,
                 wire.sectionMm2,
                 wire.lengthMm
               ];

@@ -392,7 +392,7 @@ describe("App integration UI - list ergonomics", () => {
       );
       expect(headerLine).not.toContain("Endpoints");
       expect(capturedPayload).toContain("TERM-A-CSV");
-      expect(capturedPayload).toContain("SEAL-B-CSV");
+      expect(capturedPayload).toContain("Preden 13mm");
     } finally {
       (globalThis as typeof globalThis & { Blob: typeof Blob }).Blob = OriginalBlob;
       vi.restoreAllMocks();

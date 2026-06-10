@@ -1,4 +1,5 @@
-import type { Connector, Splice, Wire } from "../../core/entities";
+import { resolveConnectorTerminalMaterial } from "../../core/connectorCatalogMaterials";
+import type { CatalogItem, Connector, Splice, Wire, WireEndpoint } from "../../core/entities";
 import type { TabularWorksheetExport } from "./tabularExport";
 
 function resolveColor(wire: Wire): string {
@@ -14,6 +15,121 @@ interface ResolvedEndpoint {
   type: string;
   ref: string;
   position: string | number;
+}
+
+interface ResolvedEndpointMaterial {
+  reference: string;
+  name?: string;
+}
+
+export interface ResolvedWireExportEndpointMaterials {
+  connectionRef: string;
+  sealRef: string;
+}
+
+function normalizeReference(value: string | undefined): string | undefined {
+  const normalized = value?.trim() ?? "";
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+function normalizeName(value: string | undefined): string | undefined {
+  const normalized = value?.trim() ?? "";
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+function formatResolvedMaterial(material: ResolvedEndpointMaterial | undefined): string {
+  if (material === undefined) {
+    return "";
+  }
+  return material.name === undefined ? material.reference : `${material.reference} - ${material.name}`;
+}
+
+function resolveEndpointConnectionMaterial(
+  endpoint: WireEndpoint,
+  reference: string | undefined,
+  name: string | undefined,
+  connectorById: ReadonlyMap<string, Connector>,
+  catalogItemById: ReadonlyMap<string, CatalogItem>
+): ResolvedEndpointMaterial | undefined {
+  if (endpoint.kind === "splicePort") {
+    return { reference: "Preden 13mm" };
+  }
+
+  const manualReference = normalizeReference(reference);
+  if (manualReference !== undefined) {
+    return {
+      reference: manualReference,
+      name: normalizeName(name)
+    };
+  }
+
+  const connector = connectorById.get(endpoint.connectorId);
+  const catalogItem = connector?.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId);
+  const resolved = connector === undefined ? undefined : resolveConnectorTerminalMaterial(connector, catalogItem, endpoint.cavityIndex);
+  if (resolved?.terminalReference === undefined) {
+    return undefined;
+  }
+  return {
+    reference: resolved.terminalReference,
+    name: normalizeName(resolved.terminalName)
+  };
+}
+
+function resolveEndpointSealMaterial(
+  endpoint: WireEndpoint,
+  reference: string | undefined,
+  name: string | undefined,
+  connectorById: ReadonlyMap<string, Connector>,
+  catalogItemById: ReadonlyMap<string, CatalogItem>
+): ResolvedEndpointMaterial | undefined {
+  if (endpoint.kind === "splicePort") {
+    return undefined;
+  }
+
+  const manualReference = normalizeReference(reference);
+  if (manualReference !== undefined) {
+    return {
+      reference: manualReference,
+      name: normalizeName(name)
+    };
+  }
+
+  const connector = connectorById.get(endpoint.connectorId);
+  if (connector === undefined || connector.applyCatalogSeals === false) {
+    return undefined;
+  }
+
+  const catalogItem = connector.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId);
+  const resolved = resolveConnectorTerminalMaterial(connector, catalogItem, endpoint.cavityIndex);
+  if (resolved?.sealReference === undefined) {
+    return undefined;
+  }
+  return {
+    reference: resolved.sealReference,
+    name: normalizeName(resolved.sealName)
+  };
+}
+
+export function resolveWireExportEndpointMaterials(
+  wire: Wire,
+  side: "A" | "B",
+  connectorById: ReadonlyMap<string, Connector>,
+  catalogItemById: ReadonlyMap<string, CatalogItem>
+): ResolvedWireExportEndpointMaterials {
+  const endpoint = side === "A" ? wire.endpointA : wire.endpointB;
+  const connectionReference = side === "A" ? wire.endpointAConnectionReference : wire.endpointBConnectionReference;
+  const connectionName = side === "A" ? wire.endpointAConnectionName : wire.endpointBConnectionName;
+  const sealReference = side === "A" ? wire.endpointASealReference : wire.endpointBSealReference;
+  const sealName = side === "A" ? wire.endpointASealName : wire.endpointBSealName;
+
+  return {
+    connectionRef: formatResolvedMaterial(
+      resolveEndpointConnectionMaterial(endpoint, connectionReference, connectionName, connectorById, catalogItemById)
+    ),
+    sealRef: formatResolvedMaterial(
+      resolveEndpointSealMaterial(endpoint, sealReference, sealName, connectorById, catalogItemById)
+    )
+  };
 }
 
 function resolveEndpoint(
@@ -43,10 +159,12 @@ export function buildWireListSheet(
   sheetName: string,
   wires: Wire[],
   connectors: Connector[],
-  splices: Splice[]
+  splices: Splice[],
+  catalogItems: CatalogItem[]
 ): TabularWorksheetExport {
   const connectorById = new Map(connectors.map((c) => [c.id, c]));
   const spliceById = new Map(splices.map((s) => [s.id, s]));
+  const catalogItemById = new Map(catalogItems.map((item) => [item.id, item]));
 
   const headers = [
     "Technical ID",
@@ -74,6 +192,8 @@ export function buildWireListSheet(
   const rows = sortedWires.map((wire) => {
     const begin = resolveEndpoint(wire, "A", connectorById, spliceById);
     const end = resolveEndpoint(wire, "B", connectorById, spliceById);
+    const beginMaterials = resolveWireExportEndpointMaterials(wire, "A", connectorById, catalogItemById);
+    const endMaterials = resolveWireExportEndpointMaterials(wire, "B", connectorById, catalogItemById);
     return [
       wire.technicalId,
       wire.name,
@@ -83,13 +203,13 @@ export function buildWireListSheet(
       begin.type,
       begin.ref,
       begin.position,
-      wire.endpointAConnectionReference ?? "",
-      wire.endpointASealReference ?? "",
+      beginMaterials.connectionRef,
+      beginMaterials.sealRef,
       end.type,
       end.ref,
       end.position,
-      wire.endpointBConnectionReference ?? "",
-      wire.endpointBSealReference ?? "",
+      endMaterials.connectionRef,
+      endMaterials.sealRef,
       wire.lengthMm
     ];
   });

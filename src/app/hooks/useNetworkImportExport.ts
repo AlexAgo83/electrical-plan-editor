@@ -369,7 +369,13 @@ export function useNetworkImportExport({
         }
 
         allSheets.push(
-          buildWireListSheet(`${prefix} Wires`, wires, connectors, splices)
+          buildWireListSheet(
+            `${prefix} Wires`,
+            wires,
+            connectors,
+            splices,
+            catalogItems
+          )
         );
       }
 

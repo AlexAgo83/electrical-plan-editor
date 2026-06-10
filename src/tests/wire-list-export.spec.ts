@@ -1,0 +1,146 @@
+import { describe, expect, it } from "vitest";
+import type { CatalogItem, CatalogItemId, Connector, ConnectorId, Splice, SpliceId, Wire, WireId } from "../core/entities";
+import { buildWireListSheet } from "../app/lib/wireListExport";
+
+function asCatalogItemId(value: string): CatalogItemId {
+  return value as CatalogItemId;
+}
+
+function asConnectorId(value: string): ConnectorId {
+  return value as ConnectorId;
+}
+
+function asSpliceId(value: string): SpliceId {
+  return value as SpliceId;
+}
+
+function asWireId(value: string): WireId {
+  return value as WireId;
+}
+
+describe("buildWireListSheet", () => {
+  it("uses catalog connector defaults, keeps manual overrides, and marks splice endpoints as predenuded", () => {
+    const catalogItems: CatalogItem[] = [
+      {
+        id: asCatalogItemId("CAT-1"),
+        manufacturerReference: "CONN-CAT-1",
+        connectionCount: 2,
+        connectorDefaults: {
+          allSameTerminals: true,
+          defaultTerminal: {
+            terminalReference: "TERM-DEFAULT",
+            terminalName: "Default terminal",
+            sealReference: "SEAL-DEFAULT",
+            sealName: "Default seal"
+          }
+        }
+      }
+    ];
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-1",
+        cavityCount: 2,
+        catalogItemId: asCatalogItemId("CAT-1")
+      }
+    ];
+    const splices: Splice[] = [
+      {
+        id: asSpliceId("S1"),
+        name: "Splice 1",
+        technicalId: "S-1",
+        portCount: 2
+      }
+    ];
+    const wires: Wire[] = [
+      {
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "W-001",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 100,
+        sectionMm2: 1,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W2"),
+        name: "Wire 2",
+        technicalId: "W-002",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 2 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointAConnectionReference: "TERM-MANUAL",
+        endpointAConnectionName: "Manual terminal",
+        endpointBSealReference: "SEAL-MANUAL",
+        endpointBSealName: "Manual seal",
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 150,
+        sectionMm2: 1.5,
+        isRouteLocked: false
+      }
+    ];
+
+    const sheet = buildWireListSheet("Wires", wires, connectors, splices, catalogItems);
+
+    expect(sheet.headers).toEqual([
+      "Technical ID",
+      "Name",
+      "Twist group",
+      "Section (mm²)",
+      "Color",
+      "Begin type",
+      "Begin ref",
+      "Begin pin",
+      "Begin connection ref",
+      "Begin seal ref",
+      "End type",
+      "End ref",
+      "End pin",
+      "End connection ref",
+      "End seal ref",
+      "Length (mm)"
+    ]);
+    expect(sheet.rows[0]).toEqual([
+      "W-001",
+      "Wire 1",
+      "",
+      1,
+      "",
+      "Connector",
+      "C-1",
+      2,
+      "TERM-DEFAULT - Default terminal",
+      "SEAL-DEFAULT - Default seal",
+      "Splice",
+      "S-1",
+      1,
+      "Preden 13mm",
+      "",
+      100
+    ]);
+    expect(sheet.rows[1]).toEqual([
+      "W-002",
+      "Wire 2",
+      "",
+      1.5,
+      "",
+      "Connector",
+      "C-1",
+      3,
+      "TERM-MANUAL - Manual terminal",
+      "SEAL-DEFAULT - Default seal",
+      "Connector",
+      "C-1",
+      2,
+      "TERM-DEFAULT - Default terminal",
+      "SEAL-MANUAL - Manual seal",
+      150
+    ]);
+  });
+});

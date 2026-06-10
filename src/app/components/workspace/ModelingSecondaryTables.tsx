@@ -18,6 +18,7 @@ import {
   getWireColorCsvValue,
   renderWireColorCellValue,
 } from "../../lib/wireColorPresentation";
+import { resolveWireExportEndpointMaterials } from "../../lib/wireListExport";
 import { TabularExportPreviewDialog } from "../dialogs/TabularExportPreviewDialog";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
@@ -971,6 +972,18 @@ export function ModelingSecondaryTables({
                     const begin = describeWireEndpointCsvParts(wire.endpointA);
                     const end = describeWireEndpointCsvParts(wire.endpointB);
                     const colorCode = getWireColorCsvValue(wire);
+                    const beginMaterials = resolveWireExportEndpointMaterials(
+                      wire,
+                      "A",
+                      connectorById,
+                      catalogItemById,
+                    );
+                    const endMaterials = resolveWireExportEndpointMaterials(
+                      wire,
+                      "B",
+                      connectorById,
+                      catalogItemById,
+                    );
                     if (showWireRouteModeColumn) {
                       return [
                         wire.name,
@@ -979,12 +992,12 @@ export function ModelingSecondaryTables({
                         colorCode,
                         begin.endpointId,
                         begin.pin,
-                        wire.endpointAConnectionReference ?? "",
-                        wire.endpointASealReference ?? "",
+                        beginMaterials.connectionRef,
+                        beginMaterials.sealRef,
                         end.endpointId,
                         end.pin,
-                        wire.endpointBConnectionReference ?? "",
-                        wire.endpointBSealReference ?? "",
+                        endMaterials.connectionRef,
+                        endMaterials.sealRef,
                         wire.sectionMm2,
                         wire.lengthMm,
                         wire.isRouteLocked ? "Locked" : "Auto",
@@ -997,12 +1010,12 @@ export function ModelingSecondaryTables({
                       colorCode,
                       begin.endpointId,
                       begin.pin,
-                      wire.endpointAConnectionReference ?? "",
-                      wire.endpointASealReference ?? "",
+                      beginMaterials.connectionRef,
+                      beginMaterials.sealRef,
                       end.endpointId,
                       end.pin,
-                      wire.endpointBConnectionReference ?? "",
-                      wire.endpointBSealReference ?? "",
+                      endMaterials.connectionRef,
+                      endMaterials.sealRef,
                       wire.sectionMm2,
                       wire.lengthMm,
                     ];
