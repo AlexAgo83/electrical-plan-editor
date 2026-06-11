@@ -57,7 +57,6 @@ describe("App integration UI - network summary workflow polish", () => {
     expect(settingsPanel).not.toBeNull();
     fireEvent.change(within(settingsPanel as HTMLElement).getByLabelText("Theme mode"), { target: { value: "dark" } });
     switchScreenDrawerAware("modeling");
-
     const panel = getPanelByHeading("Network summary");
     const canvasControls = within(panel).getByLabelText("Canvas controls");
     expect(canvasControls).toHaveClass("network-canvas-floating-controls");
@@ -83,7 +82,6 @@ describe("App integration UI - network summary workflow polish", () => {
     if (scoped === undefined) {
       throw new Error("Expected active scoped network.");
     }
-
     renderAppWithState({
       ...base,
       networkStates: {
