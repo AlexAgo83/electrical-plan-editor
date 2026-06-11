@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { type FormEvent } from "react";
 import type { CatalogItemId, Splice, SpliceId, SplicePlacement } from "../../core/entities";
 import {
   DEFAULT_NEW_SPLICE_PORT_MODE,
@@ -10,11 +10,11 @@ import {
 import { appActions } from "../../store";
 import { analyzeSpliceDeleteImpact } from "../../store/deleteImpact";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
-import { scrollNetworkPlanIntoView } from "../lib/networkPlanScroll";
 import { suggestAutoSpliceNodeId, suggestNextSpliceTechnicalId } from "../lib/technical-id-suggestions";
 import { hasSpliceOccupancyIndexAboveLimit, hasSpliceWireEndpointIndexAboveLimit } from "./spliceCapacityGuards";
 import { toCatalogItemId, toNodeId, toSegmentId, type UseSpliceHandlersParams } from "./spliceHandlerTypes";
-import { buildSplicePlacementSuggestion, type PendingSpliceLengthSuggestion } from "./splicePlacementSuggestion";
+import { useSpliceOptimizedPlacementSuggestion } from "./useSpliceOptimizedPlacementSuggestion";
+import { useSplicePortReservation } from "./useSplicePortReservation";
 
 export type { PendingSpliceLengthSuggestion } from "./splicePlacementSuggestion";
 
@@ -62,7 +62,15 @@ export function useSpliceHandlers({
   const spliceManufacturerReference = _spliceManufacturerReference;
   const portCount = _portCount;
   void _spliceEditAfterCreate;
-  const [optimizedLengthSuggestion, setOptimizedLengthSuggestion] = useState<PendingSpliceLengthSuggestion | null>(null);
+  const {
+    optimizedLengthSuggestion,
+    handleSuggestOptimizedSplicePlacement,
+    handleSuggestOptimizedSplicePlacementForSplice,
+    applyOptimizedSpliceLengthSuggestion,
+    cancelOptimizedSpliceLengthSuggestion,
+    clearOptimizedLengthSuggestion
+  } = useSpliceOptimizedPlacementSuggestion({ store, dispatchAction, notifyToast, spliceFormMode, editingSpliceId, setSpliceFormError, setSpliceFormInfo });
+  const { handleReservePort, handleReleasePort } = useSplicePortReservation({ dispatchAction, selectedSpliceId, portIndexInput, spliceOccupantRefInput });
 
   function setSpliceCapacityMode(nextMode: SplicePortMode): void {
     if (nextMode === "unbounded" && spliceCatalogItemId.trim().length > 0) {
@@ -139,7 +147,7 @@ export function useSpliceHandlers({
     setPortCount("4");
     setSpliceFormError(null);
     setSpliceFormInfo(null);
-    setOptimizedLengthSuggestion(null);
+    clearOptimizedLengthSuggestion();
   }
 
   function clearSpliceForm(): void {
@@ -158,7 +166,7 @@ export function useSpliceHandlers({
     setPortCount("4");
     setSpliceFormError(null);
     setSpliceFormInfo(null);
-    setOptimizedLengthSuggestion(null);
+    clearOptimizedLengthSuggestion();
   }
 
   function cancelSpliceEdit(): void {
@@ -458,80 +466,7 @@ export function useSpliceHandlers({
     }
     setSpliceFormError(null);
     setSpliceFormInfo(null);
-    setOptimizedLengthSuggestion(null);
-  }
-
-  function suggestOptimizedSplicePlacement(spliceId: SpliceId): void {
-    const result = buildSplicePlacementSuggestion(store, spliceId);
-    if (result.kind === "empty") {
-      setSpliceFormError(null);
-      setSpliceFormInfo(null);
-      notifyToast("No optimized lengths", { message: result.reason, variant: "info" });
-      return;
-    }
-
-    setOptimizedLengthSuggestion(result.suggestion);
-    scrollNetworkPlanIntoView();
-  }
-
-  function handleSuggestOptimizedSplicePlacement(): void {
-    if (spliceFormMode !== "edit" || editingSpliceId === null) {
-      return;
-    }
-
-    suggestOptimizedSplicePlacement(editingSpliceId);
-  }
-
-  function handleSuggestOptimizedSplicePlacementForSplice(spliceId: SpliceId): void {
-    suggestOptimizedSplicePlacement(spliceId);
-  }
-
-  function applyOptimizedSpliceLengthSuggestion(): void {
-    if (optimizedLengthSuggestion === null) {
-      return;
-    }
-
-    dispatchAction(
-      appActions.applyOptimizedSpliceCanvasLayout(
-        optimizedLengthSuggestion.spliceId,
-        optimizedLengthSuggestion.spliceNodeId,
-        optimizedLengthSuggestion.segmentLengths,
-        optimizedLengthSuggestion.segments,
-        optimizedLengthSuggestion.removedSegmentIds,
-        optimizedLengthSuggestion.spliceNodePosition
-      )
-    );
-    const nextError = store.getState().ui.lastError?.message ?? null;
-    if (nextError !== null) {
-      notifyToast("Optimized lengths failed", { message: nextError, variant: "error" });
-      return;
-    }
-    setOptimizedLengthSuggestion(null);
-    setSpliceFormError(null);
-    setSpliceFormInfo(null);
-  }
-
-  function cancelOptimizedSpliceLengthSuggestion(): void {
-    setOptimizedLengthSuggestion(null);
-  }
-
-  function handleReservePort(event: FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-
-    if (selectedSpliceId === null) {
-      return;
-    }
-
-    const portIndex = Math.max(0, Math.trunc(Number(portIndexInput)));
-    dispatchAction(appActions.occupySplicePort(selectedSpliceId, portIndex, spliceOccupantRefInput));
-  }
-
-  function handleReleasePort(portIndex: number): void {
-    if (selectedSpliceId === null) {
-      return;
-    }
-
-    dispatchAction(appActions.releaseSplicePort(selectedSpliceId, portIndex));
+    clearOptimizedLengthSuggestion();
   }
 
   return {

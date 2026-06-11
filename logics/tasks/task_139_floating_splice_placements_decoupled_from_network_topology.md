@@ -2,9 +2,9 @@
 > From version: 1.15.6 (ADR companion linked on 2026-06-10; amended 2026-06-10 after pre-implementation review)
 > Schema version: 1.0
 > Status: In progress
-> Understanding: 96% (task scopes one coordinated implementation of req_144/item_630/adr_012)
-> Confidence: 90% (amendment resolves migration safety, determinism, visibility, and feedback-channel questions; AC21-AC30 added)
-> Progress: 5%
+> Understanding: 98% (task scopes one coordinated implementation of req_144/item_630/adr_012)
+> Confidence: 95% (implementation phases 1-7 delivered and committed; post-implementation CI modularization recovery applied)
+> Progress: 90% (phases 1-7 implemented, committed, and green under local CI after modularization recovery; formal AC traceability/closure pending)
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -99,7 +99,22 @@ flowchart TD
 - Phase 8: Close AC traceability with targeted tests and complete validation gates.
 
 # Report
-- Pending implementation.
+- Implementation delivered across phases 1-7 and committed to `main`:
+  - Phase 1: segment-offset placement contract, normalization helpers, and the central `resolveSplicePlacement` API; the legacy canvas-position "placement" naming was renamed to canvas-layout wording (`splicePlacementReducer.ts` -> `spliceCanvasLayoutReducer.ts`).
+  - Phase 2: load-time legacy splice-node migration (degree-0/1/2 and branch) with the safe-fusion predicate, intermediate-node fallback, deterministic surviving-ID/`fromNodeId`/offset rules, global wire route rewriting, reserved `MIG-SPLICE-*` labels, and migration report data.
+  - Phase 3: derived routing graph with virtual splice points, partial endpoint route detail, host-ID tie-breaks, consecutive-host dedup, and zero-length route representation.
+  - Phase 4: reducer/validation guards for unplaced-splice rejection, host-segment delete blocking, placement removal/move guards, `rearBackshellLink` exclusion, offset clamping, and the non-blocking warning channel.
+  - Phase 5: splice form host-segment/reference-node/offset/conversion surfaces, analysis/table partial-length info, and the modal migration report wired to both load paths.
+  - Phase 6: Network Summary floating-splice overlay rendering, callout anchoring from resolved geometry, and the deterministic anti-superposition render-only offset.
+  - Phase 7: workspace/network-file schema bumps (v3 -> v4), fixtures, and compatibility/parity tests for both load paths.
+- Post-implementation CI recovery (this session): the cumulative feature work pushed several files past their modularization budgets and introduced one type error. Fixes applied to restore a green pipeline without behavior changes:
+  - `src/tests/persistence.splice-node-migration.spec.ts`: removed invalid `Connector` color fields (typecheck).
+  - `src/app/AppController.tsx` (1103 -> 1081): extracted `useAppControllerSpliceMigrationReport`.
+  - `src/app/hooks/useSpliceHandlers.ts` (556 -> 491): extracted `useSpliceOptimizedPlacementSuggestion` and `useSplicePortReservation`.
+  - `src/store/reducer/helpers/wireTransitions.ts` (881 -> 119): split into `wireEndpointHelpers`, `derivedWireRouting`, and `directionalSpliceSide`, re-exporting the public API.
+  - `src/store/reducer/spliceReducer.ts` (523 -> 461): extracted `spliceDirectionalConversion`.
+  - `src/store/reducer/wireReducer.ts` (508 -> 442): extracted `wireEndpointOccupancyGuards`.
+- Remaining: phase 8 AC1-AC30 traceability proof capture and formal workflow closure (not performed in this session).
 
 # AI Context
 - Summary: Implement the full floating-splice placement architecture: segment-offset placement, load-time legacy migration, derived virtual routing points, Network Summary overlay rendering, form editing, validation, and import/export compatibility.

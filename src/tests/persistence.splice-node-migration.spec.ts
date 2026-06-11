@@ -54,9 +54,7 @@ function buildLegacyDegreeTwoActions(options?: {
       id: asConnectorId("C-A"),
       name: "Connector A",
       technicalId: "CONN-A",
-      cavityCount: 4,
-      primaryColorId: null,
-      secondaryColorId: null
+      cavityCount: 4
     }),
     appActions.upsertConnector({
       id: asConnectorId("C-B"),

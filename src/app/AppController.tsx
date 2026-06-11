@@ -1,6 +1,5 @@
 import { type ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import appPackageMetadata from "../../package.json";
-import { consumeLastSpliceMigrationReport } from "../adapters/persistence";
 import type { CatalogItemId } from "../core/entities";
 import { appActions } from "../store";
 import { appStore } from "./store";
@@ -37,6 +36,7 @@ import { useAppControllerWorkspaceContentAssembly } from "./hooks/controller/use
 import { useAppControllerUniquenessFlags } from "./hooks/controller/useAppControllerUniquenessFlags";
 import { useAppControllerRefs } from "./hooks/controller/useAppControllerRefs";
 import { useAppControllerWorkspaceRuntime } from "./hooks/controller/useAppControllerWorkspaceRuntime";
+import { useAppControllerSpliceMigrationReport } from "./hooks/controller/useAppControllerSpliceMigrationReport";
 import { scrollToAiAgentPanel } from "./lib/aiAgentPanelScroll";
 import {
   useAppControllerActionRefsSyncEffect,
@@ -63,14 +63,13 @@ import { buildAppControllerNamespacedFormsState } from "./hooks/useAppController
 import { useAppSnapshot } from "./hooks/useAppSnapshot";
 import { NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE } from "./lib/app-utils-shared";
 import { useAppControllerBomExportHandlers } from "./hooks/controller/useAppControllerBomExportHandlers";
-import type { FileFeedbackDialogModel } from "./hooks/networkImportExportTypes";
 import type { AppProps, SubScreenId } from "./types/app-controller";
 import "./styles.css";
 export type { AppProps } from "./types/app-controller";
 const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor";
 export function AppController({ store = appStore }: AppProps): ReactElement {
   const currentYear = new Date().getFullYear(), state = useAppSnapshot(store);
-  const [spliceMigrationReportDialog, setSpliceMigrationReportDialog] = useState<FileFeedbackDialogModel | null>(null);
+  const { spliceMigrationReportDialog, showSpliceMigrationReport } = useAppControllerSpliceMigrationReport();
   const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, StatisticsScreen, ValidationScreen, AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables, NetworkScopeWorkspaceContent, SettingsWorkspaceContent, StatisticsWorkspaceContent, ValidationWorkspaceContent } = appUiModules;
   const {
     networks,
@@ -231,27 +230,6 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     [setActiveSubScreen]
   );
-  const showSpliceMigrationReport = useCallback((entries: string[]): void => {
-    if (entries.length === 0) {
-      return;
-    }
-
-    setSpliceMigrationReportDialog({
-      title: "Splice migration report",
-      message:
-        entries.length === 1
-          ? "A legacy splice-node migration ran while loading this workspace."
-          : `Legacy splice-node migration ran and produced ${String(entries.length)} report entries.`,
-      items: entries,
-      onClose: () => setSpliceMigrationReportDialog(null)
-    });
-  }, []);
-  useEffect(() => {
-    const pendingEntries = consumeLastSpliceMigrationReport().map((entry) => entry.message);
-    if (pendingEntries.length > 0) {
-      showSpliceMigrationReport(pendingEntries);
-    }
-  }, [showSpliceMigrationReport]);
   const handleOpenAiAgent = useCallback(() => {
     if (!aiSettings.readiness.isReady) {
       return;

@@ -162,18 +162,28 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     catalogItems,
     connectors,
     splices,
+    nodes,
     wireFormError
   } = props;
   const wireHandlers = useWireHandlersContext();
   const primaryColor = wirePrimaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wirePrimaryColorId] : undefined;
   const secondaryColor = wireSecondaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wireSecondaryColorId] : undefined;
-  const placedSplices = splices.filter((splice) => splice.placement !== undefined);
+  // A splice can host a wire endpoint when it has a canonical floating placement
+  // or still resolves through a legacy splice node (the same connectable states
+  // accepted by `resolveWireEndpointAnchor`). Splices that are neither placed nor
+  // backed by a node are unplaced and cannot be connected.
+  const spliceIdsWithLegacyNode = new Set(
+    nodes.filter((node) => node.kind === "splice").map((node) => node.spliceId)
+  );
+  const isSpliceConnectable = (splice: (typeof splices)[number]): boolean =>
+    splice.placement !== undefined || spliceIdsWithLegacyNode.has(splice.id);
+  const connectableSplices = splices.filter(isSpliceConnectable);
   const selectedEndpointASplice = splices.find((splice) => splice.id === wireEndpointASpliceId);
   const selectedEndpointBSplice = splices.find((splice) => splice.id === wireEndpointBSpliceId);
   const selectedEndpointASpliceIsUnplaced =
-    selectedEndpointASplice !== undefined && selectedEndpointASplice.placement === undefined;
+    selectedEndpointASplice !== undefined && !isSpliceConnectable(selectedEndpointASplice);
   const selectedEndpointBSpliceIsUnplaced =
-    selectedEndpointBSplice !== undefined && selectedEndpointBSplice.placement === undefined;
+    selectedEndpointBSplice !== undefined && !isSpliceConnectable(selectedEndpointBSplice);
   const endpointAIsDirectionalSplice =
     selectedEndpointASplice !== undefined && resolveSplicePortMode(selectedEndpointASplice) === "directional";
   const endpointBIsDirectionalSplice =
@@ -230,7 +240,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         : { label: `Missing connector (${wireEndpointAConnectorId})`, technicalId: wireEndpointAConnectorId }
   });
   const endpointASpliceOptions = buildModelingDynamicSelectOptions({
-    options: placedSplices.map((splice) => ({
+    options: connectableSplices.map((splice) => ({
       value: splice.id,
       label: `${splice.name} (${splice.technicalId})`,
       technicalId: splice.technicalId
@@ -256,7 +266,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         : { label: `Missing connector (${wireEndpointBConnectorId})`, technicalId: wireEndpointBConnectorId }
   });
   const endpointBSpliceOptions = buildModelingDynamicSelectOptions({
-    options: placedSplices.map((splice) => ({
+    options: connectableSplices.map((splice) => ({
       value: splice.id,
       label: `${splice.name} (${splice.technicalId})`,
       technicalId: splice.technicalId

@@ -424,7 +424,7 @@ describe("AI agent operation contract", () => {
           {
             type: "add_segment",
             nodeA: "H-N-AI-SERVICE",
-            nodeB: "H-N-HVIL",
+            nodeB: "H-N-OBC",
             lengthMm: 25
           },
           {
@@ -465,7 +465,7 @@ describe("AI agent operation contract", () => {
           {
             type: "add_segment",
             nodeA: "AI Service Connector",
-            nodeB: "H-N-HVIL",
+            nodeB: "H-N-OBC",
             lengthMm: 25
           },
           {
