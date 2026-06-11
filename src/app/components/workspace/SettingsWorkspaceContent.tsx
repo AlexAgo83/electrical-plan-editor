@@ -785,28 +785,32 @@ export function SettingsWorkspaceContent({
                   <h4>Wire list</h4>
                   <p>One XLSX workbook.</p>
                 </div>
-                <button
-                  type="button"
-                  className="button-with-icon settings-export-action-button"
-                  onClick={() => handleExportGroupedWire?.(selectedExportNetworkIds)}
-                  disabled={!canExportSelectedNetworks || handleExportGroupedWire === undefined}
-                >
-                  {renderSettingLabel("Export selected wire list (XLSX)")}
-                </button>
+                <div className="row-actions settings-actions settings-export-single-action">
+                  <button
+                    type="button"
+                    className="button-with-icon settings-export-action-button"
+                    onClick={() => handleExportGroupedWire?.(selectedExportNetworkIds)}
+                    disabled={!canExportSelectedNetworks || handleExportGroupedWire === undefined}
+                  >
+                    {renderSettingLabel("Export selected wire list (XLSX)")}
+                  </button>
+                </div>
               </article>
               <article className="settings-export-option-group">
                 <div className="settings-export-option-copy">
                   <h4>BOM grouped</h4>
                   <p>One XLSX workbook.</p>
                 </div>
-                <button
-                  type="button"
-                  className="button-with-icon settings-export-action-button"
-                  onClick={() => handleExportGroupedBom?.(selectedExportNetworkIds)}
-                  disabled={!canExportSelectedNetworks || handleExportGroupedBom === undefined}
-                >
-                  {renderSettingLabel("Export selected BOM (XLSX)")}
-                </button>
+                <div className="row-actions settings-actions settings-export-single-action">
+                  <button
+                    type="button"
+                    className="button-with-icon settings-export-action-button"
+                    onClick={() => handleExportGroupedBom?.(selectedExportNetworkIds)}
+                    disabled={!canExportSelectedNetworks || handleExportGroupedBom === undefined}
+                  >
+                    {renderSettingLabel("Export selected BOM (XLSX)")}
+                  </button>
+                </div>
               </article>
               <article className="settings-export-option-group settings-export-option-group--plan">
                 <div className="settings-export-option-copy">
