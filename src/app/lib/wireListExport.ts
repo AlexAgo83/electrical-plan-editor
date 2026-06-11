@@ -144,7 +144,7 @@ function resolveEndpoint(
     return {
       type: "Connector",
       ref: connector?.technicalId ?? endpoint.connectorId,
-      position: endpoint.cavityIndex + 1
+      position: `C${endpoint.cavityIndex}`
     };
   }
   const splice = spliceById.get(endpoint.spliceId);

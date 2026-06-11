@@ -114,7 +114,7 @@ describe("buildWireListSheet", () => {
       "",
       "Connector",
       "C-1",
-      2,
+      "C1",
       "TERM-DEFAULT - Default terminal",
       "SEAL-DEFAULT - Default seal",
       "Splice",
@@ -132,15 +132,69 @@ describe("buildWireListSheet", () => {
       "",
       "Connector",
       "C-1",
-      3,
+      "C2",
       "TERM-MANUAL - Manual terminal",
       "SEAL-DEFAULT - Default seal",
       "Connector",
       "C-1",
-      2,
+      "C1",
       "TERM-DEFAULT - Default terminal",
       "SEAL-MANUAL - Manual seal",
       150
     ]);
+  });
+
+  it("formats connector pins with their C-prefixed one-based cavity label without offsetting", () => {
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("CT1"),
+        name: "CT1",
+        technicalId: "CT1",
+        cavityCount: 10
+      }
+    ];
+    const splices: Splice[] = [
+      {
+        id: asSpliceId("S1"),
+        name: "Splice 1",
+        technicalId: "S-1",
+        portCount: 1
+      }
+    ];
+    const wires: Wire[] = [
+      {
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "W-001",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("CT1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 100,
+        sectionMm2: 1,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W9"),
+        name: "Wire 9",
+        technicalId: "W-009",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("CT1"), cavityIndex: 9 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 900,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
+
+    const sheet = buildWireListSheet("Wires", wires, connectors, splices, []);
+
+    expect(sheet.rows[0]?.[7]).toBe("C1");
+    expect(sheet.rows[0]?.[7]).not.toBe(2);
+    expect(sheet.rows[1]?.[7]).toBe("C9");
+    expect(sheet.rows[1]?.[7]).not.toBe(10);
   });
 });

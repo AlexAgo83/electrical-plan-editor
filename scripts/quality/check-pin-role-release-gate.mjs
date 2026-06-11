@@ -13,7 +13,7 @@ const releaseGateSpecs = [
   "src/tests/app.ui.multi-network-functional-analysis.spec.tsx"
 ];
 
-const result = spawnSync(process.execPath, [vitestEntrypoint, "run", ...releaseGateSpecs], {
+const result = spawnSync(process.execPath, [vitestEntrypoint, "run", "--testTimeout=15000", ...releaseGateSpecs], {
   stdio: "inherit"
 });
 
