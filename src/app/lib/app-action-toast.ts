@@ -225,7 +225,7 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
         message: getSpliceLabel(nextState, action.payload.id),
         variant: "success"
       };
-    case "splice/applyOptimizedCanvasLayout":
+    case "splice/applyOptimizedPlacement":
       return {
         title: "Optimized lengths applied",
         message: getSpliceLabel(nextState, action.payload.id),

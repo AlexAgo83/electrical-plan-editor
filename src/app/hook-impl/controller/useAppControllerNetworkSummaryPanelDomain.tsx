@@ -180,7 +180,6 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
   onExportNetwork: () => void;
   handleRegenerateLayout: () => void;
   markDetailPanelsSelectionSourceAsTable: () => void;
-  startSpliceEdit: (splice: Splice) => void;
   startWireEdit: (wire: Wire) => void;
   onOpenHarnessAssemblyOnboardingHelp: () => void;
   onOpenMultiNetworkFunctionalAnalysis?: () => void;
@@ -248,7 +247,6 @@ export function useAppControllerNetworkSummaryPanelDomain({
   onExportNetwork,
   handleRegenerateLayout,
   markDetailPanelsSelectionSourceAsTable,
-  startSpliceEdit,
   startWireEdit,
   onOpenHarnessAssemblyOnboardingHelp,
   onOpenMultiNetworkFunctionalAnalysis,
@@ -286,36 +284,6 @@ export function useAppControllerNetworkSummaryPanelDomain({
       });
     },
     [dispatchAction, markDetailPanelsSelectionSourceAsTable, setActiveSubScreen]
-  );
-
-  const handleActivateFloatingSplice = useCallback(
-    (spliceId: SpliceId) => {
-      const splice = store.getState().splices.byId[spliceId];
-      if (splice === undefined) {
-        return;
-      }
-      unstable_batchedUpdates(() => {
-        clearSelectedCanvasNodes();
-        if (isModelingScreen && !isModelingAnalysisFocused) {
-          setActiveSubScreen("splice");
-          startSpliceEdit(splice);
-          return;
-        }
-        setActiveSubScreen("splice");
-        dispatchAction(appActions.select({ kind: "splice", id: spliceId }), {
-          trackHistory: false,
-        });
-      });
-    },
-    [
-      clearSelectedCanvasNodes,
-      dispatchAction,
-      isModelingAnalysisFocused,
-      isModelingScreen,
-      setActiveSubScreen,
-      startSpliceEdit,
-      store,
-    ]
   );
 
   const handleSelectWireFromConnectorPin = useCallback(
@@ -490,7 +458,6 @@ export function useAppControllerNetworkSummaryPanelDomain({
         onOpenAiAgent,
         onSelectConnectorFromCallout: handleSelectConnectorFromCallout,
         onSelectSpliceFromCallout: handleSelectSpliceFromCallout,
-        onActivateFloatingSplice: handleActivateFloatingSplice,
         onSelectWireFromConnectorPin: handleSelectWireFromConnectorPin,
         onPersistConnectorCalloutPosition: persistConnectorCalloutPosition,
         onPersistSpliceCalloutPosition: persistSpliceCalloutPosition,

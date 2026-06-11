@@ -38,11 +38,8 @@ import {
 } from "../../core/splicePortMode";
 import type { AppState, LayoutNodePosition, NetworkScopedState } from "../../store";
 import { bootstrapCatalogForScopedState, normalizeCatalogItem, normalizeManufacturerReference } from "../../store/catalog";
-import { normalizeSplicePlacement, normalizeWireRouteEndpointDetail } from "../../core/splicePlacement";
-import { appendSpliceMigrationReportEntries } from "../persistence/migrations";
-import { migrateLegacySpliceNodes } from "../persistence/spliceNodeMigration";
 
-export const NETWORK_FILE_SCHEMA_VERSION = 4;
+export const NETWORK_FILE_SCHEMA_VERSION = 3;
 export const NETWORK_FILE_PAYLOAD_KIND = "electrical-plan-editor.network-export";
 
 export type NetworkExportScope = "active" | "selected" | "all";
@@ -169,9 +166,7 @@ function normalizeWiresEntityState(
       endpointBConnectionReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointBConnectionReference),
       endpointBConnectionName: normalizeWireEndpointReferenceName((wire as Partial<Wire>).endpointBConnectionName),
       endpointBSealReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointBSealReference),
-      endpointBSealName: normalizeWireEndpointReferenceName((wire as Partial<Wire>).endpointBSealName),
-      routeEndpointDetailA: normalizeWireRouteEndpointDetail((wire as Partial<Wire>).routeEndpointDetailA),
-      routeEndpointDetailB: normalizeWireRouteEndpointDetail((wire as Partial<Wire>).routeEndpointDetailB)
+      endpointBSealName: normalizeWireEndpointReferenceName((wire as Partial<Wire>).endpointBSealName)
     };
   }
 
@@ -339,7 +334,6 @@ function normalizeSplicesEntityState(splices: NetworkScopedState["splices"]): Ne
             ? DIRECTIONAL_SPLICE_PORT_COUNT
             : normalizeUnboundedPortCountFallback(rawSplice.portCount),
       sideInverted: rawSplice.sideInverted === true,
-      placement: normalizeSplicePlacement(rawSplice.placement),
       manufacturerReference: normalizeManufacturerReference(rawSplice.manufacturerReference)
     };
   }
@@ -779,13 +773,7 @@ export function parseNetworkFilePayload(rawJson: string): { payload: NetworkFile
     };
   }
 
-  if (
-    schemaVersion !== 0 &&
-    schemaVersion !== 1 &&
-    schemaVersion !== 2 &&
-    schemaVersion !== 3 &&
-    schemaVersion !== 4
-  ) {
+  if (schemaVersion !== 0 && schemaVersion !== 1 && schemaVersion !== 2 && schemaVersion !== 3) {
     return {
       payload: null,
       error: `Unsupported file schema version '${String(schemaVersion)}'.`
@@ -812,19 +800,12 @@ export function parseNetworkFilePayload(rawJson: string): { payload: NetworkFile
         appVersion: sourceAppVersion,
         appSchemaVersion: APP_SCHEMA_VERSION
       },
-      networks: parsedBundles.map((bundle) => {
-        const normalizedState = normalizeScopedState(bundle.state);
-        const migration = migrateLegacySpliceNodes(normalizedState, bundle.network.name);
-        if (migration.changed) {
-          appendSpliceMigrationReportEntries(migration.report);
-        }
-        return {
-          network: {
-            ...bundle.network
-          },
-          state: migration.changed ? migration.state : normalizedState
-        };
-      }),
+      networks: parsedBundles.map((bundle) => ({
+        network: {
+          ...bundle.network
+        },
+        state: normalizeScopedState(bundle.state)
+      })),
       harnessAssemblies
     },
     error: null
@@ -1034,15 +1015,7 @@ export function resolveImportConflicts(
       updatedAt: normalizedTimestamps.updatedAt,
       ...normalizedMetadata
     });
-    const normalizedScopedState = normalizeScopedState(bundle.state);
-    const scopedMigration = migrateLegacySpliceNodes(normalizedScopedState, normalizedName);
-    if (scopedMigration.changed) {
-      appendSpliceMigrationReportEntries(scopedMigration.report);
-      summary.warnings.push(
-        ...scopedMigration.report.map((entry) => entry.message)
-      );
-    }
-    networkStates[networkId] = scopedMigration.changed ? scopedMigration.state : normalizedScopedState;
+    networkStates[networkId] = normalizeScopedState(bundle.state);
     summary.importedNetworkIds.push(networkId);
   }
 

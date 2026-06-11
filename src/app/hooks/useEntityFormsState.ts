@@ -80,9 +80,6 @@ export function useEntityFormsState() {
   const [spliceSideInverted, setSpliceSideInverted] = useState(false);
   const [spliceManufacturerReference, setSpliceManufacturerReference] = useState("");
   const [spliceAutoCreateLinkedNode, setSpliceAutoCreateLinkedNode] = useState(true);
-  const [splicePlacementSegmentId, setSplicePlacementSegmentId] = useState("");
-  const [splicePlacementFromNodeId, setSplicePlacementFromNodeId] = useState("");
-  const [splicePlacementOffsetMm, setSplicePlacementOffsetMm] = useState("0");
   const [portCount, setPortCount] = useState("4");
   const [portIndexInput, setPortIndexInput] = useState("1");
   const [spliceOccupantRefInput, setSpliceOccupantRefInput] = useState("manual-assignment");
@@ -270,12 +267,6 @@ export function useEntityFormsState() {
     setSpliceManufacturerReference,
     spliceAutoCreateLinkedNode,
     setSpliceAutoCreateLinkedNode,
-    splicePlacementSegmentId,
-    setSplicePlacementSegmentId,
-    splicePlacementFromNodeId,
-    setSplicePlacementFromNodeId,
-    splicePlacementOffsetMm,
-    setSplicePlacementOffsetMm,
     portCount,
     setPortCount,
     portIndexInput,

@@ -8,7 +8,6 @@ export interface UseWorkspaceFileStorageParams {
   replaceStateWithHistory: (state: AppState) => void;
   requestConfirmation: (request: ConfirmDialogRequest) => Promise<boolean>;
   notifyToast: (title: string, options?: { message?: string; variant?: "success" | "info" | "warning" | "error" }) => void;
-  showSpliceMigrationReport?: (entries: string[]) => void;
 }
 
 export interface UseWorkspaceFileStorageResult {

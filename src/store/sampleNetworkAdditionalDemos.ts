@@ -86,10 +86,17 @@ export function buildAdditionalSampleNetworkDemoActions(): AppAction[] {
       cavityCount: 4,
       catalogItemId: lightingDemoCatalogIds.lamp4Way
     }),
+    appActions.upsertSplice({
+      id: asSpliceId("L-S-SPLIT"),
+      name: "Lighting Split Splice",
+      technicalId: "L-SPL-SPLIT",
+      portCount: 4,
+      catalogItemId: lightingDemoCatalogIds.split4Port
+    }),
     appActions.upsertNode({ id: asNodeId("L-N-SRC"), kind: "connector", connectorId: asConnectorId("L-C-SRC") }),
     appActions.upsertNode({ id: asNodeId("L-N-FRONT"), kind: "connector", connectorId: asConnectorId("L-C-FRONT") }),
     appActions.upsertNode({ id: asNodeId("L-N-REAR"), kind: "connector", connectorId: asConnectorId("L-C-REAR") }),
-    appActions.upsertNode({ id: asNodeId("L-N-SPLIT"), kind: "intermediate", label: "Lighting split junction" }),
+    appActions.upsertNode({ id: asNodeId("L-N-SPLIT"), kind: "splice", spliceId: asSpliceId("L-S-SPLIT") }),
     appActions.upsertNode({ id: asNodeId("L-N-MID"), kind: "intermediate", label: "L-Harness Mid" }),
     appActions.upsertSegment({
       id: asSegmentId("L-SEG-001"),
@@ -119,19 +126,6 @@ export function buildAdditionalSampleNetworkDemoActions(): AppAction[] {
       lengthMm: 42,
       subNetworkTag: "LIGHT_REAR"
     }),
-    appActions.upsertSplice({
-      id: asSpliceId("L-S-SPLIT"),
-      name: "Lighting Split Splice",
-      technicalId: "L-SPL-SPLIT",
-      portCount: 4,
-      catalogItemId: lightingDemoCatalogIds.split4Port,
-      placement: {
-        kind: "segmentOffset",
-        segmentId: asSegmentId("L-SEG-002"),
-        fromNodeId: asNodeId("L-N-SPLIT"),
-        offsetMm: 0
-      }
-    }),
     appActions.saveWire({
       id: asWireId("L-W-001"),
       name: "Lighting Feed",
@@ -158,7 +152,7 @@ export function buildAdditionalSampleNetworkDemoActions(): AppAction[] {
       endpointA: { kind: "splicePort", spliceId: asSpliceId("L-S-SPLIT"), portIndex: 3 },
       endpointB: { kind: "connectorCavity", connectorId: asConnectorId("L-C-REAR"), cavityIndex: 1 }
     }),
-    appActions.lockWireRoute(asWireId("L-W-003"), [asSegmentId("L-SEG-002"), asSegmentId("L-SEG-004")]),
+    appActions.lockWireRoute(asWireId("L-W-003"), [asSegmentId("L-SEG-004")]),
     appActions.createNetwork(
       {
         id: asNetworkId("network-sensor-backbone-demo"),
@@ -201,11 +195,18 @@ export function buildAdditionalSampleNetworkDemoActions(): AppAction[] {
       cavityCount: 4,
       catalogItemId: sensorDemoCatalogIds.sensor4Way
     }),
+    appActions.upsertSplice({
+      id: asSpliceId("S-S-GND"),
+      name: "Sensor Ground Splice",
+      technicalId: "S-SPL-GND",
+      portCount: 6,
+      catalogItemId: sensorDemoCatalogIds.groundSplice6Port
+    }),
     appActions.upsertNode({ id: asNodeId("S-N-ECU"), kind: "connector", connectorId: asConnectorId("S-C-ECU") }),
     appActions.upsertNode({ id: asNodeId("S-N-A"), kind: "connector", connectorId: asConnectorId("S-C-A") }),
     appActions.upsertNode({ id: asNodeId("S-N-B"), kind: "connector", connectorId: asConnectorId("S-C-B") }),
     appActions.upsertNode({ id: asNodeId("S-N-C"), kind: "connector", connectorId: asConnectorId("S-C-C") }),
-    appActions.upsertNode({ id: asNodeId("S-N-GND"), kind: "intermediate", label: "Sensor ground point" }),
+    appActions.upsertNode({ id: asNodeId("S-N-GND"), kind: "splice", spliceId: asSpliceId("S-S-GND") }),
     appActions.upsertNode({ id: asNodeId("S-N-TRUNK"), kind: "intermediate", label: "Sensor Trunk" }),
     appActions.upsertSegment({
       id: asSegmentId("S-SEG-001"),
@@ -241,19 +242,6 @@ export function buildAdditionalSampleNetworkDemoActions(): AppAction[] {
       nodeB: asNodeId("S-N-GND"),
       lengthMm: 14,
       subNetworkTag: "SENSOR_GND"
-    }),
-    appActions.upsertSplice({
-      id: asSpliceId("S-S-GND"),
-      name: "Sensor Ground Splice",
-      technicalId: "S-SPL-GND",
-      portCount: 6,
-      catalogItemId: sensorDemoCatalogIds.groundSplice6Port,
-      placement: {
-        kind: "segmentOffset",
-        segmentId: asSegmentId("S-SEG-005"),
-        fromNodeId: asNodeId("S-N-GND"),
-        offsetMm: 0
-      }
     }),
     appActions.saveWire({
       id: asWireId("S-W-001"),

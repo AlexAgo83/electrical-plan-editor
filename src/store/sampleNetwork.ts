@@ -145,6 +145,20 @@ export function createSampleNetworkState(): AppState {
       cavityCount: 8,
       catalogItemId: mainSampleCatalogIds.actuator8Way
     }),
+    appActions.upsertSplice({
+      id: asSpliceId("S-J1"),
+      name: "Main Junction",
+      technicalId: "SPL-J1",
+      portCount: 10,
+      catalogItemId: mainSampleCatalogIds.mainJunction10Port
+    }),
+    appActions.upsertSplice({
+      id: asSpliceId("S-J2"),
+      name: "Branch Junction",
+      technicalId: "SPL-J2",
+      portCount: 8,
+      catalogItemId: mainSampleCatalogIds.branchJunction8Port
+    }),
     appActions.upsertNode({
       id: asNodeId("N-C-SRC"),
       kind: "connector",
@@ -162,13 +176,13 @@ export function createSampleNetworkState(): AppState {
     }),
     appActions.upsertNode({
       id: asNodeId("N-S-J1"),
-      kind: "intermediate",
-      label: "Junction J1"
+      kind: "splice",
+      spliceId: asSpliceId("S-J1")
     }),
     appActions.upsertNode({
       id: asNodeId("N-S-J2"),
-      kind: "intermediate",
-      label: "Junction J2"
+      kind: "splice",
+      spliceId: asSpliceId("S-J2")
     }),
     appActions.upsertNode({
       id: asNodeId("N-MID-A"),
@@ -247,32 +261,6 @@ export function createSampleNetworkState(): AppState {
       nodeB: asNodeId("N-C-D2"),
       lengthMm: 22,
       subNetworkTag: "BRANCH"
-    }),
-    appActions.upsertSplice({
-      id: asSpliceId("S-J1"),
-      name: "Main Junction",
-      technicalId: "SPL-J1",
-      portCount: 10,
-      catalogItemId: mainSampleCatalogIds.mainJunction10Port,
-      placement: {
-        kind: "segmentOffset",
-        segmentId: asSegmentId("SEG-002"),
-        fromNodeId: asNodeId("N-S-J1"),
-        offsetMm: 0
-      }
-    }),
-    appActions.upsertSplice({
-      id: asSpliceId("S-J2"),
-      name: "Branch Junction",
-      technicalId: "SPL-J2",
-      portCount: 8,
-      catalogItemId: mainSampleCatalogIds.branchJunction8Port,
-      placement: {
-        kind: "segmentOffset",
-        segmentId: asSegmentId("SEG-007"),
-        fromNodeId: asNodeId("N-S-J2"),
-        offsetMm: 0
-      }
     }),
     appActions.saveWire({
       id: asWireId("W-001"),

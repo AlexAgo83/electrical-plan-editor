@@ -1,18 +1,9 @@
 import type { AppAction } from "../actions";
-import type { Segment, Splice } from "../../core/entities";
+import type { Segment } from "../../core/entities";
 import type { AppState } from "../types";
 import { recomputeAllWiresForNetwork } from "./helpers/wireTransitions";
-import { listPlacedSpliceIdsOnSegment } from "./helpers/splicePlacement";
 import { resolveSegmentEndpointForRearBackshell } from "./helpers/rearBackshell";
-import {
-  bumpRevision,
-  clearLastError,
-  removeEntity,
-  shouldClearSelection,
-  upsertEntity,
-  withError,
-  withWarning
-} from "./shared";
+import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
 
 function normalizeOptionalSegmentText(value: string | undefined): string | undefined {
   if (value === undefined) {
@@ -84,84 +75,24 @@ export function handleSegmentActions(state: AppState, action: AppAction): AppSta
         return withError(state, "Segment endpoints must reference two different nodes.");
       }
 
-      const previousSegment = state.segments.byId[normalizedSegmentId];
-      const hostedSpliceIds = listPlacedSpliceIdsOnSegment(state, normalizedSegmentId);
-      const nextRole = action.payload.role === "rearBackshellLink" ? ("rearBackshellLink" as const) : undefined;
-      if (nextRole === "rearBackshellLink" && hostedSpliceIds.length > 0) {
-        return withError(state, "Cannot mark a segment as rear backshell link while splices are placed on it.");
-      }
-
       const normalizedSubNetworkTag = action.payload.subNetworkTag?.trim();
-      const nextSegment: Segment = {
-        ...action.payload,
-        id: normalizedSegmentId,
-        nodeA: normalizedNodeA,
-        nodeB: normalizedNodeB,
-        role: nextRole,
-        subNetworkTag: normalizedSubNetworkTag === undefined || normalizedSubNetworkTag.length === 0
-          ? undefined
-          : normalizedSubNetworkTag,
-        sheathType: normalizeOptionalSegmentText(action.payload.sheathType),
-        insulation: normalizeOptionalSegmentText(action.payload.insulation),
-        lineStyle: normalizeOptionalSegmentText(action.payload.lineStyle),
-        internalPartReference: normalizeOptionalSegmentText(action.payload.internalPartReference),
-        mountingLabels: normalizeMountingLabels(action.payload)
-      };
-
-      // Keep splice placements coherent with the edited segment: remap the
-      // reference node when an endpoint moved, preserve absolute offsets when
-      // possible, clamp out-of-range offsets, and report relative shifts.
-      let nextSplices = state.splices;
-      const warningMessages: string[] = [];
-      if (previousSegment !== undefined && hostedSpliceIds.length > 0) {
-        for (const spliceId of hostedSpliceIds) {
-          const splice = state.splices.byId[spliceId];
-          const placement = splice?.placement;
-          if (splice === undefined || placement === undefined) {
-            continue;
-          }
-
-          let nextFromNodeId = placement.fromNodeId;
-          if (placement.fromNodeId === previousSegment.nodeA) {
-            nextFromNodeId = nextSegment.nodeA;
-          } else if (placement.fromNodeId === previousSegment.nodeB) {
-            nextFromNodeId = nextSegment.nodeB;
-          }
-
-          let nextOffsetMm = placement.offsetMm;
-          if (nextOffsetMm > nextSegment.lengthMm) {
-            warningMessages.push(
-              `Splice '${splice.technicalId}' offset clamped from ${String(placement.offsetMm)} mm to ${String(nextSegment.lengthMm)} mm on segment '${normalizedSegmentId}'.`
-            );
-            nextOffsetMm = nextSegment.lengthMm;
-          } else if (previousSegment.lengthMm !== nextSegment.lengthMm && previousSegment.lengthMm > 0 && nextSegment.lengthMm > 0) {
-            const previousPercent = Math.round((placement.offsetMm / previousSegment.lengthMm) * 100);
-            const nextPercent = Math.round((nextOffsetMm / nextSegment.lengthMm) * 100);
-            if (previousPercent !== nextPercent) {
-              warningMessages.push(
-                `Splice '${splice.technicalId}' keeps ${String(nextOffsetMm)} mm from its reference node on segment '${normalizedSegmentId}' (relative position shifts from ${String(previousPercent)}% to ${String(nextPercent)}%).`
-              );
-            }
-          }
-
-          if (nextFromNodeId !== placement.fromNodeId || nextOffsetMm !== placement.offsetMm) {
-            const nextSplice: Splice = {
-              ...splice,
-              placement: {
-                ...placement,
-                fromNodeId: nextFromNodeId,
-                offsetMm: nextOffsetMm
-              }
-            };
-            nextSplices = upsertEntity(nextSplices, nextSplice);
-          }
-        }
-      }
-
       const stateWithUpdatedSegments = {
         ...clearLastError(state),
-        splices: nextSplices,
-        segments: upsertEntity(state.segments, nextSegment)
+        segments: upsertEntity(state.segments, {
+          ...action.payload,
+          id: normalizedSegmentId,
+          nodeA: normalizedNodeA,
+          nodeB: normalizedNodeB,
+          role: action.payload.role === "rearBackshellLink" ? "rearBackshellLink" : undefined,
+          subNetworkTag: normalizedSubNetworkTag === undefined || normalizedSubNetworkTag.length === 0
+            ? undefined
+            : normalizedSubNetworkTag,
+          sheathType: normalizeOptionalSegmentText(action.payload.sheathType),
+          insulation: normalizeOptionalSegmentText(action.payload.insulation),
+          lineStyle: normalizeOptionalSegmentText(action.payload.lineStyle),
+          internalPartReference: normalizeOptionalSegmentText(action.payload.internalPartReference),
+          mountingLabels: normalizeMountingLabels(action.payload)
+        })
       };
 
       const recomputed = recomputeAllWiresForNetwork(stateWithUpdatedSegments);
@@ -169,12 +100,10 @@ export function handleSegmentActions(state: AppState, action: AppAction): AppSta
         return withError(state, recomputed.error);
       }
 
-      const nextState = bumpRevision({
+      return bumpRevision({
         ...stateWithUpdatedSegments,
         wires: recomputed.wires
       });
-
-      return warningMessages.length === 0 ? nextState : withWarning(nextState, warningMessages.join(" "));
     }
 
     case "segment/updateBatch": {
@@ -265,40 +194,13 @@ export function handleSegmentActions(state: AppState, action: AppAction): AppSta
       const nextWiresById = { ...state.wires.byId };
       for (const wireId of state.wires.allIds) {
         const wire = state.wires.byId[wireId];
-        if (
-          wire === undefined ||
-          (!wire.routeSegmentIds.includes(fromId) &&
-            wire.routeEndpointDetailA?.segmentId !== fromId &&
-            wire.routeEndpointDetailB?.segmentId !== fromId)
-        ) {
+        if (wire === undefined || !wire.routeSegmentIds.includes(fromId)) {
           continue;
         }
         wiresChanged = true;
         nextWiresById[wireId] = {
           ...wire,
-          routeSegmentIds: wire.routeSegmentIds.map((segmentId) => (segmentId === fromId ? toId : segmentId)),
-          routeEndpointDetailA:
-            wire.routeEndpointDetailA?.segmentId === fromId
-              ? { ...wire.routeEndpointDetailA, segmentId: toId }
-              : wire.routeEndpointDetailA,
-          routeEndpointDetailB:
-            wire.routeEndpointDetailB?.segmentId === fromId
-              ? { ...wire.routeEndpointDetailB, segmentId: toId }
-              : wire.routeEndpointDetailB
-        };
-      }
-
-      let splicesChanged = false;
-      const nextSplicesById = { ...state.splices.byId };
-      for (const spliceId of state.splices.allIds) {
-        const splice = state.splices.byId[spliceId];
-        if (splice?.placement === undefined || splice.placement.segmentId !== fromId) {
-          continue;
-        }
-        splicesChanged = true;
-        nextSplicesById[spliceId] = {
-          ...splice,
-          placement: { ...splice.placement, segmentId: toId }
+          routeSegmentIds: wire.routeSegmentIds.map((segmentId) => (segmentId === fromId ? toId : segmentId))
         };
       }
 
@@ -319,12 +221,6 @@ export function handleSegmentActions(state: AppState, action: AppAction): AppSta
               byId: nextWiresById
             }
           : state.wires,
-        splices: splicesChanged
-          ? {
-              ...state.splices,
-              byId: nextSplicesById
-            }
-          : state.splices,
         ui: {
           ...state.ui,
           selected: nextSelected,
@@ -334,18 +230,6 @@ export function handleSegmentActions(state: AppState, action: AppAction): AppSta
     }
 
     case "segment/remove": {
-      const hostedSpliceIds = listPlacedSpliceIdsOnSegment(state, action.payload.id);
-      if (hostedSpliceIds.length > 0) {
-        const hostedTechnicalIds = hostedSpliceIds
-          .map((spliceId) => state.splices.byId[spliceId]?.technicalId ?? spliceId)
-          .slice(0, 3)
-          .join("', '");
-        return withError(
-          state,
-          `Segment '${action.payload.id}' cannot be deleted while splice(s) '${hostedTechnicalIds}' are placed on it. Move or delete the splice first.`
-        );
-      }
-
       const stateWithRemovedSegment = {
         ...clearLastError(state),
         segments: removeEntity(state.segments, action.payload.id),

@@ -12,7 +12,6 @@ import type {
 import { resolveEditedConnectorLayout } from "../../../../core/connectorLayout";
 import { resolveSplicePortMode } from "../../../../core/splicePortMode";
 import type { NetworkCalloutContentMode, NodePosition } from "../../../types/app-controller";
-import type { RenderedFloatingSpliceModel } from "../graph/networkSummaryGraphModel";
 import {
   buildCalloutHeaderDisplay,
   type CableCalloutViewModel,
@@ -214,7 +213,6 @@ interface BuildCableCalloutViewModelsOptions {
   spliceMap: Map<SpliceId, Splice>;
   connectorCalloutGroupsById: Map<ConnectorId, CalloutGroup[]>;
   spliceCalloutGroupsById: Map<SpliceId, CalloutGroup[]>;
-  renderedFloatingSplices: RenderedFloatingSpliceModel[];
   draftCalloutPositions: Record<string, NodePosition>;
   getDefaultCalloutPosition: (nodeId: NodeId, nodePosition: NodePosition) => NodePosition;
   isSubNetworkFilteringActive: boolean;
@@ -261,7 +259,6 @@ export function buildCableCalloutViewModels({
   spliceMap,
   connectorCalloutGroupsById,
   spliceCalloutGroupsById,
-  renderedFloatingSplices,
   draftCalloutPositions,
   getDefaultCalloutPosition,
   isSubNetworkFilteringActive,
@@ -276,92 +273,56 @@ export function buildCableCalloutViewModels({
 
   const shouldShowConnectorDrawing = calloutContentMode === "connectorDrawing" || calloutContentMode === "both";
   const catalogItemById = new Map(catalogItems.map((item) => [item.id, item] as const));
-  const floatingSpliceById = new Map(
-    renderedFloatingSplices.map((splice) => [splice.splice.id, splice] as const),
-  );
-  const spliceNodeBySpliceId = new Map(
-    nodes
-      .filter((node) => node.kind === "splice")
-      .map((node) => [node.spliceId, node] as const),
-  );
   const models: CableCalloutViewModel[] = [];
   for (const node of nodes) {
     const nodePosition = networkNodePositions[node.id];
-    if (
-      nodePosition === undefined ||
-      node.kind !== "connector"
-    ) {
+    if (nodePosition === undefined || (node.kind !== "connector" && node.kind !== "splice")) {
       continue;
     }
 
-    const connector = connectorMap.get(node.connectorId);
-    if (connector === undefined) {
-      continue;
-    }
-    const key = `connector:${connector.id}` as const;
-    const draftPosition = draftCalloutPositions[key];
-    const persistedPosition = connector.cableCalloutPosition;
-    const position = draftPosition ?? persistedPosition ?? getDefaultCalloutPosition(node.id, nodePosition);
-    const groups = (connectorCalloutGroupsById.get(connector.id) ?? []).filter((group) => group.entries.length > 0);
-    if (groups.length === 0 && !shouldShowConnectorDrawing) {
-      continue;
-    }
-    const catalogItem = connector.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId);
-    const header = buildCalloutHeaderDisplay(connector.name, connector.technicalId);
-    models.push({
-      key,
-      kind: "connector",
-      entityId: connector.id,
-      nodeId: node.id,
-      nodePosition,
-      position,
-      title: header.title,
-      subtitle: header.subtitle,
-      connectorLayout: shouldShowConnectorDrawing
-        ? resolveEditedConnectorLayout(catalogItem?.connectorLayout, connector.cavityCount)
-        : undefined,
-      groups,
-      isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
-      isSelected: selectedConnectorId === connector.id
-    });
-  }
-
-  for (const splice of spliceMap.values()) {
-    const floatingSplice = floatingSpliceById.get(splice.id);
-    const spliceNode = spliceNodeBySpliceId.get(splice.id);
-    const calloutAnchor =
-      floatingSplice !== undefined
-        ? {
-            nodeId: floatingSplice.hostNodeId,
-            nodePosition: floatingSplice.anchorPosition,
-            isDeemphasized: floatingSplice.isSubNetworkDeemphasized,
-          }
-        : spliceNode !== undefined
-          ? {
-              nodeId: spliceNode.id,
-              nodePosition: networkNodePositions[spliceNode.id],
-              isDeemphasized:
-                isSubNetworkFilteringActive &&
-                !(nodeHasActiveSubNetworkConnection.get(spliceNode.id) ?? false),
-            }
-          : null;
-    if (calloutAnchor === null || calloutAnchor.nodePosition === undefined) {
+    if (node.kind === "connector") {
+      const connector = connectorMap.get(node.connectorId);
+      if (connector === undefined) {
+        continue;
+      }
+      const key = `connector:${connector.id}` as const;
+      const draftPosition = draftCalloutPositions[key];
+      const persistedPosition = connector.cableCalloutPosition;
+      const position = draftPosition ?? persistedPosition ?? getDefaultCalloutPosition(node.id, nodePosition);
+      const groups = (connectorCalloutGroupsById.get(connector.id) ?? []).filter((group) => group.entries.length > 0);
+      if (groups.length === 0 && !shouldShowConnectorDrawing) {
+        continue;
+      }
+      const catalogItem = connector.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId);
+      const header = buildCalloutHeaderDisplay(connector.name, connector.technicalId);
+      models.push({
+        key,
+        kind: "connector",
+        entityId: connector.id,
+        nodeId: node.id,
+        nodePosition,
+        position,
+        title: header.title,
+        subtitle: header.subtitle,
+        connectorLayout: shouldShowConnectorDrawing
+          ? resolveEditedConnectorLayout(catalogItem?.connectorLayout, connector.cavityCount)
+          : undefined,
+        groups,
+        isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
+        isSelected: selectedConnectorId === connector.id
+      });
       continue;
     }
 
+    const splice = spliceMap.get(node.spliceId);
+    if (splice === undefined) {
+      continue;
+    }
     const key = `splice:${splice.id}` as const;
     const draftPosition = draftCalloutPositions[key];
     const persistedPosition = splice.cableCalloutPosition;
-    const position =
-      draftPosition ??
-      persistedPosition ??
-      getDefaultCalloutPosition(
-        calloutAnchor.nodeId,
-        calloutAnchor.nodePosition,
-      );
-    const groups = (spliceCalloutGroupsById.get(splice.id) ?? []).filter(
-      (group) => group.entries.length > 0,
-    );
+    const position = draftPosition ?? persistedPosition ?? getDefaultCalloutPosition(node.id, nodePosition);
+    const groups = (spliceCalloutGroupsById.get(splice.id) ?? []).filter((group) => group.entries.length > 0);
     if (groups.length === 0) {
       continue;
     }
@@ -370,14 +331,14 @@ export function buildCableCalloutViewModels({
       key,
       kind: "splice",
       entityId: splice.id,
-      nodeId: calloutAnchor.nodeId,
-      nodePosition: calloutAnchor.nodePosition,
+      nodeId: node.id,
+      nodePosition,
       position,
       title: header.title,
       subtitle: header.subtitle,
       groups,
-      isDeemphasized: calloutAnchor.isDeemphasized,
-      isSelected: selectedSpliceId === splice.id,
+      isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
+      isSelected: selectedSpliceId === splice.id
     });
   }
 

@@ -1,19 +1,8 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type FormEvent,
-  type ReactElement,
-} from "react";
-import type { Segment, Splice } from "../../../core/entities";
+import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
 import { resolveSplicePortMode } from "../../../core/splicePortMode";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
-import {
-  formatOccupantRefForDisplay,
-  parseWireOccupantRef,
-} from "../../lib/app-utils-networking";
+import { formatOccupantRefForDisplay, parseWireOccupantRef } from "../../lib/app-utils-networking";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
@@ -22,9 +11,7 @@ import { EntityReferenceButton } from "./EntityReferenceButton";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 
-export function AnalysisSpliceWorkspacePanels(
-  props: AnalysisWorkspaceContentProps,
-): ReactElement {
+export function AnalysisSpliceWorkspacePanels(props: AnalysisWorkspaceContentProps): ReactElement {
   const {
     isSpliceSubScreen,
     selectedSplice,
@@ -36,9 +23,6 @@ export function AnalysisSpliceWorkspacePanels(
     spliceFilterQuery,
     setSpliceFilterQuery,
     splices,
-    nodes,
-    describeNode,
-    segments,
     catalogItems,
     visibleSplices,
     wires,
@@ -65,94 +49,21 @@ export function AnalysisSpliceWorkspacePanels(
     setSpliceSynthesisSort: _setSpliceSynthesisSort,
     spliceAnalysisView,
     setSpliceAnalysisView,
-    getSortIndicator: _getSortIndicator,
+    getSortIndicator: _getSortIndicator
   } = props;
   void _spliceSort;
   void _setSpliceSort;
   void _spliceSynthesisSort;
   void _setSpliceSynthesisSort;
   void _getSortIndicator;
-
-  type SpliceAnalysisTableSortField =
-    | "name"
-    | "technicalId"
-    | "manufacturerReference"
-    | "hostSegment"
-    | "offsetMm"
-    | "portCount"
-    | "branchCount";
-  type SpliceSynthesisTableSortField =
-    | "name"
-    | "technicalId"
-    | "localPort"
-    | "destination"
-    | "localCoveredLengthMm"
-    | "remoteCoveredLengthMm"
-    | "lengthMm";
-
+  type SpliceAnalysisTableSortField = "name" | "technicalId" | "manufacturerReference" | "portCount" | "branchCount";
+  type SpliceSynthesisTableSortField = "name" | "technicalId" | "localPort" | "destination" | "lengthMm";
   const isMobileViewport = useIsMobileViewport();
-  const [spliceTableSort, setSpliceTableSort] = useState<{
-    field: SpliceAnalysisTableSortField;
-    direction: "asc" | "desc";
-  }>({ field: "name", direction: "asc" });
-  const [spliceSynthesisTableSort, setSpliceSynthesisTableSort] = useState<{
-    field: SpliceSynthesisTableSortField;
-    direction: "asc" | "desc";
-  }>({ field: "name", direction: "asc" });
-  const catalogItemById = useMemo(
-    () => new Map(catalogItems.map((item) => [item.id, item] as const)),
-    [catalogItems],
-  );
-  const segmentById = useMemo(
-    () => new Map(segments.map((segment) => [segment.id, segment] as const)),
-    [segments],
-  );
-  const nodeById = useMemo(
-    () => new Map(nodes.map((node) => [node.id, node] as const)),
-    [nodes],
-  );
+  const [spliceTableSort, setSpliceTableSort] = useState<{ field: SpliceAnalysisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
+  const [spliceSynthesisTableSort, setSpliceSynthesisTableSort] = useState<{ field: SpliceSynthesisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
+  const catalogItemById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item] as const)), [catalogItems]);
   const spliceFilterPlaceholder =
-    spliceFilterField === "name"
-      ? "Splice name"
-      : spliceFilterField === "technicalId"
-        ? "Technical ID"
-        : "Name or technical ID...";
-  const resolveSplicePlacementPresentation = useCallback(
-    (
-      splice: Splice,
-    ): {
-      hostSegmentLabel: string;
-      fromNodeLabel: string;
-      offsetLabel: string;
-      hostSegmentSort: string;
-      offsetSort: number;
-    } => {
-      const placement = splice.placement;
-      if (placement === undefined) {
-        return {
-          hostSegmentLabel: "Draft",
-          fromNodeLabel: "Unplaced",
-          offsetLabel: "Draft",
-          hostSegmentSort: "",
-          offsetSort: Number.NEGATIVE_INFINITY,
-        };
-      }
-
-      const hostSegment: Segment | undefined = segmentById.get(
-        placement.segmentId,
-      );
-      const fromNode = nodeById.get(placement.fromNodeId);
-      return {
-        hostSegmentLabel: hostSegment?.id ?? placement.segmentId,
-        fromNodeLabel:
-          fromNode === undefined ? placement.fromNodeId : describeNode(fromNode),
-        offsetLabel: `${placement.offsetMm} mm`,
-        hostSegmentSort: placement.segmentId,
-        offsetSort: placement.offsetMm,
-      };
-    },
-    [describeNode, nodeById, segmentById],
-  );
+    spliceFilterField === "name" ? "Splice name" : spliceFilterField === "technicalId" ? "Technical ID" : "Name or technical ID...";
   const sortedVisibleSplices = useMemo(
     () =>
       sortByTableColumns(
@@ -161,39 +72,18 @@ export function AnalysisSpliceWorkspacePanels(
         (splice, field) => {
           if (field === "name") return splice.name;
           if (field === "technicalId") return splice.technicalId;
-          if (field === "manufacturerReference")
-            return splice.manufacturerReference;
-          if (field === "hostSegment")
-            return resolveSplicePlacementPresentation(splice).hostSegmentSort;
-          if (field === "offsetMm")
-            return resolveSplicePlacementPresentation(splice).offsetSort;
-          if (field === "portCount")
-            return resolveSplicePortMode(splice) === "unbounded"
-              ? Number.POSITIVE_INFINITY
-              : splice.portCount;
+          if (field === "manufacturerReference") return splice.manufacturerReference;
+          if (field === "portCount") return resolveSplicePortMode(splice) === "unbounded" ? Number.POSITIVE_INFINITY : splice.portCount;
           return spliceOccupiedCountById.get(splice.id) ?? 0;
         },
-        (splice) => splice.id,
+        (splice) => splice.id
       ),
-    [
-      resolveSplicePlacementPresentation,
-      spliceOccupiedCountById,
-      spliceTableSort,
-      visibleSplices,
-    ],
+    [spliceOccupiedCountById, spliceTableSort, visibleSplices]
   );
-  const wireTechnicalIdById = useMemo(
-    () => new Map(wires.map((wire) => [wire.id, wire.technicalId] as const)),
-    [wires],
-  );
-  const wireById = useMemo(
-    () => new Map(wires.map((wire) => [wire.id, wire] as const)),
-    [wires],
-  );
+  const wireTechnicalIdById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire.technicalId] as const)), [wires]);
+  const wireById = useMemo(() => new Map(wires.map((wire) => [wire.id, wire] as const)), [wires]);
   const formatOccupantRef = (occupantRef: string | null): string =>
-    occupantRef === null
-      ? ""
-      : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
+    occupantRef === null ? "" : formatOccupantRefForDisplay(occupantRef, wireTechnicalIdById);
   const sortedSpliceSynthesisRowsByColumns = useMemo(
     () =>
       sortByTableColumns(
@@ -204,33 +94,17 @@ export function AnalysisSpliceWorkspacePanels(
           if (field === "technicalId") return row.wireTechnicalId;
           if (field === "localPort") return row.localEndpointLabel;
           if (field === "destination") return row.remoteEndpointLabel;
-          if (field === "localCoveredLengthMm")
-            return row.localCoveredLengthMm ?? Number.NEGATIVE_INFINITY;
-          if (field === "remoteCoveredLengthMm")
-            return row.remoteCoveredLengthMm ?? Number.NEGATIVE_INFINITY;
           return row.lengthMm;
         },
-        (row) => `${row.wireId}-${row.localEndpointLabel}`,
+        (row) => `${row.wireId}-${row.localEndpointLabel}`
       ),
-    [sortedSpliceSynthesisRows, spliceSynthesisTableSort],
+    [sortedSpliceSynthesisRows, spliceSynthesisTableSort]
   );
   const spliceListSortIndicator = (field: SpliceAnalysisTableSortField) =>
-    spliceTableSort.field === field
-      ? spliceTableSort.direction === "asc"
-        ? "▲"
-        : "▼"
-      : "";
-  const spliceSynthesisSortIndicator = (
-    field: SpliceSynthesisTableSortField,
-  ) =>
-    spliceSynthesisTableSort.field === field
-      ? spliceSynthesisTableSort.direction === "asc"
-        ? "▲"
-        : "▼"
-      : "";
-  const renderDestinationReference = (
-    row: (typeof sortedSpliceSynthesisRowsByColumns)[number],
-  ): ReactElement => {
+    spliceTableSort.field === field ? (spliceTableSort.direction === "asc" ? "▲" : "▼") : "";
+  const spliceSynthesisSortIndicator = (field: SpliceSynthesisTableSortField) =>
+    spliceSynthesisTableSort.field === field ? (spliceSynthesisTableSort.direction === "asc" ? "▲" : "▼") : "";
+  const renderDestinationReference = (row: (typeof sortedSpliceSynthesisRowsByColumns)[number]): ReactElement => {
     if (row.remoteEndpoint.kind === "connectorCavity") {
       const connectorId = row.remoteEndpoint.connectorId;
       return (
@@ -253,15 +127,12 @@ export function AnalysisSpliceWorkspacePanels(
       </EntityReferenceButton>
     );
   };
-  const selectedSplicePortMode =
-    selectedSplice === null ? "bounded" : resolveSplicePortMode(selectedSplice);
-  const selectedSpliceHasFinitePorts =
-    selectedSplicePortMode !== "unbounded";
-  const [unboundedVisibleFreePortCount, setUnboundedVisibleFreePortCount] =
-    useState(0);
+  const selectedSplicePortMode = selectedSplice === null ? "bounded" : resolveSplicePortMode(selectedSplice);
+  const selectedSpliceHasFinitePorts = selectedSplicePortMode !== "unbounded";
+  const [unboundedVisibleFreePortCount, setUnboundedVisibleFreePortCount] = useState(0);
   const splicePortStatusByIndex = useMemo(
     () => new Map(splicePortStatuses.map((slot) => [slot.portIndex, slot] as const)),
-    [splicePortStatuses],
+    [splicePortStatuses]
   );
   const occupiedPortIndexSet = useMemo(() => {
     const occupied = new Set<number>();
@@ -299,7 +170,7 @@ export function AnalysisSpliceWorkspacePanels(
         return {
           portIndex,
           occupantRef: null,
-          isOccupied: false,
+          isOccupied: false
         };
       });
   }, [
@@ -308,14 +179,13 @@ export function AnalysisSpliceWorkspacePanels(
     splicePortStatuses,
     unboundedVisibleFreePortCount,
     occupiedPortIndexSet,
-    splicePortStatusByIndex,
+    splicePortStatusByIndex
   ]);
   const nextFreePortIndex =
     selectedSplice === null
       ? null
       : selectedSpliceHasFinitePorts
-        ? (splicePortStatuses.find((slot) => !slot.isOccupied)?.portIndex ??
-          null)
+        ? (splicePortStatuses.find((slot) => !slot.isOccupied)?.portIndex ?? null)
         : (() => {
             let candidate = 1;
             while (occupiedPortIndexSet.has(candidate)) {
@@ -324,11 +194,8 @@ export function AnalysisSpliceWorkspacePanels(
             return candidate;
           })();
   const parsedPortIndex = Number.parseInt(portIndexInput, 10);
-  const portIndexIsInteger =
-    Number.isInteger(parsedPortIndex) && parsedPortIndex > 0;
-  const selectedPortSlot = portIndexIsInteger
-    ? splicePortStatusByIndex.get(parsedPortIndex) ?? null
-    : null;
+  const portIndexIsInteger = Number.isInteger(parsedPortIndex) && parsedPortIndex > 0;
+  const selectedPortSlot = portIndexIsInteger ? splicePortStatusByIndex.get(parsedPortIndex) ?? null : null;
   const portIsOccupied = selectedPortSlot?.isOccupied === true;
   const portIndexOutOfRange =
     selectedSplice !== null &&
@@ -344,22 +211,16 @@ export function AnalysisSpliceWorkspacePanels(
           ? `Port index must be between 1 and ${selectedSplice.portCount}.`
           : portIsOccupied
             ? `Port P${parsedPortIndex} is already used (${formatOccupantRef(selectedPortSlot.occupantRef)}).${
-                nextFreePortIndex === null
-                  ? " No available ports."
-                  : ` Suggested: P${nextFreePortIndex}.`
+                nextFreePortIndex === null ? " No available ports." : ` Suggested: P${nextFreePortIndex}.`
               }`
             : null;
   const canReservePort =
     selectedSplice !== null &&
     portIndexInput.trim() !== "" &&
-    spliceOccupantRefInput.trim() !== "" &&
+      spliceOccupantRefInput.trim() !== "" &&
     portIndexIsInteger &&
     !portIndexOutOfRange &&
     !portIsOccupied;
-  const selectedSplicePlacement =
-    selectedSplice === null
-      ? null
-      : resolveSplicePlacementPresentation(selectedSplice);
 
   useEffect(() => {
     setUnboundedVisibleFreePortCount(0);
@@ -373,10 +234,7 @@ export function AnalysisSpliceWorkspacePanels(
       setPortIndexInput("");
       return;
     }
-    if (
-      selectedSpliceHasFinitePorts &&
-      (nextFreePortIndex < 1 || nextFreePortIndex > selectedSplice.portCount)
-    ) {
+    if (selectedSpliceHasFinitePorts && (nextFreePortIndex < 1 || nextFreePortIndex > selectedSplice.portCount)) {
       setPortIndexInput("");
       return;
     }
@@ -393,7 +251,7 @@ export function AnalysisSpliceWorkspacePanels(
     selectedSplice,
     selectedSpliceHasFinitePorts,
     setPortIndexInput,
-    splicePortStatusByIndex,
+    splicePortStatusByIndex
   ]);
 
   function handleReservePortSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -406,854 +264,375 @@ export function AnalysisSpliceWorkspacePanels(
 
   return (
     <>
-      <section className="panel" hidden={!isSpliceSubScreen || !showEntityTables}>
-        <header className="list-panel-header list-panel-header-mobile-inline-tools">
-          <h2>Splices</h2>
-          <div className="list-panel-header-tools">
-            <div className="list-panel-header-tools-row is-title-actions">
-              <div
-                className="chip-group list-panel-filters"
-                role="group"
-                aria-label="Splice occupancy filter"
-              >
-                {(
-                  [
-                    ["all", "All"],
-                    ["occupied", "Occupied"],
-                    ["free", "Free"],
-                  ] as const
-                ).map(([filterId, label]) => (
-                  <button
-                    key={filterId}
-                    type="button"
-                    className={
-                      spliceOccupancyFilter === filterId
-                        ? "filter-chip is-active"
-                        : "filter-chip"
-                    }
-                    onClick={() => setSpliceOccupancyFilter(filterId)}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              <button
-                type="button"
-                className="filter-chip table-export-button"
-                onClick={() =>
-                  downloadCsvFile(
-                    "analysis-splices",
-                    [
-                      "Name",
-                      "Technical ID",
-                      "Mfr Ref",
-                      "Host segment",
-                      "Reference node",
-                      "Offset (mm)",
-                      "Port mode",
-                      "Ports",
-                      "Branches",
-                    ],
-                    sortedVisibleSplices.map((splice) => {
-                      const placement =
-                        resolveSplicePlacementPresentation(splice);
-                      return [
-                        splice.name,
-                        splice.technicalId,
-                        splice.manufacturerReference ?? "",
-                        placement.hostSegmentLabel,
-                        placement.fromNodeLabel,
-                        splice.placement?.offsetMm ?? "",
-                        resolveSplicePortMode(splice),
-                        resolveSplicePortMode(splice) === "unbounded"
-                          ? ""
-                          : splice.portCount,
-                        spliceOccupiedCountById.get(splice.id) ?? 0,
-                      ];
-                    }),
-                  )
-                }
-                disabled={sortedVisibleSplices.length === 0}
-              >
-                <span className="table-export-icon" aria-hidden="true" />
-                CSV
-              </button>
-              {onOpenSpliceOnboardingHelp !== undefined ? (
-                <button
-                  type="button"
-                  className="filter-chip onboarding-help-button"
-                  onClick={onOpenSpliceOnboardingHelp}
-                >
-                  <span
-                    className="action-button-icon is-help"
-                    aria-hidden="true"
-                  />
-                  <span>Help</span>
-                </button>
-              ) : null}
-            </div>
-            <div className="list-panel-header-tools-row is-filter-row">
-              <TableFilterBar
-                label="Filter"
-                fieldLabel="Splice filter field"
-                fieldValue={spliceFilterField}
-                onFieldChange={(value) =>
-                  setSpliceFilterField(value as "name" | "technicalId" | "any")
-                }
-                fieldOptions={[
-                  { value: "name", label: "Name" },
-                  { value: "technicalId", label: "Technical ID" },
-                  { value: "any", label: "Any" },
-                ]}
-                queryValue={spliceFilterQuery}
-                onQueryChange={setSpliceFilterQuery}
-                placeholder={spliceFilterPlaceholder}
-              />
-            </div>
-          </div>
-        </header>
-        {splices.length === 0 ? (
-          <p className="empty-copy">No splice yet.</p>
-        ) : sortedVisibleSplices.length === 0 ? (
-          <>
-            <p className="empty-copy">No splice matches the current filters.</p>
-            <TableEntryCountFooter count={0} />
-          </>
-        ) : (
-          <>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th aria-sort={getTableAriaSort(spliceTableSort, "name")}>
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() =>
-                        setSpliceTableSort((current) => ({
-                          field: "name",
-                          direction:
-                            current.field === "name" &&
-                            current.direction === "asc"
-                              ? "desc"
-                              : "asc",
-                        }))
-                      }
-                    >
-                      Name{" "}
-                      <span className="sort-indicator">
-                        {spliceListSortIndicator("name")}
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-sort={getTableAriaSort(spliceTableSort, "technicalId")}
-                  >
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() =>
-                        setSpliceTableSort((current) => ({
-                          field: "technicalId",
-                          direction:
-                            current.field === "technicalId" &&
-                            current.direction === "asc"
-                              ? "desc"
-                              : "asc",
-                        }))
-                      }
-                    >
-                      {isMobileViewport ? "ID" : "Technical ID"}{" "}
-                      <span className="sort-indicator">
-                        {spliceListSortIndicator("technicalId")}
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-sort={getTableAriaSort(
-                      spliceTableSort,
-                      "manufacturerReference",
-                    )}
-                  >
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() =>
-                        setSpliceTableSort((current) => ({
-                          field: "manufacturerReference",
-                          direction:
-                            current.field === "manufacturerReference" &&
-                            current.direction === "asc"
-                              ? "desc"
-                              : "asc",
-                        }))
-                      }
-                    >
-                      Mfr Ref{" "}
-                      <span className="sort-indicator">
-                        {spliceListSortIndicator("manufacturerReference")}
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-sort={getTableAriaSort(
-                      spliceTableSort,
-                      "hostSegment",
-                    )}
-                  >
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() =>
-                        setSpliceTableSort((current) => ({
-                          field: "hostSegment",
-                          direction:
-                            current.field === "hostSegment" &&
-                            current.direction === "asc"
-                              ? "desc"
-                              : "asc",
-                        }))
-                      }
-                    >
-                      Segment{" "}
-                      <span className="sort-indicator">
-                        {spliceListSortIndicator("hostSegment")}
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-sort={getTableAriaSort(spliceTableSort, "offsetMm")}
-                  >
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() =>
-                        setSpliceTableSort((current) => ({
-                          field: "offsetMm",
-                          direction:
-                            current.field === "offsetMm" &&
-                            current.direction === "asc"
-                              ? "desc"
-                              : "asc",
-                        }))
-                      }
-                    >
-                      Offset{" "}
-                      <span className="sort-indicator">
-                        {spliceListSortIndicator("offsetMm")}
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-sort={getTableAriaSort(spliceTableSort, "portCount")}
-                  >
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() =>
-                        setSpliceTableSort((current) => ({
-                          field: "portCount",
-                          direction:
-                            current.field === "portCount" &&
-                            current.direction === "asc"
-                              ? "desc"
-                              : "asc",
-                        }))
-                      }
-                    >
-                      Ports{" "}
-                      <span className="sort-indicator">
-                        {spliceListSortIndicator("portCount")}
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-sort={getTableAriaSort(
-                      spliceTableSort,
-                      "branchCount",
-                    )}
-                  >
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() =>
-                        setSpliceTableSort((current) => ({
-                          field: "branchCount",
-                          direction:
-                            current.field === "branchCount" &&
-                            current.direction === "asc"
-                              ? "desc"
-                              : "asc",
-                        }))
-                      }
-                    >
-                      Branches{" "}
-                      <span className="sort-indicator">
-                        {spliceListSortIndicator("branchCount")}
-                      </span>
-                    </button>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedVisibleSplices.map((splice) => {
-                  const occupiedCount =
-                    spliceOccupiedCountById.get(splice.id) ?? 0;
-                  const isSelected = selectedSpliceId === splice.id;
-                  const linkedCatalogItemId = splice.catalogItemId;
-                  const linkedCatalogItem =
-                    linkedCatalogItemId === undefined
-                      ? undefined
-                      : catalogItemById.get(linkedCatalogItemId);
-                  const placement =
-                    resolveSplicePlacementPresentation(splice);
-                  return (
-                    <tr
-                      key={splice.id}
-                      className={
-                        isSelected
-                          ? "is-selected is-focusable-row"
-                          : "is-focusable-row"
-                      }
-                      aria-selected={isSelected}
-                      tabIndex={0}
-                      onClick={() => onSelectSplice(splice.id)}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-                          onSelectSplice(splice.id);
-                        }
-                      }}
-                    >
-                      <td>{splice.name}</td>
-                      <td className="technical-id">{splice.technicalId}</td>
-                      <td className="technical-id">
-                        {linkedCatalogItemId !== undefined &&
-                        linkedCatalogItem !== undefined ? (
-                          <EntityReferenceButton
-                            className="technical-id"
-                            title={`Open catalog item ${splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
-                            onClick={() =>
-                              onSelectCatalogItem(linkedCatalogItemId)
-                            }
-                          >
-                            {splice.manufacturerReference ??
-                              linkedCatalogItem.manufacturerReference}
-                          </EntityReferenceButton>
-                        ) : (
-                          splice.manufacturerReference ?? ""
-                        )}
-                      </td>
-                      <td>
-                        <span>{placement.hostSegmentLabel}</span>
-                        <br />
-                        <small>{placement.fromNodeLabel}</small>
-                      </td>
-                      <td>{placement.offsetLabel}</td>
-                      <td>
-                        {resolveSplicePortMode(splice) === "unbounded"
-                          ? "∞"
-                          : splice.portCount}
-                      </td>
-                      <td>{occupiedCount}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-            <TableEntryCountFooter count={sortedVisibleSplices.length} />
-          </>
-        )}
-      </section>
-
-      <section className="panel" hidden={!isSpliceSubScreen}>
-        <header className="list-panel-header">
-          <h2>Splice analysis</h2>
-          <div className="list-panel-header-tools">
-            <div
-              className="chip-group list-panel-filters"
-              role="group"
-              aria-label="Splice analysis view"
+<section className="panel" hidden={!isSpliceSubScreen || !showEntityTables}>
+  <header className="list-panel-header list-panel-header-mobile-inline-tools">
+    <h2>Splices</h2>
+    <div className="list-panel-header-tools">
+      <div className="list-panel-header-tools-row is-title-actions">
+        <div className="chip-group list-panel-filters" role="group" aria-label="Splice occupancy filter">
+          {([
+            ["all", "All"],
+            ["occupied", "Occupied"],
+            ["free", "Free"]
+          ] as const).map(([filterId, label]) => (
+            <button
+              key={filterId}
+              type="button"
+              className={spliceOccupancyFilter === filterId ? "filter-chip is-active" : "filter-chip"}
+              onClick={() => setSpliceOccupancyFilter(filterId)}
             >
-              <button
-                type="button"
-                className={
-                  spliceAnalysisView === "ports"
-                    ? "filter-chip is-active"
-                    : "filter-chip"
-                }
-                aria-pressed={spliceAnalysisView === "ports"}
-                onClick={() => setSpliceAnalysisView("ports")}
-              >
-                Ports
-              </button>
-              <button
-                type="button"
-                className={
-                  spliceAnalysisView === "synthesis"
-                    ? "filter-chip is-active"
-                    : "filter-chip"
-                }
-                aria-pressed={spliceAnalysisView === "synthesis"}
-                onClick={() => setSpliceAnalysisView("synthesis")}
-              >
-                Synthesis
-              </button>
-            </div>
+              {label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="filter-chip table-export-button"
+          onClick={() =>
+            downloadCsvFile(
+              "analysis-splices",
+              ["Name", "Technical ID", "Mfr Ref", "Port mode", "Ports", "Branches"],
+              sortedVisibleSplices.map((splice) => [
+                splice.name,
+                splice.technicalId,
+                splice.manufacturerReference ?? "",
+                resolveSplicePortMode(splice),
+                resolveSplicePortMode(splice) === "unbounded" ? "" : splice.portCount,
+                spliceOccupiedCountById.get(splice.id) ?? 0
+              ])
+            )
+          }
+          disabled={sortedVisibleSplices.length === 0}
+        >
+          <span className="table-export-icon" aria-hidden="true" />
+          CSV
+        </button>
+        {onOpenSpliceOnboardingHelp !== undefined ? (
+          <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenSpliceOnboardingHelp}>
+            <span className="action-button-icon is-help" aria-hidden="true" />
+            <span>Help</span>
+          </button>
+        ) : null}
+      </div>
+      <div className="list-panel-header-tools-row is-filter-row">
+        <TableFilterBar
+          label="Filter"
+          fieldLabel="Splice filter field"
+          fieldValue={spliceFilterField}
+          onFieldChange={(value) => setSpliceFilterField(value as "name" | "technicalId" | "any")}
+          fieldOptions={[
+            { value: "name", label: "Name" },
+            { value: "technicalId", label: "Technical ID" },
+            { value: "any", label: "Any" }
+          ]}
+          queryValue={spliceFilterQuery}
+          onQueryChange={setSpliceFilterQuery}
+          placeholder={spliceFilterPlaceholder}
+        />
+      </div>
+    </div>
+  </header>
+  {splices.length === 0 ? (
+    <p className="empty-copy">No splice yet.</p>
+  ) : sortedVisibleSplices.length === 0 ? (
+    <>
+      <p className="empty-copy">No splice matches the current filters.</p>
+      <TableEntryCountFooter count={0} />
+    </>
+  ) : (
+    <>
+      <table className="data-table">
+        <thead>
+          <tr>
+          <th aria-sort={getTableAriaSort(spliceTableSort, "name")}>
             <button
               type="button"
-              className="filter-chip table-export-button"
-              onClick={() => {
-                if (spliceAnalysisView === "ports") {
-                  downloadCsvFile(
-                    `analysis-splice-ports-${selectedSplice?.technicalId ?? "selection"}`,
-                    ["Port", "Status", "Occupant reference"],
-                    displayedSplicePortStatuses.map((slot) => [
-                      `P${slot.portIndex}`,
-                      slot.isOccupied ? "Occupied" : "Free",
-                      formatOccupantRef(slot.occupantRef),
-                    ]),
-                  );
-                  return;
-                }
-                downloadCsvFile(
-                  `analysis-splice-synthesis-${selectedSplice?.technicalId ?? "selection"}`,
-                  [
-                    "Wire",
-                    "Technical ID",
-                    "Local port",
-                    "Destination",
-                    "Covered from splice (mm)",
-                    "Covered from remote endpoint (mm)",
-                    "Length (mm)",
-                  ],
-                  sortedSpliceSynthesisRowsByColumns.map((row) => [
-                    row.wireName,
-                    row.wireTechnicalId,
-                    row.localEndpointLabel,
-                    row.remoteEndpointLabel,
-                    row.localCoveredLengthMm ?? "",
-                    row.remoteCoveredLengthMm ?? "",
-                    row.lengthMm,
-                  ]),
-                );
-              }}
-              disabled={
-                selectedSplice === null ||
-                (spliceAnalysisView === "ports"
-                  ? displayedSplicePortStatuses.length === 0
-                  : sortedSpliceSynthesisRowsByColumns.length === 0)
-              }
+              className="sort-header-button"
+              onClick={() => setSpliceTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" }))}
             >
-              <span className="table-export-icon" aria-hidden="true" />
-              CSV
+              Name <span className="sort-indicator">{spliceListSortIndicator("name")}</span>
             </button>
-          </div>
-        </header>
-        {selectedSplice === null ? (
-          <p className="empty-copy">Select a splice to view ports and synthesis.</p>
-        ) : spliceAnalysisView === "ports" ? (
-          <>
-            <p className="meta-line">
-              <span className="splice-badge">Junction</span>{" "}
-              <strong>{selectedSplice.name}</strong> ({selectedSplice.technicalId})
-            </p>
-            {selectedSplicePlacement !== null ? (
-              <p className="meta-line">
-                Placement: {selectedSplicePlacement.hostSegmentLabel} from{" "}
-                {selectedSplicePlacement.fromNodeLabel} at{" "}
-                {selectedSplicePlacement.offsetLabel}
-              </p>
-            ) : null}
-            <p className="meta-line">
-              Capacity:{" "}
-              {selectedSplicePortMode === "unbounded"
-                ? "∞ (unbounded)"
-                : `${selectedSplice.portCount} ports`}
-            </p>
-            <p className="meta-line">
-              Branch count:{" "}
-              {splicePortStatuses.filter((slot) => slot.isOccupied).length}
-            </p>
-            <div className="connector-ways-view splice-ports-view">
-              <section
-                className="connector-ways-assignment-panel splice-ports-assignment-panel"
-                aria-label="Manual port assignment"
+          </th>
+          <th aria-sort={getTableAriaSort(spliceTableSort, "technicalId")}>
+            <button
+              type="button"
+              className="sort-header-button"
+              onClick={() => setSpliceTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" }))}
+            >
+              {isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{spliceListSortIndicator("technicalId")}</span>
+            </button>
+          </th>
+          <th aria-sort={getTableAriaSort(spliceTableSort, "manufacturerReference")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "manufacturerReference", direction: current.field === "manufacturerReference" && current.direction === "asc" ? "desc" : "asc" }))}>Mfr Ref <span className="sort-indicator">{spliceListSortIndicator("manufacturerReference")}</span></button></th>
+          <th aria-sort={getTableAriaSort(spliceTableSort, "portCount")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "portCount", direction: current.field === "portCount" && current.direction === "asc" ? "desc" : "asc" }))}>Ports <span className="sort-indicator">{spliceListSortIndicator("portCount")}</span></button></th>
+          <th aria-sort={getTableAriaSort(spliceTableSort, "branchCount")}><button type="button" className="sort-header-button" onClick={() => setSpliceTableSort((current) => ({ field: "branchCount", direction: current.field === "branchCount" && current.direction === "asc" ? "desc" : "asc" }))}>Branches <span className="sort-indicator">{spliceListSortIndicator("branchCount")}</span></button></th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedVisibleSplices.map((splice) => {
+            const occupiedCount = spliceOccupiedCountById.get(splice.id) ?? 0;
+            const isSelected = selectedSpliceId === splice.id;
+            const linkedCatalogItemId = splice.catalogItemId;
+            const linkedCatalogItem = linkedCatalogItemId === undefined ? undefined : catalogItemById.get(linkedCatalogItemId);
+            return (
+              <tr
+                key={splice.id}
+                className={isSelected ? "is-selected is-focusable-row" : "is-focusable-row"}
+                aria-selected={isSelected}
+                tabIndex={0}
+                onClick={() => onSelectSplice(splice.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelectSplice(splice.id);
+                  }
+                }}
               >
-                <form
-                  className="row-form connector-ways-assignment-form splice-ports-assignment-form"
-                  onSubmit={handleReservePortSubmit}
-                >
-                  <label>
-                    Port index
-                    <input
-                      type="number"
-                      min={1}
-                      max={
-                        selectedSpliceHasFinitePorts
-                          ? selectedSplice.portCount
-                          : undefined
-                      }
-                      step={1}
-                      value={portIndexInput}
-                      onChange={(event) => setPortIndexInput(event.target.value)}
-                      aria-invalid={
-                        spliceReserveValidationMessage !== null
-                          ? true
-                          : undefined
-                      }
-                      required
-                    />
-                  </label>
+                <td>{splice.name}</td>
+                <td className="technical-id">{splice.technicalId}</td>
+                <td className="technical-id">
+                  {linkedCatalogItemId !== undefined && linkedCatalogItem !== undefined ? (
+                    <EntityReferenceButton
+                      className="technical-id"
+                      title={`Open catalog item ${splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
+                      onClick={() => onSelectCatalogItem(linkedCatalogItemId)}
+                    >
+                      {splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}
+                    </EntityReferenceButton>
+                  ) : (
+                    splice.manufacturerReference ?? ""
+                  )}
+                </td>
+                <td>{resolveSplicePortMode(splice) === "unbounded" ? "∞" : splice.portCount}</td>
+                <td>{occupiedCount}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <TableEntryCountFooter count={sortedVisibleSplices.length} />
+    </>
+  )}
+</section>
 
-                  <label>
-                    Occupant reference
-                    <input
-                      value={spliceOccupantRefInput}
-                      onChange={(event) =>
-                        setSpliceOccupantRefInput(event.target.value)
-                      }
-                      placeholder="wire-draft-001:B"
-                      required
-                    />
-                  </label>
+<section className="panel" hidden={!isSpliceSubScreen}>
+  <header className="list-panel-header">
+    <h2>Splice analysis</h2>
+    <div className="list-panel-header-tools">
+      <div className="chip-group list-panel-filters" role="group" aria-label="Splice analysis view">
+        <button
+          type="button"
+          className={spliceAnalysisView === "ports" ? "filter-chip is-active" : "filter-chip"}
+          aria-pressed={spliceAnalysisView === "ports"}
+          onClick={() => setSpliceAnalysisView("ports")}
+        >
+          Ports
+        </button>
+        <button
+          type="button"
+          className={spliceAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
+          aria-pressed={spliceAnalysisView === "synthesis"}
+          onClick={() => setSpliceAnalysisView("synthesis")}
+        >
+          Synthesis
+        </button>
+      </div>
+      <button
+        type="button"
+        className="filter-chip table-export-button"
+        onClick={() => {
+          if (spliceAnalysisView === "ports") {
+            downloadCsvFile(
+              `analysis-splice-ports-${selectedSplice?.technicalId ?? "selection"}`,
+              ["Port", "Status", "Occupant reference"],
+              displayedSplicePortStatuses.map((slot) => [
+                `P${slot.portIndex}`,
+                slot.isOccupied ? "Occupied" : "Free",
+                formatOccupantRef(slot.occupantRef)
+              ])
+            );
+            return;
+          }
+          downloadCsvFile(
+            `analysis-splice-synthesis-${selectedSplice?.technicalId ?? "selection"}`,
+            ["Wire", "Technical ID", "Local port", "Destination", "Length (mm)"],
+            sortedSpliceSynthesisRowsByColumns.map((row) => [
+              row.wireName,
+              row.wireTechnicalId,
+              row.localEndpointLabel,
+              row.remoteEndpointLabel,
+              row.lengthMm
+            ])
+          );
+        }}
+        disabled={
+          selectedSplice === null ||
+          (spliceAnalysisView === "ports" ? displayedSplicePortStatuses.length === 0 : sortedSpliceSynthesisRowsByColumns.length === 0)
+        }
+      >
+        <span className="table-export-icon" aria-hidden="true" />
+        CSV
+      </button>
+    </div>
+  </header>
+  {selectedSplice === null ? (
+    <p className="empty-copy">Select a splice to view ports and synthesis.</p>
+  ) : spliceAnalysisView === "ports" ? (
+    <>
+      <p className="meta-line">
+        <span className="splice-badge">Junction</span> <strong>{selectedSplice.name}</strong> ({selectedSplice.technicalId})
+      </p>
+      <p className="meta-line">Capacity: {selectedSplicePortMode === "unbounded" ? "∞ (unbounded)" : `${selectedSplice.portCount} ports`}</p>
+      <p className="meta-line">Branch count: {splicePortStatuses.filter((slot) => slot.isOccupied).length}</p>
+      <div className="connector-ways-view splice-ports-view">
+        <section className="connector-ways-assignment-panel splice-ports-assignment-panel" aria-label="Manual port assignment">
+          <form className="row-form connector-ways-assignment-form splice-ports-assignment-form" onSubmit={handleReservePortSubmit}>
+            <label>
+              Port index
+              <input
+                type="number"
+                min={1}
+                max={selectedSpliceHasFinitePorts ? selectedSplice.portCount : undefined}
+                step={1}
+                value={portIndexInput}
+                onChange={(event) => setPortIndexInput(event.target.value)}
+                aria-invalid={spliceReserveValidationMessage !== null ? true : undefined}
+                required
+              />
+            </label>
 
-                  <button
-                    type="submit"
-                    className="button-with-icon"
-                    disabled={!canReservePort}
-                  >
-                    <span
-                      className="action-button-icon is-lock-move"
-                      aria-hidden="true"
-                    />
-                    Reserve port
-                  </button>
-                </form>
-                {spliceReserveValidationMessage !== null ? (
-                  <small className="inline-error">
-                    {spliceReserveValidationMessage}
-                  </small>
-                ) : null}
-                {spliceReserveValidationMessage === null &&
-                nextFreePortIndex !== null ? (
-                  <small className="inline-help">
-                    Suggested next free port: P{nextFreePortIndex}
-                  </small>
-                ) : null}
-                {spliceReserveValidationMessage === null &&
-                nextFreePortIndex === null &&
-                selectedSpliceHasFinitePorts ? (
-                  <small className="inline-help">
-                    No available ports on this splice.
-                  </small>
-                ) : null}
-                {selectedSplicePortMode === "unbounded" ? (
-                  <div className="row-actions splice-ports-assignment-actions">
+            <label>
+              Occupant reference
+              <input
+                value={spliceOccupantRefInput}
+                onChange={(event) => setSpliceOccupantRefInput(event.target.value)}
+                placeholder="wire-draft-001:B"
+                required
+              />
+            </label>
+
+            <button type="submit" className="button-with-icon" disabled={!canReservePort}>
+              <span className="action-button-icon is-lock-move" aria-hidden="true" />
+              Reserve port
+            </button>
+          </form>
+          {spliceReserveValidationMessage !== null ? <small className="inline-error">{spliceReserveValidationMessage}</small> : null}
+          {spliceReserveValidationMessage === null && nextFreePortIndex !== null ? (
+            <small className="inline-help">Suggested next free port: P{nextFreePortIndex}</small>
+          ) : null}
+          {spliceReserveValidationMessage === null && nextFreePortIndex === null && selectedSpliceHasFinitePorts ? (
+            <small className="inline-help">No available ports on this splice.</small>
+          ) : null}
+          {selectedSplicePortMode === "unbounded" ? (
+            <div className="row-actions splice-ports-assignment-actions">
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() => setUnboundedVisibleFreePortCount((current) => current + 1)}
+              >
+                <span className="action-button-icon is-add" aria-hidden="true" />
+                + Add visible port(s)
+              </button>
+            </div>
+          ) : null}
+        </section>
+
+        <div className="cavity-grid connector-ways-cavity-grid splice-ports-cavity-grid" aria-label="Splice port occupancy grid">
+          {displayedSplicePortStatuses.map((slot) => {
+            const parsedOccupantRef = slot.occupantRef === null ? null : parseWireOccupantRef(slot.occupantRef);
+            const canGoToWire =
+              parsedOccupantRef !== null &&
+              wireById.has(parsedOccupantRef.wireId);
+
+            return (
+              <article key={slot.portIndex} className={slot.isOccupied ? "cavity is-occupied" : "cavity"}>
+                <h3>P{slot.portIndex}</h3>
+                <p>{slot.isOccupied ? formatOccupantRef(slot.occupantRef) : "Free"}</p>
+                {slot.isOccupied ? (
+                  <div className="cavity-actions">
                     <button
                       type="button"
-                      className="button-with-icon"
-                      onClick={() =>
-                        setUnboundedVisibleFreePortCount(
-                          (current) => current + 1,
-                        )
-                      }
+                      className="validation-row-go-to-button button-with-icon"
+                      disabled={!canGoToWire}
+                      onClick={() => {
+                        if (!canGoToWire || parsedOccupantRef === null) {
+                          return;
+                        }
+                        onGoToWireFromAnalysis(parsedOccupantRef.wireId);
+                      }}
                     >
-                      <span
-                        className="action-button-icon is-add"
-                        aria-hidden="true"
-                      />
-                      + Add visible port(s)
+                      <span className="action-button-icon is-open" aria-hidden="true" />
+                      Go to
+                    </button>
+                    <button type="button" className="button-with-icon" onClick={() => handleReleasePort(slot.portIndex)}>
+                      <span className="action-button-icon is-cancel" aria-hidden="true" />
+                      Release
                     </button>
                   </div>
                 ) : null}
-              </section>
-
-              <div
-                className="cavity-grid connector-ways-cavity-grid splice-ports-cavity-grid"
-                aria-label="Splice port occupancy grid"
-              >
-                {displayedSplicePortStatuses.map((slot) => {
-                  const parsedOccupantRef =
-                    slot.occupantRef === null
-                      ? null
-                      : parseWireOccupantRef(slot.occupantRef);
-                  const canGoToWire =
-                    parsedOccupantRef !== null &&
-                    wireById.has(parsedOccupantRef.wireId);
-
-                  return (
-                    <article
-                      key={slot.portIndex}
-                      className={slot.isOccupied ? "cavity is-occupied" : "cavity"}
-                    >
-                      <h3>P{slot.portIndex}</h3>
-                      <p>
-                        {slot.isOccupied
-                          ? formatOccupantRef(slot.occupantRef)
-                          : "Free"}
-                      </p>
-                      {slot.isOccupied ? (
-                        <div className="cavity-actions">
-                          <button
-                            type="button"
-                            className="validation-row-go-to-button button-with-icon"
-                            disabled={!canGoToWire}
-                            onClick={() => {
-                              if (!canGoToWire || parsedOccupantRef === null) {
-                                return;
-                              }
-                              onGoToWireFromAnalysis(parsedOccupantRef.wireId);
-                            }}
-                          >
-                            <span
-                              className="action-button-icon is-open"
-                              aria-hidden="true"
-                            />
-                            Go to
-                          </button>
-                          <button
-                            type="button"
-                            className="button-with-icon"
-                            onClick={() => handleReleasePort(slot.portIndex)}
-                          >
-                            <span
-                              className="action-button-icon is-cancel"
-                              aria-hidden="true"
-                            />
-                            Release
-                          </button>
-                        </div>
-                      ) : null}
-                    </article>
-                  );
-                })}
-              </div>
-            </div>
-          </>
-        ) : sortedSpliceSynthesisRowsByColumns.length === 0 ? (
-          <p className="empty-copy">No wire currently connected to this splice.</p>
-        ) : (
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th aria-sort={getTableAriaSort(spliceSynthesisTableSort, "name")}>
-                  <button
-                    type="button"
-                    className="sort-header-button"
-                    onClick={() =>
-                      setSpliceSynthesisTableSort((current) => ({
-                        field: "name",
-                        direction:
-                          current.field === "name" && current.direction === "asc"
-                            ? "desc"
-                            : "asc",
-                      }))
-                    }
-                  >
-                    Wire{" "}
-                    <span className="sort-indicator">
-                      {spliceSynthesisSortIndicator("name")}
-                    </span>
-                  </button>
-                </th>
-                <th
-                  aria-sort={getTableAriaSort(
-                    spliceSynthesisTableSort,
-                    "technicalId",
-                  )}
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  ) : sortedSpliceSynthesisRowsByColumns.length === 0 ? (
+    <p className="empty-copy">No wire currently connected to this splice.</p>
+  ) : (
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th aria-sort={getTableAriaSort(spliceSynthesisTableSort, "name")}>
+            <button
+              type="button"
+              className="sort-header-button"
+              onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "name", direction: current.field === "name" && current.direction === "asc" ? "desc" : "asc" }))}
+            >
+              Wire <span className="sort-indicator">{spliceSynthesisSortIndicator("name")}</span>
+            </button>
+          </th>
+          <th aria-sort={getTableAriaSort(spliceSynthesisTableSort, "technicalId")}>
+            <button
+              type="button"
+              className="sort-header-button"
+              onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "technicalId", direction: current.field === "technicalId" && current.direction === "asc" ? "desc" : "asc" }))}
+            >
+              {isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{spliceSynthesisSortIndicator("technicalId")}</span>
+            </button>
+          </th>
+          <th aria-sort={getTableAriaSort(spliceSynthesisTableSort, "localPort")}><button type="button" className="sort-header-button" onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "localPort", direction: current.field === "localPort" && current.direction === "asc" ? "desc" : "asc" }))}>Local port <span className="sort-indicator">{spliceSynthesisSortIndicator("localPort")}</span></button></th>
+          <th aria-sort={getTableAriaSort(spliceSynthesisTableSort, "destination")}><button type="button" className="sort-header-button" onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "destination", direction: current.field === "destination" && current.direction === "asc" ? "desc" : "asc" }))}>Destination <span className="sort-indicator">{spliceSynthesisSortIndicator("destination")}</span></button></th>
+          <th aria-sort={getTableAriaSort(spliceSynthesisTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setSpliceSynthesisTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{spliceSynthesisSortIndicator("lengthMm")}</span></button></th>
+        </tr>
+      </thead>
+      <tbody>
+        {sortedSpliceSynthesisRowsByColumns.map((row) => {
+          const wire = wireById.get(row.wireId);
+          return (
+          <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
+            <td>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }}>
+                {renderWireColorPrefixMarker(wire)}
+                <EntityReferenceButton
+                  title={`Open wire ${row.wireTechnicalId}`}
+                  onClick={() => onOpenWireFromAnalysisTable(row.wireId)}
                 >
-                  <button
-                    type="button"
-                    className="sort-header-button"
-                    onClick={() =>
-                      setSpliceSynthesisTableSort((current) => ({
-                        field: "technicalId",
-                        direction:
-                          current.field === "technicalId" &&
-                          current.direction === "asc"
-                            ? "desc"
-                            : "asc",
-                      }))
-                    }
-                  >
-                    {isMobileViewport ? "ID" : "Technical ID"}{" "}
-                    <span className="sort-indicator">
-                      {spliceSynthesisSortIndicator("technicalId")}
-                    </span>
-                  </button>
-                </th>
-                <th
-                  aria-sort={getTableAriaSort(
-                    spliceSynthesisTableSort,
-                    "localPort",
-                  )}
-                >
-                  <button
-                    type="button"
-                    className="sort-header-button"
-                    onClick={() =>
-                      setSpliceSynthesisTableSort((current) => ({
-                        field: "localPort",
-                        direction:
-                          current.field === "localPort" &&
-                          current.direction === "asc"
-                            ? "desc"
-                            : "asc",
-                      }))
-                    }
-                  >
-                    Local port{" "}
-                    <span className="sort-indicator">
-                      {spliceSynthesisSortIndicator("localPort")}
-                    </span>
-                  </button>
-                </th>
-                <th
-                  aria-sort={getTableAriaSort(
-                    spliceSynthesisTableSort,
-                    "destination",
-                  )}
-                >
-                  <button
-                    type="button"
-                    className="sort-header-button"
-                    onClick={() =>
-                      setSpliceSynthesisTableSort((current) => ({
-                        field: "destination",
-                        direction:
-                          current.field === "destination" &&
-                          current.direction === "asc"
-                            ? "desc"
-                            : "asc",
-                      }))
-                    }
-                  >
-                    Destination{" "}
-                    <span className="sort-indicator">
-                      {spliceSynthesisSortIndicator("destination")}
-                    </span>
-                  </button>
-                </th>
-                <th
-                  aria-sort={getTableAriaSort(
-                    spliceSynthesisTableSort,
-                    "localCoveredLengthMm",
-                  )}
-                >
-                  <button
-                    type="button"
-                    className="sort-header-button"
-                    onClick={() =>
-                      setSpliceSynthesisTableSort((current) => ({
-                        field: "localCoveredLengthMm",
-                        direction:
-                          current.field === "localCoveredLengthMm" &&
-                          current.direction === "asc"
-                            ? "desc"
-                            : "asc",
-                      }))
-                    }
-                  >
-                    {isMobileViewport
-                      ? "Local mm"
-                      : "Covered from splice (mm)"}{" "}
-                    <span className="sort-indicator">
-                      {spliceSynthesisSortIndicator("localCoveredLengthMm")}
-                    </span>
-                  </button>
-                </th>
-                <th
-                  aria-sort={getTableAriaSort(
-                    spliceSynthesisTableSort,
-                    "remoteCoveredLengthMm",
-                  )}
-                >
-                  <button
-                    type="button"
-                    className="sort-header-button"
-                    onClick={() =>
-                      setSpliceSynthesisTableSort((current) => ({
-                        field: "remoteCoveredLengthMm",
-                        direction:
-                          current.field === "remoteCoveredLengthMm" &&
-                          current.direction === "asc"
-                            ? "desc"
-                            : "asc",
-                      }))
-                    }
-                  >
-                    {isMobileViewport
-                      ? "Remote mm"
-                      : "Covered from remote (mm)"}{" "}
-                    <span className="sort-indicator">
-                      {spliceSynthesisSortIndicator("remoteCoveredLengthMm")}
-                    </span>
-                  </button>
-                </th>
-                <th
-                  aria-sort={getTableAriaSort(
-                    spliceSynthesisTableSort,
-                    "lengthMm",
-                  )}
-                >
-                  <button
-                    type="button"
-                    className="sort-header-button"
-                    onClick={() =>
-                      setSpliceSynthesisTableSort((current) => ({
-                        field: "lengthMm",
-                        direction:
-                          current.field === "lengthMm" &&
-                          current.direction === "asc"
-                            ? "desc"
-                            : "asc",
-                      }))
-                    }
-                  >
-                    {isMobileViewport ? "Len" : "Length (mm)"}{" "}
-                    <span className="sort-indicator">
-                      {spliceSynthesisSortIndicator("lengthMm")}
-                    </span>
-                  </button>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedSpliceSynthesisRowsByColumns.map((row) => {
-                const wire = wireById.get(row.wireId);
-                return (
-                  <tr key={`${row.wireId}-${row.localEndpointLabel}`}>
-                    <td>
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "0.35rem",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        {renderWireColorPrefixMarker(wire)}
-                        <EntityReferenceButton
-                          title={`Open wire ${row.wireTechnicalId}`}
-                          onClick={() => onOpenWireFromAnalysisTable(row.wireId)}
-                        >
-                          {row.wireName}
-                        </EntityReferenceButton>
-                      </span>
-                    </td>
-                    <td className="technical-id">{row.wireTechnicalId}</td>
-                    <td>{row.localEndpointLabel}</td>
-                    <td>{renderDestinationReference(row)}</td>
-                    <td>{row.localCoveredLengthMm ?? ""}</td>
-                    <td>{row.remoteCoveredLengthMm ?? ""}</td>
-                    <td>{row.lengthMm}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </section>
+                  {row.wireName}
+                </EntityReferenceButton>
+              </span>
+            </td>
+            <td className="technical-id">
+              {row.wireTechnicalId}
+            </td>
+            <td>{row.localEndpointLabel}</td>
+            <td>{renderDestinationReference(row)}</td>
+            <td>{row.lengthMm}</td>
+          </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  )}
+</section>
     </>
   );
 }

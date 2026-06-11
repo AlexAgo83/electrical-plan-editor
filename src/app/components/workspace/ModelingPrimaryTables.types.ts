@@ -6,7 +6,6 @@ import type {
   Network,
   NetworkNode,
   NodeId,
-  Segment,
   Splice,
   SpliceId,
   Wire,
@@ -70,7 +69,6 @@ export interface ModelingPrimaryTablesProps {
   spliceFilterQuery: string;
   setSpliceFilterQuery: (value: string) => void;
   splices: Splice[];
-  segments: Segment[];
   visibleSplices: Splice[];
   spliceSort: SortState;
   setSpliceSort: (

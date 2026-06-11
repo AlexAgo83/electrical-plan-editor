@@ -167,13 +167,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
   const wireHandlers = useWireHandlersContext();
   const primaryColor = wirePrimaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wirePrimaryColorId] : undefined;
   const secondaryColor = wireSecondaryColorId.length > 0 ? CABLE_COLOR_BY_ID[wireSecondaryColorId] : undefined;
-  const placedSplices = splices.filter((splice) => splice.placement !== undefined);
   const selectedEndpointASplice = splices.find((splice) => splice.id === wireEndpointASpliceId);
   const selectedEndpointBSplice = splices.find((splice) => splice.id === wireEndpointBSpliceId);
-  const selectedEndpointASpliceIsUnplaced =
-    selectedEndpointASplice !== undefined && selectedEndpointASplice.placement === undefined;
-  const selectedEndpointBSpliceIsUnplaced =
-    selectedEndpointBSplice !== undefined && selectedEndpointBSplice.placement === undefined;
   const endpointAIsDirectionalSplice =
     selectedEndpointASplice !== undefined && resolveSplicePortMode(selectedEndpointASplice) === "directional";
   const endpointBIsDirectionalSplice =
@@ -230,7 +225,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         : { label: `Missing connector (${wireEndpointAConnectorId})`, technicalId: wireEndpointAConnectorId }
   });
   const endpointASpliceOptions = buildModelingDynamicSelectOptions({
-    options: placedSplices.map((splice) => ({
+    options: splices.map((splice) => ({
       value: splice.id,
       label: `${splice.name} (${splice.technicalId})`,
       technicalId: splice.technicalId
@@ -239,9 +234,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     missingOption:
       wireEndpointASpliceId.trim().length === 0
         ? null
-        : selectedEndpointASpliceIsUnplaced
-          ? { label: `Unplaced splice (${wireEndpointASpliceId})`, technicalId: wireEndpointASpliceId }
-          : { label: `Missing splice (${wireEndpointASpliceId})`, technicalId: wireEndpointASpliceId }
+        : { label: `Missing splice (${wireEndpointASpliceId})`, technicalId: wireEndpointASpliceId }
   });
   const endpointBConnectorOptions = buildModelingDynamicSelectOptions({
     options: connectors.map((connector) => ({
@@ -256,7 +249,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         : { label: `Missing connector (${wireEndpointBConnectorId})`, technicalId: wireEndpointBConnectorId }
   });
   const endpointBSpliceOptions = buildModelingDynamicSelectOptions({
-    options: placedSplices.map((splice) => ({
+    options: splices.map((splice) => ({
       value: splice.id,
       label: `${splice.name} (${splice.technicalId})`,
       technicalId: splice.technicalId
@@ -265,9 +258,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     missingOption:
       wireEndpointBSpliceId.trim().length === 0
         ? null
-        : selectedEndpointBSpliceIsUnplaced
-          ? { label: `Unplaced splice (${wireEndpointBSpliceId})`, technicalId: wireEndpointBSpliceId }
-          : { label: `Missing splice (${wireEndpointBSpliceId})`, technicalId: wireEndpointBSpliceId }
+        : { label: `Missing splice (${wireEndpointBSpliceId})`, technicalId: wireEndpointBSpliceId }
   });
   const endpointACatalogDefaults = resolveWireEndpointCatalogDefaults({
     kind: wireEndpointAKind,
@@ -500,9 +491,6 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
                 ))}
               </select>
             </label>
-            <small className={selectedEndpointASpliceIsUnplaced ? "inline-error" : "inline-help"}>
-              Only placed splices can be connected to wire endpoints.
-            </small>
             {endpointAIsDirectionalSplice ? (
               <>
                 <label>
@@ -621,9 +609,6 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
                 ))}
               </select>
             </label>
-            <small className={selectedEndpointBSpliceIsUnplaced ? "inline-error" : "inline-help"}>
-              Only placed splices can be connected to wire endpoints.
-            </small>
             {endpointBIsDirectionalSplice ? (
               <>
                 <label>

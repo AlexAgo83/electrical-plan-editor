@@ -97,7 +97,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "splice/upsert":
     case "splice/convertToDirectional":
     case "splice/rerouteConnectedWires":
-    case "splice/applyOptimizedCanvasLayout":
+    case "splice/applyOptimizedPlacement":
     case "splice/remove":
     case "splice/removeCascade":
     case "splice/occupyPort":

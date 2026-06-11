@@ -255,7 +255,7 @@ function actionVerb(action: AppAction, previousState: AppState): string {
       return "converted";
     case "splice/rerouteConnectedWires":
       return "rerouted";
-    case "splice/applyOptimizedCanvasLayout":
+    case "splice/applyOptimizedPlacement":
       return "lengths optimized";
     case "splice/remove":
     case "splice/removeCascade":
@@ -384,7 +384,7 @@ function resolveDisplayRef(action: AppAction, previousState: AppState, nextState
       );
     case "splice/convertToDirectional":
     case "splice/rerouteConnectedWires":
-    case "splice/applyOptimizedCanvasLayout":
+    case "splice/applyOptimizedPlacement":
       return preferDisplayText(
         resolveSpliceDisplayRef(nextState, action.payload.id),
         resolveSpliceDisplayRef(previousState, action.payload.id)
@@ -760,7 +760,7 @@ function describeRecentChangeDetail(action: AppAction, previousState: AppState):
     case "connector/removeCascade":
     case "splice/removeCascade":
       return "Cascade delete";
-    case "splice/applyOptimizedCanvasLayout":
+    case "splice/applyOptimizedPlacement":
       return `${Object.keys(action.payload.segmentLengths).length} segment length(s)`;
     case "layout/setNodePositions":
       return `${Object.keys(action.payload.positions).length} node position(s)`;
@@ -816,7 +816,7 @@ function resolveNavigationTarget(action: AppAction): RecentChangeNavigationTarge
     case "splice/upsert":
     case "splice/convertToDirectional":
     case "splice/rerouteConnectedWires":
-    case "splice/applyOptimizedCanvasLayout":
+    case "splice/applyOptimizedPlacement":
       return buildSelectionNavigationTarget("splice", "splice", action.payload.id);
     case "splice/occupyPort":
     case "splice/releasePort":

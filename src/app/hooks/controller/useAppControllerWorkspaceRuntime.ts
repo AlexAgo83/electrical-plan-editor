@@ -16,7 +16,6 @@ interface UseAppControllerWorkspaceRuntimeParams {
   setActiveSubScreen: (subScreen: SubScreenId) => void;
   setInteractionMode: (mode: InteractionMode) => void;
   requestConfirmation: (request: ConfirmDialogRequest) => Promise<boolean>;
-  showSpliceMigrationReport?: (entries: string[]) => void;
 }
 
 export function useAppControllerWorkspaceRuntime({
@@ -27,8 +26,7 @@ export function useAppControllerWorkspaceRuntime({
   setActiveScreen,
   setActiveSubScreen,
   setInteractionMode,
-  requestConfirmation,
-  showSpliceMigrationReport
+  requestConfirmation
 }: UseAppControllerWorkspaceRuntimeParams) {
   const isCurrentWorkspaceEmpty = isWorkspaceEmpty(state);
   const hasBuiltInSampleState = hasSampleNetworkSignature(state);
@@ -50,8 +48,7 @@ export function useAppControllerWorkspaceRuntime({
     store,
     replaceStateWithHistory: historyDispatch.replaceStateWithHistory,
     requestConfirmation,
-    notifyToast,
-    showSpliceMigrationReport
+    notifyToast
   });
 
   return {

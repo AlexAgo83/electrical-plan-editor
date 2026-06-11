@@ -19,9 +19,9 @@ function validateSegment(segment: Segment): string | null {
   return null;
 }
 
-export function applyOptimizedSpliceCanvasLayout(
+export function applyOptimizedSplicePlacement(
   state: AppState,
-  action: Extract<AppAction, { type: "splice/applyOptimizedCanvasLayout" }>
+  action: Extract<AppAction, { type: "splice/applyOptimizedPlacement" }>
 ): AppState {
   const splice = state.splices.byId[action.payload.id];
   if (splice === undefined) {
