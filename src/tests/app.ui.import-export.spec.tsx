@@ -19,7 +19,7 @@ describe("App integration UI - import/export", () => {
     });
   });
 
-  it("keeps import/export content in compact two-column structure with import action under export actions", () => {
+  it("organizes import/export into a top JSON block, a selected-networks picker, and a three-block selected export package", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreen("settings");
 
@@ -30,22 +30,31 @@ describe("App integration UI - import/export", () => {
 
     const actionsColumn = panel.querySelector(".settings-import-export-actions-column");
     const selectionColumn = panel.querySelector(".settings-import-export-selection-column");
+    const selectedPackage = within(panel).getByLabelText("Selected networks export package");
     expect(actionsColumn).not.toBeNull();
     expect(selectionColumn).not.toBeNull();
+    expect(selectedPackage).toHaveClass("settings-export-package-card--full");
 
     expect(within(actionsColumn as HTMLElement).getByRole("heading", { name: "Network JSON" })).toBeInTheDocument();
-    expect(within(actionsColumn as HTMLElement).getByRole("heading", { name: "Export selected" })).toBeInTheDocument();
-    expect(within(actionsColumn as HTMLElement).getByRole("heading", { name: "Network plan" })).toBeInTheDocument();
+    expect(within(selectedPackage).getByRole("heading", { name: "Export selected" })).toBeInTheDocument();
+    expect(within(selectedPackage).queryByRole("heading", { name: "Network JSON" })).toBeNull();
+    expect(within(selectedPackage).getByRole("heading", { name: "BOM grouped" })).toBeInTheDocument();
+    expect(within(selectedPackage).getByRole("heading", { name: "Wire list" })).toBeInTheDocument();
+    expect(within(selectedPackage).getByRole("heading", { name: "Network plan" })).toBeInTheDocument();
 
     const exportAllButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export all" });
-    const groupedBomButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export selected BOM (XLSX)" });
-    const groupedWireButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export selected wire list (XLSX)" });
-    const groupedSvgButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export selected SVG" });
-    const groupedPngButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export selected PNG" });
-    const groupedPdfButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export selected PDF" });
+    const selectedJsonButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export selected JSON" });
     const importButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Import from file" });
+    const groupedBomButton = within(selectedPackage).getByRole("button", { name: "Export selected BOM (XLSX)" });
+    const groupedWireButton = within(selectedPackage).getByRole("button", { name: "Export selected wire list (XLSX)" });
+    const groupedSvgButton = within(selectedPackage).getByRole("button", { name: "Export selected SVG" });
+    const groupedPngButton = within(selectedPackage).getByRole("button", { name: "Export selected PNG" });
+    const groupedPdfButton = within(selectedPackage).getByRole("button", { name: "Export selected PDF" });
     expect(exportAllButton.compareDocumentPosition(importButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
-    expect(groupedBomButton.compareDocumentPosition(groupedWireButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    expect(selectedJsonButton).toBeEnabled();
+    const selectedBlocks = selectedPackage.querySelectorAll(".settings-export-option-group");
+    expect(selectedBlocks).toHaveLength(3);
+    expect(groupedWireButton.compareDocumentPosition(groupedBomButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     expect(groupedSvgButton.compareDocumentPosition(groupedPngButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     expect(groupedPngButton.compareDocumentPosition(groupedPdfButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     expect(within(selectionColumn as HTMLElement).getByText("Selected networks for export")).toBeInTheDocument();

@@ -687,19 +687,19 @@ export function SettingsWorkspaceContent({
           <span className="settings-panel-chip">Portability</span>
         </header>
         <p className="settings-panel-intro">
-          Package exports by intent: workspace JSON, selected BOM/wire workbooks, and grouped network plan images.
+          JSON above, grouped exports below.
         </p>
         <div className="settings-import-export-grid">
           <div className="settings-import-export-actions-column">
-            <section className="settings-export-package-card" aria-label="Network JSON export actions">
+            <section className="settings-export-package-card settings-export-package-card--top" aria-label="Network JSON export actions">
               <div className="settings-export-package-head">
                 <div>
                   <h3>Network JSON</h3>
-                  <p>Deterministic workspace payloads for active, selected, or full export scopes.</p>
+                  <p>Active, selected, all.</p>
                 </div>
                 <span className="settings-state-chip">JSON</span>
               </div>
-              <div className="row-actions settings-actions settings-export-package-actions">
+              <div className="row-actions settings-actions settings-export-package-actions settings-export-package-actions--standalone">
                 <button type="button" onClick={() => handleExportNetworks("active")} disabled={activeNetworkId === null}>
                   {renderSettingLabel("Export active")}
                 </button>
@@ -710,131 +710,43 @@ export function SettingsWorkspaceContent({
                   {renderSettingLabel("Export all")}
                 </button>
               </div>
-            </section>
-
-            <section className="settings-export-package-card settings-export-package-card--selected" aria-label="Selected networks export package">
-              <div className="settings-export-package-head">
-                <div>
-                  <h3>Export selected</h3>
-                  <p>Selected networks: <strong>{selectedExportCount}</strong>. Generate the exact package you need instead of a long flat action list.</p>
-                </div>
-                <span className={`settings-state-chip${canExportSelectedNetworks ? " is-ok" : ""}`}>
-                  {canExportSelectedNetworks ? `${selectedExportCount} ready` : "Select networks"}
-                </span>
-              </div>
-              <div className="settings-export-package-groups">
-                <div className="settings-export-option-group">
-                  <div className="settings-export-option-copy">
-                    <h4>Network data</h4>
-                    <p>Share the selected networks as importable JSON.</p>
-                  </div>
-                  <button type="button" onClick={() => handleExportNetworks("selected")} disabled={!canExportSelectedNetworks}>
-                    {renderSettingLabel("Export selected JSON")}
-                  </button>
-                </div>
-                <div className="settings-export-option-group">
-                  <div className="settings-export-option-copy">
-                    <h4>BOM</h4>
-                    <p>One XLSX workbook with grouped BOM sheets for the selected networks.</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleExportGroupedBom?.(selectedExportNetworkIds)}
-                    disabled={!canExportSelectedNetworks || handleExportGroupedBom === undefined}
-                  >
-                    {renderSettingLabel("Export selected BOM (XLSX)")}
-                  </button>
-                </div>
-                <div className="settings-export-option-group">
-                  <div className="settings-export-option-copy">
-                    <h4>Wire list</h4>
-                    <p>One XLSX workbook with one wire sheet per selected network.</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleExportGroupedWire?.(selectedExportNetworkIds)}
-                    disabled={!canExportSelectedNetworks || handleExportGroupedWire === undefined}
-                  >
-                    {renderSettingLabel("Export selected wire list (XLSX)")}
-                  </button>
-                </div>
-                <div className="settings-export-option-group settings-export-option-group--plan">
-                  <div className="settings-export-option-copy">
-                    <h4>Network plan</h4>
-                    <p>Render the selected networks as grouped plan exports.</p>
-                  </div>
-                  <div className="row-actions settings-actions settings-export-plan-actions">
-                    <button
-                      type="button"
-                      onClick={() => handleExportGroupedSvg?.(selectedExportNetworkIds)}
-                      disabled={!canExportSelectedNetworks || handleExportGroupedSvg === undefined}
-                    >
-                      {renderSettingLabel("Export selected SVG")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleExportGroupedPng?.(selectedExportNetworkIds)}
-                      disabled={!canExportSelectedNetworks || handleExportGroupedPng === undefined}
-                    >
-                      {renderSettingLabel("Export selected PNG")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleExportGroupedPdf?.(selectedExportNetworkIds)}
-                      disabled={!canExportSelectedNetworks || handleExportGroupedPdf === undefined}
-                    >
-                      {renderSettingLabel("Export selected PDF")}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="settings-export-package-card" aria-label="Network import actions">
-              <div className="settings-export-package-head">
-                <div>
-                  <h3>Import</h3>
-                  <p>Bring in a previously exported JSON file. Existing local data is preserved until you confirm conflict resolution.</p>
-                </div>
-                <span className="settings-state-chip">JSON</span>
-              </div>
-              <div className="row-actions settings-actions settings-export-package-actions">
+              <div className="settings-export-package-footer">
                 <button type="button" onClick={handleOpenImportPicker}>{renderSettingLabel("Import from file")}</button>
-                <input
-                  ref={importFileInputRef}
-                  type="file"
-                  accept="application/json,.json"
-                  onChange={(event) => {
-                    void handleImportFileChange(event);
-                  }}
-                  hidden
-                />
-                {importOverwriteDialog !== null ? (
-                  <ImportOverwriteDialog
-                    isOpen
-                    candidates={importOverwriteDialog.candidates}
-                    onConfirm={importOverwriteDialog.onConfirm}
-                    onCancel={importOverwriteDialog.onCancel}
-                  />
-                ) : null}
-                {importFailureDialog !== null ? (
-                  <FileFeedbackDialog
-                    isOpen={importFailureDialog !== null}
-                    title={importFailureDialog.title}
-                    message={importFailureDialog.message}
-                    items={importFailureDialog.items}
-                    onClose={importFailureDialog.onClose}
-                  />
-                ) : null}
               </div>
+              <input
+                ref={importFileInputRef}
+                type="file"
+                accept="application/json,.json"
+                onChange={(event) => {
+                  void handleImportFileChange(event);
+                }}
+                hidden
+              />
+              {importOverwriteDialog !== null ? (
+                <ImportOverwriteDialog
+                  isOpen
+                  candidates={importOverwriteDialog.candidates}
+                  onConfirm={importOverwriteDialog.onConfirm}
+                  onCancel={importOverwriteDialog.onCancel}
+                />
+              ) : null}
+              {importFailureDialog !== null ? (
+                <FileFeedbackDialog
+                  isOpen={importFailureDialog !== null}
+                  title={importFailureDialog.title}
+                  message={importFailureDialog.message}
+                  items={importFailureDialog.items}
+                  onClose={importFailureDialog.onClose}
+                />
+              ) : null}
             </section>
           </div>
           <fieldset className="inline-fieldset settings-export-fieldset settings-import-export-selection-column">
             <legend>{renderSettingLabel("Selected networks for export")}</legend>
             <p className="meta-line settings-export-selection-summary">
               {canExportSelectedNetworks
-                ? `${selectedExportCount} network${selectedExportCount === 1 ? "" : "s"} selected for the export package.`
-                : "Choose one or more networks to unlock the selected export package."}
+                ? `${selectedExportCount} network${selectedExportCount === 1 ? "" : "s"} selected.`
+                : "Select one or more networks."}
             </p>
             {networks.length === 0 ? (
               <p className="empty-copy">No network available.</p>
@@ -860,6 +772,82 @@ export function SettingsWorkspaceContent({
               </div>
             )}
           </fieldset>
+          <section className="settings-export-package-card settings-export-package-card--selected settings-export-package-card--full" aria-label="Selected networks export package">
+            <div className="settings-export-package-head">
+              <div>
+                <h3>Export selected</h3>
+                <p>Grouped outputs.</p>
+              </div>
+            </div>
+            <div className="settings-export-selected-grid">
+              <article className="settings-export-option-group">
+                <div className="settings-export-option-copy">
+                  <h4>Wire list</h4>
+                  <p>One XLSX workbook.</p>
+                </div>
+                <button
+                  type="button"
+                  className="button-with-icon settings-export-action-button"
+                  onClick={() => handleExportGroupedWire?.(selectedExportNetworkIds)}
+                  disabled={!canExportSelectedNetworks || handleExportGroupedWire === undefined}
+                >
+                  {renderSettingLabel("Export selected wire list (XLSX)")}
+                </button>
+              </article>
+              <article className="settings-export-option-group">
+                <div className="settings-export-option-copy">
+                  <h4>BOM grouped</h4>
+                  <p>One XLSX workbook.</p>
+                </div>
+                <button
+                  type="button"
+                  className="button-with-icon settings-export-action-button"
+                  onClick={() => handleExportGroupedBom?.(selectedExportNetworkIds)}
+                  disabled={!canExportSelectedNetworks || handleExportGroupedBom === undefined}
+                >
+                  {renderSettingLabel("Export selected BOM (XLSX)")}
+                </button>
+              </article>
+              <article className="settings-export-option-group settings-export-option-group--plan">
+                <div className="settings-export-option-copy">
+                  <h4>Network plan</h4>
+                  <p>SVG, PNG, or PDF.</p>
+                </div>
+                <div className="row-actions settings-actions settings-export-plan-actions">
+                  <button
+                    type="button"
+                    className="button-with-icon settings-export-action-button settings-export-plan-button"
+                    onClick={() => handleExportGroupedSvg?.(selectedExportNetworkIds)}
+                    disabled={!canExportSelectedNetworks || handleExportGroupedSvg === undefined}
+                    aria-label="Export selected SVG"
+                  >
+                    <span className="network-summary-export-icon" aria-hidden="true" />
+                    SVG
+                  </button>
+                  <button
+                    type="button"
+                    className="button-with-icon settings-export-action-button settings-export-plan-button"
+                    onClick={() => handleExportGroupedPng?.(selectedExportNetworkIds)}
+                    disabled={!canExportSelectedNetworks || handleExportGroupedPng === undefined}
+                    aria-label="Export selected PNG"
+                  >
+                    <span className="network-summary-export-icon" aria-hidden="true" />
+                    PNG
+                  </button>
+                  <button
+                    type="button"
+                    className="button-with-icon settings-export-action-button settings-export-plan-button"
+                    onClick={() => handleExportGroupedPdf?.(selectedExportNetworkIds)}
+                    disabled={!canExportSelectedNetworks || handleExportGroupedPdf === undefined}
+                    aria-label="Export selected PDF"
+                  >
+                    <span className="network-summary-export-icon" aria-hidden="true" />
+                    PDF
+                  </button>
+                </div>
+              </article>
+            </div>
+          </section>
         </div>
         {importExportStatus !== null ? <p className={`meta-line import-status is-${importExportStatus.kind}`}>{importExportStatus.message}</p> : null}
         {lastImportSummary !== null ? (
@@ -893,117 +881,6 @@ export function SettingsWorkspaceContent({
           </>
         ) : null}
       </section>
-
-      <section id="settings-ai-provider" className="panel settings-panel" data-onboarding-panel="settings-ai-provider">
-        <header className="settings-panel-header">
-          <h2>AI provider</h2>
-          <span className="settings-panel-chip">AI</span>
-        </header>
-        <p className="settings-panel-intro">
-          Configure the local provider used by the Modeling AI Agent. API keys are stored locally in this browser.
-          <span className="settings-info-tooltip">
-            <button type="button" className="settings-info-tooltip-button" aria-label="AI provider API key security notice">
-              i
-            </button>
-            <span className="settings-info-tooltip-popover" role="tooltip">
-              Warning: your API key is kept in this browser&apos;s localStorage and sent directly to the provider over HTTPS.
-              Anyone with access to this browser profile (extensions, shared device) can read it. Avoid using personal or
-              high-privilege keys, and prefer a dedicated proxy when sharing the workspace.
-            </span>
-          </span>
-        </p>
-        <div className="settings-state-row" aria-label="AI provider status">
-          <span className={aiSettings.readiness.isReady ? "settings-state-chip is-ok" : "settings-state-chip is-warn"}>
-            {aiSettings.readiness.isReady ? "Ready" : "Not ready"}
-          </span>
-          <span className="settings-state-chip">{aiSettings.readiness.message}</span>
-        </div>
-        <div className="settings-grid">
-          <label className="settings-field">
-            {renderSettingLabel("Provider")}
-            <select
-              value={aiSettings.settings.provider}
-              onChange={(event) => aiSettings.setProvider(event.target.value as AiProviderId)}
-            >
-              <option value="openai">OpenAI</option>
-              <option value="gemini">Gemini</option>
-            </select>
-          </label>
-          <label className="settings-field">
-            {renderSettingLabel("Model")}
-            <input
-              type="text"
-              value={activeAiProviderConfig.model}
-              onChange={(event) => aiSettings.updateProviderConfig(aiSettings.settings.provider, { model: event.target.value })}
-              placeholder={aiSettings.settings.provider === "openai" ? "gpt-5.5" : "gemini-2.0-flash"}
-            />
-          </label>
-          <label className="settings-field">
-            {renderSettingLabel("API key")}
-            <input
-              type="password"
-              value={activeAiProviderConfig.apiKey}
-              onChange={(event) => aiSettings.updateProviderConfig(aiSettings.settings.provider, { apiKey: event.target.value })}
-              placeholder={`${getAiProviderLabel(aiSettings.settings.provider)} API key`}
-              autoComplete="off"
-            />
-          </label>
-          <label className="settings-field">
-            {renderSettingLabel("Endpoint")}
-            <input
-              type="url"
-              value={activeAiProviderConfig.endpoint}
-              onChange={(event) => aiSettings.updateProviderConfig(aiSettings.settings.provider, { endpoint: event.target.value })}
-            />
-          </label>
-          <label className="settings-field">
-            {renderSettingLabel("Timeout (ms)")}
-            <input
-              type="number"
-              min={5000}
-              max={120000}
-              step={1000}
-              value={String(aiSettings.settings.timeoutMs)}
-              onChange={(event) => {
-                const parsed = Number(event.target.value);
-                if (!Number.isFinite(parsed)) {
-                  return;
-                }
-                aiSettings.setTimeoutMs(Math.min(120000, Math.max(5000, Math.round(parsed))));
-              }}
-            />
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={aiSettings.settings.strictMode}
-              onChange={(event) => aiSettings.setStrictMode(event.target.checked)}
-            />
-            {renderSettingLabel("Strict structured output mode")}
-          </label>
-          <label className="settings-checkbox">
-            <input
-              type="checkbox"
-              checked={aiSettings.settings.experimentalDirectExecutionEnabled}
-              onChange={(event) => aiSettings.setExperimentalDirectExecutionEnabled(event.target.checked)}
-            />
-            {renderSettingLabel("Enable experimental direct execution")}
-          </label>
-        </div>
-        <div className="row-actions settings-actions settings-ai-provider-actions">
-          <button
-            type="button"
-            onClick={() => {
-              void aiSettings.testConnection();
-            }}
-            disabled={!aiSettings.readiness.isReady || aiSettings.connectionTest.status === "testing"}
-          >
-            {renderSettingLabel("Test connection")}
-          </button>
-        </div>
-        <p className="meta-line">{aiSettings.connectionTest.message}</p>
-      </section>
-
       <section id="settings-canvas-render" className="panel settings-panel">
         <header className="settings-panel-header">
           <h2>Canvas render preferences</h2>
@@ -1620,6 +1497,116 @@ export function SettingsWorkspaceContent({
             {renderSettingLabel("Reset sample network to baseline")}
           </button>
         </div>
+      </section>
+
+      <section id="settings-ai-provider" className="panel settings-panel" data-onboarding-panel="settings-ai-provider">
+        <header className="settings-panel-header">
+          <h2>AI provider</h2>
+          <span className="settings-panel-chip">AI</span>
+        </header>
+        <p className="settings-panel-intro">
+          Configure the local provider used by the Modeling AI Agent. API keys are stored locally in this browser.
+          <span className="settings-info-tooltip">
+            <button type="button" className="settings-info-tooltip-button" aria-label="AI provider API key security notice">
+              i
+            </button>
+            <span className="settings-info-tooltip-popover" role="tooltip">
+              Warning: your API key is kept in this browser&apos;s localStorage and sent directly to the provider over HTTPS.
+              Anyone with access to this browser profile (extensions, shared device) can read it. Avoid using personal or
+              high-privilege keys, and prefer a dedicated proxy when sharing the workspace.
+            </span>
+          </span>
+        </p>
+        <div className="settings-state-row" aria-label="AI provider status">
+          <span className={aiSettings.readiness.isReady ? "settings-state-chip is-ok" : "settings-state-chip is-warn"}>
+            {aiSettings.readiness.isReady ? "Ready" : "Not ready"}
+          </span>
+          <span className="settings-state-chip">{aiSettings.readiness.message}</span>
+        </div>
+        <div className="settings-grid">
+          <label className="settings-field">
+            {renderSettingLabel("Provider")}
+            <select
+              value={aiSettings.settings.provider}
+              onChange={(event) => aiSettings.setProvider(event.target.value as AiProviderId)}
+            >
+              <option value="openai">OpenAI</option>
+              <option value="gemini">Gemini</option>
+            </select>
+          </label>
+          <label className="settings-field">
+            {renderSettingLabel("Model")}
+            <input
+              type="text"
+              value={activeAiProviderConfig.model}
+              onChange={(event) => aiSettings.updateProviderConfig(aiSettings.settings.provider, { model: event.target.value })}
+              placeholder={aiSettings.settings.provider === "openai" ? "gpt-5.5" : "gemini-2.0-flash"}
+            />
+          </label>
+          <label className="settings-field">
+            {renderSettingLabel("API key")}
+            <input
+              type="password"
+              value={activeAiProviderConfig.apiKey}
+              onChange={(event) => aiSettings.updateProviderConfig(aiSettings.settings.provider, { apiKey: event.target.value })}
+              placeholder={`${getAiProviderLabel(aiSettings.settings.provider)} API key`}
+              autoComplete="off"
+            />
+          </label>
+          <label className="settings-field">
+            {renderSettingLabel("Endpoint")}
+            <input
+              type="url"
+              value={activeAiProviderConfig.endpoint}
+              onChange={(event) => aiSettings.updateProviderConfig(aiSettings.settings.provider, { endpoint: event.target.value })}
+            />
+          </label>
+          <label className="settings-field">
+            {renderSettingLabel("Timeout (ms)")}
+            <input
+              type="number"
+              min={5000}
+              max={120000}
+              step={1000}
+              value={String(aiSettings.settings.timeoutMs)}
+              onChange={(event) => {
+                const parsed = Number(event.target.value);
+                if (!Number.isFinite(parsed)) {
+                  return;
+                }
+                aiSettings.setTimeoutMs(Math.min(120000, Math.max(5000, Math.round(parsed))));
+              }}
+            />
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={aiSettings.settings.strictMode}
+              onChange={(event) => aiSettings.setStrictMode(event.target.checked)}
+            />
+            {renderSettingLabel("Strict structured output mode")}
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={aiSettings.settings.experimentalDirectExecutionEnabled}
+              onChange={(event) => aiSettings.setExperimentalDirectExecutionEnabled(event.target.checked)}
+            />
+            {renderSettingLabel("Enable experimental direct execution")}
+          </label>
+        </div>
+        <div className="row-actions settings-actions settings-ai-provider-actions">
+          <button
+            type="button"
+            onClick={() => {
+              void aiSettings.testConnection();
+            }}
+            disabled={!aiSettings.readiness.isReady || aiSettings.connectionTest.status === "testing"}
+          >
+            {renderSettingLabel("Test connection")}
+          </button>
+        </div>
+        <p className="meta-line">{aiSettings.connectionTest.message}</p>
       </section>
         </section>
       </div>

@@ -201,6 +201,28 @@ describe("App integration UI - settings", () => {
     expect(within(document.body).queryByRole("heading", { name: "No active network" })).not.toBeInTheDocument();
   });
 
+  it("renders settings panels in the same order as the section navigation", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+
+    const panelHeadings = Array.from(
+      document.querySelectorAll(".settings-section-list > .settings-panel > .settings-panel-header > h2")
+    ).map((heading) => heading.textContent?.trim());
+
+    expect(panelHeadings).toEqual([
+      "Workspace storage",
+      "Import / Export networks",
+      "Canvas render preferences",
+      "Canvas tools preferences",
+      "Appearance preferences",
+      "Global preferences",
+      "Action bar and shortcuts",
+      "Catalog & BOM setup",
+      "Sample network controls",
+      "AI provider"
+    ]);
+  });
+
   it("exposes workspace storage status and file actions in settings", () => {
     renderAppWithState(createUiIntegrationState());
 

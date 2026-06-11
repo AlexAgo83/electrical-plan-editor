@@ -18,48 +18,46 @@
   padding-top: 0;
 }
 
-.settings-workspace .settings-section-list > #settings-canvas-render {
+.settings-workspace .settings-section-list > #settings-workspace-storage {
   order: 1;
   border-top: 0;
   padding-top: 0;
 }
 
-.settings-workspace .settings-section-list > #settings-canvas-tools {
+.settings-workspace .settings-section-list > #settings-import-export {
   order: 2;
 }
 
-.settings-workspace .settings-section-list > #settings-appearance {
+.settings-workspace .settings-section-list > #settings-canvas-render {
   order: 3;
 }
 
-.settings-workspace .settings-section-list > #settings-global-preferences {
+.settings-workspace .settings-section-list > #settings-canvas-tools {
   order: 4;
 }
 
-.settings-workspace .settings-section-list > #settings-shortcuts {
+.settings-workspace .settings-section-list > #settings-appearance {
   order: 5;
 }
 
-.settings-workspace .settings-section-list > #settings-catalog-bom {
+.settings-workspace .settings-section-list > #settings-global-preferences {
   order: 6;
 }
 
-.settings-workspace .settings-section-list > #settings-import-export {
+.settings-workspace .settings-section-list > #settings-shortcuts {
   order: 7;
 }
 
-.settings-workspace .settings-section-list > #settings-sample-network {
+.settings-workspace .settings-section-list > #settings-catalog-bom {
   order: 8;
 }
 
-.settings-workspace .settings-section-list > #settings-ai-provider {
+.settings-workspace .settings-section-list > #settings-sample-network {
   order: 9;
 }
 
-.settings-workspace .settings-section-list > #settings-workspace-storage {
+.settings-workspace .settings-section-list > #settings-ai-provider {
   order: 10;
-  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-  padding-top: 1rem;
 }
 
 .settings-workspace .settings-section-list > .settings-panel > .settings-panel-header {
