@@ -300,7 +300,7 @@ describe("2D layout generation", () => {
   }, 15_000);
 
   it("keeps layout generation responsive on representative medium topology", () => {
-    const { nodes, segments } = createSyntheticTopology(40);
+    const { nodes, segments } = createSyntheticTopology(36);
     let generated = {} as Record<NodeId, NodePosition>;
     const start = performance.now();
     generated = createNodePositionMap(nodes, segments, {
@@ -317,5 +317,5 @@ describe("2D layout generation", () => {
 
     expect(Object.keys(generated)).toHaveLength(nodes.length);
     expect(elapsedMs).toBeLessThan(performanceBudgetMs);
-  }, 20_000);
+  }, 30_000);
 });

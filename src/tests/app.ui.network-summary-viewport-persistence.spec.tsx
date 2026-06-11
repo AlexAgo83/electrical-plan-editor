@@ -110,7 +110,7 @@ describe("App integration UI - network summary viewport persistence", () => {
         `translate(${persistedViewState.offset.x} ${persistedViewState.offset.y}) scale(${persistedViewState.scale})`
       );
     });
-  }, 15000);
+  });
 
   it("restores independent network summary viewport and display toggles per network when switching active network", async () => {
     const base = createUiIntegrationState();
@@ -225,7 +225,7 @@ describe("App integration UI - network summary viewport persistence", () => {
         Lock: true
       });
     });
-  }, 15000);
+  });
 
   it("restores the captured network viewport on undo/redo when the preference is enabled", async () => {
     renderAppWithState(createUiIntegrationState());
@@ -274,7 +274,7 @@ describe("App integration UI - network summary viewport persistence", () => {
       expect(within(wiresPanel).queryByText("Wire 1")).not.toBeInTheDocument();
       expect(getNetworkSummaryViewportTransform(getPanelByHeading("Network summary"))).toBe(viewportBeforeUndo);
     });
-  }, 15000);
+  });
 
   it("keeps the current viewport during undo/redo when viewport restoration is disabled in settings", async () => {
     renderAppWithState(createUiIntegrationState());
@@ -330,5 +330,5 @@ describe("App integration UI - network summary viewport persistence", () => {
       expect(within(wiresPanel).queryByText("Wire 1")).not.toBeInTheDocument();
       expect(getNetworkSummaryViewportTransform(getPanelByHeading("Network summary"))).toBe(viewportBeforeUndo);
     });
-  }, 15000);
+  });
 });
