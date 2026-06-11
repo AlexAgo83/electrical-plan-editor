@@ -64,6 +64,7 @@ interface NetworkSummaryCanvasPanelProps {
   renderedNodes: RenderedNodeModel[];
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
+  showSegmentDressings: boolean;
   inverseLabelScale: number;
   labelRotationDegrees: number;
   zoomInvariantNodeShapes: boolean;
@@ -134,6 +135,7 @@ export function NetworkSummaryCanvasPanel({
   renderedNodes,
   showSegmentNames,
   showSegmentLengths,
+  showSegmentDressings,
   inverseLabelScale,
   labelRotationDegrees,
   zoomInvariantNodeShapes,
@@ -212,6 +214,7 @@ export function NetworkSummaryCanvasPanel({
                 renderedNodes={renderedNodes}
                 showSegmentNames={showSegmentNames}
                 showSegmentLengths={showSegmentLengths}
+                showSegmentDressings={showSegmentDressings}
                 inverseLabelScale={inverseLabelScale}
                 labelRotationDegrees={labelRotationDegrees}
                 zoomInvariantNodeShapes={zoomInvariantNodeShapes}

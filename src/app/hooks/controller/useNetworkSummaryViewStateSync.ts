@@ -28,6 +28,7 @@ function isSameNetworkSummaryViewState(
     left.showNetworkInfoPanels === right.showNetworkInfoPanels &&
     left.showSegmentNames === right.showSegmentNames &&
     left.showSegmentLengths === right.showSegmentLengths &&
+    left.showSegmentDressings === right.showSegmentDressings &&
     left.showCableCallouts === right.showCableCallouts &&
     left.showNetworkGrid === right.showNetworkGrid &&
     left.snapNodesToGrid === right.snapNodesToGrid &&
@@ -80,6 +81,7 @@ export interface UseNetworkSummaryViewStateSyncOptions {
   showNetworkInfoPanels: boolean;
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
+  showSegmentDressings: boolean;
   showCableCallouts: boolean;
   networkCalloutContentMode: NetworkCalloutContentMode;
   showNetworkGrid: boolean;
@@ -91,6 +93,7 @@ export interface UseNetworkSummaryViewStateSyncOptions {
   setShowNetworkInfoPanels: (value: boolean) => void;
   setShowSegmentNames: (value: boolean) => void;
   setShowSegmentLengths: (value: boolean) => void;
+  setShowSegmentDressings: (value: boolean) => void;
   setShowCableCallouts: (value: boolean) => void;
   setNetworkCalloutContentMode: (value: NetworkCalloutContentMode) => void;
   setShowNetworkGrid: (value: boolean) => void;
@@ -127,6 +130,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     showNetworkInfoPanels,
     showSegmentNames,
     showSegmentLengths,
+    showSegmentDressings,
     showCableCallouts,
     networkCalloutContentMode,
     showNetworkGrid,
@@ -138,6 +142,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     setShowNetworkInfoPanels,
     setShowSegmentNames,
     setShowSegmentLengths,
+    setShowSegmentDressings,
     setShowCableCallouts,
     setNetworkCalloutContentMode,
     setShowNetworkGrid,
@@ -152,6 +157,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     showNetworkInfoPanels,
     showSegmentNames,
     showSegmentLengths,
+    showSegmentDressings,
     showCableCallouts,
     networkCalloutContentMode,
     showNetworkGrid,
@@ -168,6 +174,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
           effectiveActiveNetworkSummaryViewState.showNetworkInfoPanels,
           effectiveActiveNetworkSummaryViewState.showSegmentNames,
           effectiveActiveNetworkSummaryViewState.showSegmentLengths,
+          effectiveActiveNetworkSummaryViewState.showSegmentDressings,
           effectiveActiveNetworkSummaryViewState.showCableCallouts,
           effectiveActiveNetworkSummaryViewState.showNetworkGrid,
           effectiveActiveNetworkSummaryViewState.snapNodesToGrid,
@@ -202,6 +209,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
       showNetworkInfoPanels,
       showSegmentNames,
       showSegmentLengths,
+      showSegmentDressings,
       showCableCallouts,
       networkCalloutContentMode,
       showNetworkGrid,
@@ -214,6 +222,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     showNetworkInfoPanels,
     showSegmentNames,
     showSegmentLengths,
+    showSegmentDressings,
     showCableCallouts,
     networkCalloutContentMode,
     showNetworkGrid,
@@ -267,6 +276,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     const nextShowSegmentNames = effectiveActiveNetworkSummaryViewState?.showSegmentNames ?? canvasDefaultShowSegmentNames;
     const nextShowSegmentLengths =
       effectiveActiveNetworkSummaryViewState?.showSegmentLengths ?? canvasDefaultShowSegmentLengths;
+    const nextShowSegmentDressings = effectiveActiveNetworkSummaryViewState?.showSegmentDressings ?? true;
     const nextShowCableCallouts =
       effectiveActiveNetworkSummaryViewState?.showCableCallouts ?? canvasDefaultShowCableCallouts;
     const nextCalloutContentMode = canvasDefaultCalloutContentMode;
@@ -297,6 +307,10 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     if (localView.showSegmentLengths !== nextShowSegmentLengths) {
       didScheduleRestore = true;
       setShowSegmentLengths(nextShowSegmentLengths);
+    }
+    if (localView.showSegmentDressings !== nextShowSegmentDressings) {
+      didScheduleRestore = true;
+      setShowSegmentDressings(nextShowSegmentDressings);
     }
     if (localView.showCableCallouts !== nextShowCableCallouts) {
       didScheduleRestore = true;
@@ -348,6 +362,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     setShowNetworkInfoPanels,
     setShowSegmentNames,
     setShowSegmentLengths,
+    setShowSegmentDressings,
     setShowCableCallouts,
     setNetworkCalloutContentMode,
     setShowNetworkGrid,
@@ -386,6 +401,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
       showNetworkInfoPanels: showNetworkInfoPanels,
       showSegmentNames: showSegmentNames,
       showSegmentLengths: showSegmentLengths,
+      showSegmentDressings: showSegmentDressings,
       showCableCallouts: showCableCallouts,
       showNetworkGrid: showNetworkGrid,
       snapNodesToGrid: snapNodesToGrid,
@@ -398,6 +414,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
       nextViewState.showNetworkInfoPanels === canvasDefaultShowInfoPanels &&
       nextViewState.showSegmentNames === canvasDefaultShowSegmentNames &&
       nextViewState.showSegmentLengths === canvasDefaultShowSegmentLengths &&
+      nextViewState.showSegmentDressings === true &&
       nextViewState.showCableCallouts === canvasDefaultShowCableCallouts &&
       nextViewState.showNetworkGrid === canvasDefaultShowGrid &&
       nextViewState.snapNodesToGrid === canvasDefaultSnapToGrid &&
@@ -445,6 +462,7 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     showNetworkInfoPanels,
     showSegmentNames,
     showSegmentLengths,
+    showSegmentDressings,
     showCableCallouts,
     showNetworkGrid,
     snapNodesToGrid,

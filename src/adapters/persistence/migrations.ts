@@ -163,16 +163,20 @@ function normalizeNetworkSummaryViewState(candidate: unknown): NetworkSummaryVie
   const showNetworkInfoPanels = candidate.showNetworkInfoPanels;
   const showSegmentNames = candidate.showSegmentNames;
   const showSegmentLengths = candidate.showSegmentLengths;
+  const showSegmentDressings = candidate.showSegmentDressings;
   const showCableCallouts = candidate.showCableCallouts;
   const showNetworkGrid = candidate.showNetworkGrid;
   const snapNodesToGrid = candidate.snapNodesToGrid;
   const lockEntityMovement = candidate.lockEntityMovement;
   const normalizedShowSegmentNames =
     showSegmentNames === undefined ? false : typeof showSegmentNames === "boolean" ? showSegmentNames : null;
+  const normalizedShowSegmentDressings =
+    showSegmentDressings === undefined ? true : typeof showSegmentDressings === "boolean" ? showSegmentDressings : null;
   if (
     typeof showNetworkInfoPanels !== "boolean" ||
     normalizedShowSegmentNames === null ||
     typeof showSegmentLengths !== "boolean" ||
+    normalizedShowSegmentDressings === null ||
     typeof showCableCallouts !== "boolean" ||
     typeof showNetworkGrid !== "boolean" ||
     typeof snapNodesToGrid !== "boolean" ||
@@ -187,6 +191,7 @@ function normalizeNetworkSummaryViewState(candidate: unknown): NetworkSummaryVie
     showNetworkInfoPanels,
     showSegmentNames: normalizedShowSegmentNames,
     showSegmentLengths,
+    showSegmentDressings: normalizedShowSegmentDressings,
     showCableCallouts,
     showNetworkGrid,
     snapNodesToGrid,

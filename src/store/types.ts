@@ -121,6 +121,7 @@ export interface NetworkSummaryViewState {
   showNetworkInfoPanels: boolean;
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
+  showSegmentDressings: boolean;
   showCableCallouts: boolean;
   calloutContentMode?: "wireDetails" | "connectorDrawing" | "both";
   showNetworkGrid: boolean;

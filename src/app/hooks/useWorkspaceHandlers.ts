@@ -53,6 +53,7 @@ export function useWorkspaceHandlers({
   networkViewHeight,
   setNetworkScale,
   setNetworkOffset,
+  showSegmentDressings,
   showCableCallouts,
   networkCalloutTextSize,
   setShowNetworkGrid,
@@ -61,6 +62,7 @@ export function useWorkspaceHandlers({
   setShowNetworkInfoPanels,
   setShowSegmentNames,
   setShowSegmentLengths,
+  setShowSegmentDressings,
   setShowCableCallouts,
   setNetworkCalloutContentMode,
   setShowSelectedCalloutOnly,
@@ -375,6 +377,7 @@ export function useWorkspaceHandlers({
       configuredResetScale,
       networkViewWidth,
       networkViewHeight,
+      showSegmentDressings,
       showCableCallouts,
       networkCalloutTextSize,
       setCanvasGlobalRenderScalePercent,
@@ -393,6 +396,7 @@ export function useWorkspaceHandlers({
       configuredResetScale,
       networkViewWidth,
       networkViewHeight,
+      showSegmentDressings,
       showCableCallouts,
       networkCalloutTextSize,
       setCanvasGlobalRenderScalePercent,
@@ -455,6 +459,7 @@ export function useWorkspaceHandlers({
     setShowNetworkInfoPanels(true);
     setShowSegmentNames(false);
     setShowSegmentLengths(true);
+    setShowSegmentDressings(true);
     setShowCableCallouts(false);
     setNetworkCalloutContentMode("wireDetails");
     setShowSelectedCalloutOnly(false);

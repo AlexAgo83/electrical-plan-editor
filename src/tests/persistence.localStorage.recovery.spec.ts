@@ -518,6 +518,7 @@ describe("localStorage persistence adapter - migration recovery and sidecars", (
       showNetworkInfoPanels: false,
       showSegmentNames: true,
       showSegmentLengths: true,
+      showSegmentDressings: true,
       showCableCallouts: true,
       showNetworkGrid: false,
       snapNodesToGrid: false,

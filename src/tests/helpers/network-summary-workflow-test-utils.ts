@@ -92,9 +92,9 @@ export function openEditMenu(panel: HTMLElement): void {
 
 export function getDisplayToggleButton(
   panel: HTMLElement,
-  label: "Info" | "Length" | "Callouts" | "Grid" | "Snap" | "Lock"
+  label: "Info" | "Length" | "Dressings" | "Callouts" | "Grid" | "Snap" | "Lock"
 ): HTMLButtonElement {
-  if (label === "Info" || label === "Length" || label === "Callouts") {
+  if (label === "Info" || label === "Length" || label === "Dressings" || label === "Callouts") {
     openViewMenu(panel);
   } else {
     openEditMenu(panel);
@@ -200,7 +200,7 @@ export function panNetworkSummaryViewport(
 
 export function expectDisplayToggles(
   panel: HTMLElement,
-  expected: Record<"Info" | "Length" | "Callouts" | "Grid" | "Snap" | "Lock", boolean>
+  expected: Record<"Info" | "Length" | "Dressings" | "Callouts" | "Grid" | "Snap" | "Lock", boolean>
 ): void {
   (Object.entries(expected) as Array<[keyof typeof expected, boolean]>).forEach(([label, isActive]) => {
     const button = getDisplayToggleButton(panel, label);

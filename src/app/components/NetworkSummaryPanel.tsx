@@ -50,6 +50,7 @@ export function NetworkSummaryPanel({
   showNetworkInfoPanels,
   showSegmentNames,
   showSegmentLengths,
+  showSegmentDressings,
   showCableCallouts,
   calloutContentMode,
   showSelectedCalloutOnly,
@@ -84,6 +85,7 @@ export function NetworkSummaryPanel({
   lockEntityMovement,
   toggleShowNetworkInfoPanels,
   toggleShowSegmentLengths,
+  toggleShowSegmentDressings,
   toggleShowCableCallouts,
   toggleShowFloatingInspectorPanel,
   openInspectorForCanvasSelection,
@@ -783,6 +785,7 @@ export function NetworkSummaryPanel({
           showFloatingInspectorPanel={showFloatingInspectorPanel}
           showNetworkInfoPanels={showNetworkInfoPanels}
           showSegmentLengths={showSegmentLengths}
+          showSegmentDressings={showSegmentDressings}
           showCableCallouts={showCableCallouts}
           canExportSvg={nodes.length > 0}
           canExportPng={nodes.length > 0}
@@ -796,6 +799,7 @@ export function NetworkSummaryPanel({
           toggleShowFloatingInspectorPanel={toggleShowFloatingInspectorPanel}
           toggleShowNetworkInfoPanels={toggleShowNetworkInfoPanels}
           toggleShowSegmentLengths={toggleShowSegmentLengths}
+          toggleShowSegmentDressings={toggleShowSegmentDressings}
           toggleShowCableCallouts={toggleShowCableCallouts}
           onRegenerateLayout={onRegenerateLayout}
           onOpenCurrentNetworkFunctional={onOpenCurrentNetworkFunctional}
@@ -857,6 +861,7 @@ export function NetworkSummaryPanel({
           renderedNodes={renderedNodes}
           showSegmentNames={showSegmentNames}
           showSegmentLengths={showSegmentLengths}
+          showSegmentDressings={showSegmentDressings}
           inverseLabelScale={inverseLabelScale}
           labelRotationDegrees={labelRotationDegrees}
           zoomInvariantNodeShapes={zoomInvariantNodeShapes}

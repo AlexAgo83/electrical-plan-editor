@@ -14,6 +14,7 @@ interface NetworkSummaryHeaderProps {
   showFloatingInspectorPanel: boolean;
   showNetworkInfoPanels: boolean;
   showSegmentLengths: boolean;
+  showSegmentDressings: boolean;
   showCableCallouts: boolean;
   canExportSvg: boolean;
   canExportPng: boolean;
@@ -27,6 +28,7 @@ interface NetworkSummaryHeaderProps {
   toggleShowFloatingInspectorPanel: () => void;
   toggleShowNetworkInfoPanels: () => void;
   toggleShowSegmentLengths: () => void;
+  toggleShowSegmentDressings: () => void;
   toggleShowCableCallouts: () => void;
   onRegenerateLayout: () => void;
   onOpenCurrentNetworkFunctional?: () => void;
@@ -47,6 +49,7 @@ export function NetworkSummaryHeader({
   showFloatingInspectorPanel,
   showNetworkInfoPanels,
   showSegmentLengths,
+  showSegmentDressings,
   showCableCallouts,
   canExportSvg,
   canExportPng,
@@ -60,6 +63,7 @@ export function NetworkSummaryHeader({
   toggleShowFloatingInspectorPanel,
   toggleShowNetworkInfoPanels,
   toggleShowSegmentLengths,
+  toggleShowSegmentDressings,
   toggleShowCableCallouts,
   onRegenerateLayout,
   onOpenCurrentNetworkFunctional,
@@ -125,10 +129,12 @@ export function NetworkSummaryHeader({
           showFloatingInspectorPanel={showFloatingInspectorPanel}
           showNetworkInfoPanels={showNetworkInfoPanels}
           showSegmentLengths={showSegmentLengths}
+          showSegmentDressings={showSegmentDressings}
           showCableCallouts={showCableCallouts}
           toggleShowFloatingInspectorPanel={toggleShowFloatingInspectorPanel}
           toggleShowNetworkInfoPanels={toggleShowNetworkInfoPanels}
           toggleShowSegmentLengths={toggleShowSegmentLengths}
+          toggleShowSegmentDressings={toggleShowSegmentDressings}
           toggleShowCableCallouts={toggleShowCableCallouts}
         />
         {onOpenCurrentNetworkFunctional === undefined ? null : (

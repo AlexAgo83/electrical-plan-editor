@@ -62,6 +62,7 @@ export interface UseWorkspaceHandlersParams {
   networkViewHeight: number;
   setNetworkScale: (value: number) => void;
   setNetworkOffset: (value: NodePosition) => void;
+  showSegmentDressings: boolean;
   showCableCallouts: boolean;
   networkCalloutTextSize: CanvasCalloutTextSize;
   setShowNetworkGrid: (value: boolean | ((current: boolean) => boolean)) => void;
@@ -70,6 +71,7 @@ export interface UseWorkspaceHandlersParams {
   setShowNetworkInfoPanels: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowSegmentNames: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowSegmentLengths: (value: boolean | ((current: boolean) => boolean)) => void;
+  setShowSegmentDressings: (value: boolean | ((current: boolean) => boolean)) => void;
   setShowCableCallouts: (value: boolean | ((current: boolean) => boolean)) => void;
   setNetworkCalloutContentMode: (
     value: NetworkCalloutContentMode | ((current: NetworkCalloutContentMode) => NetworkCalloutContentMode)

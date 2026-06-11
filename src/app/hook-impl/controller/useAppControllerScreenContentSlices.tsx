@@ -47,6 +47,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   | "autoSegmentLabelRotation"
   | "toggleShowNetworkInfoPanels"
   | "toggleShowSegmentLengths"
+  | "toggleShowSegmentDressings"
   | "toggleShowCableCallouts"
   | "toggleShowFloatingInspectorPanel"
   | "openInspectorForCanvasSelection"
@@ -70,6 +71,7 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
   setShowNetworkGrid: BooleanStateSetter;
   setSnapNodesToGrid: BooleanStateSetter;
   setLockEntityMovement: BooleanStateSetter;
+  setShowSegmentDressings: BooleanStateSetter;
   networkLabelStrokeMode: NetworkSummaryPanelProps["labelStrokeMode"];
   networkLabelSizeMode: NetworkSummaryPanelProps["labelSizeMode"];
   networkCalloutTextSize: NetworkSummaryPanelProps["calloutTextSize"];
@@ -201,6 +203,7 @@ export function buildNetworkSummaryPanelControllerSlice(
     showNetworkInfoPanels: params.showNetworkInfoPanels,
     showSegmentNames: params.showSegmentNames,
     showSegmentLengths: params.showSegmentLengths,
+    showSegmentDressings: params.showSegmentDressings,
     showCableCallouts: params.showCableCallouts,
     calloutContentMode: params.networkCalloutContentMode,
     showSelectedCalloutOnly: params.showSelectedCalloutOnly,
@@ -234,6 +237,8 @@ export function buildNetworkSummaryPanelControllerSlice(
       params.setShowNetworkInfoPanels((current: boolean) => !current),
     toggleShowSegmentLengths: () =>
       params.setShowSegmentLengths((current: boolean) => !current),
+    toggleShowSegmentDressings: () =>
+      params.setShowSegmentDressings((current: boolean) => !current),
     toggleShowCableCallouts: () =>
       params.setShowCableCallouts((current: boolean) => !current),
     toggleShowFloatingInspectorPanel: () =>

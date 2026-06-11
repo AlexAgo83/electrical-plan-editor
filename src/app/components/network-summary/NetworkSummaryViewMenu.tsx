@@ -4,10 +4,12 @@ interface NetworkSummaryViewMenuProps {
   showFloatingInspectorPanel: boolean;
   showNetworkInfoPanels: boolean;
   showSegmentLengths: boolean;
+  showSegmentDressings: boolean;
   showCableCallouts: boolean;
   toggleShowFloatingInspectorPanel: () => void;
   toggleShowNetworkInfoPanels: () => void;
   toggleShowSegmentLengths: () => void;
+  toggleShowSegmentDressings: () => void;
   toggleShowCableCallouts: () => void;
 }
 
@@ -15,10 +17,12 @@ export function NetworkSummaryViewMenu({
   showFloatingInspectorPanel,
   showNetworkInfoPanels,
   showSegmentLengths,
+  showSegmentDressings,
   showCableCallouts,
   toggleShowFloatingInspectorPanel,
   toggleShowNetworkInfoPanels,
   toggleShowSegmentLengths,
+  toggleShowSegmentDressings,
   toggleShowCableCallouts
 }: NetworkSummaryViewMenuProps): ReactElement {
   const [open, setOpen] = useState(false);
@@ -74,6 +78,14 @@ export function NetworkSummaryViewMenu({
           >
             <span className="network-summary-length-icon" aria-hidden="true" />
             Length
+          </button>
+          <button
+            type="button"
+            className={showSegmentDressings ? "network-summary-view-menu-item is-active" : "network-summary-view-menu-item"}
+            onClick={toggleShowSegmentDressings}
+          >
+            <span className="network-summary-callouts-icon" aria-hidden="true" />
+            Dressings
           </button>
           <button
             type="button"

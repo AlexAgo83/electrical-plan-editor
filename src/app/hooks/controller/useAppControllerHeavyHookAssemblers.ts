@@ -47,6 +47,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
   >;
   canvasDefaults: Pick<
     WorkspaceHandlersParams,
+    | "showSegmentDressings"
     | "showCableCallouts"
     | "networkCalloutTextSize"
     | "setShowNetworkGrid"
@@ -55,6 +56,7 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setShowNetworkInfoPanels"
     | "setShowSegmentNames"
     | "setShowSegmentLengths"
+    | "setShowSegmentDressings"
     | "setShowCableCallouts"
     | "setNetworkCalloutContentMode"
     | "setShowSelectedCalloutOnly"

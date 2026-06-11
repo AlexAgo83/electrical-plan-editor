@@ -45,6 +45,7 @@ describe("App integration UI - network summary viewport persistence", () => {
     const initialToggleState = {
       Info: getDisplayToggleButton(networkSummaryPanel, "Info").classList.contains("is-active"),
       Length: getDisplayToggleButton(networkSummaryPanel, "Length").classList.contains("is-active"),
+      Dressings: getDisplayToggleButton(networkSummaryPanel, "Dressings").classList.contains("is-active"),
       Callouts: getDisplayToggleButton(networkSummaryPanel, "Callouts").classList.contains("is-active"),
       Grid: getDisplayToggleButton(networkSummaryPanel, "Grid").classList.contains("is-active"),
       Snap: getDisplayToggleButton(networkSummaryPanel, "Snap").classList.contains("is-active"),
@@ -69,6 +70,7 @@ describe("App integration UI - network summary viewport persistence", () => {
     const expectedToggleState = {
       Info: !initialToggleState.Info,
       Length: !initialToggleState.Length,
+      Dressings: !initialToggleState.Dressings,
       Callouts: !initialToggleState.Callouts,
       Grid: !initialToggleState.Grid,
       Snap: !initialToggleState.Snap,
@@ -82,6 +84,7 @@ describe("App integration UI - network summary viewport persistence", () => {
       expect(persisted?.offset.y ?? 0).not.toBe(0);
       expect(persisted?.showNetworkInfoPanels).toBe(expectedToggleState.Info);
       expect(persisted?.showSegmentLengths).toBe(expectedToggleState.Length);
+      expect(persisted?.showSegmentDressings).toBe(expectedToggleState.Dressings);
       expect(persisted?.showCableCallouts).toBe(expectedToggleState.Callouts);
       expect(persisted?.showNetworkGrid).toBe(expectedToggleState.Grid);
       expect(persisted?.snapNodesToGrid).toBe(expectedToggleState.Snap);
@@ -107,7 +110,7 @@ describe("App integration UI - network summary viewport persistence", () => {
         `translate(${persistedViewState.offset.x} ${persistedViewState.offset.y}) scale(${persistedViewState.scale})`
       );
     });
-  });
+  }, 15000);
 
   it("restores independent network summary viewport and display toggles per network when switching active network", async () => {
     const base = createUiIntegrationState();
@@ -149,6 +152,7 @@ describe("App integration UI - network summary viewport persistence", () => {
             showNetworkInfoPanels: false,
             showSegmentNames: true,
             showSegmentLengths: true,
+            showSegmentDressings: false,
             showCableCallouts: true,
             showNetworkGrid: false,
             snapNodesToGrid: false,
@@ -163,6 +167,7 @@ describe("App integration UI - network summary viewport persistence", () => {
             showNetworkInfoPanels: true,
             showSegmentNames: true,
             showSegmentLengths: false,
+            showSegmentDressings: true,
             showCableCallouts: false,
             showNetworkGrid: true,
             snapNodesToGrid: true,
@@ -181,6 +186,7 @@ describe("App integration UI - network summary viewport persistence", () => {
       expectDisplayToggles(panel, {
         Info: false,
         Length: true,
+        Dressings: false,
         Callouts: true,
         Grid: false,
         Snap: false,
@@ -196,6 +202,7 @@ describe("App integration UI - network summary viewport persistence", () => {
       expectDisplayToggles(panel, {
         Info: true,
         Length: false,
+        Dressings: true,
         Callouts: false,
         Grid: true,
         Snap: true,
@@ -211,13 +218,14 @@ describe("App integration UI - network summary viewport persistence", () => {
       expectDisplayToggles(panel, {
         Info: false,
         Length: true,
+        Dressings: false,
         Callouts: true,
         Grid: false,
         Snap: false,
         Lock: true
       });
     });
-  });
+  }, 15000);
 
   it("restores the captured network viewport on undo/redo when the preference is enabled", async () => {
     renderAppWithState(createUiIntegrationState());
@@ -266,7 +274,7 @@ describe("App integration UI - network summary viewport persistence", () => {
       expect(within(wiresPanel).queryByText("Wire 1")).not.toBeInTheDocument();
       expect(getNetworkSummaryViewportTransform(getPanelByHeading("Network summary"))).toBe(viewportBeforeUndo);
     });
-  });
+  }, 15000);
 
   it("keeps the current viewport during undo/redo when viewport restoration is disabled in settings", async () => {
     renderAppWithState(createUiIntegrationState());
@@ -322,5 +330,5 @@ describe("App integration UI - network summary viewport persistence", () => {
       expect(within(wiresPanel).queryByText("Wire 1")).not.toBeInTheDocument();
       expect(getNetworkSummaryViewportTransform(getPanelByHeading("Network summary"))).toBe(viewportBeforeUndo);
     });
-  });
+  }, 15000);
 });

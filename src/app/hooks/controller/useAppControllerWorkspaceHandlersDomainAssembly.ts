@@ -88,6 +88,7 @@ export function useAppControllerWorkspaceHandlersDomainAssembly({
       ...workspace
     },
     canvasDefaults: {
+      showSegmentDressings: canvasDisplayState.showSegmentDressings,
       showCableCallouts: canvasDisplayState.showCableCallouts,
       networkCalloutTextSize: canvasDisplayState.networkCalloutTextSize,
       setShowNetworkGrid: canvasViewportSetters.setShowNetworkGrid,
@@ -96,6 +97,7 @@ export function useAppControllerWorkspaceHandlersDomainAssembly({
       setShowNetworkInfoPanels: canvasDisplayState.setShowNetworkInfoPanels,
       setShowSegmentNames: canvasDisplayState.setShowSegmentNames,
       setShowSegmentLengths: canvasDisplayState.setShowSegmentLengths,
+      setShowSegmentDressings: canvasDisplayState.setShowSegmentDressings,
       setShowCableCallouts: canvasDisplayState.setShowCableCallouts,
       setNetworkCalloutContentMode: canvasDisplayState.setNetworkCalloutContentMode,
       setShowSelectedCalloutOnly: canvasDisplayState.setShowSelectedCalloutOnly,

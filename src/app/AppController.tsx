@@ -96,7 +96,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const { routePreviewStartNodeId, setRoutePreviewStartNodeId, routePreviewEndNodeId, setRoutePreviewEndNodeId } =
     canvasDisplayState;
   const { showNetworkInfoPanels, setShowNetworkInfoPanels, showSegmentNames, setShowSegmentNames } = canvasDisplayState;
-  const { showSegmentLengths, setShowSegmentLengths, showCableCallouts, setShowCableCallouts } = canvasDisplayState;
+  const { showSegmentLengths, setShowSegmentLengths, showSegmentDressings, setShowSegmentDressings } = canvasDisplayState;
+  const { showCableCallouts, setShowCableCallouts } = canvasDisplayState;
   const { networkCalloutContentMode, setNetworkCalloutContentMode, canvasResetZoomPercentInput } = canvasDisplayState;
   const { setNetworkLabelSizeMode, setNetworkCalloutTextSize, setNetworkLabelRotationDegrees, setNetworkAutoSegmentLabelRotation } =
     canvasDisplayState;
@@ -507,6 +508,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     showNetworkInfoPanels,
     showSegmentNames,
     showSegmentLengths,
+    showSegmentDressings,
     showCableCallouts,
     networkCalloutContentMode,
     showNetworkGrid,
@@ -518,6 +520,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setShowNetworkInfoPanels,
     setShowSegmentNames,
     setShowSegmentLengths,
+    setShowSegmentDressings,
     setShowCableCallouts,
     setNetworkCalloutContentMode,
     setShowNetworkGrid,

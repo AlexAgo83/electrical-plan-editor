@@ -43,6 +43,7 @@ interface NetworkSummaryGraphLayersProps {
   renderedNodes: RenderedNodeModel[];
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
+  showSegmentDressings: boolean;
   inverseLabelScale: number;
   labelRotationDegrees: number;
   zoomInvariantNodeShapes: boolean;
@@ -130,6 +131,7 @@ export function NetworkSummaryGraphLayers({
   renderedNodes,
   showSegmentNames,
   showSegmentLengths,
+  showSegmentDressings,
   inverseLabelScale,
   labelRotationDegrees,
   zoomInvariantNodeShapes,
@@ -541,18 +543,34 @@ export function NetworkSummaryGraphLayers({
                   </text>
                 </g>
               ) : null}
-              {mountingLabels.map((label) => (
-                <g
-                  key={label.key}
-                  className="network-segment-mounting-label-anchor"
-                  transform={`translate(${label.x} ${label.y}) scale(${inverseLabelScale})`}
-                >
-                  <rect className="network-segment-mounting-label-frame" x={-22} y={-8} width={44} height={16} rx={3} ry={3} />
-                  <text className="network-segment-mounting-label-text" x={0} y={0} textAnchor="middle" dominantBaseline="middle">
-                    {label.text}
-                  </text>
-                </g>
-              ))}
+              {showSegmentDressings
+                ? mountingLabels.map((label) => (
+                    <g
+                      key={label.key}
+                      className="network-segment-mounting-label-anchor"
+                      transform={`translate(${label.x} ${label.y}) scale(${inverseLabelScale})`}
+                    >
+                      <rect
+                        className="network-segment-mounting-label-frame"
+                        x={-22}
+                        y={-8}
+                        width={44}
+                        height={16}
+                        rx={3}
+                        ry={3}
+                      />
+                      <text
+                        className="network-segment-mounting-label-text"
+                        x={0}
+                        y={0}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                      >
+                        {label.text}
+                      </text>
+                    </g>
+                  ))
+                : null}
             </g>
           )
         )}
@@ -623,7 +641,7 @@ export function NetworkSummaryGraphLayers({
         className="network-graph-layer network-graph-layer-callouts network-graph-layer-segment-callouts"
         transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}
       >
-        {renderedSegments.map(renderSegmentCallout)}
+        {showSegmentDressings ? renderedSegments.map(renderSegmentCallout) : null}
       </g>
     </>
   );

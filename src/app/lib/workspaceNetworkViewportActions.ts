@@ -12,6 +12,7 @@ interface WorkspaceNetworkViewportParams {
   configuredResetScale: number;
   networkViewWidth: number;
   networkViewHeight: number;
+  showSegmentDressings: boolean;
   showCableCallouts: boolean;
   networkCalloutTextSize: CanvasCalloutTextSize;
   setCanvasGlobalRenderScalePercent: (value: number) => void;
@@ -119,17 +120,19 @@ export function fitNetworkToContent(params: WorkspaceNetworkViewportParams): voi
       bounds.maxY = Math.max(bounds.maxY, persistedPosition.y + calloutHalfHeight);
     }
   }
-  const segmentCalloutHalfWidth = 120;
-  const segmentCalloutHalfHeight = 24;
-  for (const segment of params.segments) {
-    const persistedPosition = segment.sheathCalloutPosition;
-    if (persistedPosition === undefined) {
-      continue;
+  if (params.showSegmentDressings) {
+    const segmentCalloutHalfWidth = 120;
+    const segmentCalloutHalfHeight = 24;
+    for (const segment of params.segments) {
+      const persistedPosition = segment.sheathCalloutPosition;
+      if (persistedPosition === undefined) {
+        continue;
+      }
+      bounds.minX = Math.min(bounds.minX, persistedPosition.x - segmentCalloutHalfWidth);
+      bounds.maxX = Math.max(bounds.maxX, persistedPosition.x + segmentCalloutHalfWidth);
+      bounds.minY = Math.min(bounds.minY, persistedPosition.y - segmentCalloutHalfHeight);
+      bounds.maxY = Math.max(bounds.maxY, persistedPosition.y + segmentCalloutHalfHeight);
     }
-    bounds.minX = Math.min(bounds.minX, persistedPosition.x - segmentCalloutHalfWidth);
-    bounds.maxX = Math.max(bounds.maxX, persistedPosition.x + segmentCalloutHalfWidth);
-    bounds.minY = Math.min(bounds.minY, persistedPosition.y - segmentCalloutHalfHeight);
-    bounds.maxY = Math.max(bounds.maxY, persistedPosition.y + segmentCalloutHalfHeight);
   }
   const fittedViewport = computeNetworkFitViewportForBounds({
     bounds,

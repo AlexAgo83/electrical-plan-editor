@@ -40,6 +40,7 @@ export interface NetworkSummaryPanelProps {
   showNetworkInfoPanels: boolean;
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
+  showSegmentDressings: boolean;
   showCableCallouts: boolean;
   calloutContentMode: NetworkCalloutContentMode;
   showSelectedCalloutOnly: boolean;
@@ -74,6 +75,7 @@ export interface NetworkSummaryPanelProps {
   lockEntityMovement: boolean;
   toggleShowNetworkInfoPanels: () => void;
   toggleShowSegmentLengths: () => void;
+  toggleShowSegmentDressings: () => void;
   toggleShowCableCallouts: () => void;
   toggleShowFloatingInspectorPanel: () => void;
   openInspectorForCanvasSelection: () => void;

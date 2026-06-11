@@ -39,6 +39,7 @@ function isSameNetworkSummaryViewState(
     left.showNetworkInfoPanels === right.showNetworkInfoPanels &&
     left.showSegmentNames === right.showSegmentNames &&
     left.showSegmentLengths === right.showSegmentLengths &&
+    left.showSegmentDressings === right.showSegmentDressings &&
     left.showCableCallouts === right.showCableCallouts &&
     left.calloutContentMode === right.calloutContentMode &&
     left.showNetworkGrid === right.showNetworkGrid &&

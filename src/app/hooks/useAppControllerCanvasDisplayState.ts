@@ -13,6 +13,7 @@ export function useAppControllerCanvasDisplayState() {
   const [showNetworkInfoPanels, setShowNetworkInfoPanels] = useState(true);
   const [showSegmentNames, setShowSegmentNames] = useState(false);
   const [showSegmentLengths, setShowSegmentLengths] = useState(true);
+  const [showSegmentDressings, setShowSegmentDressings] = useState(true);
   const [showCableCallouts, setShowCableCallouts] = useState(false);
   const [networkCalloutContentMode, setNetworkCalloutContentMode] = useState<NetworkCalloutContentMode>("wireDetails");
   const [showSelectedCalloutOnly, setShowSelectedCalloutOnly] = useState(false);
@@ -34,6 +35,8 @@ export function useAppControllerCanvasDisplayState() {
     setShowSegmentNames,
     showSegmentLengths,
     setShowSegmentLengths,
+    showSegmentDressings,
+    setShowSegmentDressings,
     showCableCallouts,
     setShowCableCallouts,
     networkCalloutContentMode,
