@@ -53,7 +53,7 @@ describe("App integration UI - settings search", () => {
       switchScreenDrawerAware("settings");
 
       const settingsNavigation = screen.getByRole("navigation", { name: "Settings sections" });
-      expect(within(settingsNavigation).getByRole("button", { name: "Canvas render preferences" })).toHaveAttribute("aria-current", "location");
+      expect(within(settingsNavigation).getByRole("button", { name: "Workspace storage" })).toHaveAttribute("aria-current", "location");
 
       const catalogSectionButton = within(settingsNavigation).getByRole("button", { name: "Catalog & BOM setup" });
       fireEvent.click(catalogSectionButton);

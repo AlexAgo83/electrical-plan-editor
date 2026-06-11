@@ -368,15 +368,6 @@ export function useNetworkImportExport({
           allSheets.push({ ...sheet, name: `${prefix} ${shortSheetName}` });
         }
 
-        allSheets.push(
-          buildWireListSheet(
-            `${prefix} Wires`,
-            wires,
-            connectors,
-            splices,
-            catalogItems
-          )
-        );
       }
 
       if (allSheets.length === 0) {
@@ -391,6 +382,68 @@ export function useNetworkImportExport({
         namedNetworks.length === 1 ? `bom-${namedNetworks[0]}` : `bom-grouped-${networkIds.length}-networks`;
       await downloadTabularWorkbookFile(exportBaseName, allSheets);
       setImportExportStatus({ kind: "success", message: `Exported grouped BOM for ${networkIds.length} network(s).` });
+    })();
+  }
+
+  function handleExportGroupedWire(networkIds: NetworkId[]): void {
+    if (networkIds.length === 0) {
+      return;
+    }
+    void (async () => {
+      const state = store.getState();
+      const usedPrefixes = new Set<string>();
+
+      function buildSheetPrefix(technicalId: string): string {
+        const sanitized = technicalId.replace(/[:\\/?*[\]]/g, "_").slice(0, 18);
+        if (!usedPrefixes.has(sanitized)) {
+          usedPrefixes.add(sanitized);
+          return sanitized;
+        }
+        let index = 2;
+        while (usedPrefixes.has(`${sanitized.slice(0, 15)}_${index}`)) {
+          index += 1;
+        }
+        const unique = `${sanitized.slice(0, 15)}_${index}`;
+        usedPrefixes.add(unique);
+        return unique;
+      }
+
+      const allSheets = [];
+      for (const networkId of networkIds) {
+        const network = state.networks.byId[networkId];
+        const networkState = state.networkStates[networkId];
+        if (network === undefined || networkState === undefined) {
+          continue;
+        }
+
+        const connectors = networkState.connectors.allIds
+          .map((id) => networkState.connectors.byId[id])
+          .filter((connector) => connector !== undefined);
+        const splices = networkState.splices.allIds
+          .map((id) => networkState.splices.byId[id])
+          .filter((splice) => splice !== undefined);
+        const wires = networkState.wires.allIds
+          .map((id) => networkState.wires.byId[id])
+          .filter((wire) => wire !== undefined);
+        const catalogItems = networkState.catalogItems.allIds
+          .map((id) => networkState.catalogItems.byId[id])
+          .filter((catalogItem) => catalogItem !== undefined);
+
+        allSheets.push(buildWireListSheet(`${buildSheetPrefix(network.technicalId)} Wires`, wires, connectors, splices, catalogItems));
+      }
+
+      if (allSheets.length === 0) {
+        setImportExportStatus({ kind: "failed", message: "No network data found for selected networks." });
+        return;
+      }
+
+      const namedNetworks = networkIds
+        .map((networkId) => state.networks.byId[networkId]?.name || state.networks.byId[networkId]?.technicalId)
+        .filter((value): value is string => typeof value === "string" && value.trim().length > 0);
+      const exportBaseName =
+        namedNetworks.length === 1 ? `wire-list-${namedNetworks[0]}` : `wire-list-grouped-${networkIds.length}-networks`;
+      await downloadTabularWorkbookFile(exportBaseName, allSheets);
+      setImportExportStatus({ kind: "success", message: `Exported grouped wire list for ${networkIds.length} network(s).` });
     })();
   }
 
@@ -594,6 +647,7 @@ export function useNetworkImportExport({
     handleExportNetworks,
     handleExportNetwork,
     handleExportGroupedBom,
+    handleExportGroupedWire,
     handleExportGroupedPdf,
     handleExportGroupedPng,
     handleExportGroupedSvg,

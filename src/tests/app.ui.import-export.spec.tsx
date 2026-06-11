@@ -33,12 +33,19 @@ describe("App integration UI - import/export", () => {
     expect(actionsColumn).not.toBeNull();
     expect(selectionColumn).not.toBeNull();
 
+    expect(within(actionsColumn as HTMLElement).getByRole("heading", { name: "Network JSON" })).toBeInTheDocument();
+    expect(within(actionsColumn as HTMLElement).getByRole("heading", { name: "Export selected" })).toBeInTheDocument();
+    expect(within(actionsColumn as HTMLElement).getByRole("heading", { name: "Network plan" })).toBeInTheDocument();
+
     const exportAllButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export all" });
-    const groupedSvgButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export grouped SVG" });
-    const groupedPngButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export grouped PNG" });
-    const groupedPdfButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export grouped PDF" });
+    const groupedBomButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export selected BOM (XLSX)" });
+    const groupedWireButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export selected wire list (XLSX)" });
+    const groupedSvgButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export selected SVG" });
+    const groupedPngButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export selected PNG" });
+    const groupedPdfButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Export selected PDF" });
     const importButton = within(actionsColumn as HTMLElement).getByRole("button", { name: "Import from file" });
     expect(exportAllButton.compareDocumentPosition(importButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
+    expect(groupedBomButton.compareDocumentPosition(groupedWireButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     expect(groupedSvgButton.compareDocumentPosition(groupedPngButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     expect(groupedPngButton.compareDocumentPosition(groupedPdfButton) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     expect(within(selectionColumn as HTMLElement).getByText("Selected networks for export")).toBeInTheDocument();

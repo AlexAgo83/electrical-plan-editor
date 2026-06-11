@@ -158,6 +158,7 @@ interface SettingsWorkspaceContentProps {
   importOverwriteDialog?: import("../../hooks/useNetworkImportExport").ImportOverwriteDialogModel | null;
   importFailureDialog?: import("../../hooks/useNetworkImportExport").FileFeedbackDialogModel | null;
   handleExportGroupedBom?: (networkIds: NetworkId[]) => void;
+  handleExportGroupedWire?: (networkIds: NetworkId[]) => void;
   handleExportGroupedPdf?: (networkIds: NetworkId[]) => void;
   handleExportGroupedPng?: (networkIds: NetworkId[]) => void;
   handleExportGroupedSvg?: (networkIds: NetworkId[]) => void;
@@ -300,6 +301,7 @@ export function SettingsWorkspaceContent({
   importOverwriteDialog = null,
   importFailureDialog = null,
   handleExportGroupedBom,
+  handleExportGroupedWire,
   handleExportGroupedPdf,
   handleExportGroupedPng,
   handleExportGroupedSvg,
@@ -327,7 +329,7 @@ export function SettingsWorkspaceContent({
   const hasSearchQuery = normalizedSettingsSearch.length > 0;
   const contentRef = useRef<HTMLElement | null>(null);
   const sectionVisibilityRatiosRef = useRef<Map<string, number>>(new Map());
-  const [activeSettingsSectionId, setActiveSettingsSectionId] = useState("settings-canvas-render");
+  const [activeSettingsSectionId, setActiveSettingsSectionId] = useState("settings-workspace-storage");
   const relinkWorkspaceLabel = workspaceFileStatus.mode === "linked" || workspaceFileStatus.resumeFileName !== null ? "Relink" : "Link";
   const relinkWorkspaceAriaLabel =
     relinkWorkspaceLabel === "Relink" ? "Relink workspace file" : "Link workspace file";
@@ -350,6 +352,8 @@ export function SettingsWorkspaceContent({
       : workspaceFileStatus.resumeFileName !== null
         ? "Your work is safe in this browser. You can resume the last file link or save a fresh portable copy."
         : "Your work is safe in this browser. Save a workspace file when you want a portable copy or cloud-folder sync.";
+  const selectedExportCount = selectedExportNetworkIds.length;
+  const canExportSelectedNetworks = selectedExportCount > 0;
   const workspaceStoragePrimaryAction = workspaceFileStatus.conflict
     ? {
         label: "Resolve conflict",
@@ -675,6 +679,219 @@ export function SettingsWorkspaceContent({
             </div>
           </dl>
         </details>
+      </section>
+
+      <section id="settings-import-export" className="panel settings-panel settings-panel--import-export">
+        <header className="settings-panel-header">
+          <h2>Import / Export networks</h2>
+          <span className="settings-panel-chip">Portability</span>
+        </header>
+        <p className="settings-panel-intro">
+          Package exports by intent: workspace JSON, selected BOM/wire workbooks, and grouped network plan images.
+        </p>
+        <div className="settings-import-export-grid">
+          <div className="settings-import-export-actions-column">
+            <section className="settings-export-package-card" aria-label="Network JSON export actions">
+              <div className="settings-export-package-head">
+                <div>
+                  <h3>Network JSON</h3>
+                  <p>Deterministic workspace payloads for active, selected, or full export scopes.</p>
+                </div>
+                <span className="settings-state-chip">JSON</span>
+              </div>
+              <div className="row-actions settings-actions settings-export-package-actions">
+                <button type="button" onClick={() => handleExportNetworks("active")} disabled={activeNetworkId === null}>
+                  {renderSettingLabel("Export active")}
+                </button>
+                <button type="button" onClick={() => handleExportNetworks("selected")} disabled={!canExportSelectedNetworks}>
+                  {renderSettingLabel("Export selected JSON")}
+                </button>
+                <button type="button" onClick={() => handleExportNetworks("all")} disabled={networks.length === 0}>
+                  {renderSettingLabel("Export all")}
+                </button>
+              </div>
+            </section>
+
+            <section className="settings-export-package-card settings-export-package-card--selected" aria-label="Selected networks export package">
+              <div className="settings-export-package-head">
+                <div>
+                  <h3>Export selected</h3>
+                  <p>Selected networks: <strong>{selectedExportCount}</strong>. Generate the exact package you need instead of a long flat action list.</p>
+                </div>
+                <span className={`settings-state-chip${canExportSelectedNetworks ? " is-ok" : ""}`}>
+                  {canExportSelectedNetworks ? `${selectedExportCount} ready` : "Select networks"}
+                </span>
+              </div>
+              <div className="settings-export-package-groups">
+                <div className="settings-export-option-group">
+                  <div className="settings-export-option-copy">
+                    <h4>Network data</h4>
+                    <p>Share the selected networks as importable JSON.</p>
+                  </div>
+                  <button type="button" onClick={() => handleExportNetworks("selected")} disabled={!canExportSelectedNetworks}>
+                    {renderSettingLabel("Export selected JSON")}
+                  </button>
+                </div>
+                <div className="settings-export-option-group">
+                  <div className="settings-export-option-copy">
+                    <h4>BOM</h4>
+                    <p>One XLSX workbook with grouped BOM sheets for the selected networks.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleExportGroupedBom?.(selectedExportNetworkIds)}
+                    disabled={!canExportSelectedNetworks || handleExportGroupedBom === undefined}
+                  >
+                    {renderSettingLabel("Export selected BOM (XLSX)")}
+                  </button>
+                </div>
+                <div className="settings-export-option-group">
+                  <div className="settings-export-option-copy">
+                    <h4>Wire list</h4>
+                    <p>One XLSX workbook with one wire sheet per selected network.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleExportGroupedWire?.(selectedExportNetworkIds)}
+                    disabled={!canExportSelectedNetworks || handleExportGroupedWire === undefined}
+                  >
+                    {renderSettingLabel("Export selected wire list (XLSX)")}
+                  </button>
+                </div>
+                <div className="settings-export-option-group settings-export-option-group--plan">
+                  <div className="settings-export-option-copy">
+                    <h4>Network plan</h4>
+                    <p>Render the selected networks as grouped plan exports.</p>
+                  </div>
+                  <div className="row-actions settings-actions settings-export-plan-actions">
+                    <button
+                      type="button"
+                      onClick={() => handleExportGroupedSvg?.(selectedExportNetworkIds)}
+                      disabled={!canExportSelectedNetworks || handleExportGroupedSvg === undefined}
+                    >
+                      {renderSettingLabel("Export selected SVG")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleExportGroupedPng?.(selectedExportNetworkIds)}
+                      disabled={!canExportSelectedNetworks || handleExportGroupedPng === undefined}
+                    >
+                      {renderSettingLabel("Export selected PNG")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleExportGroupedPdf?.(selectedExportNetworkIds)}
+                      disabled={!canExportSelectedNetworks || handleExportGroupedPdf === undefined}
+                    >
+                      {renderSettingLabel("Export selected PDF")}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="settings-export-package-card" aria-label="Network import actions">
+              <div className="settings-export-package-head">
+                <div>
+                  <h3>Import</h3>
+                  <p>Bring in a previously exported JSON file. Existing local data is preserved until you confirm conflict resolution.</p>
+                </div>
+                <span className="settings-state-chip">JSON</span>
+              </div>
+              <div className="row-actions settings-actions settings-export-package-actions">
+                <button type="button" onClick={handleOpenImportPicker}>{renderSettingLabel("Import from file")}</button>
+                <input
+                  ref={importFileInputRef}
+                  type="file"
+                  accept="application/json,.json"
+                  onChange={(event) => {
+                    void handleImportFileChange(event);
+                  }}
+                  hidden
+                />
+                {importOverwriteDialog !== null ? (
+                  <ImportOverwriteDialog
+                    isOpen
+                    candidates={importOverwriteDialog.candidates}
+                    onConfirm={importOverwriteDialog.onConfirm}
+                    onCancel={importOverwriteDialog.onCancel}
+                  />
+                ) : null}
+                {importFailureDialog !== null ? (
+                  <FileFeedbackDialog
+                    isOpen={importFailureDialog !== null}
+                    title={importFailureDialog.title}
+                    message={importFailureDialog.message}
+                    items={importFailureDialog.items}
+                    onClose={importFailureDialog.onClose}
+                  />
+                ) : null}
+              </div>
+            </section>
+          </div>
+          <fieldset className="inline-fieldset settings-export-fieldset settings-import-export-selection-column">
+            <legend>{renderSettingLabel("Selected networks for export")}</legend>
+            <p className="meta-line settings-export-selection-summary">
+              {canExportSelectedNetworks
+                ? `${selectedExportCount} network${selectedExportCount === 1 ? "" : "s"} selected for the export package.`
+                : "Choose one or more networks to unlock the selected export package."}
+            </p>
+            {networks.length === 0 ? (
+              <p className="empty-copy">No network available.</p>
+            ) : (
+              <div className="settings-grid settings-export-selection-grid">
+                {networks.map((network) => (
+                  <label key={network.id} className="settings-checkbox settings-export-network-option">
+                    <input
+                      type="checkbox"
+                      checked={selectedExportNetworkIds.includes(network.id)}
+                      onChange={() => toggleSelectedExportNetwork(network.id)}
+                    />
+                    <span className="settings-export-network-copy">
+                      <span className="settings-export-network-name">{network.name}</span>
+                      <span className="settings-export-network-technical-id">
+                        <span aria-hidden="true">(</span>
+                        <span className="technical-id">{network.technicalId}</span>
+                        <span aria-hidden="true">)</span>
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </fieldset>
+        </div>
+        {importExportStatus !== null ? <p className={`meta-line import-status is-${importExportStatus.kind}`}>{importExportStatus.message}</p> : null}
+        {lastImportSummary !== null ? (
+          <>
+            <div className="settings-import-summary">
+              <p className="meta-line"><span>Imported</span> <strong>{lastImportSummary.importedNetworkIds.length}</strong></p>
+              <p className="meta-line"><span>Skipped</span> <strong>{lastImportSummary.skippedNetworkIds.length}</strong></p>
+              <p className="meta-line"><span>Warnings</span> <strong>{lastImportSummary.warnings.length}</strong></p>
+              <p className="meta-line"><span>Errors</span> <strong>{lastImportSummary.errors.length}</strong></p>
+            </div>
+            {lastImportSummary.warnings.length > 0 ? (
+              <div className="settings-import-details is-warning" role="status" aria-label="Import warning details">
+                <h3>Warning details</h3>
+                <ul>
+                  {lastImportSummary.warnings.map((warning, index) => (
+                    <li key={`${index}-${warning}`}>{warning}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {lastImportSummary.errors.length > 0 ? (
+              <div className="settings-import-details is-error" role="alert" aria-label="Import error details">
+                <h3>Error details</h3>
+                <ul>
+                  {lastImportSummary.errors.map((error, index) => (
+                    <li key={`${index}-${error}`}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </>
+        ) : null}
       </section>
 
       <section id="settings-ai-provider" className="panel settings-panel" data-onboarding-panel="settings-ai-provider">
@@ -1379,144 +1596,6 @@ export function SettingsWorkspaceContent({
             />
           </label>
         </div>
-      </section>
-
-      <section id="settings-import-export" className="panel settings-panel settings-panel--import-export">
-        <header className="settings-panel-header">
-          <h2>Import / Export networks</h2>
-          <span className="settings-panel-chip">Portability</span>
-        </header>
-        <p className="settings-panel-intro">
-          Deterministic JSON import/export for active, selected, or full network scopes.
-        </p>
-        <p className="meta-line">
-          Export active, selected, or all networks as deterministic JSON payloads. Import preserves existing local data and resolves conflicts with deterministic suffixes.
-        </p>
-        <div className="settings-import-export-grid">
-          <div className="settings-import-export-actions-column">
-            <div className="row-actions settings-actions">
-              <button type="button" onClick={() => handleExportNetworks("active")} disabled={activeNetworkId === null}>{renderSettingLabel("Export active")}</button>
-              <button type="button" onClick={() => handleExportNetworks("selected")} disabled={selectedExportNetworkIds.length === 0}>{renderSettingLabel("Export selected")}</button>
-              <button type="button" onClick={() => handleExportNetworks("all")} disabled={networks.length === 0}>{renderSettingLabel("Export all")}</button>
-            </div>
-            <div className="row-actions settings-actions">
-              <button
-                type="button"
-                onClick={() => handleExportGroupedBom?.(selectedExportNetworkIds)}
-                disabled={selectedExportNetworkIds.length === 0 || handleExportGroupedBom === undefined}
-              >
-                Export grouped BOM (XLSX)
-              </button>
-              <button
-                type="button"
-                onClick={() => handleExportGroupedSvg?.(selectedExportNetworkIds)}
-                disabled={selectedExportNetworkIds.length === 0 || handleExportGroupedSvg === undefined}
-              >
-                Export grouped SVG
-              </button>
-              <button
-                type="button"
-                onClick={() => handleExportGroupedPng?.(selectedExportNetworkIds)}
-                disabled={selectedExportNetworkIds.length === 0 || handleExportGroupedPng === undefined}
-              >
-                Export grouped PNG
-              </button>
-              <button
-                type="button"
-                onClick={() => handleExportGroupedPdf?.(selectedExportNetworkIds)}
-                disabled={selectedExportNetworkIds.length === 0 || handleExportGroupedPdf === undefined}
-              >
-                Export grouped PDF
-              </button>
-            </div>
-            <div className="row-actions settings-actions">
-              <button type="button" onClick={handleOpenImportPicker}>{renderSettingLabel("Import from file")}</button>
-              <input
-                ref={importFileInputRef}
-                type="file"
-                accept="application/json,.json"
-                onChange={(event) => {
-                  void handleImportFileChange(event);
-                }}
-                hidden
-              />
-              {importOverwriteDialog !== null ? (
-                <ImportOverwriteDialog
-                  isOpen
-                  candidates={importOverwriteDialog.candidates}
-                  onConfirm={importOverwriteDialog.onConfirm}
-                  onCancel={importOverwriteDialog.onCancel}
-                />
-              ) : null}
-              {importFailureDialog !== null ? (
-                <FileFeedbackDialog
-                  isOpen={importFailureDialog !== null}
-                  title={importFailureDialog.title}
-                  message={importFailureDialog.message}
-                  items={importFailureDialog.items}
-                  onClose={importFailureDialog.onClose}
-                />
-              ) : null}
-            </div>
-          </div>
-          <fieldset className="inline-fieldset settings-export-fieldset settings-import-export-selection-column">
-            <legend>{renderSettingLabel("Selected networks for export")}</legend>
-            {networks.length === 0 ? (
-              <p className="empty-copy">No network available.</p>
-            ) : (
-              <div className="settings-grid settings-export-selection-grid">
-                {networks.map((network) => (
-                  <label key={network.id} className="settings-checkbox settings-export-network-option">
-                    <input
-                      type="checkbox"
-                      checked={selectedExportNetworkIds.includes(network.id)}
-                      onChange={() => toggleSelectedExportNetwork(network.id)}
-                    />
-                    <span className="settings-export-network-copy">
-                      <span className="settings-export-network-name">{network.name}</span>
-                      <span className="settings-export-network-technical-id">
-                        <span aria-hidden="true">(</span>
-                        <span className="technical-id">{network.technicalId}</span>
-                        <span aria-hidden="true">)</span>
-                      </span>
-                    </span>
-                  </label>
-                ))}
-              </div>
-            )}
-          </fieldset>
-        </div>
-        {importExportStatus !== null ? <p className={`meta-line import-status is-${importExportStatus.kind}`}>{importExportStatus.message}</p> : null}
-        {lastImportSummary !== null ? (
-          <>
-            <div className="settings-import-summary">
-              <p className="meta-line"><span>Imported</span> <strong>{lastImportSummary.importedNetworkIds.length}</strong></p>
-              <p className="meta-line"><span>Skipped</span> <strong>{lastImportSummary.skippedNetworkIds.length}</strong></p>
-              <p className="meta-line"><span>Warnings</span> <strong>{lastImportSummary.warnings.length}</strong></p>
-              <p className="meta-line"><span>Errors</span> <strong>{lastImportSummary.errors.length}</strong></p>
-            </div>
-            {lastImportSummary.warnings.length > 0 ? (
-              <div className="settings-import-details is-warning" role="status" aria-label="Import warning details">
-                <h3>Warning details</h3>
-                <ul>
-                  {lastImportSummary.warnings.map((warning, index) => (
-                    <li key={`${index}-${warning}`}>{warning}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-            {lastImportSummary.errors.length > 0 ? (
-              <div className="settings-import-details is-error" role="alert" aria-label="Import error details">
-                <h3>Error details</h3>
-                <ul>
-                  {lastImportSummary.errors.map((error, index) => (
-                    <li key={`${index}-${error}`}>{error}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </>
-        ) : null}
       </section>
 
       <section id="settings-sample-network" className="panel settings-panel">

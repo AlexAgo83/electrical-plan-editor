@@ -84,7 +84,7 @@ export function NetworkSummaryViewMenu({
             className={showSegmentDressings ? "network-summary-view-menu-item is-active" : "network-summary-view-menu-item"}
             onClick={toggleShowSegmentDressings}
           >
-            <span className="network-summary-callouts-icon" aria-hidden="true" />
+            <span className="network-summary-dressings-icon" aria-hidden="true" />
             Dressings
           </button>
           <button

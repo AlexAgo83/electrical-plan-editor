@@ -1129,7 +1129,7 @@ export function buildHarnessAssemblyFunctionalSchematicGraph({
             .get(networkIdRaw as NetworkId)
             ?.get(connectorIdRaw as ConnectorId)
             ?.get(cavityIndex);
-          if (fuseInfo !== undefined && fuseInfo.isA) {
+          if (fuseInfo !== undefined) {
             const fusePairKey = makeAssemblyFuseBoxPairKey(networkIdRaw as NetworkId, connectorIdRaw as ConnectorId, fuseInfo.pairIndex);
             for (const connectedWireId of fuseBoxPairToWireIds.get(fusePairKey) ?? []) {
               if (!includedQualifiedWireIds.has(connectedWireId)) {

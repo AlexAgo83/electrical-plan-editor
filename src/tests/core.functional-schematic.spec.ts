@@ -1276,4 +1276,157 @@ describe("buildFunctionalSchematicGraph", () => {
     expect(inEdges.length).toBeGreaterThan(0);
     expect(outEdges.length).toBeGreaterThan(0);
   });
+
+  it("traverses a fuse-box pair from pin B toward pin A in harness assembly graphs", () => {
+    const fuseBoxCatalogItem = createFuseBoxCatalogItem("FBOX-B-TO-A");
+    const network: Network = {
+      id: asNetworkId("net-fuse-b-to-a"),
+      name: "Fuse B to A harness",
+      technicalId: "H-FUSE-B-TO-A",
+      createdAt: "2026-06-11T00:00:00.000Z",
+      updatedAt: "2026-06-11T00:00:00.000Z"
+    };
+    const connectorsLocal: Connector[] = [
+      { id: asConnectorId("C-ROOT"), name: "Root", technicalId: "ROOT", cavityCount: 2, isMainHarnessConnector: true },
+      {
+        id: asConnectorId("C-FUSE"),
+        name: "Fuse box",
+        technicalId: "FUSEBOX",
+        cavityCount: 4,
+        catalogItemId: fuseBoxCatalogItem.id,
+        fusePairRatings: { 0: 5 }
+      },
+      { id: asConnectorId("C-LOAD"), name: "Load", technicalId: "LOAD", cavityCount: 2 }
+    ];
+    const splicesLocal: Splice[] = [
+      {
+        id: asSpliceId("S-POWER"),
+        name: "Power splice",
+        technicalId: "S-POWER",
+        portCount: 2,
+        portMode: "directional"
+      }
+    ];
+    const wiresLocal: Wire[] = [
+      {
+        id: asWireId("W-B-OUT"),
+        name: "Fuse to splice",
+        technicalId: "W-B-OUT",
+        functionalDomainTag: "12V power",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE"), cavityIndex: 2 },
+        endpointB: {
+          kind: "splicePort",
+          spliceId: asSpliceId("S-POWER"),
+          portIndex: 2,
+          spliceSideOverride: "R",
+          spliceSideLocked: false
+        },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-A-IN"),
+        name: "Fuse input",
+        technicalId: "W-A-IN",
+        functionalDomainTag: "12V power",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-FUSE"), cavityIndex: 1 },
+        endpointB: {
+          kind: "splicePort",
+          spliceId: asSpliceId("S-UPSTREAM"),
+          portIndex: 1,
+          spliceSideOverride: "L",
+          spliceSideLocked: false
+        },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-SPLICE-LOAD"),
+        name: "Splice to load",
+        technicalId: "W-SPLICE-LOAD",
+        functionalDomainTag: "12V power",
+        sectionMm2: 1,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: {
+          kind: "splicePort",
+          spliceId: asSpliceId("S-POWER"),
+          portIndex: 1,
+          spliceSideOverride: "L",
+          spliceSideLocked: false
+        },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-LOAD"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 100,
+        isRouteLocked: false
+      }
+    ];
+    const spliceMap = new Map(
+      [
+        ...splicesLocal,
+        {
+          id: asSpliceId("S-UPSTREAM"),
+          name: "Upstream splice",
+          technicalId: "S-UPSTREAM",
+          portCount: 2,
+          portMode: "directional"
+        } satisfies Splice
+      ].map((splice) => [splice.id, splice])
+    );
+    const assembly: HarnessAssembly = {
+      id: asHarnessAssemblyId("asm-fuse-b-to-a"),
+      name: "Fuse B to A assembly",
+      technicalId: "ASM-FUSE-B-TO-A",
+      members: [{ networkId: network.id, color: "#2563eb" }],
+      masterConnectorRefs: [{ networkId: network.id, connectorId: asConnectorId("C-LOAD") }],
+      connectorLinks: [],
+      createdAt: "2026-06-11T00:00:00.000Z",
+      updatedAt: "2026-06-11T00:00:00.000Z"
+    };
+
+    const graph = buildHarnessAssemblyFunctionalSchematicGraph({
+      assembly,
+      activeFilter: "12V power",
+      networksById: new Map([
+        [
+          network.id,
+          {
+            network,
+            wires: wiresLocal,
+            segments: [],
+            connectorMap: new Map(connectorsLocal.map((connector) => [connector.id, connector])),
+            spliceMap,
+            catalogItemMap: new Map([[fuseBoxCatalogItem.id, fuseBoxCatalogItem]])
+          }
+        ]
+      ])
+    });
+
+    expect(graph.includedWireIds).toEqual(
+      expect.arrayContaining([asWireId("W-A-IN"), asWireId("W-B-OUT"), asWireId("W-SPLICE-LOAD")])
+    );
+    expect(graph.includedWireIds).toHaveLength(3);
+    expect(graph.edges).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "W-B-OUT",
+          fromNodeId: "network:net-fuse-b-to-a:fuse-box:C-FUSE:pair:0",
+          toNodeId: "network:net-fuse-b-to-a:splice:S-POWER"
+        }),
+        expect.objectContaining({
+          label: "W-A-IN",
+          fromNodeId: "network:net-fuse-b-to-a:splice:S-UPSTREAM",
+          toNodeId: "network:net-fuse-b-to-a:fuse-box:C-FUSE:pair:0"
+        })
+      ])
+    );
+  });
 });

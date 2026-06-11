@@ -6,6 +6,43 @@ export interface SettingsSectionDefinition {
 
 export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
   {
+    id: "settings-workspace-storage",
+    title: "Workspace storage",
+    labels: [
+      "Persistence mode",
+      "Linked file",
+      "Permission",
+      "Open workspace file",
+      "Save as file",
+      "Save as copy",
+      "Use a file for autosave",
+      "Resume last file",
+      "Save now",
+      "Stop autosave link",
+      "Resolve conflict",
+      "Restore file access",
+      "Load file version",
+      "Keep local version",
+      "Save local copy"
+    ]
+  },
+  {
+    id: "settings-import-export",
+    title: "Import / Export networks",
+    labels: [
+      "Selected networks for export",
+      "Export active",
+      "Export selected JSON",
+      "Export all",
+      "Export selected BOM (XLSX)",
+      "Export selected wire list (XLSX)",
+      "Export selected SVG",
+      "Export selected PNG",
+      "Export selected PDF",
+      "Import from file"
+    ]
+  },
+  {
     id: "settings-canvas-render",
     title: "Canvas render preferences",
     labels: [
@@ -82,11 +119,6 @@ export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
     ]
   },
   {
-    id: "settings-import-export",
-    title: "Import / Export networks",
-    labels: ["Selected networks for export", "Export active", "Export selected", "Export all", "Import from file"]
-  },
-  {
     id: "settings-sample-network",
     title: "Sample network controls",
     labels: ["Recreate sample network", "Reset sample network to baseline"]
@@ -95,27 +127,6 @@ export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
     id: "settings-ai-provider",
     title: "AI provider",
     labels: ["Provider", "Model", "API key", "Endpoint", "Timeout (ms)", "Strict structured output mode", "Enable experimental direct execution", "Test connection"]
-  },
-  {
-    id: "settings-workspace-storage",
-    title: "Workspace storage",
-    labels: [
-      "Persistence mode",
-      "Linked file",
-      "Permission",
-      "Open workspace file",
-      "Save as file",
-      "Save as copy",
-      "Use a file for autosave",
-      "Resume last file",
-      "Save now",
-      "Stop autosave link",
-      "Resolve conflict",
-      "Restore file access",
-      "Load file version",
-      "Keep local version",
-      "Save local copy"
-    ]
   }
 ];
 

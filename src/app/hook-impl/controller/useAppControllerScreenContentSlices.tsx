@@ -1131,6 +1131,7 @@ export function buildSettingsScreenContentSlice(
       params.resetWorkspacePreferencesToDefaults,
     importOverwriteDialog: params.importOverwriteDialog,
     handleExportGroupedBom: params.handleExportGroupedBom,
+    handleExportGroupedWire: params.handleExportGroupedWire,
     handleExportGroupedPdf: params.handleExportGroupedPdf,
     handleExportGroupedPng: params.handleExportGroupedPng,
     handleExportGroupedSvg: params.handleExportGroupedSvg,
