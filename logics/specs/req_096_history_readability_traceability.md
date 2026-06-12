@@ -1,6 +1,10 @@
 ## req_096_history_readability_traceability - Acceptance Criteria Traceability
 > Request: `req_096_recent_changes_human_readable_entity_references_instead_of_system_ids`
 > Last updated: 2026-03-25
+> From version: 1.4.3
+> Status: Done
+> Understanding: 100%
+> Confidence: 99%
 
 # Traceability Matrix
 - AC1: New `Recent changes` entries no longer show raw UUID-like IDs as primary target references.

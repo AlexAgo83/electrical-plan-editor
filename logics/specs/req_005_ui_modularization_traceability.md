@@ -1,6 +1,10 @@
 ## req_005_ui_modularization_traceability - Acceptance Criteria Traceability
 > Request: `req_005_large_ui_files_split_and_hook_extraction`
 > Last updated: 2026-02-21
+> From version: 0.1.0
+> Status: Done
+> Understanding: 99%
+> Confidence: 97%
 
 # Traceability Matrix
 - AC1: `App.tsx` is reduced to orchestration/composition role.

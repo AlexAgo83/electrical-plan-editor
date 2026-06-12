@@ -1,6 +1,10 @@
 ## req_006_store_modularization_traceability - Acceptance Criteria Traceability
 > Request: `req_006_large_store_files_split_and_reducer_modularization`
 > Last updated: 2026-02-21
+> From version: 0.1.0
+> Status: Done
+> Understanding: 99%
+> Confidence: 97%
 
 # Traceability Matrix
 - AC1: Reducer responsibilities are split into modular files with a stable composed entry point.
