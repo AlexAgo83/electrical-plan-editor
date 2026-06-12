@@ -369,13 +369,13 @@ export function buildCalloutLayoutMetrics(
     { key: "pin", header: "Pin", textAnchor: "start" },
     { key: "technicalId", header: "Wire ID", textAnchor: "start" },
     { key: "color", header: "Color", textAnchor: "start" },
-    { key: "targetId", header: "Node ID", textAnchor: "start" },
+    { key: "targetId", header: "End ID", textAnchor: "start" },
     { key: "targetPin", header: "PIN", textAnchor: "start" },
     ...(showCalloutWireNames
       ? ([{ key: "wireName", header: "Wire name", textAnchor: "start" }] as const)
       : []),
-    { key: "length", header: "Len", textAnchor: "end" },
-    { key: "section", header: "Sec", textAnchor: "end" }
+    { key: "length", header: "Length", textAnchor: "end" },
+    { key: "section", header: "Section", textAnchor: "end" }
   ];
 
   const rowFontSize = getCalloutRowFontSize(calloutTextSize);

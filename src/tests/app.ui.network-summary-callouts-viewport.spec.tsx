@@ -165,10 +165,10 @@ describe("App integration UI - network summary callouts and viewport persistence
     const calloutRows = networkSummaryPanel.querySelectorAll(".network-callout-table-cell");
     expect(calloutFrames.length).toBeGreaterThanOrEqual(4);
     expect(calloutRows.length).toBeGreaterThanOrEqual(8);
-    expect(networkSummaryPanel).toHaveTextContent("Len");
-    expect(networkSummaryPanel).toHaveTextContent("Sec");
+    expect(networkSummaryPanel).toHaveTextContent("Length");
+    expect(networkSummaryPanel).toHaveTextContent("Section");
     expect(networkSummaryPanel).toHaveTextContent("Color");
-    expect(networkSummaryPanel).toHaveTextContent("Node ID");
+    expect(networkSummaryPanel).toHaveTextContent("End ID");
     expect(networkSummaryPanel).toHaveTextContent("PIN");
     expect(networkSummaryPanel).toHaveTextContent("W-8");
   });

@@ -295,7 +295,8 @@ export function buildCableCalloutViewModels({
       }
       const catalogItem = connector.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId);
       const header = buildCalloutHeaderDisplay(connector.name, connector.technicalId);
-      const connectorReference = connector.manufacturerReference?.trim() ?? "";
+      const connectorReferenceValue = connector.manufacturerReference?.trim() ?? "";
+      const connectorReference = connectorReferenceValue.length > 0 ? `ref : ${connectorReferenceValue}` : "";
       models.push({
         key,
         kind: "connector",
@@ -328,7 +329,8 @@ export function buildCableCalloutViewModels({
       continue;
     }
     const header = buildCalloutHeaderDisplay(splice.name, splice.technicalId);
-    const spliceReference = splice.manufacturerReference?.trim() ?? "";
+    const spliceReferenceValue = splice.manufacturerReference?.trim() ?? "";
+    const spliceReference = spliceReferenceValue.length > 0 ? `ref : ${spliceReferenceValue}` : "";
     models.push({
       key,
       kind: "splice",

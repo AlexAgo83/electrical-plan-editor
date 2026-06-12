@@ -120,8 +120,8 @@ describe("App integration UI - network summary SVG export", () => {
       expect(exportedSvg).toContain(
         'class="network-export-cartouche-logo-frame"',
       );
-      expect(exportedSvg).toContain(">Len<");
-      expect(exportedSvg).toContain(">Sec<");
+      expect(exportedSvg).toContain(">Length<");
+      expect(exportedSvg).toContain(">Section<");
       expect(exportedSvg).not.toContain("Length (mm)");
       expect(exportedSvg).not.toContain("Section (mm²)");
       expect(exportedSvg).toContain(
