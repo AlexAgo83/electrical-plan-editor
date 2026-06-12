@@ -11,7 +11,7 @@ import type {
   SpliceId,
   WireId
 } from "../../../../core/entities";
-import { resolveSplicePlacementFromEntities } from "../../../../core/splicePlacement";
+import { resolveSplicePlacementFromEntities, type ResolvedSplicePlacement } from "../../../../core/splicePlacement";
 import { resolveEditedConnectorLayout } from "../../../../core/connectorLayout";
 import type { NodePosition } from "../../../types/app-controller";
 import type { ConnectorDrawingDisplayMode } from "../../../types/app-controller";
@@ -23,6 +23,30 @@ import {
 } from "../callouts/NetworkSummaryCalloutsLayer";
 import { normalizeReadableSegmentLabelAngle } from "../callouts/calloutLayout";
 import { resolveBackshellHelperNodeReference } from "../../../lib/backshellHelperNodeReference";
+
+export interface SegmentLengthSubLabel {
+  key: string;
+  anchorX: number;
+  anchorY: number;
+  textX: number;
+  textY: number;
+  rotationDegrees: number;
+  lengthMm: number;
+}
+
+export interface SegmentWireHighlightPortion {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  markers: Array<{ key: string; x: number; y: number }>;
+}
+
+export interface SegmentWirePartialCoverage {
+  segmentId: SegmentId;
+  spliceId: SpliceId;
+  coveredLengthMm: number;
+}
 
 export interface RenderedSegmentModel {
   segment: Segment;
@@ -37,6 +61,12 @@ export interface RenderedSegmentModel {
   segmentIdLabelY: number;
   segmentLengthLabelX: number;
   segmentLengthLabelY: number;
+  // Per sub-span length labels (between consecutive nodes/splices). Empty when the
+  // segment carries no floating splice, in which case the single full-length label is used.
+  segmentLengthSubLabels: SegmentLengthSubLabel[];
+  // Only the portion of an endpoint segment actually traversed by the selected wire
+  // when that wire terminates on a floating splice. Null for full-segment highlights.
+  wireHighlightPortion: SegmentWireHighlightPortion | null;
   segmentCallout: {
     key: string;
     segmentId: SegmentId;
@@ -88,6 +118,7 @@ interface BuildRenderedSegmentsParams {
   isSubNetworkFilteringActive: boolean;
   activeSubNetworkTagSet: ReadonlySet<string>;
   selectedWireRouteSegmentIds: ReadonlySet<SegmentId>;
+  selectedWirePartialCoverage?: ReadonlyArray<SegmentWirePartialCoverage>;
   selectedSegmentId: SegmentId | null;
   selectedBatchSegmentIds?: ReadonlySet<SegmentId>;
   connectorMap: ReadonlyMap<ConnectorId, Connector>;
@@ -356,6 +387,7 @@ export function buildRenderedSegments({
   isSubNetworkFilteringActive,
   activeSubNetworkTagSet,
   selectedWireRouteSegmentIds,
+  selectedWirePartialCoverage = [],
   selectedSegmentId,
   selectedBatchSegmentIds = new Set<SegmentId>(),
   connectorMap,
@@ -377,6 +409,58 @@ export function buildRenderedSegments({
   const nodeById = new Map(nodes.map((node) => [node.id, node] as const));
   const segmentById = new Map(segments.map((segment) => [segment.id, segment] as const));
   const catalogItemById = new Map(catalogItems.map((item) => [item.id, item] as const));
+
+  // Offset of a placed splice measured from the segment's nodeA endpoint, regardless of
+  // which endpoint the placement happens to reference.
+  const offsetFromSegmentNodeA = (placement: ResolvedSplicePlacement, segment: Segment): number =>
+    placement.fromNodeId === segment.nodeA ? placement.offsetMm : segment.lengthMm - placement.offsetMm;
+
+  // Floating splices that land strictly inside a segment, sorted by their offset from nodeA.
+  // These subdivide the segment so we can display node↔splice / splice↔splice distances.
+  const placedSpliceOffsetsBySegmentId = new Map<SegmentId, number[]>();
+  for (const splice of spliceMap.values()) {
+    const placement = resolveSplicePlacementFromEntities(splice, (segmentId) => segmentById.get(segmentId));
+    if (placement.status !== "placed") {
+      continue;
+    }
+    const segment = segmentById.get(placement.segmentId);
+    if (segment === undefined || segment.lengthMm <= 0) {
+      continue;
+    }
+    const offset = offsetFromSegmentNodeA(placement, segment);
+    if (offset <= 0.0001 || offset >= segment.lengthMm - 0.0001) {
+      // Sitting on a node endpoint: it does not subdivide the segment.
+      continue;
+    }
+    const offsets = placedSpliceOffsetsBySegmentId.get(placement.segmentId) ?? [];
+    offsets.push(offset);
+    placedSpliceOffsetsBySegmentId.set(placement.segmentId, offsets);
+  }
+  for (const offsets of placedSpliceOffsetsBySegmentId.values()) {
+    offsets.sort((left, right) => left - right);
+  }
+
+  // Per-segment partial highlight ranges for the selected wire when it terminates on a
+  // floating splice (it only traverses part of that endpoint segment).
+  const partialCoverageBySegmentId = new Map<SegmentId, Array<{ markerRatio: number; coveredLengthMm: number }>>();
+  for (const entry of selectedWirePartialCoverage) {
+    const segment = segmentById.get(entry.segmentId);
+    if (segment === undefined || segment.lengthMm <= 0) {
+      continue;
+    }
+    const splice = spliceMap.get(entry.spliceId);
+    if (splice === undefined) {
+      continue;
+    }
+    const placement = resolveSplicePlacementFromEntities(splice, (segmentId) => segmentById.get(segmentId));
+    if (placement.status !== "placed" || placement.segmentId !== entry.segmentId) {
+      continue;
+    }
+    const markerRatio = offsetFromSegmentNodeA(placement, segment) / segment.lengthMm;
+    const ranges = partialCoverageBySegmentId.get(entry.segmentId) ?? [];
+    ranges.push({ markerRatio, coveredLengthMm: entry.coveredLengthMm });
+    partialCoverageBySegmentId.set(entry.segmentId, ranges);
+  }
   const nodeShapeScale = normalizedNodeShapeScale * (zoomInvariantNodeShapes ? inverseLabelScale : 1);
   const segmentGeometryById = new Map<SegmentId, SegmentRenderGeometry>();
   const segmentCalloutById = new Map<SegmentId, RenderedSegmentModel["segmentCallout"]>();
@@ -593,8 +677,11 @@ export function buildRenderedSegments({
     const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
     const isSubNetworkDeemphasized = isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentSubNetworkTag);
     const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
+    const partialCoverage = partialCoverageBySegmentId.get(segment.id);
+    const isPartialWireHighlight = isWireHighlighted && partialCoverage !== undefined && partialCoverage.length > 0;
     const isSelectedSegment = selectedSegmentId === segment.id || selectedBatchSegmentIds.has(segment.id);
-    const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
+    // Partial highlights are drawn as a dedicated overlay, so the base line keeps its normal style.
+    const segmentClassName = `network-segment${isWireHighlighted && !isPartialWireHighlight ? " is-wire-highlighted" : ""}${
       isSelectedSegment ? " is-selected" : ""
     }`;
     const segmentGroupClassName = `network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`;
@@ -635,6 +722,75 @@ export function buildRenderedSegments({
       };
     });
 
+    const pointAtRatio = (ratio: number): NodePosition => ({
+      x: nodeAPosition.x + segmentVectorX * ratio,
+      y: nodeAPosition.y + segmentVectorY * ratio
+    });
+
+    // One length label per sub-span (node↔splice, splice↔splice) when the segment carries
+    // floating splices; otherwise empty and the single full-length label is rendered instead.
+    const spliceOffsets = placedSpliceOffsetsBySegmentId.get(segment.id) ?? [];
+    const segmentLengthSubLabels: SegmentLengthSubLabel[] = [];
+    if (spliceOffsets.length > 0 && segment.lengthMm > 0) {
+      const breakpoints = [0, ...spliceOffsets, segment.lengthMm];
+      for (let index = 0; index < breakpoints.length - 1; index += 1) {
+        const spanStart = breakpoints[index] ?? 0;
+        const spanEnd = breakpoints[index + 1] ?? segment.lengthMm;
+        const spanLengthMm = spanEnd - spanStart;
+        if (spanLengthMm <= 0.0001) {
+          continue;
+        }
+        const midpoint = pointAtRatio((spanStart + spanEnd) / 2 / segment.lengthMm);
+        segmentLengthSubLabels.push({
+          key: `${segment.id}-len-${index}`,
+          anchorX: midpoint.x,
+          anchorY: midpoint.y,
+          textX: segmentLengthLabelOffsetX,
+          textY: segmentLengthLabelOffsetY,
+          rotationDegrees: segmentLabelRotationDegrees,
+          lengthMm: spanLengthMm
+        });
+      }
+    }
+
+    let wireHighlightPortion: SegmentWireHighlightPortion | null = null;
+    if (isPartialWireHighlight && partialCoverage !== undefined) {
+      const markerRatios = partialCoverage.map((coverage) => coverage.markerRatio);
+      let startRatio = 0;
+      let endRatio = 0;
+      const firstCoverage = partialCoverage[0];
+      if (partialCoverage.length >= 2) {
+        // Both wire endpoints sit on splices of this single segment: cover between them.
+        startRatio = Math.min(...markerRatios);
+        endRatio = Math.max(...markerRatios);
+      } else if (firstCoverage !== undefined) {
+        const { markerRatio, coveredLengthMm } = firstCoverage;
+        const distanceToNodeAMm = markerRatio * segment.lengthMm;
+        const distanceToNodeBMm = segment.lengthMm - distanceToNodeAMm;
+        const extendsTowardNodeA =
+          Math.abs(coveredLengthMm - distanceToNodeAMm) <= Math.abs(coveredLengthMm - distanceToNodeBMm);
+        const coveredRatio = segment.lengthMm > 0 ? coveredLengthMm / segment.lengthMm : 0;
+        const otherRatio = Math.min(
+          1,
+          Math.max(0, extendsTowardNodeA ? markerRatio - coveredRatio : markerRatio + coveredRatio)
+        );
+        startRatio = Math.min(markerRatio, otherRatio);
+        endRatio = Math.max(markerRatio, otherRatio);
+      }
+      const start = pointAtRatio(startRatio);
+      const end = pointAtRatio(endRatio);
+      wireHighlightPortion = {
+        x1: start.x,
+        y1: start.y,
+        x2: end.x,
+        y2: end.y,
+        markers: partialCoverage.map((coverage, index) => {
+          const markerPoint = pointAtRatio(coverage.markerRatio);
+          return { key: `${segment.id}-wirehl-${index}`, x: markerPoint.x, y: markerPoint.y };
+        })
+      };
+    }
+
     result.push({
       segment,
       nodeAPosition,
@@ -648,6 +804,8 @@ export function buildRenderedSegments({
       segmentIdLabelY: -segmentLengthLabelOffsetY,
       segmentLengthLabelX: segmentLengthLabelOffsetX,
       segmentLengthLabelY: segmentLengthLabelOffsetY,
+      segmentLengthSubLabels,
+      wireHighlightPortion,
       segmentCallout,
       mountingLabels
     });

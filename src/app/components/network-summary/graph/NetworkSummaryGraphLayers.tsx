@@ -19,6 +19,11 @@ import {
 
 const DOUBLE_CLICK_INTERVAL_MS = 450;
 
+// Sub-span distances can carry rounding noise from non-integer splice offsets; keep them tidy.
+function formatSegmentLengthMm(lengthMm: number): number {
+  return Number.isInteger(lengthMm) ? lengthMm : Math.round(lengthMm * 10) / 10;
+}
+
 export interface SplicePlacementPreviewSegmentModel {
   key: string;
   segmentId: SegmentId;
@@ -539,7 +544,7 @@ export function NetworkSummaryGraphLayers({
       ) : null}
 
       <g className="network-graph-layer network-graph-layer-segments" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
-        {renderedSegments.map(({ segment, nodeAPosition, nodeBPosition, segmentClassName, segmentGroupClassName }) => (
+        {renderedSegments.map(({ segment, nodeAPosition, nodeBPosition, segmentClassName, segmentGroupClassName, wireHighlightPortion }) => (
           <g key={segment.id} className={segmentGroupClassName} data-segment-id={segment.id}>
             <line
               className={segmentClassName}
@@ -548,6 +553,26 @@ export function NetworkSummaryGraphLayers({
               x2={nodeBPosition.x}
               y2={nodeBPosition.y}
             />
+            {wireHighlightPortion ? (
+              <>
+                <line
+                  className="network-segment-wire-highlight-portion"
+                  x1={wireHighlightPortion.x1}
+                  y1={wireHighlightPortion.y1}
+                  x2={wireHighlightPortion.x2}
+                  y2={wireHighlightPortion.y2}
+                />
+                {wireHighlightPortion.markers.map((marker) => (
+                  <circle
+                    key={marker.key}
+                    className="network-segment-wire-highlight-marker"
+                    cx={marker.x}
+                    cy={marker.y}
+                    r={4}
+                  />
+                ))}
+              </>
+            ) : null}
             <line
               className="network-segment-hitbox"
               x1={nodeAPosition.x}
@@ -592,6 +617,7 @@ export function NetworkSummaryGraphLayers({
             segmentIdLabelY,
             segmentLengthLabelX,
             segmentLengthLabelY,
+            segmentLengthSubLabels,
             mountingLabels
           }) => (
             <g key={`${segment.id}-labels`} className={segmentGroupClassName} data-segment-id={segment.id}>
@@ -614,28 +640,56 @@ export function NetworkSummaryGraphLayers({
                 </g>
               ) : null}
               {showSegmentLengths ? (
-                <g
-                  className="network-segment-length-label-anchor"
-                  transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
-                >
-                  <text
-                    className="network-segment-length-label"
-                    x={segmentLengthLabelX}
-                    y={segmentLengthLabelY}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    transform={
-                      segmentLabelRotationDegrees === 0
-                        ? undefined
-                        : `rotate(${segmentLabelRotationDegrees} ${segmentLengthLabelX} ${segmentLengthLabelY})`
-                    }
+                segmentLengthSubLabels.length > 0 ? (
+                  segmentLengthSubLabels.map((subLabel) => (
+                    <g
+                      key={subLabel.key}
+                      className="network-segment-length-label-anchor"
+                      transform={`translate(${subLabel.anchorX} ${subLabel.anchorY}) scale(${inverseLabelScale})`}
+                    >
+                      <text
+                        className="network-segment-length-label"
+                        x={subLabel.textX}
+                        y={subLabel.textY}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        transform={
+                          subLabel.rotationDegrees === 0
+                            ? undefined
+                            : `rotate(${subLabel.rotationDegrees} ${subLabel.textX} ${subLabel.textY})`
+                        }
+                      >
+                        <tspan>{formatSegmentLengthMm(subLabel.lengthMm)}</tspan>
+                        <tspan className="network-segment-length-unit" dx="2">
+                          mm
+                        </tspan>
+                      </text>
+                    </g>
+                  ))
+                ) : (
+                  <g
+                    className="network-segment-length-label-anchor"
+                    transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
                   >
-                    <tspan>{segment.lengthMm}</tspan>
-                    <tspan className="network-segment-length-unit" dx="2">
-                      mm
-                    </tspan>
-                  </text>
-                </g>
+                    <text
+                      className="network-segment-length-label"
+                      x={segmentLengthLabelX}
+                      y={segmentLengthLabelY}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      transform={
+                        segmentLabelRotationDegrees === 0
+                          ? undefined
+                          : `rotate(${segmentLabelRotationDegrees} ${segmentLengthLabelX} ${segmentLengthLabelY})`
+                      }
+                    >
+                      <tspan>{segment.lengthMm}</tspan>
+                      <tspan className="network-segment-length-unit" dx="2">
+                        mm
+                      </tspan>
+                    </text>
+                  </g>
+                )
               ) : null}
               {showSegmentDressings
                 ? mountingLabels.map((label) => (

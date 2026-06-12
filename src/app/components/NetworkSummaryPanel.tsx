@@ -35,6 +35,7 @@ import {
   buildRenderedFloatingSplices,
   buildRenderedNodes,
   buildRenderedSegments,
+  type SegmentWirePartialCoverage,
 } from "./network-summary/graph/networkSummaryGraphModel";
 import { type SvgPreviewOptions, useNetworkSummaryExportActions } from "./network-summary/export/useNetworkSummaryExportActions";
 import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
@@ -628,6 +629,34 @@ export function NetworkSummaryPanel({
     visibleModelMaxY
   ]);
 
+  // A wire that terminates on a floating splice only traverses part of that endpoint
+  // segment; expose those covered lengths so the highlight can be drawn partially.
+  const selectedWirePartialCoverage = useMemo<SegmentWirePartialCoverage[]>(() => {
+    if (selectedWireId === null) {
+      return [];
+    }
+    const selectedWire = wires.find((wire) => wire.id === selectedWireId);
+    if (selectedWire === undefined) {
+      return [];
+    }
+    const coverage: SegmentWirePartialCoverage[] = [];
+    const addEndpointCoverage = (
+      detail: typeof selectedWire.routeEndpointDetailA,
+      endpoint: typeof selectedWire.endpointA
+    ): void => {
+      if (detail !== undefined && endpoint.kind === "splicePort") {
+        coverage.push({
+          segmentId: detail.segmentId,
+          spliceId: endpoint.spliceId,
+          coveredLengthMm: detail.coveredLengthMm,
+        });
+      }
+    };
+    addEndpointCoverage(selectedWire.routeEndpointDetailA, selectedWire.endpointA);
+    addEndpointCoverage(selectedWire.routeEndpointDetailB, selectedWire.endpointB);
+    return coverage;
+  }, [selectedWireId, wires]);
+
   const renderedSegments = useMemo(
     () =>
       buildRenderedSegments({
@@ -638,6 +667,7 @@ export function NetworkSummaryPanel({
         isSubNetworkFilteringActive,
         activeSubNetworkTagSet: activeSubNetworkTags,
         selectedWireRouteSegmentIds,
+        selectedWirePartialCoverage,
         selectedSegmentId,
         selectedBatchSegmentIds,
         connectorMap,
@@ -663,6 +693,7 @@ export function NetworkSummaryPanel({
       isSubNetworkFilteringActive,
       activeSubNetworkTags,
       selectedWireRouteSegmentIds,
+      selectedWirePartialCoverage,
       selectedSegmentId,
       selectedBatchSegmentIds,
       connectorMap,
