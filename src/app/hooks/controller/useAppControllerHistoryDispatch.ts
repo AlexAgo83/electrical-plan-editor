@@ -64,6 +64,14 @@ export function useAppControllerHistoryDispatch({
           variant: toast.variant
         });
       }
+
+      const nextWarning = nextState.ui.lastWarning ?? null;
+      if (nextWarning !== null && nextWarning !== (previousState.ui.lastWarning ?? null)) {
+        notifyToast("Adjustment applied", {
+          message: nextWarning.message,
+          variant: "warning"
+        });
+      }
     },
     [dispatchActionWithHistory, notifyToast, store]
   );

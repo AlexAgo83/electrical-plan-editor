@@ -1,13 +1,10 @@
-import type { CatalogItemId, SegmentId, WireProtection } from "../../core/entities";
+import type { CatalogItemId, NodeId, SegmentId, Wire, WireProtection } from "../../core/entities";
 import { normalizeWireColorState } from "../../core/cableColors";
 import { normalizeDirectionalSpliceEndpoint } from "../../core/directionalSplice";
 import { normalizeWireEndpointReferenceName } from "../../core/wireReferences";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
 import { FUNCTIONAL_FILTERS } from "../../core/functionalSchematic";
-import { buildRoutingGraphIndex } from "../../core/graph";
-import { findShortestRoute } from "../../core/pathfinding";
-import { resolveSplicePortMode } from "../../core/splicePortMode";
 import type { AppAction } from "../actions";
 import type { AppState } from "../types";
 import {
@@ -17,15 +14,17 @@ import {
   setEndpointOccupant,
   type EndpointOccupancyState
 } from "./helpers/occupancy";
+import { canWriteEndpointOccupancy, isEndpointOccupancyExclusive } from "./helpers/wireEndpointOccupancyGuards";
 import {
-  computeForcedRouteLength,
-  findNodeIdForEndpoint,
+  computeForcedRouteWithAnchors,
+  computeShortestWireRoute,
   getEndpointKey,
   getEndpointValidationError,
   recomputeWireRouteAndDirectionalEndpoints,
-  resolveDirectionalSpliceEndpointSide
+  resolveDirectionalSpliceEndpointSide,
+  resolveWireEndpointAnchor
 } from "./helpers/wireTransitions";
-import { bumpRevision, clearLastError, isValidSlotIndex, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
+import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
 
 function hasDuplicateWireTechnicalId(state: AppState, wireId: string, technicalId: string): boolean {
   return state.wires.allIds.some((id) => {
@@ -70,19 +69,6 @@ function normalizeWireFunctionalDomainTag(value: string | undefined): string | u
   return (FUNCTIONAL_FILTERS as readonly string[]).includes(normalized) && normalized !== "all" ? normalized : undefined;
 }
 
-function isDirectionalSpliceEndpoint(state: AppState, endpoint: Parameters<typeof getEndpointOccupant>[1]): boolean {
-  if (endpoint.kind !== "splicePort") {
-    return false;
-  }
-
-  const splice = state.splices.byId[endpoint.spliceId];
-  return splice !== undefined && resolveSplicePortMode(splice) === "directional";
-}
-
-function isEndpointOccupancyExclusive(state: AppState, endpoint: Parameters<typeof getEndpointOccupant>[1]): boolean {
-  return !isDirectionalSpliceEndpoint(state, endpoint);
-}
-
 function normalizeWireProtection(
   state: AppState,
   protection: WireProtection | undefined
@@ -118,58 +104,6 @@ function normalizeWireProtection(
     },
     error: null
   };
-}
-
-function canWriteEndpointOccupancy(state: AppState, endpoint: Parameters<typeof getEndpointOccupant>[1]): boolean {
-  if (endpoint.kind === "connectorCavity") {
-    const connector = state.connectors.byId[endpoint.connectorId];
-    if (connector === undefined) {
-      console.warn("Rejected wire occupancy write for missing connector endpoint.", {
-        connectorId: endpoint.connectorId,
-        cavityIndex: endpoint.cavityIndex
-      });
-      return false;
-    }
-
-    if (!isValidSlotIndex(endpoint.cavityIndex, connector.cavityCount)) {
-      console.warn("Rejected wire occupancy write with out-of-range connector cavity index.", {
-        connectorId: endpoint.connectorId,
-        cavityIndex: endpoint.cavityIndex,
-        cavityCount: connector.cavityCount
-      });
-      return false;
-    }
-
-    return true;
-  }
-
-  const splice = state.splices.byId[endpoint.spliceId];
-  if (splice === undefined) {
-    console.warn("Rejected wire occupancy write for missing splice endpoint.", {
-      spliceId: endpoint.spliceId,
-      portIndex: endpoint.portIndex
-    });
-    return false;
-  }
-
-  const portMode = resolveSplicePortMode(splice);
-  const isValidPortIndex =
-    portMode === "unbounded"
-      ? Number.isInteger(endpoint.portIndex) && endpoint.portIndex >= 1
-      : portMode === "directional"
-        ? endpoint.portIndex === 1 || endpoint.portIndex === 2
-        : isValidSlotIndex(endpoint.portIndex, splice.portCount);
-  if (!isValidPortIndex) {
-    console.warn("Rejected wire occupancy write with out-of-range splice port index.", {
-      spliceId: endpoint.spliceId,
-      portIndex: endpoint.portIndex,
-      portMode,
-      portCount: splice.portCount
-    });
-    return false;
-  }
-
-  return true;
 }
 
 export function handleWireActions(state: AppState, action: AppAction): AppState | null {
@@ -225,25 +159,26 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         return withError(state, "Wire endpoints must be different.");
       }
 
-      const startNodeId = findNodeIdForEndpoint(state, endpointA);
-      const endNodeId = findNodeIdForEndpoint(state, endpointB);
-      if (startNodeId === undefined || endNodeId === undefined) {
-        return withError(state, "Wire endpoints must be mapped to routing graph nodes.");
+      const anchorAResult = resolveWireEndpointAnchor(state, endpointA);
+      const anchorBResult = resolveWireEndpointAnchor(state, endpointB);
+      if ("error" in anchorAResult) {
+        return withError(state, anchorAResult.error);
       }
+      if ("error" in anchorBResult) {
+        return withError(state, anchorBResult.error);
+      }
+      const anchorA = anchorAResult.anchor;
+      const anchorB = anchorBResult.anchor;
 
       const existingWire = state.wires.byId[action.payload.id];
-      const graph = buildRoutingGraphIndex(
-        state.nodes.allIds
-          .map((nodeId) => state.nodes.byId[nodeId])
-          .filter((node): node is NonNullable<typeof node> => node !== undefined),
-        state.segments.allIds
-          .map((segmentId) => state.segments.byId[segmentId])
-          .filter((segment): segment is NonNullable<typeof segment> => segment !== undefined)
-      );
 
       let routeSegmentIds: SegmentId[] = [];
+      let routeEndpointDetailA: Wire["routeEndpointDetailA"];
+      let routeEndpointDetailB: Wire["routeEndpointDetailB"];
       let lengthMm = 0;
       let isRouteLocked = false;
+      let exitNodeIdHintA: NodeId | null = null;
+      let exitNodeIdHintB: NodeId | null = null;
 
       const sameEndpointsAsExisting =
         existingWire !== undefined &&
@@ -251,30 +186,36 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         getEndpointKey(existingWire.endpointB) === getEndpointKey(endpointB);
 
       if (existingWire !== undefined && existingWire.isRouteLocked && sameEndpointsAsExisting) {
-        const forcedLength = computeForcedRouteLength(state, startNodeId, endNodeId, existingWire.routeSegmentIds);
-        if (forcedLength === null) {
+        const forced = computeForcedRouteWithAnchors(state, anchorA, anchorB, existingWire.routeSegmentIds);
+        if (forced === null) {
           return withError(state, "Existing locked route is invalid for the current network.");
         }
 
         routeSegmentIds = existingWire.routeSegmentIds;
-        lengthMm = forcedLength;
+        routeEndpointDetailA = forced.detailA;
+        routeEndpointDetailB = forced.detailB;
+        lengthMm = forced.lengthMm;
         isRouteLocked = true;
       } else {
-        const shortestRoute = findShortestRoute(graph, startNodeId, endNodeId);
-        if (shortestRoute === null) {
+        const computedRoute = computeShortestWireRoute(state, anchorA, anchorB);
+        if (computedRoute === null) {
           return withError(state, "No valid route was found between selected wire endpoints.");
         }
 
-        routeSegmentIds = shortestRoute.segmentIds;
-        lengthMm = shortestRoute.totalLengthMm;
+        routeSegmentIds = computedRoute.routeSegmentIds;
+        routeEndpointDetailA = computedRoute.detailA;
+        routeEndpointDetailB = computedRoute.detailB;
+        lengthMm = computedRoute.lengthMm;
+        exitNodeIdHintA = computedRoute.exitNodeIdHintA;
+        exitNodeIdHintB = computedRoute.exitNodeIdHintB;
         isRouteLocked = false;
       }
 
-      const endpointASide = resolveDirectionalSpliceEndpointSide(state, endpointA, routeSegmentIds, "A");
+      const endpointASide = resolveDirectionalSpliceEndpointSide(state, endpointA, routeSegmentIds, "A", exitNodeIdHintA);
       if (endpointASide !== null) {
         endpointA = normalizeDirectionalSpliceEndpoint(endpointA, endpointASide);
       }
-      const endpointBSide = resolveDirectionalSpliceEndpointSide(state, endpointB, routeSegmentIds, "B");
+      const endpointBSide = resolveDirectionalSpliceEndpointSide(state, endpointB, routeSegmentIds, "B", exitNodeIdHintB);
       if (endpointBSide !== null) {
         endpointB = normalizeDirectionalSpliceEndpoint(endpointB, endpointBSide);
       }
@@ -369,6 +310,8 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
           endpointA,
           endpointB,
           routeSegmentIds,
+          routeEndpointDetailA,
+          routeEndpointDetailB,
           lengthMm,
           isRouteLocked
         })
@@ -381,14 +324,19 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         return withError(state, "Cannot lock route for unknown wire.");
       }
 
-      const startNodeId = findNodeIdForEndpoint(state, wire.endpointA);
-      const endNodeId = findNodeIdForEndpoint(state, wire.endpointB);
-      if (startNodeId === undefined || endNodeId === undefined) {
+      const anchorAResult = resolveWireEndpointAnchor(state, wire.endpointA);
+      const anchorBResult = resolveWireEndpointAnchor(state, wire.endpointB);
+      if ("error" in anchorAResult || "error" in anchorBResult) {
         return withError(state, "Cannot lock route: wire endpoints are not mapped to graph nodes.");
       }
 
-      const forcedLength = computeForcedRouteLength(state, startNodeId, endNodeId, action.payload.segmentIds);
-      if (forcedLength === null) {
+      const forced = computeForcedRouteWithAnchors(
+        state,
+        anchorAResult.anchor,
+        anchorBResult.anchor,
+        action.payload.segmentIds
+      );
+      if (forced === null) {
         return withError(state, "Forced route is invalid for selected wire endpoints.");
       }
 
@@ -397,7 +345,9 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         wires: upsertEntity(state.wires, {
           ...wire,
           routeSegmentIds: [...action.payload.segmentIds],
-          lengthMm: forcedLength,
+          routeEndpointDetailA: forced.detailA,
+          routeEndpointDetailB: forced.detailB,
+          lengthMm: forced.lengthMm,
           isRouteLocked: true
         })
       });

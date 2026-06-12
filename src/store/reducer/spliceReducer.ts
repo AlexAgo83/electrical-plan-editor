@@ -1,13 +1,11 @@
 import type { AppAction } from "../actions";
 import { analyzeSpliceDeleteImpact } from "../deleteImpact";
-import {
-  normalizeDirectionalSpliceEndpoint,
-  type DirectionalSpliceSide
-} from "../../core/directionalSplice";
-import type { SegmentId, Wire, WireEndpoint, WireId } from "../../core/entities";
-import { recomputeWireRouteAndDirectionalEndpoints, resolveDirectionalSpliceEndpointSide } from "./helpers/wireTransitions";
-import type { AppState, EntityState } from "../types";
-import { applyOptimizedSplicePlacement } from "./splicePlacementReducer";
+import { recomputeWireRouteAndDirectionalEndpoints } from "./helpers/wireTransitions";
+import { convertWireEndpointsForDirectionalSplice } from "./helpers/spliceDirectionalConversion";
+import { isSameSplicePlacement } from "../../core/splicePlacement";
+import { getSplicePlacementValidationError } from "./helpers/splicePlacement";
+import type { AppState } from "../types";
+import { applyOptimizedSpliceCanvasLayout } from "./spliceCanvasLayoutReducer";
 import {
   DIRECTIONAL_SPLICE_PORT_COUNT,
   normalizeSplicePortMode,
@@ -106,63 +104,6 @@ function hasWireEndpointReferenceOnSplice(state: AppState, spliceId: string): bo
   });
 }
 
-function resolveConvertedEndpointSide(
-  state: AppState,
-  endpoint: Extract<WireEndpoint, { kind: "splicePort" }>,
-  routeSegmentIds: SegmentId[],
-  wireSide: "A" | "B",
-  originalPortCount: number
-): DirectionalSpliceSide {
-  const inferredSide = resolveDirectionalSpliceEndpointSide(state, endpoint, routeSegmentIds, wireSide);
-  if (inferredSide !== null) {
-    return inferredSide;
-  }
-
-  return endpoint.portIndex > Math.ceil(originalPortCount / 2) ? "R" : "L";
-}
-
-function convertWireEndpointsForDirectionalSplice(
-  state: AppState,
-  spliceId: string,
-  originalPortCount: number
-): EntityState<Wire, WireId> {
-  const nextWiresById = { ...state.wires.byId };
-  for (const wireId of state.wires.allIds) {
-    const wire = state.wires.byId[wireId];
-    if (wire === undefined) {
-      continue;
-    }
-
-    let endpointA = wire.endpointA;
-    let endpointB = wire.endpointB;
-    if (endpointA.kind === "splicePort" && endpointA.spliceId === spliceId) {
-      endpointA = normalizeDirectionalSpliceEndpoint(
-        endpointA,
-        resolveConvertedEndpointSide(state, endpointA, wire.routeSegmentIds, "A", originalPortCount)
-      );
-    }
-    if (endpointB.kind === "splicePort" && endpointB.spliceId === spliceId) {
-      endpointB = normalizeDirectionalSpliceEndpoint(
-        endpointB,
-        resolveConvertedEndpointSide(state, endpointB, wire.routeSegmentIds, "B", originalPortCount)
-      );
-    }
-
-    if (endpointA !== wire.endpointA || endpointB !== wire.endpointB) {
-      nextWiresById[wireId] = {
-        ...wire,
-        endpointA,
-        endpointB
-      };
-    }
-  }
-
-  return {
-    ...state.wires,
-    byId: nextWiresById
-  };
-}
-
 export function handleSpliceActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "splice/upsert": {
@@ -199,6 +140,24 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
         return withError(state, `Splice technical ID '${normalizedTechnicalId}' is already used.`);
       }
 
+      const previousSplice = state.splices.byId[action.payload.id];
+      const nextPlacement = action.payload.placement;
+      if (nextPlacement !== undefined) {
+        const placementError = getSplicePlacementValidationError(state, nextPlacement);
+        if (placementError !== null) {
+          return withError(state, placementError);
+        }
+      }
+      const placementChanged = !isSameSplicePlacement(previousSplice?.placement, nextPlacement);
+      if (
+        placementChanged &&
+        nextPlacement === undefined &&
+        previousSplice?.placement !== undefined &&
+        hasWireEndpointReferenceOnSplice(state, action.payload.id)
+      ) {
+        return withError(state, "Cannot remove splice placement while wire endpoints reference the splice.");
+      }
+
       if (portMode === "bounded") {
         const occupancy = state.splicePortOccupancy[action.payload.id];
         if (occupancy !== undefined) {
@@ -217,42 +176,68 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
           return withError(state, "Splice portCount cannot be reduced below wire endpoint port indexes.");
         }
       }
+      const upsertedSplice = {
+        ...action.payload,
+        name: normalizedName,
+        technicalId: normalizedTechnicalId,
+        portMode,
+        portCount,
+        sideInverted: action.payload.sideInverted === true,
+        placement: nextPlacement,
+        manufacturerReference:
+          linkedCatalogItem !== undefined
+            ? linkedCatalogItem.manufacturerReference
+            : normalizeManufacturerReference(action.payload.manufacturerReference)
+      };
+
+      let nextSplicePortOccupancy = state.splicePortOccupancy;
       if (portMode === "directional") {
-        const nextSplicePortOccupancy = { ...state.splicePortOccupancy };
+        nextSplicePortOccupancy = { ...state.splicePortOccupancy };
         delete nextSplicePortOccupancy[action.payload.id];
-        return bumpRevision({
-          ...clearLastError(state),
-          splicePortOccupancy: nextSplicePortOccupancy,
-          splices: upsertEntity(state.splices, {
-            ...action.payload,
-            name: normalizedName,
-            technicalId: normalizedTechnicalId,
-            portMode,
-            portCount,
-            sideInverted: action.payload.sideInverted === true,
-            manufacturerReference:
-              linkedCatalogItem !== undefined
-                ? linkedCatalogItem.manufacturerReference
-                : normalizeManufacturerReference(action.payload.manufacturerReference)
-          })
-        });
       }
 
-      return bumpRevision({
+      let stateAfterUpsert: AppState = {
         ...clearLastError(state),
-        splices: upsertEntity(state.splices, {
-          ...action.payload,
-          name: normalizedName,
-          technicalId: normalizedTechnicalId,
-          portMode,
-          portCount,
-          sideInverted: action.payload.sideInverted === true,
-          manufacturerReference:
-            linkedCatalogItem !== undefined
-              ? linkedCatalogItem.manufacturerReference
-              : normalizeManufacturerReference(action.payload.manufacturerReference)
-        })
-      });
+        splicePortOccupancy: nextSplicePortOccupancy,
+        splices: upsertEntity(state.splices, upsertedSplice)
+      };
+
+      if (placementChanged && previousSplice !== undefined) {
+        const nextWiresById = { ...stateAfterUpsert.wires.byId };
+        let touchedWireCount = 0;
+        for (const wireId of stateAfterUpsert.wires.allIds) {
+          const wire = stateAfterUpsert.wires.byId[wireId];
+          if (
+            wire === undefined ||
+            !(
+              (wire.endpointA.kind === "splicePort" && wire.endpointA.spliceId === action.payload.id) ||
+              (wire.endpointB.kind === "splicePort" && wire.endpointB.spliceId === action.payload.id)
+            )
+          ) {
+            continue;
+          }
+
+          const recomputed = recomputeWireRouteAndDirectionalEndpoints(stateAfterUpsert, wire);
+          if (!("wire" in recomputed)) {
+            return withError(state, recomputed.error);
+          }
+
+          nextWiresById[wireId] = recomputed.wire;
+          touchedWireCount += 1;
+        }
+
+        if (touchedWireCount > 0) {
+          stateAfterUpsert = {
+            ...stateAfterUpsert,
+            wires: {
+              ...stateAfterUpsert.wires,
+              byId: nextWiresById
+            }
+          };
+        }
+      }
+
+      return bumpRevision(stateAfterUpsert);
     }
 
     case "splice/convertToDirectional": {
@@ -330,8 +315,8 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
       });
     }
 
-    case "splice/applyOptimizedPlacement": {
-      return applyOptimizedSplicePlacement(state, action);
+    case "splice/applyOptimizedCanvasLayout": {
+      return applyOptimizedSpliceCanvasLayout(state, action);
     }
 
     case "splice/remove": {

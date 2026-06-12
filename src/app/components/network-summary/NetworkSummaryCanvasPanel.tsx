@@ -5,7 +5,7 @@ import type {
   RefObject,
   WheelEvent as ReactWheelEvent
 } from "react";
-import type { NetworkNode, NodeId, SegmentId, Wire } from "../../../core/entities";
+import type { NetworkNode, NodeId, SegmentId, SpliceId, Wire } from "../../../core/entities";
 import type { CanvasCalloutTextSize, CanvasLabelSizeMode, CanvasLabelStrokeMode, NodePosition } from "../../types/app-controller";
 import { NetworkSummaryCalloutLeaders, NetworkSummaryCalloutsLayer } from "./callouts/NetworkSummaryCalloutsLayer";
 import type { CableCalloutViewModel, CalloutTargetKey, RenderedCableCallout } from "./callouts/calloutLayout";
@@ -14,7 +14,11 @@ import {
   type SplicePlacementPreviewNodeModel,
   type SplicePlacementPreviewSegmentModel
 } from "./graph/NetworkSummaryGraphLayers";
-import type { RenderedNodeModel, RenderedSegmentModel } from "./graph/networkSummaryGraphModel";
+import type {
+  RenderedFloatingSpliceModel,
+  RenderedNodeModel,
+  RenderedSegmentModel
+} from "./graph/networkSummaryGraphModel";
 import { NetworkCanvasFloatingInfoPanels } from "./NetworkCanvasFloatingInfoPanels";
 import { NetworkSummaryLegend } from "./NetworkSummaryLegend";
 import type { SubNetworkSummary } from "../../../store";
@@ -61,6 +65,7 @@ interface NetworkSummaryCanvasPanelProps {
   renderedSegments: RenderedSegmentModel[];
   splicePlacementPreviewSegments: SplicePlacementPreviewSegmentModel[];
   splicePlacementPreviewNode: SplicePlacementPreviewNodeModel | null;
+  renderedFloatingSplices: RenderedFloatingSpliceModel[];
   renderedNodes: RenderedNodeModel[];
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
@@ -87,6 +92,7 @@ interface NetworkSummaryCanvasPanelProps {
   ) => void;
   onSelectConnectorFromCallout: Parameters<typeof NetworkSummaryCalloutsLayer>[0]["onSelectConnectorFromCallout"];
   onSelectSpliceFromCallout: Parameters<typeof NetworkSummaryCalloutsLayer>[0]["onSelectSpliceFromCallout"];
+  onActivateFloatingSplice: (spliceId: SpliceId) => void;
   onSelectWireFromConnectorPin: Parameters<typeof NetworkSummaryCalloutsLayer>[0]["onSelectWireFromConnectorPin"];
 }
 
@@ -132,6 +138,7 @@ export function NetworkSummaryCanvasPanel({
   renderedSegments,
   splicePlacementPreviewSegments,
   splicePlacementPreviewNode,
+  renderedFloatingSplices,
   renderedNodes,
   showSegmentNames,
   showSegmentLengths,
@@ -155,6 +162,7 @@ export function NetworkSummaryCanvasPanel({
   handleCalloutMouseDown,
   onSelectConnectorFromCallout,
   onSelectSpliceFromCallout,
+  onActivateFloatingSplice,
   onSelectWireFromConnectorPin
 }: NetworkSummaryCanvasPanelProps): ReactElement {
   return (
@@ -211,6 +219,7 @@ export function NetworkSummaryCanvasPanel({
                 renderedSegments={renderedSegments}
                 splicePlacementPreviewSegments={splicePlacementPreviewSegments}
                 splicePlacementPreviewNode={splicePlacementPreviewNode}
+                renderedFloatingSplices={renderedFloatingSplices}
                 renderedNodes={renderedNodes}
                 showSegmentNames={showSegmentNames}
                 showSegmentLengths={showSegmentLengths}
@@ -228,6 +237,8 @@ export function NetworkSummaryCanvasPanel({
                 onSegmentCalloutMouseDown={handleSegmentCalloutMouseDown}
                 onNodeMouseDown={handleNetworkNodeMouseDown}
                 onNodeActivate={handleNetworkNodeActivate}
+                onSelectFloatingSplice={onSelectSpliceFromCallout}
+                onActivateFloatingSplice={onActivateFloatingSplice}
                 onOpenInspectorForSelection={openInspectorForCanvasSelection}
                 onSelectWireFromConnectorPin={onSelectWireFromConnectorPin}
               />

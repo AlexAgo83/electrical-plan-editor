@@ -6,17 +6,23 @@ import {
   type ReactNode,
   useRef
 } from "react";
-import type { NetworkNode, NodeId, SegmentId, WireId } from "../../../../core/entities";
+import type { NetworkNode, NodeId, SegmentId, SpliceId, WireId } from "../../../../core/entities";
 import type { NodePosition } from "../../../types/app-controller";
 import { getConsistentConnectorLayoutDrawingSize, renderConnectorLayoutDrawing } from "../callouts/NetworkSummaryCalloutsLayer";
 import {
   SEGMENT_SHEATH_CALLOUT_COLUMN_DIVIDER_OFFSETS,
   SEGMENT_SHEATH_CALLOUT_COLUMN_TEXT_OFFSETS,
+  type RenderedFloatingSpliceModel,
   type RenderedNodeModel,
   type RenderedSegmentModel
 } from "./networkSummaryGraphModel";
 
 const DOUBLE_CLICK_INTERVAL_MS = 450;
+
+// Sub-span distances can carry rounding noise from non-integer splice offsets; keep them tidy.
+function formatSegmentLengthMm(lengthMm: number): number {
+  return Number.isInteger(lengthMm) ? lengthMm : Math.round(lengthMm * 10) / 10;
+}
 
 export interface SplicePlacementPreviewSegmentModel {
   key: string;
@@ -45,6 +51,7 @@ interface NetworkSummaryGraphLayersProps {
   renderedSegments: RenderedSegmentModel[];
   splicePlacementPreviewSegments?: SplicePlacementPreviewSegmentModel[];
   splicePlacementPreviewNode?: SplicePlacementPreviewNodeModel | null;
+  renderedFloatingSplices: RenderedFloatingSpliceModel[];
   renderedNodes: RenderedNodeModel[];
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
@@ -62,6 +69,8 @@ interface NetworkSummaryGraphLayersProps {
   onSegmentCalloutMouseDown: (event: ReactMouseEvent<SVGGElement>, segmentId: SegmentId) => void;
   onNodeMouseDown: (event: ReactMouseEvent<SVGGElement>, nodeId: NodeId) => void;
   onNodeActivate: (nodeId: NodeId) => void;
+  onSelectFloatingSplice: (spliceId: SpliceId) => void;
+  onActivateFloatingSplice: (spliceId: SpliceId) => void;
   onOpenInspectorForSelection: () => void;
   onSelectWireFromConnectorPin: (wireId: WireId) => void;
 }
@@ -133,6 +142,7 @@ export function NetworkSummaryGraphLayers({
   renderedSegments,
   splicePlacementPreviewSegments = [],
   splicePlacementPreviewNode = null,
+  renderedFloatingSplices,
   renderedNodes,
   showSegmentNames,
   showSegmentLengths,
@@ -150,6 +160,8 @@ export function NetworkSummaryGraphLayers({
   onSegmentCalloutMouseDown,
   onNodeMouseDown,
   onNodeActivate,
+  onSelectFloatingSplice,
+  onActivateFloatingSplice,
   onOpenInspectorForSelection,
   onSelectWireFromConnectorPin
 }: NetworkSummaryGraphLayersProps): ReactElement {
@@ -396,6 +408,90 @@ export function NetworkSummaryGraphLayers({
     );
   };
 
+  const renderFloatingSplice = ({
+    splice,
+    position,
+    anchorPosition,
+    nodeClassName,
+  }: RenderedFloatingSpliceModel): ReactElement => {
+    const spliceDiamondSize = 30 * normalizedNodeShapeScale;
+    const spliceHitboxSize = 38 * normalizedNodeShapeScale;
+    const shapeAnchorTransform = `translate(${position.x} ${position.y}) scale(${inverseLabelScale}) translate(${-position.x} ${-position.y})`;
+    const hasAnchorTick =
+      Math.abs(anchorPosition.x - position.x) > 0.01 ||
+      Math.abs(anchorPosition.y - position.y) > 0.01;
+    return (
+      <g
+        key={splice.id}
+        className={nodeClassName}
+        data-splice-id={splice.id}
+        role="button"
+        tabIndex={0}
+        focusable="true"
+        aria-label={`Select splice ${splice.technicalId}`}
+        onClick={(event) => {
+          event.stopPropagation();
+          onSelectFloatingSplice(splice.id);
+          if (event.detail >= 2 || isRepeatedClick(`splice:${splice.id}`)) {
+            onActivateFloatingSplice(splice.id);
+            onOpenInspectorForSelection();
+          }
+        }}
+        onDoubleClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          onActivateFloatingSplice(splice.id);
+          onOpenInspectorForSelection();
+        }}
+        onKeyDown={(event) => {
+          if (event.key !== "Enter" && event.key !== " ") {
+            return;
+          }
+          event.preventDefault();
+          event.stopPropagation();
+          onActivateFloatingSplice(splice.id);
+          onOpenInspectorForSelection();
+        }}
+      >
+        <title>{splice.technicalId}</title>
+        {hasAnchorTick ? (
+          <line
+            className="network-splice-placement-preview-segment is-current"
+            x1={anchorPosition.x}
+            y1={anchorPosition.y}
+            x2={position.x}
+            y2={position.y}
+          />
+        ) : null}
+        <g
+          className={zoomInvariantNodeShapes ? "network-node-shape-anchor" : undefined}
+          transform={zoomInvariantNodeShapes ? shapeAnchorTransform : undefined}
+        >
+          <rect
+            className="network-node-hitbox"
+            x={position.x - spliceHitboxSize / 2}
+            y={position.y - spliceHitboxSize / 2}
+            width={spliceHitboxSize}
+            height={spliceHitboxSize}
+            rx={7}
+            ry={7}
+            transform={`rotate(45 ${position.x} ${position.y})`}
+          />
+          <rect
+            className="network-node-shape"
+            x={position.x - spliceDiamondSize / 2}
+            y={position.y - spliceDiamondSize / 2}
+            width={spliceDiamondSize}
+            height={spliceDiamondSize}
+            rx={5}
+            ry={5}
+            transform={`rotate(45 ${position.x} ${position.y})`}
+          />
+        </g>
+      </g>
+    );
+  };
+
   return (
     <>
       <g
@@ -448,7 +544,7 @@ export function NetworkSummaryGraphLayers({
       ) : null}
 
       <g className="network-graph-layer network-graph-layer-segments" transform={`translate(${networkOffset.x} ${networkOffset.y}) scale(${networkScale})`}>
-        {renderedSegments.map(({ segment, nodeAPosition, nodeBPosition, segmentClassName, segmentGroupClassName }) => (
+        {renderedSegments.map(({ segment, nodeAPosition, nodeBPosition, segmentClassName, segmentGroupClassName, wireHighlightPortion }) => (
           <g key={segment.id} className={segmentGroupClassName} data-segment-id={segment.id}>
             <line
               className={segmentClassName}
@@ -457,6 +553,26 @@ export function NetworkSummaryGraphLayers({
               x2={nodeBPosition.x}
               y2={nodeBPosition.y}
             />
+            {wireHighlightPortion ? (
+              <>
+                <line
+                  className="network-segment-wire-highlight-portion"
+                  x1={wireHighlightPortion.x1}
+                  y1={wireHighlightPortion.y1}
+                  x2={wireHighlightPortion.x2}
+                  y2={wireHighlightPortion.y2}
+                />
+                {wireHighlightPortion.markers.map((marker) => (
+                  <circle
+                    key={marker.key}
+                    className="network-segment-wire-highlight-marker"
+                    cx={marker.x}
+                    cy={marker.y}
+                    r={4}
+                  />
+                ))}
+              </>
+            ) : null}
             <line
               className="network-segment-hitbox"
               x1={nodeAPosition.x}
@@ -501,6 +617,7 @@ export function NetworkSummaryGraphLayers({
             segmentIdLabelY,
             segmentLengthLabelX,
             segmentLengthLabelY,
+            segmentLengthSubLabels,
             mountingLabels
           }) => (
             <g key={`${segment.id}-labels`} className={segmentGroupClassName} data-segment-id={segment.id}>
@@ -523,28 +640,56 @@ export function NetworkSummaryGraphLayers({
                 </g>
               ) : null}
               {showSegmentLengths ? (
-                <g
-                  className="network-segment-length-label-anchor"
-                  transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
-                >
-                  <text
-                    className="network-segment-length-label"
-                    x={segmentLengthLabelX}
-                    y={segmentLengthLabelY}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    transform={
-                      segmentLabelRotationDegrees === 0
-                        ? undefined
-                        : `rotate(${segmentLabelRotationDegrees} ${segmentLengthLabelX} ${segmentLengthLabelY})`
-                    }
+                segmentLengthSubLabels.length > 0 ? (
+                  segmentLengthSubLabels.map((subLabel) => (
+                    <g
+                      key={subLabel.key}
+                      className="network-segment-length-label-anchor"
+                      transform={`translate(${subLabel.anchorX} ${subLabel.anchorY}) scale(${inverseLabelScale})`}
+                    >
+                      <text
+                        className="network-segment-length-label"
+                        x={subLabel.textX}
+                        y={subLabel.textY}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        transform={
+                          subLabel.rotationDegrees === 0
+                            ? undefined
+                            : `rotate(${subLabel.rotationDegrees} ${subLabel.textX} ${subLabel.textY})`
+                        }
+                      >
+                        <tspan>{formatSegmentLengthMm(subLabel.lengthMm)}</tspan>
+                        <tspan className="network-segment-length-unit" dx="2">
+                          mm
+                        </tspan>
+                      </text>
+                    </g>
+                  ))
+                ) : (
+                  <g
+                    className="network-segment-length-label-anchor"
+                    transform={`translate(${labelX} ${labelY}) scale(${inverseLabelScale})`}
                   >
-                    <tspan>{segment.lengthMm}</tspan>
-                    <tspan className="network-segment-length-unit" dx="2">
-                      mm
-                    </tspan>
-                  </text>
-                </g>
+                    <text
+                      className="network-segment-length-label"
+                      x={segmentLengthLabelX}
+                      y={segmentLengthLabelY}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      transform={
+                        segmentLabelRotationDegrees === 0
+                          ? undefined
+                          : `rotate(${segmentLabelRotationDegrees} ${segmentLengthLabelX} ${segmentLengthLabelY})`
+                      }
+                    >
+                      <tspan>{segment.lengthMm}</tspan>
+                      <tspan className="network-segment-length-unit" dx="2">
+                        mm
+                      </tspan>
+                    </text>
+                  </g>
+                )
               ) : null}
               {showSegmentDressings
                 ? mountingLabels.map((label) => (
@@ -590,6 +735,7 @@ export function NetworkSummaryGraphLayers({
         }
       >
         {renderedNodes.filter(({ connectorLayout }) => connectorLayout === undefined).map(renderNode)}
+        {renderedFloatingSplices.map(renderFloatingSplice)}
       </g>
 
       <g
@@ -625,6 +771,29 @@ export function NetworkSummaryGraphLayers({
             </g>
           );
         })}
+        {renderedFloatingSplices.map(({ splice, position, nodeLabel, isSubNetworkDeemphasized }) => (
+          <g
+            key={`${splice.id}-label`}
+            className={`network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`}
+            data-splice-id={splice.id}
+          >
+            <g
+              className="network-node-label-anchor"
+              transform={`translate(${position.x} ${position.y}) scale(${inverseLabelScale})`}
+            >
+              <text
+                className="network-node-label"
+                x={0}
+                y={0}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                transform={labelRotationDegrees === 0 ? undefined : `rotate(${labelRotationDegrees} 0 0)`}
+              >
+                {nodeLabel}
+              </text>
+            </g>
+          </g>
+        ))}
       </g>
 
       <g

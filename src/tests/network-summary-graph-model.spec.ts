@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogItemId, ConnectorId, NetworkNode, NodeId, Segment, SegmentId, SpliceId } from "../core/entities";
-import { buildRenderedNodes, buildRenderedSegments } from "../app/components/network-summary/graph/networkSummaryGraphModel";
+import {
+  buildRenderedFloatingSplices,
+  buildRenderedNodes,
+  buildRenderedSegments
+} from "../app/components/network-summary/graph/networkSummaryGraphModel";
 
 function asNodeId(value: string): NodeId {
   return value as NodeId;
@@ -466,6 +470,118 @@ describe("buildRenderedSegments", () => {
     expect(rendered[0]?.segmentCallout?.targetX).toBe(20);
     expect(rendered[0]?.segmentCallout?.targetY).toBe(0);
   });
+
+  it("splits the length label into node↔splice sub-distances when splices sit on the segment", () => {
+    const segmentId = asSegmentId("SEG-SUB");
+    const segment: Segment = {
+      id: segmentId,
+      nodeA: asNodeId("N-A"),
+      nodeB: asNodeId("N-B"),
+      lengthMm: 400
+    };
+    const spliceOneId = asSpliceId("SP-1");
+    const spliceTwoId = asSpliceId("SP-2");
+
+    const rendered = buildRenderedSegments({
+      segments: [segment],
+      networkNodePositions: {
+        [asNodeId("N-A")]: { x: 0, y: 0 },
+        [asNodeId("N-B")]: { x: 400, y: 0 }
+      },
+      segmentSubNetworkTagById: new Map(),
+      isSubNetworkFilteringActive: false,
+      activeSubNetworkTagSet: new Set(),
+      selectedWireRouteSegmentIds: new Set(),
+      selectedSegmentId: null,
+      ...emptySegmentRenderContext,
+      spliceMap: new Map([
+        [
+          spliceOneId,
+          {
+            id: spliceOneId,
+            name: "Splice 1",
+            technicalId: "SP-1",
+            portCount: 2,
+            placement: { kind: "segmentOffset", segmentId, fromNodeId: asNodeId("N-A"), offsetMm: 120 }
+          }
+        ],
+        [
+          spliceTwoId,
+          {
+            id: spliceTwoId,
+            name: "Splice 2",
+            technicalId: "SP-2",
+            portCount: 2,
+            placement: { kind: "segmentOffset", segmentId, fromNodeId: asNodeId("N-A"), offsetMm: 200 }
+          }
+        ]
+      ]),
+      autoSegmentLabelRotation: true,
+      labelRotationDegrees: 0,
+      showSegmentNames: false,
+      showSegmentLengths: true
+    });
+
+    const subLabels = rendered[0]?.segmentLengthSubLabels ?? [];
+    // 0→120, 120→200, 200→400 along nodeA→nodeB.
+    expect(subLabels.map((label) => label.lengthMm)).toEqual([120, 80, 200]);
+    // Midpoints projected on the (0,0)→(400,0) centerline.
+    expect(subLabels.map((label) => Math.round(label.anchorX))).toEqual([60, 160, 300]);
+  });
+
+  it("highlights only the covered portion when a selected wire ends on a floating splice", () => {
+    const segmentId = asSegmentId("SEG-PARTIAL");
+    const segment: Segment = {
+      id: segmentId,
+      nodeA: asNodeId("N-A"),
+      nodeB: asNodeId("N-B"),
+      lengthMm: 400
+    };
+    const spliceId = asSpliceId("SP-END");
+
+    const rendered = buildRenderedSegments({
+      segments: [segment],
+      networkNodePositions: {
+        [asNodeId("N-A")]: { x: 0, y: 0 },
+        [asNodeId("N-B")]: { x: 400, y: 0 }
+      },
+      segmentSubNetworkTagById: new Map(),
+      isSubNetworkFilteringActive: false,
+      activeSubNetworkTagSet: new Set(),
+      selectedWireRouteSegmentIds: new Set([segmentId]),
+      selectedWirePartialCoverage: [{ segmentId, spliceId, coveredLengthMm: 280 }],
+      selectedSegmentId: null,
+      ...emptySegmentRenderContext,
+      spliceMap: new Map([
+        [
+          spliceId,
+          {
+            id: spliceId,
+            name: "Splice End",
+            technicalId: "SP-END",
+            portCount: 2,
+            // Splice at 120mm from nodeA; wire covers 280mm → runs to nodeB.
+            placement: { kind: "segmentOffset", segmentId, fromNodeId: asNodeId("N-A"), offsetMm: 120 }
+          }
+        ]
+      ]),
+      autoSegmentLabelRotation: true,
+      labelRotationDegrees: 0,
+      showSegmentNames: false,
+      showSegmentLengths: true
+    });
+
+    const entry = rendered[0];
+    // Partial highlights are overlaid, so the base line is not given the full-highlight class.
+    expect(entry?.segmentClassName).not.toContain("is-wire-highlighted");
+    expect(entry?.wireHighlightPortion).not.toBeNull();
+    // Covered portion spans the splice (x=120) to nodeB (x=400).
+    expect(Math.round(entry?.wireHighlightPortion?.x1 ?? -1)).toBe(120);
+    expect(Math.round(entry?.wireHighlightPortion?.x2 ?? -1)).toBe(400);
+    // A marker is placed at the splice anchor.
+    expect(entry?.wireHighlightPortion?.markers).toHaveLength(1);
+    expect(Math.round(entry?.wireHighlightPortion?.markers[0]?.x ?? -1)).toBe(120);
+  });
 });
 
 describe("buildRenderedNodes", () => {
@@ -608,5 +724,98 @@ describe("buildRenderedNodes", () => {
     });
 
     expect(rendered[0]?.nodeLabel).toBe("LAT-N10.1");
+  });
+});
+
+describe("buildRenderedFloatingSplices", () => {
+  it("renders a placed splice without requiring a splice node", () => {
+    const segment: Segment = {
+      id: asSegmentId("SEG-1"),
+      nodeA: asNodeId("N-A"),
+      nodeB: asNodeId("N-B"),
+      lengthMm: 100,
+    };
+
+    const rendered = buildRenderedFloatingSplices({
+      splices: [
+        {
+          id: asSpliceId("S-1"),
+          name: "Splice 1",
+          technicalId: "SP-1",
+          portCount: 2,
+          placement: {
+            kind: "segmentOffset",
+            segmentId: segment.id,
+            fromNodeId: segment.nodeA,
+            offsetMm: 25,
+          },
+        },
+      ],
+      nodes: [],
+      segments: [segment],
+      networkNodePositions: {
+        [segment.nodeA]: { x: 0, y: 0 },
+        [segment.nodeB]: { x: 100, y: 0 },
+      },
+      segmentSubNetworkTagById: new Map([[segment.id, "(default)"]]),
+      isSubNetworkFilteringActive: false,
+      activeSubNetworkTagSet: new Set(["(default)"]),
+      selectedSpliceId: asSpliceId("S-1"),
+    });
+
+    expect(rendered).toHaveLength(1);
+    expect(rendered[0]?.anchorPosition).toEqual({ x: 25, y: 0 });
+    expect(rendered[0]?.nodeClassName).toContain("is-selected");
+  });
+
+  it("applies a render-only offset when a placed splice resolves onto a node", () => {
+    const segment: Segment = {
+      id: asSegmentId("SEG-1"),
+      nodeA: asNodeId("N-A"),
+      nodeB: asNodeId("N-B"),
+      lengthMm: 100,
+    };
+
+    const rendered = buildRenderedFloatingSplices({
+      splices: [
+        {
+          id: asSpliceId("S-1"),
+          name: "Splice 1",
+          technicalId: "SP-1",
+          portCount: 2,
+          placement: {
+            kind: "segmentOffset",
+            segmentId: segment.id,
+            fromNodeId: segment.nodeA,
+            offsetMm: 0,
+          },
+        },
+      ],
+      nodes: [
+        {
+          id: segment.nodeA,
+          kind: "intermediate",
+          label: "A",
+        },
+        {
+          id: segment.nodeB,
+          kind: "intermediate",
+          label: "B",
+        },
+      ],
+      segments: [segment],
+      networkNodePositions: {
+        [segment.nodeA]: { x: 0, y: 0 },
+        [segment.nodeB]: { x: 100, y: 0 },
+      },
+      segmentSubNetworkTagById: new Map([[segment.id, "(default)"]]),
+      isSubNetworkFilteringActive: false,
+      activeSubNetworkTagSet: new Set(["(default)"]),
+      selectedSpliceId: null,
+    });
+
+    expect(rendered).toHaveLength(1);
+    expect(rendered[0]?.anchorPosition).toEqual({ x: 0, y: 0 });
+    expect(rendered[0]?.position).not.toEqual(rendered[0]?.anchorPosition);
   });
 });

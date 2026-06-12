@@ -21,7 +21,7 @@ import {
   analyzeSegmentDeleteImpact,
   analyzeSpliceDeleteImpact
 } from "../../store/deleteImpact";
-import { computeForcedRouteLength, findNodeIdForEndpoint } from "../../store/reducer/helpers/wireTransitions";
+import { computeForcedRouteWithAnchors, resolveWireEndpointAnchor } from "../../store/reducer/helpers/wireTransitions";
 import { assignScopedState } from "../../store/networking";
 import { createNodePositionMap } from "./layout/generation";
 
@@ -1618,12 +1618,12 @@ function routeLockValidationMessage(state: AppState, operation: AiAgentLockWireR
   if (wire === undefined) {
     return null;
   }
-  const startNodeId = findNodeIdForEndpoint(state, wire.endpointA);
-  const endNodeId = findNodeIdForEndpoint(state, wire.endpointB);
-  if (startNodeId === undefined || endNodeId === undefined) {
+  const anchorA = resolveWireEndpointAnchor(state, wire.endpointA);
+  const anchorB = resolveWireEndpointAnchor(state, wire.endpointB);
+  if ("error" in anchorA || "error" in anchorB) {
     return "Route lock requires endpoints that can be resolved to canvas nodes.";
   }
-  return computeForcedRouteLength(state, startNodeId, endNodeId, operation.segmentIds) === null
+  return computeForcedRouteWithAnchors(state, anchorA.anchor, anchorB.anchor, operation.segmentIds) === null
     ? "Route lock segments must form a continuous path between the wire endpoints."
     : null;
 }

@@ -116,6 +116,16 @@ function createModelingDropdownOrderingState(): AppState {
       lengthMm: 25
     })
   );
+  state = appReducer(
+    state,
+    appActions.upsertSplice({
+      id: asSpliceId("S-Z"),
+      name: "Zulu splice",
+      technicalId: "S-Z",
+      portCount: 4,
+      placement: { kind: "segmentOffset", segmentId: asSegmentId("SEG-MISSING"), fromNodeId: asNodeId("NODE-A"), offsetMm: 10 }
+    })
+  );
 
   const stateWithWire = appReducer(
     state,

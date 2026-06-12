@@ -11,6 +11,7 @@ import type {
   SpliceId,
   WireId
 } from "../../../../core/entities";
+import { resolveSplicePlacementFromEntities, type ResolvedSplicePlacement } from "../../../../core/splicePlacement";
 import { resolveEditedConnectorLayout } from "../../../../core/connectorLayout";
 import type { NodePosition } from "../../../types/app-controller";
 import type { ConnectorDrawingDisplayMode } from "../../../types/app-controller";
@@ -22,6 +23,30 @@ import {
 } from "../callouts/NetworkSummaryCalloutsLayer";
 import { normalizeReadableSegmentLabelAngle } from "../callouts/calloutLayout";
 import { resolveBackshellHelperNodeReference } from "../../../lib/backshellHelperNodeReference";
+
+export interface SegmentLengthSubLabel {
+  key: string;
+  anchorX: number;
+  anchorY: number;
+  textX: number;
+  textY: number;
+  rotationDegrees: number;
+  lengthMm: number;
+}
+
+export interface SegmentWireHighlightPortion {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  markers: Array<{ key: string; x: number; y: number }>;
+}
+
+export interface SegmentWirePartialCoverage {
+  segmentId: SegmentId;
+  spliceId: SpliceId;
+  coveredLengthMm: number;
+}
 
 export interface RenderedSegmentModel {
   segment: Segment;
@@ -36,6 +61,12 @@ export interface RenderedSegmentModel {
   segmentIdLabelY: number;
   segmentLengthLabelX: number;
   segmentLengthLabelY: number;
+  // Per sub-span length labels (between consecutive nodes/splices). Empty when the
+  // segment carries no floating splice, in which case the single full-length label is used.
+  segmentLengthSubLabels: SegmentLengthSubLabel[];
+  // Only the portion of an endpoint segment actually traversed by the selected wire
+  // when that wire terminates on a floating splice. Null for full-segment highlights.
+  wireHighlightPortion: SegmentWireHighlightPortion | null;
   segmentCallout: {
     key: string;
     segmentId: SegmentId;
@@ -69,6 +100,16 @@ export interface RenderedNodeModel {
   isSubNetworkDeemphasized: boolean;
 }
 
+export interface RenderedFloatingSpliceModel {
+  splice: Splice;
+  position: NodePosition;
+  anchorPosition: NodePosition;
+  nodeClassName: string;
+  nodeLabel: string;
+  hostNodeId: NodeId;
+  isSubNetworkDeemphasized: boolean;
+}
+
 interface BuildRenderedSegmentsParams {
   segments: Segment[];
   nodes: NetworkNode[];
@@ -77,6 +118,7 @@ interface BuildRenderedSegmentsParams {
   isSubNetworkFilteringActive: boolean;
   activeSubNetworkTagSet: ReadonlySet<string>;
   selectedWireRouteSegmentIds: ReadonlySet<SegmentId>;
+  selectedWirePartialCoverage?: ReadonlyArray<SegmentWirePartialCoverage>;
   selectedSegmentId: SegmentId | null;
   selectedBatchSegmentIds?: ReadonlySet<SegmentId>;
   connectorMap: ReadonlyMap<ConnectorId, Connector>;
@@ -345,6 +387,7 @@ export function buildRenderedSegments({
   isSubNetworkFilteringActive,
   activeSubNetworkTagSet,
   selectedWireRouteSegmentIds,
+  selectedWirePartialCoverage = [],
   selectedSegmentId,
   selectedBatchSegmentIds = new Set<SegmentId>(),
   connectorMap,
@@ -366,6 +409,58 @@ export function buildRenderedSegments({
   const nodeById = new Map(nodes.map((node) => [node.id, node] as const));
   const segmentById = new Map(segments.map((segment) => [segment.id, segment] as const));
   const catalogItemById = new Map(catalogItems.map((item) => [item.id, item] as const));
+
+  // Offset of a placed splice measured from the segment's nodeA endpoint, regardless of
+  // which endpoint the placement happens to reference.
+  const offsetFromSegmentNodeA = (placement: ResolvedSplicePlacement, segment: Segment): number =>
+    placement.fromNodeId === segment.nodeA ? placement.offsetMm : segment.lengthMm - placement.offsetMm;
+
+  // Floating splices that land strictly inside a segment, sorted by their offset from nodeA.
+  // These subdivide the segment so we can display node↔splice / splice↔splice distances.
+  const placedSpliceOffsetsBySegmentId = new Map<SegmentId, number[]>();
+  for (const splice of spliceMap.values()) {
+    const placement = resolveSplicePlacementFromEntities(splice, (segmentId) => segmentById.get(segmentId));
+    if (placement.status !== "placed") {
+      continue;
+    }
+    const segment = segmentById.get(placement.segmentId);
+    if (segment === undefined || segment.lengthMm <= 0) {
+      continue;
+    }
+    const offset = offsetFromSegmentNodeA(placement, segment);
+    if (offset <= 0.0001 || offset >= segment.lengthMm - 0.0001) {
+      // Sitting on a node endpoint: it does not subdivide the segment.
+      continue;
+    }
+    const offsets = placedSpliceOffsetsBySegmentId.get(placement.segmentId) ?? [];
+    offsets.push(offset);
+    placedSpliceOffsetsBySegmentId.set(placement.segmentId, offsets);
+  }
+  for (const offsets of placedSpliceOffsetsBySegmentId.values()) {
+    offsets.sort((left, right) => left - right);
+  }
+
+  // Per-segment partial highlight ranges for the selected wire when it terminates on a
+  // floating splice (it only traverses part of that endpoint segment).
+  const partialCoverageBySegmentId = new Map<SegmentId, Array<{ markerRatio: number; coveredLengthMm: number }>>();
+  for (const entry of selectedWirePartialCoverage) {
+    const segment = segmentById.get(entry.segmentId);
+    if (segment === undefined || segment.lengthMm <= 0) {
+      continue;
+    }
+    const splice = spliceMap.get(entry.spliceId);
+    if (splice === undefined) {
+      continue;
+    }
+    const placement = resolveSplicePlacementFromEntities(splice, (segmentId) => segmentById.get(segmentId));
+    if (placement.status !== "placed" || placement.segmentId !== entry.segmentId) {
+      continue;
+    }
+    const markerRatio = offsetFromSegmentNodeA(placement, segment) / segment.lengthMm;
+    const ranges = partialCoverageBySegmentId.get(entry.segmentId) ?? [];
+    ranges.push({ markerRatio, coveredLengthMm: entry.coveredLengthMm });
+    partialCoverageBySegmentId.set(entry.segmentId, ranges);
+  }
   const nodeShapeScale = normalizedNodeShapeScale * (zoomInvariantNodeShapes ? inverseLabelScale : 1);
   const segmentGeometryById = new Map<SegmentId, SegmentRenderGeometry>();
   const segmentCalloutById = new Map<SegmentId, RenderedSegmentModel["segmentCallout"]>();
@@ -582,8 +677,11 @@ export function buildRenderedSegments({
     const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
     const isSubNetworkDeemphasized = isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentSubNetworkTag);
     const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
+    const partialCoverage = partialCoverageBySegmentId.get(segment.id);
+    const isPartialWireHighlight = isWireHighlighted && partialCoverage !== undefined && partialCoverage.length > 0;
     const isSelectedSegment = selectedSegmentId === segment.id || selectedBatchSegmentIds.has(segment.id);
-    const segmentClassName = `network-segment${isWireHighlighted ? " is-wire-highlighted" : ""}${
+    // Partial highlights are drawn as a dedicated overlay, so the base line keeps its normal style.
+    const segmentClassName = `network-segment${isWireHighlighted && !isPartialWireHighlight ? " is-wire-highlighted" : ""}${
       isSelectedSegment ? " is-selected" : ""
     }`;
     const segmentGroupClassName = `network-entity-group${isSubNetworkDeemphasized ? " is-deemphasized" : ""}`;
@@ -624,6 +722,75 @@ export function buildRenderedSegments({
       };
     });
 
+    const pointAtRatio = (ratio: number): NodePosition => ({
+      x: nodeAPosition.x + segmentVectorX * ratio,
+      y: nodeAPosition.y + segmentVectorY * ratio
+    });
+
+    // One length label per sub-span (node↔splice, splice↔splice) when the segment carries
+    // floating splices; otherwise empty and the single full-length label is rendered instead.
+    const spliceOffsets = placedSpliceOffsetsBySegmentId.get(segment.id) ?? [];
+    const segmentLengthSubLabels: SegmentLengthSubLabel[] = [];
+    if (spliceOffsets.length > 0 && segment.lengthMm > 0) {
+      const breakpoints = [0, ...spliceOffsets, segment.lengthMm];
+      for (let index = 0; index < breakpoints.length - 1; index += 1) {
+        const spanStart = breakpoints[index] ?? 0;
+        const spanEnd = breakpoints[index + 1] ?? segment.lengthMm;
+        const spanLengthMm = spanEnd - spanStart;
+        if (spanLengthMm <= 0.0001) {
+          continue;
+        }
+        const midpoint = pointAtRatio((spanStart + spanEnd) / 2 / segment.lengthMm);
+        segmentLengthSubLabels.push({
+          key: `${segment.id}-len-${index}`,
+          anchorX: midpoint.x,
+          anchorY: midpoint.y,
+          textX: segmentLengthLabelOffsetX,
+          textY: segmentLengthLabelOffsetY,
+          rotationDegrees: segmentLabelRotationDegrees,
+          lengthMm: spanLengthMm
+        });
+      }
+    }
+
+    let wireHighlightPortion: SegmentWireHighlightPortion | null = null;
+    if (isPartialWireHighlight && partialCoverage !== undefined) {
+      const markerRatios = partialCoverage.map((coverage) => coverage.markerRatio);
+      let startRatio = 0;
+      let endRatio = 0;
+      const firstCoverage = partialCoverage[0];
+      if (partialCoverage.length >= 2) {
+        // Both wire endpoints sit on splices of this single segment: cover between them.
+        startRatio = Math.min(...markerRatios);
+        endRatio = Math.max(...markerRatios);
+      } else if (firstCoverage !== undefined) {
+        const { markerRatio, coveredLengthMm } = firstCoverage;
+        const distanceToNodeAMm = markerRatio * segment.lengthMm;
+        const distanceToNodeBMm = segment.lengthMm - distanceToNodeAMm;
+        const extendsTowardNodeA =
+          Math.abs(coveredLengthMm - distanceToNodeAMm) <= Math.abs(coveredLengthMm - distanceToNodeBMm);
+        const coveredRatio = segment.lengthMm > 0 ? coveredLengthMm / segment.lengthMm : 0;
+        const otherRatio = Math.min(
+          1,
+          Math.max(0, extendsTowardNodeA ? markerRatio - coveredRatio : markerRatio + coveredRatio)
+        );
+        startRatio = Math.min(markerRatio, otherRatio);
+        endRatio = Math.max(markerRatio, otherRatio);
+      }
+      const start = pointAtRatio(startRatio);
+      const end = pointAtRatio(endRatio);
+      wireHighlightPortion = {
+        x1: start.x,
+        y1: start.y,
+        x2: end.x,
+        y2: end.y,
+        markers: partialCoverage.map((coverage, index) => {
+          const markerPoint = pointAtRatio(coverage.markerRatio);
+          return { key: `${segment.id}-wirehl-${index}`, x: markerPoint.x, y: markerPoint.y };
+        })
+      };
+    }
+
     result.push({
       segment,
       nodeAPosition,
@@ -637,6 +804,8 @@ export function buildRenderedSegments({
       segmentIdLabelY: -segmentLengthLabelOffsetY,
       segmentLengthLabelX: segmentLengthLabelOffsetX,
       segmentLengthLabelY: segmentLengthLabelOffsetY,
+      segmentLengthSubLabels,
+      wireHighlightPortion,
       segmentCallout,
       mountingLabels
     });
@@ -660,6 +829,212 @@ interface BuildRenderedNodesParams {
   connectorCalloutGroupsById: ReadonlyMap<ConnectorId, CalloutGroup[]>;
   selectedWireId: WireId | null;
   spliceMap: ReadonlyMap<SpliceId, Splice>;
+}
+
+interface BuildRenderedFloatingSplicesParams {
+  splices: Splice[];
+  nodes: NetworkNode[];
+  segments: Segment[];
+  networkNodePositions: Record<NodeId, NodePosition>;
+  segmentSubNetworkTagById: ReadonlyMap<SegmentId, string>;
+  isSubNetworkFilteringActive: boolean;
+  activeSubNetworkTagSet: ReadonlySet<string>;
+  selectedSpliceId: SpliceId | null;
+}
+
+const FLOATING_SPLICE_RENDER_CLEARANCE = 24;
+const FLOATING_SPLICE_RENDER_STEP = 18;
+
+function normalizeVector(x: number, y: number): NodePosition {
+  const length = Math.hypot(x, y);
+  if (length <= 0.0001) {
+    return { x: 0, y: -1 };
+  }
+  return { x: x / length, y: y / length };
+}
+
+function buildFanSteps(count: number): number[] {
+  if (count <= 1) {
+    return [0];
+  }
+  const steps: number[] = [];
+  if (count % 2 === 1) {
+    const radius = (count - 1) / 2;
+    for (let index = -radius; index <= radius; index += 1) {
+      steps.push(index);
+    }
+    return steps;
+  }
+
+  const radius = count / 2;
+  for (let index = -radius; index <= radius; index += 1) {
+    if (index === 0) {
+      continue;
+    }
+    steps.push(index);
+  }
+  return steps;
+}
+
+function isTooClose(
+  position: NodePosition,
+  obstacles: readonly NodePosition[],
+  minimumDistance: number
+): boolean {
+  const minimumDistanceSquared = minimumDistance * minimumDistance;
+  return obstacles.some((obstacle) => {
+    const deltaX = position.x - obstacle.x;
+    const deltaY = position.y - obstacle.y;
+    return deltaX * deltaX + deltaY * deltaY < minimumDistanceSquared;
+  });
+}
+
+export function buildRenderedFloatingSplices({
+  splices,
+  nodes,
+  segments,
+  networkNodePositions,
+  segmentSubNetworkTagById,
+  isSubNetworkFilteringActive,
+  activeSubNetworkTagSet,
+  selectedSpliceId,
+}: BuildRenderedFloatingSplicesParams): RenderedFloatingSpliceModel[] {
+  const segmentById = new Map(segments.map((segment) => [segment.id, segment] as const));
+  const spliceNodeIds = new Set(
+    nodes
+      .filter((node) => node.kind === "splice")
+      .map((node) => node.spliceId),
+  );
+  const placedCandidates = splices
+    .filter((splice) => !spliceNodeIds.has(splice.id))
+    .flatMap((splice) => {
+      const placement = resolveSplicePlacementFromEntities(
+        splice,
+        (segmentId) => segmentById.get(segmentId),
+      );
+      if (placement.status !== "placed") {
+        return [];
+      }
+      const fromPosition = networkNodePositions[placement.fromNodeId];
+      const toPosition = networkNodePositions[placement.toNodeId];
+      if (fromPosition === undefined || toPosition === undefined) {
+        return [];
+      }
+      const anchorPosition = {
+        x: fromPosition.x + (toPosition.x - fromPosition.x) * placement.ratio,
+        y: fromPosition.y + (toPosition.y - fromPosition.y) * placement.ratio,
+      };
+      const tangent = normalizeVector(
+        toPosition.x - fromPosition.x,
+        toPosition.y - fromPosition.y,
+      );
+      return [
+        {
+          splice,
+          hostNodeId: placement.fromNodeId,
+          anchorPosition,
+          normal: normalizeVector(-tangent.y, tangent.x),
+          segmentId: placement.segmentId,
+        },
+      ];
+    })
+    .sort(
+      (left, right) =>
+        left.anchorPosition.x - right.anchorPosition.x ||
+        left.anchorPosition.y - right.anchorPosition.y ||
+        left.splice.id.localeCompare(right.splice.id),
+    );
+
+  const groupEntriesByAnchorKey = new Map<string, typeof placedCandidates>();
+  for (const candidate of placedCandidates) {
+    const key = `${candidate.anchorPosition.x.toFixed(3)}:${candidate.anchorPosition.y.toFixed(3)}`;
+    const entries = groupEntriesByAnchorKey.get(key) ?? [];
+    entries.push(candidate);
+    groupEntriesByAnchorKey.set(key, entries);
+  }
+
+  const nodeObstacles = Object.values(networkNodePositions);
+  const renderedPositions: NodePosition[] = [];
+  const result: RenderedFloatingSpliceModel[] = [];
+
+  for (const [anchorKey, groupEntries] of groupEntriesByAnchorKey) {
+    void anchorKey;
+    const fanSteps = buildFanSteps(groupEntries.length);
+    for (let index = 0; index < groupEntries.length; index += 1) {
+      const entry = groupEntries[index]!;
+      const segmentTag =
+        segmentSubNetworkTagById.get(entry.segmentId) ?? "(default)";
+      const isSubNetworkDeemphasized =
+        isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentTag);
+      const nodeClassName = `network-node splice${
+        selectedSpliceId === entry.splice.id ? " is-selected" : ""
+      }${isSubNetworkDeemphasized ? " is-deemphasized" : ""} network-floating-splice`;
+      const preferredStep = fanSteps[index] ?? 0;
+      const nodeOverlap = isTooClose(
+        entry.anchorPosition,
+        nodeObstacles,
+        FLOATING_SPLICE_RENDER_CLEARANCE,
+      );
+      const fallbackSign =
+        preferredStep === 0
+          ? 1
+          : preferredStep < 0
+            ? -1
+            : 1;
+      const stepCandidates =
+        preferredStep === 0
+          ? [0, fallbackSign, -fallbackSign, 2 * fallbackSign, -2 * fallbackSign, 3 * fallbackSign]
+          : [
+              preferredStep,
+              preferredStep + fallbackSign,
+              preferredStep - fallbackSign,
+              preferredStep + 2 * fallbackSign,
+              preferredStep - 2 * fallbackSign,
+            ];
+
+      let displayPosition = entry.anchorPosition;
+      for (const candidateStep of stepCandidates) {
+        if (candidateStep === 0 && (nodeOverlap || groupEntries.length > 1)) {
+          continue;
+        }
+        const candidatePosition =
+          candidateStep === 0
+            ? entry.anchorPosition
+            : {
+                x:
+                  entry.anchorPosition.x +
+                  entry.normal.x * candidateStep * FLOATING_SPLICE_RENDER_STEP,
+                y:
+                  entry.anchorPosition.y +
+                  entry.normal.y * candidateStep * FLOATING_SPLICE_RENDER_STEP,
+              };
+        if (
+          isTooClose(
+            candidatePosition,
+            renderedPositions,
+            FLOATING_SPLICE_RENDER_CLEARANCE,
+          )
+        ) {
+          continue;
+        }
+        displayPosition = candidatePosition;
+        break;
+      }
+
+      renderedPositions.push(displayPosition);
+      result.push({
+        splice: entry.splice,
+        position: displayPosition,
+        anchorPosition: entry.anchorPosition,
+        nodeClassName,
+        nodeLabel: entry.splice.technicalId,
+        hostNodeId: entry.hostNodeId,
+        isSubNetworkDeemphasized,
+      });
+    }
+  }
+
+  return result;
 }
 
 function resolveNodeKindClass(nodeKind: NetworkNode["kind"]): "connector" | "splice" | "intermediate" {

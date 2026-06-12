@@ -37,6 +37,7 @@ interface UseAppControllerWorkspaceNetworkDomainAssemblyParams {
     dispatchAction: (action: AppAction, options?: { trackHistory?: boolean }) => void;
     notifyToast: (title: string, options?: { message?: string; variant?: ToastNotificationVariant }) => void;
     replaceStateWithHistory: (nextState: AppState) => void;
+    showSpliceMigrationReport: (entries: string[]) => void;
   };
   forms: {
     networkScopeFormState: NetworkScopeFormStateModel;
@@ -108,6 +109,7 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     activeNetworkId: core.activeNetworkId,
     dispatchAction: core.dispatchAction,
     notifyToast: core.notifyToast,
+    showSpliceMigrationReport: core.showSpliceMigrationReport,
     groupedBomPreferences: {
       workspaceCurrencyCode: ui.preferencesState.workspaceCurrencyCode,
       workspaceTaxEnabled: ui.preferencesState.workspaceTaxEnabled,

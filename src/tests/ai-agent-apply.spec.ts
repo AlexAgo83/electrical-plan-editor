@@ -434,7 +434,7 @@ describe("AI agent apply", () => {
         {
           type: "add_segment",
           nodeA: "H-N-AI-SERVICE" as NodeId,
-          nodeB: "H-N-HVIL" as NodeId,
+          nodeB: "H-N-OBC" as NodeId,
           lengthMm: 25
         },
         {
@@ -469,7 +469,7 @@ describe("AI agent apply", () => {
     expect(result.nextState.segments.byId["AI-SEG-001" as SegmentId]).toEqual({
       id: "AI-SEG-001",
       nodeA: "H-N-AI-SERVICE",
-      nodeB: "H-N-HVIL",
+      nodeB: "H-N-OBC",
       lengthMm: 25
     });
     expect(result.nextState.wires.byId["AI-WIRE-001" as WireId]).toEqual(

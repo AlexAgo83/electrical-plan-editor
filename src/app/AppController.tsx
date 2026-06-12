@@ -36,6 +36,7 @@ import { useAppControllerWorkspaceContentAssembly } from "./hooks/controller/use
 import { useAppControllerUniquenessFlags } from "./hooks/controller/useAppControllerUniquenessFlags";
 import { useAppControllerRefs } from "./hooks/controller/useAppControllerRefs";
 import { useAppControllerWorkspaceRuntime } from "./hooks/controller/useAppControllerWorkspaceRuntime";
+import { useAppControllerSpliceMigrationReport } from "./hooks/controller/useAppControllerSpliceMigrationReport";
 import { scrollToAiAgentPanel } from "./lib/aiAgentPanelScroll";
 import {
   useAppControllerActionRefsSyncEffect,
@@ -68,6 +69,7 @@ export type { AppProps } from "./types/app-controller";
 const APP_REPOSITORY_URL = "https://github.com/AlexAgo83/electrical-plan-editor";
 export function AppController({ store = appStore }: AppProps): ReactElement {
   const currentYear = new Date().getFullYear(), state = useAppSnapshot(store);
+  const { spliceMigrationReportDialog, showSpliceMigrationReport } = useAppControllerSpliceMigrationReport();
   const { NetworkSummaryPanel, AnalysisScreen, HomeScreen, ModelingScreen, NetworkScopeScreen, SettingsScreen, StatisticsScreen, ValidationScreen, AnalysisWorkspaceContent, HomeWorkspaceContent, ModelingFormsColumn, ModelingPrimaryTables, ModelingSecondaryTables, NetworkScopeWorkspaceContent, SettingsWorkspaceContent, StatisticsWorkspaceContent, ValidationWorkspaceContent } = appUiModules;
   const {
     networks,
@@ -428,7 +430,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setActiveScreen,
     setActiveSubScreen,
     setInteractionMode,
-    requestConfirmation
+    requestConfirmation,
+    showSpliceMigrationReport
   });
 
   const catalogHandlers = useCatalogHandlers({
@@ -541,7 +544,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isNetworkScopeScreen,
       dispatchAction,
       notifyToast,
-      replaceStateWithHistory
+      replaceStateWithHistory,
+      showSpliceMigrationReport
     },
     forms: {
       networkScopeFormState
@@ -1076,5 +1080,5 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     inspector: { isInspectorHidden, isInspectorOpen, inspectorContextPanel }
   });
-  return <><AppShellLayout {...appShellLayoutProps} /><ToastViewport toasts={toasts} onDismissToast={dismissToast} /><AppControllerOverlays appShellClassName={appShellClassName} activeConfirmDialog={activeConfirmDialog} closeActiveConfirmDialog={closeActiveConfirmDialog} activeChoiceDialog={activeChoiceDialog} closeActiveChoiceDialog={closeActiveChoiceDialog} activeBomPreview={activeBomPreview} isBomPreviewLoading={isBomPreviewLoading} closeActiveBomPreview={closeActiveBomPreview} confirmActiveBomPreviewDownload={confirmActiveBomPreviewDownload} openBomPreviewCatalogItem={openBomPreviewCatalogItem} openBomPreviewConnector={openBomPreviewConnector} onboarding={{ activeOnboardingStep, isOnboardingOpen, onboardingModalMode, onboardingStepDisplayIndex, onboardingTotalSteps, onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabledPersisted, closeOnboarding, handleOnboardingNext, canGoNext: canOnboardingGoNext, onboardingTargetActions }} /></>;
+  return <><AppShellLayout {...appShellLayoutProps} /><ToastViewport toasts={toasts} onDismissToast={dismissToast} /><AppControllerOverlays appShellClassName={appShellClassName} activeConfirmDialog={activeConfirmDialog} closeActiveConfirmDialog={closeActiveConfirmDialog} activeChoiceDialog={activeChoiceDialog} closeActiveChoiceDialog={closeActiveChoiceDialog} activeBomPreview={activeBomPreview} isBomPreviewLoading={isBomPreviewLoading} spliceMigrationReportDialog={spliceMigrationReportDialog} closeActiveBomPreview={closeActiveBomPreview} confirmActiveBomPreviewDownload={confirmActiveBomPreviewDownload} openBomPreviewCatalogItem={openBomPreviewCatalogItem} openBomPreviewConnector={openBomPreviewConnector} onboarding={{ activeOnboardingStep, isOnboardingOpen, onboardingModalMode, onboardingStepDisplayIndex, onboardingTotalSteps, onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabledPersisted, closeOnboarding, handleOnboardingNext, canGoNext: canOnboardingGoNext, onboardingTargetActions }} /></>;
 }

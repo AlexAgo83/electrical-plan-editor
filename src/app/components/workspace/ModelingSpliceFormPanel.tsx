@@ -31,18 +31,37 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     spliceManufacturerReference,
     spliceAutoCreateLinkedNode,
     setSpliceAutoCreateLinkedNode,
+    splicePlacementSegmentId,
+    setSplicePlacementSegmentId,
+    splicePlacementFromNodeId,
+    setSplicePlacementFromNodeId,
+    splicePlacementOffsetMm,
+    setSplicePlacementOffsetMm,
     spliceTechnicalIdAlreadyUsed,
     portCount,
     setPortCount,
     spliceFormInfo,
     cancelSpliceEdit,
-    spliceFormError
+    spliceFormError,
+    segments,
+    nodes,
+    describeNode
   } = props;
   const hasCatalogItems = catalogItems.length > 0;
   const isCatalogLinked = spliceCatalogItemId.trim().length > 0;
   const isUnbounded = splicePortMode === "unbounded";
   const isDirectional = splicePortMode === "directional";
   const selectedCatalogItem = catalogItems.find((item) => item.id === spliceCatalogItemId);
+  const selectablePlacementSegments = segments.filter((segment) => segment.role !== "rearBackshellLink");
+  const selectedPlacementSegment =
+    splicePlacementSegmentId.trim().length === 0
+      ? undefined
+      : selectablePlacementSegments.find((segment) => segment.id === splicePlacementSegmentId);
+  const placementReferenceNodeIds =
+    selectedPlacementSegment === undefined
+      ? []
+      : [selectedPlacementSegment.nodeA, selectedPlacementSegment.nodeB];
+  const nodeById = new Map(nodes.map((node) => [node.id, node] as const));
   const catalogItemOptions = buildModelingDynamicSelectOptions({
     options: catalogItems.map((item) => ({
       value: item.id,
@@ -197,6 +216,69 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       />
       Auto-create linked node on splice creation
     </label>
+    <label>
+      Host segment
+      <select
+        value={splicePlacementSegmentId}
+        onChange={(event) => {
+          const nextSegmentId = event.target.value;
+          setSplicePlacementSegmentId(nextSegmentId);
+          const nextSegment = selectablePlacementSegments.find((segment) => segment.id === nextSegmentId);
+          setSplicePlacementFromNodeId(nextSegment?.nodeA ?? "");
+          if (nextSegmentId.length === 0) {
+            setSplicePlacementOffsetMm("0");
+          }
+        }}
+      >
+        <option value="">Unplaced draft</option>
+        {selectablePlacementSegments.map((segment) => {
+          const nodeA = nodeById.get(segment.nodeA);
+          const nodeB = nodeById.get(segment.nodeB);
+          return (
+            <option key={segment.id} value={segment.id}>
+              {segment.id} ({nodeA === undefined ? segment.nodeA : describeNode(nodeA)} ↔ {nodeB === undefined ? segment.nodeB : describeNode(nodeB)}, {segment.lengthMm} mm)
+            </option>
+          );
+        })}
+      </select>
+    </label>
+    {selectedPlacementSegment !== undefined ? (
+      <>
+        <label>
+          Reference node
+          <select
+            value={splicePlacementFromNodeId}
+            onChange={(event) => setSplicePlacementFromNodeId(event.target.value)}
+          >
+            {placementReferenceNodeIds.map((nodeId) => {
+              const node = nodeById.get(nodeId);
+              return (
+                <option key={nodeId} value={nodeId}>
+                  {node === undefined ? nodeId : describeNode(node)}
+                </option>
+              );
+            })}
+          </select>
+        </label>
+        <label>
+          Offset from reference (mm)
+          <input
+            type="number"
+            min={0}
+            step={1}
+            value={splicePlacementOffsetMm}
+            onChange={(event) => setSplicePlacementOffsetMm(event.target.value)}
+          />
+        </label>
+        <small className="inline-help">
+          Host segment length: {selectedPlacementSegment.lengthMm} mm. `0` and the full segment length are valid placements.
+        </small>
+      </>
+    ) : (
+      <small className="inline-help">
+        Unplaced splices stay out of Network Summary and cannot be connected to wires until a segment placement is defined.
+      </small>
+    )}
     <div className="row-actions">
       <button
         type="submit"

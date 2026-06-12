@@ -1,4 +1,4 @@
-import type { ConnectorId, NetworkId, NodeId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
+import type { ConnectorId, NetworkId, NodeId, SegmentId, SpliceId, WireEndpoint, WireId } from "../../core/entities";
 import type { AppStore } from "../../store";
 
 export interface AppProps {
@@ -36,6 +36,15 @@ export interface SpliceSynthesisRow {
   remoteEndpointLabel: string;
   remoteEndpoint: WireEndpoint;
   lengthMm: number;
+  localCoveredLengthMm: number | null;
+  remoteCoveredLengthMm: number | null;
+}
+
+export interface SplicePlacementPresentation {
+  segmentId: SegmentId | null;
+  fromNodeId: NodeId | null;
+  fromNodeLabel: string | null;
+  offsetMm: number | null;
 }
 
 export type SubScreenId = "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
