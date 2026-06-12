@@ -1175,6 +1175,15 @@ export function useAppControllerModelingAnalysisScreenDomains({
           formsState.setSpliceManufacturerReference,
         spliceAutoCreateLinkedNode: formsState.spliceAutoCreateLinkedNode,
         setSpliceAutoCreateLinkedNode: formsState.setSpliceAutoCreateLinkedNode,
+        splicePlacementSegmentId: formsState.splicePlacementSegmentId,
+        setSplicePlacementSegmentId:
+          formsState.setSplicePlacementSegmentId,
+        splicePlacementFromNodeId: formsState.splicePlacementFromNodeId,
+        setSplicePlacementFromNodeId:
+          formsState.setSplicePlacementFromNodeId,
+        splicePlacementOffsetMm: formsState.splicePlacementOffsetMm,
+        setSplicePlacementOffsetMm:
+          formsState.setSplicePlacementOffsetMm,
         spliceTechnicalIdAlreadyUsed,
         portCount: formsState.portCount,
         setPortCount: formsState.setPortCount,

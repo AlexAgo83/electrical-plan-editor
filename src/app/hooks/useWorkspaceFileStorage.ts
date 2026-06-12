@@ -1,4 +1,5 @@
 import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { consumeLastSpliceMigrationReport } from "../../adapters/persistence";
 import { downloadJsonFile } from "./useNetworkImportExport";
 import { buildWorkspaceFileName, buildWorkspaceFilePayload, parseWorkspaceFilePayload, serializeWorkspaceFilePayload, type WorkspaceFilePayloadV1 } from "../lib/workspaceFile";
 import {
@@ -26,7 +27,8 @@ export function useWorkspaceFileStorage({
   store,
   replaceStateWithHistory,
   requestConfirmation,
-  notifyToast
+  notifyToast,
+  showSpliceMigrationReport
 }: UseWorkspaceFileStorageParams): UseWorkspaceFileStorageResult {
   const workspaceFileInputRef = useRef<HTMLInputElement | null>(null);
   const linkedHandleRef = useRef<WorkspaceFileHandle | null>(null);
@@ -73,17 +75,21 @@ export function useWorkspaceFileStorage({
       replaceStateWithHistory(parsed.state);
       lastLoadedPayloadRef.current = parsed.payload;
       linkedHandleRef.current = handle;
+      const spliceMigrationReport = consumeLastSpliceMigrationReport().map((entry) => entry.message);
       const nextPermission = handle === null ? "unavailable" : await resolveWritePermission(handle);
       if (handle !== null) {
         void writeStoredWorkspaceFileHandle(handle);
       }
       setStatusBase(createOpenedWorkspaceFileStatus(sourceLabel, handle, parsed.payload, nextPermission));
+      if (spliceMigrationReport.length > 0) {
+        showSpliceMigrationReport?.(spliceMigrationReport);
+      }
       notifyToast("Workspace file opened", {
         message: sourceLabel,
         variant: "success"
       });
     },
-    [notifyToast, replaceStateWithHistory, requestConfirmation]
+    [notifyToast, replaceStateWithHistory, requestConfirmation, showSpliceMigrationReport]
   );
 
   useEffect(() => {

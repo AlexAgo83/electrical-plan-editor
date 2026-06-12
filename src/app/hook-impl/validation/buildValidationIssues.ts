@@ -427,6 +427,79 @@ export function buildValidationIssues({
       }
     }
 
+    const placement = splice.placement;
+    const hasLegacySpliceNode = nodes.some((node) => node.kind === "splice" && node.spliceId === splice.id);
+    if (placement !== undefined) {
+      const hostSegment = segmentMap.get(placement.segmentId);
+      if (!Number.isFinite(placement.offsetMm) || placement.offsetMm < 0) {
+        issues.push({
+          id: `splice-placement-invalid-offset-${splice.id}`,
+          severity: "error",
+          category: "Splice placement validity",
+          message: `Splice '${splice.technicalId}' placement offset is invalid.`,
+          subScreen: "splice",
+          selectionKind: "splice",
+          selectionId: splice.id
+        });
+      } else if (hostSegment === undefined) {
+        issues.push({
+          id: `splice-placement-missing-segment-${splice.id}`,
+          severity: "error",
+          category: "Splice placement validity",
+          message: `Splice '${splice.technicalId}' is placed on missing segment '${placement.segmentId}'.`,
+          subScreen: "splice",
+          selectionKind: "splice",
+          selectionId: splice.id
+        });
+      } else if (hostSegment.role === "rearBackshellLink") {
+        issues.push({
+          id: `splice-placement-backshell-segment-${splice.id}`,
+          severity: "error",
+          category: "Splice placement validity",
+          message: `Splice '${splice.technicalId}' cannot be placed on rear backshell link segment '${hostSegment.id}'.`,
+          subScreen: "splice",
+          selectionKind: "splice",
+          selectionId: splice.id
+        });
+      } else if (placement.fromNodeId !== hostSegment.nodeA && placement.fromNodeId !== hostSegment.nodeB) {
+        issues.push({
+          id: `splice-placement-invalid-from-node-${splice.id}`,
+          severity: "error",
+          category: "Splice placement validity",
+          message: `Splice '${splice.technicalId}' placement reference node '${placement.fromNodeId}' is not an endpoint of segment '${hostSegment.id}'.`,
+          subScreen: "splice",
+          selectionKind: "splice",
+          selectionId: splice.id
+        });
+      } else if (placement.offsetMm > hostSegment.lengthMm) {
+        issues.push({
+          id: `splice-placement-offset-out-of-range-${splice.id}`,
+          severity: "error",
+          category: "Splice placement validity",
+          message: `Splice '${splice.technicalId}' placement offset (${placement.offsetMm} mm) exceeds segment '${hostSegment.id}' length (${hostSegment.lengthMm} mm).`,
+          subScreen: "splice",
+          selectionKind: "splice",
+          selectionId: splice.id
+        });
+      }
+    } else if (!hasLegacySpliceNode) {
+      const isConnected = wires.some(
+        (wire) =>
+          (wire.endpointA.kind === "splicePort" && wire.endpointA.spliceId === splice.id) ||
+          (wire.endpointB.kind === "splicePort" && wire.endpointB.spliceId === splice.id)
+      );
+      issues.push({
+        id: `splice-unplaced-${splice.id}`,
+        severity: isConnected ? "error" : "warning",
+        category: "Splice placement validity",
+        message: isConnected
+          ? `Splice '${splice.technicalId}' has connected wires but no segment placement.`
+          : `Splice '${splice.technicalId}' is not placed on a segment yet; it stays hidden and cannot be wired.`,
+        subScreen: "splice",
+        selectionKind: "splice",
+        selectionId: splice.id
+      });
+    }
   }
 
   for (const wire of wires) {

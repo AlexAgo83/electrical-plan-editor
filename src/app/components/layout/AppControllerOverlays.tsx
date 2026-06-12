@@ -3,12 +3,14 @@ import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 import { ChoiceDialog } from "../dialogs/ChoiceDialog";
 import { DeleteImpactDialog } from "../dialogs/DeleteImpactDialog";
 import { BomExportPreviewDialog } from "../dialogs/BomExportPreviewDialog";
+import { FileFeedbackDialog } from "../dialogs/FileFeedbackDialog";
 import { PreviewLoadingDialog } from "../dialogs/PreviewLoadingDialog";
 import { OnboardingModal } from "../onboarding/OnboardingModal";
 import type { ActiveConfirmDialogState } from "../../hooks/controller/useConfirmDialogController";
 import type { ActiveChoiceDialogState } from "../../hooks/controller/useChoiceDialogController";
 import type { OnboardingControllerModel } from "../../hooks/controller/useOnboardingController";
 import type { ActiveBomPreviewState } from "../../hooks/controller/useAppControllerBomExportHandlers";
+import type { FileFeedbackDialogModel } from "../../hooks/networkImportExportTypes";
 import type { CatalogItemId, ConnectorId } from "../../../core/entities";
 
 interface AppControllerOverlaysProps {
@@ -19,6 +21,7 @@ interface AppControllerOverlaysProps {
   closeActiveChoiceDialog: (choiceId: string | null) => void;
   activeBomPreview: ActiveBomPreviewState | null;
   isBomPreviewLoading: boolean;
+  spliceMigrationReportDialog: FileFeedbackDialogModel | null;
   closeActiveBomPreview: () => void;
   confirmActiveBomPreviewDownload: () => void;
   openBomPreviewCatalogItem: (catalogItemId: CatalogItemId) => void;
@@ -47,6 +50,7 @@ export function AppControllerOverlays({
   closeActiveChoiceDialog,
   activeBomPreview,
   isBomPreviewLoading,
+  spliceMigrationReportDialog,
   closeActiveBomPreview,
   confirmActiveBomPreviewDownload,
   openBomPreviewCatalogItem,
@@ -58,6 +62,7 @@ export function AppControllerOverlays({
     activeChoiceDialog === null &&
     activeBomPreview === null &&
     !isBomPreviewLoading &&
+    spliceMigrationReportDialog === null &&
     onboarding.activeOnboardingStep === undefined
   ) {
     return null;
@@ -131,6 +136,16 @@ export function AppControllerOverlays({
         title="Preparing BOM preview"
         message="Building the export table."
       />
+      {spliceMigrationReportDialog !== null ? (
+        <FileFeedbackDialog
+          isOpen={spliceMigrationReportDialog !== null}
+          themeHostClassName={appShellClassName}
+          title={spliceMigrationReportDialog.title}
+          message={spliceMigrationReportDialog.message}
+          items={spliceMigrationReportDialog.items}
+          onClose={spliceMigrationReportDialog.onClose}
+        />
+      ) : null}
       {onboarding.activeOnboardingStep !== undefined ? (
         <OnboardingModal
           isOpen={onboarding.isOnboardingOpen}

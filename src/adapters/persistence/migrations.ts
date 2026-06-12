@@ -47,9 +47,11 @@ import {
   normalizeAppError,
   type AppError
 } from "../../store/types";
+import { normalizeSplicePlacement, normalizeWireRouteEndpointDetail } from "../../core/splicePlacement";
 import { normalizeHarnessAssemblyEntityState } from "./harnessAssemblyMigrations";
+import { migrateLegacySpliceNodes, type SpliceMigrationReportEntry } from "./spliceNodeMigration";
 
-export const PERSISTED_STATE_SCHEMA_VERSION = 3;
+export const PERSISTED_STATE_SCHEMA_VERSION = 4;
 export const PERSISTED_STATE_PAYLOAD_KIND = "electrical-plan-editor.workspace-state";
 
 type PlainObject = Record<string, unknown>;
@@ -135,7 +137,9 @@ function normalizeWireEntityState(candidate: EntityState<Wire, WireId>): EntityS
       endpointBConnectionReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointBConnectionReference),
       endpointBConnectionName: normalizeWireEndpointReferenceName((wire as Partial<Wire>).endpointBConnectionName),
       endpointBSealReference: normalizeManufacturerReference((wire as Partial<Wire>).endpointBSealReference),
-      endpointBSealName: normalizeWireEndpointReferenceName((wire as Partial<Wire>).endpointBSealName)
+      endpointBSealName: normalizeWireEndpointReferenceName((wire as Partial<Wire>).endpointBSealName),
+      routeEndpointDetailA: normalizeWireRouteEndpointDetail((wire as Partial<Wire>).routeEndpointDetailA),
+      routeEndpointDetailB: normalizeWireRouteEndpointDetail((wire as Partial<Wire>).routeEndpointDetailB)
     };
   }
 
@@ -271,6 +275,7 @@ function normalizeSpliceEntityState(candidate: EntityState<Splice, SpliceId>): E
             ? DIRECTIONAL_SPLICE_PORT_COUNT
             : normalizeUnboundedPortCountFallback(rawSplice.portCount),
       sideInverted: rawSplice.sideInverted === true,
+      placement: normalizeSplicePlacement(rawSplice.placement),
       manufacturerReference: normalizeManufacturerReference(rawSplice.manufacturerReference)
     };
   }
@@ -627,6 +632,47 @@ function asCurrentVersionedSnapshot(payload: unknown): PersistedStateSnapshot | 
   return buildCurrentSnapshotEnvelope(normalizedState, createdAtIso, updatedAtIso);
 }
 
+interface VersionedPipelineEntrySnapshot {
+  pipelineVersion: PipelineVersion;
+  createdAtIso: string;
+  updatedAtIso: string;
+  state: AppState;
+}
+
+function asVersionedSnapshotBeforeSpliceMigration(payload: unknown): VersionedPipelineEntrySnapshot | null {
+  if (!isRecord(payload)) {
+    return null;
+  }
+
+  if (
+    payload.payloadKind !== PERSISTED_STATE_PAYLOAD_KIND ||
+    payload.schemaVersion !== 3 ||
+    typeof payload.appVersion !== "string" ||
+    payload.appVersion.trim().length === 0 ||
+    payload.appSchemaVersion !== APP_SCHEMA_VERSION
+  ) {
+    return null;
+  }
+
+  const createdAtIso = payload.createdAtIso;
+  const updatedAtIso = payload.updatedAtIso;
+  if (!isIsoDate(createdAtIso) || !isIsoDate(updatedAtIso)) {
+    return null;
+  }
+
+  const normalizedState = normalizeAndValidateCurrentAppState(payload.state);
+  if (normalizedState === null) {
+    return null;
+  }
+
+  return {
+    pipelineVersion: 3,
+    createdAtIso,
+    updatedAtIso,
+    state: normalizedState
+  };
+}
+
 interface LegacyTimestampedSnapshotV1 {
   schemaVersion: number;
   createdAtIso: string;
@@ -756,8 +802,8 @@ function migrateLegacySingleNetworkStateToCurrent(
   };
 }
 
-type PipelineVersion = 1 | 2 | 3;
-const CURRENT_PIPELINE_VERSION: PipelineVersion = 3;
+type PipelineVersion = 1 | 2 | 3 | 4;
+const CURRENT_PIPELINE_VERSION: PipelineVersion = 4;
 
 interface PipelineSnapshot {
   version: PipelineVersion;
@@ -767,7 +813,77 @@ interface PipelineSnapshot {
 }
 
 type MigrationStep = (snapshot: PipelineSnapshot) => PipelineSnapshot;
-const migrationStepOverrides = new Map<1 | 2, MigrationStep>();
+const migrationStepOverrides = new Map<1 | 2 | 3, MigrationStep>();
+
+let lastSpliceMigrationReport: SpliceMigrationReportEntry[] = [];
+
+export function consumeLastSpliceMigrationReport(): SpliceMigrationReportEntry[] {
+  const report = lastSpliceMigrationReport;
+  lastSpliceMigrationReport = [];
+  return report;
+}
+
+export function appendSpliceMigrationReportEntries(entries: SpliceMigrationReportEntry[]): void {
+  if (entries.length > 0) {
+    lastSpliceMigrationReport = [...lastSpliceMigrationReport, ...entries];
+  }
+}
+
+function migrateWorkspaceLegacySpliceNodes(snapshot: PipelineSnapshot): PipelineSnapshot {
+  const state = snapshot.state;
+  let nextNetworkStates = state.networkStates;
+  let changed = false;
+  const report: SpliceMigrationReportEntry[] = [];
+
+  for (const networkId of Object.keys(state.networkStates) as NetworkId[]) {
+    const scoped = state.networkStates[networkId];
+    if (scoped === undefined) {
+      continue;
+    }
+    const networkLabel = state.networks.byId[networkId]?.name ?? networkId;
+    const migration = migrateLegacySpliceNodes(scoped, networkLabel);
+    if (!migration.changed) {
+      continue;
+    }
+    changed = true;
+    report.push(...migration.report);
+    nextNetworkStates = {
+      ...nextNetworkStates,
+      [networkId]: migration.state
+    };
+  }
+
+  if (!changed) {
+    return { ...snapshot, version: 4 };
+  }
+
+  appendSpliceMigrationReportEntries(report);
+
+  const activeNetworkId = state.activeNetworkId;
+  const activeScoped = activeNetworkId === null ? undefined : nextNetworkStates[activeNetworkId];
+
+  return {
+    ...snapshot,
+    version: 4,
+    state: {
+      ...state,
+      networkStates: nextNetworkStates,
+      ...(activeScoped === undefined
+        ? {}
+        : {
+            catalogItems: activeScoped.catalogItems,
+            connectors: activeScoped.connectors,
+            splices: activeScoped.splices,
+            nodes: activeScoped.nodes,
+            segments: activeScoped.segments,
+            wires: activeScoped.wires,
+            nodePositions: activeScoped.nodePositions,
+            connectorCavityOccupancy: activeScoped.connectorCavityOccupancy,
+            splicePortOccupancy: activeScoped.splicePortOccupancy
+          })
+    }
+  };
+}
 
 const PIPELINE_MIGRATIONS: Record<Exclude<PipelineVersion, typeof CURRENT_PIPELINE_VERSION>, MigrationStep> = {
   1: (snapshot) => ({
@@ -777,7 +893,8 @@ const PIPELINE_MIGRATIONS: Record<Exclude<PipelineVersion, typeof CURRENT_PIPELI
   2: (snapshot) => ({
     ...snapshot,
     version: 3
-  })
+  }),
+  3: migrateWorkspaceLegacySpliceNodes
 };
 
 function runPipeline(initial: PipelineSnapshot): { snapshot: PipelineSnapshot; diagnostics: string[] } {
@@ -793,7 +910,7 @@ function runPipeline(initial: PipelineSnapshot): { snapshot: PipelineSnapshot; d
 }
 
 export function setPersistenceMigrationStepOverrideForTests(
-  version: 1 | 2,
+  version: 1 | 2 | 3,
   step: MigrationStep | null
 ): void {
   if (step === null) {
@@ -846,11 +963,30 @@ function validatePostMigrationState(state: AppState): string[] {
 export function migratePersistedPayloadDetailed(payload: unknown, nowIso: string): PersistenceMigrationAttempt {
   const currentSnapshot = asCurrentVersionedSnapshot(payload);
   if (currentSnapshot !== null) {
+    // Legacy splice nodes are migrated on every load, even inside up-to-date
+    // envelopes, so node-style content can never survive a reload silently.
+    const spliceMigrated = migrateWorkspaceLegacySpliceNodes({
+      version: CURRENT_PIPELINE_VERSION,
+      createdAtIso: currentSnapshot.createdAtIso,
+      updatedAtIso: currentSnapshot.updatedAtIso,
+      state: currentSnapshot.state
+    });
+    const spliceMigrationChanged = spliceMigrated.state !== currentSnapshot.state;
+
     return {
       ok: true,
-      snapshot: currentSnapshot,
-      wasMigrated: false,
-      diagnostics: validatePostMigrationState(currentSnapshot.state)
+      snapshot: spliceMigrationChanged
+        ? buildCurrentSnapshotEnvelope(
+            spliceMigrated.state,
+            currentSnapshot.createdAtIso,
+            currentSnapshot.updatedAtIso
+          )
+        : currentSnapshot,
+      wasMigrated: spliceMigrationChanged,
+      diagnostics: [
+        ...(spliceMigrationChanged ? ["Migrated legacy splice nodes to segment-offset placements."] : []),
+        ...validatePostMigrationState(spliceMigrationChanged ? spliceMigrated.state : currentSnapshot.state)
+      ]
     };
   }
 
@@ -860,6 +996,37 @@ export function migratePersistedPayloadDetailed(payload: unknown, nowIso: string
       ok: false,
       error: futureError
     };
+  }
+
+  const versionedBeforeSpliceMigration = asVersionedSnapshotBeforeSpliceMigration(payload);
+  if (versionedBeforeSpliceMigration !== null) {
+    try {
+      const pipeline = runPipeline({
+        version: versionedBeforeSpliceMigration.pipelineVersion,
+        createdAtIso: versionedBeforeSpliceMigration.createdAtIso,
+        updatedAtIso: versionedBeforeSpliceMigration.updatedAtIso,
+        state: versionedBeforeSpliceMigration.state
+      });
+
+      return {
+        ok: true,
+        snapshot: buildCurrentSnapshotEnvelope(
+          pipeline.snapshot.state,
+          pipeline.snapshot.createdAtIso,
+          pipeline.snapshot.updatedAtIso
+        ),
+        wasMigrated: true,
+        diagnostics: [...pipeline.diagnostics, ...validatePostMigrationState(pipeline.snapshot.state)]
+      };
+    } catch {
+      return {
+        ok: false,
+        error: {
+          code: "invalidPayload",
+          message: "Persisted workspace migration failed before the data could be upgraded safely."
+        }
+      };
+    }
   }
 
   const legacyTimestamped = asLegacyTimestampedSnapshotV1(payload);

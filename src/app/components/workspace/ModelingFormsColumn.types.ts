@@ -3,6 +3,7 @@ import type {
   CatalogItem,
   Connector,
   NetworkNode,
+  Segment,
   Splice,
   WireEndpoint,
   WireMaterial,
@@ -110,6 +111,12 @@ export interface ModelingFormsColumnProps {
   setSpliceManufacturerReference: (value: string) => void;
   spliceAutoCreateLinkedNode: boolean;
   setSpliceAutoCreateLinkedNode: (value: boolean) => void;
+  splicePlacementSegmentId: string;
+  setSplicePlacementSegmentId: (value: string) => void;
+  splicePlacementFromNodeId: string;
+  setSplicePlacementFromNodeId: (value: string) => void;
+  splicePlacementOffsetMm: string;
+  setSplicePlacementOffsetMm: (value: string) => void;
   spliceTechnicalIdAlreadyUsed: boolean;
   portCount: string;
   setPortCount: (value: string) => void;
@@ -132,6 +139,7 @@ export interface ModelingFormsColumnProps {
   nodeConnectorId: string;
   setNodeConnectorId: (value: string) => void;
   splices: Splice[];
+  segments: Segment[];
   nodeSpliceId: string;
   setNodeSpliceId: (value: string) => void;
   cancelNodeEdit: () => void;

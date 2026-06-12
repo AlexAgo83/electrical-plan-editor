@@ -88,6 +88,13 @@ export interface HarnessAssembly {
   updatedAt: string;
 }
 
+export interface SplicePlacement {
+  kind: "segmentOffset";
+  segmentId: SegmentId;
+  fromNodeId: NodeId;
+  offsetMm: number;
+}
+
 export interface Splice {
   id: SpliceId;
   name: string;
@@ -97,6 +104,7 @@ export interface Splice {
   sideInverted?: boolean;
   catalogItemId?: CatalogItemId;
   manufacturerReference?: string;
+  placement?: SplicePlacement;
   cableCalloutPosition?: {
     x: number;
     y: number;
@@ -279,6 +287,11 @@ export type WireProtection =
       catalogItemId: CatalogItemId;
     };
 
+export interface WireRouteEndpointDetail {
+  segmentId: SegmentId;
+  coveredLengthMm: number;
+}
+
 export interface Wire {
   id: WireId;
   name: string;
@@ -304,6 +317,8 @@ export interface Wire {
   endpointB: WireEndpoint;
   protection?: WireProtection;
   routeSegmentIds: SegmentId[];
+  routeEndpointDetailA?: WireRouteEndpointDetail;
+  routeEndpointDetailB?: WireRouteEndpointDetail;
   lengthMm: number;
   isRouteLocked: boolean;
 }

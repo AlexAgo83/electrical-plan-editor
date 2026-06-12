@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { getWireColorSearchText } from "../../core/cableColors";
-import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, Splice, SpliceId, Wire } from "../../core/entities";
+import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, Splice, SpliceId, Wire, WireRouteEndpointDetail } from "../../core/entities";
 import { selectConnectorCavityStatuses, selectSplicePortStatuses, type AppState } from "../../store";
 import { normalizeSearch, sortById, sortByNameAndTechnicalId } from "../lib/app-utils-shared";
 import type {
@@ -71,6 +71,8 @@ export function useEntityListModel({
   const [wireEndpointFilterQuery, setWireEndpointFilterQuery] = useState("");
   const [connectorSynthesisSort, setConnectorSynthesisSort] = useState<SortState>({ field: "name", direction: "asc" });
   const [spliceSynthesisSort, setSpliceSynthesisSort] = useState<SortState>({ field: "name", direction: "asc" });
+  const resolveCoveredLength = (detail: WireRouteEndpointDetail | undefined): number | null =>
+    detail === undefined ? null : detail.coveredLengthMm;
 
   const connectorSynthesisRows = useMemo<ConnectorSynthesisRow[]>(() => {
     if (selectedConnector === null) {
@@ -118,7 +120,9 @@ export function useEntityListModel({
           localEndpointLabel: `P${wire.endpointA.portIndex}`,
           remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
           remoteEndpoint: wire.endpointB,
-          lengthMm: wire.lengthMm
+          lengthMm: wire.lengthMm,
+          localCoveredLengthMm: resolveCoveredLength(wire.routeEndpointDetailA),
+          remoteCoveredLengthMm: resolveCoveredLength(wire.routeEndpointDetailB)
         });
       }
       if (wire.endpointB.kind === "splicePort" && wire.endpointB.spliceId === selectedSplice.id) {
@@ -129,7 +133,9 @@ export function useEntityListModel({
           localEndpointLabel: `P${wire.endpointB.portIndex}`,
           remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
           remoteEndpoint: wire.endpointA,
-          lengthMm: wire.lengthMm
+          lengthMm: wire.lengthMm,
+          localCoveredLengthMm: resolveCoveredLength(wire.routeEndpointDetailB),
+          remoteCoveredLengthMm: resolveCoveredLength(wire.routeEndpointDetailA)
         });
       }
       return entries;

@@ -31,7 +31,11 @@ import {
   type CableCalloutViewModel,
   type CalloutTargetKey
 } from "./network-summary/callouts/calloutLayout";
-import { buildRenderedNodes, buildRenderedSegments } from "./network-summary/graph/networkSummaryGraphModel";
+import {
+  buildRenderedFloatingSplices,
+  buildRenderedNodes,
+  buildRenderedSegments,
+} from "./network-summary/graph/networkSummaryGraphModel";
 import { type SvgPreviewOptions, useNetworkSummaryExportActions } from "./network-summary/export/useNetworkSummaryExportActions";
 import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
 import { SvgExportPreviewDialog } from "./dialogs/SvgExportPreviewDialog";
@@ -144,6 +148,7 @@ export function NetworkSummaryPanel({
   onOpenAiAgent,
   onSelectConnectorFromCallout,
   onSelectSpliceFromCallout,
+  onActivateFloatingSplice,
   onSelectWireFromConnectorPin,
   onPersistConnectorCalloutPosition,
   onPersistSpliceCalloutPosition,
@@ -321,6 +326,30 @@ export function NetworkSummaryPanel({
     [connectorMap, spliceMap, wires]
   );
 
+  const renderedFloatingSplices = useMemo(
+    () =>
+      buildRenderedFloatingSplices({
+        splices: [...spliceMap.values()],
+        nodes,
+        segments,
+        networkNodePositions,
+        segmentSubNetworkTagById,
+        isSubNetworkFilteringActive,
+        activeSubNetworkTagSet: activeSubNetworkTags,
+        selectedSpliceId,
+      }),
+    [
+      spliceMap,
+      nodes,
+      segments,
+      networkNodePositions,
+      segmentSubNetworkTagById,
+      isSubNetworkFilteringActive,
+      activeSubNetworkTags,
+      selectedSpliceId,
+    ],
+  );
+
   const getDefaultCalloutPosition = useCallback(
     (nodeId: NodeId, nodePosition: NodePosition) => {
       const connectedDirections = connectedSegmentDirectionByNodeId.get(nodeId) ?? [];
@@ -418,6 +447,7 @@ export function NetworkSummaryPanel({
         spliceMap,
         connectorCalloutGroupsById,
         spliceCalloutGroupsById,
+        renderedFloatingSplices,
         draftCalloutPositions,
         getDefaultCalloutPosition,
         isSubNetworkFilteringActive,
@@ -438,6 +468,7 @@ export function NetworkSummaryPanel({
       spliceMap,
       connectorCalloutGroupsById,
       spliceCalloutGroupsById,
+      renderedFloatingSplices,
       draftCalloutPositions,
       getDefaultCalloutPosition,
       isSubNetworkFilteringActive,
@@ -858,6 +889,7 @@ export function NetworkSummaryPanel({
           renderedSegments={renderedSegments}
           splicePlacementPreviewSegments={splicePlacementPreviewSegments}
           splicePlacementPreviewNode={splicePlacementPreviewNode}
+          renderedFloatingSplices={renderedFloatingSplices}
           renderedNodes={renderedNodes}
           showSegmentNames={showSegmentNames}
           showSegmentLengths={showSegmentLengths}
@@ -881,6 +913,7 @@ export function NetworkSummaryPanel({
           handleCalloutMouseDown={handleCalloutMouseDown}
           onSelectConnectorFromCallout={onSelectConnectorFromCallout}
           onSelectSpliceFromCallout={onSelectSpliceFromCallout}
+          onActivateFloatingSplice={onActivateFloatingSplice}
           onSelectWireFromConnectorPin={onSelectWireFromConnectorPin}
         />
       </section>

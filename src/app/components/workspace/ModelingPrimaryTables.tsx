@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import {
@@ -65,6 +65,7 @@ export function ModelingPrimaryTables({
   spliceFilterQuery,
   setSpliceFilterQuery,
   splices,
+  segments,
   visibleSplices,
   spliceSort,
   setSpliceSort,
@@ -104,7 +105,9 @@ export function ModelingPrimaryTables({
     | "technicalId"
     | "manufacturerReference"
     | "portCount"
-    | "branchCount";
+    | "branchCount"
+    | "hostSegment"
+    | "offsetMm";
   type NodeTableSortField = "id" | "kind" | "reference" | "linkedSegments";
   const connectorRowRefs = useRef<
     Partial<Record<ConnectorId, HTMLTableRowElement | null>>
@@ -146,6 +149,41 @@ export function ModelingPrimaryTables({
   const catalogItemById = useMemo(
     () => new Map(catalogItems.map((item) => [item.id, item] as const)),
     [catalogItems],
+  );
+  const segmentById = useMemo(
+    () => new Map(segments.map((segment) => [segment.id, segment] as const)),
+    [segments],
+  );
+  const nodeById = useMemo(
+    () => new Map(nodes.map((node) => [node.id, node] as const)),
+    [nodes],
+  );
+  const resolveSplicePlacementPresentation = useCallback(
+    (splice: Splice) => {
+      const placement = splice.placement;
+      if (placement === undefined) {
+        return {
+          hostSegmentLabel: "Draft",
+          fromNodeLabel: "Unplaced",
+          offsetLabel: "Draft",
+          hostSegmentSort: "",
+          offsetSort: Number.NEGATIVE_INFINITY,
+        };
+      }
+
+      const hostSegment = segmentById.get(placement.segmentId);
+      const fromNode = nodeById.get(placement.fromNodeId);
+
+      return {
+        hostSegmentLabel: hostSegment?.id ?? placement.segmentId,
+        fromNodeLabel:
+          fromNode === undefined ? placement.fromNodeId : describeNode(fromNode),
+        offsetLabel: `${placement.offsetMm} mm`,
+        hostSegmentSort: placement.segmentId,
+        offsetSort: placement.offsetMm,
+      };
+    },
+    [describeNode, nodeById, segmentById],
   );
   const connectorFilterPlaceholder =
     connectorFilterField === "name"
@@ -273,6 +311,10 @@ export function ModelingPrimaryTables({
           if (field === "technicalId") return splice.technicalId;
           if (field === "manufacturerReference")
             return splice.manufacturerReference;
+          if (field === "hostSegment")
+            return resolveSplicePlacementPresentation(splice).hostSegmentSort;
+          if (field === "offsetMm")
+            return resolveSplicePlacementPresentation(splice).offsetSort;
           if (field === "portCount")
             return resolveSplicePortMode(splice) === "unbounded"
               ? Number.POSITIVE_INFINITY
@@ -281,7 +323,12 @@ export function ModelingPrimaryTables({
         },
         (splice) => splice.id,
       ),
-    [spliceOccupiedCountById, spliceTableSort, visibleSplices],
+    [
+      resolveSplicePlacementPresentation,
+      spliceOccupiedCountById,
+      spliceTableSort,
+      visibleSplices,
+    ],
   );
   const sortedVisibleNodes = useMemo(
     () =>
@@ -936,34 +983,44 @@ export function ModelingPrimaryTables({
           <h2>Splices</h2>
           <div className="list-panel-header-tools">
             <div className="list-panel-header-tools-row is-title-actions">
-              <button
-                type="button"
-                className="filter-chip table-export-button"
-                onClick={() =>
-                  downloadCsvFile(
-                    "modeling-splices",
-                    [
-                      "Name",
-                      "Technical ID",
-                      "Mfr Ref",
-                      "Port mode",
-                      "Ports",
-                      "Branches",
-                    ],
-                    sortedVisibleSplices.map((splice) => [
-                      splice.name,
-                      splice.technicalId,
-                      splice.manufacturerReference ?? "",
-                      resolveSplicePortMode(splice),
-                      resolveSplicePortMode(splice) === "unbounded"
-                        ? ""
-                        : splice.portCount,
-                      spliceOccupiedCountById.get(splice.id) ?? 0,
-                    ]),
-                  )
-                }
-                disabled={sortedVisibleSplices.length === 0}
-              >
+                <button
+                  type="button"
+                  className="filter-chip table-export-button"
+                  onClick={() =>
+                    downloadCsvFile(
+                      "modeling-splices",
+                      [
+                        "Name",
+                        "Technical ID",
+                        "Mfr Ref",
+                        "Host segment",
+                        "Reference node",
+                        "Offset (mm)",
+                        "Port mode",
+                        "Ports",
+                        "Branches",
+                      ],
+                      sortedVisibleSplices.map((splice) => {
+                        const placement =
+                          resolveSplicePlacementPresentation(splice);
+                        return [
+                          splice.name,
+                          splice.technicalId,
+                          splice.manufacturerReference ?? "",
+                          placement.hostSegmentLabel,
+                          placement.fromNodeLabel,
+                          splice.placement?.offsetMm ?? "",
+                          resolveSplicePortMode(splice),
+                          resolveSplicePortMode(splice) === "unbounded"
+                            ? ""
+                            : splice.portCount,
+                          spliceOccupiedCountById.get(splice.id) ?? 0,
+                        ];
+                      }),
+                    )
+                  }
+                  disabled={sortedVisibleSplices.length === 0}
+                >
                 <span className="table-export-icon" aria-hidden="true" />
                 CSV
               </button>
@@ -1141,6 +1198,55 @@ export function ModelingPrimaryTables({
                     </button>
                   </th>
                   <th
+                    aria-sort={getTableAriaSort(
+                      spliceTableSort,
+                      "hostSegment",
+                    )}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setSpliceTableSort((current) => ({
+                          field: "hostSegment",
+                          direction:
+                            current.field === "hostSegment" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      Segment{" "}
+                      <span className="sort-indicator">
+                        {spliceSortIndicator("hostSegment")}
+                      </span>
+                    </button>
+                  </th>
+                  <th
+                    aria-sort={getTableAriaSort(spliceTableSort, "offsetMm")}
+                  >
+                    <button
+                      type="button"
+                      className="sort-header-button"
+                      onClick={() =>
+                        setSpliceTableSort((current) => ({
+                          field: "offsetMm",
+                          direction:
+                            current.field === "offsetMm" &&
+                            current.direction === "asc"
+                              ? "desc"
+                              : "asc",
+                        }))
+                      }
+                    >
+                      Offset{" "}
+                      <span className="sort-indicator">
+                        {spliceSortIndicator("offsetMm")}
+                      </span>
+                    </button>
+                  </th>
+                  <th
                     aria-sort={getTableAriaSort(spliceTableSort, "portCount")}
                   >
                     <button
@@ -1199,6 +1305,7 @@ export function ModelingPrimaryTables({
                     linkedCatalogItemId === undefined
                       ? undefined
                       : catalogItemById.get(linkedCatalogItemId);
+                  const placement = resolveSplicePlacementPresentation(splice);
                   return (
                     <tr
                       key={splice.id}
@@ -1264,6 +1371,12 @@ export function ModelingPrimaryTables({
                           (splice.manufacturerReference ?? "")
                         )}
                       </td>
+                      <td>
+                        <span>{placement.hostSegmentLabel}</span>
+                        <br />
+                        <small>{placement.fromNodeLabel}</small>
+                      </td>
+                      <td>{placement.offsetLabel}</td>
                       <td>
                         {resolveSplicePortMode(splice) === "unbounded"
                           ? "∞"
