@@ -120,6 +120,8 @@ export function useAppControllerWorkspaceHandlersDomainAssembly({
       setWorkspaceTaxEnabled: preferencesState.setWorkspaceTaxEnabled,
       setWorkspaceTaxRatePercent: preferencesState.setWorkspaceTaxRatePercent,
       setBomTraceabilityLabelsHidden: preferencesState.setBomTraceabilityLabelsHidden,
+      setWireExportStrippingAllowanceMm: preferencesState.setWireExportStrippingAllowanceMm,
+      setWireExportTwistedPairLengthCoefficient: preferencesState.setWireExportTwistedPairLengthCoefficient,
       setDefaultWireSectionMm2: preferencesState.setDefaultWireSectionMm2,
       setDefaultAutoCreateLinkedNodes: preferencesState.setDefaultAutoCreateLinkedNodes,
       setDefaultSortField: preferencesState.setDefaultSortField,

@@ -14,8 +14,12 @@ import type {
   WorkspaceCurrencyCode,
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
+import {
+  DEFAULT_WIRE_EXPORT_STRIPPING_ALLOWANCE_MM,
+  DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT
+} from "../lib/wireExportLength";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 16;
+const UI_PREFERENCES_SCHEMA_VERSION = 17;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 type TableDensity = "comfortable" | "compact";
@@ -37,6 +41,8 @@ export interface UiPreferencesPayload {
   bomExportCompactColumns: boolean;
   bomTraceabilityLabelsHidden: boolean;
   bomExportComputedDownstreamLoad: boolean;
+  wireExportStrippingAllowanceMm: number;
+  wireExportTwistedPairLengthCoefficient: number;
   defaultWireSectionMm2: number;
   defaultAutoCreateLinkedNodes: boolean;
   spliceSectionImbalanceRatioPercent: number;
@@ -229,6 +235,21 @@ function migrateUiPreferencesFromV15(candidate: Record<string, unknown>): Record
   };
 }
 
+function migrateUiPreferencesFromV16(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    wireExportStrippingAllowanceMm:
+      typeof candidate.wireExportStrippingAllowanceMm === "number"
+        ? candidate.wireExportStrippingAllowanceMm
+        : DEFAULT_WIRE_EXPORT_STRIPPING_ALLOWANCE_MM,
+    wireExportTwistedPairLengthCoefficient:
+      typeof candidate.wireExportTwistedPairLengthCoefficient === "number"
+        ? candidate.wireExportTwistedPairLengthCoefficient
+        : DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT,
+    schemaVersion: 17
+  };
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -319,6 +340,11 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
     if (version === 15) {
       migrated = migrateUiPreferencesFromV15(migrated);
       version = 16;
+      continue;
+    }
+    if (version === 16) {
+      migrated = migrateUiPreferencesFromV16(migrated);
+      version = 17;
       continue;
     }
     return null;

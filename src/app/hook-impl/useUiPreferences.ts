@@ -2,6 +2,10 @@ import { useEffect } from "react";
 import { DEFAULT_WIRE_SECTION_MM2, normalizeWireSectionMm2 } from "../../core/wireSection";
 import type { ThemeMode } from "../../store";
 import { normalizeAppLocale } from "../lib/i18n";
+import {
+  normalizeWireExportStrippingAllowanceMm,
+  normalizeWireExportTwistedPairLengthCoefficient
+} from "../lib/wireExportLength";
 import { readUiPreferences, writeUiPreferences } from "../hooks/uiPreferencesStorage";
 import type { UiPreferencesPayload } from "../hooks/uiPreferencesStorage";
 import type {
@@ -121,6 +125,8 @@ interface UseUiPreferencesOptions {
   bomExportCompactColumns: boolean;
   bomTraceabilityLabelsHidden: boolean;
   bomExportComputedDownstreamLoad: boolean;
+  wireExportStrippingAllowanceMm: number;
+  wireExportTwistedPairLengthCoefficient: number;
   defaultWireSectionMm2: number;
   defaultAutoCreateLinkedNodes: boolean;
   spliceSectionImbalanceRatioPercent: number;
@@ -175,6 +181,8 @@ interface UseUiPreferencesOptions {
   setBomExportCompactColumns: (value: boolean) => void;
   setBomTraceabilityLabelsHidden: (value: boolean) => void;
   setBomExportComputedDownstreamLoad: (value: boolean) => void;
+  setWireExportStrippingAllowanceMm: (value: number) => void;
+  setWireExportTwistedPairLengthCoefficient: (value: number) => void;
   setDefaultWireSectionMm2: (value: number) => void;
   setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
   setSpliceSectionImbalanceRatioPercent: (value: number) => void;
@@ -361,6 +369,8 @@ export function useUiPreferences({
   bomExportCompactColumns,
   bomTraceabilityLabelsHidden,
   bomExportComputedDownstreamLoad,
+  wireExportStrippingAllowanceMm,
+  wireExportTwistedPairLengthCoefficient,
   defaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
   spliceSectionImbalanceRatioPercent,
@@ -415,6 +425,8 @@ export function useUiPreferences({
   setBomExportCompactColumns,
   setBomTraceabilityLabelsHidden,
   setBomExportComputedDownstreamLoad,
+  setWireExportStrippingAllowanceMm,
+  setWireExportTwistedPairLengthCoefficient,
   setDefaultWireSectionMm2,
   setDefaultAutoCreateLinkedNodes,
   setSpliceSectionImbalanceRatioPercent,
@@ -488,6 +500,12 @@ export function useUiPreferences({
     if (preferences !== null) {
       const sortField = preferences.defaultSortField === "technicalId" ? "technicalId" : "name";
       const defaultWireSectionMm2Value = normalizeWireSectionMm2(preferences.defaultWireSectionMm2) ?? DEFAULT_WIRE_SECTION_MM2;
+      const wireExportStrippingAllowanceMmValue = normalizeWireExportStrippingAllowanceMm(
+        preferences.wireExportStrippingAllowanceMm
+      );
+      const wireExportTwistedPairLengthCoefficientValue = normalizeWireExportTwistedPairLengthCoefficient(
+        preferences.wireExportTwistedPairLengthCoefficient
+      );
       const defaultAutoCreateLinkedNodesValue =
         typeof preferences.defaultAutoCreateLinkedNodes === "boolean" ? preferences.defaultAutoCreateLinkedNodes : true;
       const spliceSectionImbalanceRatioPercentValue = normalizeSpliceSectionImbalanceRatioPercent(
@@ -555,6 +573,8 @@ export function useUiPreferences({
       setBomExportCompactColumns(preferences.bomExportCompactColumns === true);
       setBomTraceabilityLabelsHidden(preferences.bomTraceabilityLabelsHidden === true);
       setBomExportComputedDownstreamLoad(preferences.bomExportComputedDownstreamLoad === true);
+      setWireExportStrippingAllowanceMm(wireExportStrippingAllowanceMmValue);
+      setWireExportTwistedPairLengthCoefficient(wireExportTwistedPairLengthCoefficientValue);
       setDefaultWireSectionMm2(defaultWireSectionMm2Value);
       setDefaultAutoCreateLinkedNodes(defaultAutoCreateLinkedNodesValue);
       setSpliceSectionImbalanceRatioPercent(spliceSectionImbalanceRatioPercentValue);
@@ -730,6 +750,8 @@ export function useUiPreferences({
     setBomExportCompactColumns,
     setBomTraceabilityLabelsHidden,
     setBomExportComputedDownstreamLoad,
+    setWireExportStrippingAllowanceMm,
+    setWireExportTwistedPairLengthCoefficient,
     setWorkspaceCurrencyCode,
     setWorkspaceTaxEnabled,
     setWorkspaceTaxRatePercent,
@@ -758,6 +780,8 @@ export function useUiPreferences({
       bomExportCompactColumns,
       bomTraceabilityLabelsHidden,
       bomExportComputedDownstreamLoad,
+      wireExportStrippingAllowanceMm,
+      wireExportTwistedPairLengthCoefficient,
       defaultWireSectionMm2,
       defaultAutoCreateLinkedNodes,
       spliceSectionImbalanceRatioPercent,
@@ -851,6 +875,8 @@ export function useUiPreferences({
     bomExportCompactColumns,
     bomExportComputedDownstreamLoad,
     bomTraceabilityLabelsHidden,
+    wireExportStrippingAllowanceMm,
+    wireExportTwistedPairLengthCoefficient,
     defaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,
     spliceSectionImbalanceRatioPercent,

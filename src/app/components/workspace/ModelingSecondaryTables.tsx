@@ -18,6 +18,11 @@ import {
   getWireColorCsvValue,
   renderWireColorCellValue,
 } from "../../lib/wireColorPresentation";
+import {
+  buildWireTwistGroupExportCounts,
+  resolveWireExportLengthMm,
+  type WireExportLengthPreferences,
+} from "../../lib/wireExportLength";
 import { resolveWireExportEndpointMaterials } from "../../lib/wireListExport";
 import { TabularExportPreviewDialog } from "../dialogs/TabularExportPreviewDialog";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
@@ -97,6 +102,7 @@ interface ModelingSecondaryTablesProps {
   wireEndpointFilterQuery: string;
   setWireEndpointFilterQuery: (value: string) => void;
   tabularExportFormat: TabularExportFormat;
+  wireExportLengthPreferences: WireExportLengthPreferences;
   catalogItems: CatalogItem[];
   connectors: Connector[];
   splices: Splice[];
@@ -159,6 +165,7 @@ export function ModelingSecondaryTables({
   wireEndpointFilterQuery,
   setWireEndpointFilterQuery,
   tabularExportFormat,
+  wireExportLengthPreferences,
   catalogItems,
   connectors,
   splices,
@@ -968,6 +975,8 @@ export function ModelingSecondaryTables({
                         "Section (mm²)",
                         "Length (mm)",
                       ];
+                  const twistGroupCounts =
+                    buildWireTwistGroupExportCounts(sortedVisibleWires);
                   const rows = sortedVisibleWires.map((wire) => {
                     const begin = describeWireEndpointCsvParts(wire.endpointA);
                     const end = describeWireEndpointCsvParts(wire.endpointB);
@@ -999,7 +1008,11 @@ export function ModelingSecondaryTables({
                         endMaterials.connectionRef,
                         endMaterials.sealRef,
                         wire.sectionMm2,
-                        wire.lengthMm,
+                        resolveWireExportLengthMm(
+                          wire,
+                          twistGroupCounts,
+                          wireExportLengthPreferences,
+                        ),
                         wire.isRouteLocked ? "Locked" : "Auto",
                       ];
                     }
@@ -1017,7 +1030,11 @@ export function ModelingSecondaryTables({
                       endMaterials.connectionRef,
                       endMaterials.sealRef,
                       wire.sectionMm2,
-                      wire.lengthMm,
+                      resolveWireExportLengthMm(
+                        wire,
+                        twistGroupCounts,
+                        wireExportLengthPreferences,
+                      ),
                     ];
                   });
                   const sheet = {

@@ -21,7 +21,13 @@ import { buildNetworkExportFilename, exportJsonFile } from "../lib/jsonFileExpor
 import { convertLegacyNumericSplicesToDirectional, hasLegacyNumericSplices } from "../lib/importLegacySpliceConversion";
 import { removeGroupedSvgExportOverlay, renderGroupedSvgExportOverlay, type GroupedSvgExportProgress } from "../lib/groupedSvgExportOverlay";
 import { buildImagePdfBlob, downloadPdfBlob, type PdfImagePage } from "../lib/pdfExport";
-import type { ImportOverwriteDialogModel, PendingOverwriteImport, UseNetworkImportExportParams, UseNetworkImportExportResult } from "./networkImportExportTypes";
+import {
+  toWireExportLengthPreferences,
+  type ImportOverwriteDialogModel,
+  type PendingOverwriteImport,
+  type UseNetworkImportExportParams,
+  type UseNetworkImportExportResult
+} from "./networkImportExportTypes";
 
 function waitForNextFrames(frameCount: number): Promise<void> {
   return new Promise((resolve) => {
@@ -77,6 +83,7 @@ export function useNetworkImportExport({
   notifyToast,
   showSpliceMigrationReport,
   groupedBomPreferences,
+  groupedWirePreferences,
   networkSummaryPanelRef,
   ensureNetworkPlanScreen
 }: UseNetworkImportExportParams): UseNetworkImportExportResult {
@@ -435,7 +442,16 @@ export function useNetworkImportExport({
           .map((id) => networkState.catalogItems.byId[id])
           .filter((catalogItem) => catalogItem !== undefined);
 
-        allSheets.push(buildWireListSheet(`${buildSheetPrefix(network.technicalId)} Wires`, wires, connectors, splices, catalogItems));
+        allSheets.push(
+          buildWireListSheet(
+            `${buildSheetPrefix(network.technicalId)} Wires`,
+            wires,
+            connectors,
+            splices,
+            catalogItems,
+            toWireExportLengthPreferences(groupedWirePreferences)
+          )
+        );
       }
 
       if (allSheets.length === 0) {

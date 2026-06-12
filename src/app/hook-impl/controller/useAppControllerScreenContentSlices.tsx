@@ -508,6 +508,7 @@ export function buildModelingScreenContentSlice(
     wireEndpointFilterQuery: params.wireEndpointFilterQuery,
     setWireEndpointFilterQuery: params.setWireEndpointFilterQuery,
     tabularExportFormat: params.tabularExportFormat,
+    wireExportLengthPreferences: params.wireExportLengthPreferences,
     catalogItems: params.catalogItems,
     connectors: params.connectors,
     splices: params.splices,
@@ -922,6 +923,7 @@ export function buildAnalysisScreenContentSlice(
     wireEndpointFilterQuery: params.wireEndpointFilterQuery,
     setWireEndpointFilterQuery: params.setWireEndpointFilterQuery,
     tabularExportFormat: params.tabularExportFormat,
+    wireExportLengthPreferences: params.wireExportLengthPreferences,
     catalogItems: params.catalogItems,
     wires: params.wires,
     visibleWires: params.visibleWires,
@@ -1032,6 +1034,13 @@ export function buildSettingsScreenContentSlice(
     bomExportComputedDownstreamLoad: params.bomExportComputedDownstreamLoad,
     setBomExportComputedDownstreamLoad:
       params.setBomExportComputedDownstreamLoad,
+    wireExportStrippingAllowanceMm: params.wireExportStrippingAllowanceMm,
+    setWireExportStrippingAllowanceMm:
+      params.setWireExportStrippingAllowanceMm,
+    wireExportTwistedPairLengthCoefficient:
+      params.wireExportTwistedPairLengthCoefficient,
+    setWireExportTwistedPairLengthCoefficient:
+      params.setWireExportTwistedPairLengthCoefficient,
     defaultWireSectionMm2: params.defaultWireSectionMm2,
     setDefaultWireSectionMm2: params.setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes: params.defaultAutoCreateLinkedNodes,

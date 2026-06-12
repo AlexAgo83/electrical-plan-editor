@@ -122,7 +122,7 @@ describe("buildWireListSheet", () => {
       1,
       "Preden 13mm",
       "",
-      100
+      140
     ]);
     expect(sheet.rows[1]).toEqual([
       "W-002",
@@ -140,7 +140,7 @@ describe("buildWireListSheet", () => {
       "C1",
       "TERM-DEFAULT - Default terminal",
       "SEAL-MANUAL - Manual seal",
-      150
+      190
     ]);
   });
 
@@ -196,5 +196,91 @@ describe("buildWireListSheet", () => {
     expect(sheet.rows[0]?.[7]).not.toBe(2);
     expect(sheet.rows[1]?.[7]).toBe("C9");
     expect(sheet.rows[1]?.[7]).not.toBe(10);
+  });
+
+  it("adds export-only stripping allowance and twisted-pair coefficient to wire lengths", () => {
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-1",
+        cavityCount: 4
+      }
+    ];
+    const splices: Splice[] = [
+      {
+        id: asSpliceId("S1"),
+        name: "Splice 1",
+        technicalId: "S-1",
+        portCount: 4
+      }
+    ];
+    const wires: Wire[] = [
+      {
+        id: asWireId("W1"),
+        name: "Plain",
+        technicalId: "W-001",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 1000,
+        sectionMm2: 1,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W2"),
+        name: "CAN H",
+        technicalId: "W-002",
+        twistGroupLabel: "CAN 1",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 2 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 2 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 1000,
+        sectionMm2: 1,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W3"),
+        name: "CAN L",
+        technicalId: "W-003",
+        twistGroupLabel: " CAN 1 ",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 3 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 3 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 1000,
+        sectionMm2: 1,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W4"),
+        name: "Singleton twist",
+        technicalId: "W-004",
+        twistGroupLabel: "LIN",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 4 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 4 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 1000,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
+
+    const defaultSheet = buildWireListSheet("Wires", wires, connectors, splices, []);
+    expect(defaultSheet.rows.map((row) => row[15])).toEqual([1040, 1115, 1115, 1040]);
+    expect(wires.map((wire) => wire.lengthMm)).toEqual([1000, 1000, 1000, 1000]);
+
+    const customSheet = buildWireListSheet("Wires", wires, connectors, splices, [], {
+      strippingAllowanceMm: 25,
+      twistedPairLengthCoefficient: 1.08
+    });
+    expect(customSheet.rows.map((row) => row[15])).toEqual([1050, 1130, 1130, 1050]);
   });
 });

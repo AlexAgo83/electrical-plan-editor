@@ -21,17 +21,26 @@ describe("App integration UI - settings wire/create defaults", () => {
 
       switchScreenDrawerAware("settings");
       const globalPreferencesPanel = getPanelByHeading("Global preferences");
+      const catalogBomPanel = getPanelByHeading("Catalog & BOM setup");
       const defaultWireSectionInput = within(globalPreferencesPanel).getByLabelText("Default wire section (mm²)");
       const defaultAutoCreateLinkedNodesCheckbox = within(globalPreferencesPanel).getByLabelText(
         "Default auto-create linked nodes for connectors/splices"
       );
+      const wireStrippingAllowanceInput = within(catalogBomPanel).getByLabelText("Wire stripping allowance (mm)");
+      const twistedPairCoefficientInput = within(catalogBomPanel).getByLabelText("Twisted-pair length coefficient");
       expect(defaultWireSectionInput).toHaveValue(0.5);
       expect(defaultAutoCreateLinkedNodesCheckbox).toBeChecked();
+      expect(wireStrippingAllowanceInput).toHaveValue(20);
+      expect(twistedPairCoefficientInput).toHaveValue(1.075);
 
       fireEvent.change(defaultWireSectionInput, { target: { value: "0.75" } });
       fireEvent.click(defaultAutoCreateLinkedNodesCheckbox);
+      fireEvent.change(wireStrippingAllowanceInput, { target: { value: "25" } });
+      fireEvent.change(twistedPairCoefficientInput, { target: { value: "1.08" } });
       expect(defaultWireSectionInput).toHaveValue(0.75);
       expect(defaultAutoCreateLinkedNodesCheckbox).not.toBeChecked();
+      expect(wireStrippingAllowanceInput).toHaveValue(25);
+      expect(twistedPairCoefficientInput).toHaveValue(1.08);
 
       switchScreenDrawerAware("modeling");
       switchSubScreenDrawerAware("wire");
@@ -56,10 +65,13 @@ describe("App integration UI - settings wire/create defaults", () => {
       renderAppWithState(createUiIntegrationState());
       switchScreenDrawerAware("settings");
       const restoredGlobalPreferencesPanel = getPanelByHeading("Global preferences");
+      const restoredCatalogBomPanel = getPanelByHeading("Catalog & BOM setup");
       expect(within(restoredGlobalPreferencesPanel).getByLabelText("Default wire section (mm²)")).toHaveValue(0.75);
       expect(
         within(restoredGlobalPreferencesPanel).getByLabelText("Default auto-create linked nodes for connectors/splices")
       ).not.toBeChecked();
+      expect(within(restoredCatalogBomPanel).getByLabelText("Wire stripping allowance (mm)")).toHaveValue(25);
+      expect(within(restoredCatalogBomPanel).getByLabelText("Twisted-pair length coefficient")).toHaveValue(1.08);
     },
     10_000
   );

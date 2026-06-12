@@ -112,6 +112,8 @@ export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
       "Currency (Catalog/BOM)",
       "Enable tax / VAT (TVA)",
       "Tabular export format",
+      "Wire stripping allowance (mm)",
+      "Twisted-pair length coefficient",
       "Compact BOM export columns",
       "Hide BOM traceability labels",
       "Computed downstream load (A)",

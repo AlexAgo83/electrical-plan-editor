@@ -7,6 +7,7 @@ import type { NetworkImportSummary, OverwriteCandidate } from "../../adapters/po
 import type { NetworkFilePayloadV1 } from "../../adapters/portability/networkFile";
 import type { OverwriteDecision } from "../components/dialogs/ImportOverwriteDialog";
 import type { ToastNotificationVariant } from "./useToastNotifications";
+import type { WireExportLengthPreferences } from "../lib/wireExportLength";
 
 export type NotifyToast = (title: string, options?: { message?: string; variant?: ToastNotificationVariant }) => void;
 
@@ -39,6 +40,11 @@ export interface GroupedBomPreferences {
   bomExportComputedDownstreamLoad?: boolean;
 }
 
+export interface GroupedWirePreferences {
+  wireExportStrippingAllowanceMm?: number;
+  wireExportTwistedPairLengthCoefficient?: number;
+}
+
 export interface UseNetworkImportExportParams {
   store: AppStore;
   networks: Network[];
@@ -47,8 +53,16 @@ export interface UseNetworkImportExportParams {
   notifyToast?: NotifyToast;
   showSpliceMigrationReport?: (entries: string[]) => void;
   groupedBomPreferences?: GroupedBomPreferences;
+  groupedWirePreferences?: GroupedWirePreferences;
   networkSummaryPanelRef?: RefObject<NetworkSummaryPanelHandle | null>;
   ensureNetworkPlanScreen?: () => void;
+}
+
+export function toWireExportLengthPreferences(preferences: GroupedWirePreferences | undefined): WireExportLengthPreferences {
+  return {
+    strippingAllowanceMm: preferences?.wireExportStrippingAllowanceMm,
+    twistedPairLengthCoefficient: preferences?.wireExportTwistedPairLengthCoefficient
+  };
 }
 
 export interface UseNetworkImportExportResult {

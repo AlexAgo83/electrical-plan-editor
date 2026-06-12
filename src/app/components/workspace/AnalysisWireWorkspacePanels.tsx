@@ -7,6 +7,10 @@ import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { normalizeFileNamePart } from "../../lib/exportFileName";
 import { downloadTabularCsvOrXlsxFile, downloadTabularWorkbookFile, type TabularWorksheetExport } from "../../lib/tabularExport";
 import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireColorPresentation";
+import {
+  buildWireTwistGroupExportCounts,
+  resolveWireExportLengthMm
+} from "../../lib/wireExportLength";
 import { resolveWireExportEndpointMaterials } from "../../lib/wireListExport";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 import { TabularExportPreviewDialog } from "../dialogs/TabularExportPreviewDialog";
@@ -26,6 +30,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     wireEndpointFilterQuery,
     setWireEndpointFilterQuery,
     tabularExportFormat,
+    wireExportLengthPreferences,
     catalogItems,
     connectors,
     segments,
@@ -219,6 +224,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   "Section (mm²)",
                   "Length (mm)"
                 ];
+            const twistGroupCounts = buildWireTwistGroupExportCounts(sortedVisibleWires);
             const rows = sortedVisibleWires.map((wire) => {
               const begin = describeWireEndpointCsvParts(wire.endpointA);
               const end = describeWireEndpointCsvParts(wire.endpointB);
@@ -240,7 +246,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   endMaterials.connectionRef,
                   endMaterials.sealRef,
                   wire.sectionMm2,
-                  wire.lengthMm,
+                  resolveWireExportLengthMm(wire, twistGroupCounts, wireExportLengthPreferences),
                   wire.isRouteLocked ? "Locked" : "Auto"
                 ];
               }
@@ -258,7 +264,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 endMaterials.connectionRef,
                 endMaterials.sealRef,
                 wire.sectionMm2,
-                wire.lengthMm
+                resolveWireExportLengthMm(wire, twistGroupCounts, wireExportLengthPreferences)
               ];
             });
             const sheet = { name: "Analysis Wires", headers, rows, freezeHeaderRow: true, autoFilter: true } satisfies TabularWorksheetExport;

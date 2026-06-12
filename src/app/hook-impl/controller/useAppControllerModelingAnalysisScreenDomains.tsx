@@ -121,6 +121,7 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   >;
   activeNetwork: AnalysisSliceParams["activeNetwork"];
   tabularExportFormat: ModelingSliceParams["tabularExportFormat"];
+  wireExportLengthPreferences: ModelingSliceParams["wireExportLengthPreferences"];
   hideWireAnalysisRoutePanel: AnalysisSliceParams["hideWireAnalysisRoutePanel"];
   showMultiNetworkFunctionalAnalysisPanel: AnalysisSliceParams["showMultiNetworkFunctionalAnalysisPanel"];
   isMultiNetworkFunctionalAnalysisOpen: AnalysisSliceParams["isMultiNetworkFunctionalAnalysisOpen"];
@@ -268,6 +269,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
   spliceTechnicalIdAlreadyUsed,
   wireTechnicalIdAlreadyUsed,
   tabularExportFormat,
+  wireExportLengthPreferences,
   hideWireAnalysisRoutePanel,
   showMultiNetworkFunctionalAnalysisPanel,
   isMultiNetworkFunctionalAnalysisOpen,
@@ -1072,6 +1074,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
         wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,
         setWireEndpointFilterQuery: listModel.setWireEndpointFilterQuery,
         tabularExportFormat,
+        wireExportLengthPreferences,
         wires: entities.wires,
         visibleWires: listModel.visibleWires,
         wireSort: listModel.wireSort,
@@ -1509,6 +1512,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
           wireEndpointFilterQuery: listModel.wireEndpointFilterQuery,
           setWireEndpointFilterQuery: listModel.setWireEndpointFilterQuery,
           tabularExportFormat,
+          wireExportLengthPreferences,
           catalogItems: entities.catalogItems,
           wires: entities.wires,
           visibleWires: listModel.visibleWires,

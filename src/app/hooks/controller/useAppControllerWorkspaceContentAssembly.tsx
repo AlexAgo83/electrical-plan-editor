@@ -240,6 +240,10 @@ export function useAppControllerWorkspaceContentAssembly({
       },
       activeNetwork: state.activeNetwork,
       tabularExportFormat: models.preferencesState.tabularExportFormat,
+      wireExportLengthPreferences: {
+        strippingAllowanceMm: models.preferencesState.wireExportStrippingAllowanceMm,
+        twistedPairLengthCoefficient: models.preferencesState.wireExportTwistedPairLengthCoefficient
+      },
       hideWireAnalysisRoutePanel: models.preferencesState.hideWireAnalysisRoutePanel,
       showMultiNetworkFunctionalAnalysisPanel: models.preferencesState.showMultiNetworkFunctionalAnalysisPanel,
       isMultiNetworkFunctionalAnalysisOpen,

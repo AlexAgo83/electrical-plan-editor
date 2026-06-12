@@ -118,6 +118,10 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
       bomTraceabilityLabelsHidden: ui.preferencesState.bomTraceabilityLabelsHidden,
       bomExportComputedDownstreamLoad: ui.preferencesState.bomExportComputedDownstreamLoad
     },
+    groupedWirePreferences: {
+      wireExportStrippingAllowanceMm: ui.preferencesState.wireExportStrippingAllowanceMm,
+      wireExportTwistedPairLengthCoefficient: ui.preferencesState.wireExportTwistedPairLengthCoefficient
+    },
     networkSummaryPanelRef,
     ensureNetworkPlanScreen: () => navigation.setActiveScreen("modeling")
   });

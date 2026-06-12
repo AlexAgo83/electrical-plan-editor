@@ -100,6 +100,8 @@ export interface UseWorkspaceHandlersParams {
   setWorkspaceTaxEnabled: (value: boolean) => void;
   setWorkspaceTaxRatePercent: (value: number) => void;
   setBomTraceabilityLabelsHidden: (value: boolean) => void;
+  setWireExportStrippingAllowanceMm: (value: number) => void;
+  setWireExportTwistedPairLengthCoefficient: (value: number) => void;
   setDefaultWireSectionMm2: (value: number) => void;
   setDefaultAutoCreateLinkedNodes: (value: boolean) => void;
   setDefaultSortField: (value: SortField) => void;

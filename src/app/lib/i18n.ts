@@ -248,6 +248,8 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Currency (Catalog/BOM)": "Devise (Catalogue/BOM)",
   "Enable tax / VAT (TVA)": "Activer la taxe / TVA",
   "Computed downstream load (A)": "Charge aval calculée (A)",
+  "Wire stripping allowance (mm)": "Longueur à dénuder par extrémité (mm)",
+  "Twisted-pair length coefficient": "Coefficient de longueur pour paire torsadée",
   "Tax rate (%)": "Taux de taxe (%)",
   "Show floating inspector panel on supported screens": "Afficher le panneau inspecteur flottant sur les écrans compatibles",
   "Workspace panels layout": "Disposition des panneaux",

@@ -87,6 +87,8 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setWorkspaceTaxEnabled"
     | "setWorkspaceTaxRatePercent"
     | "setBomTraceabilityLabelsHidden"
+    | "setWireExportStrippingAllowanceMm"
+    | "setWireExportTwistedPairLengthCoefficient"
     | "setDefaultWireSectionMm2"
     | "setDefaultAutoCreateLinkedNodes"
     | "setDefaultSortField"

@@ -1,5 +1,9 @@
 import { useState } from "react";
 import type { ThemeMode } from "../../store";
+import {
+  DEFAULT_WIRE_EXPORT_STRIPPING_ALLOWANCE_MM,
+  DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT
+} from "../lib/wireExportLength";
 import type {
   AppLocale,
   CanvasCalloutTextSize,
@@ -32,6 +36,12 @@ export function useAppControllerPreferencesState() {
   const [bomExportCompactColumns, setBomExportCompactColumns] = useState(false);
   const [bomTraceabilityLabelsHidden, setBomTraceabilityLabelsHidden] = useState(false);
   const [bomExportComputedDownstreamLoad, setBomExportComputedDownstreamLoad] = useState(false);
+  const [wireExportStrippingAllowanceMm, setWireExportStrippingAllowanceMm] = useState(
+    DEFAULT_WIRE_EXPORT_STRIPPING_ALLOWANCE_MM
+  );
+  const [wireExportTwistedPairLengthCoefficient, setWireExportTwistedPairLengthCoefficient] = useState(
+    DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT
+  );
   const [defaultWireSectionMm2, setDefaultWireSectionMm2] = useState(0.5);
   const [defaultAutoCreateLinkedNodes, setDefaultAutoCreateLinkedNodes] = useState(true);
   const [spliceSectionImbalanceRatioPercent, setSpliceSectionImbalanceRatioPercent] = useState(300);
@@ -103,6 +113,10 @@ export function useAppControllerPreferencesState() {
     setBomTraceabilityLabelsHidden,
     bomExportComputedDownstreamLoad,
     setBomExportComputedDownstreamLoad,
+    wireExportStrippingAllowanceMm,
+    setWireExportStrippingAllowanceMm,
+    wireExportTwistedPairLengthCoefficient,
+    setWireExportTwistedPairLengthCoefficient,
     defaultWireSectionMm2,
     setDefaultWireSectionMm2,
     defaultAutoCreateLinkedNodes,

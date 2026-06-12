@@ -1,10 +1,10 @@
 ## item_631_wire_list_export_stripping_allowance_and_twisted_pair_length_coefficient - Wire list export stripping allowance and twisted-pair length coefficient
 > From version: 1.16.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 95%
 > Confidence: 92%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Export / Settings / Wire length
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -105,6 +105,7 @@ flowchart TD
 - Hybrid rationale: Derived from request `req_145_wire_list_export_stripping_allowance_and_twisted_pair_length_coefficient` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_145_wire_list_export_stripping_allowance_and_twisted_pair_length_coefficient.md`.
 - Generated locally by logics-manager.
+- Task `task_140_wire_list_export_stripping_allowance_and_twisted_pair_length_coefficient` was finished via `logics-manager flow finish task` on 2026-06-12.
 
 # Tasks
 - `task_140_wire_list_export_stripping_allowance_and_twisted_pair_length_coefficient`

@@ -23,6 +23,7 @@ import type {
   SpliceSynthesisRow,
   TabularExportFormat
 } from "../../types/app-controller";
+import type { WireExportLengthPreferences } from "../../lib/wireExportLength";
 import type {
   MultiNetworkFunctionalAnalysisModel,
   MultiNetworkFunctionalAnalysisScope,
@@ -176,6 +177,7 @@ export interface AnalysisWorkspaceContentProps {
   wireEndpointFilterQuery: string;
   setWireEndpointFilterQuery: (value: string) => void;
   tabularExportFormat: TabularExportFormat;
+  wireExportLengthPreferences: WireExportLengthPreferences;
   catalogItems: CatalogItem[];
   wires: Wire[];
   visibleWires: Wire[];

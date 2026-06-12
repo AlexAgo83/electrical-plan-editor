@@ -11,6 +11,10 @@ import {
 import { buildUniqueNetworkTechnicalId, createEntityId } from "../lib/app-utils-shared";
 import { buildNetworkFormDraft } from "../lib/networkFormDraft";
 import {
+  DEFAULT_WIRE_EXPORT_STRIPPING_ALLOWANCE_MM,
+  DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT
+} from "../lib/wireExportLength";
+import {
   fitNetworkToContent as fitNetworkToContentViewport,
   resetNetworkViewToConfiguredScale as resetNetworkViewToConfiguredScaleViewport
 } from "../lib/workspaceNetworkViewportActions";
@@ -87,6 +91,8 @@ export function useWorkspaceHandlers({
   setWorkspaceTaxEnabled,
   setWorkspaceTaxRatePercent,
   setBomTraceabilityLabelsHidden,
+  setWireExportStrippingAllowanceMm,
+  setWireExportTwistedPairLengthCoefficient,
   setDefaultWireSectionMm2,
   setDefaultAutoCreateLinkedNodes,
   setDefaultSortField,
@@ -415,6 +421,8 @@ export function useWorkspaceHandlers({
     setWorkspaceTaxEnabled(true);
     setWorkspaceTaxRatePercent(20);
     setBomTraceabilityLabelsHidden(false);
+    setWireExportStrippingAllowanceMm(DEFAULT_WIRE_EXPORT_STRIPPING_ALLOWANCE_MM);
+    setWireExportTwistedPairLengthCoefficient(DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT);
     setDefaultWireSectionMm2(0.5);
     setDefaultAutoCreateLinkedNodes(true);
     setDefaultSortField("name");

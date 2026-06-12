@@ -68,6 +68,10 @@ interface SettingsWorkspaceContentProps {
   setBomTraceabilityLabelsHidden: (value: boolean) => void;
   bomExportComputedDownstreamLoad: boolean;
   setBomExportComputedDownstreamLoad: (value: boolean) => void;
+  wireExportStrippingAllowanceMm: number;
+  setWireExportStrippingAllowanceMm: (value: number) => void;
+  wireExportTwistedPairLengthCoefficient: number;
+  setWireExportTwistedPairLengthCoefficient: (value: number) => void;
   defaultWireSectionMm2: number;
   setDefaultWireSectionMm2: (value: number) => void;
   defaultAutoCreateLinkedNodes: boolean;
@@ -213,6 +217,10 @@ export function SettingsWorkspaceContent({
   setBomTraceabilityLabelsHidden,
   bomExportComputedDownstreamLoad,
   setBomExportComputedDownstreamLoad,
+  wireExportStrippingAllowanceMm,
+  setWireExportStrippingAllowanceMm,
+  wireExportTwistedPairLengthCoefficient,
+  setWireExportTwistedPairLengthCoefficient,
   defaultWireSectionMm2,
   setDefaultWireSectionMm2,
   defaultAutoCreateLinkedNodes,
@@ -1433,6 +1441,38 @@ export function SettingsWorkspaceContent({
               <option value="csv">CSV</option>
               <option value="xlsx">XLSX</option>
             </select>
+          </label>
+          <label className="settings-field">
+            {renderSettingLabel("Wire stripping allowance (mm)")}
+            <input
+              type="number"
+              min={0}
+              step={1}
+              value={String(wireExportStrippingAllowanceMm)}
+              onChange={(event) => {
+                const nextValue = Number(event.target.value.replace(",", "."));
+                if (!Number.isFinite(nextValue) || nextValue < 0) {
+                  return;
+                }
+                setWireExportStrippingAllowanceMm(nextValue);
+              }}
+            />
+          </label>
+          <label className="settings-field">
+            {renderSettingLabel("Twisted-pair length coefficient")}
+            <input
+              type="number"
+              min={0.001}
+              step={0.001}
+              value={String(wireExportTwistedPairLengthCoefficient)}
+              onChange={(event) => {
+                const nextValue = Number(event.target.value.replace(",", "."));
+                if (!Number.isFinite(nextValue) || nextValue <= 0) {
+                  return;
+                }
+                setWireExportTwistedPairLengthCoefficient(nextValue);
+              }}
+            />
           </label>
           <label className="settings-checkbox">
             <input

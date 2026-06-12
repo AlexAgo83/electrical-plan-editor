@@ -1,6 +1,11 @@
 import { resolveConnectorTerminalMaterial } from "../../core/connectorCatalogMaterials";
 import type { CatalogItem, Connector, Splice, Wire, WireEndpoint } from "../../core/entities";
 import type { TabularWorksheetExport } from "./tabularExport";
+import {
+  buildWireTwistGroupExportCounts,
+  resolveWireExportLengthMm,
+  type WireExportLengthPreferences
+} from "./wireExportLength";
 
 function resolveColor(wire: Wire): string {
   if (wire.colorMode === "free") {
@@ -160,7 +165,8 @@ export function buildWireListSheet(
   wires: Wire[],
   connectors: Connector[],
   splices: Splice[],
-  catalogItems: CatalogItem[]
+  catalogItems: CatalogItem[],
+  exportLengthPreferences: WireExportLengthPreferences = {}
 ): TabularWorksheetExport {
   const connectorById = new Map(connectors.map((c) => [c.id, c]));
   const spliceById = new Map(splices.map((s) => [s.id, s]));
@@ -188,6 +194,7 @@ export function buildWireListSheet(
   const sortedWires = [...wires].sort((a, b) =>
     a.technicalId.localeCompare(b.technicalId, undefined, { sensitivity: "base" })
   );
+  const twistGroupCounts = buildWireTwistGroupExportCounts(sortedWires);
 
   const rows = sortedWires.map((wire) => {
     const begin = resolveEndpoint(wire, "A", connectorById, spliceById);
@@ -210,7 +217,7 @@ export function buildWireListSheet(
       end.position,
       endMaterials.connectionRef,
       endMaterials.sealRef,
-      wire.lengthMm
+      resolveWireExportLengthMm(wire, twistGroupCounts, exportLengthPreferences)
     ];
   });
 
