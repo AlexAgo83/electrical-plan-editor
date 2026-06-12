@@ -295,6 +295,7 @@ export function buildCableCalloutViewModels({
       }
       const catalogItem = connector.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId);
       const header = buildCalloutHeaderDisplay(connector.name, connector.technicalId);
+      const connectorReference = connector.manufacturerReference?.trim() ?? "";
       models.push({
         key,
         kind: "connector",
@@ -303,7 +304,7 @@ export function buildCableCalloutViewModels({
         nodePosition,
         position,
         title: header.title,
-        subtitle: header.subtitle,
+        subtitle: connectorReference.length > 0 ? connectorReference : header.subtitle,
         connectorLayout: shouldShowConnectorDrawing
           ? resolveEditedConnectorLayout(catalogItem?.connectorLayout, connector.cavityCount)
           : undefined,
@@ -327,6 +328,7 @@ export function buildCableCalloutViewModels({
       continue;
     }
     const header = buildCalloutHeaderDisplay(splice.name, splice.technicalId);
+    const spliceReference = splice.manufacturerReference?.trim() ?? "";
     models.push({
       key,
       kind: "splice",
@@ -335,7 +337,7 @@ export function buildCableCalloutViewModels({
       nodePosition,
       position,
       title: header.title,
-      subtitle: header.subtitle,
+      subtitle: spliceReference.length > 0 ? spliceReference : header.subtitle,
       groups,
       isDeemphasized: isSubNetworkFilteringActive && !(nodeHasActiveSubNetworkConnection.get(node.id) ?? false),
       isSelected: selectedSpliceId === splice.id

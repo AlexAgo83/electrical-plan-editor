@@ -158,4 +158,81 @@ describe("NetworkSummaryCalloutsLayer", () => {
     expect(container.querySelector(".network-callout-frame")).not.toBeNull();
     expect(container).toHaveTextContent("Far connector");
   });
+
+  it("renders the reference subtitle line and a grid divider between each table column", () => {
+    const renderedCallout: RenderedCableCallout = {
+      callout: {
+        key: "connector:C1",
+        kind: "connector",
+        entityId: "C1" as ConnectorId,
+        nodeId: "N-C1" as NodeId,
+        nodePosition: { x: 0, y: 0 },
+        position: { x: 20, y: 20 },
+        title: "C-04 · Body Controller",
+        subtitle: "MFR-REF-12297667",
+        groups: [],
+        isDeemphasized: false,
+        isSelected: false
+      },
+      layout: {
+        width: 160,
+        drawingTopY: null,
+        drawingWidth: 0,
+        drawingHeight: 0,
+        titleStartY: 8,
+        subtitleStartY: 16,
+        headerY: 26,
+        rowsStartY: 34,
+        rowStep: 8,
+        rowHeight: 6,
+        height: 60,
+        columns: [
+          { key: "pin", header: "Pin", width: 10, x: 0, textAnchor: "start" },
+          { key: "technicalId", header: "Wire ID", width: 20, x: 13, textAnchor: "start" },
+          { key: "targetId", header: "Node ID", width: 20, x: 36, textAnchor: "start" }
+        ],
+        rows: [
+          {
+            wireId: "W1",
+            pin: "C1",
+            technicalId: "W-1",
+            color: "",
+            colorPrimaryHex: null,
+            colorSecondaryHex: null,
+            targetId: "S-1",
+            targetPin: "P1",
+            wireName: "Wire 1",
+            length: "0 mm",
+            section: "0.5 mm²"
+          }
+        ]
+      },
+      lineEnd: { x: 10, y: 10 },
+      calloutClassName: "network-callout-group",
+      isVisibleInViewport: true
+    };
+
+    const { container } = render(
+      <svg>
+        <NetworkSummaryCalloutsLayer
+          renderedCableCallouts={[renderedCallout]}
+          inverseLabelScale={1}
+          selectedWireId={null}
+          onHoverCallout={vi.fn()}
+          onCalloutMouseDown={vi.fn()}
+          onSelectConnectorFromCallout={vi.fn()}
+          onSelectSpliceFromCallout={vi.fn()}
+          onSelectWireFromConnectorPin={vi.fn()}
+          onOpenInspectorForSelection={vi.fn()}
+          networkOffset={{ x: 0, y: 0 }}
+          networkScale={1}
+        />
+      </svg>
+    );
+
+    // Reference line is shown under the id · name header.
+    expect(container.querySelector(".network-callout-subtitle")?.textContent).toBe("MFR-REF-12297667");
+    // One vertical divider between each adjacent pair of the three columns.
+    expect(container.querySelectorAll(".network-callout-table-column-divider")).toHaveLength(2);
+  });
 });

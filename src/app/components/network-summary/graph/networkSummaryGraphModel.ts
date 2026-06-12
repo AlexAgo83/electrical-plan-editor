@@ -112,9 +112,26 @@ const CONNECTOR_NODE_HEIGHT = 30;
 const SPLICE_DIAMOND_SIZE = 30;
 const INTERMEDIATE_NODE_RADIUS = 17;
 const SEGMENT_SHEATH_CALLOUT_HEADERS = ["Layer", "Insulation", "Line Style", "Int Part", "Quantity"] as const;
-const SEGMENT_SHEATH_CALLOUT_WIDTH = 192;
+// Base column widths were [32, 34, 44, 42, 40]. The sheath-type (Layer) column is
+// reduced by 10% and the Insulation column enlarged by 35% for better legibility.
+const SEGMENT_SHEATH_CALLOUT_COLUMN_WIDTHS = [29, 46, 44, 42, 40] as const;
+const SEGMENT_SHEATH_CALLOUT_CELL_PADDING = 3;
+const SEGMENT_SHEATH_CALLOUT_WIDTH = SEGMENT_SHEATH_CALLOUT_COLUMN_WIDTHS.reduce((total, width) => total + width, 0);
 const SEGMENT_SHEATH_CALLOUT_HEIGHT = 28;
 const SEGMENT_SHEATH_CALLOUT_OFFSET = 26;
+const SEGMENT_SHEATH_CALLOUT_COLUMN_LEFT_OFFSETS = SEGMENT_SHEATH_CALLOUT_COLUMN_WIDTHS.reduce<number[]>(
+  (offsets, width) => {
+    offsets.push((offsets[offsets.length - 1] ?? 0) + width);
+    return offsets;
+  },
+  [0]
+);
+// Text x (relative to the callout left edge) for each of the 5 columns.
+export const SEGMENT_SHEATH_CALLOUT_COLUMN_TEXT_OFFSETS = SEGMENT_SHEATH_CALLOUT_COLUMN_WIDTHS.map(
+  (_width, index) => (SEGMENT_SHEATH_CALLOUT_COLUMN_LEFT_OFFSETS[index] ?? 0) + SEGMENT_SHEATH_CALLOUT_CELL_PADDING
+);
+// Vertical divider x (relative to the left edge) between adjacent columns.
+export const SEGMENT_SHEATH_CALLOUT_COLUMN_DIVIDER_OFFSETS = SEGMENT_SHEATH_CALLOUT_COLUMN_LEFT_OFFSETS.slice(1, -1);
 
 function getSegmentLabelAnchor(
   nodeAPosition: NodePosition,

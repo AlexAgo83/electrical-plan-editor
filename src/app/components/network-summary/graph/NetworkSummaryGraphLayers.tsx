@@ -9,7 +9,12 @@ import {
 import type { NetworkNode, NodeId, SegmentId, WireId } from "../../../../core/entities";
 import type { NodePosition } from "../../../types/app-controller";
 import { getConsistentConnectorLayoutDrawingSize, renderConnectorLayoutDrawing } from "../callouts/NetworkSummaryCalloutsLayer";
-import type { RenderedNodeModel, RenderedSegmentModel } from "./networkSummaryGraphModel";
+import {
+  SEGMENT_SHEATH_CALLOUT_COLUMN_DIVIDER_OFFSETS,
+  SEGMENT_SHEATH_CALLOUT_COLUMN_TEXT_OFFSETS,
+  type RenderedNodeModel,
+  type RenderedSegmentModel
+} from "./networkSummaryGraphModel";
 
 const DOUBLE_CLICK_INTERVAL_MS = 450;
 
@@ -350,21 +355,19 @@ export function NetworkSummaryGraphLayers({
             x2={segmentCallout.width / 2}
             y2={-segmentCallout.height / 2 + 18}
           />
-          {[
-            -segmentCallout.width / 2 + 32,
-            -segmentCallout.width / 2 + 66,
-            -segmentCallout.width / 2 + 110,
-            -segmentCallout.width / 2 + 152
-          ].map((x, index) => (
-            <line
-              key={`${segment.id}-callout-divider-${index}`}
-              className="network-callout-table-divider network-segment-callout-table-divider"
-              x1={x}
-              y1={-segmentCallout.height / 2 + 9}
-              x2={x}
-              y2={segmentCallout.height / 2}
-            />
-          ))}
+          {SEGMENT_SHEATH_CALLOUT_COLUMN_DIVIDER_OFFSETS.map((offset, index) => {
+            const x = -segmentCallout.width / 2 + offset;
+            return (
+              <line
+                key={`${segment.id}-callout-divider-${index}`}
+                className="network-callout-table-divider network-segment-callout-table-divider"
+                x1={x}
+                y1={-segmentCallout.height / 2 + 9}
+                x2={x}
+                y2={segmentCallout.height / 2}
+              />
+            );
+          })}
           <text className="network-callout-table-cell network-segment-callout-text network-segment-callout-route" x={-segmentCallout.width / 2 + 3} y={-6}>
             {segmentCallout.routeLabel}
           </text>
@@ -372,7 +375,7 @@ export function NetworkSummaryGraphLayers({
             <text
               key={`${segment.id}-callout-header-${header}`}
               className="network-callout-table-header-cell network-segment-callout-text network-segment-callout-header"
-              x={[-segmentCallout.width / 2 + 3, -segmentCallout.width / 2 + 35, -segmentCallout.width / 2 + 69, -segmentCallout.width / 2 + 113, -segmentCallout.width / 2 + 155][index]}
+              x={-segmentCallout.width / 2 + (SEGMENT_SHEATH_CALLOUT_COLUMN_TEXT_OFFSETS[index] ?? 0)}
               y={3}
             >
               {header}
@@ -382,7 +385,7 @@ export function NetworkSummaryGraphLayers({
             <text
               key={`${segment.id}-callout-value-${index}`}
               className="network-callout-table-cell network-segment-callout-text"
-              x={[-segmentCallout.width / 2 + 3, -segmentCallout.width / 2 + 35, -segmentCallout.width / 2 + 69, -segmentCallout.width / 2 + 113, -segmentCallout.width / 2 + 155][index]}
+              x={-segmentCallout.width / 2 + (SEGMENT_SHEATH_CALLOUT_COLUMN_TEXT_OFFSETS[index] ?? 0)}
               y={12}
             >
               {value}

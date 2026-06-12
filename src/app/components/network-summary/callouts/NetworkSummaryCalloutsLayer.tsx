@@ -574,6 +574,25 @@ export function NetworkSummaryCalloutsLayer({
                       x2={tableRightX}
                       y2={rowsStartY - 0.35}
                     />
+                    {layout.columns.slice(0, -1).map((column, columnIndex) => {
+                      const nextColumn = layout.columns[columnIndex + 1];
+                      if (nextColumn === undefined) {
+                        return null;
+                      }
+                      const dividerX = contentLeftX + (column.x + column.width + nextColumn.x) / 2;
+                      const tableBottomY =
+                        rowsStartY + Math.max(0, layout.rows.length - 1) * layout.rowStep + layout.rowHeight;
+                      return (
+                        <line
+                          key={`${callout.key}-col-divider-${column.key}`}
+                          className="network-callout-table-divider network-callout-table-column-divider"
+                          x1={dividerX}
+                          y1={headerY - 0.5}
+                          x2={dividerX}
+                          y2={tableBottomY}
+                        />
+                      );
+                    })}
                     {layout.rows.map((row, rowIndex) => {
                       const rowY = rowsStartY + rowIndex * layout.rowStep;
                       const isSelectedWireRow = selectedWireId !== null && row.wireId === selectedWireId;

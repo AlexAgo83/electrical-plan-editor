@@ -502,7 +502,7 @@ export function computeRenderedCableCallouts(options: ComputeRenderedCableCallou
   return options.orderedCableCallouts.map((callout) => {
     const layout = buildCalloutLayoutMetrics(
       callout.title,
-      "",
+      callout.subtitle,
       callout.groups,
       options.calloutTextSize,
       options.showCalloutWireNames,
