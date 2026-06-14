@@ -229,8 +229,8 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
               const begin = describeWireEndpointCsvParts(wire.endpointA);
               const end = describeWireEndpointCsvParts(wire.endpointB);
               const colorCode = getWireColorCsvValue(wire);
-              const beginMaterials = resolveWireExportEndpointMaterials(wire, "A", connectorById, catalogItemById);
-              const endMaterials = resolveWireExportEndpointMaterials(wire, "B", connectorById, catalogItemById);
+              const beginMaterials = resolveWireExportEndpointMaterials(wire, "A", connectorById, spliceById, catalogItemById);
+              const endMaterials = resolveWireExportEndpointMaterials(wire, "B", connectorById, spliceById, catalogItemById);
               if (showWireRouteModeColumn) {
                 return [
                   wire.name,

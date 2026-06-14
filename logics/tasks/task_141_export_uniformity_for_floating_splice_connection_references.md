@@ -2,20 +2,20 @@
 > From version: 1.16.0
 > Schema version: 1.0
 > Status: In progress
-> Understanding: 95%
-> Confidence: 90%
-> Progress: 10%
+> Understanding: 98%
+> Confidence: 95%
+> Progress: 80%
 > Complexity: Medium
 > Theme: Export
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Definition of Done (DoD)
-- [ ] `resolveEndpointConnectionMaterial` resolves splice-port ends from real splice data instead of the hardcoded `"Preden 13mm"`: manual endpoint connection reference/name first, then `splice.catalogItemId` -> `catalogItem.manufacturerReference` (+ name), then `splice.manufacturerReference`, then empty.
-- [ ] `resolveWireExportEndpointMaterials` and `buildWireListSheet` accept the splice map; both wire export preview callers pass it so the preview matches the downloaded CSV/XLSX.
-- [ ] Splice seal resolution and connector connection/seal resolution are unchanged.
-- [ ] `withWarning` clears any pre-existing blocking `lastError` while keeping the new warning.
-- [ ] Targeted tests cover splice-end connection resolution branches and warning/error channel exclusivity; existing export/persistence/reducer tests stay green.
-- [ ] Logics lint, lint, typecheck, and the relevant focused tests pass.
+- [x] `resolveEndpointConnectionMaterial` resolves splice-port ends from real splice data instead of the hardcoded `"Preden 13mm"`: manual endpoint connection reference/name first, then `splice.catalogItemId` -> `catalogItem.manufacturerReference` (+ name), then `splice.manufacturerReference`, then empty.
+- [x] `resolveWireExportEndpointMaterials` and `buildWireListSheet` accept the splice map; both wire export preview callers pass it so the preview matches the downloaded CSV/XLSX.
+- [x] Splice seal resolution and connector connection/seal resolution are unchanged.
+- [x] `withWarning` clears any pre-existing blocking `lastError` while keeping the new warning.
+- [x] Targeted tests cover splice-end connection resolution branches and warning/error channel exclusivity; existing export/persistence/reducer tests stay green.
+- [ ] Logics lint, lint, typecheck, and the relevant focused tests pass (full local CI + remote CI pending).
 
 # Implementation plan
 - Step 1: In `src/app/lib/wireListExport.ts`, give `resolveEndpointConnectionMaterial` and `resolveWireExportEndpointMaterials` access to a `spliceById` map and a catalog map; resolve splice material via manual ref -> catalog `manufacturerReference` -> `splice.manufacturerReference`. Remove the `"Preden 13mm"` literal. Thread the splice map through `buildWireListSheet`.
@@ -53,7 +53,12 @@ flowchart TD
 - Run `python3 -m logics_manager flow closeout task_141_export_uniformity_for_floating_splice_connection_references --validation "<evidence>" --lint` after implementation and evidence capture.
 
 # Report
-- (pending implementation)
+- Implemented in `src/app/lib/wireListExport.ts`: new `resolveSpliceConnectionMaterial` resolves a splice-port wire end via manual endpoint reference -> `splice.catalogItemId` catalog `manufacturerReference` (+ catalog `name`) -> `splice.manufacturerReference` -> empty; the hardcoded `"Preden 13mm"` literal is removed. `resolveEndpointConnectionMaterial`, `resolveWireExportEndpointMaterials`, and `buildWireListSheet` now thread a `spliceById` map.
+- Callers updated to pass the existing splice map: `src/app/components/workspace/ModelingSecondaryTables.tsx` and `src/app/components/workspace/AnalysisWireWorkspacePanels.tsx`, so the in-app wire export preview matches the downloaded CSV/XLSX.
+- `src/store/reducer/shared.ts`: `withWarning` now clears `lastError` while setting the new `lastWarning`, keeping the two feedback channels mutually exclusive (task_139 AC30).
+- Tests: extended `src/tests/wire-list-export.spec.ts` (manual ref, catalog ref + name, bare `manufacturerReference`, none, splice ends carry no seal) and added `src/tests/store.shared-warning-channel.spec.ts` (error cleared on warning; fresh warning preserved).
+- Local validation so far: `logics-manager lint --require-status` OK; `npm run -s typecheck` OK; `npm run -s lint` OK; focused vitest (`wire-list-export`, `store.shared-warning-channel`, `csv.export`, `app.ui.wire-export-preview`, `network-summary-bom-csv`, `store.reducer.entities/wires/rear-backshell`) all green.
+- Remaining: full `npm run -s ci:local`, push, remote CI confirmation, and workflow closeout.
 
 # AI Context
 - Summary: Implement export uniformity for floating splice connection references.

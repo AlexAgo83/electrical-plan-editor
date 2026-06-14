@@ -19,7 +19,7 @@ function asWireId(value: string): WireId {
 }
 
 describe("buildWireListSheet", () => {
-  it("uses catalog connector defaults, keeps manual overrides, and marks splice endpoints as predenuded", () => {
+  it("uses catalog connector defaults, keeps manual overrides, and leaves splice connection refs empty without splice material", () => {
     const catalogItems: CatalogItem[] = [
       {
         id: asCatalogItemId("CAT-1"),
@@ -120,7 +120,7 @@ describe("buildWireListSheet", () => {
       "Splice",
       "S-1",
       1,
-      "Preden 13mm",
+      "",
       "",
       140
     ]);
@@ -142,6 +142,118 @@ describe("buildWireListSheet", () => {
       "SEAL-MANUAL - Manual seal",
       190
     ]);
+  });
+
+  it("resolves splice-end connection refs from manual ref, catalog material, then splice manufacturerReference", () => {
+    const catalogItems: CatalogItem[] = [
+      {
+        id: asCatalogItemId("CAT-SPLICE"),
+        manufacturerReference: "SPLICE-CAT-REF",
+        connectionCount: 4,
+        name: "Manchon épissure"
+      }
+    ];
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-1",
+        cavityCount: 4
+      }
+    ];
+    const splices: Splice[] = [
+      {
+        id: asSpliceId("S-CAT"),
+        name: "Catalog splice",
+        technicalId: "S-CAT",
+        portCount: 4,
+        catalogItemId: asCatalogItemId("CAT-SPLICE"),
+        manufacturerReference: "IGNORED-WHEN-CATALOG"
+      },
+      {
+        id: asSpliceId("S-MANUF"),
+        name: "Bare manufacturer splice",
+        technicalId: "S-MANUF",
+        portCount: 4,
+        manufacturerReference: "Manchon épissure"
+      },
+      {
+        id: asSpliceId("S-NONE"),
+        name: "Bare splice",
+        technicalId: "S-NONE",
+        portCount: 4
+      }
+    ];
+    const wires: Wire[] = [
+      {
+        id: asWireId("W-CAT"),
+        name: "Catalog wire",
+        technicalId: "W-001",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-CAT"), portIndex: 1 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 100,
+        sectionMm2: 1,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-MANUAL"),
+        name: "Manual override wire",
+        technicalId: "W-002",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 2 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-CAT"), portIndex: 2 },
+        endpointBConnectionReference: "MANUAL-SPLICE-REF",
+        endpointBConnectionName: "Manual splice ref",
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 100,
+        sectionMm2: 1,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-MANUF"),
+        name: "Bare manufacturer wire",
+        technicalId: "W-003",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 3 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-MANUF"), portIndex: 1 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 100,
+        sectionMm2: 1,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-NONE"),
+        name: "Bare wire",
+        technicalId: "W-004",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 4 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-NONE"), portIndex: 1 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 100,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
+
+    const sheet = buildWireListSheet("Wires", wires, connectors, splices, catalogItems);
+    const connectionRefByWire = new Map(sheet.rows.map((row) => [row[0], row[13]]));
+
+    // Catalog splice -> catalog manufacturerReference (matches BOM grouping key) + name.
+    expect(connectionRefByWire.get("W-001")).toBe("SPLICE-CAT-REF - Manchon épissure");
+    // Manual endpoint reference wins over catalog material.
+    expect(connectionRefByWire.get("W-002")).toBe("MANUAL-SPLICE-REF - Manual splice ref");
+    // No catalog item -> falls back to splice.manufacturerReference.
+    expect(connectionRefByWire.get("W-003")).toBe("Manchon épissure");
+    // No material at all -> empty, never a hardcoded default.
+    expect(connectionRefByWire.get("W-004")).toBe("");
+    // Splice ends never carry a seal reference.
+    expect(sheet.rows.every((row) => row[14] === "")).toBe(true);
   });
 
   it("formats connector pins with their C-prefixed one-based cavity label without offsetting", () => {

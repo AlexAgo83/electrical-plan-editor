@@ -985,12 +985,14 @@ export function ModelingSecondaryTables({
                       wire,
                       "A",
                       connectorById,
+                      spliceById,
                       catalogItemById,
                     );
                     const endMaterials = resolveWireExportEndpointMaterials(
                       wire,
                       "B",
                       connectorById,
+                      spliceById,
                       catalogItemById,
                     );
                     if (showWireRouteModeColumn) {

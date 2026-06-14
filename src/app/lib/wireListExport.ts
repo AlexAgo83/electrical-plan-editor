@@ -49,15 +49,51 @@ function formatResolvedMaterial(material: ResolvedEndpointMaterial | undefined):
   return material.name === undefined ? material.reference : `${material.reference} - ${material.name}`;
 }
 
+function resolveSpliceConnectionMaterial(
+  endpoint: Extract<WireEndpoint, { kind: "splicePort" }>,
+  reference: string | undefined,
+  name: string | undefined,
+  spliceById: ReadonlyMap<string, Splice>,
+  catalogItemById: ReadonlyMap<string, CatalogItem>
+): ResolvedEndpointMaterial | undefined {
+  const manualReference = normalizeReference(reference);
+  if (manualReference !== undefined) {
+    return {
+      reference: manualReference,
+      name: normalizeName(name)
+    };
+  }
+
+  const splice = spliceById.get(endpoint.spliceId);
+  if (splice === undefined) {
+    return undefined;
+  }
+
+  const catalogItem = splice.catalogItemId === undefined ? undefined : catalogItemById.get(splice.catalogItemId);
+  if (catalogItem !== undefined) {
+    return {
+      reference: catalogItem.manufacturerReference,
+      name: normalizeName(catalogItem.name)
+    };
+  }
+
+  const spliceReference = normalizeReference(splice.manufacturerReference);
+  if (spliceReference === undefined) {
+    return undefined;
+  }
+  return { reference: spliceReference };
+}
+
 function resolveEndpointConnectionMaterial(
   endpoint: WireEndpoint,
   reference: string | undefined,
   name: string | undefined,
   connectorById: ReadonlyMap<string, Connector>,
+  spliceById: ReadonlyMap<string, Splice>,
   catalogItemById: ReadonlyMap<string, CatalogItem>
 ): ResolvedEndpointMaterial | undefined {
   if (endpoint.kind === "splicePort") {
-    return { reference: "Preden 13mm" };
+    return resolveSpliceConnectionMaterial(endpoint, reference, name, spliceById, catalogItemById);
   }
 
   const manualReference = normalizeReference(reference);
@@ -119,6 +155,7 @@ export function resolveWireExportEndpointMaterials(
   wire: Wire,
   side: "A" | "B",
   connectorById: ReadonlyMap<string, Connector>,
+  spliceById: ReadonlyMap<string, Splice>,
   catalogItemById: ReadonlyMap<string, CatalogItem>
 ): ResolvedWireExportEndpointMaterials {
   const endpoint = side === "A" ? wire.endpointA : wire.endpointB;
@@ -129,7 +166,7 @@ export function resolveWireExportEndpointMaterials(
 
   return {
     connectionRef: formatResolvedMaterial(
-      resolveEndpointConnectionMaterial(endpoint, connectionReference, connectionName, connectorById, catalogItemById)
+      resolveEndpointConnectionMaterial(endpoint, connectionReference, connectionName, connectorById, spliceById, catalogItemById)
     ),
     sealRef: formatResolvedMaterial(
       resolveEndpointSealMaterial(endpoint, sealReference, sealName, connectorById, catalogItemById)
@@ -199,8 +236,8 @@ export function buildWireListSheet(
   const rows = sortedWires.map((wire) => {
     const begin = resolveEndpoint(wire, "A", connectorById, spliceById);
     const end = resolveEndpoint(wire, "B", connectorById, spliceById);
-    const beginMaterials = resolveWireExportEndpointMaterials(wire, "A", connectorById, catalogItemById);
-    const endMaterials = resolveWireExportEndpointMaterials(wire, "B", connectorById, catalogItemById);
+    const beginMaterials = resolveWireExportEndpointMaterials(wire, "A", connectorById, spliceById, catalogItemById);
+    const endMaterials = resolveWireExportEndpointMaterials(wire, "B", connectorById, spliceById, catalogItemById);
     return [
       wire.technicalId,
       wire.name,

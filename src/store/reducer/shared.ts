@@ -76,6 +76,7 @@ export function withWarning(state: AppState, warning: string | AppError): AppSta
     ...state,
     ui: {
       ...state.ui,
+      lastError: null,
       lastWarning: normalizeAppError(warning)
     }
   };
