@@ -2,18 +2,10 @@ import type { FormEvent } from "react";
 import type { NetworkId } from "../../core/entities";
 import { formatIsoToLocalDateInput } from "../../core/networkMetadata";
 import type { AppState } from "../../store";
-import {
-  appActions,
-  appReducer,
-  createSampleNetworkState,
-  selectNetworkTechnicalIdTaken
-} from "../../store";
+import { appActions, appReducer, createSampleNetworkState, selectNetworkTechnicalIdTaken } from "../../store";
 import { buildUniqueNetworkTechnicalId, createEntityId } from "../lib/app-utils-shared";
 import { buildNetworkFormDraft } from "../lib/networkFormDraft";
-import {
-  DEFAULT_WIRE_EXPORT_STRIPPING_ALLOWANCE_MM,
-  DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT
-} from "../lib/wireExportLength";
+import { DEFAULT_WIRE_EXPORT_STRIPPING_ALLOWANCE_MM, DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT } from "../lib/wireExportLength";
 import {
   fitNetworkToContent as fitNetworkToContentViewport,
   resetNetworkViewToConfiguredScale as resetNetworkViewToConfiguredScaleViewport
