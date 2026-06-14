@@ -1,10 +1,10 @@
 ## item_632_export_uniformity_for_floating_splice_connection_references - Export uniformity for floating splice connection references
 > From version: 1.16.0
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 95%
 > Confidence: 90%
-> Progress: 10%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Export
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -58,7 +58,7 @@ flowchart TD
 # Links
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
-- Request: `logics/request/req_146_floating_splice_export_connection_reference_uniformity.md`
+- Request: `req_146_floating_splice_export_connection_reference_uniformity`
 - Primary task(s): `task_141_export_uniformity_for_floating_splice_connection_references`
 
 # AI Context
@@ -75,6 +75,7 @@ flowchart TD
 - Hybrid rationale: Derived from request `req_146_floating_splice_export_connection_reference_uniformity` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_146_floating_splice_export_connection_reference_uniformity.md`.
 - Generated locally by logics-manager.
+- Task `task_141_export_uniformity_for_floating_splice_connection_references` was finished via `logics-manager flow finish task` on 2026-06-15.
 
 # Tasks
 - `task_141_export_uniformity_for_floating_splice_connection_references`
