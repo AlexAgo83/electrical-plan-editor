@@ -1322,7 +1322,7 @@ export function SettingsWorkspaceContent({
               checked={defaultAutoCreateLinkedNodes}
               onChange={(event) => setDefaultAutoCreateLinkedNodes(event.target.checked)}
             />
-            {renderSettingLabel("Default auto-create linked nodes for connectors/splices")}
+            {renderSettingLabel("Default auto-create linked nodes for connectors")}
           </label>
           <label className="settings-field">
             {renderSettingLabel("Directional splice imbalance limit (%)")}

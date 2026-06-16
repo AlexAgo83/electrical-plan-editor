@@ -218,6 +218,11 @@
 .network-node:focus-visible {
   outline: none;
 }
+/* Mouse focus must not paint the browser's default outline: selection feedback is the
+   `is-selected` highlight. Keyboard focus keeps the `:focus-visible` styling below. */
+.network-node:focus:not(:focus-visible) {
+  outline: none;
+}
 .network-node:focus-visible .network-node-shape {
   stroke: var(--network-selection-focus-color, var(--network-selection-color, #0b4f86));
   stroke-width: var(--network-node-stroke-emphasis-width, 3);

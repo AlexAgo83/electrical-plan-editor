@@ -24,7 +24,7 @@ describe("App integration UI - settings wire/create defaults", () => {
       const catalogBomPanel = getPanelByHeading("Catalog & BOM setup");
       const defaultWireSectionInput = within(globalPreferencesPanel).getByLabelText("Default wire section (mm²)");
       const defaultAutoCreateLinkedNodesCheckbox = within(globalPreferencesPanel).getByLabelText(
-        "Default auto-create linked nodes for connectors/splices"
+        "Default auto-create linked nodes for connectors"
       );
       const wireStrippingAllowanceInput = within(catalogBomPanel).getByLabelText("Wire stripping allowance (mm)");
       const twistedPairCoefficientInput = within(catalogBomPanel).getByLabelText("Twisted-pair length coefficient");
@@ -55,11 +55,6 @@ describe("App integration UI - settings wire/create defaults", () => {
       expect(within(createConnectorPanel).getByLabelText("Auto-create linked node on connector creation")).not.toBeChecked();
       fireEvent.click(within(createConnectorPanel).getByRole("button", { name: "Cancel" }));
 
-      switchSubScreenDrawerAware("splice");
-      clickNewFromPanel("Splices");
-      const createSplicePanel = getPanelByHeading("Create Splice");
-      expect(within(createSplicePanel).getByLabelText("Auto-create linked node on splice creation")).not.toBeChecked();
-
       firstRender.unmount();
 
       renderAppWithState(createUiIntegrationState());
@@ -68,7 +63,7 @@ describe("App integration UI - settings wire/create defaults", () => {
       const restoredCatalogBomPanel = getPanelByHeading("Catalog & BOM setup");
       expect(within(restoredGlobalPreferencesPanel).getByLabelText("Default wire section (mm²)")).toHaveValue(0.75);
       expect(
-        within(restoredGlobalPreferencesPanel).getByLabelText("Default auto-create linked nodes for connectors/splices")
+        within(restoredGlobalPreferencesPanel).getByLabelText("Default auto-create linked nodes for connectors")
       ).not.toBeChecked();
       expect(within(restoredCatalogBomPanel).getByLabelText("Wire stripping allowance (mm)")).toHaveValue(25);
       expect(within(restoredCatalogBomPanel).getByLabelText("Twisted-pair length coefficient")).toHaveValue(1.08);

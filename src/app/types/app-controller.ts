@@ -32,6 +32,7 @@ export interface SpliceSynthesisRow {
   wireId: WireId;
   wireName: string;
   wireTechnicalId: string;
+  sectionMm2: number;
   localEndpointLabel: string;
   remoteEndpointLabel: string;
   remoteEndpoint: WireEndpoint;

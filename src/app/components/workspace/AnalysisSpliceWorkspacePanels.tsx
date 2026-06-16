@@ -6,7 +6,7 @@ import {
   type FormEvent,
   type ReactElement,
 } from "react";
-import type { Segment, Splice } from "../../../core/entities";
+import type { Segment, Splice, SpliceId } from "../../../core/entities";
 import { resolveSplicePortMode } from "../../../core/splicePortMode";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
@@ -44,7 +44,6 @@ export function AnalysisSpliceWorkspacePanels(
     wires,
     spliceSort: _spliceSort,
     setSpliceSort: _setSpliceSort,
-    spliceOccupiedCountById,
     onSelectSplice,
     onSelectCatalogItem,
     onOpenSpliceOnboardingHelp,
@@ -79,11 +78,11 @@ export function AnalysisSpliceWorkspacePanels(
     | "manufacturerReference"
     | "hostSegment"
     | "offsetMm"
-    | "portCount"
-    | "branchCount";
+    | "connectedWireCount";
   type SpliceSynthesisTableSortField =
     | "name"
     | "technicalId"
+    | "sectionMm2"
     | "localPort"
     | "destination"
     | "localCoveredLengthMm"
@@ -153,6 +152,24 @@ export function AnalysisSpliceWorkspacePanels(
     },
     [describeNode, nodeById, segmentById],
   );
+  const spliceConnectedWireCountById = useMemo(() => {
+    const result = new Map<SpliceId, number>();
+    for (const wire of wires) {
+      if (wire.endpointA.kind === "splicePort") {
+        result.set(
+          wire.endpointA.spliceId,
+          (result.get(wire.endpointA.spliceId) ?? 0) + 1,
+        );
+      }
+      if (wire.endpointB.kind === "splicePort") {
+        result.set(
+          wire.endpointB.spliceId,
+          (result.get(wire.endpointB.spliceId) ?? 0) + 1,
+        );
+      }
+    }
+    return result;
+  }, [wires]);
   const sortedVisibleSplices = useMemo(
     () =>
       sortByTableColumns(
@@ -167,17 +184,13 @@ export function AnalysisSpliceWorkspacePanels(
             return resolveSplicePlacementPresentation(splice).hostSegmentSort;
           if (field === "offsetMm")
             return resolveSplicePlacementPresentation(splice).offsetSort;
-          if (field === "portCount")
-            return resolveSplicePortMode(splice) === "unbounded"
-              ? Number.POSITIVE_INFINITY
-              : splice.portCount;
-          return spliceOccupiedCountById.get(splice.id) ?? 0;
+          return spliceConnectedWireCountById.get(splice.id) ?? 0;
         },
         (splice) => splice.id,
       ),
     [
       resolveSplicePlacementPresentation,
-      spliceOccupiedCountById,
+      spliceConnectedWireCountById,
       spliceTableSort,
       visibleSplices,
     ],
@@ -202,6 +215,7 @@ export function AnalysisSpliceWorkspacePanels(
         (row, field) => {
           if (field === "name") return row.wireName;
           if (field === "technicalId") return row.wireTechnicalId;
+          if (field === "sectionMm2") return row.sectionMm2;
           if (field === "localPort") return row.localEndpointLabel;
           if (field === "destination") return row.remoteEndpointLabel;
           if (field === "localCoveredLengthMm")
@@ -450,9 +464,7 @@ export function AnalysisSpliceWorkspacePanels(
                       "Host segment",
                       "Reference node",
                       "Offset (mm)",
-                      "Port mode",
-                      "Ports",
-                      "Branches",
+                      "Connected wires",
                     ],
                     sortedVisibleSplices.map((splice) => {
                       const placement =
@@ -464,11 +476,7 @@ export function AnalysisSpliceWorkspacePanels(
                         placement.hostSegmentLabel,
                         placement.fromNodeLabel,
                         splice.placement?.offsetMm ?? "",
-                        resolveSplicePortMode(splice),
-                        resolveSplicePortMode(splice) === "unbounded"
-                          ? ""
-                          : splice.portCount,
-                        spliceOccupiedCountById.get(splice.id) ?? 0,
+                        spliceConnectedWireCountById.get(splice.id) ?? 0,
                       ];
                     }),
                   )
@@ -644,32 +652,9 @@ export function AnalysisSpliceWorkspacePanels(
                     </button>
                   </th>
                   <th
-                    aria-sort={getTableAriaSort(spliceTableSort, "portCount")}
-                  >
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() =>
-                        setSpliceTableSort((current) => ({
-                          field: "portCount",
-                          direction:
-                            current.field === "portCount" &&
-                            current.direction === "asc"
-                              ? "desc"
-                              : "asc",
-                        }))
-                      }
-                    >
-                      Ports{" "}
-                      <span className="sort-indicator">
-                        {spliceListSortIndicator("portCount")}
-                      </span>
-                    </button>
-                  </th>
-                  <th
                     aria-sort={getTableAriaSort(
                       spliceTableSort,
-                      "branchCount",
+                      "connectedWireCount",
                     )}
                   >
                     <button
@@ -677,18 +662,18 @@ export function AnalysisSpliceWorkspacePanels(
                       className="sort-header-button"
                       onClick={() =>
                         setSpliceTableSort((current) => ({
-                          field: "branchCount",
+                          field: "connectedWireCount",
                           direction:
-                            current.field === "branchCount" &&
+                            current.field === "connectedWireCount" &&
                             current.direction === "asc"
                               ? "desc"
                               : "asc",
                         }))
                       }
                     >
-                      Branches{" "}
+                      Connected wires{" "}
                       <span className="sort-indicator">
-                        {spliceListSortIndicator("branchCount")}
+                        {spliceListSortIndicator("connectedWireCount")}
                       </span>
                     </button>
                   </th>
@@ -696,8 +681,8 @@ export function AnalysisSpliceWorkspacePanels(
               </thead>
               <tbody>
                 {sortedVisibleSplices.map((splice) => {
-                  const occupiedCount =
-                    spliceOccupiedCountById.get(splice.id) ?? 0;
+                  const connectedWireCount =
+                    spliceConnectedWireCountById.get(splice.id) ?? 0;
                   const isSelected = selectedSpliceId === splice.id;
                   const linkedCatalogItemId = splice.catalogItemId;
                   const linkedCatalogItem =
@@ -749,12 +734,7 @@ export function AnalysisSpliceWorkspacePanels(
                         <small>{placement.fromNodeLabel}</small>
                       </td>
                       <td>{placement.offsetLabel}</td>
-                      <td>
-                        {resolveSplicePortMode(splice) === "unbounded"
-                          ? "∞"
-                          : splice.portCount}
-                      </td>
-                      <td>{occupiedCount}</td>
+                      <td>{connectedWireCount}</td>
                     </tr>
                   );
                 })}
@@ -820,6 +800,7 @@ export function AnalysisSpliceWorkspacePanels(
                   [
                     "Wire",
                     "Technical ID",
+                    "Section (mm²)",
                     "Local port",
                     "Destination",
                     "Covered from splice (mm)",
@@ -829,6 +810,7 @@ export function AnalysisSpliceWorkspacePanels(
                   sortedSpliceSynthesisRowsByColumns.map((row) => [
                     row.wireName,
                     row.wireTechnicalId,
+                    row.sectionMm2,
                     row.localEndpointLabel,
                     row.remoteEndpointLabel,
                     row.localCoveredLengthMm ?? "",
@@ -1033,6 +1015,7 @@ export function AnalysisSpliceWorkspacePanels(
         ) : sortedSpliceSynthesisRowsByColumns.length === 0 ? (
           <p className="empty-copy">No wire currently connected to this splice.</p>
         ) : (
+          <>
           <table className="data-table">
             <thead>
               <tr>
@@ -1079,6 +1062,32 @@ export function AnalysisSpliceWorkspacePanels(
                     {isMobileViewport ? "ID" : "Technical ID"}{" "}
                     <span className="sort-indicator">
                       {spliceSynthesisSortIndicator("technicalId")}
+                    </span>
+                  </button>
+                </th>
+                <th
+                  aria-sort={getTableAriaSort(
+                    spliceSynthesisTableSort,
+                    "sectionMm2",
+                  )}
+                >
+                  <button
+                    type="button"
+                    className="sort-header-button"
+                    onClick={() =>
+                      setSpliceSynthesisTableSort((current) => ({
+                        field: "sectionMm2",
+                        direction:
+                          current.field === "sectionMm2" &&
+                          current.direction === "asc"
+                            ? "desc"
+                            : "asc",
+                      }))
+                    }
+                  >
+                    {isMobileViewport ? "Sect." : "Section (mm²)"}{" "}
+                    <span className="sort-indicator">
+                      {spliceSynthesisSortIndicator("sectionMm2")}
                     </span>
                   </button>
                 </th>
@@ -1242,6 +1251,7 @@ export function AnalysisSpliceWorkspacePanels(
                       </span>
                     </td>
                     <td className="technical-id">{row.wireTechnicalId}</td>
+                    <td>{row.sectionMm2}</td>
                     <td>{row.localEndpointLabel}</td>
                     <td>{renderDestinationReference(row)}</td>
                     <td>{row.localCoveredLengthMm ?? ""}</td>
@@ -1252,6 +1262,10 @@ export function AnalysisSpliceWorkspacePanels(
               })}
             </tbody>
           </table>
+          <TableEntryCountFooter
+            count={sortedSpliceSynthesisRowsByColumns.length}
+          />
+          </>
         )}
       </section>
     </>

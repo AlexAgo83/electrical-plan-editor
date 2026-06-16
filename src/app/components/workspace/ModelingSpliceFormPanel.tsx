@@ -29,8 +29,6 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     spliceSideInverted,
     setSpliceSideInverted,
     spliceManufacturerReference,
-    spliceAutoCreateLinkedNode,
-    setSpliceAutoCreateLinkedNode,
     splicePlacementSegmentId,
     setSplicePlacementSegmentId,
     splicePlacementFromNodeId,
@@ -207,15 +205,6 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
         />
       </label>
     )}
-    <label className="settings-checkbox">
-      <input
-        type="checkbox"
-        checked={spliceAutoCreateLinkedNode}
-        onChange={(event) => setSpliceAutoCreateLinkedNode(event.target.checked)}
-        disabled={spliceFormMode !== "create"}
-      />
-      Auto-create linked node on splice creation
-    </label>
     <label>
       Host segment
       <select

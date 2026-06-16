@@ -167,7 +167,7 @@ describe("App integration UI - creation flow ergonomics", () => {
     });
   });
 
-  it("auto-creates linked connector and splice nodes when creating entities", () => {
+  it("auto-creates a linked connector node when creating a connector", () => {
     renderAppWithState(createInitialStateWithCatalog());
     switchScreenDrawerAware("modeling");
 
@@ -182,11 +182,20 @@ describe("App integration UI - creation flow ergonomics", () => {
     expect(within(connectorFormPanel).getByLabelText("Way count (from catalog)")).toHaveValue(2);
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
 
+    switchSubScreenDrawerAware("node");
+    const nodesPanel = getPanelByHeading("Nodes");
+    expect(within(nodesPanel).getByText("Auto node connector (C-001)")).toBeInTheDocument();
+  });
+
+  it("never creates a structural splice node when creating a splice (floating splice model)", () => {
+    renderAppWithState(createInitialStateWithCatalog());
+    switchScreenDrawerAware("modeling");
+
     switchSubScreenDrawerAware("splice");
     clickNewFromPanel("Splices");
     const spliceFormPanel = getPanelByHeading("Create Splice");
     fireEvent.change(within(spliceFormPanel).getByLabelText("Functional name"), {
-      target: { value: "Auto node splice" }
+      target: { value: "Floating splice" }
     });
     fireEvent.change(within(spliceFormPanel).getByLabelText("Catalog item (manufacturer reference)"), {
       target: { value: "CAT-2" }
@@ -196,11 +205,10 @@ describe("App integration UI - creation flow ergonomics", () => {
 
     switchSubScreenDrawerAware("node");
     const nodesPanel = getPanelByHeading("Nodes");
-    expect(within(nodesPanel).getByText("Auto node connector (C-001)")).toBeInTheDocument();
-    expect(within(nodesPanel).getByText("Auto node splice (S-001)")).toBeInTheDocument();
+    expect(within(nodesPanel).queryByText(/Floating splice/)).not.toBeInTheDocument();
   });
 
-  it("allows disabling linked node auto-creation per connector/splice create form", () => {
+  it("allows disabling linked node auto-creation per connector create form", () => {
     renderAppWithState(createInitialState());
     switchScreenDrawerAware("modeling");
 
@@ -212,19 +220,9 @@ describe("App integration UI - creation flow ergonomics", () => {
     fireEvent.click(within(connectorFormPanel).getByLabelText("Auto-create linked node on connector creation"));
     fireEvent.click(within(connectorFormPanel).getByRole("button", { name: "Create" }));
 
-    switchSubScreenDrawerAware("splice");
-    clickNewFromPanel("Splices");
-    const spliceFormPanel = getPanelByHeading("Create Splice");
-    fireEvent.change(within(spliceFormPanel).getByLabelText("Functional name"), {
-      target: { value: "Manual node splice" }
-    });
-    fireEvent.click(within(spliceFormPanel).getByLabelText("Auto-create linked node on splice creation"));
-    fireEvent.click(within(spliceFormPanel).getByRole("button", { name: "Create" }));
-
     switchSubScreenDrawerAware("node");
     const nodesPanel = getPanelByHeading("Nodes");
     expect(within(nodesPanel).queryByText(/Manual node connector/)).not.toBeInTheDocument();
-    expect(within(nodesPanel).queryByText(/Manual node splice/)).not.toBeInTheDocument();
   });
 
   it("allows editing a node ID in edit mode and saves the renamed node", () => {

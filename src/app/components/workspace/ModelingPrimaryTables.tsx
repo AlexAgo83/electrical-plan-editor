@@ -7,7 +7,6 @@ import {
 } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
-import { resolveSplicePortMode } from "../../../core/splicePortMode";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
 import type {
@@ -69,7 +68,6 @@ export function ModelingPrimaryTables({
   visibleSplices,
   spliceSort,
   setSpliceSort,
-  spliceOccupiedCountById,
   selectedSpliceId,
   onEditSplice,
   onDeleteSplice,
@@ -104,8 +102,7 @@ export function ModelingPrimaryTables({
     | "name"
     | "technicalId"
     | "manufacturerReference"
-    | "portCount"
-    | "branchCount"
+    | "connectedWireCount"
     | "hostSegment"
     | "offsetMm";
   type NodeTableSortField = "id" | "kind" | "reference" | "linkedSegments";
@@ -301,6 +298,24 @@ export function ModelingPrimaryTables({
       ),
     [connectorOccupiedCountById, connectorTableSort, visibleConnectors],
   );
+  const spliceConnectedWireCountById = useMemo(() => {
+    const result = new Map<SpliceId, number>();
+    for (const wire of wires) {
+      if (wire.endpointA.kind === "splicePort") {
+        result.set(
+          wire.endpointA.spliceId,
+          (result.get(wire.endpointA.spliceId) ?? 0) + 1,
+        );
+      }
+      if (wire.endpointB.kind === "splicePort") {
+        result.set(
+          wire.endpointB.spliceId,
+          (result.get(wire.endpointB.spliceId) ?? 0) + 1,
+        );
+      }
+    }
+    return result;
+  }, [wires]);
   const sortedVisibleSplices = useMemo(
     () =>
       sortByTableColumns(
@@ -315,17 +330,13 @@ export function ModelingPrimaryTables({
             return resolveSplicePlacementPresentation(splice).hostSegmentSort;
           if (field === "offsetMm")
             return resolveSplicePlacementPresentation(splice).offsetSort;
-          if (field === "portCount")
-            return resolveSplicePortMode(splice) === "unbounded"
-              ? Number.POSITIVE_INFINITY
-              : splice.portCount;
-          return spliceOccupiedCountById.get(splice.id) ?? 0;
+          return spliceConnectedWireCountById.get(splice.id) ?? 0;
         },
         (splice) => splice.id,
       ),
     [
       resolveSplicePlacementPresentation,
-      spliceOccupiedCountById,
+      spliceConnectedWireCountById,
       spliceTableSort,
       visibleSplices,
     ],
@@ -996,9 +1007,7 @@ export function ModelingPrimaryTables({
                         "Host segment",
                         "Reference node",
                         "Offset (mm)",
-                        "Port mode",
-                        "Ports",
-                        "Branches",
+                        "Connected wires",
                       ],
                       sortedVisibleSplices.map((splice) => {
                         const placement =
@@ -1010,11 +1019,7 @@ export function ModelingPrimaryTables({
                           placement.hostSegmentLabel,
                           placement.fromNodeLabel,
                           splice.placement?.offsetMm ?? "",
-                          resolveSplicePortMode(splice),
-                          resolveSplicePortMode(splice) === "unbounded"
-                            ? ""
-                            : splice.portCount,
-                          spliceOccupiedCountById.get(splice.id) ?? 0,
+                          spliceConnectedWireCountById.get(splice.id) ?? 0,
                         ];
                       }),
                     )
@@ -1247,48 +1252,28 @@ export function ModelingPrimaryTables({
                     </button>
                   </th>
                   <th
-                    aria-sort={getTableAriaSort(spliceTableSort, "portCount")}
+                    aria-sort={getTableAriaSort(
+                      spliceTableSort,
+                      "connectedWireCount",
+                    )}
                   >
                     <button
                       type="button"
                       className="sort-header-button"
                       onClick={() =>
                         setSpliceTableSort((current) => ({
-                          field: "portCount",
+                          field: "connectedWireCount",
                           direction:
-                            current.field === "portCount" &&
+                            current.field === "connectedWireCount" &&
                             current.direction === "asc"
                               ? "desc"
                               : "asc",
                         }))
                       }
                     >
-                      Ports{" "}
+                      Connected wires{" "}
                       <span className="sort-indicator">
-                        {spliceSortIndicator("portCount")}
-                      </span>
-                    </button>
-                  </th>
-                  <th
-                    aria-sort={getTableAriaSort(spliceTableSort, "branchCount")}
-                  >
-                    <button
-                      type="button"
-                      className="sort-header-button"
-                      onClick={() =>
-                        setSpliceTableSort((current) => ({
-                          field: "branchCount",
-                          direction:
-                            current.field === "branchCount" &&
-                            current.direction === "asc"
-                              ? "desc"
-                              : "asc",
-                        }))
-                      }
-                    >
-                      Branches{" "}
-                      <span className="sort-indicator">
-                        {spliceSortIndicator("branchCount")}
+                        {spliceSortIndicator("connectedWireCount")}
                       </span>
                     </button>
                   </th>
@@ -1296,8 +1281,8 @@ export function ModelingPrimaryTables({
               </thead>
               <tbody>
                 {sortedVisibleSplices.map((splice) => {
-                  const occupiedCount =
-                    spliceOccupiedCountById.get(splice.id) ?? 0;
+                  const connectedWireCount =
+                    spliceConnectedWireCountById.get(splice.id) ?? 0;
                   const isFocused = focusedSplice?.id === splice.id;
                   const isBatchSelected = batchSelectionIds.has(splice.id);
                   const linkedCatalogItemId = splice.catalogItemId;
@@ -1377,12 +1362,7 @@ export function ModelingPrimaryTables({
                         <small>{placement.fromNodeLabel}</small>
                       </td>
                       <td>{placement.offsetLabel}</td>
-                      <td>
-                        {resolveSplicePortMode(splice) === "unbounded"
-                          ? "∞"
-                          : splice.portCount}
-                      </td>
-                      <td>{occupiedCount}</td>
+                      <td>{connectedWireCount}</td>
                     </tr>
                   );
                 })}

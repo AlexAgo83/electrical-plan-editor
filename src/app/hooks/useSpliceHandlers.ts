@@ -10,7 +10,7 @@ import {
 import { appActions } from "../../store";
 import { analyzeSpliceDeleteImpact } from "../../store/deleteImpact";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
-import { suggestAutoSpliceNodeId, suggestNextSpliceTechnicalId } from "../lib/technical-id-suggestions";
+import { suggestNextSpliceTechnicalId } from "../lib/technical-id-suggestions";
 import { hasSpliceOccupancyIndexAboveLimit, hasSpliceWireEndpointIndexAboveLimit } from "./spliceCapacityGuards";
 import { toCatalogItemId, toNodeId, toSegmentId, type UseSpliceHandlersParams } from "./spliceHandlerTypes";
 import { useSpliceOptimizedPlacementSuggestion } from "./useSpliceOptimizedPlacementSuggestion";
@@ -42,7 +42,6 @@ export function useSpliceHandlers({
   setSpliceSideInverted,
   spliceManufacturerReference: _spliceManufacturerReference,
   setSpliceManufacturerReference,
-  spliceAutoCreateLinkedNode,
   setSpliceAutoCreateLinkedNode,
   splicePlacementSegmentId,
   setSplicePlacementSegmentId,
@@ -310,34 +309,10 @@ export function useSpliceHandlers({
     const savedSplice = nextState.splices.byId[spliceId];
     if (savedSplice !== undefined) {
       if (wasCreateMode) {
-        const existingNodeForSplice = nextState.nodes.allIds.some((nodeId) => {
-          const node = nextState.nodes.byId[nodeId];
-          return node?.kind === "splice" && node.spliceId === spliceId;
-        });
-
-        if (spliceAutoCreateLinkedNode && !existingNodeForSplice) {
-          const autoNodeId = suggestAutoSpliceNodeId(savedSplice.technicalId, nextState.nodes.allIds);
-          dispatchAction(
-            appActions.upsertNode({
-              id: autoNodeId,
-              kind: "splice",
-              spliceId
-            }),
-            { trackHistory: false }
-          );
-
-          const stateAfterNodeCreate = store.getState();
-          const linkedNodeExists = stateAfterNodeCreate.nodes.allIds.some((nodeId) => {
-            const node = stateAfterNodeCreate.nodes.byId[nodeId];
-            return node?.kind === "splice" && node.spliceId === spliceId;
-          });
-          if (!linkedNodeExists) {
-            setSpliceFormError(
-              "Splice created, but the linked splice node could not be created automatically. Create it manually in Nodes."
-            );
-          }
-        }
-
+        // Floating splices are placed via segment-offset placement (ADR-012) and must never
+        // create a structural splice node: a node-less placement is the canonical model, and a
+        // persisted splice node would hide the splice in Network Summary (the floating-splice
+        // overlay filters out any splice that owns a splice node).
         startSpliceEdit(savedSplice, true);
         return;
       }

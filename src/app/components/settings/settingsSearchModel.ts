@@ -95,7 +95,7 @@ export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
       "Workspace panels layout",
       "Wide screen (remove app max width cap)",
       "Default wire section (mm²)",
-      "Default auto-create linked nodes for connectors/splices",
+      "Default auto-create linked nodes for connectors",
       "Directional splice imbalance limit (%)",
       "Language"
     ]
