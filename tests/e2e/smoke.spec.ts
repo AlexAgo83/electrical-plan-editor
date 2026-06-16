@@ -293,6 +293,13 @@ test("create -> route -> recompute flow works end-to-end", async ({ page }) => {
   await nodeForm.getByLabel("Label").fill("MID");
   await nodeForm.getByRole("button", { name: "Create" }).click();
 
+  await openCreateFormIfIdle("Node form");
+  const secondNodeForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Node" }) });
+  await secondNodeForm.getByLabel("Node ID").fill("NODE-END");
+  await secondNodeForm.getByLabel("Node kind").selectOption("intermediate");
+  await secondNodeForm.getByLabel("Label").fill("END");
+  await secondNodeForm.getByRole("button", { name: "Create" }).click();
+
   await switchSubScreen("segment");
   await openCreateFormIfIdle("Segment form");
   const segmentForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Segment" }) });
@@ -308,9 +315,19 @@ test("create -> route -> recompute flow works end-to-end", async ({ page }) => {
   });
   await secondSegmentForm.getByLabel("Segment ID").fill("SEG-B");
   await secondSegmentForm.getByLabel("Node A").selectOption({ label: "MID" });
-  await secondSegmentForm.getByLabel("Node B").selectOption({ label: "Splice 1 (S-1)" });
+  await secondSegmentForm.getByLabel("Node B").selectOption({ label: "END" });
   await secondSegmentForm.getByLabel("Length (mm)").fill("60");
   await secondSegmentForm.getByRole("button", { name: "Create" }).click();
+
+  await switchSubScreen("splice");
+  await openCreateFormIfIdle("Splice form");
+  const placedSpliceForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Splice" }) });
+  await placedSpliceForm.getByLabel("Functional name").fill("Splice 1");
+  await placedSpliceForm.getByLabel("Technical ID").fill("S-1");
+  await placedSpliceForm.getByLabel("Host segment").selectOption("SEG-B");
+  await placedSpliceForm.getByLabel("Reference node").selectOption("NODE-MID");
+  await placedSpliceForm.getByLabel("Offset from reference (mm)").fill("60");
+  await placedSpliceForm.getByRole("button", { name: "Create" }).click();
 
   await switchSubScreen("wire");
   await openCreateFormIfIdle("Wire form");
