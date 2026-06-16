@@ -1,7 +1,7 @@
 ## adr_011_local_first_persistence_durability_lifecycle_flush_and_synchronous_write - Local-first persistence durability: lifecycle flush and synchronous write
 
 > Date: 2026-06-09
-> Status: Accepted
+> Status: Settled
 > Drivers: local-first persistence guarantee, debounced persistence performance, page-lifecycle durability, deterministic save feedback
 > Related request: `req_142_debounced_persistence_durability_flush_on_unload`
 > Related backlog: `item_628_debounced_persistence_loses_unsaved_edits_on_tab_close_or_unmount`

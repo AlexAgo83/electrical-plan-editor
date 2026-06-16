@@ -1,6 +1,6 @@
 ## adr_005_bom_and_export_contracts_for_csv_xlsx_and_reference_naming - BOM and Export Contracts for CSV, XLSX, and Reference Naming
 > Date: 2026-04-14
-> Status: Proposed
+> Status: Settled
 > Drivers: Unified BOM row model, parallel CSV/XLSX format selection, XLSX workbook layout, catalog export column toggles, reference naming fallback for wire terminations
 > Related request: `req_119_bom_and_catalog_export_enhancements`
 > Related backlog: `item_584_catalog_export_column_toggles`, `item_585_reference_naming_fallback_for_wire_terminations`, `item_586_flatten_bom_export_into_a_single_plane`, `item_587_parallel_csv_and_xlsx_export_options`, `item_588_grouped_bom_workbook_with_merged_connector_rows`

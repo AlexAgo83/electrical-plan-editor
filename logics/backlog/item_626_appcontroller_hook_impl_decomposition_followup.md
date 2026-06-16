@@ -1,10 +1,10 @@
 ## item_626_appcontroller_hook_impl_decomposition_followup - AppController hook-impl decomposition follow-up
 > From version: 1.15.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Archived
 > Understanding: 94%
 > Confidence: 88%
-> Progress: 0%
+> Progress: 0% (archived before implementation)
 > Complexity: High
 > Theme: Architecture
 
@@ -46,6 +46,7 @@ flowchart LR
 # Delivery Status
 - Ready follow-up created on 2026-06-09 after the shell-runtime wave delivered `useAppControllerWorkspaceRuntime`.
 - Remaining target evidence: `src/app/hook-impl/controller/useAppControllerModelingAnalysisScreenDomains.tsx`, `src/app/hook-impl/controller/useAppControllerScreenContentSlices.tsx`, and `src/app/hook-impl/controller/useAppControllerNetworkSummaryPanelDomain.tsx` remain large implementation bodies.
+- Archived on 2026-06-16 to remove this non-started follow-up from the active corpus. No implementation was delivered for this backlog item.
 
 # AI Context
 - Summary: Follow-up AppController decomposition backlog for remaining large hook-impl controller bodies.

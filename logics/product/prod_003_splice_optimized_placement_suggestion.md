@@ -1,6 +1,6 @@
 ## prod_003_splice_optimized_placement_suggestion - Splice optimized placement suggestion
 > Date: 2026-05-22
-> Status: Validated
+> Status: Settled
 > Related request: TBD
 > Related backlog: TBD
 > Related task: TBD

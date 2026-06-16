@@ -1,6 +1,6 @@
 ## prod_006_trustworthy_functional_schematic_review - Trustworthy Functional Schematic Review
 > Date: 2026-06-05
-> Status: Draft
+> Status: Settled
 > Related request: `req_136_harness_assembly_functional_schematic_root_fidelity_fuse_box_and_strict_scope`
 > Related request: `req_134_harness_assembly_functional_trace_scope_boundaries_for_selected_master_connectors`
 > Related backlog: `item_617_harness_assembly_functional_root_connector_visual_fidelity`, `item_618_harness_assembly_functional_strict_saved_root_scope`, `item_619_harness_assembly_functional_fuse_box_pair_traversal`
@@ -100,3 +100,6 @@ These behaviors reduce confidence in the view. Operators need the schematic to a
 - Architecture: `logics/architecture/adr_007_harness_assembly_and_physical_interconnector_contract.md`
 - Core implementation: `src/core/functionalSchematic.ts`
 - UI implementation: `src/app/components/network-summary/FunctionalSchematicPanel.tsx`
+
+# Settlement
+- Validated on 2026-06-16: linked functional-schematic scope decisions are closed in this brief and the active workflow corpus has no remaining linked open items.

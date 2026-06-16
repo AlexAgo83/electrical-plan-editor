@@ -1,6 +1,6 @@
 ## prod_002_connector_layout_editor_and_physical_view - Connector Layout Editor and Physical Connector View
 > Date: 2026-05-19
-> Status: Validated
+> Status: Settled
 > Related request: TBD
 > Related backlog: TBD
 > Related task: TBD

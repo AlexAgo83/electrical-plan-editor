@@ -1,6 +1,6 @@
 ## adr_004_post_release_modeling_ux_corrections_and_localized_canvas_group_drag_persistence - Post-release modeling UX corrections and localized canvas group-drag persistence
 > Date: 2026-04-02
-> Status: Proposed
+> Status: Settled
 > Drivers: post-release correction traceability, modeling action-row consistency, post-create reset clarity, localized grouped-drag persistence, no unintended regenerate side effects
 > Related request: `req_118_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`
 > Related backlog: `item_579_post_release_ux_and_grouped_move_corrections_after_req_114_to_req_117`, `item_580_post_create_edit_state_new_action_correction_for_modeling_forms`, `item_581_select_multiple_action_row_placement_and_icon_alignment_across_modeling_tables`, `item_582_canvas_grouped_drag_generate_isolation_and_localized_move_persistence_correction`, `item_583_regression_coverage_and_closure_for_post_release_ux_and_grouped_move_corrections`

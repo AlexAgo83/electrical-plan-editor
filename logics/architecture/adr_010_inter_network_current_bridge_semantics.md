@@ -1,7 +1,7 @@
 ## adr_010_inter_network_current_bridge_semantics - Inter-network current bridge semantics for pin-load aggregation
 
 > Date: 2026-06-09
-> Status: Accepted
+> Status: Settled
 > Drivers: pin-level electrical roles, harness assembly cross-cutting analysis, permissive diagnostics, deterministic aggregation, multi-network functional analysis view, Product Brief migration
 > Related request: `req_133_pin_level_source_consumer_currents_and_harness_dimensioning_diagnostics`, `req_141_segment_callout_layering_docs_product_brief_migration_and_connector_material_default_sync`
 > Related backlog: `item_608_pin_electrical_role_data_model_and_catalog_defaults`, `item_610_in_network_pin_load_aggregation_engine`, `item_611_electrical_dimensioning_validation_category`, `item_614_multi_network_functional_analysis_view_and_assembly_scope`, `item_627_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`

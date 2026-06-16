@@ -1,6 +1,6 @@
 ## adr_001_modeling_assisted_sizing_and_guarded_delete_contracts - Modeling assisted sizing and guarded delete contracts
 > Date: 2026-03-27
-> Status: Accepted
+> Status: Settled
 > Drivers: Keep assisted wire sizing, modeling dropdown ordering, and guarded delete feedback deterministic across UI, store, and persistence layers while limiting V1 destructive scope.
 > Related request: `req_110_automatic_recommended_wire_section_from_current_material_network_voltage_and_wire_length.md`, `req_111_alphabetically_sorted_dropdown_menus_in_modeling_screens.md`, `req_112_explicit_blocked_delete_feedback_and_dependency_aware_cascade_delete_confirmation.md`
 > Related backlog: `item_542_wire_sizing_metadata_and_recommendation_core_contract`, `item_544_wire_sizing_persistence_compatibility_and_standard_section_normalization`, `item_546_shared_alphabetical_sorting_contract_for_modeling_dynamic_dropdown_options`, `item_550_delete_dependency_summary_contract_and_representative_impacted_reference_visibility`, `item_551_safe_connector_and_splice_cascade_delete_confirmation_and_execution_contract`

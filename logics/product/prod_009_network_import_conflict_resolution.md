@@ -1,6 +1,6 @@
 ## prod_009_network_import_conflict_resolution - Network Import Conflict Resolution
 > Date: 2026-06-09
-> Status: Validated
+> Status: Settled
 > Related request: `req_141_segment_callout_layering_docs_product_brief_migration_and_connector_material_default_sync`
 > Related backlog: `item_627_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`
 > Related task: `task_137_segment_callout_layering_product_brief_migration_and_connector_material_default_sync`

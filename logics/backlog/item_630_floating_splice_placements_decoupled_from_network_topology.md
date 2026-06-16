@@ -1,10 +1,10 @@
 ## item_630_floating_splice_placements_decoupled_from_network_topology - Floating splice placements decoupled from network topology
 > From version: 1.15.6 (ADR companion linked on 2026-06-10; amended 2026-06-10 after pre-implementation review)
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 96% (single coordinated implementation slice scoped from req_144 and adr_012)
-> Confidence: 92% (amendment resolves migration safety, determinism, visibility, and feedback-channel questions; AC21-AC30 added)
-> Progress: 0%
+> Status: Done
+> Understanding: 100% (single coordinated implementation slice delivered through task_139)
+> Confidence: 96% (AC traceability and validation evidence captured on 2026-06-16)
+> Progress: 100%
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -154,6 +154,7 @@ flowchart TD
 - Source file: `logics/request/req_144_floating_splice_placements_decoupled_from_network_topology.md`.
 - Generated locally by logics-manager.
 - Amended 2026-06-10 after pre-implementation review: migration safety/determinism contract, visibility-first rendering, migration report modal, and non-blocking warning channel added (AC21-AC30). Accepted trade-offs: migrated splices may render displaced (never hidden), and directional L/R sides are re-inferred rather than locked.
+- Closed 2026-06-16: implementation, task AC traceability, and validation evidence are recorded in `task_139_floating_splice_placements_decoupled_from_network_topology`.
 
 # Tasks
 - `task_139_floating_splice_placements_decoupled_from_network_topology`

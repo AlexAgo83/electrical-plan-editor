@@ -2,7 +2,7 @@
 > Request: `req_004_network_import_export_file_workflow`
 > Last updated: 2026-02-21
 > From version: 0.1.0
-> Status: Done
+> Status: Settled
 > Understanding: 98%
 > Confidence: 96%
 

@@ -1,6 +1,6 @@
 ## adr_007_harness_assembly_and_physical_interconnector_contract - Harness Assembly and Physical Interconnector Contract
 > Date: 2026-05-11
-> Status: Accepted
+> Status: Settled
 > Drivers: multi-harness grouping, physical-only connector links, symmetric pin continuity, migration-safe persistence, cross-harness functional tracing
 > Related request: `req_122_multi_harness_super_category_and_cross_harness_functional_schematic`
 > Related backlog: `item_591_harness_assembly_data_model_persistence_and_migration`, `item_592_inter_harness_connector_links_and_symmetric_pin_continuity`, `item_593_cross_harness_functional_trace_derivation_from_master_connectors`, `item_594_aggregated_functional_schematic_ui_interconnector_blocks_and_harness_coloring`, `item_595_multi_harness_validation_import_export_and_regression_coverage`

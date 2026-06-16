@@ -1,6 +1,6 @@
 ## adr_000_v1_frontend_local_first_reference_architecture - V1 Frontend Local-First Reference Architecture
 > Date: 2026-03-15
-> Status: Proposed
+> Status: Settled
 > Drivers: Establish a deterministic V1 frontend baseline, keep persistence local-only, and provide a stable implementation frame for request/backlog/task generation.
 > Related request: `req_000_kickoff_v1_electrical_plan_editor`
 > Related backlog: `item_000_v1_foundation_domain_model_and_store`

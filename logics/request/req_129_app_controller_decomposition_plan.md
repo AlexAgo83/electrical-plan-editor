@@ -2,9 +2,9 @@
 
 > From version: 1.15.0
 > Schema version: 1.0
-> Status: In progress
+> Status: Archived
 > Understanding: 100%
-> Confidence: 93%
+> Confidence: 93% (initial shell-runtime wave delivered; remaining hook-impl follow-up removed from the active corpus on 2026-06-16)
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -80,4 +80,5 @@ flowchart LR
 - Evidence checked: controller-boundary coverage was added in `src/tests/app-controller-workspace-runtime.hook.spec.tsx`; affected UI tests and modularization gates passed.
 - Evidence checked: `quality:hooks-modularization` still passes. `quality:ui-modularization` now records explicit exceptions for two pre-existing oversize UI files while keeping the AppController locked budget unchanged at 1100.
 - Second-wave task prepared on 2026-06-09 in `task_136_appcontroller_hook_impl_decomposition_follow_up`. The task records current line counts and recommends `useAppControllerModelingAnalysisScreenDomains.tsx` as the next extraction target.
-- Remaining work is still pertinent: the large implementation bodies under `src/app/hook-impl/controller/` (`useAppControllerScreenContentSlices.tsx`, `useAppControllerModelingAnalysisScreenDomains.tsx`, `useAppControllerNetworkSummaryPanelDomain.tsx`) remain concentrated and should be handled in follow-up decomposition waves before this request is closed.
+- Archived on 2026-06-16 to close the active Logics corpus without claiming unimplemented follow-up work as delivered.
+- Remaining hook-impl decomposition work under `src/app/hook-impl/controller/` is not active. Reopen it through a fresh request/backlog/task chain if that refactor becomes a priority again.

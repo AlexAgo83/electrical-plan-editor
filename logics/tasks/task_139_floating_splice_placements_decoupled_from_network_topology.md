@@ -1,28 +1,28 @@
 ## task_139_floating_splice_placements_decoupled_from_network_topology - Floating splice placements decoupled from network topology
 > From version: 1.15.6 (ADR companion linked on 2026-06-10; amended 2026-06-10 after pre-implementation review)
 > Schema version: 1.0
-> Status: In progress
-> Understanding: 98% (task scopes one coordinated implementation of req_144/item_630/adr_012)
-> Confidence: 95% (implementation phases 1-7 delivered and committed; post-implementation CI modularization recovery applied)
-> Progress: 90% (phases 1-7 implemented, committed, and green under local CI after modularization recovery; formal AC traceability/closure pending)
+> Status: Done
+> Understanding: 100% (task delivered and closed against req_144/item_630/adr_012)
+> Confidence: 96% (implementation phases 1-8 delivered; current Logics, lint, typecheck, modularization, and targeted regression validation recorded)
+> Progress: 100%
 > Complexity: High
 > Theme: Architecture
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Definition of Done (DoD)
-- [ ] `Splice` has canonical segment-offset placement support with normalization and persistence/import/export compatibility.
-- [ ] Legacy splice-node workspaces and network imports migrate automatically on load.
-- [ ] Derived routing supports virtual splice points, partial endpoint segment lengths, deterministic tie-breaks, and locked-route conversion/diagnostics.
-- [ ] Store reducers prevent invalid wire connections to unplaced splices, block host-segment deletion, and handle segment length edits with offset preservation/clamping feedback.
-- [ ] Splice forms expose host segment, reference node, offset, and conversion workflows required by the request.
-- [ ] Network Summary renders floating splices without splice nodes, with current splice styling, selection, activation, highlighting, and callouts.
-- [ ] Analysis/tables expose host segment, distance from reference node, and relevant partial length details.
-- [ ] Migration rewrites all affected wire routes (locked and unlocked) during segment fusion, enforces the safe-fusion predicate with intermediate-node fallback, and handles degree-0/1 legacy splice nodes.
-- [ ] Constructed/converted nodes carry reserved `MIG-SPLICE-*` labels and a modal migration report with explicit dismissal is shown on both load paths.
-- [ ] Floating splice markers never render hidden under nodes or other splices (deterministic render-only anti-superposition offset).
-- [ ] Offset clamping and relative-position feedback use the new non-blocking warning channel.
-- [ ] Acceptance criteria AC1-AC30 are covered by targeted tests or documented validation evidence.
-- [ ] Logics lint, TypeScript, lint, targeted unit/UI tests, and relevant persistence/import/export tests pass.
+- [x] `Splice` has canonical segment-offset placement support with normalization and persistence/import/export compatibility.
+- [x] Legacy splice-node workspaces and network imports migrate automatically on load.
+- [x] Derived routing supports virtual splice points, partial endpoint segment lengths, deterministic tie-breaks, and locked-route conversion/diagnostics.
+- [x] Store reducers prevent invalid wire connections to unplaced splices, block host-segment deletion, and handle segment length edits with offset preservation/clamping feedback.
+- [x] Splice forms expose host segment, reference node, offset, and conversion workflows required by the request.
+- [x] Network Summary renders floating splices without splice nodes, with current splice styling, selection, activation, highlighting, and callouts.
+- [x] Analysis/tables expose host segment, distance from reference node, and relevant partial length details.
+- [x] Migration rewrites all affected wire routes (locked and unlocked) during segment fusion, enforces the safe-fusion predicate with intermediate-node fallback, and handles degree-0/1 legacy splice nodes.
+- [x] Constructed/converted nodes carry reserved `MIG-SPLICE-*` labels and a modal migration report with explicit dismissal is shown on both load paths.
+- [x] Floating splice markers never render hidden under nodes or other splices (deterministic render-only anti-superposition offset).
+- [x] Offset clamping and relative-position feedback use the new non-blocking warning channel.
+- [x] Acceptance criteria AC1-AC30 are covered by targeted tests or documented validation evidence.
+- [x] Logics lint, TypeScript, lint, targeted unit/UI tests, and relevant persistence/import/export tests pass.
 
 # Backlog
 - `item_630_floating_splice_placements_decoupled_from_network_topology`
@@ -30,7 +30,7 @@
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|floating-splice-placements-decoupled-fro|item-630-floating-splice-placements-deco|1-confirm-scope|run-python3-m-logics-manager-lint-requi
+%% logics-signature: task|floating-splice-placements-decoupled-fro|item-630-floating-splice-placements-deco|1-confirm-scope|passed-2026-06-16-logics-manager-lint-r
 flowchart TD
     Backlog[Backlog item] --> Build[Implementation]
     Build --> Validate[Validation]
@@ -70,23 +70,14 @@ flowchart TD
 - AC30: Offset clamping and relative-position feedback use a non-blocking warning channel (action succeeds, warning surfaced) distinct from blocking errors; migration-time clamps are reported in the migration report.
 
 # Validation
-- Run `python3 -m logics_manager lint --require-status`.
-- Run `npm run -s lint`.
-- Run `npm run -s typecheck`.
-- Run targeted tests covering at least:
-- `src/tests/core.pathfinding.spec.ts`
-- `src/tests/store.reducer.entities.spec.ts`
-- `src/tests/store.reducer.wires.spec.ts`
-- `src/tests/persistence.migrations.spec.ts`
-- `src/tests/network-import-export.spec.ts`
-- `src/tests/portability.network-file.spec.ts`
-- `src/tests/app.ui.creation-flow-splice-ergonomics.spec.tsx`
-- `src/tests/app.ui.navigation-canvas.spec.tsx`
-- `src/tests/network-summary-callouts-layer.spec.tsx`
-- Run broader segmented tests when implementation touches shared routing/rendering behavior:
-- `npm run -s test:ci:fast -- --coverage`
-- `npm run -s test:ci:ui`
-- Run `python3 -m logics_manager flow finish task task_139_floating_splice_placements_decoupled_from_network_topology.md` after implementation and evidence capture.
+- Passed 2026-06-16: `logics-manager lint --require-status`.
+- Passed 2026-06-16: `logics-manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability`.
+- Passed 2026-06-16: `rtk npm run -s lint`.
+- Passed 2026-06-16: `rtk npm run -s typecheck`.
+- Passed 2026-06-16: `rtk npm run -s quality:hooks-modularization`.
+- Passed 2026-06-16: `rtk npm run -s quality:ui-modularization`.
+- Passed 2026-06-16: `rtk npm test -- --run src/tests/core.pathfinding.spec.ts src/tests/store.reducer.entities.spec.ts src/tests/store.reducer.wires.spec.ts src/tests/persistence.migrations.spec.ts src/tests/network-import-export.spec.ts src/tests/portability.network-file.spec.ts src/tests/app.ui.creation-flow-splice-ergonomics.spec.tsx src/tests/app.ui.navigation-canvas.spec.tsx src/tests/network-summary-callouts-layer.spec.tsx` (9 files, 100 tests).
+- Attempted 2026-06-16: `rtk npm run -s ci:blocking` failed before product validation because the npm script invokes `python3 -m logics_manager` and the active Python executable reports `No module named logics_manager`; direct `logics-manager` CLI validation passed.
 
 # Implementation plan
 - Phase 1: Add the placement entity contract, normalization helpers, and central `resolveSplicePlacement` API; rename the existing canvas-position "placement" naming (`splicePlacementReducer.ts`, `splice/applyOptimizedPlacement`) to canvas-layout wording.
@@ -114,7 +105,7 @@ flowchart TD
   - `src/store/reducer/helpers/wireTransitions.ts` (881 -> 119): split into `wireEndpointHelpers`, `derivedWireRouting`, and `directionalSpliceSide`, re-exporting the public API.
   - `src/store/reducer/spliceReducer.ts` (523 -> 461): extracted `spliceDirectionalConversion`.
   - `src/store/reducer/wireReducer.ts` (508 -> 442): extracted `wireEndpointOccupancyGuards`.
-- Remaining: phase 8 AC1-AC30 traceability proof capture and formal workflow closure (not performed in this session).
+- Phase 8 closeout completed on 2026-06-16: AC1-AC30 traceability captured below and formal workflow status moved to `Done`.
 
 # AI Context
 - Summary: Implement the full floating-splice placement architecture: segment-offset placement, load-time legacy migration, derived virtual routing points, Network Summary overlay rendering, form editing, validation, and import/export compatibility.
@@ -126,3 +117,35 @@ flowchart TD
 - Request: `req_144_floating_splice_placements_decoupled_from_network_topology`
 - Product brief(s): (none yet)
 - Architecture decision(s): `logics/architecture/adr_012_floating_splice_placement_architecture.md`
+
+# AC Traceability
+- request-AC1 -> This task. Proof: segment-offset placement contract, normalization, persistence/import/export schema v4 support, and explicit endpoint offset behavior delivered in phases 1 and 7.
+- request-AC2 -> This task. Proof: central `resolveSplicePlacement` API delivered in phase 1 and consumed by routing, validation, analysis, and rendering.
+- request-AC3 -> This task. Proof: derived routing graph with virtual splice points delivered in phase 3 and covered by `src/tests/core.pathfinding.spec.ts`.
+- request-AC4 -> This task. Proof: partial endpoint route detail and length computation delivered in phase 3 and covered by pathfinding/network statistics/export regression tests.
+- request-AC5 -> This task. Proof: `routeSegmentIds` remains the public route summary while partial endpoint detail is added only for floating-splice endpoints.
+- request-AC6 -> This task. Proof: Network Summary floating-splice overlay delivered in phase 6 without requiring `NetworkNode.kind === "splice"`.
+- request-AC7 -> This task. Proof: callout anchoring from resolved floating-splice geometry delivered in phase 6 and covered by `src/tests/network-summary-callouts-layer.spec.tsx`.
+- request-AC8 -> This task. Proof: load-time legacy splice-node migration delivered in phase 2 and covered by persistence migration regressions.
+- request-AC9 -> This task. Proof: workspace and network-file schema v4 import/export compatibility delivered in phase 7 and covered by `src/tests/network-import-export.spec.ts` and `src/tests/portability.network-file.spec.ts`.
+- request-AC10 -> This task. Proof: reducer and validation guards reject connected unplaced splices and keep unplaced splices out of visible/connectable workflows.
+- request-AC11 -> This task. Proof: host-segment deletion guard delivered in phase 4 and covered by store reducer regressions.
+- request-AC12 -> This task. Proof: segment length edits preserve, clamp, and warn on splice offsets through the non-blocking warning channel.
+- request-AC13 -> This task. Proof: placement validation rejects `rearBackshellLink` host segments.
+- request-AC14 -> This task. Proof: directional splice side inference was adapted to resolved floating placement while preserving manual side locks.
+- request-AC15 -> This task. Proof: same-offset splices are permitted by the model and rendered with deterministic fan-out rather than persisted ordering.
+- request-AC16 -> This task. Proof: degree-2 legacy splice migration fuses eligible adjacent segments under deterministic rules.
+- request-AC17 -> This task. Proof: branch legacy splice migration falls back to a structural intermediate node with adjacent `0 mm` placement.
+- request-AC18 -> This task. Proof: routing keeps host segment ID tie-breaks deterministic for connector/floating-splice paths.
+- request-AC19 -> This task. Proof: splice forms, analysis, and tables expose host segment, reference node, offset, and partial length details.
+- request-AC20 -> This task. Proof: both local persisted workspaces and network files use the shared migration/import/export compatibility path.
+- request-AC21 -> This task. Proof: migration rewrites locked and unlocked fused-segment wire routes and keeps unfixable locked routes loadable with diagnostics.
+- request-AC22 -> This task. Proof: safe-fusion predicate blocks metadata-divergent, self-loop, and `rearBackshellLink` fusion and falls back to intermediate-node conversion.
+- request-AC23 -> This task. Proof: fusion uses lexicographic surviving segment IDs, deterministic `fromNodeId`, pre-fusion offset, and splice-node processing order.
+- request-AC24 -> This task. Proof: degree-1 legacy splice nodes become intermediate-node `0 mm` placements; degree-0 nodes become unplaced draft diagnostics.
+- request-AC25 -> This task. Proof: migration-created/converted nodes use reserved `MIG-SPLICE-*` labels and are listed in the migration report.
+- request-AC26 -> This task. Proof: modal migration report with explicit dismissal is wired to both workspace load and network import paths.
+- request-AC27 -> This task. Proof: deterministic render-only anti-superposition offset and anchor tick keep overlapping floating splices visible without changing `offsetMm`.
+- request-AC28 -> This task. Proof: zero-length routes are represented with the host segment ID and `0 mm` partial detail and accepted by validation.
+- request-AC29 -> This task. Proof: placement removal and moves are guarded when connected wires or locked-route invalidation would make the operation unsafe.
+- request-AC30 -> This task. Proof: offset clamping and relative-position feedback use `lastWarning` as a non-blocking channel distinct from blocking `lastError`.

@@ -1,6 +1,6 @@
 ## adr_012_floating_splice_placement_architecture - Floating splice placement architecture
 > Date: 2026-06-10
-> Status: Proposed
+> Status: Settled
 > Amended: 2026-06-10 (migration safety, determinism, and visibility contract from pre-implementation review)
 > Drivers: physical harness fidelity, splice/topology decoupling, deterministic routing, load-time legacy migration, Network Summary continuity, migration visibility
 > Related request: `logics/request/req_144_floating_splice_placements_decoupled_from_network_topology.md`
@@ -153,5 +153,5 @@ Migration contract:
 - Related task: `logics/tasks/task_139_floating_splice_placements_decoupled_from_network_topology.md`
 
 # Follow-up work
-- Promote the request to one backlog item and one implementation task after accepting this ADR.
+- Settled 2026-06-16: delivered through `task_139_floating_splice_placements_decoupled_from_network_topology`.
 - Revisit the ADR if future work requires canvas drag placement, ratio-based placement, route detail as the public primary contract, or backward compatibility for new exports in older app versions.

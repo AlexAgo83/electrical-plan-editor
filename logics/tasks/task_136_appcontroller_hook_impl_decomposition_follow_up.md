@@ -1,10 +1,10 @@
 ## task_136_appcontroller_hook_impl_decomposition_follow_up - AppController hook-impl decomposition follow-up
 > From version: 1.15.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Archived
 > Understanding: 94%
 > Confidence: 88%
-> Progress: 0%
+> Progress: 0% (archived before implementation)
 > Complexity: High
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -30,9 +30,9 @@
 6. Update `req_129_app_controller_decomposition_plan` with delivered wave evidence and remaining work.
 
 # Definition of Done (DoD)
-- [ ] The backlog scope is implemented.
-- [ ] Acceptance criteria are covered.
-- [ ] Validation passes.
+- [x] N/A: the backlog scope was archived before implementation and no delivery is claimed.
+- [x] N/A: acceptance criteria remain documented for future reuse but were not delivered in this task.
+- [x] N/A: product validation was not run because the task was archived before implementation.
 
 # Backlog
 - `item_626_appcontroller_hook_impl_decomposition_followup`
@@ -40,7 +40,7 @@
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|appcontroller-hook-impl-decomposition-fo|item-626-appcontroller-hook-impl-decompo|1-confirm-the-selected-target-and|run-logics-manager-lint-require-status
+%% logics-signature: task|appcontroller-hook-impl-decomposition-fo|item-626-appcontroller-hook-impl-decompo|1-confirm-the-selected-target-and|archived-before-implementation-product-v
 flowchart TD
     Backlog[Backlog item] --> Build[Implementation]
     Build --> Validate[Validation]
@@ -55,17 +55,14 @@ flowchart TD
 - AC5: `req_129_app_controller_decomposition_plan` is updated with delivered wave evidence and remaining work.
 
 # Validation
-- Run `logics-manager lint --require-status`.
-- Run `logics-manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability`.
-- Run `npm run -s quality:hooks-modularization`.
-- Run `npm run -s quality:ui-modularization`.
-- Run affected focused specs after the extraction.
-- Run `npm run -s ci:blocking` before closeout.
+- Archived before implementation; product validation was not applicable.
+- Corpus validation on 2026-06-16: `logics-manager lint --require-status` and `logics-manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability`.
 
 # Report
 - Prepared on 2026-06-09 as the implementation task for the second AppController decomposition wave.
 - Implementation not started yet.
 - Current target recommendation: extract a focused boundary from `useAppControllerModelingAnalysisScreenDomains.tsx`, preferably the batch-selection state/action surface if still cohesive at implementation time.
+- Archived on 2026-06-16 to close the active Logics corpus. This task did not ship code or validation; reopen with a fresh task if the hook-impl decomposition wave becomes active again.
 
 # AI Context
 - Summary: Implement appcontroller hook-impl decomposition follow-up.

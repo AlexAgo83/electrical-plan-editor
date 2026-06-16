@@ -1,6 +1,6 @@
 ## adr_006_global_reference_name_propagation_for_wire_endpoint_renames - Global reference name propagation for wire endpoint renames
 > Date: 2026-04-23
-> Status: Accepted
+> Status: Settled
 > Drivers: shared-name propagation by normalized reference, overwrite conflict atomicity, cross-kind isolation, zero propagation to empty references, release traceability
 > Related request: `req_121_global_reference_name_propagation_for_wire_endpoint_renames`
 > Related backlog: `item_590_global_reference_name_propagation_for_wire_endpoint_renames`

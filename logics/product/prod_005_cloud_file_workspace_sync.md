@@ -1,6 +1,6 @@
 ## prod_005_cloud_file_workspace_sync - Cloud file workspace sync
 > Date: 2026-05-30
-> Status: Draft
+> Status: Settled
 > Related request: TBD
 > Related backlog: TBD
 > Related task: TBD
@@ -239,3 +239,6 @@ Out:
 - Should the app support multiple recent workspace files, or only one linked file in V1?
 - What is the minimum acceptable mobile behavior for the first release?
 - Should workspace files include local UI preferences, AI provider settings, and onboarding state, or only modeling/project state?
+
+# Settlement
+- Archived on 2026-06-16 as a non-active product direction brief. It has no linked request/backlog/task chain and should be reopened through a fresh workflow if cloud file workspace sync becomes active.

@@ -1,6 +1,6 @@
 ## adr_008_audit_hardening_delivery_strategy_for_security_ci_bundle_and_maintainability - Audit hardening delivery strategy for security CI bundle and maintainability
 > Date: 2026-05-12
-> Status: Accepted
+> Status: Settled
 > Drivers: dependency security, cross-platform validation, CI reliability, bundle size, PWA stability, incremental maintainability
 > Related request: `req_124_audit_hardening_security_ci_bundle_and_maintainability_follow_ups`
 > Related backlog: `item_596_audit_hardening_security_ci_bundle_and_maintainability_follow_ups`

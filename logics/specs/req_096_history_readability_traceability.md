@@ -2,7 +2,7 @@
 > Request: `req_096_recent_changes_human_readable_entity_references_instead_of_system_ids`
 > Last updated: 2026-03-25
 > From version: 1.4.3
-> Status: Done
+> Status: Settled
 > Understanding: 100%
 > Confidence: 99%
 

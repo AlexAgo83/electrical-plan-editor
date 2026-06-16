@@ -2,7 +2,7 @@
 > Request: `req_003_theme_mode_switch_normal_dark`
 > Last updated: 2026-02-21
 > From version: 0.1.0
-> Status: Done
+> Status: Settled
 > Understanding: 98%
 > Confidence: 96%
 

@@ -1,7 +1,7 @@
 ## adr_009_app_controller_decomposition_plan - AppController decomposition plan
 
 > Date: 2026-05-30
-> Status: Proposed
+> Status: Settled
 > Drivers: maintainability, screen-level testability, hooks modularization quality gate, AppController growth budget
 > Related request: `req_129_app_controller_decomposition_plan`
 > Related backlog: `item_600_appcontroller_decomposition_plan`
@@ -129,8 +129,8 @@ Add to the PR description:
 
 # Follow-up work
 
-- Once Wave 1 ships, write a short ADR amendment (or a `logics/specs/` doc) capturing the actual line-count deltas and any deviations from the plan.
-- After Wave 4, consider lowering `LOCKED_LINE_BUDGETS["src/app/AppController.tsx"]` further and locking it as a permanent budget rather than a moving ceiling.
+- Settled 2026-06-16: Wave 1 shipped and the remaining hook-impl follow-up was archived rather than kept active.
+- Revisit target file budgets only if a new AppController decomposition request reopens the remaining hook-impl work.
 
 # Amendments
 
