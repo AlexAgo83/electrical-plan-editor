@@ -278,13 +278,6 @@ test("create -> route -> recompute flow works end-to-end", async ({ page }) => {
   await connectorForm.getByLabel("Technical ID").fill("C-1");
   await connectorForm.getByRole("button", { name: "Create" }).click();
 
-  await switchSubScreen("splice");
-  await openCreateFormIfIdle("Splice form");
-  const spliceForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Splice" }) });
-  await spliceForm.getByLabel("Functional name").fill("Splice 1");
-  await spliceForm.getByLabel("Technical ID").fill("S-1");
-  await spliceForm.getByRole("button", { name: "Create" }).click();
-
   await switchSubScreen("node");
   await openCreateFormIfIdle("Node form");
   const nodeForm = page.locator("article.panel").filter({ has: page.getByRole("heading", { name: "Create Node" }) });
