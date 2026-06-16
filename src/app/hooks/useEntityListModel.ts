@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { getWireColorSearchText } from "../../core/cableColors";
+import { portIndexToSpliceSide } from "../../core/directionalSplice";
 import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, Splice, SpliceId, Wire, WireRouteEndpointDetail } from "../../core/entities";
+import { resolveSplicePortMode } from "../../core/splicePortMode";
 import { selectConnectorCavityStatuses, selectSplicePortStatuses, type AppState } from "../../store";
 import { normalizeSearch, sortById, sortByNameAndTechnicalId } from "../lib/app-utils-shared";
 import type {
@@ -110,6 +112,7 @@ export function useEntityListModel({
     if (selectedSplice === null) {
       return [];
     }
+    const isDirectional = resolveSplicePortMode(selectedSplice) === "directional";
     return wires.flatMap((wire) => {
       const entries: SpliceSynthesisRow[] = [];
       if (wire.endpointA.kind === "splicePort" && wire.endpointA.spliceId === selectedSplice.id) {
@@ -118,7 +121,10 @@ export function useEntityListModel({
           wireName: wire.name,
           wireTechnicalId: wire.technicalId,
           sectionMm2: wire.sectionMm2,
-          localEndpointLabel: `P${wire.endpointA.portIndex}`,
+          localEndpointLabel: isDirectional
+            ? (wire.endpointA.spliceSideOverride ??
+              portIndexToSpliceSide(wire.endpointA.portIndex))
+            : `P${wire.endpointA.portIndex}`,
           remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
           remoteEndpoint: wire.endpointB,
           lengthMm: wire.lengthMm,
@@ -132,7 +138,10 @@ export function useEntityListModel({
           wireName: wire.name,
           wireTechnicalId: wire.technicalId,
           sectionMm2: wire.sectionMm2,
-          localEndpointLabel: `P${wire.endpointB.portIndex}`,
+          localEndpointLabel: isDirectional
+            ? (wire.endpointB.spliceSideOverride ??
+              portIndexToSpliceSide(wire.endpointB.portIndex))
+            : `P${wire.endpointB.portIndex}`,
           remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
           remoteEndpoint: wire.endpointA,
           lengthMm: wire.lengthMm,
