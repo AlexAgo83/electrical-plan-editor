@@ -5,7 +5,7 @@ A local-first electrical network editor for modeling, validating, and documentin
 The app treats connectors, splices, nodes, segments, and wires as a graph, computes routes deterministically, and keeps canvas preferences and export outputs aligned with the current workspace state.
 
 [![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/electrical-plan-editor)](LICENSE)
-[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.16.1-4C8BF5)
+[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.16.2-4C8BF5)
 
 <img width="951" height="708" alt="network_summary" src="https://github.com/user-attachments/assets/342133f2-4171-4836-a2dd-2b8354af73f3" />
 
@@ -27,7 +27,7 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 
 - Production: [https://e-plan-editor.onrender.com](https://e-plan-editor.onrender.com)
 - Hosting: Render Static Site (Blueprint via `render.yaml`)
-- Current version: `1.16.1`
+- Current version: `1.16.2`
 - CI status: see the GitHub Actions badge above
 
 ## Product
