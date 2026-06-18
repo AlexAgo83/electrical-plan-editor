@@ -526,10 +526,11 @@ describe("buildRenderedSegments", () => {
     });
 
     const subLabels = rendered[0]?.segmentLengthSubLabels ?? [];
-    // 0→120, 120→200, 200→400 along nodeA→nodeB.
+    // Displayed lengths stay physical: 0→120, 120→200, 200→400 along nodeA→nodeB.
     expect(subLabels.map((label) => label.lengthMm)).toEqual([120, 80, 200]);
-    // Midpoints projected on the (0,0)→(400,0) centerline.
-    expect(subLabels.map((label) => Math.round(label.anchorX))).toEqual([60, 160, 300]);
+    // Labels sit in the VISUAL gaps between the evenly-spread markers (boundaries
+    // 0, 1/3, 2/3, 1 on the 400px segment) → midpoints at 1/6, 1/2, 5/6.
+    expect(subLabels.map((label) => Math.round(label.anchorX))).toEqual([67, 200, 333]);
   });
 
   it("highlights only the covered portion when a selected wire ends on a floating splice", () => {

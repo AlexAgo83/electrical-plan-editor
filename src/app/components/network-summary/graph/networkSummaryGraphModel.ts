@@ -732,15 +732,24 @@ export function buildRenderedSegments({
     const spliceOffsets = placedSpliceOffsetsBySegmentId.get(segment.id) ?? [];
     const segmentLengthSubLabels: SegmentLengthSubLabel[] = [];
     if (spliceOffsets.length > 0 && segment.lengthMm > 0) {
-      const breakpoints = [0, ...spliceOffsets, segment.lengthMm];
-      for (let index = 0; index < breakpoints.length - 1; index += 1) {
-        const spanStart = breakpoints[index] ?? 0;
-        const spanEnd = breakpoints[index + 1] ?? segment.lengthMm;
+      // Physical breakpoints drive the displayed lengths (real mm), while the
+      // render-only visual ratios drive WHERE each label sits, so labels land in
+      // the visual gaps between the evenly-spread splice markers instead of the
+      // physical midpoints (which would bunch up and collide).
+      const physicalBreakpoints = [0, ...spliceOffsets, segment.lengthMm];
+      const visualRatios = computeFloatingSpliceVisualRatios(
+        spliceOffsets.map((offset) => offset / segment.lengthMm),
+      );
+      const visualBoundaries = [0, ...visualRatios, 1];
+      for (let index = 0; index < physicalBreakpoints.length - 1; index += 1) {
+        const spanStart = physicalBreakpoints[index] ?? 0;
+        const spanEnd = physicalBreakpoints[index + 1] ?? segment.lengthMm;
         const spanLengthMm = spanEnd - spanStart;
         if (spanLengthMm <= 0.0001) {
           continue;
         }
-        const midpoint = pointAtRatio((spanStart + spanEnd) / 2 / segment.lengthMm);
+        const visualMidRatio = ((visualBoundaries[index] ?? 0) + (visualBoundaries[index + 1] ?? 1)) / 2;
+        const midpoint = pointAtRatio(visualMidRatio);
         segmentLengthSubLabels.push({
           key: `${segment.id}-len-${index}`,
           anchorX: midpoint.x,
@@ -878,6 +887,25 @@ export function biasFloatingSpliceVisualRatio(physicalRatio: number): number {
   );
 }
 
+/**
+ * Render-only visual ratios for the floating splices that share a segment, given
+ * their physical ratios already sorted along the segment (from nodeA). A lone
+ * splice keeps its mild center bias; multiple splices are spread evenly at
+ * `i / (N + 1)` so they never overlap. The same mapping drives both the splice
+ * markers and the segment length sub-label placement so labels sit in the visual
+ * gaps between markers.
+ */
+export function computeFloatingSpliceVisualRatios(orderedCanonicalRatios: readonly number[]): number[] {
+  const count = orderedCanonicalRatios.length;
+  if (count === 0) {
+    return [];
+  }
+  if (count === 1) {
+    return [biasFloatingSpliceVisualRatio(orderedCanonicalRatios[0] ?? FLOATING_SPLICE_VISUAL_CENTER_RATIO)];
+  }
+  return orderedCanonicalRatios.map((_ratio, index) => (index + 1) / (count + 1));
+}
+
 function normalizeVector(x: number, y: number): NodePosition {
   const length = Math.hypot(x, y);
   if (length <= 0.0001) {
@@ -995,12 +1023,11 @@ export function buildRenderedFloatingSplices({
           left.canonicalPhysicalRatio - right.canonicalPhysicalRatio ||
           left.splice.id.localeCompare(right.splice.id),
       );
-      const count = ordered.length;
+      const visualRatios = computeFloatingSpliceVisualRatios(
+        ordered.map((input) => input.canonicalPhysicalRatio),
+      );
       return ordered.map((input, index) => {
-        const visualRatio =
-          count === 1
-            ? biasFloatingSpliceVisualRatio(input.canonicalPhysicalRatio)
-            : (index + 1) / (count + 1);
+        const visualRatio = visualRatios[index] ?? FLOATING_SPLICE_VISUAL_CENTER_RATIO;
         const anchorPosition = {
           x: input.fromPosition.x + (input.toPosition.x - input.fromPosition.x) * visualRatio,
           y: input.fromPosition.y + (input.toPosition.y - input.fromPosition.y) * visualRatio,
