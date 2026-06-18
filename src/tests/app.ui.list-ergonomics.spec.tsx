@@ -394,9 +394,7 @@ describe("App integration UI - list ergonomics", () => {
       expect(capturedPayload).toContain("TERM-A-CSV");
       // Manual connection references on splice ends are now honored (previously discarded).
       expect(capturedPayload).toContain("TERM-B-CSV");
-      // Splice ends without a manual reference resolve to their real catalog material,
-      // not a hardcoded default, keeping the wire list uniform with the BOM. The
-      // reference and name are now exported as separate columns.
+      // Splice ends resolve to their real catalog material (uniform with the BOM); ref/name are now separate columns.
       expect(capturedPayload).toContain("SAMPLE-CAT-J1-10P,Sample main junction 10-port");
       expect(capturedPayload).not.toContain("SAMPLE-CAT-J1-10P - Sample main junction 10-port");
       expect(capturedPayload).not.toContain("Preden 13mm");
