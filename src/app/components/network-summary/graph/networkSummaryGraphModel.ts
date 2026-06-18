@@ -845,6 +845,39 @@ interface BuildRenderedFloatingSplicesParams {
 const FLOATING_SPLICE_RENDER_CLEARANCE = 24;
 const FLOATING_SPLICE_RENDER_STEP = 18;
 
+/**
+ * Render-only visual placement tuning for floating splices. The physical
+ * placement (`segmentId`/`fromNodeId`/`offsetMm`) is never mutated; only the
+ * on-segment anchor used for drawing is biased toward the segment center so the
+ * marker stays clear of endpoint node icons and segment length labels.
+ */
+export const FLOATING_SPLICE_VISUAL_CENTER_RATIO = 0.5;
+/** How much of the physical offset deviation from center is kept visually. */
+export const FLOATING_SPLICE_VISUAL_BIAS_FACTOR = 0.35;
+/** Bounded visual band around the center the marker is confined to. */
+export const FLOATING_SPLICE_VISUAL_MIN_RATIO = 0.3;
+export const FLOATING_SPLICE_VISUAL_MAX_RATIO = 0.7;
+
+/**
+ * Remaps a physical segment ratio (0..1) into a bounded, center-biased visual
+ * ratio. The marker stays generally near the midpoint while keeping only a mild
+ * directional bias toward the endpoint the splice is physically closer to. Pure
+ * and deterministic so it can be unit tested in isolation.
+ */
+export function biasFloatingSpliceVisualRatio(physicalRatio: number): number {
+  if (!Number.isFinite(physicalRatio)) {
+    return FLOATING_SPLICE_VISUAL_CENTER_RATIO;
+  }
+  const clampedPhysical = Math.min(1, Math.max(0, physicalRatio));
+  const biased =
+    FLOATING_SPLICE_VISUAL_CENTER_RATIO +
+    (clampedPhysical - FLOATING_SPLICE_VISUAL_CENTER_RATIO) * FLOATING_SPLICE_VISUAL_BIAS_FACTOR;
+  return Math.min(
+    FLOATING_SPLICE_VISUAL_MAX_RATIO,
+    Math.max(FLOATING_SPLICE_VISUAL_MIN_RATIO, biased),
+  );
+}
+
 function normalizeVector(x: number, y: number): NodePosition {
   const length = Math.hypot(x, y);
   if (length <= 0.0001) {
@@ -920,9 +953,13 @@ export function buildRenderedFloatingSplices({
       if (fromPosition === undefined || toPosition === undefined) {
         return [];
       }
+      // Render-only: bias the on-segment anchor toward the center so the marker
+      // stays clear of endpoint nodes/length labels. Persisted placement,
+      // routing, lengths, validation and export data keep the real offset.
+      const visualRatio = biasFloatingSpliceVisualRatio(placement.ratio);
       const anchorPosition = {
-        x: fromPosition.x + (toPosition.x - fromPosition.x) * placement.ratio,
-        y: fromPosition.y + (toPosition.y - fromPosition.y) * placement.ratio,
+        x: fromPosition.x + (toPosition.x - fromPosition.x) * visualRatio,
+        y: fromPosition.y + (toPosition.y - fromPosition.y) * visualRatio,
       };
       const tangent = normalizeVector(
         toPosition.x - fromPosition.x,

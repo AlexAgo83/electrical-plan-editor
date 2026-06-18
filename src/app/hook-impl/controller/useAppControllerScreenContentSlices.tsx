@@ -527,6 +527,7 @@ export function buildModelingScreenContentSlice(
     onDeleteWire: params.handleWireDelete,
     onOpenSegmentOnboardingHelp: params.onOpenSegmentOnboardingHelp,
     onOpenWireOnboardingHelp: params.onOpenWireOnboardingHelp,
+    activeNetworkName: params.activeNetwork?.name ?? params.activeNetwork?.technicalId ?? null,
   } satisfies ModelingSecondaryTablesProps;
   const modelingFormsColumnProps = {
     catalogItems: params.catalogItems,

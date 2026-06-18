@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogItemId, ConnectorId, NetworkNode, NodeId, Segment, SegmentId, SpliceId } from "../core/entities";
 import {
+  biasFloatingSpliceVisualRatio,
   buildRenderedFloatingSplices,
   buildRenderedNodes,
-  buildRenderedSegments
+  buildRenderedSegments,
+  FLOATING_SPLICE_VISUAL_MAX_RATIO,
+  FLOATING_SPLICE_VISUAL_MIN_RATIO
 } from "../app/components/network-summary/graph/networkSummaryGraphModel";
 
 function asNodeId(value: string): NodeId {
@@ -764,11 +767,15 @@ describe("buildRenderedFloatingSplices", () => {
     });
 
     expect(rendered).toHaveLength(1);
-    expect(rendered[0]?.anchorPosition).toEqual({ x: 25, y: 0 });
+    // Physical ratio 0.25 → biased visual anchor 0.5 + (0.25 - 0.5) * 0.35 = 0.4125.
+    expect(rendered[0]?.anchorPosition.x).toBeCloseTo(41.25);
+    expect(rendered[0]?.anchorPosition.y).toBeCloseTo(0);
+    // Render-only: persisted physical offset is untouched (AC3).
+    expect(rendered[0]?.splice.placement).toMatchObject({ offsetMm: 25 });
     expect(rendered[0]?.nodeClassName).toContain("is-selected");
   });
 
-  it("applies a render-only offset when a placed splice resolves onto a node", () => {
+  it("biases a zero-offset splice toward the center so it stays clear of the endpoint node", () => {
     const segment: Segment = {
       id: asSegmentId("SEG-1"),
       nodeA: asNodeId("N-A"),
@@ -815,7 +822,82 @@ describe("buildRenderedFloatingSplices", () => {
     });
 
     expect(rendered).toHaveLength(1);
-    expect(rendered[0]?.anchorPosition).toEqual({ x: 0, y: 0 });
-    expect(rendered[0]?.position).not.toEqual(rendered[0]?.anchorPosition);
+    // Physical ratio 0 → biased visual anchor 0.5 + (0 - 0.5) * 0.35 = 0.325.
+    expect(rendered[0]?.anchorPosition.x).toBeCloseTo(32.5);
+    expect(rendered[0]?.anchorPosition.y).toBeCloseTo(0);
+    // The visual marker sits well inside the segment, away from the endpoint node at x=0.
+    expect(rendered[0]?.position.x).toBeGreaterThanOrEqual(FLOATING_SPLICE_VISUAL_MIN_RATIO * 100);
+    // Persisted physical placement still records the real zero offset (AC3).
+    expect(rendered[0]?.splice.placement).toMatchObject({ offsetMm: 0 });
+  });
+
+  it("keeps multiple splices on one segment within the bounded visual band and non-overlapping", () => {
+    const segment: Segment = {
+      id: asSegmentId("SEG-1"),
+      nodeA: asNodeId("N-A"),
+      nodeB: asNodeId("N-B"),
+      lengthMm: 100,
+    };
+    const offsets = [5, 50, 95];
+    const rendered = buildRenderedFloatingSplices({
+      splices: offsets.map((offsetMm, index) => ({
+        id: asSpliceId(`S-${index}`),
+        name: `Splice ${index}`,
+        technicalId: `SP-${index}`,
+        portCount: 2,
+        placement: {
+          kind: "segmentOffset",
+          segmentId: segment.id,
+          fromNodeId: segment.nodeA,
+          offsetMm,
+        },
+      })),
+      nodes: [],
+      segments: [segment],
+      networkNodePositions: {
+        [segment.nodeA]: { x: 0, y: 0 },
+        [segment.nodeB]: { x: 100, y: 0 },
+      },
+      segmentSubNetworkTagById: new Map([[segment.id, "(default)"]]),
+      isSubNetworkFilteringActive: false,
+      activeSubNetworkTagSet: new Set(["(default)"]),
+      selectedSpliceId: null,
+    });
+
+    expect(rendered).toHaveLength(3);
+    for (const model of rendered) {
+      // Every visual anchor stays inside the bounded center band [30, 70].
+      expect(model.anchorPosition.x).toBeGreaterThanOrEqual(FLOATING_SPLICE_VISUAL_MIN_RATIO * 100 - 0.001);
+      expect(model.anchorPosition.x).toBeLessThanOrEqual(FLOATING_SPLICE_VISUAL_MAX_RATIO * 100 + 0.001);
+    }
+    // No two rendered markers collapse onto the exact same display point.
+    const positionKeys = rendered.map((model) => `${model.position.x.toFixed(2)}:${model.position.y.toFixed(2)}`);
+    expect(new Set(positionKeys).size).toBe(rendered.length);
+  });
+});
+
+describe("biasFloatingSpliceVisualRatio", () => {
+  it("keeps the center at the center", () => {
+    expect(biasFloatingSpliceVisualRatio(0.5)).toBeCloseTo(0.5);
+  });
+
+  it("biases only mildly toward the physically closer endpoint", () => {
+    // Near-start offset stays left of center but well inside the segment.
+    expect(biasFloatingSpliceVisualRatio(0)).toBeCloseTo(0.325);
+    // Near-end offset is the symmetric mirror about the center.
+    expect(biasFloatingSpliceVisualRatio(1)).toBeCloseTo(0.675);
+    expect(biasFloatingSpliceVisualRatio(0.25) - 0.5).toBeCloseTo(-(biasFloatingSpliceVisualRatio(0.75) - 0.5));
+  });
+
+  it("never leaves the bounded visual band even for out-of-range input", () => {
+    for (const ratio of [-5, -0.0001, 0, 0.5, 1, 1.0001, 5, Number.NaN]) {
+      const result = biasFloatingSpliceVisualRatio(ratio);
+      expect(result).toBeGreaterThanOrEqual(FLOATING_SPLICE_VISUAL_MIN_RATIO);
+      expect(result).toBeLessThanOrEqual(FLOATING_SPLICE_VISUAL_MAX_RATIO);
+    }
+  });
+
+  it("is deterministic for repeated calls", () => {
+    expect(biasFloatingSpliceVisualRatio(0.13)).toBe(biasFloatingSpliceVisualRatio(0.13));
   });
 });

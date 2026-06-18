@@ -48,6 +48,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     onSelectCatalogItem,
     onOpenWireOnboardingHelp,
     selectedWire,
+    activeNetwork,
     showEntityTables = true,
     describeWireEndpoint,
     describeWireEndpointCsvParts,
@@ -268,7 +269,13 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
               ];
             });
             const sheet = { name: "Analysis Wires", headers, rows, freezeHeaderRow: true, autoFilter: true } satisfies TabularWorksheetExport;
-            const filenameBase = `wire-list-${normalizeFileNamePart(selectedWire?.technicalId) ?? "analysis"}`;
+            const filenameBase = [
+              "wire-list",
+              normalizeFileNamePart(activeNetwork?.name) ?? normalizeFileNamePart(activeNetwork?.technicalId),
+              normalizeFileNamePart(selectedWire?.technicalId) ?? "analysis",
+            ]
+              .filter((part): part is string => part !== null)
+              .join("-");
             if (tabularExportFormat === "xlsx") {
               setWireExportPreview({
                 filenameBase,

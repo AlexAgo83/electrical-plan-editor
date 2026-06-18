@@ -29,6 +29,48 @@ export function toFilesystemSafeTimestamp(exportedAtIso: string): string {
   return `${year}-${month}-${day}_${hour}-${minute}-${second}`;
 }
 
+/**
+ * Maximum combined length (in characters) of the joined, sanitized name segment
+ * used in a grouped export filename before truncation kicks in. Keeps filenames
+ * within filesystem limits while still naming every selection in typical cases.
+ */
+export const GROUPED_FILE_NAME_MAX_NAME_LENGTH = 120;
+
+/**
+ * Builds a grouped export filename base that includes every selected
+ * harness/network label in deterministic (selection) order. When the joined
+ * names would exceed the length cap, the overflow names are dropped and a
+ * stable `-plus-<n>-more` suffix documents how many were omitted.
+ */
+export function buildGroupedFileNameBase(
+  prefix: string,
+  names: Array<string | null | undefined>,
+  maxNameLength: number = GROUPED_FILE_NAME_MAX_NAME_LENGTH
+): string {
+  const normalizedNames = names.flatMap((name) => {
+    const normalized = normalizeFileNamePart(name);
+    return normalized === null ? [] : [normalized];
+  });
+  if (normalizedNames.length === 0) {
+    return prefix;
+  }
+
+  const included: string[] = [];
+  let length = 0;
+  for (const name of normalizedNames) {
+    const addition = (included.length === 0 ? 0 : 1) + name.length;
+    if (included.length > 0 && length + addition > maxNameLength) {
+      break;
+    }
+    included.push(name);
+    length += addition;
+  }
+
+  const omitted = normalizedNames.length - included.length;
+  const joined = included.join("-");
+  return omitted > 0 ? `${prefix}-${joined}-plus-${omitted}-more` : `${prefix}-${joined}`;
+}
+
 export function buildTimestampedFileName(
   parts: Array<string | null | undefined>,
   extension: string,

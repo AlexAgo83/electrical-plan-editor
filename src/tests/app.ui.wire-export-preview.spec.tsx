@@ -51,7 +51,8 @@ describe("App integration UI - wire export preview", () => {
 
     const previewDialog = await screen.findByRole("dialog", { name: "Wire export preview" });
     expect(within(previewDialog).getByText("Modeling wires")).toBeInTheDocument();
-    expect(within(previewDialog).getByText(/wire-list-modeling\.xlsx/i)).toBeInTheDocument();
+    // Wire-to-wire export filenames include the active network label (AC5).
+    expect(within(previewDialog).getByText(/wire-list-main-network-sample-modeling\.xlsx/i)).toBeInTheDocument();
 
     expect(within(previewDialog).getByRole("button", { name: "Export" })).toBeInTheDocument();
     fireEvent.click(within(previewDialog).getByRole("button", { name: "Cancel" }));

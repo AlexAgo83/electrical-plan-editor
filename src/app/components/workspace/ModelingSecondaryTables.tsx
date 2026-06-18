@@ -123,6 +123,7 @@ interface ModelingSecondaryTablesProps {
   onEditWire: (wire: Wire) => void;
   onDeleteWire: (wireId: WireId) => void;
   onOpenWireOnboardingHelp?: () => void;
+  activeNetworkName?: string | null;
 }
 
 export function ModelingSecondaryTables({
@@ -183,6 +184,7 @@ export function ModelingSecondaryTables({
   onEditWire,
   onDeleteWire,
   onOpenWireOnboardingHelp,
+  activeNetworkName,
 }: ModelingSecondaryTablesProps): ReactElement {
   void _getSortIndicator;
   type SegmentTableSortField =
@@ -1046,7 +1048,13 @@ export function ModelingSecondaryTables({
                     freezeHeaderRow: true,
                     autoFilter: true,
                   } satisfies TabularWorksheetExport;
-                  const filenameBase = `wire-list-${normalizeFileNamePart(focusedWire?.technicalId) ?? "modeling"}`;
+                  const filenameBase = [
+                    "wire-list",
+                    normalizeFileNamePart(activeNetworkName),
+                    normalizeFileNamePart(focusedWire?.technicalId) ?? "modeling",
+                  ]
+                    .filter((part): part is string => part !== null)
+                    .join("-");
                   if (tabularExportFormat === "xlsx") {
                     setWireExportPreview({
                       filenameBase,

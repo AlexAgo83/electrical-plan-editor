@@ -18,6 +18,7 @@ import { appActions } from "../../store";
 import type { NetworkFilePayloadV1 } from "../../adapters/portability/networkFile";
 import type { ImportExportStatus } from "../types/app-controller";
 import { buildNetworkExportFilename, exportJsonFile } from "../lib/jsonFileExport";
+import { buildGroupedFileNameBase } from "../lib/exportFileName";
 import { convertLegacyNumericSplicesToDirectional, hasLegacyNumericSplices } from "../lib/importLegacySpliceConversion";
 import { removeGroupedSvgExportOverlay, renderGroupedSvgExportOverlay, type GroupedSvgExportProgress } from "../lib/groupedSvgExportOverlay";
 import { buildImagePdfBlob, downloadPdfBlob, type PdfImagePage } from "../lib/pdfExport";
@@ -381,6 +382,18 @@ export function useNetworkImportExport({
           allSheets.push({ ...sheet, name: `${prefix} ${shortSheetName}` });
         }
 
+        // Include the wire list alongside the BOM so the grouped package is
+        // complete without running a separate wire-list export.
+        allSheets.push(
+          buildWireListSheet(
+            `${prefix} Wires`,
+            wires,
+            connectors,
+            splices,
+            catalogItems,
+            toWireExportLengthPreferences(groupedWirePreferences)
+          )
+        );
       }
 
       if (allSheets.length === 0) {
@@ -391,8 +404,7 @@ export function useNetworkImportExport({
       const namedNetworks = networkIds
         .map((networkId) => state.networks.byId[networkId]?.name || state.networks.byId[networkId]?.technicalId)
         .filter((value): value is string => typeof value === "string" && value.trim().length > 0);
-      const exportBaseName =
-        namedNetworks.length === 1 ? `bom-${namedNetworks[0]}` : `bom-grouped-${networkIds.length}-networks`;
+      const exportBaseName = buildGroupedFileNameBase("bom", namedNetworks);
       await downloadTabularWorkbookFile(exportBaseName, allSheets);
       setImportExportStatus({ kind: "success", message: `Exported grouped BOM for ${networkIds.length} network(s).` });
     })();
@@ -462,8 +474,7 @@ export function useNetworkImportExport({
       const namedNetworks = networkIds
         .map((networkId) => state.networks.byId[networkId]?.name || state.networks.byId[networkId]?.technicalId)
         .filter((value): value is string => typeof value === "string" && value.trim().length > 0);
-      const exportBaseName =
-        namedNetworks.length === 1 ? `wire-list-${namedNetworks[0]}` : `wire-list-grouped-${networkIds.length}-networks`;
+      const exportBaseName = buildGroupedFileNameBase("wire-list", namedNetworks);
       await downloadTabularWorkbookFile(exportBaseName, allSheets);
       setImportExportStatus({ kind: "success", message: `Exported grouped wire list for ${networkIds.length} network(s).` });
     })();
@@ -528,7 +539,8 @@ export function useNetworkImportExport({
             return;
           }
           const blob = buildImagePdfBlob(pdfPages);
-          downloadPdfBlob(`network-plan-grouped-${pdfPages.length}-networks.pdf`, blob);
+          const groupedPlanNames = validNetworks.map((network) => network.name || network.technicalId);
+          downloadPdfBlob(`${buildGroupedFileNameBase("network-plan", groupedPlanNames)}.pdf`, blob);
         }
         setImportExportStatus({ kind: "success", message: `Exported grouped ${format.toUpperCase()} for ${exportedCount} network(s).` });
       } finally {
