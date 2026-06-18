@@ -388,15 +388,17 @@ describe("App integration UI - list ergonomics", () => {
       }
       const headerLine = capturedPayload.split(/\r?\n/u, 1)[0] ?? "";
       expect(headerLine).toContain(
-        "Begin ID,Begin pin,Begin connection ref,Begin seal ref,End ID,End pin,End connection ref,End seal ref"
+        "Begin ID,Begin pin,Begin connection ref,Begin connection name,Begin seal ref,Begin seal name,End ID,End pin,End connection ref,End connection name,End seal ref,End seal name"
       );
       expect(headerLine).not.toContain("Endpoints");
       expect(capturedPayload).toContain("TERM-A-CSV");
       // Manual connection references on splice ends are now honored (previously discarded).
       expect(capturedPayload).toContain("TERM-B-CSV");
       // Splice ends without a manual reference resolve to their real catalog material,
-      // not a hardcoded default, keeping the wire list uniform with the BOM.
-      expect(capturedPayload).toContain("SAMPLE-CAT-J1-10P - Sample main junction 10-port");
+      // not a hardcoded default, keeping the wire list uniform with the BOM. The
+      // reference and name are now exported as separate columns.
+      expect(capturedPayload).toContain("SAMPLE-CAT-J1-10P,Sample main junction 10-port");
+      expect(capturedPayload).not.toContain("SAMPLE-CAT-J1-10P - Sample main junction 10-port");
       expect(capturedPayload).not.toContain("Preden 13mm");
     } finally {
       (globalThis as typeof globalThis & { Blob: typeof Blob }).Blob = OriginalBlob;

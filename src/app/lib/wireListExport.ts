@@ -29,7 +29,9 @@ interface ResolvedEndpointMaterial {
 
 export interface ResolvedWireExportEndpointMaterials {
   connectionRef: string;
+  connectionName: string;
   sealRef: string;
+  sealName: string;
 }
 
 function normalizeReference(value: string | undefined): string | undefined {
@@ -42,11 +44,12 @@ function normalizeName(value: string | undefined): string | undefined {
   return normalized.length > 0 ? normalized : undefined;
 }
 
-function formatResolvedMaterial(material: ResolvedEndpointMaterial | undefined): string {
-  if (material === undefined) {
-    return "";
-  }
-  return material.name === undefined ? material.reference : `${material.reference} - ${material.name}`;
+function resolvedMaterialReference(material: ResolvedEndpointMaterial | undefined): string {
+  return material?.reference ?? "";
+}
+
+function resolvedMaterialName(material: ResolvedEndpointMaterial | undefined): string {
+  return material?.name ?? "";
 }
 
 function resolveSpliceConnectionMaterial(
@@ -164,13 +167,21 @@ export function resolveWireExportEndpointMaterials(
   const sealReference = side === "A" ? wire.endpointASealReference : wire.endpointBSealReference;
   const sealName = side === "A" ? wire.endpointASealName : wire.endpointBSealName;
 
+  const connectionMaterial = resolveEndpointConnectionMaterial(
+    endpoint,
+    connectionReference,
+    connectionName,
+    connectorById,
+    spliceById,
+    catalogItemById
+  );
+  const sealMaterial = resolveEndpointSealMaterial(endpoint, sealReference, sealName, connectorById, catalogItemById);
+
   return {
-    connectionRef: formatResolvedMaterial(
-      resolveEndpointConnectionMaterial(endpoint, connectionReference, connectionName, connectorById, spliceById, catalogItemById)
-    ),
-    sealRef: formatResolvedMaterial(
-      resolveEndpointSealMaterial(endpoint, sealReference, sealName, connectorById, catalogItemById)
-    )
+    connectionRef: resolvedMaterialReference(connectionMaterial),
+    connectionName: resolvedMaterialName(connectionMaterial),
+    sealRef: resolvedMaterialReference(sealMaterial),
+    sealName: resolvedMaterialName(sealMaterial)
   };
 }
 
@@ -219,12 +230,16 @@ export function buildWireListSheet(
     "Begin ref",
     "Begin pin",
     "Begin connection ref",
+    "Begin connection name",
     "Begin seal ref",
+    "Begin seal name",
     "End type",
     "End ref",
     "End pin",
     "End connection ref",
+    "End connection name",
     "End seal ref",
+    "End seal name",
     "Length (mm)"
   ];
 
@@ -248,12 +263,16 @@ export function buildWireListSheet(
       begin.ref,
       begin.position,
       beginMaterials.connectionRef,
+      beginMaterials.connectionName,
       beginMaterials.sealRef,
+      beginMaterials.sealName,
       end.type,
       end.ref,
       end.position,
       endMaterials.connectionRef,
+      endMaterials.connectionName,
       endMaterials.sealRef,
+      endMaterials.sealName,
       resolveWireExportLengthMm(wire, twistGroupCounts, exportLengthPreferences)
     ];
   });

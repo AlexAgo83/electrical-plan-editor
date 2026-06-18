@@ -98,12 +98,16 @@ describe("buildWireListSheet", () => {
       "Begin ref",
       "Begin pin",
       "Begin connection ref",
+      "Begin connection name",
       "Begin seal ref",
+      "Begin seal name",
       "End type",
       "End ref",
       "End pin",
       "End connection ref",
+      "End connection name",
       "End seal ref",
+      "End seal name",
       "Length (mm)"
     ]);
     expect(sheet.rows[0]).toEqual([
@@ -115,11 +119,15 @@ describe("buildWireListSheet", () => {
       "Connector",
       "C-1",
       "C1",
-      "TERM-DEFAULT - Default terminal",
-      "SEAL-DEFAULT - Default seal",
+      "TERM-DEFAULT",
+      "Default terminal",
+      "SEAL-DEFAULT",
+      "Default seal",
       "Splice",
       "S-1",
       1,
+      "",
+      "",
       "",
       "",
       140
@@ -133,13 +141,17 @@ describe("buildWireListSheet", () => {
       "Connector",
       "C-1",
       "C2",
-      "TERM-MANUAL - Manual terminal",
-      "SEAL-DEFAULT - Default seal",
+      "TERM-MANUAL",
+      "Manual terminal",
+      "SEAL-DEFAULT",
+      "Default seal",
       "Connector",
       "C-1",
       "C1",
-      "TERM-DEFAULT - Default terminal",
-      "SEAL-MANUAL - Manual seal",
+      "TERM-DEFAULT",
+      "Default terminal",
+      "SEAL-MANUAL",
+      "Manual seal",
       190
     ]);
   });
@@ -242,18 +254,24 @@ describe("buildWireListSheet", () => {
     ];
 
     const sheet = buildWireListSheet("Wires", wires, connectors, splices, catalogItems);
-    const connectionRefByWire = new Map(sheet.rows.map((row) => [row[0], row[13]]));
+    // End connection ref/name are now separate columns (indexes 15 and 16).
+    const connectionRefByWire = new Map(sheet.rows.map((row) => [row[0], row[15]]));
+    const connectionNameByWire = new Map(sheet.rows.map((row) => [row[0], row[16]]));
 
     // Catalog splice -> catalog manufacturerReference (matches BOM grouping key) + name.
-    expect(connectionRefByWire.get("W-001")).toBe("SPLICE-CAT-REF - Manchon épissure");
+    expect(connectionRefByWire.get("W-001")).toBe("SPLICE-CAT-REF");
+    expect(connectionNameByWire.get("W-001")).toBe("Manchon épissure");
     // Manual endpoint reference wins over catalog material.
-    expect(connectionRefByWire.get("W-002")).toBe("MANUAL-SPLICE-REF - Manual splice ref");
-    // No catalog item -> falls back to splice.manufacturerReference.
+    expect(connectionRefByWire.get("W-002")).toBe("MANUAL-SPLICE-REF");
+    expect(connectionNameByWire.get("W-002")).toBe("Manual splice ref");
+    // No catalog item -> falls back to splice.manufacturerReference (no separate name).
     expect(connectionRefByWire.get("W-003")).toBe("Manchon épissure");
+    expect(connectionNameByWire.get("W-003")).toBe("");
     // No material at all -> empty, never a hardcoded default.
     expect(connectionRefByWire.get("W-004")).toBe("");
-    // Splice ends never carry a seal reference.
-    expect(sheet.rows.every((row) => row[14] === "")).toBe(true);
+    expect(connectionNameByWire.get("W-004")).toBe("");
+    // Splice ends never carry a seal reference (now index 17).
+    expect(sheet.rows.every((row) => row[17] === "")).toBe(true);
   });
 
   it("formats connector pins with their C-prefixed one-based cavity label without offsetting", () => {
@@ -386,13 +404,14 @@ describe("buildWireListSheet", () => {
     ];
 
     const defaultSheet = buildWireListSheet("Wires", wires, connectors, splices, []);
-    expect(defaultSheet.rows.map((row) => row[15])).toEqual([1040, 1115, 1115, 1040]);
+    // Length (mm) is the last column (index 19) after splitting ref/name columns.
+    expect(defaultSheet.rows.map((row) => row[19])).toEqual([1040, 1115, 1115, 1040]);
     expect(wires.map((wire) => wire.lengthMm)).toEqual([1000, 1000, 1000, 1000]);
 
     const customSheet = buildWireListSheet("Wires", wires, connectors, splices, [], {
       strippingAllowanceMm: 25,
       twistedPairLengthCoefficient: 1.08
     });
-    expect(customSheet.rows.map((row) => row[15])).toEqual([1050, 1130, 1130, 1050]);
+    expect(customSheet.rows.map((row) => row[19])).toEqual([1050, 1130, 1130, 1050]);
   });
 });
