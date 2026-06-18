@@ -831,15 +831,14 @@ describe("buildRenderedFloatingSplices", () => {
     expect(rendered[0]?.splice.placement).toMatchObject({ offsetMm: 0 });
   });
 
-  it("keeps multiple splices on one segment within the bounded visual band and non-overlapping", () => {
+  function renderSplicesOnSegment(offsets: number[], selectedSpliceId: SpliceId | null = null) {
     const segment: Segment = {
       id: asSegmentId("SEG-1"),
       nodeA: asNodeId("N-A"),
       nodeB: asNodeId("N-B"),
       lengthMm: 100,
     };
-    const offsets = [5, 50, 95];
-    const rendered = buildRenderedFloatingSplices({
+    return buildRenderedFloatingSplices({
       splices: offsets.map((offsetMm, index) => ({
         id: asSpliceId(`S-${index}`),
         name: `Splice ${index}`,
@@ -861,18 +860,37 @@ describe("buildRenderedFloatingSplices", () => {
       segmentSubNetworkTagById: new Map([[segment.id, "(default)"]]),
       isSubNetworkFilteringActive: false,
       activeSubNetworkTagSet: new Set(["(default)"]),
-      selectedSpliceId: null,
+      selectedSpliceId,
     });
+  }
 
+  it("spreads two splices on one segment to 1/3 and 2/3 in physical order", () => {
+    const rendered = renderSplicesOnSegment([10, 80]);
+    expect(rendered).toHaveLength(2);
+    const byTechnicalId = new Map(rendered.map((model) => [model.splice.technicalId, model]));
+    // SP-0 (offset 10) is physically closer to nodeA -> 1/3; SP-1 (offset 80) -> 2/3.
+    expect(byTechnicalId.get("SP-0")?.anchorPosition.x).toBeCloseTo(100 / 3);
+    expect(byTechnicalId.get("SP-1")?.anchorPosition.x).toBeCloseTo(200 / 3);
+  });
+
+  it("spreads three splices on one segment to 1/4, 2/4 and 3/4 in physical order", () => {
+    const rendered = renderSplicesOnSegment([5, 50, 95]);
     expect(rendered).toHaveLength(3);
-    for (const model of rendered) {
-      // Every visual anchor stays inside the bounded center band [30, 70].
-      expect(model.anchorPosition.x).toBeGreaterThanOrEqual(FLOATING_SPLICE_VISUAL_MIN_RATIO * 100 - 0.001);
-      expect(model.anchorPosition.x).toBeLessThanOrEqual(FLOATING_SPLICE_VISUAL_MAX_RATIO * 100 + 0.001);
-    }
-    // No two rendered markers collapse onto the exact same display point.
+    const byTechnicalId = new Map(rendered.map((model) => [model.splice.technicalId, model]));
+    expect(byTechnicalId.get("SP-0")?.anchorPosition.x).toBeCloseTo(25);
+    expect(byTechnicalId.get("SP-1")?.anchorPosition.x).toBeCloseTo(50);
+    expect(byTechnicalId.get("SP-2")?.anchorPosition.x).toBeCloseTo(75);
+    // Markers are distinct and ordered, so inter-splice distances stay visible.
     const positionKeys = rendered.map((model) => `${model.position.x.toFixed(2)}:${model.position.y.toFixed(2)}`);
     expect(new Set(positionKeys).size).toBe(rendered.length);
+  });
+
+  it("orders the even spread by physical offset even when splices are declared out of order", () => {
+    const rendered = renderSplicesOnSegment([90, 10]);
+    const byTechnicalId = new Map(rendered.map((model) => [model.splice.technicalId, model]));
+    // SP-1 (offset 10) is closer to nodeA -> 1/3; SP-0 (offset 90) -> 2/3.
+    expect(byTechnicalId.get("SP-1")?.anchorPosition.x).toBeCloseTo(100 / 3);
+    expect(byTechnicalId.get("SP-0")?.anchorPosition.x).toBeCloseTo(200 / 3);
   });
 });
 

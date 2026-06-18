@@ -1,4 +1,4 @@
-import { fireEvent, waitFor } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { appActions, appReducer, createInitialState, type AppState } from "../store";
 import {
@@ -41,6 +41,13 @@ describe("App integration UI - floating splice click-to-edit", () => {
     switchScreenDrawerAware("modeling");
 
     const panel = getPanelByHeading("Network summary");
+
+    // Hide the floating inspector first; a single click must not force it back open.
+    const displayOptions = within(panel).getByRole("group", { name: "Network summary display options" });
+    fireEvent.click(within(displayOptions).getByRole("button", { name: "View" }));
+    fireEvent.click(within(displayOptions).getByRole("button", { name: "Hide inspector" }));
+    expect(screen.queryByLabelText("Inspector context panel")).not.toBeInTheDocument();
+
     const floatingSplice = await waitFor(() => {
       const element = panel.querySelector('[data-splice-id="SP-1"]');
       expect(element).not.toBeNull();
@@ -54,5 +61,9 @@ describe("App integration UI - floating splice click-to-edit", () => {
       expect(getPanelByHeading("Edit Splice")).toBeInTheDocument();
     });
     expect(store.getState().ui.selected).toMatchObject({ kind: "splice", id: "SP-1" });
+
+    // The hidden inspector must NOT pop open on a single click (matching connector
+    // icon behavior). It only opens on double-click.
+    expect(screen.queryByLabelText("Inspector context panel")).not.toBeInTheDocument();
   });
 });

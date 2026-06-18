@@ -431,12 +431,11 @@ export function NetworkSummaryGraphLayers({
         aria-label={`Select splice ${splice.technicalId}`}
         onClick={(event) => {
           event.stopPropagation();
-          // Match connector behavior: a single click opens the splice edit flow
-          // directly (connectors activate on mouse-down), while still refocusing
-          // the splice tables on selection.
+          // Match connector behavior: a single click selects and opens the splice
+          // edit flow directly (connectors activate on mouse-down) WITHOUT opening
+          // the inspector panel. The inspector is reserved for double-click below.
           onSelectFloatingSplice(splice.id);
           onActivateFloatingSplice(splice.id);
-          onOpenInspectorForSelection();
         }}
         onDoubleClick={(event) => {
           event.preventDefault();

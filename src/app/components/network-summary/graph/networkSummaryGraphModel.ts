@@ -938,7 +938,10 @@ export function buildRenderedFloatingSplices({
       .filter((node) => node.kind === "splice")
       .map((node) => node.spliceId),
   );
-  const placedCandidates = splices
+  // Collect placed splices with a canonical along-segment ratio (measured from
+  // segment.nodeA) so multiple splices on one segment can be ordered and
+  // distributed consistently regardless of each splice's reference end.
+  const placedInputs = splices
     .filter((splice) => !spliceNodeIds.has(splice.id))
     .flatMap((splice) => {
       const placement = resolveSplicePlacementFromEntities(
@@ -948,32 +951,72 @@ export function buildRenderedFloatingSplices({
       if (placement.status !== "placed") {
         return [];
       }
-      const fromPosition = networkNodePositions[placement.fromNodeId];
-      const toPosition = networkNodePositions[placement.toNodeId];
+      const segment = segmentById.get(placement.segmentId);
+      if (segment === undefined) {
+        return [];
+      }
+      const fromPosition = networkNodePositions[segment.nodeA];
+      const toPosition = networkNodePositions[segment.nodeB];
       if (fromPosition === undefined || toPosition === undefined) {
         return [];
       }
-      // Render-only: bias the on-segment anchor toward the center so the marker
-      // stays clear of endpoint nodes/length labels. Persisted placement,
-      // routing, lengths, validation and export data keep the real offset.
-      const visualRatio = biasFloatingSpliceVisualRatio(placement.ratio);
-      const anchorPosition = {
-        x: fromPosition.x + (toPosition.x - fromPosition.x) * visualRatio,
-        y: fromPosition.y + (toPosition.y - fromPosition.y) * visualRatio,
-      };
-      const tangent = normalizeVector(
-        toPosition.x - fromPosition.x,
-        toPosition.y - fromPosition.y,
-      );
+      const canonicalPhysicalRatio =
+        placement.fromNodeId === segment.nodeA ? placement.ratio : 1 - placement.ratio;
       return [
         {
           splice,
-          hostNodeId: placement.fromNodeId,
-          anchorPosition,
-          normal: normalizeVector(-tangent.y, tangent.x),
           segmentId: placement.segmentId,
+          hostNodeId: placement.fromNodeId,
+          fromPosition,
+          toPosition,
+          canonicalPhysicalRatio,
         },
       ];
+    });
+
+  const inputsBySegment = new Map<SegmentId, typeof placedInputs>();
+  for (const input of placedInputs) {
+    const entries = inputsBySegment.get(input.segmentId) ?? [];
+    entries.push(input);
+    inputsBySegment.set(input.segmentId, entries);
+  }
+
+  // Render-only visual placement (persisted placement/routing/lengths/exports keep
+  // the real offset):
+  // - a lone splice is biased toward the segment center with a mild lean to the
+  //   physically closer endpoint;
+  // - multiple splices on one segment are spread evenly at i/(N+1) along the
+  //   segment, in physical order, so they no longer collide or hide the inter-
+  //   splice distance labels.
+  const placedCandidates = [...inputsBySegment.values()]
+    .flatMap((segmentInputs) => {
+      const ordered = [...segmentInputs].sort(
+        (left, right) =>
+          left.canonicalPhysicalRatio - right.canonicalPhysicalRatio ||
+          left.splice.id.localeCompare(right.splice.id),
+      );
+      const count = ordered.length;
+      return ordered.map((input, index) => {
+        const visualRatio =
+          count === 1
+            ? biasFloatingSpliceVisualRatio(input.canonicalPhysicalRatio)
+            : (index + 1) / (count + 1);
+        const anchorPosition = {
+          x: input.fromPosition.x + (input.toPosition.x - input.fromPosition.x) * visualRatio,
+          y: input.fromPosition.y + (input.toPosition.y - input.fromPosition.y) * visualRatio,
+        };
+        const tangent = normalizeVector(
+          input.toPosition.x - input.fromPosition.x,
+          input.toPosition.y - input.fromPosition.y,
+        );
+        return {
+          splice: input.splice,
+          hostNodeId: input.hostNodeId,
+          anchorPosition,
+          normal: normalizeVector(-tangent.y, tangent.x),
+          segmentId: input.segmentId,
+        };
+      });
     })
     .sort(
       (left, right) =>
