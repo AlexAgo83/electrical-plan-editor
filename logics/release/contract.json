@@ -1,0 +1,276 @@
+{
+  "schema_version": "1.0",
+  "project": {
+    "id": "electrical-plan-editor",
+    "display_name": "Electrical Plan Editor",
+    "release_profile": "discovered-local"
+  },
+  "version_sources": [
+    {
+      "path": "VERSION",
+      "format": "plain_text",
+      "required": true
+    },
+    {
+      "path": "package.json",
+      "format": "json",
+      "selector": "version",
+      "required": true
+    },
+    {
+      "path": "README.md",
+      "format": "plain_text",
+      "selector": "badge.version",
+      "required": false
+    }
+  ],
+  "changelog": {
+    "required": true,
+    "version_heading_required": true,
+    "paths": [
+      {
+        "path": "changelogs/CHANGELOGS_{version_underscore}.md",
+        "format": "markdown",
+        "required": true
+      }
+    ]
+  },
+  "operator_intents": [
+    {
+      "utterance": "prepare release",
+      "boundary": "Prepare metadata, changelog, and validation evidence only. Do not tag, push, publish, upload assets, or create a GitHub release unless explicitly requested.",
+      "publication_action": false
+    },
+    {
+      "utterance": "commit and push, fix if CI is not green",
+      "boundary": "Push first, then inspect the real remote CI run for the exact pushed commit before making fixes.",
+      "publication_action": false
+    },
+    {
+      "utterance": "publish release",
+      "boundary": "Publish only after required local and remote gates are green, then verify downstream publication or deployment evidence.",
+      "publication_action": true
+    }
+  ],
+  "missing_contract_discovery": {
+    "draft_path": {
+      "path": "logics/release/contract.draft.json",
+      "format": "json",
+      "required": false
+    },
+    "local_first": true,
+    "neighbor_projects_allowed": true,
+    "local_sources": [
+      {
+        "path": "LOGICS.md",
+        "required": false
+      },
+      {
+        "path": "README.md",
+        "required": false
+      },
+      {
+        "path": "package.json",
+        "required": false
+      },
+      {
+        "path": "pyproject.toml",
+        "required": false
+      },
+      {
+        "path": ".github/workflows/",
+        "required": false
+      },
+      {
+        "path": "changelogs/",
+        "required": false
+      },
+      {
+        "path": "VERSION",
+        "required": false
+      },
+      {
+        "path": "checksums/",
+        "required": false
+      }
+    ],
+    "assistant_rule": "Infer this draft from local repository signals first. Use neighboring projects only as comparison evidence after local surfaces have been inspected."
+  },
+  "state_machine": [
+    "planning",
+    "preparing",
+    "local_validation",
+    "commit_ready",
+    "pushed",
+    "ci_verification",
+    "github_release",
+    "external_publication",
+    "ready",
+    "blocked"
+  ],
+  "gates": [
+    {
+      "id": "version_metadata",
+      "state": "preparing",
+      "required": true,
+      "evidence_kinds": [
+        "file"
+      ]
+    },
+    {
+      "id": "changelog",
+      "state": "preparing",
+      "required": true,
+      "evidence_kinds": [
+        "file"
+      ]
+    },
+    {
+      "id": "local_validation",
+      "state": "local_validation",
+      "required": true,
+      "evidence_kinds": [
+        "command"
+      ]
+    },
+    {
+      "id": "git_push",
+      "state": "pushed",
+      "required": true,
+      "evidence_kinds": [
+        "git"
+      ]
+    },
+    {
+      "id": "ci",
+      "state": "ci_verification",
+      "required": true,
+      "evidence_kinds": [
+        "ci"
+      ]
+    },
+    {
+      "id": "github_release",
+      "state": "github_release",
+      "required": false,
+      "evidence_kinds": [
+        "github_release"
+      ]
+    },
+    {
+      "id": "npm_package",
+      "state": "external_publication",
+      "required": false,
+      "evidence_kinds": [
+        "external"
+      ]
+    },
+    {
+      "id": "production_deployment",
+      "state": "external_publication",
+      "required": true,
+      "evidence_kinds": [
+        "external"
+      ]
+    }
+  ],
+  "evidence": {
+    "store": {
+      "path": "logics/release/evidence.jsonl",
+      "format": "jsonl",
+      "required": true
+    },
+    "freshness": {
+      "match_target_version": true,
+      "match_commit_for_source_gates": true,
+      "match_tag_for_publication_gates": true
+    },
+    "required_fields": [
+      "kind",
+      "status",
+      "observed_at",
+      "target_version",
+      "commit",
+      "summary"
+    ]
+  },
+  "validation_commands": [
+    {
+      "id": "ci_blocking",
+      "command": [
+        "npm",
+        "run",
+        "ci:blocking"
+      ],
+      "required": true,
+      "evidence_kind": "command"
+    },
+    {
+      "id": "lint",
+      "command": [
+        "npm",
+        "run",
+        "lint"
+      ],
+      "required": true,
+      "evidence_kind": "command"
+    },
+    {
+      "id": "test",
+      "command": [
+        "npm",
+        "run",
+        "test"
+      ],
+      "required": true,
+      "evidence_kind": "command"
+    },
+    {
+      "id": "build",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "required": true,
+      "evidence_kind": "command"
+    }
+  ],
+  "git": {
+    "release_branch_policy": "main_only",
+    "allowed_branches": [
+      "main"
+    ],
+    "tag_policy": {
+      "required": false,
+      "pattern": "v{version}"
+    },
+    "require_clean_worktree": true,
+    "require_pushed_commit": true
+  },
+  "github_release": {
+    "required": false,
+    "mode": "manual",
+    "draft_allowed": false,
+    "asset_paths": []
+  },
+  "assistant_readiness": {
+    "must_inspect_status_before_claiming_ready": true,
+    "readiness_source": "project_owned_evidence",
+    "publication_requires_explicit_operator_approval": true
+  },
+  "external_publication": [
+    {
+      "id": "npm_package",
+      "kind": "package_registry",
+      "required": false,
+      "url_template": "https://www.npmjs.com/package/electrical-plan-editor/v/{version}"
+    },
+    {
+      "id": "production_deployment",
+      "kind": "deployment",
+      "required": true,
+      "description": "Verify the production deployment for the target commit and version."
+    }
+  ]
+}
