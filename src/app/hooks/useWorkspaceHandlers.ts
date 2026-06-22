@@ -338,13 +338,6 @@ export function useWorkspaceHandlers({
     })();
   }
 
-  function handleRecomputeNetwork(): void {
-    // Operates on the active network's working set; the network-scope button is
-    // only enabled when the edited network is the active one.
-    dispatchAction(appActions.recomputeAllWires());
-    setNetworkFormError(null);
-  }
-
   function handleRecreateSampleNetwork(): void {
     refreshBuiltInSampleNetworks(createSampleNetworkState, {
       activateImportedSample: isCurrentWorkspaceEmpty
@@ -494,7 +487,9 @@ export function useWorkspaceHandlers({
     handleUpdateActiveNetwork,
     handleDuplicateNetwork,
     handleDeleteNetwork,
-    handleRecomputeNetwork,
+    // Recompute operates on the active network's working set; the network-scope
+    // button is only enabled when the edited network is the active one.
+    handleRecomputeNetwork: () => dispatchAction(appActions.recomputeAllWires()),
     handleRecreateSampleNetwork,
     handleResetSampleNetwork,
     resetNetworkViewToConfiguredScale,
