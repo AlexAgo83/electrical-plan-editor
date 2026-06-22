@@ -40,6 +40,20 @@ export function handleUiActions(state: AppState, action: AppAction): AppState | 
       return clearLastError(state);
     }
 
+    case "ui/clearRecomputeReport": {
+      if (state.ui.lastRecomputeReport === undefined || state.ui.lastRecomputeReport === null) {
+        return null;
+      }
+
+      return {
+        ...state,
+        ui: {
+          ...state.ui,
+          lastRecomputeReport: null
+        }
+      };
+    }
+
     case "ui/setError": {
       if (isSameAppError(state.ui.lastError, action.payload.error)) {
         return state;

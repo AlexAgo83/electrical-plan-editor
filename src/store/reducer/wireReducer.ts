@@ -24,6 +24,7 @@ import {
   resolveDirectionalSpliceEndpointSide,
   resolveWireEndpointAnchor
 } from "./helpers/wireTransitions";
+import { buildWireRecomputeReport } from "./helpers/wireRecomputeReport";
 import { bumpRevision, clearLastError, removeEntity, shouldClearSelection, upsertEntity, withError } from "./shared";
 
 function hasDuplicateWireTechnicalId(state: AppState, wireId: string, technicalId: string): boolean {
@@ -433,6 +434,23 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         ui: shouldClearSelection(state.ui.selected, "wire", action.payload.id)
           ? { ...state.ui, selected: null, lastError: null }
           : { ...state.ui, lastError: null }
+      });
+    }
+
+    case "wire/recomputeAll": {
+      const result = buildWireRecomputeReport(state);
+      if ("error" in result) {
+        return withError(state, result.error);
+      }
+
+      return bumpRevision({
+        ...clearLastError(state),
+        wires: result.wires,
+        ui: {
+          ...state.ui,
+          lastError: null,
+          lastRecomputeReport: result.report
+        }
       });
     }
 

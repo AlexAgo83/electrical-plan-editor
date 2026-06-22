@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { appActions } from "../store";
+import { appActions, appReducer } from "../store";
 import {
   getEndpointOccupant,
   getWireEndpointOccupantRef,
@@ -14,6 +14,7 @@ import {
   recomputeAllWiresForNetwork,
   resolveDirectionalSpliceEndpointSide
 } from "../store/reducer/helpers/wireTransitions";
+import { buildWireRecomputeReport } from "../store/reducer/helpers/wireRecomputeReport";
 import {
   asConnectorId,
   asNodeId,
@@ -338,5 +339,249 @@ describe("store reducer helpers - wire transitions", () => {
     expect(branchState.byId[asWireId("W-SOLO")]?.endpointB).toMatchObject({ spliceSideOverride: "R", portIndex: 2 });
     expect(branchState.byId[asWireId("W-BUS-1")]?.endpointB).toMatchObject({ spliceSideOverride: "L", portIndex: 1 });
     expect(branchState.byId[asWireId("W-BUS-2")]?.endpointB).toMatchObject({ spliceSideOverride: "L", portIndex: 1 });
+  });
+
+  // Regression for floating directional splices placed on a vertical carrier
+  // segment (e.g. connector drop branches). The carrier endpoints share the
+  // splice x coordinate, so the side must be inferred from the vertical axis
+  // instead of collapsing every wire onto a single port.
+  const buildVerticalDirectionalState = (sideInverted: boolean) =>
+    reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C-TOP"), name: "Top", technicalId: "C-TOP", cavityCount: 1 }),
+      appActions.upsertConnector({ id: asConnectorId("C-BOT"), name: "Bottom", technicalId: "C-BOT", cavityCount: 1 }),
+      appActions.upsertNode({ id: asNodeId("N-TOP"), kind: "connector", connectorId: asConnectorId("C-TOP") }),
+      appActions.upsertNode({ id: asNodeId("N-BOT"), kind: "connector", connectorId: asConnectorId("C-BOT") }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-VERT"),
+        nodeA: asNodeId("N-TOP"),
+        nodeB: asNodeId("N-BOT"),
+        lengthMm: 200
+      }),
+      appActions.upsertSplice({
+        id: asSpliceId("S-VERT"),
+        name: "Vertical splice",
+        technicalId: "S-VERT",
+        portCount: 2,
+        portMode: "directional",
+        sideInverted,
+        placement: {
+          kind: "segmentOffset",
+          segmentId: asSegmentId("SEG-VERT"),
+          fromNodeId: asNodeId("N-TOP"),
+          offsetMm: 100
+        }
+      }),
+      appActions.setNodePositions({
+        [asNodeId("N-TOP")]: { x: 100, y: 0 },
+        [asNodeId("N-BOT")]: { x: 100, y: 200 }
+      }),
+      appActions.saveWire({
+        id: asWireId("W-UP"),
+        name: "Up wire",
+        technicalId: "W-UP",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-TOP"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-VERT"), portIndex: 1 }
+      }),
+      appActions.saveWire({
+        id: asWireId("W-DOWN"),
+        name: "Down wire",
+        technicalId: "W-DOWN",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-BOT"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-VERT"), portIndex: 1 }
+      })
+    ]);
+
+  it("splits directional splice sides by exit direction on a vertical carrier segment", () => {
+    const verticalState = buildVerticalDirectionalState(false);
+
+    // Wire exiting upward (toward the smaller-y endpoint) lands on L / port 1,
+    // wire exiting downward lands on R / port 2 — two ports, two directions.
+    expect(verticalState.wires.byId[asWireId("W-UP")]?.endpointB).toMatchObject({
+      spliceSideOverride: "L",
+      portIndex: 1
+    });
+    expect(verticalState.wires.byId[asWireId("W-DOWN")]?.endpointB).toMatchObject({
+      spliceSideOverride: "R",
+      portIndex: 2
+    });
+  });
+
+  it("mirrors vertical directional splice sides when sideInverted is set", () => {
+    const invertedState = buildVerticalDirectionalState(true);
+
+    expect(invertedState.wires.byId[asWireId("W-UP")]?.endpointB).toMatchObject({
+      spliceSideOverride: "R",
+      portIndex: 2
+    });
+    expect(invertedState.wires.byId[asWireId("W-DOWN")]?.endpointB).toMatchObject({
+      spliceSideOverride: "L",
+      portIndex: 1
+    });
+  });
+
+  it("preserves a locked directional splice side on a vertical carrier instead of recomputing it", () => {
+    const verticalState = buildVerticalDirectionalState(false);
+    const downWire = verticalState.wires.byId[asWireId("W-DOWN")];
+    if (downWire?.endpointB.kind !== "splicePort") {
+      throw new Error("Expected a splice endpoint.");
+    }
+
+    // Geometry would resolve this downward wire to R, but a locked override wins.
+    expect(
+      resolveDirectionalSpliceEndpointSide(
+        verticalState,
+        { ...downWire.endpointB, spliceSideOverride: "L", spliceSideLocked: true },
+        downWire.routeSegmentIds,
+        "B"
+      )
+    ).toBe("L");
+  });
+
+  it("keeps horizontal carrier directional splice sides driven by the x axis", () => {
+    const horizontalState = reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C-LEFT"), name: "Left", technicalId: "C-LEFT", cavityCount: 1 }),
+      appActions.upsertConnector({ id: asConnectorId("C-RIGHT"), name: "Right", technicalId: "C-RIGHT", cavityCount: 1 }),
+      appActions.upsertNode({ id: asNodeId("N-LEFT"), kind: "connector", connectorId: asConnectorId("C-LEFT") }),
+      appActions.upsertNode({ id: asNodeId("N-RIGHT"), kind: "connector", connectorId: asConnectorId("C-RIGHT") }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-HORIZ"),
+        nodeA: asNodeId("N-LEFT"),
+        nodeB: asNodeId("N-RIGHT"),
+        lengthMm: 200
+      }),
+      appActions.upsertSplice({
+        id: asSpliceId("S-HORIZ"),
+        name: "Horizontal splice",
+        technicalId: "S-HORIZ",
+        portCount: 2,
+        portMode: "directional",
+        placement: {
+          kind: "segmentOffset",
+          segmentId: asSegmentId("SEG-HORIZ"),
+          fromNodeId: asNodeId("N-LEFT"),
+          offsetMm: 100
+        }
+      }),
+      appActions.setNodePositions({
+        [asNodeId("N-LEFT")]: { x: 0, y: 100 },
+        [asNodeId("N-RIGHT")]: { x: 200, y: 100 }
+      }),
+      appActions.saveWire({
+        id: asWireId("W-LEFT"),
+        name: "Left wire",
+        technicalId: "W-LEFT",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-LEFT"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-HORIZ"), portIndex: 1 }
+      }),
+      appActions.saveWire({
+        id: asWireId("W-RIGHT"),
+        name: "Right wire",
+        technicalId: "W-RIGHT",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-RIGHT"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-HORIZ"), portIndex: 1 }
+      })
+    ]);
+
+    expect(horizontalState.wires.byId[asWireId("W-LEFT")]?.endpointB).toMatchObject({
+      spliceSideOverride: "L",
+      portIndex: 1
+    });
+    expect(horizontalState.wires.byId[asWireId("W-RIGHT")]?.endpointB).toMatchObject({
+      spliceSideOverride: "R",
+      portIndex: 2
+    });
+  });
+});
+
+describe("store reducer helpers - wire recompute report", () => {
+  const buildDirectionalVerticalState = () =>
+    reduceAll([
+      appActions.upsertConnector({ id: asConnectorId("C-TOP"), name: "Top", technicalId: "C-TOP", cavityCount: 1 }),
+      appActions.upsertConnector({ id: asConnectorId("C-BOT"), name: "Bottom", technicalId: "C-BOT", cavityCount: 1 }),
+      appActions.upsertNode({ id: asNodeId("N-TOP"), kind: "connector", connectorId: asConnectorId("C-TOP") }),
+      appActions.upsertNode({ id: asNodeId("N-BOT"), kind: "connector", connectorId: asConnectorId("C-BOT") }),
+      appActions.upsertSegment({
+        id: asSegmentId("SEG-VERT"),
+        nodeA: asNodeId("N-TOP"),
+        nodeB: asNodeId("N-BOT"),
+        lengthMm: 200
+      }),
+      appActions.upsertSplice({
+        id: asSpliceId("S-VERT"),
+        name: "Vertical splice",
+        technicalId: "S-VERT",
+        portCount: 2,
+        portMode: "directional",
+        placement: {
+          kind: "segmentOffset",
+          segmentId: asSegmentId("SEG-VERT"),
+          fromNodeId: asNodeId("N-TOP"),
+          offsetMm: 100
+        }
+      }),
+      appActions.setNodePositions({
+        [asNodeId("N-TOP")]: { x: 100, y: 0 },
+        [asNodeId("N-BOT")]: { x: 100, y: 200 }
+      }),
+      appActions.saveWire({
+        id: asWireId("W-DOWN"),
+        name: "Down wire",
+        technicalId: "W-DOWN",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-BOT"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S-VERT"), portIndex: 1 }
+      })
+    ]);
+
+  it("reports no changes when the network is already consistent", () => {
+    const state = buildDirectionalVerticalState();
+    const result = buildWireRecomputeReport(state);
+    if ("error" in result) {
+      throw new Error(`Unexpected recompute error: ${result.error}`);
+    }
+    expect(result.report).toEqual([]);
+  });
+
+  it("reports and corrects a stale directional splice side", () => {
+    const state = buildDirectionalVerticalState();
+    const downWire = state.wires.byId[asWireId("W-DOWN")];
+    if (downWire?.endpointB.kind !== "splicePort") {
+      throw new Error("Expected a splice endpoint.");
+    }
+    // The clean state resolves this downward wire to R; corrupt the stored side
+    // to L (as a stale workspace would have it) and confirm the recompute fixes it.
+    const corruptedState = {
+      ...state,
+      wires: {
+        ...state.wires,
+        byId: {
+          ...state.wires.byId,
+          [asWireId("W-DOWN")]: {
+            ...downWire,
+            endpointB: { ...downWire.endpointB, spliceSideOverride: "L" as const, portIndex: 1 }
+          }
+        }
+      }
+    };
+
+    const result = buildWireRecomputeReport(corruptedState);
+    if ("error" in result) {
+      throw new Error(`Unexpected recompute error: ${result.error}`);
+    }
+
+    expect(result.report).toHaveLength(1);
+    const entry = result.report[0];
+    expect(entry?.technicalId).toBe("W-DOWN");
+    expect(entry?.kinds).toContain("sideB");
+    expect(entry?.message).toContain("L -> R");
+
+    const corrected = result.wires.byId[asWireId("W-DOWN")];
+    expect(corrected?.endpointB).toMatchObject({ spliceSideOverride: "R", portIndex: 2 });
+  });
+
+  it("surfaces the report on ui.lastRecomputeReport via the recomputeAllWires action", () => {
+    const state = buildDirectionalVerticalState();
+    const after = appReducer(state, appActions.recomputeAllWires());
+    // A consistent network reports zero changes but still records that the run happened.
+    expect(after.ui.lastRecomputeReport).toEqual([]);
   });
 });

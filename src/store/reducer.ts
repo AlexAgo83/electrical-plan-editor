@@ -127,7 +127,8 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "wire/lockRoute":
     case "wire/resetRoute":
     case "wire/upsert":
-    case "wire/remove": {
+    case "wire/remove":
+    case "wire/recomputeAll": {
       return runScopedDomainReducer(state, action, handleWireActions);
     }
 
@@ -140,7 +141,8 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "ui/setError":
     case "ui/setThemeMode":
     case "ui/clearSelection":
-    case "ui/clearError": {
+    case "ui/clearError":
+    case "ui/clearRecomputeReport": {
       return handleUiActions(state, action) ?? state;
     }
   }

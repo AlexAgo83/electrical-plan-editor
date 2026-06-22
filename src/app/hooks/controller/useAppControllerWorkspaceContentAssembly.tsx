@@ -466,6 +466,7 @@ export function useAppControllerWorkspaceContentAssembly({
         importOverwriteDialog: domains.workspaceNetworkDomain.importOverwriteDialog,
         importFailureDialog: domains.workspaceNetworkDomain.importFailureDialog,
         handleDeleteNetwork: domains.workspaceNetworkDomain.handleDeleteNetwork,
+        handleRecomputeNetwork: domains.workspaceNetworkDomain.handleRecomputeNetwork,
         handleOpenCreateNetworkForm: domains.workspaceNetworkDomain.handleOpenCreateNetworkForm,
         handleOpenEditNetworkForm: domains.workspaceNetworkDomain.handleOpenEditNetworkForm,
         handleCloseNetworkForm: domains.workspaceNetworkDomain.handleCloseNetworkForm,

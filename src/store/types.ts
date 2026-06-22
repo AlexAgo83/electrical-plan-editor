@@ -149,6 +149,16 @@ export interface ImportRejection {
   reason: string;
 }
 
+/** One kind of change a manual full-network recompute can produce for a wire. */
+export type WireRecomputeChangeKind = "route" | "length" | "sideA" | "sideB";
+
+export interface WireRecomputeReportEntry {
+  wireId: WireId;
+  technicalId: string;
+  kinds: WireRecomputeChangeKind[];
+  message: string;
+}
+
 export interface AppState {
   schemaVersion: AppSchemaVersion;
   networks: EntityState<Network, NetworkId>;
@@ -170,6 +180,7 @@ export interface AppState {
     lastWarning?: AppError | null;
     themeMode: ThemeMode;
     lastImportRejections?: ImportRejection[] | null;
+    lastRecomputeReport?: WireRecomputeReportEntry[] | null;
   };
   meta: {
     revision: number;

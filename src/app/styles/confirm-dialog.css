@@ -78,6 +78,28 @@
   opacity: 0.78;
 }
 
+/*
+ * The feedback list can grow long (e.g. a full-network recompute report or a
+ * legacy splice-node migration report). Keep it scrollable within a bounded
+ * height so the dialog never overflows the viewport and the header/actions stay
+ * reachable. Shared by every FileFeedbackDialog usage.
+ */
+.confirm-dialog-feedback-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.3rem;
+  min-height: 0;
+  max-height: min(22rem, calc(100vh - 14rem));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  line-height: 1.35;
+}
+
+.confirm-dialog-feedback-list li {
+  overflow-wrap: anywhere;
+}
+
 .confirm-dialog-details-code {
   font-family: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.82rem;

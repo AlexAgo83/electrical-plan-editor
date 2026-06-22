@@ -10,6 +10,7 @@ import type {
   Wire
 } from "../../../../core/entities";
 import { resolveEditedConnectorLayout } from "../../../../core/connectorLayout";
+import { portIndexToSpliceSide } from "../../../../core/directionalSplice";
 import { resolveSplicePortMode } from "../../../../core/splicePortMode";
 import type { NetworkCalloutContentMode, NodePosition } from "../../../types/app-controller";
 import type { RenderedFloatingSpliceModel } from "../graph/networkSummaryGraphModel";
@@ -23,6 +24,18 @@ import {
 interface CalloutTarget {
   targetId: string;
   targetPin: string;
+}
+
+/**
+ * Port label shown in callouts for a splice endpoint. Directional splices have
+ * exactly two opposite ports, so they read as the side (L / R) the wire leaves
+ * on; bounded/unbounded splices keep their numbered port label (P1, P2, ...).
+ */
+function describeSplicePortLabel(splice: Splice | undefined, portIndex: number): string {
+  if (splice !== undefined && resolveSplicePortMode(splice) === "directional") {
+    return portIndexToSpliceSide(portIndex);
+  }
+  return `P${portIndex}`;
 }
 
 interface WireColorSwatches {
@@ -42,10 +55,11 @@ function describeWireEndpointForCallout(
       targetPin: `C${endpoint.cavityIndex}`
     };
   }
-  const spliceTechnicalId = spliceMap.get(endpoint.spliceId)?.technicalId ?? String(endpoint.spliceId);
+  const splice = spliceMap.get(endpoint.spliceId);
+  const spliceTechnicalId = splice?.technicalId ?? String(endpoint.spliceId);
   return {
     targetId: spliceTechnicalId,
-    targetPin: `P${endpoint.portIndex}`
+    targetPin: describeSplicePortLabel(splice, endpoint.portIndex)
   };
 }
 
@@ -191,7 +205,7 @@ export function buildSpliceCalloutGroupsById({
         : [...entriesByPort.keys()].sort((left, right) => left - right);
     const groups = portIndexes.map((portIndex) => ({
       key: `splice:${splice.id}:P${portIndex}`,
-      label: `P${portIndex}`,
+      label: describeSplicePortLabel(splice, portIndex),
       entries: entriesByPort.get(portIndex) ?? []
     }));
     for (const group of groups) {

@@ -48,6 +48,7 @@ interface NetworkScopeWorkspaceContentProps {
   importFileInputRef: RefObject<HTMLInputElement | null>;
   handleImportFileChange: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   handleDeleteNetwork: (networkId: NetworkId | null) => void;
+  handleRecomputeNetwork: () => void;
   networkFormMode: "create" | "edit" | null;
   handleOpenCreateNetworkForm: () => void;
   handleOpenEditNetworkForm: (networkId: NetworkId) => void;
@@ -95,6 +96,7 @@ export function NetworkScopeWorkspaceContent({
   importFileInputRef,
   handleImportFileChange,
   handleDeleteNetwork,
+  handleRecomputeNetwork,
   networkFormMode,
   handleOpenCreateNetworkForm,
   handleOpenEditNetworkForm,
@@ -678,6 +680,18 @@ export function NetworkScopeWorkspaceContent({
                 >
                   <span className="action-button-icon is-delete" aria-hidden="true" />
                   Delete
+                </button>
+              ) : null}
+              {isEditMode ? (
+                <button
+                  type="button"
+                  className="button-with-icon"
+                  title="Recompute all wire routes and splice sides for this network"
+                  onClick={handleRecomputeNetwork}
+                  disabled={focusedNetwork === null || focusedNetwork.id !== activeNetworkId}
+                >
+                  <span className="action-button-icon is-redo" aria-hidden="true" />
+                  Recompute routes
                 </button>
               ) : null}
               <button

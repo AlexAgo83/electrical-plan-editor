@@ -143,6 +143,30 @@ function resolveAlignedDirectionalBranchSide(
   return routeSegmentId === rightBranchSegmentId ? "R" : "L";
 }
 
+/**
+ * Infer the directional side (L/R) of an exit point relative to the splice.
+ *
+ * The directional splice symbol is laid out horizontally, so Left/Right is
+ * driven by the horizontal (x) offset whenever the carrier segment is not
+ * vertical. When the exit point shares the splice's x coordinate — i.e. the
+ * carrier segment is perfectly vertical — x cannot disambiguate the two branch
+ * directions, so we fall back to the vertical (y) axis (upward exits map to L,
+ * downward to R). Returns null only when the exit point coincides exactly with
+ * the splice, leaving the caller to apply its own positional fallback.
+ */
+function inferSideAlongAxis(
+  exitPosition: { x: number; y: number },
+  splicePosition: { x: number; y: number }
+): DirectionalSpliceSide | null {
+  if (exitPosition.x !== splicePosition.x) {
+    return exitPosition.x < splicePosition.x ? "L" : "R";
+  }
+  if (exitPosition.y !== splicePosition.y) {
+    return exitPosition.y < splicePosition.y ? "L" : "R";
+  }
+  return null;
+}
+
 function countConnectorNodesAroundPosition(
   state: AppState,
   splicePosition: { x: number; y: number }
@@ -247,8 +271,8 @@ export function resolveDirectionalSpliceEndpointSide(
       const exitNodeId =
         exitNodeIdHint ?? deriveFloatingExitNodeId(state, resolution, routeSegmentIds, wireSide);
       const exitPosition = exitNodeId === undefined || exitNodeId === null ? undefined : state.nodePositions[exitNodeId];
-      if (exitPosition !== undefined && exitPosition.x !== splicePosition.x) {
-        const inferredSide = exitPosition.x < splicePosition.x ? "L" : "R";
+      const inferredSide = exitPosition === undefined ? null : inferSideAlongAxis(exitPosition, splicePosition);
+      if (inferredSide !== null) {
         return splice.sideInverted === true ? swapDirectionalSpliceSide(inferredSide) : inferredSide;
       }
 
@@ -275,8 +299,11 @@ export function resolveDirectionalSpliceEndpointSide(
     const routeSegment = routeSegmentId === undefined ? undefined : state.segments.byId[routeSegmentId];
     const adjacentNodeId = routeSegment === undefined ? null : getOtherNodeId(routeSegment, spliceNodeId);
     const adjacentPosition = adjacentNodeId === null ? undefined : state.nodePositions[adjacentNodeId];
-    if (splicePosition !== undefined && adjacentPosition !== undefined && adjacentPosition.x !== splicePosition.x) {
-      const inferredSide = adjacentPosition.x < splicePosition.x ? "L" : "R";
+    const inferredSide =
+      splicePosition !== undefined && adjacentPosition !== undefined
+        ? inferSideAlongAxis(adjacentPosition, splicePosition)
+        : null;
+    if (inferredSide !== null) {
       return splice.sideInverted === true ? swapDirectionalSpliceSide(inferredSide) : inferredSide;
     }
 

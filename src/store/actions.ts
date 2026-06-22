@@ -169,13 +169,15 @@ export type AppAction =
   | { type: "wire/resetRoute"; payload: { id: WireId } }
   | { type: "wire/upsert"; payload: Wire }
   | { type: "wire/remove"; payload: { id: WireId } }
+  | { type: "wire/recomputeAll" }
   | { type: "layout/setNodePosition"; payload: { nodeId: NodeId; position: LayoutNodePosition } }
   | { type: "layout/setNodePositions"; payload: { positions: Record<NodeId, LayoutNodePosition> } }
   | { type: "ui/select"; payload: SelectionState }
   | { type: "ui/setThemeMode"; payload: { mode: ThemeMode } }
   | { type: "ui/setError"; payload: { error: AppError } }
   | { type: "ui/clearSelection" }
-  | { type: "ui/clearError" };
+  | { type: "ui/clearError" }
+  | { type: "ui/clearRecomputeReport" };
 
 function getNowIso(): string {
   return new Date().toISOString();
@@ -362,6 +364,7 @@ export const appActions = {
   resetWireRoute: (id: WireId): AppAction => ({ type: "wire/resetRoute", payload: { id } }),
   upsertWire: (payload: Wire): AppAction => ({ type: "wire/upsert", payload }),
   removeWire: (id: WireId): AppAction => ({ type: "wire/remove", payload: { id } }),
+  recomputeAllWires: (): AppAction => ({ type: "wire/recomputeAll" }),
   setNodePosition: (nodeId: NodeId, position: LayoutNodePosition): AppAction => ({
     type: "layout/setNodePosition",
     payload: { nodeId, position }
@@ -378,5 +381,6 @@ export const appActions = {
     payload: { error: normalizeAppError(error) }
   }),
   clearSelection: (): AppAction => ({ type: "ui/clearSelection" }),
-  clearError: (): AppAction => ({ type: "ui/clearError" })
+  clearError: (): AppAction => ({ type: "ui/clearError" }),
+  clearRecomputeReport: (): AppAction => ({ type: "ui/clearRecomputeReport" })
 };

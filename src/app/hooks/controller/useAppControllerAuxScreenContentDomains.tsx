@@ -39,6 +39,7 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     | "importOverwriteDialog"
     | "importFailureDialog"
     | "handleDeleteNetwork"
+    | "handleRecomputeNetwork"
     | "handleOpenCreateNetworkForm"
     | "handleOpenEditNetworkForm"
     | "handleCloseNetworkForm"
@@ -100,6 +101,7 @@ export function useAppControllerAuxScreenContentDomains({
     importOverwriteDialog: networkScope.importOverwriteDialog,
     importFailureDialog: networkScope.importFailureDialog,
     handleDeleteNetwork: networkScope.handleDeleteNetwork,
+    handleRecomputeNetwork: networkScope.handleRecomputeNetwork,
     networkFormMode: networkScope.formState.networkFormMode,
     handleOpenCreateNetworkForm: networkScope.handleOpenCreateNetworkForm,
     handleOpenEditNetworkForm: networkScope.handleOpenEditNetworkForm,

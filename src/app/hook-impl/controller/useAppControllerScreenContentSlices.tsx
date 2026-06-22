@@ -353,6 +353,7 @@ export function buildNetworkScopeScreenContentSlice(
     handleImportFileChange: params.handleImportFileChange,
     importFailureDialog: params.importFailureDialog,
     handleDeleteNetwork: params.handleDeleteNetwork,
+    handleRecomputeNetwork: params.handleRecomputeNetwork,
     networkFormMode: params.networkFormMode,
     handleOpenCreateNetworkForm: params.handleOpenCreateNetworkForm,
     handleOpenEditNetworkForm: params.handleOpenEditNetworkForm,

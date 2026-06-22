@@ -22,6 +22,7 @@ interface AppControllerOverlaysProps {
   activeBomPreview: ActiveBomPreviewState | null;
   isBomPreviewLoading: boolean;
   spliceMigrationReportDialog: FileFeedbackDialogModel | null;
+  networkRecomputeReportDialog: FileFeedbackDialogModel | null;
   closeActiveBomPreview: () => void;
   confirmActiveBomPreviewDownload: () => void;
   openBomPreviewCatalogItem: (catalogItemId: CatalogItemId) => void;
@@ -51,6 +52,7 @@ export function AppControllerOverlays({
   activeBomPreview,
   isBomPreviewLoading,
   spliceMigrationReportDialog,
+  networkRecomputeReportDialog,
   closeActiveBomPreview,
   confirmActiveBomPreviewDownload,
   openBomPreviewCatalogItem,
@@ -63,6 +65,7 @@ export function AppControllerOverlays({
     activeBomPreview === null &&
     !isBomPreviewLoading &&
     spliceMigrationReportDialog === null &&
+    networkRecomputeReportDialog === null &&
     onboarding.activeOnboardingStep === undefined
   ) {
     return null;
@@ -144,6 +147,17 @@ export function AppControllerOverlays({
           message={spliceMigrationReportDialog.message}
           items={spliceMigrationReportDialog.items}
           onClose={spliceMigrationReportDialog.onClose}
+        />
+      ) : null}
+      {networkRecomputeReportDialog !== null ? (
+        <FileFeedbackDialog
+          isOpen={networkRecomputeReportDialog !== null}
+          themeHostClassName={appShellClassName}
+          title={networkRecomputeReportDialog.title}
+          message={networkRecomputeReportDialog.message}
+          items={networkRecomputeReportDialog.items}
+          intent="neutral"
+          onClose={networkRecomputeReportDialog.onClose}
         />
       ) : null}
       {onboarding.activeOnboardingStep !== undefined ? (

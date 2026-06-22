@@ -26,5 +26,7 @@ export {
   type NetworkSummaryViewState,
   type NetworkScopedState,
   type SelectionState,
-  type ThemeMode
+  type ThemeMode,
+  type WireRecomputeChangeKind,
+  type WireRecomputeReportEntry
 } from "./types";

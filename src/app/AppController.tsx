@@ -37,6 +37,7 @@ import { useAppControllerUniquenessFlags } from "./hooks/controller/useAppContro
 import { useAppControllerRefs } from "./hooks/controller/useAppControllerRefs";
 import { useAppControllerWorkspaceRuntime } from "./hooks/controller/useAppControllerWorkspaceRuntime";
 import { useAppControllerSpliceMigrationReport } from "./hooks/controller/useAppControllerSpliceMigrationReport";
+import { useAppControllerNetworkRecomputeReport } from "./hooks/controller/useAppControllerNetworkRecomputeReport";
 import { scrollToAiAgentPanel } from "./lib/aiAgentPanelScroll";
 import {
   useAppControllerActionRefsSyncEffect,
@@ -433,6 +434,14 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     requestConfirmation,
     showSpliceMigrationReport
   });
+
+  const { networkRecomputeReportDialog } = useAppControllerNetworkRecomputeReport(
+    state.ui.lastRecomputeReport ?? null,
+    useCallback(
+      () => dispatchAction(appActions.clearRecomputeReport(), { trackHistory: false }),
+      [dispatchAction]
+    )
+  );
 
   const catalogHandlers = useCatalogHandlers({
     store,
@@ -1080,5 +1089,5 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     inspector: { isInspectorHidden, isInspectorOpen, inspectorContextPanel }
   });
-  return <><AppShellLayout {...appShellLayoutProps} /><ToastViewport toasts={toasts} onDismissToast={dismissToast} /><AppControllerOverlays appShellClassName={appShellClassName} activeConfirmDialog={activeConfirmDialog} closeActiveConfirmDialog={closeActiveConfirmDialog} activeChoiceDialog={activeChoiceDialog} closeActiveChoiceDialog={closeActiveChoiceDialog} activeBomPreview={activeBomPreview} isBomPreviewLoading={isBomPreviewLoading} spliceMigrationReportDialog={spliceMigrationReportDialog} closeActiveBomPreview={closeActiveBomPreview} confirmActiveBomPreviewDownload={confirmActiveBomPreviewDownload} openBomPreviewCatalogItem={openBomPreviewCatalogItem} openBomPreviewConnector={openBomPreviewConnector} onboarding={{ activeOnboardingStep, isOnboardingOpen, onboardingModalMode, onboardingStepDisplayIndex, onboardingTotalSteps, onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabledPersisted, closeOnboarding, handleOnboardingNext, canGoNext: canOnboardingGoNext, onboardingTargetActions }} /></>;
+  return <><AppShellLayout {...appShellLayoutProps} /><ToastViewport toasts={toasts} onDismissToast={dismissToast} /><AppControllerOverlays appShellClassName={appShellClassName} activeConfirmDialog={activeConfirmDialog} closeActiveConfirmDialog={closeActiveConfirmDialog} activeChoiceDialog={activeChoiceDialog} closeActiveChoiceDialog={closeActiveChoiceDialog} activeBomPreview={activeBomPreview} isBomPreviewLoading={isBomPreviewLoading} spliceMigrationReportDialog={spliceMigrationReportDialog} networkRecomputeReportDialog={networkRecomputeReportDialog} closeActiveBomPreview={closeActiveBomPreview} confirmActiveBomPreviewDownload={confirmActiveBomPreviewDownload} openBomPreviewCatalogItem={openBomPreviewCatalogItem} openBomPreviewConnector={openBomPreviewConnector} onboarding={{ activeOnboardingStep, isOnboardingOpen, onboardingModalMode, onboardingStepDisplayIndex, onboardingTotalSteps, onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabledPersisted, closeOnboarding, handleOnboardingNext, canGoNext: canOnboardingGoNext, onboardingTargetActions }} /></>;
 }
