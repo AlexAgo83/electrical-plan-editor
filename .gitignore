@@ -27,5 +27,8 @@ logics/.cache/workflow_graph.json
 # Generated Logics runtime artifacts
 logics/.cache/
 
+# Local release evidence bookkeeping (per-operator proof, not source)
+logics/release/evidence.jsonl
+
 AGENTS.md
 LOGICS.md
