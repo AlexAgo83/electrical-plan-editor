@@ -159,10 +159,8 @@ export function useWorkspaceHandlers({
     replaceStateWithHistory(imported);
   }
 
-  function handleCreateNetwork(event: FormEvent<HTMLFormElement>): void {
-    event.preventDefault();
-
-    const draftResult = buildNetworkFormDraft({
+  function buildCurrentNetworkFormDraft() {
+    return buildNetworkFormDraft({
       name: newNetworkName,
       technicalId: newNetworkTechnicalId,
       createdAtDate: newNetworkCreatedAtDate,
@@ -174,6 +172,12 @@ export function useWorkspaceHandlers({
       logoUrl: newNetworkLogoUrl,
       exportNotes: newNetworkExportNotes
     });
+  }
+
+  function handleCreateNetwork(event: FormEvent<HTMLFormElement>): void {
+    event.preventDefault();
+
+    const draftResult = buildCurrentNetworkFormDraft();
     if (draftResult.kind === "error") {
       setNetworkFormError(draftResult.message);
       return;
@@ -240,18 +244,7 @@ export function useWorkspaceHandlers({
       return;
     }
 
-    const draftResult = buildNetworkFormDraft({
-      name: newNetworkName,
-      technicalId: newNetworkTechnicalId,
-      createdAtDate: newNetworkCreatedAtDate,
-      description: newNetworkDescription,
-      author: newNetworkAuthor,
-      voltageV: newNetworkVoltageV,
-      projectCode: newNetworkProjectCode,
-      entityPrefix: newNetworkEntityPrefix,
-      logoUrl: newNetworkLogoUrl,
-      exportNotes: newNetworkExportNotes
-    });
+    const draftResult = buildCurrentNetworkFormDraft();
     if (draftResult.kind === "error") {
       setNetworkFormError(draftResult.message);
       return;
