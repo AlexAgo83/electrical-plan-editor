@@ -45,24 +45,46 @@ export function suggestNextTechnicalId(existingTechnicalIds: Iterable<string>, p
   }
 }
 
-export function suggestNextConnectorTechnicalId(existingTechnicalIds: Iterable<string>): string {
-  return suggestNextTechnicalId(existingTechnicalIds, "C");
+/**
+ * Anchors the network entity prefix (e.g. `LAT-`) in front of a type prefix
+ * (`C`) so prefixed networks generate IDs like `LAT-C-001` (AC12). Returns the
+ * bare type prefix when no network prefix is active.
+ */
+function withNetworkEntityPrefix(typePrefix: string, networkEntityPrefix?: string): string {
+  if (networkEntityPrefix === undefined || networkEntityPrefix.length === 0) {
+    return typePrefix;
+  }
+  const base = networkEntityPrefix.replace(/-+$/, "");
+  return base.length === 0 ? typePrefix : `${base}-${typePrefix}`;
 }
 
-export function suggestNextSpliceTechnicalId(existingTechnicalIds: Iterable<string>): string {
-  return suggestNextTechnicalId(existingTechnicalIds, "S");
+export function suggestNextConnectorTechnicalId(
+  existingTechnicalIds: Iterable<string>,
+  networkEntityPrefix?: string
+): string {
+  return suggestNextTechnicalId(existingTechnicalIds, withNetworkEntityPrefix("C", networkEntityPrefix));
 }
 
-export function suggestNextWireTechnicalId(existingTechnicalIds: Iterable<string>): string {
-  return suggestNextTechnicalId(existingTechnicalIds, "W");
+export function suggestNextSpliceTechnicalId(
+  existingTechnicalIds: Iterable<string>,
+  networkEntityPrefix?: string
+): string {
+  return suggestNextTechnicalId(existingTechnicalIds, withNetworkEntityPrefix("S", networkEntityPrefix));
 }
 
-export function suggestNextNodeId(existingNodeIds: Iterable<string>): string {
-  return suggestNextTechnicalId(existingNodeIds, "N");
+export function suggestNextWireTechnicalId(
+  existingTechnicalIds: Iterable<string>,
+  networkEntityPrefix?: string
+): string {
+  return suggestNextTechnicalId(existingTechnicalIds, withNetworkEntityPrefix("W", networkEntityPrefix));
 }
 
-export function suggestNextSegmentId(existingSegmentIds: Iterable<string>): string {
-  return suggestNextTechnicalId(existingSegmentIds, "SEG");
+export function suggestNextNodeId(existingNodeIds: Iterable<string>, networkEntityPrefix?: string): string {
+  return suggestNextTechnicalId(existingNodeIds, withNetworkEntityPrefix("N", networkEntityPrefix));
+}
+
+export function suggestNextSegmentId(existingSegmentIds: Iterable<string>, networkEntityPrefix?: string): string {
+  return suggestNextTechnicalId(existingSegmentIds, withNetworkEntityPrefix("SEG", networkEntityPrefix));
 }
 
 function sanitizeNodeIdToken(value: string): string {

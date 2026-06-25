@@ -126,6 +126,10 @@ interface SettingsWorkspaceContentProps {
   setCanvasGlobalRenderScalePercent: (value: number) => void;
   canvasZoomInvariantNodeShapes: boolean;
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
+  canvasShowColocatedSpliceLinkLine: boolean;
+  setCanvasShowColocatedSpliceLinkLine: (value: boolean) => void;
+  canvasShowNetworkEntityPrefix: boolean;
+  setCanvasShowNetworkEntityPrefix: (value: boolean) => void;
   canvasNodeShapeSizePercent: number;
   setCanvasNodeShapeSizePercent: (value: number) => void;
   canvasPngExportIncludeBackground: boolean;
@@ -274,6 +278,10 @@ export function SettingsWorkspaceContent({
   setCanvasGlobalRenderScalePercent,
   canvasZoomInvariantNodeShapes,
   setCanvasZoomInvariantNodeShapes,
+  canvasShowColocatedSpliceLinkLine,
+  setCanvasShowColocatedSpliceLinkLine,
+  canvasShowNetworkEntityPrefix,
+  setCanvasShowNetworkEntityPrefix,
   canvasNodeShapeSizePercent,
   setCanvasNodeShapeSizePercent,
   canvasPngExportIncludeBackground,
@@ -1136,6 +1144,22 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setCanvasZoomInvariantNodeShapes(event.target.checked)}
             />
             {renderSettingLabel("Keep connector/splice/node shape size constant while zooming")}
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasShowColocatedSpliceLinkLine}
+              onChange={(event) => setCanvasShowColocatedSpliceLinkLine(event.target.checked)}
+            />
+            {renderSettingLabel("Show colocated splice link line")}
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasShowNetworkEntityPrefix}
+              onChange={(event) => setCanvasShowNetworkEntityPrefix(event.target.checked)}
+            />
+            {renderSettingLabel("Show network entity ID prefix")}
           </label>
           <label className="settings-field settings-range-field">
             {renderSettingLabel("Node shape target size (%)")}

@@ -108,6 +108,12 @@ export interface RenderedFloatingSpliceModel {
   nodeLabel: string;
   hostNodeId: NodeId;
   isSubNetworkDeemphasized: boolean;
+  /**
+   * True when this splice shares its physical placement point with one or more
+   * other splices and was offset orthogonally to the carrier segment for
+   * legibility. Drives the optional colocated-splice link line.
+   */
+  isColocated: boolean;
 }
 
 interface BuildRenderedSegmentsParams {
@@ -838,6 +844,8 @@ interface BuildRenderedNodesParams {
   connectorCalloutGroupsById: ReadonlyMap<ConnectorId, CalloutGroup[]>;
   selectedWireId: WireId | null;
   spliceMap: ReadonlyMap<SpliceId, Splice>;
+  /** Display-only formatter for entity IDs (e.g. network prefix hiding). */
+  formatEntityId?: (id: string) => string;
 }
 
 interface BuildRenderedFloatingSplicesParams {
@@ -849,10 +857,42 @@ interface BuildRenderedFloatingSplicesParams {
   isSubNetworkFilteringActive: boolean;
   activeSubNetworkTagSet: ReadonlySet<string>;
   selectedSpliceId: SpliceId | null;
+  /** Display-only formatter for entity IDs (e.g. network prefix hiding). */
+  formatEntityId?: (id: string) => string;
 }
 
 const FLOATING_SPLICE_RENDER_CLEARANCE = 24;
 const FLOATING_SPLICE_RENDER_STEP = 18;
+
+/**
+ * Two placements describe the same physical point when their canonical
+ * along-segment ratios (measured from `nodeA`) match within this tolerance. This
+ * also catches placements expressed from opposite segment nodes (AC6), because
+ * the reverse ratio `1 - r` normalizes back to the same canonical ratio.
+ */
+const COLOCATION_RATIO_TOLERANCE = 1e-6;
+
+/**
+ * Orthogonal spacing (model units) between colocated splice symbols, derived from
+ * the rendered splice diamond size so the symbols never overlap (AC14). The
+ * diamond is a square rotated 45°, so its bounding half-extent along an axis is
+ * ~`size * √2 / 2`; spacing of one full diagonal plus a small gap keeps adjacent
+ * symbols clear.
+ */
+export const COLOCATED_SPLICE_OFFSET_STEP = Math.round(SPLICE_DIAMOND_SIZE * Math.SQRT2) + 6;
+
+/**
+ * Render-only symmetric offset units for a colocated group, centered on the true
+ * placement point: a pair lands at `[-0.5, 0.5]` (one on each side), a triple at
+ * `[-1, 0, 1]`, and so on. Deterministic spacing that avoids overlap (AC3).
+ */
+export function computeColocatedSpliceOffsetUnits(count: number): number[] {
+  if (count <= 0) {
+    return [];
+  }
+  const center = (count - 1) / 2;
+  return Array.from({ length: count }, (_value, index) => index - center);
+}
 
 /**
  * Render-only visual placement tuning for floating splices. The physical
@@ -914,29 +954,6 @@ function normalizeVector(x: number, y: number): NodePosition {
   return { x: x / length, y: y / length };
 }
 
-function buildFanSteps(count: number): number[] {
-  if (count <= 1) {
-    return [0];
-  }
-  const steps: number[] = [];
-  if (count % 2 === 1) {
-    const radius = (count - 1) / 2;
-    for (let index = -radius; index <= radius; index += 1) {
-      steps.push(index);
-    }
-    return steps;
-  }
-
-  const radius = count / 2;
-  for (let index = -radius; index <= radius; index += 1) {
-    if (index === 0) {
-      continue;
-    }
-    steps.push(index);
-  }
-  return steps;
-}
-
 function isTooClose(
   position: NodePosition,
   obstacles: readonly NodePosition[],
@@ -959,6 +976,7 @@ export function buildRenderedFloatingSplices({
   isSubNetworkFilteringActive,
   activeSubNetworkTagSet,
   selectedSpliceId,
+  formatEntityId = (id) => id,
 }: BuildRenderedFloatingSplicesParams): RenderedFloatingSpliceModel[] {
   const segmentById = new Map(segments.map((segment) => [segment.id, segment] as const));
   const spliceNodeIds = new Set(
@@ -1016,33 +1034,69 @@ export function buildRenderedFloatingSplices({
   // - multiple splices on one segment are spread evenly at i/(N+1) along the
   //   segment, in physical order, so they no longer collide or hide the inter-
   //   splice distance labels.
-  const placedCandidates = [...inputsBySegment.values()]
+  interface PlacedColocationCandidate {
+    splice: Splice;
+    hostNodeId: NodeId;
+    anchorPosition: NodePosition;
+    normal: NodePosition;
+    segmentId: SegmentId;
+    colocationSize: number;
+    colocationIndex: number;
+  }
+
+  const placedCandidates: PlacedColocationCandidate[] = [...inputsBySegment.values()]
     .flatMap((segmentInputs) => {
       const ordered = [...segmentInputs].sort(
         (left, right) =>
           left.canonicalPhysicalRatio - right.canonicalPhysicalRatio ||
           left.splice.id.localeCompare(right.splice.id),
       );
+      // Cluster splices that share the same physical point on the segment into
+      // colocation groups. Reverse-from-node placements normalize to the same
+      // canonical ratio (AC6), so they cluster together here.
+      const groups: (typeof ordered)[] = [];
+      for (const input of ordered) {
+        const lastGroup = groups[groups.length - 1];
+        if (
+          lastGroup !== undefined &&
+          Math.abs(lastGroup[0]!.canonicalPhysicalRatio - input.canonicalPhysicalRatio) <=
+            COLOCATION_RATIO_TOLERANCE
+        ) {
+          lastGroup.push(input);
+        } else {
+          groups.push([input]);
+        }
+      }
+      // Distinct colocation points spread evenly along the segment (i/(N+1)); a
+      // colocated group occupies a single along-segment slot at the true point.
       const visualRatios = computeFloatingSpliceVisualRatios(
-        ordered.map((input) => input.canonicalPhysicalRatio),
+        groups.map((group) => group[0]!.canonicalPhysicalRatio),
       );
-      return ordered.map((input, index) => {
-        const visualRatio = visualRatios[index] ?? FLOATING_SPLICE_VISUAL_CENTER_RATIO;
+      return groups.flatMap((group, groupIndex) => {
+        const visualRatio = visualRatios[groupIndex] ?? FLOATING_SPLICE_VISUAL_CENTER_RATIO;
+        const reference = group[0]!;
         const anchorPosition = {
-          x: input.fromPosition.x + (input.toPosition.x - input.fromPosition.x) * visualRatio,
-          y: input.fromPosition.y + (input.toPosition.y - input.fromPosition.y) * visualRatio,
+          x: reference.fromPosition.x + (reference.toPosition.x - reference.fromPosition.x) * visualRatio,
+          y: reference.fromPosition.y + (reference.toPosition.y - reference.fromPosition.y) * visualRatio,
         };
         const tangent = normalizeVector(
-          input.toPosition.x - input.fromPosition.x,
-          input.toPosition.y - input.fromPosition.y,
+          reference.toPosition.x - reference.fromPosition.x,
+          reference.toPosition.y - reference.fromPosition.y,
         );
-        return {
+        const normal = normalizeVector(-tangent.y, tangent.x);
+        // Deterministic ordering within the colocated group by splice id.
+        const orderedGroup = [...group].sort((left, right) =>
+          left.splice.id.localeCompare(right.splice.id),
+        );
+        return orderedGroup.map((input, indexInGroup) => ({
           splice: input.splice,
           hostNodeId: input.hostNodeId,
           anchorPosition,
-          normal: normalizeVector(-tangent.y, tangent.x),
+          normal,
           segmentId: input.segmentId,
-        };
+          colocationSize: orderedGroup.length,
+          colocationIndex: indexInGroup,
+        }));
       });
     })
     .sort(
@@ -1052,93 +1106,73 @@ export function buildRenderedFloatingSplices({
         left.splice.id.localeCompare(right.splice.id),
     );
 
-  const groupEntriesByAnchorKey = new Map<string, typeof placedCandidates>();
-  for (const candidate of placedCandidates) {
-    const key = `${candidate.anchorPosition.x.toFixed(3)}:${candidate.anchorPosition.y.toFixed(3)}`;
-    const entries = groupEntriesByAnchorKey.get(key) ?? [];
-    entries.push(candidate);
-    groupEntriesByAnchorKey.set(key, entries);
-  }
-
   const nodeObstacles = Object.values(networkNodePositions);
   const renderedPositions: NodePosition[] = [];
   const result: RenderedFloatingSpliceModel[] = [];
 
-  for (const [anchorKey, groupEntries] of groupEntriesByAnchorKey) {
-    void anchorKey;
-    const fanSteps = buildFanSteps(groupEntries.length);
-    for (let index = 0; index < groupEntries.length; index += 1) {
-      const entry = groupEntries[index]!;
-      const segmentTag =
-        segmentSubNetworkTagById.get(entry.segmentId) ?? "(default)";
-      const isSubNetworkDeemphasized =
-        isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentTag);
-      const nodeClassName = `network-node splice${
-        selectedSpliceId === entry.splice.id ? " is-selected" : ""
-      }${isSubNetworkDeemphasized ? " is-deemphasized" : ""} network-floating-splice`;
-      const preferredStep = fanSteps[index] ?? 0;
+  for (const entry of placedCandidates) {
+    const segmentTag = segmentSubNetworkTagById.get(entry.segmentId) ?? "(default)";
+    const isSubNetworkDeemphasized =
+      isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentTag);
+    const isColocated = entry.colocationSize > 1;
+    const nodeClassName = `network-node splice${
+      selectedSpliceId === entry.splice.id ? " is-selected" : ""
+    }${isSubNetworkDeemphasized ? " is-deemphasized" : ""} network-floating-splice${
+      isColocated ? " is-colocated" : ""
+    }`;
+
+    let displayPosition: NodePosition;
+    if (isColocated) {
+      // Symmetric orthogonal offset around the true placement point, spacing
+      // derived from the symbol size so the markers never overlap (AC1-AC3,
+      // AC14). The persisted placement is untouched; only the drawn position
+      // moves along the carrier-segment normal.
+      const offsetUnits =
+        computeColocatedSpliceOffsetUnits(entry.colocationSize)[entry.colocationIndex] ?? 0;
+      displayPosition = {
+        x: entry.anchorPosition.x + entry.normal.x * offsetUnits * COLOCATED_SPLICE_OFFSET_STEP,
+        y: entry.anchorPosition.y + entry.normal.y * offsetUnits * COLOCATED_SPLICE_OFFSET_STEP,
+      };
+    } else {
+      // Lone splice: keep it at its along-segment anchor, nudging clear of node
+      // icons and previously placed markers along the segment normal.
       const nodeOverlap = isTooClose(
         entry.anchorPosition,
         nodeObstacles,
         FLOATING_SPLICE_RENDER_CLEARANCE,
       );
-      const fallbackSign =
-        preferredStep === 0
-          ? 1
-          : preferredStep < 0
-            ? -1
-            : 1;
-      const stepCandidates =
-        preferredStep === 0
-          ? [0, fallbackSign, -fallbackSign, 2 * fallbackSign, -2 * fallbackSign, 3 * fallbackSign]
-          : [
-              preferredStep,
-              preferredStep + fallbackSign,
-              preferredStep - fallbackSign,
-              preferredStep + 2 * fallbackSign,
-              preferredStep - 2 * fallbackSign,
-            ];
-
-      let displayPosition = entry.anchorPosition;
+      displayPosition = entry.anchorPosition;
+      const stepCandidates = [0, 1, -1, 2, -2, 3, -3];
       for (const candidateStep of stepCandidates) {
-        if (candidateStep === 0 && (nodeOverlap || groupEntries.length > 1)) {
+        if (candidateStep === 0 && nodeOverlap) {
           continue;
         }
         const candidatePosition =
           candidateStep === 0
             ? entry.anchorPosition
             : {
-                x:
-                  entry.anchorPosition.x +
-                  entry.normal.x * candidateStep * FLOATING_SPLICE_RENDER_STEP,
-                y:
-                  entry.anchorPosition.y +
-                  entry.normal.y * candidateStep * FLOATING_SPLICE_RENDER_STEP,
+                x: entry.anchorPosition.x + entry.normal.x * candidateStep * FLOATING_SPLICE_RENDER_STEP,
+                y: entry.anchorPosition.y + entry.normal.y * candidateStep * FLOATING_SPLICE_RENDER_STEP,
               };
-        if (
-          isTooClose(
-            candidatePosition,
-            renderedPositions,
-            FLOATING_SPLICE_RENDER_CLEARANCE,
-          )
-        ) {
+        if (isTooClose(candidatePosition, renderedPositions, FLOATING_SPLICE_RENDER_CLEARANCE)) {
           continue;
         }
         displayPosition = candidatePosition;
         break;
       }
-
-      renderedPositions.push(displayPosition);
-      result.push({
-        splice: entry.splice,
-        position: displayPosition,
-        anchorPosition: entry.anchorPosition,
-        nodeClassName,
-        nodeLabel: entry.splice.technicalId,
-        hostNodeId: entry.hostNodeId,
-        isSubNetworkDeemphasized,
-      });
     }
+
+    renderedPositions.push(displayPosition);
+    result.push({
+      splice: entry.splice,
+      position: displayPosition,
+      anchorPosition: entry.anchorPosition,
+      nodeClassName,
+      nodeLabel: formatEntityId(entry.splice.technicalId),
+      hostNodeId: entry.hostNodeId,
+      isSubNetworkDeemphasized,
+      isColocated,
+    });
   }
 
   return result;
@@ -1168,7 +1202,8 @@ export function buildRenderedNodes({
   connectorDrawingDisplayMode,
   connectorCalloutGroupsById,
   selectedWireId,
-  spliceMap
+  spliceMap,
+  formatEntityId = (id) => id
 }: BuildRenderedNodesParams): RenderedNodeModel[] {
   const result: RenderedNodeModel[] = [];
   const catalogItemById = new Map(catalogItems.map((item) => [item.id, item] as const));
@@ -1190,14 +1225,15 @@ export function buildRenderedNodes({
     const nodeClassName = `network-node ${nodeKindClass}${isSelectedNode ? " is-selected" : ""}${
       isSubNetworkDeemphasized ? " is-deemphasized" : ""
     }`;
-    const nodeLabel =
+    const nodeLabel = formatEntityId(
       node.kind === "intermediate"
         ? node.id
         : node.kind === "connectorBackshellHelper"
           ? resolveBackshellHelperNodeReference(node, connectorMap)
         : node.kind === "connector"
           ? (connectorMap.get(node.connectorId)?.technicalId ?? node.connectorId)
-          : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId);
+          : (spliceMap.get(node.spliceId)?.technicalId ?? node.spliceId)
+    );
     const connector = node.kind === "connector" ? connectorMap.get(node.connectorId) : undefined;
     const connectorLayout =
       connectorDrawingDisplayMode === "nodes" && connector !== undefined

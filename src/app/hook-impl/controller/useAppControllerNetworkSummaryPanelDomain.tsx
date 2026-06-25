@@ -143,6 +143,8 @@ interface UseAppControllerNetworkSummaryPanelDomainParams {
     | "canvasExportIncludeCartouche"
     | "setCanvasExportIncludeCartouche"
     | "canvasPngExportIncludeBackground"
+    | "canvasShowColocatedSpliceLinkLine"
+    | "canvasShowNetworkEntityPrefix"
     | "showFloatingInspectorPanel"
     | "setShowFloatingInspectorPanel"
     | "showRoutePreviewPanel"
@@ -409,6 +411,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
         setShowSegmentDressings: canvasDisplayState.setShowSegmentDressings,
         showCableCallouts: canvasDisplayState.showCableCallouts,
         setShowCableCallouts: canvasDisplayState.setShowCableCallouts,
+        showColocatedSpliceLinkLine: preferencesState.canvasShowColocatedSpliceLinkLine,
+        showNetworkEntityPrefix: preferencesState.canvasShowNetworkEntityPrefix,
         networkCalloutContentMode: canvasDisplayState.networkCalloutContentMode,
         showSelectedCalloutOnly: canvasDisplayState.showSelectedCalloutOnly,
         networkLabelStrokeMode: canvasDisplayState.networkLabelStrokeMode,

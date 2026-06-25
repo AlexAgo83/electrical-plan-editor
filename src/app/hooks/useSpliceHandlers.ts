@@ -7,7 +7,7 @@ import {
   resolveSplicePortMode,
   type SplicePortMode
 } from "../../core/splicePortMode";
-import { appActions } from "../../store";
+import { appActions, selectActiveNetwork } from "../../store";
 import { analyzeSpliceDeleteImpact } from "../../store/deleteImpact";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestNextSpliceTechnicalId } from "../lib/technical-id-suggestions";
@@ -134,7 +134,12 @@ export function useSpliceHandlers({
     setSpliceEditAfterCreate(false);
     setEditingSpliceId(null);
     setSpliceName("");
-    setSpliceTechnicalId(suggestNextSpliceTechnicalId(Object.values(state.splices.byId).map((splice) => splice.technicalId)));
+    setSpliceTechnicalId(
+      suggestNextSpliceTechnicalId(
+        Object.values(state.splices.byId).map((splice) => splice.technicalId),
+        selectActiveNetwork(state)?.entityPrefix
+      )
+    );
     setSpliceCatalogItemId("");
     setSplicePortMode(DEFAULT_NEW_SPLICE_PORT_MODE);
     setSpliceSideInverted(false);

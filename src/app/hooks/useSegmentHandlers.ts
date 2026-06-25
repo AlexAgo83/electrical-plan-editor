@@ -1,7 +1,7 @@
 import type { FormEvent } from "react";
 import type { MountingLabel, NodeId, Segment, SegmentId } from "../../core/entities";
 import type { AppStore } from "../../store";
-import { appActions, getAppErrorMessage } from "../../store";
+import { appActions, getAppErrorMessage, selectActiveNetwork } from "../../store";
 import { analyzeSegmentDeleteImpact } from "../../store/deleteImpact";
 import { focusSelectedTableRowInPanel, toPositiveNumber } from "../lib/app-utils-shared";
 import { suggestNextSegmentId } from "../lib/technical-id-suggestions";
@@ -128,7 +128,7 @@ export function useSegmentHandlers({
     setSegmentFormMode("create");
     setSegmentEditAfterCreate(false);
     setEditingSegmentId(null);
-    setSegmentIdInput(suggestNextSegmentId(nextState.segments.allIds));
+    setSegmentIdInput(suggestNextSegmentId(nextState.segments.allIds, selectActiveNetwork(nextState)?.entityPrefix));
     setSegmentNodeA("");
     setSegmentNodeB("");
     setSegmentLengthMm("120");

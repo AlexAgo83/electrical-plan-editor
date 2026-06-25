@@ -214,7 +214,8 @@ export function buildWireListSheet(
   connectors: Connector[],
   splices: Splice[],
   catalogItems: CatalogItem[],
-  exportLengthPreferences: WireExportLengthPreferences = {}
+  exportLengthPreferences: WireExportLengthPreferences = {},
+  formatEntityId: (id: string) => string = (id) => id
 ): TabularWorksheetExport {
   const connectorById = new Map(connectors.map((c) => [c.id, c]));
   const spliceById = new Map(splices.map((s) => [s.id, s]));
@@ -254,20 +255,20 @@ export function buildWireListSheet(
     const beginMaterials = resolveWireExportEndpointMaterials(wire, "A", connectorById, spliceById, catalogItemById);
     const endMaterials = resolveWireExportEndpointMaterials(wire, "B", connectorById, spliceById, catalogItemById);
     return [
-      wire.technicalId,
+      formatEntityId(wire.technicalId),
       wire.name,
       wire.twistGroupLabel ?? "",
       wire.sectionMm2,
       resolveColor(wire),
       begin.type,
-      begin.ref,
+      formatEntityId(begin.ref),
       begin.position,
       beginMaterials.connectionRef,
       beginMaterials.connectionName,
       beginMaterials.sealRef,
       beginMaterials.sealName,
       end.type,
-      end.ref,
+      formatEntityId(end.ref),
       end.position,
       endMaterials.connectionRef,
       endMaterials.connectionName,

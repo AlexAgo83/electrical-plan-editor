@@ -29,4 +29,17 @@ describe("technical ID suggestions", () => {
     expect(suggestAutoConnectorNodeId("C-001", ["N-CONN-C-001"])).toBe("N-CONN-C-001-2");
     expect(suggestAutoSpliceNodeId("S 001", ["N-SPLICE-S-001"])).toBe("N-SPLICE-S-001-2");
   });
+
+  it("anchors the network entity prefix into new IDs (AC12)", () => {
+    expect(suggestNextConnectorTechnicalId([], "LAT-")).toBe("LAT-C-001");
+    expect(suggestNextSpliceTechnicalId(["LAT-S-001"], "LAT-")).toBe("LAT-S-002");
+    expect(suggestNextWireTechnicalId([], "LAT-")).toBe("LAT-W-001");
+    expect(suggestNextNodeId([], "LAT-")).toBe("LAT-N-001");
+    expect(suggestNextSegmentId([], "LAT-")).toBe("LAT-SEG-001");
+  });
+
+  it("continues numbering from prefixed IDs and tolerates a missing trailing separator", () => {
+    expect(suggestNextConnectorTechnicalId(["LAT-C-001", "LAT-C-002", "C-005"], "LAT-")).toBe("LAT-C-003");
+    expect(suggestNextConnectorTechnicalId([], "LAT")).toBe("LAT-C-001");
+  });
 });

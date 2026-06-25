@@ -14,7 +14,7 @@ import {
   normalizeWireColorState
 } from "../../core/cableColors";
 import type { AppStore } from "../../store";
-import { appActions } from "../../store";
+import { appActions, selectActiveNetwork } from "../../store";
 import { DEFAULT_WIRE_SECTION_MM2 } from "../../core/wireSection";
 import { normalizeWireCurrentA, resolveWireMaterial } from "../../core/wireSizing";
 import { createEntityId, focusSelectedTableRowInPanel, toPositiveInteger } from "../lib/app-utils-shared";
@@ -378,7 +378,12 @@ export function useWireHandlers({
     setWireEditAfterCreate(false);
     setEditingWireId(null);
     setWireName("");
-    setWireTechnicalId(suggestNextWireTechnicalId(Object.values(state.wires.byId).map((wire) => wire.technicalId)));
+    setWireTechnicalId(
+      suggestNextWireTechnicalId(
+        Object.values(state.wires.byId).map((wire) => wire.technicalId),
+        selectActiveNetwork(state)?.entityPrefix
+      )
+    );
     setWireTwistGroupLabel("");
     setWireFunctionalDomainTag("");
     setWireSectionMm2(String(effectiveDefaultWireSectionMm2));

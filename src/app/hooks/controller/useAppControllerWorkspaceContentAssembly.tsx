@@ -351,6 +351,8 @@ export function useAppControllerWorkspaceContentAssembly({
       canvasGlobalRenderScalePercent: models.preferencesState.canvasGlobalRenderScalePercent,
       setCanvasGlobalRenderScalePercent: models.preferencesState.setCanvasGlobalRenderScalePercent,
       canvasZoomInvariantNodeShapes: models.preferencesState.canvasZoomInvariantNodeShapes,
+      canvasShowColocatedSpliceLinkLine: models.preferencesState.canvasShowColocatedSpliceLinkLine,
+      canvasShowNetworkEntityPrefix: models.preferencesState.canvasShowNetworkEntityPrefix,
       canvasNodeShapeSizePercent: models.preferencesState.canvasNodeShapeSizePercent,
       canvasResizeBehaviorMode: models.preferencesState.canvasResizeBehaviorMode,
       themeMode: models.preferencesState.themeMode,

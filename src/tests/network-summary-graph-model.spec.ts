@@ -5,6 +5,8 @@ import {
   buildRenderedFloatingSplices,
   buildRenderedNodes,
   buildRenderedSegments,
+  COLOCATED_SPLICE_OFFSET_STEP,
+  computeColocatedSpliceOffsetUnits,
   FLOATING_SPLICE_VISUAL_MAX_RATIO,
   FLOATING_SPLICE_VISUAL_MIN_RATIO
 } from "../app/components/network-summary/graph/networkSummaryGraphModel";
@@ -892,6 +894,113 @@ describe("buildRenderedFloatingSplices", () => {
     // SP-1 (offset 10) is closer to nodeA -> 1/3; SP-0 (offset 90) -> 2/3.
     expect(byTechnicalId.get("SP-1")?.anchorPosition.x).toBeCloseTo(100 / 3);
     expect(byTechnicalId.get("SP-0")?.anchorPosition.x).toBeCloseTo(200 / 3);
+  });
+});
+
+describe("computeColocatedSpliceOffsetUnits", () => {
+  it("centers a pair on either side of the true point", () => {
+    expect(computeColocatedSpliceOffsetUnits(2)).toEqual([-0.5, 0.5]);
+  });
+
+  it("uses a deterministic symmetric spread for larger groups", () => {
+    expect(computeColocatedSpliceOffsetUnits(3)).toEqual([-1, 0, 1]);
+    expect(computeColocatedSpliceOffsetUnits(4)).toEqual([-1.5, -0.5, 0.5, 1.5]);
+  });
+});
+
+describe("buildRenderedFloatingSplices colocated layout", () => {
+  const segment: Segment = {
+    id: asSegmentId("SEG-1"),
+    nodeA: asNodeId("N-A"),
+    nodeB: asNodeId("N-B"),
+    lengthMm: 100,
+  };
+
+  function renderColocated(
+    placements: Array<{ id: string; fromNodeId: NodeId; offsetMm: number }>,
+  ) {
+    return buildRenderedFloatingSplices({
+      splices: placements.map((placement) => ({
+        id: asSpliceId(placement.id),
+        name: placement.id,
+        technicalId: placement.id,
+        portCount: 2,
+        placement: {
+          kind: "segmentOffset" as const,
+          segmentId: segment.id,
+          fromNodeId: placement.fromNodeId,
+          offsetMm: placement.offsetMm,
+        },
+      })),
+      nodes: [],
+      segments: [segment],
+      networkNodePositions: {
+        [segment.nodeA]: { x: 0, y: 0 },
+        [segment.nodeB]: { x: 100, y: 0 },
+      },
+      segmentSubNetworkTagById: new Map([[segment.id, "(default)"]]),
+      isSubNetworkFilteringActive: false,
+      activeSubNetworkTagSet: new Set(["(default)"]),
+      selectedSpliceId: null,
+    });
+  }
+
+  it("offsets two colocated splices symmetrically across the segment (AC1-AC3)", () => {
+    const rendered = renderColocated([
+      { id: "SP-A", fromNodeId: segment.nodeA, offsetMm: 40 },
+      { id: "SP-B", fromNodeId: segment.nodeA, offsetMm: 40 },
+    ]);
+    expect(rendered).toHaveLength(2);
+    const byId = new Map(rendered.map((model) => [model.splice.technicalId, model]));
+    const a = byId.get("SP-A")!;
+    const b = byId.get("SP-B")!;
+    // Both share the same along-segment anchor (the true placement point).
+    expect(a.anchorPosition).toEqual(b.anchorPosition);
+    expect(a.isColocated).toBe(true);
+    expect(b.isColocated).toBe(true);
+    // Separation is orthogonal to the horizontal segment (i.e. purely vertical).
+    expect(a.position.x).toBeCloseTo(a.anchorPosition.x);
+    expect(b.position.x).toBeCloseTo(b.anchorPosition.x);
+    expect(a.position.y).toBeCloseTo(-b.position.y);
+    expect(a.position.y).not.toBeCloseTo(b.position.y);
+    // Spacing derived from the symbol size keeps the symbols clear (AC14).
+    expect(Math.abs(a.position.y - b.position.y)).toBeCloseTo(COLOCATED_SPLICE_OFFSET_STEP);
+    // Persisted placement is unchanged (AC5).
+    expect(a.splice.placement).toMatchObject({ offsetMm: 40 });
+  });
+
+  it("treats opposite from-node placements at the same point as colocated (AC6)", () => {
+    const rendered = renderColocated([
+      { id: "SP-A", fromNodeId: segment.nodeA, offsetMm: 30 },
+      { id: "SP-B", fromNodeId: segment.nodeB, offsetMm: 70 },
+    ]);
+    expect(rendered).toHaveLength(2);
+    expect(rendered.every((model) => model.isColocated)).toBe(true);
+    const [a, b] = rendered;
+    expect(a!.anchorPosition).toEqual(b!.anchorPosition);
+    expect(a!.position.y).toBeCloseTo(-b!.position.y);
+  });
+
+  it("keeps a lone splice un-colocated and on its anchor", () => {
+    const rendered = renderColocated([{ id: "SP-A", fromNodeId: segment.nodeA, offsetMm: 40 }]);
+    expect(rendered).toHaveLength(1);
+    expect(rendered[0]!.isColocated).toBe(false);
+    expect(rendered[0]!.position.y).toBeCloseTo(0);
+  });
+
+  it("spreads three colocated splices symmetrically without overlap (AC3)", () => {
+    const rendered = renderColocated([
+      { id: "SP-A", fromNodeId: segment.nodeA, offsetMm: 50 },
+      { id: "SP-B", fromNodeId: segment.nodeA, offsetMm: 50 },
+      { id: "SP-C", fromNodeId: segment.nodeA, offsetMm: 50 },
+    ]);
+    expect(rendered).toHaveLength(3);
+    const ys = rendered.map((model) => model.position.y).sort((left, right) => left - right);
+    expect(ys[1]).toBeCloseTo(0);
+    expect(ys[0]).toBeCloseTo(-COLOCATED_SPLICE_OFFSET_STEP);
+    expect(ys[2]).toBeCloseTo(COLOCATED_SPLICE_OFFSET_STEP);
+    const positionKeys = new Set(rendered.map((model) => `${model.position.x.toFixed(2)}:${model.position.y.toFixed(2)}`));
+    expect(positionKeys.size).toBe(3);
   });
 });
 

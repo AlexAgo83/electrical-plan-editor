@@ -78,6 +78,8 @@ export function useAppControllerWorkspaceHandlersDomainAssembly({
       setNewNetworkVoltageV: networkScopeFormState.setNewNetworkVoltageV,
       newNetworkProjectCode: networkScopeFormState.newNetworkProjectCode,
       setNewNetworkProjectCode: networkScopeFormState.setNewNetworkProjectCode,
+      newNetworkEntityPrefix: networkScopeFormState.newNetworkEntityPrefix,
+      setNewNetworkEntityPrefix: networkScopeFormState.setNewNetworkEntityPrefix,
       newNetworkLogoUrl: networkScopeFormState.newNetworkLogoUrl,
       setNewNetworkLogoUrl: networkScopeFormState.setNewNetworkLogoUrl,
       newNetworkExportNotes: networkScopeFormState.newNetworkExportNotes,

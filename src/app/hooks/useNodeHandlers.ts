@@ -1,7 +1,7 @@
 import type { FormEvent } from "react";
 import type { ConnectorId, NetworkNode, NodeId, SpliceId } from "../../core/entities";
 import type { AppStore } from "../../store";
-import { appActions, getAppErrorMessage } from "../../store";
+import { appActions, getAppErrorMessage, selectActiveNetwork } from "../../store";
 import { analyzeNodeDeleteImpact } from "../../store/deleteImpact";
 import { focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { suggestNextNodeId } from "../lib/technical-id-suggestions";
@@ -75,7 +75,7 @@ export function useNodeHandlers({
     setNodeFormMode("create");
     setNodeEditAfterCreate(false);
     setEditingNodeId(null);
-    setNodeIdInput(suggestNextNodeId(nextState.nodes.allIds));
+    setNodeIdInput(suggestNextNodeId(nextState.nodes.allIds, selectActiveNetwork(nextState)?.entityPrefix));
     setNodeKind("intermediate");
     setNodeConnectorId("");
     setNodeSpliceId("");

@@ -42,6 +42,8 @@ export interface NetworkSummaryPanelProps {
   showSegmentLengths: boolean;
   showSegmentDressings: boolean;
   showCableCallouts: boolean;
+  showColocatedSpliceLinkLine: boolean;
+  showNetworkEntityPrefix: boolean;
   calloutContentMode: NetworkCalloutContentMode;
   showSelectedCalloutOnly: boolean;
   showCalloutWireNames: boolean;

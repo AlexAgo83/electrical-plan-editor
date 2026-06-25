@@ -17,6 +17,7 @@ interface UseNetworkScopeFormOrchestrationParams {
   setNewNetworkAuthor: Dispatch<SetStateAction<string>>;
   setNewNetworkVoltageV: Dispatch<SetStateAction<string>>;
   setNewNetworkProjectCode: Dispatch<SetStateAction<string>>;
+  setNewNetworkEntityPrefix: Dispatch<SetStateAction<string>>;
   setNewNetworkLogoUrl: Dispatch<SetStateAction<string>>;
   setNewNetworkExportNotes: Dispatch<SetStateAction<string>>;
   setNetworkFormError: Dispatch<SetStateAction<string | null>>;
@@ -42,6 +43,7 @@ export function useNetworkScopeFormOrchestration({
   setNewNetworkAuthor,
   setNewNetworkVoltageV,
   setNewNetworkProjectCode,
+  setNewNetworkEntityPrefix,
   setNewNetworkLogoUrl,
   setNewNetworkExportNotes,
   setNetworkFormError,
@@ -66,6 +68,7 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkAuthor("");
     setNewNetworkVoltageV("");
     setNewNetworkProjectCode("");
+    setNewNetworkEntityPrefix("");
     setNewNetworkLogoUrl("");
     setNewNetworkExportNotes("");
     setNetworkFormError(null);
@@ -82,6 +85,7 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkLogoUrl,
     setNewNetworkName,
     setNewNetworkProjectCode,
+    setNewNetworkEntityPrefix,
     setNewNetworkTechnicalId
   ]);
 
@@ -101,6 +105,7 @@ export function useNetworkScopeFormOrchestration({
       setNewNetworkAuthor(targetNetwork.author ?? "");
       setNewNetworkVoltageV(targetNetwork.voltageV === undefined ? "" : String(targetNetwork.voltageV));
       setNewNetworkProjectCode(targetNetwork.projectCode ?? "");
+      setNewNetworkEntityPrefix(targetNetwork.entityPrefix ?? "");
       setNewNetworkLogoUrl(targetNetwork.logoUrl ?? "");
       setNewNetworkExportNotes(targetNetwork.exportNotes ?? "");
       setNetworkFormError(null);
@@ -118,6 +123,7 @@ export function useNetworkScopeFormOrchestration({
       setNewNetworkLogoUrl,
       setNewNetworkName,
       setNewNetworkProjectCode,
+      setNewNetworkEntityPrefix,
       setNewNetworkTechnicalId
     ]
   );
@@ -178,6 +184,7 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkAuthor(targetNetwork.author ?? "");
     setNewNetworkVoltageV(targetNetwork.voltageV === undefined ? "" : String(targetNetwork.voltageV));
     setNewNetworkProjectCode(targetNetwork.projectCode ?? "");
+    setNewNetworkEntityPrefix(targetNetwork.entityPrefix ?? "");
     setNewNetworkLogoUrl(targetNetwork.logoUrl ?? "");
     setNewNetworkExportNotes(targetNetwork.exportNotes ?? "");
   }, [
@@ -194,6 +201,7 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkLogoUrl,
     setNewNetworkName,
     setNewNetworkProjectCode,
+    setNewNetworkEntityPrefix,
     setNewNetworkTechnicalId
   ]);
 

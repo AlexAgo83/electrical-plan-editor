@@ -43,6 +43,8 @@ export interface GroupedBomPreferences {
 export interface GroupedWirePreferences {
   wireExportStrippingAllowanceMm?: number;
   wireExportTwistedPairLengthCoefficient?: number;
+  /** When false, the active network entity prefix is hidden in human-readable IDs. */
+  showNetworkEntityPrefix?: boolean;
 }
 
 export interface UseNetworkImportExportParams {

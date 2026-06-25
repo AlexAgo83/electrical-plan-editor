@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogItem, CatalogItemId, Connector, ConnectorId, Splice, SpliceId, Wire, WireId } from "../core/entities";
 import { buildWireListSheet } from "../app/lib/wireListExport";
+import { formatEntityIdForDisplay } from "../core/networkEntityPrefix";
 
 function asCatalogItemId(value: string): CatalogItemId {
   return value as CatalogItemId;
@@ -413,5 +414,40 @@ describe("buildWireListSheet", () => {
       twistedPairLengthCoefficient: 1.08
     });
     expect(customSheet.rows.map((row) => row[19])).toEqual([1050, 1130, 1130, 1050]);
+  });
+
+  it("hides the active network prefix in human-readable IDs when the formatter strips it (AC9)", () => {
+    const connectors: Connector[] = [
+      { id: asConnectorId("C1"), name: "Connector 1", technicalId: "LAT-C-1", cavityCount: 2 }
+    ];
+    const splices: Splice[] = [{ id: asSpliceId("S1"), name: "Splice 1", technicalId: "LAT-S-1", portCount: 2 }];
+    const wires: Wire[] = [
+      {
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "LAT-W-001",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 100,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
+
+    const shown = buildWireListSheet("Wires", wires, connectors, splices, []);
+    expect(shown.rows[0]?.[0]).toBe("LAT-W-001");
+    expect(shown.rows[0]?.[6]).toBe("LAT-C-1");
+    expect(shown.rows[0]?.[13]).toBe("LAT-S-1");
+
+    const hidden = buildWireListSheet("Wires", wires, connectors, splices, [], {}, (id) =>
+      formatEntityIdForDisplay(id, "LAT-", false)
+    );
+    // Wire technical ID, begin ref (connector) and end ref (splice) drop the prefix.
+    expect(hidden.rows[0]?.[0]).toBe("W-001");
+    expect(hidden.rows[0]?.[6]).toBe("C-1");
+    expect(hidden.rows[0]?.[13]).toBe("S-1");
   });
 });

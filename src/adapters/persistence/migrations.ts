@@ -10,6 +10,7 @@ import {
   normalizeNetworkLogoUrl,
   normalizeNetworkProjectCode
 } from "../../core/networkMetadata";
+import { normalizeNetworkEntityPrefix } from "../../core/networkEntityPrefix";
 import { normalizeNetworkVoltageV, normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
 import { normalizeWireEndpointReferenceName } from "../../core/wireReferences";
@@ -343,6 +344,7 @@ function normalizeNetworkEntityState(
       logoUrl:
         normalizedLogoUrl !== undefined && isNetworkLogoUrlValid(normalizedLogoUrl) ? normalizedLogoUrl : undefined,
       exportNotes: normalizeNetworkExportNotes(network.exportNotes),
+      entityPrefix: normalizeNetworkEntityPrefix(network.entityPrefix),
       createdAt: normalizedCreatedAt,
       updatedAt: normalizedUpdatedAt
     };

@@ -233,6 +233,8 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Show only selected connector/splice callout": "Afficher uniquement le cartouche connecteur/épissure sélectionné",
   "Show wire names in callout table": "Afficher les noms de fils dans le tableau des cartouches",
   "Keep connector/splice/node shape size constant while zooming": "Conserver la taille des formes connecteur/épissure/nœud pendant le zoom",
+  "Show colocated splice link line": "Afficher la ligne de liaison des épissures colocalisées",
+  "Show network entity ID prefix": "Afficher le préfixe d'identifiant réseau",
   "Node shape target size (%)": "Taille cible des formes de nœud (%)",
   "Export format": "Format d'export",
   "Include background in PNG export": "Inclure l'arrière-plan dans l'export PNG",
@@ -272,6 +274,11 @@ const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Creation date": "Date de création",
   "Author (optional)": "Auteur (optionnel)",
   "Project code (optional)": "Code projet (optionnel)",
+  "Entity ID prefix (optional)": "Préfixe d'identifiant (optionnel)",
+  "Anchored into new entity IDs (e.g. LAT-C-001). Allowed: letters, numbers, underscore, and hyphen.":
+    "Ancré dans les nouveaux identifiants (ex. LAT-C-001). Autorisé : lettres, chiffres, tiret bas et trait d'union.",
+  "Entity prefix supports letters, numbers, underscore, and hyphen only.":
+    "Le préfixe d'identifiant accepte uniquement les lettres, chiffres, tiret bas et trait d'union.",
   "Logo URL (optional)": "URL du logo (optionnel)",
   "Export notes (optional)": "Notes d'export (optionnel)",
   "Allowed: letters, numbers, spaces, and _ . / -": "Autorisé : lettres, chiffres, espaces, et _ . / -",

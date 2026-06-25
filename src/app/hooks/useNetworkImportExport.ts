@@ -1,6 +1,7 @@
 import { type ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { consumeLastSpliceMigrationReport } from "../../adapters/persistence";
 import { type Network, type NetworkId } from "../../core/entities";
+import { formatEntityIdForDisplay } from "../../core/networkEntityPrefix";
 import { buildNetworkSummaryBomWorkbookSheets } from "../lib/networkSummaryBomCsv";
 import { buildWireListSheet } from "../lib/wireListExport";
 import { downloadTabularWorkbookFile } from "../lib/tabularExport";
@@ -391,7 +392,13 @@ export function useNetworkImportExport({
             connectors,
             splices,
             catalogItems,
-            toWireExportLengthPreferences(groupedWirePreferences)
+            toWireExportLengthPreferences(groupedWirePreferences),
+            (id) =>
+              formatEntityIdForDisplay(
+                id,
+                network.entityPrefix,
+                groupedWirePreferences?.showNetworkEntityPrefix ?? true
+              )
           )
         );
       }
@@ -461,7 +468,13 @@ export function useNetworkImportExport({
             connectors,
             splices,
             catalogItems,
-            toWireExportLengthPreferences(groupedWirePreferences)
+            toWireExportLengthPreferences(groupedWirePreferences),
+            (id) =>
+              formatEntityIdForDisplay(
+                id,
+                network.entityPrefix,
+                groupedWirePreferences?.showNetworkEntityPrefix ?? true
+              )
           )
         );
       }

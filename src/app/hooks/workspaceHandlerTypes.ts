@@ -43,6 +43,8 @@ export interface UseWorkspaceHandlersParams {
   setNewNetworkVoltageV: (value: string) => void;
   newNetworkProjectCode: string;
   setNewNetworkProjectCode: (value: string) => void;
+  newNetworkEntityPrefix: string;
+  setNewNetworkEntityPrefix: (value: string) => void;
   newNetworkLogoUrl: string;
   setNewNetworkLogoUrl: (value: string) => void;
   newNetworkExportNotes: string;

@@ -56,6 +56,7 @@ interface NetworkSummaryGraphLayersProps {
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
   showSegmentDressings: boolean;
+  showColocatedSpliceLinkLine: boolean;
   inverseLabelScale: number;
   labelRotationDegrees: number;
   zoomInvariantNodeShapes: boolean;
@@ -147,6 +148,7 @@ export function NetworkSummaryGraphLayers({
   showSegmentNames,
   showSegmentLengths,
   showSegmentDressings,
+  showColocatedSpliceLinkLine,
   inverseLabelScale,
   labelRotationDegrees,
   zoomInvariantNodeShapes,
@@ -413,6 +415,7 @@ export function NetworkSummaryGraphLayers({
     position,
     anchorPosition,
     nodeClassName,
+    isColocated,
   }: RenderedFloatingSpliceModel): ReactElement => {
     const spliceDiamondSize = 30 * normalizedNodeShapeScale;
     const spliceHitboxSize = 38 * normalizedNodeShapeScale;
@@ -420,6 +423,10 @@ export function NetworkSummaryGraphLayers({
     const hasAnchorTick =
       Math.abs(anchorPosition.x - position.x) > 0.01 ||
       Math.abs(anchorPosition.y - position.y) > 0.01;
+    // Colocated splices draw a short link line back to the shared placement point
+    // (default on, hidden via settings). Lone splices nudged off their anchor for
+    // node clearance keep their always-on placement tick.
+    const showAnchorTick = hasAnchorTick && (isColocated ? showColocatedSpliceLinkLine : true);
     return (
       <g
         key={splice.id}
@@ -454,9 +461,11 @@ export function NetworkSummaryGraphLayers({
         }}
       >
         <title>{splice.technicalId}</title>
-        {hasAnchorTick ? (
+        {showAnchorTick ? (
           <line
-            className="network-splice-placement-preview-segment is-current"
+            className={`network-splice-placement-preview-segment is-current${
+              isColocated ? " network-splice-colocated-link-line" : ""
+            }`}
             x1={anchorPosition.x}
             y1={anchorPosition.y}
             x2={position.x}

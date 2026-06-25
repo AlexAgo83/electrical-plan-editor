@@ -22,6 +22,12 @@ export interface Network {
   voltageV?: number;
   author?: string;
   projectCode?: string;
+  /**
+   * Optional network-scope prefix (e.g. `LAT-`) anchored into the canonical
+   * `technicalId` of every entity in this network. Display only: canonical IDs
+   * and AI-agent JSON keep the full prefixed value. See `core/networkEntityPrefix`.
+   */
+  entityPrefix?: string;
   logoUrl?: string;
   exportNotes?: string;
   createdAt: string;

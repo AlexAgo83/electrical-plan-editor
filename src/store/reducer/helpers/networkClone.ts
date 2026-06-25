@@ -7,6 +7,7 @@ import {
   normalizeNetworkLogoUrl,
   normalizeNetworkProjectCode
 } from "../../../core/networkMetadata";
+import { normalizeNetworkEntityPrefix } from "../../../core/networkEntityPrefix";
 import { cloneNetworkSummaryViewState, type AppState, type NetworkScopedState } from "../../types";
 
 export function normalizeOptionalText(value: string | undefined): string | undefined {
@@ -18,13 +19,13 @@ export function normalizeOptionalText(value: string | undefined): string | undef
 }
 
 export interface NormalizeNetworkMetadataResult {
-  metadata: Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes">;
+  metadata: Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes" | "entityPrefix">;
   error: string | null;
 }
 
 export function normalizeNetworkMetadata(
-  source: Partial<Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes">>,
-  fallback: Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes">
+  source: Partial<Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes" | "entityPrefix">>,
+  fallback: Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes" | "entityPrefix">
 ): NormalizeNetworkMetadataResult {
   const rawProjectCode = source.projectCode === undefined ? fallback.projectCode : source.projectCode;
   const rawLogoUrl = source.logoUrl === undefined ? fallback.logoUrl : source.logoUrl;
@@ -47,7 +48,10 @@ export function normalizeNetworkMetadata(
       author: normalizeNetworkAuthor(source.author === undefined ? fallback.author : source.author),
       projectCode: normalizedProjectCode,
       logoUrl: normalizedLogoUrl,
-      exportNotes: normalizeNetworkExportNotes(source.exportNotes === undefined ? fallback.exportNotes : source.exportNotes)
+      exportNotes: normalizeNetworkExportNotes(source.exportNotes === undefined ? fallback.exportNotes : source.exportNotes),
+      entityPrefix: normalizeNetworkEntityPrefix(
+        source.entityPrefix === undefined ? fallback.entityPrefix : source.entityPrefix
+      )
     },
     error: null
   };

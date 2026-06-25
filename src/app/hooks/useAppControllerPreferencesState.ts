@@ -72,6 +72,8 @@ export function useAppControllerPreferencesState() {
   const [canvasCalloutConnectorDrawingScalePercent, setCanvasCalloutConnectorDrawingScalePercent] = useState(150);
   const [canvasGlobalRenderScalePercent, setCanvasGlobalRenderScalePercent] = useState(0);
   const [canvasZoomInvariantNodeShapes, setCanvasZoomInvariantNodeShapes] = useState(true);
+  const [canvasShowColocatedSpliceLinkLine, setCanvasShowColocatedSpliceLinkLine] = useState(true);
+  const [canvasShowNetworkEntityPrefix, setCanvasShowNetworkEntityPrefix] = useState(true);
   const [canvasNodeShapeSizePercent, setCanvasNodeShapeSizePercent] = useState(70);
   const [canvasExportFormat, setCanvasExportFormat] = useState<CanvasExportFormat>("svg");
   const [canvasPngExportIncludeBackground, setCanvasPngExportIncludeBackground] = useState(true);
@@ -171,6 +173,10 @@ export function useAppControllerPreferencesState() {
     setCanvasGlobalRenderScalePercent,
     canvasZoomInvariantNodeShapes,
     setCanvasZoomInvariantNodeShapes,
+    canvasShowColocatedSpliceLinkLine,
+    setCanvasShowColocatedSpliceLinkLine,
+    canvasShowNetworkEntityPrefix,
+    setCanvasShowNetworkEntityPrefix,
     canvasNodeShapeSizePercent,
     setCanvasNodeShapeSizePercent,
     canvasExportFormat,

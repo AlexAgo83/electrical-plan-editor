@@ -30,6 +30,8 @@ export function useWorkspaceHandlers({
   setNewNetworkVoltageV,
   newNetworkProjectCode,
   setNewNetworkProjectCode,
+  newNetworkEntityPrefix,
+  setNewNetworkEntityPrefix,
   newNetworkLogoUrl,
   setNewNetworkLogoUrl,
   newNetworkExportNotes,
@@ -168,6 +170,7 @@ export function useWorkspaceHandlers({
       author: newNetworkAuthor,
       voltageV: newNetworkVoltageV,
       projectCode: newNetworkProjectCode,
+      entityPrefix: newNetworkEntityPrefix,
       logoUrl: newNetworkLogoUrl,
       exportNotes: newNetworkExportNotes
     });
@@ -193,6 +196,7 @@ export function useWorkspaceHandlers({
         author: draft.author,
         voltageV: draft.voltageV,
         projectCode: draft.projectCode,
+        entityPrefix: draft.entityPrefix,
         logoUrl: draft.logoUrl,
         exportNotes: draft.exportNotes,
         description: draft.description,
@@ -209,6 +213,7 @@ export function useWorkspaceHandlers({
       setNewNetworkAuthor("");
       setNewNetworkVoltageV("");
       setNewNetworkProjectCode("");
+      setNewNetworkEntityPrefix("");
       setNewNetworkLogoUrl("");
       setNewNetworkExportNotes("");
       return;
@@ -243,6 +248,7 @@ export function useWorkspaceHandlers({
       author: newNetworkAuthor,
       voltageV: newNetworkVoltageV,
       projectCode: newNetworkProjectCode,
+      entityPrefix: newNetworkEntityPrefix,
       logoUrl: newNetworkLogoUrl,
       exportNotes: newNetworkExportNotes
     });
@@ -269,6 +275,7 @@ export function useWorkspaceHandlers({
           author: draft.author,
           voltageV: draft.voltageV,
           projectCode: draft.projectCode,
+          entityPrefix: draft.entityPrefix,
           logoUrl: draft.logoUrl,
           exportNotes: draft.exportNotes
         }
@@ -300,6 +307,7 @@ export function useWorkspaceHandlers({
         author: targetNetwork.author,
         voltageV: targetNetwork.voltageV,
         projectCode: targetNetwork.projectCode,
+        entityPrefix: targetNetwork.entityPrefix,
         logoUrl: targetNetwork.logoUrl,
         exportNotes: targetNetwork.exportNotes,
         createdAt: nowIso,

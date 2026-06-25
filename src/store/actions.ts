@@ -65,6 +65,7 @@ export type AppAction =
         projectCode?: string;
         logoUrl?: string;
         exportNotes?: string;
+        entityPrefix?: string;
         updatedAt: string;
       };
     }
@@ -210,6 +211,7 @@ export const appActions = {
       projectCode?: string;
       logoUrl?: string;
       exportNotes?: string;
+      entityPrefix?: string;
     }
   ): AppAction => ({
     type: "network/update",
@@ -224,7 +226,8 @@ export const appActions = {
       author: metadata?.author,
       projectCode: metadata?.projectCode,
       logoUrl: metadata?.logoUrl,
-      exportNotes: metadata?.exportNotes
+      exportNotes: metadata?.exportNotes,
+      entityPrefix: metadata?.entityPrefix
     }
   }),
   duplicateNetwork: (sourceNetworkId: NetworkId, network: Network): AppAction => ({

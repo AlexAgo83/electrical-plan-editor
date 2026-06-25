@@ -878,4 +878,71 @@ describe("network file portability", () => {
     expect(parsed.payload).toBeNull();
     expect(parsed.error).toMatch(/newer than supported/i);
   });
+
+  it("carries an explicit network entity prefix through export/import (AC7)", () => {
+    const seeded = appReducer(
+      createInitialState(),
+      appActions.createNetwork({
+        id: asNetworkId("net-prefixed"),
+        name: "Prefixed Network",
+        technicalId: "NET-PRI",
+        entityPrefix: "PRI-",
+        createdAt: "2026-02-21T09:00:00.000Z",
+        updatedAt: "2026-02-21T09:00:00.000Z"
+      })
+    );
+
+    const payload = buildNetworkFilePayload(seeded, "all", [], "2026-02-21T10:00:00.000Z");
+    const exportedBundle = payload.networks.find((bundle) => bundle.network.technicalId === "NET-PRI");
+    expect(exportedBundle?.network.entityPrefix).toBe("PRI-");
+
+    const parsed = parseNetworkFilePayload(serializeNetworkFilePayload(payload));
+    expect(parsed.error).toBeNull();
+    const reimported = parsed.payload?.networks.find((bundle) => bundle.network.technicalId === "NET-PRI");
+    expect(reimported?.network.entityPrefix).toBe("PRI-");
+  });
+
+  it("auto-detects an obvious entity prefix on import when the bundle omits it (AC13)", () => {
+    const scoped = createEmptyNetworkScopedState();
+    scoped.connectors.byId[asConnectorId("c1")] = {
+      id: asConnectorId("c1"),
+      name: "Connector 1",
+      technicalId: "LAT-C-001",
+      cavityCount: 2
+    };
+    scoped.connectors.allIds.push(asConnectorId("c1"));
+    scoped.splices.byId[asSpliceId("s1")] = {
+      id: asSpliceId("s1"),
+      name: "Splice 1",
+      technicalId: "LAT-S-001",
+      portCount: 2
+    };
+    scoped.splices.allIds.push(asSpliceId("s1"));
+
+    const payload = {
+      schemaVersion: 4 as const,
+      exportedAt: "2026-02-21T10:20:00.000Z",
+      source: {
+        app: "electrical-plan-editor" as const,
+        appVersion: APP_RELEASE_VERSION,
+        appSchemaVersion: 2
+      },
+      networks: [
+        {
+          network: {
+            id: asNetworkId("net-detect"),
+            name: "Detect Network",
+            technicalId: "NET-DETECT",
+            createdAt: "2026-02-20T10:00:00.000Z",
+            updatedAt: "2026-02-20T10:00:00.000Z"
+          },
+          state: scoped
+        }
+      ]
+    };
+
+    const resolved = resolveImportConflicts(payload, createEmptyWorkspaceState());
+    expect(resolved.networks).toHaveLength(1);
+    expect(resolved.networks[0]?.entityPrefix).toBe("LAT-");
+  });
 });

@@ -18,6 +18,7 @@ import type { BranchLoad, FuseProtectedLoadEntry } from "../../core/pinElectrica
 import { resolveAmpacityA } from "../../core/wireAmpacity";
 import { resolveWireMaterial } from "../../core/wireSizing";
 import type { NetworkScopedState } from "../../store";
+import { findHiddenPrefixCollisions } from "../../core/networkEntityPrefix";
 import {
   appendElectricalDimensioningIssues,
   ELECTRICAL_DIMENSIONING_CATEGORY
@@ -121,6 +122,33 @@ export function buildMultiNetworkFunctionalAnalysisModel({
 
     const aggregation = aggregateAssembly(activeAssembly, slices, effectiveSelectedNetworkIds, catalogItemsById);
     appendAssemblyDimensioningFindings(findings, aggregation, networkById, catalogItemsById);
+
+    // AC15: in a multi-network context, warn when hiding network prefixes would
+    // make bare IDs look duplicated across the selected networks.
+    if (slices.length > 1) {
+      const collisions = findHiddenPrefixCollisions(
+        slices.map((slice) => ({
+          prefix: networkById.get(slice.networkId)?.entityPrefix,
+          ids: [
+            ...slice.connectors.map((connector) => connector.technicalId),
+            ...slice.splices.map((splice) => splice.technicalId),
+            ...slice.wires.map((wire) => wire.technicalId)
+          ]
+        }))
+      );
+      if (collisions.size > 0) {
+        const sampleBareIds = [...collisions.keys()].sort().slice(0, 5);
+        findings.push({
+          id: `prefix-disambiguation-${collisions.size}`,
+          severity: "info",
+          family: "Assembly",
+          networkLabel: "Multi-network",
+          message: `Hiding network prefixes makes ${collisions.size} bare ID(s) look duplicated across networks (e.g. ${sampleBareIds.join(
+            ", "
+          )}). Keep prefixes shown or rely on the network prefix to disambiguate.`
+        });
+      }
+    }
     for (const entry of aggregation.l1Mismatches) {
       const sourceLabel = networkLabel(networkById.get(entry.sourceNetworkId), entry.sourceNetworkId);
       const targetLabel = networkLabel(networkById.get(entry.targetNetworkId), entry.targetNetworkId);

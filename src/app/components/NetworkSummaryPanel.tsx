@@ -9,6 +9,7 @@ import {
   type ReactElement
 } from "react";
 import type { ConnectorId, NodeId, Segment, SegmentId, SpliceId } from "../../core/entities";
+import { formatEntityIdForDisplay } from "../../core/networkEntityPrefix";
 import type { NodePosition } from "../types/app-controller";
 import { NetworkRoutePreviewPanel } from "./network-summary/NetworkRoutePreviewPanel";
 import { NetworkSummaryHeader } from "./network-summary/NetworkSummaryHeader";
@@ -57,6 +58,8 @@ export function NetworkSummaryPanel({
   showSegmentLengths,
   showSegmentDressings,
   showCableCallouts,
+  showColocatedSpliceLinkLine,
+  showNetworkEntityPrefix,
   calloutContentMode,
   showSelectedCalloutOnly,
   showCalloutWireNames,
@@ -327,6 +330,11 @@ export function NetworkSummaryPanel({
     [connectorMap, spliceMap, wires]
   );
 
+  const formatEntityId = useMemo(() => {
+    const prefix = activeNetwork?.entityPrefix;
+    return (id: string): string => formatEntityIdForDisplay(id, prefix, showNetworkEntityPrefix);
+  }, [activeNetwork?.entityPrefix, showNetworkEntityPrefix]);
+
   const renderedFloatingSplices = useMemo(
     () =>
       buildRenderedFloatingSplices({
@@ -338,6 +346,7 @@ export function NetworkSummaryPanel({
         isSubNetworkFilteringActive,
         activeSubNetworkTagSet: activeSubNetworkTags,
         selectedSpliceId,
+        formatEntityId,
       }),
     [
       spliceMap,
@@ -347,6 +356,7 @@ export function NetworkSummaryPanel({
       segmentSubNetworkTagById,
       isSubNetworkFilteringActive,
       activeSubNetworkTags,
+      formatEntityId,
       selectedSpliceId,
     ],
   );
@@ -805,9 +815,11 @@ export function NetworkSummaryPanel({
         connectorDrawingDisplayMode,
         connectorCalloutGroupsById,
         selectedWireId,
-        spliceMap
+        spliceMap,
+        formatEntityId
       }),
     [
+      formatEntityId,
       nodes,
       networkNodePositions,
       isSubNetworkFilteringActive,
@@ -925,6 +937,7 @@ export function NetworkSummaryPanel({
           showSegmentNames={showSegmentNames}
           showSegmentLengths={showSegmentLengths}
           showSegmentDressings={showSegmentDressings}
+          showColocatedSpliceLinkLine={showColocatedSpliceLinkLine}
           inverseLabelScale={inverseLabelScale}
           labelRotationDegrees={labelRotationDegrees}
           zoomInvariantNodeShapes={zoomInvariantNodeShapes}

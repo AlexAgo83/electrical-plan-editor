@@ -1,7 +1,7 @@
 import type { FormEvent } from "react";
 import type { CatalogItemId, Connector, ConnectorId } from "../../core/entities";
 import type { AppStore } from "../../store";
-import { appActions } from "../../store";
+import { appActions, selectActiveNetwork } from "../../store";
 import { analyzeConnectorDeleteImpact } from "../../store/deleteImpact";
 import { createEntityId, focusSelectedTableRowInPanel } from "../lib/app-utils-shared";
 import { parseConnectorTerminalOverridesDraft } from "../lib/connectorTerminalOverridesDraft";
@@ -160,7 +160,10 @@ export function useConnectorHandlers({
       setEditingConnectorId(null);
       setConnectorName("");
       setConnectorTechnicalId(
-        suggestNextConnectorTechnicalId(Object.values(state.connectors.byId).map((connector) => connector.technicalId))
+        suggestNextConnectorTechnicalId(
+          Object.values(state.connectors.byId).map((connector) => connector.technicalId),
+          selectActiveNetwork(state)?.entityPrefix
+        )
       );
       setConnectorCatalogItemId("");
       setConnectorManufacturerReference("");
@@ -184,7 +187,10 @@ export function useConnectorHandlers({
     setEditingConnectorId(null);
     setConnectorName("");
     setConnectorTechnicalId(
-      suggestNextConnectorTechnicalId(Object.values(state.connectors.byId).map((connector) => connector.technicalId))
+      suggestNextConnectorTechnicalId(
+        Object.values(state.connectors.byId).map((connector) => connector.technicalId),
+        selectActiveNetwork(state)?.entityPrefix
+      )
     );
     syncDerivedConnectorCatalogFields(firstCatalogItem.id);
     setConnectorIsMainHarnessConnector(false);

@@ -70,6 +70,7 @@ interface NetworkSummaryCanvasPanelProps {
   showSegmentNames: boolean;
   showSegmentLengths: boolean;
   showSegmentDressings: boolean;
+  showColocatedSpliceLinkLine: boolean;
   inverseLabelScale: number;
   labelRotationDegrees: number;
   zoomInvariantNodeShapes: boolean;
@@ -143,6 +144,7 @@ export function NetworkSummaryCanvasPanel({
   showSegmentNames,
   showSegmentLengths,
   showSegmentDressings,
+  showColocatedSpliceLinkLine,
   inverseLabelScale,
   labelRotationDegrees,
   zoomInvariantNodeShapes,
@@ -224,6 +226,7 @@ export function NetworkSummaryCanvasPanel({
                 showSegmentNames={showSegmentNames}
                 showSegmentLengths={showSegmentLengths}
                 showSegmentDressings={showSegmentDressings}
+                showColocatedSpliceLinkLine={showColocatedSpliceLinkLine}
                 inverseLabelScale={inverseLabelScale}
                 labelRotationDegrees={labelRotationDegrees}
                 zoomInvariantNodeShapes={zoomInvariantNodeShapes}

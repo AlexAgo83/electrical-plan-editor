@@ -24,6 +24,8 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setNewNetworkVoltageV"
     | "newNetworkProjectCode"
     | "setNewNetworkProjectCode"
+    | "newNetworkEntityPrefix"
+    | "setNewNetworkEntityPrefix"
     | "newNetworkLogoUrl"
     | "setNewNetworkLogoUrl"
     | "newNetworkExportNotes"

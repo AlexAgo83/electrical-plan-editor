@@ -153,6 +153,8 @@ interface UseUiPreferencesOptions {
   canvasCalloutConnectorDrawingScalePercent: number;
   canvasGlobalRenderScalePercent: number;
   canvasZoomInvariantNodeShapes: boolean;
+  canvasShowColocatedSpliceLinkLine: boolean;
+  canvasShowNetworkEntityPrefix: boolean;
   canvasNodeShapeSizePercent: number;
   canvasExportFormat: CanvasExportFormat;
   canvasPngExportIncludeBackground: boolean;
@@ -217,6 +219,8 @@ interface UseUiPreferencesOptions {
   setCanvasCalloutConnectorDrawingScalePercent: (value: number) => void;
   setCanvasGlobalRenderScalePercent: (value: number) => void;
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;
+  setCanvasShowColocatedSpliceLinkLine: (value: boolean) => void;
+  setCanvasShowNetworkEntityPrefix: (value: boolean) => void;
   setCanvasNodeShapeSizePercent: (value: number) => void;
   setCanvasExportFormat: (value: CanvasExportFormat) => void;
   setCanvasPngExportIncludeBackground: (value: boolean) => void;
@@ -397,6 +401,8 @@ export function useUiPreferences({
   canvasCalloutConnectorDrawingScalePercent,
   canvasGlobalRenderScalePercent,
   canvasZoomInvariantNodeShapes,
+  canvasShowColocatedSpliceLinkLine,
+  canvasShowNetworkEntityPrefix,
   canvasNodeShapeSizePercent,
   canvasExportFormat,
   canvasPngExportIncludeBackground,
@@ -461,6 +467,8 @@ export function useUiPreferences({
   setCanvasCalloutConnectorDrawingScalePercent,
   setCanvasGlobalRenderScalePercent,
   setCanvasZoomInvariantNodeShapes,
+  setCanvasShowColocatedSpliceLinkLine,
+  setCanvasShowNetworkEntityPrefix,
   setCanvasNodeShapeSizePercent,
   setCanvasExportFormat,
   setCanvasPngExportIncludeBackground,
@@ -621,6 +629,16 @@ export function useUiPreferences({
       setCanvasZoomInvariantNodeShapes(
         typeof preferences.canvasZoomInvariantNodeShapes === "boolean" ? preferences.canvasZoomInvariantNodeShapes : true
       );
+      setCanvasShowColocatedSpliceLinkLine(
+        typeof preferences.canvasShowColocatedSpliceLinkLine === "boolean"
+          ? preferences.canvasShowColocatedSpliceLinkLine
+          : true
+      );
+      setCanvasShowNetworkEntityPrefix(
+        typeof preferences.canvasShowNetworkEntityPrefix === "boolean"
+          ? preferences.canvasShowNetworkEntityPrefix
+          : true
+      );
       setCanvasNodeShapeSizePercent(normalizeCanvasNodeShapeSizePercent(preferences.canvasNodeShapeSizePercent));
       setCanvasExportFormat(normalizeCanvasExportFormat(preferences.canvasExportFormat));
       setCanvasPngExportIncludeBackground(
@@ -701,6 +719,8 @@ export function useUiPreferences({
     setCanvasCalloutConnectorDrawingScalePercent,
     setCanvasGlobalRenderScalePercent,
     setCanvasZoomInvariantNodeShapes,
+    setCanvasShowColocatedSpliceLinkLine,
+    setCanvasShowNetworkEntityPrefix,
     setCanvasNodeShapeSizePercent,
     setCanvasExportFormat,
     setCanvasPngExportIncludeBackground,
@@ -808,6 +828,8 @@ export function useUiPreferences({
       canvasCalloutConnectorDrawingScalePercent,
       canvasGlobalRenderScalePercent,
       canvasZoomInvariantNodeShapes,
+      canvasShowColocatedSpliceLinkLine,
+      canvasShowNetworkEntityPrefix,
       canvasNodeShapeSizePercent,
       canvasExportFormat,
       canvasPngExportIncludeBackground,
@@ -848,6 +870,8 @@ export function useUiPreferences({
     canvasCalloutConnectorDrawingScalePercent,
     canvasGlobalRenderScalePercent,
     canvasZoomInvariantNodeShapes,
+    canvasShowColocatedSpliceLinkLine,
+    canvasShowNetworkEntityPrefix,
     canvasNodeShapeSizePercent,
     canvasExportFormat,
     canvasPngExportIncludeBackground,

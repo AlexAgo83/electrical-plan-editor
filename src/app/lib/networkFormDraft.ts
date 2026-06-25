@@ -5,6 +5,7 @@ import {
   normalizeNetworkProjectCode,
   parseLocalDateInputToIso
 } from "../../core/networkMetadata";
+import { normalizeNetworkEntityPrefix } from "../../core/networkEntityPrefix";
 import { normalizeNetworkVoltageV } from "../../core/wireSizing";
 
 export interface NetworkFormDraftInput {
@@ -15,6 +16,7 @@ export interface NetworkFormDraftInput {
   author: string;
   voltageV: string;
   projectCode: string;
+  entityPrefix: string;
   logoUrl: string;
   exportNotes: string;
 }
@@ -34,6 +36,7 @@ export type NetworkFormDraftResult =
         author: string;
         voltageV: number | undefined;
         projectCode: string;
+        entityPrefix: string;
         logoUrl: string;
         exportNotes: string;
       };
@@ -54,6 +57,11 @@ export function buildNetworkFormDraft(input: NetworkFormDraftInput): NetworkForm
   const normalizedLogoUrl = normalizeNetworkLogoUrl(input.logoUrl);
   if (normalizedLogoUrl !== undefined && !isNetworkLogoUrlValid(normalizedLogoUrl)) {
     return { kind: "error", message: "Logo URL must use http, https, or data:image/*." };
+  }
+
+  const trimmedEntityPrefix = input.entityPrefix.trim();
+  if (trimmedEntityPrefix.length > 0 && normalizeNetworkEntityPrefix(trimmedEntityPrefix) === undefined) {
+    return { kind: "error", message: "Entity prefix supports letters, numbers, underscore, and hyphen only." };
   }
 
   const createdAtIso = parseLocalDateInputToIso(input.createdAtDate);
@@ -78,6 +86,7 @@ export function buildNetworkFormDraft(input: NetworkFormDraftInput): NetworkForm
       author: input.author,
       voltageV: normalizedVoltageV,
       projectCode: input.projectCode,
+      entityPrefix: input.entityPrefix,
       logoUrl: input.logoUrl,
       exportNotes: input.exportNotes
     }

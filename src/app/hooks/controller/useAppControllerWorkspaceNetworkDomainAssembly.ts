@@ -120,7 +120,8 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     },
     groupedWirePreferences: {
       wireExportStrippingAllowanceMm: ui.preferencesState.wireExportStrippingAllowanceMm,
-      wireExportTwistedPairLengthCoefficient: ui.preferencesState.wireExportTwistedPairLengthCoefficient
+      wireExportTwistedPairLengthCoefficient: ui.preferencesState.wireExportTwistedPairLengthCoefficient,
+      showNetworkEntityPrefix: ui.preferencesState.canvasShowNetworkEntityPrefix
     },
     networkSummaryPanelRef,
     ensureNetworkPlanScreen: () => navigation.setActiveScreen("modeling")
@@ -220,6 +221,7 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     setNewNetworkAuthor: forms.networkScopeFormState.setNewNetworkAuthor,
     setNewNetworkVoltageV: forms.networkScopeFormState.setNewNetworkVoltageV,
     setNewNetworkProjectCode: forms.networkScopeFormState.setNewNetworkProjectCode,
+    setNewNetworkEntityPrefix: forms.networkScopeFormState.setNewNetworkEntityPrefix,
     setNewNetworkLogoUrl: forms.networkScopeFormState.setNewNetworkLogoUrl,
     setNewNetworkExportNotes: forms.networkScopeFormState.setNewNetworkExportNotes,
     setNetworkFormError: forms.networkScopeFormState.setNetworkFormError,

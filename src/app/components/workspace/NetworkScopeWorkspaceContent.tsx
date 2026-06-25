@@ -67,6 +67,8 @@ interface NetworkScopeWorkspaceContentProps {
   setNewNetworkVoltageV: (value: string) => void;
   newNetworkProjectCode: string;
   setNewNetworkProjectCode: (value: string) => void;
+  newNetworkEntityPrefix: string;
+  setNewNetworkEntityPrefix: (value: string) => void;
   newNetworkLogoUrl: string;
   setNewNetworkLogoUrl: (value: string) => void;
   newNetworkExportNotes: string;
@@ -115,6 +117,8 @@ export function NetworkScopeWorkspaceContent({
   setNewNetworkVoltageV,
   newNetworkProjectCode,
   setNewNetworkProjectCode,
+  newNetworkEntityPrefix,
+  setNewNetworkEntityPrefix,
   newNetworkLogoUrl,
   setNewNetworkLogoUrl,
   newNetworkExportNotes,
@@ -623,6 +627,18 @@ export function NetworkScopeWorkspaceContent({
                 maxLength={40}
               />
               <span className="form-hint">Allowed: letters, numbers, spaces, and _ . / -</span>
+            </label>
+            <label className="stack-label">
+              <span className="network-form-label">Entity ID prefix (optional)</span>
+              <input
+                value={newNetworkEntityPrefix}
+                onChange={(event) => setNewNetworkEntityPrefix(event.target.value)}
+                placeholder="LAT-"
+                maxLength={24}
+              />
+              <span className="form-hint">
+                Anchored into new entity IDs (e.g. LAT-C-001). Allowed: letters, numbers, underscore, and hyphen.
+              </span>
             </label>
             <label className="stack-label">
               <span className="network-form-label">Logo URL (optional)</span>

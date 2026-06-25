@@ -26,6 +26,7 @@ import {
   normalizeNetworkLogoUrl,
   normalizeNetworkProjectCode
 } from "../../core/networkMetadata";
+import { detectNetworkEntityPrefix, normalizeNetworkEntityPrefix } from "../../core/networkEntityPrefix";
 import { normalizeNetworkVoltageV, normalizeWireCurrentA, normalizeWireMaterial } from "../../core/wireSizing";
 import { normalizeAmpacityOverrides } from "../../core/wireAmpacity";
 import { resolveWireSectionMm2 } from "../../core/wireSection";
@@ -439,6 +440,7 @@ function isExportedNetworkBundle(value: unknown): value is ExportedNetworkBundle
     (network.projectCode === undefined || typeof network.projectCode === "string") &&
     (network.logoUrl === undefined || typeof network.logoUrl === "string") &&
     (network.exportNotes === undefined || typeof network.exportNotes === "string") &&
+    (network.entityPrefix === undefined || typeof network.entityPrefix === "string") &&
     typeof network.createdAt === "string" &&
     typeof network.updatedAt === "string"
   );
@@ -558,7 +560,7 @@ function normalizeImportedNetworkTimestamps(
 function normalizeImportedNetworkMetadata(
   network: Network,
   warnings: string[]
-): Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes" | "voltageV" | "ampacityOverrides"> {
+): Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes" | "voltageV" | "ampacityOverrides" | "entityPrefix"> {
   const normalizedAuthor = normalizeNetworkAuthor(network.author);
   const normalizedVoltageV = normalizeNetworkVoltageV(network.voltageV);
   const normalizedAmpacityOverrides = normalizeAmpacityOverrides(network.ampacityOverrides);
@@ -597,8 +599,39 @@ function normalizeImportedNetworkMetadata(
       normalizedLogoUrl !== undefined && isNetworkLogoUrlValid(normalizedLogoUrl)
         ? normalizedLogoUrl
         : undefined,
-    exportNotes: normalizedExportNotes
+    exportNotes: normalizedExportNotes,
+    entityPrefix: normalizeNetworkEntityPrefix(network.entityPrefix)
   };
+}
+
+/** Canonical entity IDs of a network's scoped state, used for prefix auto-detection. */
+function collectNetworkEntityCanonicalIds(scoped: NetworkScopedState): string[] {
+  const ids: string[] = [];
+  for (const connectorId of scoped.connectors.allIds) {
+    const connector = scoped.connectors.byId[connectorId];
+    if (connector !== undefined) {
+      ids.push(connector.technicalId);
+    }
+  }
+  for (const spliceId of scoped.splices.allIds) {
+    const splice = scoped.splices.byId[spliceId];
+    if (splice !== undefined) {
+      ids.push(splice.technicalId);
+    }
+  }
+  for (const wireId of scoped.wires.allIds) {
+    const wire = scoped.wires.byId[wireId];
+    if (wire !== undefined) {
+      ids.push(wire.technicalId);
+    }
+  }
+  for (const nodeId of scoped.nodes.allIds) {
+    ids.push(nodeId);
+  }
+  for (const segmentId of scoped.segments.allIds) {
+    ids.push(segmentId);
+  }
+  return ids;
 }
 
 function resolveNetworkIdsForScope(
@@ -650,7 +683,8 @@ export function buildNetworkFilePayload(
             : undefined,
         logoUrl:
           normalizedLogoUrl !== undefined && isNetworkLogoUrlValid(normalizedLogoUrl) ? normalizedLogoUrl : undefined,
-        exportNotes: normalizeNetworkExportNotes(network.exportNotes)
+        exportNotes: normalizeNetworkExportNotes(network.exportNotes),
+        entityPrefix: normalizeNetworkEntityPrefix(network.entityPrefix)
       };
 
       return {
@@ -1025,6 +1059,10 @@ export function resolveImportConflicts(
     importedNetworkIdBySourceId.set(sourceNetwork.id, networkId);
     const normalizedTimestamps = normalizeImportedNetworkTimestamps(sourceNetwork, importBaseIso, summary.warnings);
     const normalizedMetadata = normalizeImportedNetworkMetadata(sourceNetwork, summary.warnings);
+    // Auto-detect an obvious network prefix from the imported entity IDs when the
+    // bundle does not carry one explicitly (AC13). Ambiguous sets stay blank.
+    const resolvedEntityPrefix =
+      normalizedMetadata.entityPrefix ?? detectNetworkEntityPrefix(collectNetworkEntityCanonicalIds(bundle.state));
     networks.push({
       ...sourceNetwork,
       id: networkId,
@@ -1032,7 +1070,8 @@ export function resolveImportConflicts(
       technicalId: importedTechnicalId,
       createdAt: normalizedTimestamps.createdAt,
       updatedAt: normalizedTimestamps.updatedAt,
-      ...normalizedMetadata
+      ...normalizedMetadata,
+      entityPrefix: resolvedEntityPrefix
     });
     const normalizedScopedState = normalizeScopedState(bundle.state);
     const scopedMigration = migrateLegacySpliceNodes(normalizedScopedState, normalizedName);

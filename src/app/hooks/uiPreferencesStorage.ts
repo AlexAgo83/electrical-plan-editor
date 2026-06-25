@@ -19,7 +19,7 @@ import {
   DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT
 } from "../lib/wireExportLength";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 17;
+const UI_PREFERENCES_SCHEMA_VERSION = 18;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 type TableDensity = "comfortable" | "compact";
@@ -69,6 +69,8 @@ export interface UiPreferencesPayload {
   canvasCalloutConnectorDrawingScalePercent: number;
   canvasGlobalRenderScalePercent: number;
   canvasZoomInvariantNodeShapes: boolean;
+  canvasShowColocatedSpliceLinkLine: boolean;
+  canvasShowNetworkEntityPrefix: boolean;
   canvasNodeShapeSizePercent: number;
   canvasExportFormat: CanvasExportFormat;
   canvasPngExportIncludeBackground: boolean;
@@ -250,6 +252,21 @@ function migrateUiPreferencesFromV16(candidate: Record<string, unknown>): Record
   };
 }
 
+function migrateUiPreferencesFromV17(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    canvasShowColocatedSpliceLinkLine:
+      typeof candidate.canvasShowColocatedSpliceLinkLine === "boolean"
+        ? candidate.canvasShowColocatedSpliceLinkLine
+        : true,
+    canvasShowNetworkEntityPrefix:
+      typeof candidate.canvasShowNetworkEntityPrefix === "boolean"
+        ? candidate.canvasShowNetworkEntityPrefix
+        : true,
+    schemaVersion: 18
+  };
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -345,6 +362,11 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
     if (version === 16) {
       migrated = migrateUiPreferencesFromV16(migrated);
       version = 17;
+      continue;
+    }
+    if (version === 17) {
+      migrated = migrateUiPreferencesFromV17(migrated);
+      version = 18;
       continue;
     }
     return null;
