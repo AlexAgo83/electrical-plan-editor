@@ -4,7 +4,7 @@
 > Status: In Progress
 > Understanding: 95
 > Confidence: 88
-> Progress: 90%
+> Progress: 95%
 > Complexity: High
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -91,16 +91,19 @@
 - Network entity prefix: added `Network.entityPrefix` to the core model, persistence normalization,
   workspace save/load and network import/export (with conservative auto-detection on import), the
   Network scope form field, prefix-anchored `technicalId` creation suggestions, prefix-aware display
-  helpers applied to canvas labels and the human-readable wire-list export (gated by
-  `canvasShowNetworkEntityPrefix`), and a multi-network disambiguation hint in the functional
-  analysis findings. AI-agent JSON keeps canonical full IDs (untouched).
+  helpers applied to canvas labels and the human-readable wire-list and BOM exports (grouped +
+  active-network export/preview), all gated by `canvasShowNetworkEntityPrefix`, plus a multi-network
+  disambiguation hint in the functional analysis findings. The BOM preview's clickable connector
+  links are keyed by the formatted ID so they resolve whether the prefix is shown or hidden.
+  AI-agent JSON keeps canonical full IDs (untouched).
 - i18n: FR entries added for the new settings, scope field, hint, and validation strings.
 - Tests: pure helpers (`network-entity-prefix`, colocated layout in `network-summary-graph-model`),
-  prefix-anchored suggestions, wire-list prefix hiding, and portability prefix carry + import
-  auto-detection.
-- Scope note: prefix-hiding display helpers are shared and applied to representative UI/export
-  surfaces (canvas labels + wire-list export) per AC16; remaining label surfaces can adopt the same
-  `formatEntityIdForDisplay`/`buildRenderedNodes` `formatEntityId` seam incrementally.
+  prefix-anchored suggestions, wire-list and BOM prefix hiding, the network-form prefix field, and
+  portability prefix carry + import auto-detection.
+- Scope note: prefix-hiding display helpers are shared and applied to the canvas labels, the
+  wire-list export, and the BOM exports per AC9/AC16; the remaining read-only label surfaces
+  (modeling tables, inspector, analysis panels) intentionally keep full canonical IDs and can adopt
+  the same `formatEntityIdForDisplay`/`formatEntityId` seam later if needed.
 
 # AI Context
 - Summary: Implement readable colocated floating-splice rendering and network-scope ID prefix display/hide behavior.
