@@ -310,14 +310,20 @@ export function NetworkSummaryPanel({
     return directions;
   }, [nodes, segments, networkNodePositions]);
 
+  const formatEntityId = useMemo(() => {
+    const prefix = activeNetwork?.entityPrefix;
+    return (id: string): string => formatEntityIdForDisplay(id, prefix, showNetworkEntityPrefix);
+  }, [activeNetwork?.entityPrefix, showNetworkEntityPrefix]);
+
   const connectorCalloutGroupsById = useMemo(
     () =>
       buildConnectorCalloutGroupsById({
         connectorMap,
         spliceMap,
-        wires
+        wires,
+        formatEntityId
       }),
-    [connectorMap, spliceMap, wires]
+    [connectorMap, spliceMap, wires, formatEntityId]
   );
 
   const spliceCalloutGroupsById = useMemo(
@@ -325,15 +331,11 @@ export function NetworkSummaryPanel({
       buildSpliceCalloutGroupsById({
         connectorMap,
         spliceMap,
-        wires
+        wires,
+        formatEntityId
       }),
-    [connectorMap, spliceMap, wires]
+    [connectorMap, spliceMap, wires, formatEntityId]
   );
-
-  const formatEntityId = useMemo(() => {
-    const prefix = activeNetwork?.entityPrefix;
-    return (id: string): string => formatEntityIdForDisplay(id, prefix, showNetworkEntityPrefix);
-  }, [activeNetwork?.entityPrefix, showNetworkEntityPrefix]);
 
   const renderedFloatingSplices = useMemo(
     () =>
@@ -465,7 +467,8 @@ export function NetworkSummaryPanel({
         nodeHasActiveSubNetworkConnection,
         selectedConnectorId,
         selectedSpliceId,
-        selectedNodeId
+        selectedNodeId,
+        formatEntityId
       }),
     [
       showCableCallouts,
@@ -486,7 +489,8 @@ export function NetworkSummaryPanel({
       nodeHasActiveSubNetworkConnection,
       selectedConnectorId,
       selectedSpliceId,
-      selectedNodeId
+      selectedNodeId,
+      formatEntityId
     ]
   );
 

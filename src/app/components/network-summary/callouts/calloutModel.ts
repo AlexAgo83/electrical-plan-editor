@@ -27,6 +27,17 @@ interface CalloutTarget {
 }
 
 /**
+ * Display formatter for entity IDs shown in callouts. Defaults to identity so
+ * callers that do not care about the network entity prefix keep canonical IDs.
+ * Only emitted display cells (title, Wire ID, End ID) are formatted; callout
+ * keys, selection targets, drag-position persistence, and grouping continue to
+ * use canonical IDs.
+ */
+type FormatEntityId = (id: string) => string;
+
+const identityFormatEntityId: FormatEntityId = (id) => id;
+
+/**
  * Port label shown in callouts for a splice endpoint. Directional splices have
  * exactly two opposite ports, so they read as the side (L / R) the wire leaves
  * on; bounded/unbounded splices keep their numbered port label (P1, P2, ...).
@@ -46,19 +57,20 @@ interface WireColorSwatches {
 function describeWireEndpointForCallout(
   endpoint: Wire["endpointA"],
   connectorMap: Map<ConnectorId, Connector>,
-  spliceMap: Map<SpliceId, Splice>
+  spliceMap: Map<SpliceId, Splice>,
+  formatEntityId: FormatEntityId
 ): CalloutTarget {
   if (endpoint.kind === "connectorCavity") {
     const connectorTechnicalId = connectorMap.get(endpoint.connectorId)?.technicalId ?? String(endpoint.connectorId);
     return {
-      targetId: connectorTechnicalId,
+      targetId: formatEntityId(connectorTechnicalId),
       targetPin: `C${endpoint.cavityIndex}`
     };
   }
   const splice = spliceMap.get(endpoint.spliceId);
   const spliceTechnicalId = splice?.technicalId ?? String(endpoint.spliceId);
   return {
-    targetId: spliceTechnicalId,
+    targetId: formatEntityId(spliceTechnicalId),
     targetPin: describeSplicePortLabel(splice, endpoint.portIndex)
   };
 }
@@ -82,12 +94,13 @@ function resolveWireColorSwatches(wire: Wire): WireColorSwatches {
 function createCalloutEntry(
   wire: Wire,
   target: CalloutTarget,
-  colorSwatches: WireColorSwatches
+  colorSwatches: WireColorSwatches,
+  formatEntityId: FormatEntityId
 ): CalloutEntry {
   return {
     wireId: wire.id,
     name: wire.name,
-    technicalId: wire.technicalId,
+    technicalId: formatEntityId(wire.technicalId),
     color: getWireColorCode(wire),
     colorPrimaryHex: colorSwatches.primaryHex,
     colorSecondaryHex: colorSwatches.secondaryHex,
@@ -108,12 +121,14 @@ interface BuildCalloutGroupsOptions {
   connectorMap: Map<ConnectorId, Connector>;
   spliceMap: Map<SpliceId, Splice>;
   wires: Wire[];
+  formatEntityId?: FormatEntityId;
 }
 
 export function buildConnectorCalloutGroupsById({
   connectorMap,
   spliceMap,
-  wires
+  wires,
+  formatEntityId = identityFormatEntityId
 }: BuildCalloutGroupsOptions): Map<ConnectorId, CalloutGroup[]> {
   const map = new Map<ConnectorId, CalloutGroup[]>();
   for (const connector of connectorMap.values()) {
@@ -142,9 +157,9 @@ export function buildConnectorCalloutGroupsById({
       if (groupIndex >= groups.length) {
         continue;
       }
-      const target = describeWireEndpointForCallout(targetEndpoint, connectorMap, spliceMap);
+      const target = describeWireEndpointForCallout(targetEndpoint, connectorMap, spliceMap, formatEntityId);
       const colorSwatches = resolveWireColorSwatches(wire);
-      groups[groupIndex]?.entries.push(createCalloutEntry(wire, target, colorSwatches));
+      groups[groupIndex]?.entries.push(createCalloutEntry(wire, target, colorSwatches, formatEntityId));
     }
   }
 
@@ -160,7 +175,8 @@ export function buildConnectorCalloutGroupsById({
 export function buildSpliceCalloutGroupsById({
   connectorMap,
   spliceMap,
-  wires
+  wires,
+  formatEntityId = identityFormatEntityId
 }: BuildCalloutGroupsOptions): Map<SpliceId, CalloutGroup[]> {
   const map = new Map<SpliceId, CalloutGroup[]>();
   const entriesBySpliceAndPort = new Map<SpliceId, Map<number, CalloutEntry[]>>();
@@ -190,9 +206,9 @@ export function buildSpliceCalloutGroupsById({
         entriesBySpliceAndPort.set(localEndpoint.spliceId, entriesByPort);
       }
       const currentEntries = entriesByPort.get(localEndpoint.portIndex) ?? [];
-      const target = describeWireEndpointForCallout(targetEndpoint, connectorMap, spliceMap);
+      const target = describeWireEndpointForCallout(targetEndpoint, connectorMap, spliceMap, formatEntityId);
       const colorSwatches = resolveWireColorSwatches(wire);
-      currentEntries.push(createCalloutEntry(wire, target, colorSwatches));
+      currentEntries.push(createCalloutEntry(wire, target, colorSwatches, formatEntityId));
       entriesByPort.set(localEndpoint.portIndex, currentEntries);
     }
   }
@@ -236,6 +252,7 @@ interface BuildCableCalloutViewModelsOptions {
   selectedConnectorId: ConnectorId | null;
   selectedSpliceId: SpliceId | null;
   selectedNodeId: NodeId | null;
+  formatEntityId?: FormatEntityId;
 }
 
 function resolveSelectedCalloutKey({
@@ -282,7 +299,8 @@ export function buildCableCalloutViewModels({
   nodeHasActiveSubNetworkConnection,
   selectedConnectorId,
   selectedSpliceId,
-  selectedNodeId
+  selectedNodeId,
+  formatEntityId = identityFormatEntityId
 }: BuildCableCalloutViewModelsOptions): CableCalloutViewModel[] {
   if (!showCableCallouts) {
     return [];
@@ -321,7 +339,7 @@ export function buildCableCalloutViewModels({
       continue;
     }
     const catalogItem = connector.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId);
-    const header = buildCalloutHeaderDisplay(connector.name, connector.technicalId);
+    const header = buildCalloutHeaderDisplay(connector.name, formatEntityId(connector.technicalId));
     const connectorReferenceValue = connector.manufacturerReference?.trim() ?? "";
     const connectorReference = connectorReferenceValue.length > 0 ? `ref : ${connectorReferenceValue}` : "";
     models.push({
@@ -381,7 +399,7 @@ export function buildCableCalloutViewModels({
     if (groups.length === 0) {
       continue;
     }
-    const header = buildCalloutHeaderDisplay(splice.name, splice.technicalId);
+    const header = buildCalloutHeaderDisplay(splice.name, formatEntityId(splice.technicalId));
     const spliceReferenceValue = splice.manufacturerReference?.trim() ?? "";
     const spliceReference = spliceReferenceValue.length > 0 ? `ref : ${spliceReferenceValue}` : "";
     models.push({
