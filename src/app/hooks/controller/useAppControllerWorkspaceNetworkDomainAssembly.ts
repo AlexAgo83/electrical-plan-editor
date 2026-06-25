@@ -116,7 +116,8 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
       workspaceTaxRatePercent: ui.preferencesState.workspaceTaxRatePercent,
       bomExportCompactColumns: ui.preferencesState.bomExportCompactColumns,
       bomTraceabilityLabelsHidden: ui.preferencesState.bomTraceabilityLabelsHidden,
-      bomExportComputedDownstreamLoad: ui.preferencesState.bomExportComputedDownstreamLoad
+      bomExportComputedDownstreamLoad: ui.preferencesState.bomExportComputedDownstreamLoad,
+      showNetworkEntityPrefix: ui.preferencesState.canvasShowNetworkEntityPrefix
     },
     groupedWirePreferences: {
       wireExportStrippingAllowanceMm: ui.preferencesState.wireExportStrippingAllowanceMm,

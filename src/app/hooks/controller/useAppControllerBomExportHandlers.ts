@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CatalogItem, CatalogItemId, Connector, Splice, Wire } from "../../../core/entities";
+import { formatEntityIdForDisplay } from "../../../core/networkEntityPrefix";
 import type { ConnectorCavityOccupancyMap } from "../../../core/connectorCatalogMaterials";
 import { buildNetworkSummaryBomCsvExport, buildNetworkSummaryBomWorkbookSheets } from "../../lib/networkSummaryBomCsv";
 import type { CsvCellValue } from "../../lib/csv";
@@ -22,6 +23,9 @@ interface UseAppControllerBomExportHandlersParams {
   bomTraceabilityLabelsHidden: boolean;
   bomExportComputedDownstreamLoad: boolean;
   connectorCavityOccupancy?: ConnectorCavityOccupancyMap;
+  /** Active network entity prefix and whether it should be shown (vs hidden) in human-readable IDs. */
+  networkEntityPrefix?: string;
+  showNetworkEntityPrefix?: boolean;
 }
 
 export interface ActiveBomPreviewState {
@@ -53,8 +57,14 @@ export function useAppControllerBomExportHandlers({
   bomExportCompactColumns,
   bomTraceabilityLabelsHidden,
   bomExportComputedDownstreamLoad,
-  connectorCavityOccupancy
+  connectorCavityOccupancy,
+  networkEntityPrefix,
+  showNetworkEntityPrefix = true
 }: UseAppControllerBomExportHandlersParams) {
+  const formatEntityId = useCallback(
+    (id: string): string => formatEntityIdForDisplay(id, networkEntityPrefix, showNetworkEntityPrefix),
+    [networkEntityPrefix, showNetworkEntityPrefix]
+  );
   const [activeBomPreview, setActiveBomPreview] = useState<ActiveBomPreviewState | null>(null);
   const [isBomPreviewLoading, setIsBomPreviewLoading] = useState(false);
   const bomPreviewRequestIdRef = useRef(0);
@@ -73,7 +83,8 @@ export function useAppControllerBomExportHandlers({
         {
           connectorCavityOccupancy,
           showTraceabilityLabels: !bomTraceabilityLabelsHidden,
-          includeComputedDownstreamLoad: bomExportComputedDownstreamLoad
+          includeComputedDownstreamLoad: bomExportComputedDownstreamLoad,
+          formatEntityId
         }
       ),
     [
@@ -83,6 +94,7 @@ export function useAppControllerBomExportHandlers({
       catalogItems,
       connectorCavityOccupancy,
       connectors,
+      formatEntityId,
       splices,
       wires,
       workspaceCurrencyCode,
@@ -114,7 +126,7 @@ export function useAppControllerBomExportHandlers({
           catalogItems.map((item) => [item.manufacturerReference, item.id] as const)
         );
         const connectorTechnicalIdLinks = Object.fromEntries(
-          connectors.map((connector) => [connector.technicalId, connector.id] as const)
+          connectors.map((connector) => [formatEntityId(connector.technicalId), connector.id] as const)
         );
         const workbookSheets = buildNetworkSummaryBomWorkbookSheets(
           catalogItems,
@@ -128,7 +140,8 @@ export function useAppControllerBomExportHandlers({
           {
             connectorCavityOccupancy,
             showTraceabilityLabels: !bomTraceabilityLabelsHidden,
-            includeComputedDownstreamLoad: bomExportComputedDownstreamLoad
+            includeComputedDownstreamLoad: bomExportComputedDownstreamLoad,
+            formatEntityId
           }
         );
 
@@ -167,6 +180,7 @@ export function useAppControllerBomExportHandlers({
     catalogItems,
     connectorCavityOccupancy,
     connectors,
+    formatEntityId,
     networkSummaryBomCsvExport.headers,
     networkSummaryBomCsvExport.itemRowCount,
     networkSummaryBomCsvExport.rows,

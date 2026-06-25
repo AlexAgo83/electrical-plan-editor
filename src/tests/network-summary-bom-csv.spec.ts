@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CatalogItem, CatalogItemId, Connector, ConnectorId, Splice, SpliceId, Wire, WireId } from "../core/entities";
 import { buildNetworkSummaryBomCsvExport, buildNetworkSummaryBomWorkbookSheets } from "../app/lib/networkSummaryBomCsv";
+import { formatEntityIdForDisplay } from "../core/networkEntityPrefix";
 
 function asCatalogItemId(value: string): CatalogItemId {
   return value as CatalogItemId;
@@ -330,6 +331,20 @@ describe("buildNetworkSummaryBomCsvExport", () => {
     const sheets = buildNetworkSummaryBomWorkbookSheets(catalogItems, connectors, [], []);
 
     expect(sheets[1]?.rows[0]).toEqual(["C-001", "Connector 1", 2, "Connector", "MFR-C1", "Catalog connector", 1]);
+  });
+
+  it("hides the active network prefix in BOM connector IDs when the formatter strips it (AC9)", () => {
+    const connectors: Connector[] = [
+      { id: asConnectorId("C1"), name: "Connector 1", technicalId: "LAT-C-001", cavityCount: 2 }
+    ];
+
+    const shown = buildNetworkSummaryBomWorkbookSheets([], connectors, [], []);
+    expect(shown[1]?.rows[0]?.[0]).toBe("LAT-C-001");
+
+    const hidden = buildNetworkSummaryBomWorkbookSheets([], connectors, [], [], "EUR", true, 20, false, {
+      formatEntityId: (id) => formatEntityIdForDisplay(id, "LAT-", false)
+    });
+    expect(hidden[1]?.rows[0]?.[0]).toBe("C-001");
   });
 
   it("returns summary and metadata rows only when no resolvable catalog-backed components are present", () => {

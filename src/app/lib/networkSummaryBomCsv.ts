@@ -347,8 +347,12 @@ function buildNetworkSummaryBomExportData(
     connectorCavityOccupancy?: ConnectorCavityOccupancyMap;
     showTraceabilityLabels?: boolean;
     includeComputedDownstreamLoad?: boolean;
+    formatEntityId?: (id: string) => string;
   } = {}
 ): NetworkSummaryBomExportData {
+  // Display-only ID formatter (e.g. network prefix hiding). Aggregation keys keep
+  // canonical IDs; only emitted cells/labels are formatted.
+  const formatEntityId = options.formatEntityId ?? ((id: string): string => id);
   const normalizedTaxEnabled = workspaceTaxEnabled === true;
   const normalizedTaxRatePercent = Number.isFinite(workspaceTaxRatePercent)
     ? Math.min(1000, Math.max(0, workspaceTaxRatePercent))
@@ -762,7 +766,7 @@ function buildNetworkSummaryBomExportData(
           createBomRow(compactColumns, {
             type: "Fuse",
             manufacturerReference: catalogItem.manufacturerReference,
-            name: catalogItem.name ?? `Fuse for ${wire.technicalId}`,
+            name: catalogItem.name ?? `Fuse for ${formatEntityId(wire.technicalId)}`,
             connectionCount: "",
             connectorQuantity: compactColumns ? 1 : "",
             spliceQuantity: "",
@@ -799,7 +803,7 @@ function buildNetworkSummaryBomExportData(
     });
     const startRow = groupedSheetRows.length + 2;
     groupedSheetRows.push([
-      group.connectorTechnicalId,
+      formatEntityId(group.connectorTechnicalId),
       group.connectorName,
       group.connectionCount,
       "Connector",
@@ -810,7 +814,7 @@ function buildNetworkSummaryBomExportData(
     ]);
     for (const row of orderedGroupRows) {
       groupedSheetRows.push([
-        group.connectorTechnicalId,
+        formatEntityId(group.connectorTechnicalId),
         group.connectorName,
         "",
         row.kind === "connection" ? "Connection" : row.kind === "seal" ? "Seal" : row.kind === "plug" ? "Plug" : "Accessory",
@@ -888,6 +892,7 @@ export function buildNetworkSummaryBomCsvExport(
     connectorCavityOccupancy?: ConnectorCavityOccupancyMap;
     showTraceabilityLabels?: boolean;
     includeComputedDownstreamLoad?: boolean;
+    formatEntityId?: (id: string) => string;
   }
 ): NetworkSummaryBomCsvExport {
   const exportData = buildNetworkSummaryBomExportData(
@@ -923,6 +928,7 @@ export function buildNetworkSummaryBomWorkbookSheets(
     connectorCavityOccupancy?: ConnectorCavityOccupancyMap;
     showTraceabilityLabels?: boolean;
     includeComputedDownstreamLoad?: boolean;
+    formatEntityId?: (id: string) => string;
   }
 ): TabularWorksheetExport[] {
   const exportData = buildNetworkSummaryBomExportData(

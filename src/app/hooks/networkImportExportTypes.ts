@@ -38,6 +38,8 @@ export interface GroupedBomPreferences {
   bomExportCompactColumns?: boolean;
   bomTraceabilityLabelsHidden?: boolean;
   bomExportComputedDownstreamLoad?: boolean;
+  /** When false, the active network entity prefix is hidden in human-readable IDs. */
+  showNetworkEntityPrefix?: boolean;
 }
 
 export interface GroupedWirePreferences {

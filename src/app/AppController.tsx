@@ -148,7 +148,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     bomExportCompactColumns,
     bomTraceabilityLabelsHidden,
     bomExportComputedDownstreamLoad,
-    connectorCavityOccupancy: state.connectorCavityOccupancy
+    connectorCavityOccupancy: state.connectorCavityOccupancy,
+    networkEntityPrefix: state.activeNetworkId === null ? undefined : state.networks.byId[state.activeNetworkId]?.entityPrefix,
+    showNetworkEntityPrefix: preferencesState.canvasShowNetworkEntityPrefix
   });
   const { effectiveNetworkViewWidth, effectiveNetworkViewHeight, handleNetworkSummaryViewportSizeChange } = useAppControllerNetworkViewportState({ canvasResizeBehaviorMode });
   const { headerOffsetPx, headerBlockRef } = useAppControllerHeaderOffsetState();

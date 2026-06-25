@@ -374,7 +374,9 @@ export function useNetworkImportExport({
           {
             connectorCavityOccupancy,
             showTraceabilityLabels: !(prefs.bomTraceabilityLabelsHidden ?? false),
-            includeComputedDownstreamLoad: prefs.bomExportComputedDownstreamLoad ?? false
+            includeComputedDownstreamLoad: prefs.bomExportComputedDownstreamLoad ?? false,
+            formatEntityId: (id) =>
+              formatEntityIdForDisplay(id, network.entityPrefix, prefs.showNetworkEntityPrefix ?? true)
           }
         );
 
