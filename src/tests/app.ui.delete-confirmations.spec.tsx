@@ -105,6 +105,31 @@ describe("App integration UI - delete confirmations", () => {
     expect(toast).toHaveTextContent("Connector deletable (C-DEL)");
   });
 
+  it("deletes the selected entity from Delete/Backspace only outside editable fields", async () => {
+    const { store } = openModelingDeleteScenario();
+    switchSubScreenDrawerAware("connector");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Connector deletable"));
+
+    const filterInput = within(connectorsPanel).getByLabelText(
+      "Connector filter field query",
+    );
+    fireEvent.focus(filterInput);
+    fireEvent.keyDown(filterInput, { key: "Backspace" });
+    expect(
+      screen.queryByRole("dialog", { name: "Delete connector" }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.blur(filterInput);
+    fireEvent.keyDown(window, { key: "Delete" });
+    await confirmDeleteDialog("Delete connector");
+
+    await waitFor(() => {
+      expect(store.getState().connectors.byId[asConnectorId("C-DEL")]).toBeUndefined();
+    });
+  });
+
   it("keeps Cancel focused in direct delete dialogs, supports Escape cancel, and confirms on Enter", async () => {
     const { store } = renderAppWithState(createDeleteConfirmationState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));

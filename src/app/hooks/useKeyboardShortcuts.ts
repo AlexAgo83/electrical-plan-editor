@@ -25,6 +25,7 @@ interface UseKeyboardShortcutsOptions {
   fitNetworkToContentRef: MutableRefObject<() => void>;
   previousValidationIssueRef: MutableRefObject<() => void>;
   nextValidationIssueRef: MutableRefObject<() => void>;
+  deleteSelectedAction?: () => boolean;
   setActiveScreen: (screen: ScreenId) => void;
   setActiveSubScreen: (subScreen: SubScreenId) => void;
 }
@@ -38,6 +39,7 @@ export function useKeyboardShortcuts({
   fitNetworkToContentRef,
   previousValidationIssueRef,
   nextValidationIssueRef,
+  deleteSelectedAction,
   setActiveScreen,
   setActiveSubScreen
 }: UseKeyboardShortcutsOptions): void {
@@ -58,6 +60,14 @@ export function useKeyboardShortcuts({
       }
 
       if (isEditableElement(event.target)) {
+        return;
+      }
+
+      if (normalizedKey === "delete" || normalizedKey === "backspace") {
+        if (deleteSelectedAction?.() === true) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
         return;
       }
 
@@ -153,6 +163,7 @@ export function useKeyboardShortcuts({
     };
   }, [
     activeScreenRef,
+    deleteSelectedAction,
     exportActiveNetworkRef,
     fitNetworkToContentRef,
     keyboardShortcutsEnabled,

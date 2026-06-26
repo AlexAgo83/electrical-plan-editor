@@ -1,10 +1,10 @@
 ## item_638_fast_element_deletion_via_keyboard_delete_backspace - Fast element deletion via keyboard (Delete/Backspace)
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Operator workflow and runtime integration
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -59,6 +59,7 @@ Goal: editing speed, natural interaction close to classic drawing tools.
 - Hybrid rationale: Derived from request `req_152_suppr_element_clavier` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_152_suppr_element_clavier.md`.
 - Generated locally by logics-manager.
+- Task `task_147_fast_element_deletion_via_keyboard_delete_backspace` was finished via `logics-manager flow finish task` on 2026-06-26.
 
 # Tasks
 - `task_147_fast_element_deletion_via_keyboard_delete_backspace`

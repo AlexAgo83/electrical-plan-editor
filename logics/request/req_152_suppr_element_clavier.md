@@ -1,7 +1,7 @@
 ## req_152_suppr_element_clavier - Fast element deletion via keyboard (Delete/Backspace)
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 95
 > Confidence: 92
 > Complexity: Low

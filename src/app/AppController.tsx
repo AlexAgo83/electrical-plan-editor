@@ -1,6 +1,6 @@
 import { type ReactElement, useCallback, useEffect, useMemo, useState } from "react";
 import appPackageMetadata from "../../package.json";
-import type { CatalogItemId } from "../core/entities";
+import type { CatalogItemId, ConnectorId, NodeId, SegmentId, SpliceId, WireId } from "../core/entities";
 import { appActions } from "../store";
 import { appStore } from "./store";
 import { appUiModules, preloadNetworkSummaryWorkspaceUiModules } from "./components/appUiModules";
@@ -729,6 +729,32 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     [catalogHandlers, dispatchAction, markDetailPanelsSelectionSourceAsTable, setActiveScreen, setActiveSubScreen, store]
   );
+  const deleteSelectedAction = useCallback(() => {
+    if (selected === null) {
+      return false;
+    }
+
+    switch (selected.kind) {
+      case "catalog":
+        catalogHandlers.handleCatalogDelete(selected.id as CatalogItemId);
+        return true;
+      case "connector":
+        connectorHandlers.handleConnectorDelete(selected.id as ConnectorId);
+        return true;
+      case "splice":
+        spliceHandlers.handleSpliceDelete(selected.id as SpliceId);
+        return true;
+      case "node":
+        nodeHandlers.handleNodeDelete(selected.id as NodeId);
+        return true;
+      case "segment":
+        segmentHandlers.handleSegmentDelete(selected.id as SegmentId);
+        return true;
+      case "wire":
+        wireHandlers.handleWireDelete(selected.id as WireId);
+        return true;
+    }
+  }, [catalogHandlers, connectorHandlers, nodeHandlers, segmentHandlers, selected, spliceHandlers, wireHandlers]);
 
   useAppControllerAnalysisSubScreenTrackingEffect({
     activeScreen,
@@ -746,6 +772,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     fitNetworkToContentRef,
     previousValidationIssueRef,
     nextValidationIssueRef,
+    deleteSelectedAction,
     setActiveScreen: handleWorkspaceScreenChange,
     setActiveSubScreen
   });
