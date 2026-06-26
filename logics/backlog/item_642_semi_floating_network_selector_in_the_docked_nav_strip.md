@@ -1,10 +1,10 @@
 ## item_642_semi_floating_network_selector_in_the_docked_nav_strip - Semi-floating network selector in the docked nav strip
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Operator workflow and runtime integration
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -61,6 +61,7 @@ Goal: faster navigation in large harnesses, less context loss.
 - Hybrid rationale: Derived from request `req_156_floating_network_selector` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_156_floating_network_selector.md`.
 - Generated locally by logics-manager.
+- Task `task_151_semi_floating_network_selector_in_the_docked_nav_strip` was finished via `logics-manager flow finish task` on 2026-06-26.
 
 # Tasks
 - `task_151_semi_floating_network_selector_in_the_docked_nav_strip`

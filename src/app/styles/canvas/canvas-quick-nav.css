@@ -109,6 +109,34 @@
   padding: 0;
 }
 
+.header-docked-network-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.header-docked-network-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  min-width: 10rem;
+  max-width: 14rem;
+}
+
+.header-docked-network-selector select {
+  width: 100%;
+  min-width: 0;
+  min-height: 1.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-muted);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  padding: 0.18rem 1.6rem 0.18rem 0.55rem;
+}
+
 .header-quick-entity-nav .filter-chip {
   min-height: 1.85rem;
   padding: 0.22rem 0.55rem;
@@ -142,6 +170,10 @@
 }
 
 @media (max-width: 760px) {
+  .header-docked-network-selector {
+    display: none;
+  }
+
   .header-center-content {
     width: 100%;
   }

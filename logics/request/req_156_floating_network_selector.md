@@ -1,7 +1,7 @@
 ## req_156_floating_network_selector - Semi-floating network selector in the docked nav strip
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 95
 > Confidence: 92
 > Complexity: Low

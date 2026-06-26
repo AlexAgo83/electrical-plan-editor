@@ -1079,6 +1079,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isAiAgentOpen: isAiAgentModelingOpen,
       isAiAgentReady: aiSettings.readiness.isReady,
       aiAgentDisabledReason,
+      activeNetwork,
+      networks,
+      onSelectActiveNetwork: workspaceNetworkDomain.handleSelectNetwork,
       onScreenChange: handleWorkspaceDrawerScreenChange,
       onSubScreenChange: handleSubScreenChange,
       onOpenAiAgent: handleOpenAiAgent

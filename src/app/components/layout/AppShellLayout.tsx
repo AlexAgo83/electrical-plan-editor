@@ -9,6 +9,7 @@ import {
   type RefObject
 } from "react";
 import { HomeWorkspaceContainer } from "../containers/HomeWorkspaceContainer";
+import type { Network, NetworkId } from "../../../core/entities";
 import { ModelingWorkspaceContainer } from "../containers/ModelingWorkspaceContainer";
 import { NetworkScopeWorkspaceContainer } from "../containers/NetworkScopeWorkspaceContainer";
 import { SettingsWorkspaceContainer } from "../containers/SettingsWorkspaceContainer";
@@ -81,6 +82,9 @@ interface AppShellLayoutProps {
   isAiAgentOpen: boolean;
   isAiAgentReady: boolean;
   aiAgentDisabledReason: string;
+  activeNetwork: Pick<Network, "id" | "name" | "technicalId"> | null;
+  networks: Array<Pick<Network, "id" | "name" | "technicalId">>;
+  onSelectActiveNetwork: (networkId: NetworkId) => void;
   onScreenChange: WorkspaceSidebarPanelProps["onScreenChange"];
   onSubScreenChange: WorkspaceSidebarPanelProps["onSubScreenChange"];
   onOpenAiAgent: () => void;
@@ -180,6 +184,9 @@ export function AppShellLayout({
   isAiAgentOpen,
   isAiAgentReady,
   aiAgentDisabledReason,
+  activeNetwork,
+  networks,
+  onSelectActiveNetwork,
   onScreenChange,
   onSubScreenChange,
   onOpenAiAgent,
@@ -435,17 +442,41 @@ export function AppShellLayout({
   const headerCenterNavigation = isHarnessAssemblyScreen ? (
     headerHarnessAssemblyFunctionalScopeNavigation
   ) : (
-    <NetworkSummaryQuickEntityNavigation
-      variant="header"
-      quickEntityNavigationMode={isAnalysisScreen ? "analysis" : "modeling"}
-      activeSubScreen={activeSubScreen}
-      entityCountBySubScreen={entityCountBySubScreen}
-      onQuickEntityNavigation={onSubScreenChange}
-      isAiAgentOpen={isAiAgentOpen}
-      isAiAgentReady={isAiAgentReady}
-      aiAgentDisabledReason={aiAgentDisabledReason}
-      onOpenAiAgent={onOpenAiAgent}
-    />
+    <div className="header-docked-network-nav">
+      {activeNetwork === null ? null : (
+        <label className="header-docked-network-selector">
+          <span className="network-summary-active-network-icon" aria-hidden="true" />
+          <select
+            aria-label={`Active plan: ${activeNetwork.name}. Change active plan`}
+            value={activeNetwork.id}
+            onChange={(event) => {
+              const nextNetworkId = event.target.value as NetworkId;
+              if (nextNetworkId !== activeNetwork.id && networks.some((network) => network.id === nextNetworkId)) {
+                onSelectActiveNetwork(nextNetworkId);
+              }
+            }}
+            disabled={networks.length < 2}
+          >
+            {networks.map((network) => (
+              <option key={network.id} value={network.id}>
+                {network.name} ({network.technicalId})
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      <NetworkSummaryQuickEntityNavigation
+        variant="header"
+        quickEntityNavigationMode={isAnalysisScreen ? "analysis" : "modeling"}
+        activeSubScreen={activeSubScreen}
+        entityCountBySubScreen={entityCountBySubScreen}
+        onQuickEntityNavigation={onSubScreenChange}
+        isAiAgentOpen={isAiAgentOpen}
+        isAiAgentReady={isAiAgentReady}
+        aiAgentDisabledReason={aiAgentDisabledReason}
+        onOpenAiAgent={onOpenAiAgent}
+      />
+    </div>
   );
   const headerCenterContent = shouldMountDockedSettingsSearch ? (
     <div

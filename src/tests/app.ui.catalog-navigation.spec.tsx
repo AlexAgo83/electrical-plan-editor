@@ -1,5 +1,6 @@
 import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
+import type { NetworkId } from "../core/entities";
 import { appActions, appReducer } from "../store";
 import {
   asConnectorId,
@@ -113,6 +114,55 @@ describe("App integration UI - catalog navigation", () => {
     const dockedNav = document.querySelector(".header-quick-entity-nav") as HTMLElement;
     fireEvent.click(within(dockedNav).getByRole("button", { name: /^Catalog/i }));
     expect(getPanelByHeading("Catalog")).toBeInTheDocument();
+  });
+
+  it("shows an active-network selector in docked quick navigation", async () => {
+    const baseState = createUiIntegrationState();
+    const activeNetworkId = baseState.activeNetworkId;
+    const stateWithSecondNetwork = appReducer(
+      baseState,
+      appActions.createNetwork(
+        {
+          id: "net-other" as NetworkId,
+          name: "Other network",
+          technicalId: "NET-OTHER",
+          createdAt: "2026-06-26T00:00:00.000Z",
+          updatedAt: "2026-06-26T00:00:00.000Z"
+        },
+        false
+      )
+    );
+    const { store } = renderAppWithState(stateWithSecondNetwork);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+
+    switchScreenDrawerAware("modeling");
+
+    const headerBlock = document.querySelector(".header-block");
+    const quickNavPanel = document.querySelector("[data-quick-entity-nav-source='true']");
+    expect(headerBlock).not.toBeNull();
+    expect(quickNavPanel).not.toBeNull();
+
+    Object.defineProperty(headerBlock, "getBoundingClientRect", {
+      configurable: true,
+      value: () => ({ top: 0, right: 1200, bottom: 72, left: 0, width: 1200, height: 72, x: 0, y: 0 })
+    });
+    Object.defineProperty(quickNavPanel, "getBoundingClientRect", {
+      configurable: true,
+      value: () => ({ top: 48, right: 800, bottom: 96, left: 240, width: 560, height: 48, x: 240, y: 48 })
+    });
+
+    act(() => {
+      window.dispatchEvent(new Event("scroll"));
+    });
+
+    await waitFor(() => expect(document.querySelector(".header-docked-nav-shell")).toHaveClass("is-visible"));
+    const dockedSelectorShell = document.querySelector(".header-docked-network-selector");
+    expect(dockedSelectorShell).not.toBeNull();
+    const selector = within(dockedSelectorShell as HTMLElement).getByLabelText(/Active plan: Main network \(Sample\)/i);
+    expect(selector).toHaveValue(activeNetworkId);
+
+    fireEvent.change(selector, { target: { value: "net-other" } });
+    expect(store.getState().activeNetworkId).toBe("net-other");
   });
 
   it("compacts header actions as soon as docked quick navigation blends in", async () => {
