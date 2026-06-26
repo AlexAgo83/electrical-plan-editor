@@ -22,6 +22,11 @@ describe("compact navigation labels", () => {
     expect(getCountedNavigationLabel("Segments", 10)).toBe("Seg.");
   });
 
+  it("can keep only the first letter above 99 for header labels", () => {
+    expect(getCountedNavigationLabel("Connectors", 100)).toBe("Conn.");
+    expect(getCountedNavigationLabel("Connectors", 100, true)).toBe("C");
+  });
+
   it("keeps the full label available for accessibility", () => {
     expect(getCountedNavigationAriaLabel("Connectors", 12)).toBe("Connectors");
   });

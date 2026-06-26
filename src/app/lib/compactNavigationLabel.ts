@@ -23,8 +23,12 @@ function normalizeLabel(label: string): string {
     .trim();
 }
 
-export function getCountedNavigationLabel(label: string, count: number): string {
+export function getCountedNavigationLabel(label: string, count: number, useInitialAbove99 = false): string {
   const trimmedLabel = label.trim();
+  if (useInitialAbove99 && count > 99) {
+    return Array.from(trimmedLabel)[0] ?? label;
+  }
+
   if (count <= 9 || Array.from(trimmedLabel).length < MIN_COMPACT_LABEL_LENGTH) {
     return label;
   }

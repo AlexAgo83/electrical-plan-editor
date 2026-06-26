@@ -73,7 +73,7 @@ export function NetworkSummaryQuickEntityNavigation({
       <div className={groupClassName} role="group" aria-label="Quick entity navigation strip">
         {QUICK_ENTITY_NAV_ITEMS[quickEntityNavigationMode].map((item) => {
           const entityCount = entityCountBySubScreen[item.subScreen];
-          const navigationLabel = getCountedNavigationLabel(item.label, entityCount);
+          const navigationLabel = getCountedNavigationLabel(item.label, entityCount, variant === "header");
           return (
             <button
               key={item.subScreen}
