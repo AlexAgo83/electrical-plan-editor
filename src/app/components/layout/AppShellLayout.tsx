@@ -238,12 +238,14 @@ export function AppShellLayout({
   const [isSettingsSearchPresentationActive, setIsSettingsSearchPresentationActive] = useState(false);
   const [settingsSearchDockProgress, setSettingsSearchDockProgress] = useState(0);
   const [isNetworkPickerOpen, setIsNetworkPickerOpen] = useState(false);
+  const [networkPickerMenuStyle, setNetworkPickerMenuStyle] = useState<CSSProperties>({});
   const isQuickEntityNavigationDockedRef = useRef(false);
   const isQuickEntityNavigationPresentationActiveRef = useRef(false);
   const quickEntityNavigationDockThresholdRef = useRef<number | null>(null);
   const isSettingsSearchDockedRef = useRef(false);
   const isSettingsSearchPresentationActiveRef = useRef(false);
   const settingsSearchDockThresholdRef = useRef<number | null>(null);
+  const networkPickerButtonRef = useRef<HTMLButtonElement | null>(null);
   const shouldOfferDockedEntityNavigation =
     hasActiveNetwork &&
     (isModelingScreen || isAnalysisScreen || (isHarnessAssemblyScreen && headerHarnessAssemblyFunctionalScopeNavigation !== null));
@@ -455,6 +457,17 @@ export function AppShellLayout({
     shouldOfferDockedEntityNavigation && isQuickEntityNavigationPresentationActive;
   const shouldMountDockedSettingsSearch = isSettingsScreen && isSettingsSearchPresentationActive;
   const closeNetworkPicker = () => setIsNetworkPickerOpen(false);
+  const toggleNetworkPicker = () => {
+    const rect = networkPickerButtonRef.current?.getBoundingClientRect();
+    if (rect !== undefined) {
+      const menuWidth = 352;
+      setNetworkPickerMenuStyle({
+        top: rect.bottom + 6,
+        left: Math.min(Math.max(8, rect.right - menuWidth), window.innerWidth - menuWidth - 8)
+      });
+    }
+    setIsNetworkPickerOpen((current) => !current);
+  };
   const headerCenterNavigation = isHarnessAssemblyScreen ? (
     headerHarnessAssemblyFunctionalScopeNavigation
   ) : (
@@ -463,17 +476,18 @@ export function AppShellLayout({
         <>
         <button
           type="button"
+          ref={networkPickerButtonRef}
           className="filter-chip header-docked-network-picker-button"
           aria-haspopup="menu"
           aria-expanded={isNetworkPickerOpen}
           aria-label={`Active plan: ${activeNetwork.name}. Change active plan`}
-          onClick={() => setIsNetworkPickerOpen((current) => !current)}
+          onClick={toggleNetworkPicker}
           title={`Active plan: ${activeNetwork.name}`}
         >
           <span className="network-summary-active-network-icon" aria-hidden="true" />
         </button>
         {isNetworkPickerOpen ? (
-          <div className="header-network-picker-menu" role="menu" aria-label="Select active plan">
+          <div className="header-network-picker-menu" role="menu" aria-label="Select active plan" style={networkPickerMenuStyle}>
             {networks.map((network) => {
               const isActive = network.id === activeNetwork.id;
               return (

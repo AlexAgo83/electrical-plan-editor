@@ -127,20 +127,20 @@
 }
 
 .header-network-picker-menu {
-  position: absolute;
-  top: calc(100% + 0.35rem);
-  left: 0;
-  z-index: 1100;
+  position: fixed;
+  z-index: 5000;
   display: grid;
   gap: 0.25rem;
   width: min(22rem, calc(100vw - 1rem));
   max-height: min(24rem, calc(100vh - 5rem));
   overflow: auto;
-  padding: 0.45rem;
-  border: 1px solid var(--color-border-muted);
+  padding: 0.5rem;
+  border: 2px solid var(--color-accent);
   border-radius: 8px;
   background: var(--color-surface);
-  box-shadow: 0 16px 40px rgb(15 23 42 / 0.2);
+  box-shadow:
+    0 20px 70px rgb(15 23 42 / 0.42),
+    0 0 0 1px rgb(255 255 255 / 0.28) inset;
 }
 
 .header-network-picker-option {
@@ -152,7 +152,7 @@
   padding: 0.55rem 0.65rem;
   border: 1px solid var(--color-border-muted);
   border-radius: 6px;
-  background: var(--color-surface);
+  background: var(--color-surface-muted);
   color: var(--color-text);
   text-align: left;
   cursor: pointer;
@@ -162,7 +162,7 @@
 .header-network-picker-option:focus-visible,
 .header-network-picker-option.is-active {
   border-color: var(--color-accent);
-  background: var(--color-surface-muted);
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
 }
 
 .header-network-picker-option-name {
