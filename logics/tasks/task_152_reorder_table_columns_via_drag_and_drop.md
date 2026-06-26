@@ -2,17 +2,18 @@
 > From version: 1.16.10
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Understanding: 95
+> Confidence: 90
+> Progress: 0
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Definition of Done (DoD)
-- [ ] The backlog scope is implemented.
-- [ ] Acceptance criteria are covered.
-- [ ] Validation passes.
+- **MERGED INTO [[task_148_configurable_visible_columns_in_data_tables]]** (decision 2026-06-26): column reordering is delivered as part of the combined "configurable + reorderable columns" task, on the shared per-table column-descriptor refactor. Do NOT implement this task standalone — its acceptance criteria (below, retained for traceability) are now covered by task_148 (AC6–AC8). Closed-as-merged once task_148 ships.
+- [ ] The backlog scope is implemented (via task_148).
+- [ ] Acceptance criteria are covered (via task_148 AC6–AC8).
+- [ ] Validation passes (via task_148).
 
 # Backlog
 - `item_643_reorder_table_columns_via_drag_and_drop`

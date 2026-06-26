@@ -2,15 +2,16 @@
 > From version: 1.16.10
 > Schema version: 1.0
 > Status: Draft
-> Understanding: 90
-> Confidence: 70
+> Understanding: 95
+> Confidence: 90
 > Complexity: Medium
 > Theme: edition-plan
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
 
 # Needs
-- Let the user reorder columns in the various data tables.
-- Goal: usability comfort, light UI personalization.
+- **FOLDED INTO [[req_153_configurable_table_columns]]** (decision 2026-06-26): column reordering is delivered as part of the combined "configurable + reorderable columns" slice, because both features require the same per-table column-descriptor refactor. This request is no longer a standalone delivery — its scope, decisions, and acceptance criteria (desktop-mouse drag-and-drop header reordering, identifier column movable, order persisted in the shared UI-preferences migration) now live in req_153.
+- Original need (retained for traceability): let the user reorder columns in the data tables; goal: usability comfort, light UI personalization.
+- Resolved decisions carried into req_153: reorder mechanism = native HTML5 drag-and-drop on headers, **desktop mouse only** (no keyboard/touch fallback in this slice).
 
 # Context
 - Companion to [[req_153_configurable_table_columns]] (configurable visible columns), which explicitly listed reordering as out of scope — this slice owns it. Both rely on the same foundation.
@@ -41,10 +42,10 @@
 - Out: column resizing; saved layout presets/views; reordering in the analysis synthesis tables (separate, unless folded in later); touch-drag polish beyond basic support.
 
 # Risks / Open questions
-- Shared dependency with req_153 on the per-table column-descriptor refactor — sequence so one introduces the descriptor model and the other builds on it (avoid double refactor). Recommend req_153 first, then this.
-- Native HTML5 drag-and-drop ergonomics (drop indicators, keyboard accessibility) — define minimum acceptable interaction; consider arrow-key fallback for accessibility.
-- Stable column-id scheme shared with req_153 so order and visibility key off the same ids and migrate together.
-- Touch/mobile drag support is limited with native DnD — confirm whether mobile is in scope.
+- RESOLVED — shared descriptor refactor: merged into req_153 (one slice, one refactor), not sequenced as two.
+- RESOLVED — input scope: desktop mouse only; no keyboard or touch fallback in this slice.
+- RESOLVED — column-id scheme: shared with req_153; order and visibility key off the same ids and migrate together.
+- All remaining implementation risk now tracked under req_153.
 
 # Companion docs
 - Product brief(s): (none yet)

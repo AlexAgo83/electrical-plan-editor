@@ -2,8 +2,8 @@
 > From version: 1.16.10
 > Schema version: 1.0
 > Status: Draft
-> Understanding: 90
-> Confidence: 70
+> Understanding: 95
+> Confidence: 90
 > Complexity: Medium
 > Theme: catalogue
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -20,10 +20,11 @@
 - No existing duplicate/clone feature today (only automatic legacy-migration id generation in `src/store/catalog.ts`).
 
 # Decisions
-- **manufacturerReference on copy**: copied then auto-suffixed to stay unique (e.g. `<ref>-copy`, `-2`…); user adjusts afterwards. Must guarantee uniqueness against the *target* network's catalog.
-- **Entry point**: a **"Copy from…" selector inside the create form** — pick a source reference (and a source network), fields pre-fill. Single flow that naturally handles cross-harness.
-- **Cross-harness included** in this slice: source can be the active network or any other network in the document.
-- Copy is a starting point: all copied fields remain editable before submit; submit goes through the normal `catalog/upsert` validation.
+- **Source enumeration = all networks in the document** (decision 2026-06-26): the source-network picker lists every network via `selectNetworks(state)` (`src/store/selectors.ts:91-93`), not just the active one and not limited to a HarnessAssembly group. Other networks' catalogs are already readable in `networkStates`.
+- **manufacturerReference on copy**: copied then auto-suffixed to stay unique (e.g. `<ref>-copy`, `-2`…); user adjusts afterwards. Uniqueness MUST be computed against the **target** network's catalog (`networkStates[targetNetworkId].catalogItems`), NOT the active/top-level list — see Risks: the existing `catalogReducer` check only scopes the active network.
+- **Deep copy via `structuredClone`** (already used in `src/app/lib/aiAgentApply.ts:91,97`): clone the source CatalogItem's nested structures (`additionalAccessories`, `connectorLayout.ways`/keying, `fuseBoxConfig.pairs`, `connectorDefaults`) so the new item shares no references with the source.
+- **Entry point**: a **"Copy from…" selector inside the create form** — pick a source network + reference, fields pre-fill. Single flow that naturally handles cross-harness.
+- Copy is a starting point: all copied fields remain editable before submit; submit goes through the normal `catalog/upsert` validation; a fresh `CatalogItemId` is generated (never reused from source).
 
 # Acceptance criteria
 - AC1: From the catalog create form, a "Copy from…" selector lets the user pick a source reference; selecting it pre-fills all configuration fields (ways, name, material defaults, accessories, layout, fuse box).
@@ -43,10 +44,10 @@
 - Out: bulk copy of multiple references at once; live linking/sync between source and copy; copying connectors placed on the plan (this is catalog-level only).
 
 # Risks / Open questions
-- Auto-suffix uniqueness must be computed against the *target* network's catalog, not the source's.
-- Deep-copy correctness for nested structures (`additionalAccessories`, `connectorLayout.ways`/keying, `fuseBoxConfig.pairs`, `connectorDefaults`) — avoid shared references.
-- Cross-harness reading: confirm how to enumerate other networks for the source selector (HarnessAssembly grouping vs all `networkStates`).
-- New `id` (CatalogItemId) must be freshly generated, never reused from source.
+- KNOWN GAP — `hasDuplicateManufacturerReference` (`src/store/reducer/catalogReducer.ts:20-31`) checks only `state.catalogItems.allIds` (active/top-level network). The auto-suffix routine MUST instead check the **target** network's `networkStates[targetNetworkId].catalogItems.allIds`; reusing the existing helper as-is would give wrong uniqueness when copying into a non-active network. Implementation must add a target-scoped uniqueness check.
+- RESOLVED — deep copy: use `structuredClone` (already in the codebase) on the source CatalogItem; avoids the shallow-clone reference sharing in `src/store/networking.ts`.
+- RESOLVED — source enumeration: `selectNetworks(state)` lists all networks; no HarnessAssembly restriction.
+- RESOLVED — fresh `CatalogItemId` generated on copy, never reused from source.
 
 # Companion docs
 - Product brief(s): (none yet)
@@ -59,6 +60,9 @@
 - `src/store/actions.ts` (catalog/upsert)
 - `src/store/reducer/catalogReducer.ts` (uniqueness/normalize/propagate)
 - `src/store/types.ts:132-143,162-177` (network-scoped catalog, activeNetworkId, networkStates)
+- `src/store/selectors.ts:91-93` (`selectNetworks` — enumerate all networks for the source picker)
+- `src/store/reducer/catalogReducer.ts:20-31` (`hasDuplicateManufacturerReference` — active-network-scoped; needs target-scoped variant)
+- `src/app/lib/aiAgentApply.ts:91,97` (`structuredClone` precedent for deep copy)
 
 # AI Context
 - Summary: "Copy from…" source selector in the catalog create form that deep-copies a CatalogItem (same or other network) into a new item with a unique auto-suffixed reference, all fields editable before upsert.

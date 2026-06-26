@@ -2,8 +2,8 @@
 > From version: 1.16.11
 > Schema version: 1.0
 > Status: Draft
-> Understanding: 85%
-> Confidence: 70%
+> Understanding: 92%
+> Confidence: 88%
 > Complexity: Low
 > Theme: edition-plan
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -50,10 +50,10 @@
 - Out: global plan-wide size slider; automatic role-driven sizing (power/signal auto-detection from `PinElectricalRole`); any size beyond the discrete small/normal/big set (e.g. free-form percentage per pin); changes to keying or shell sizing.
 
 # Risks / Open questions
-- Decoupling must be surgical: only the visual multiplier moves to the new helper. If a grid-math call site (`clampWayX/Y`, `getConnectorLayoutWayOccupiedCells`, `getConnectorLayoutWayRenderCenter` — `src/core/connectorLayout.ts:94-118`) is changed by mistake, a `small` pin would wrongly occupy a fractional/extra cell. Verify span call sites stay on `getConnectorLayoutWaySpan`.
-- Legibility / hit target: x0.5 is the agreed floor. If the smallest readable size in real plans is still too small at high pin counts, revisit the multiplier (do not go below x0.5 without a usability check).
-- Three render sites use slightly different base constants (0.6 / 0.56 / 0.56 etc.) — confirm each multiplies the new visual scale, not the span, so they stay visually consistent.
-- Confirm whether the callout layer (`NetworkSummaryCalloutsLayer`) should reflect `small`, or only the main physical view — assumed yes (all three) for consistency.
+- Decoupling must be surgical: only the visual multiplier moves to the new helper. The grid-math call sites are exactly `clampWayX/Y`, `getConnectorLayoutWayOccupiedCells`, `getConnectorLayoutWayRenderCenter` (`src/core/connectorLayout.ts:94-118`) and MUST stay on `getConnectorLayoutWaySpan`; only the three render sites switch to `getConnectorLayoutWayVisualScale`. (validated by a throwaway spike — change is mechanical and isolated)
+- RESOLVED — x0.5 is the agreed floor (chosen over x0.25 for legibility/hit-target). Do not go below x0.5 without a usability check.
+- RESOLVED — all three render sites multiply the per-shape base constants by the visual scale (not the span), so `small` stays visually consistent across physical view, editor preview, and callout.
+- RESOLVED — the callout layer (`NetworkSummaryCalloutsLayer:262`) reflects `small` too; all three render sites are in scope for consistency.
 
 # Companion docs
 - Product brief(s): (none yet)
