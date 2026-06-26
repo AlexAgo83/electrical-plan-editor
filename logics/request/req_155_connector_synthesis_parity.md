@@ -2,8 +2,8 @@
 > From version: 1.16.10
 > Schema version: 1.0
 > Status: Draft
-> Understanding: 95%
-> Confidence: 85%
+> Understanding: 95
+> Confidence: 85
 > Complexity: Low
 > Theme: analysis
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -66,3 +66,4 @@
 
 # Backlog
 - none
+- `item_641_connector_synthesis_parity_with_splice_add_section_color_twist_tag`

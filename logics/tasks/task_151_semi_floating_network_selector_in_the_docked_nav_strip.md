@@ -1,0 +1,43 @@
+## task_151_semi_floating_network_selector_in_the_docked_nav_strip - Semi-floating network selector in the docked nav strip
+> From version: 1.16.10
+> Schema version: 1.0
+> Status: Ready
+> Understanding: 90%
+> Confidence: 85%
+> Progress: 0%
+> Complexity: Medium
+> Theme: Implementation delivery
+> Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+
+# Definition of Done (DoD)
+- [ ] The backlog scope is implemented.
+- [ ] Acceptance criteria are covered.
+- [ ] Validation passes.
+
+# Backlog
+- `item_642_semi_floating_network_selector_in_the_docked_nav_strip`
+
+# Acceptance criteria
+- AC1: When the nav strip is docked on scroll, a network selector is visible next to the counters and lets the user switch the active network without scrolling back up.
+- AC2: Switching network from the docked control updates `activeNetworkId` identically to the existing `NetworkSummaryHeader` selector (same callback, same result).
+- AC3: The docked selector reflects the current active network and the available network list.
+- AC4: On narrow/mobile viewports, if the row would overflow, the docked selector is omitted (desktop-only) and counters remain intact — no layout breakage.
+- AC5: No regression to the existing in-content network selector in `NetworkSummaryHeader`.
+
+# Validation
+- Run `python3 -m logics_manager lint --require-status`.
+- Run `python3 -m logics_manager flow finish task task_151_semi_floating_network_selector_in_the_docked_nav_strip.md` after implementation.
+
+# Report
+- Implementation complete.
+
+# AI Context
+- Summary: Implement semi-floating network selector in the docked nav strip.
+- Keywords: task, implementation, backlog, runtime, python
+- Use when: You need a bounded implementation task for a backlog item.
+- Skip when: The work is still at the request or backlog shaping stage.
+
+# Links
+- Request: `req_156_floating_network_selector`
+- Product brief(s): (none yet)
+- Architecture decision(s): (none yet)

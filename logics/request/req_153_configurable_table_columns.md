@@ -2,8 +2,8 @@
 > From version: 1.16.10
 > Schema version: 1.0
 > Status: Draft
-> Understanding: 90%
-> Confidence: 70%
+> Understanding: 90
+> Confidence: 70
 > Complexity: Medium
 > Theme: edition-plan
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -67,3 +67,4 @@
 
 # Backlog
 - none
+- `item_639_configurable_visible_columns_in_data_tables`

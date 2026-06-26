@@ -2,8 +2,8 @@
 > From version: 1.16.10
 > Schema version: 1.0
 > Status: Draft
-> Understanding: 90%
-> Confidence: 70%
+> Understanding: 90
+> Confidence: 70
 > Complexity: Medium
 > Theme: edition-plan
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -65,3 +65,4 @@
 
 # Backlog
 - none
+- `item_643_reorder_table_columns_via_drag_and_drop`

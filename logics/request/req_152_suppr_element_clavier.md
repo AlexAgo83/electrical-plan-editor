@@ -2,8 +2,8 @@
 > From version: 1.16.10
 > Schema version: 1.0
 > Status: Draft
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 90
+> Confidence: 85
 > Complexity: Low
 > Theme: edition-plan
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -60,3 +60,4 @@
 
 # Backlog
 - none
+- `item_638_fast_element_deletion_via_keyboard_delete_backspace`
