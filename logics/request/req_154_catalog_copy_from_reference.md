@@ -1,7 +1,7 @@
 ## req_154_catalog_copy_from_reference - Catalog connector: copy configuration from another reference
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 95
 > Confidence: 90
 > Complexity: Medium

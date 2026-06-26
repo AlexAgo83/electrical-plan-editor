@@ -8,6 +8,12 @@ import { ConnectorLayoutEditor } from "./ConnectorLayoutEditor";
 import { renderFormHeader } from "./ModelingFormsColumn.shared";
 import { PinElectricalRolesEditor } from "./PinElectricalRolesEditor";
 import type { ConnectorPinElectricalRoleDrafts } from "../../hooks/connectorPinElectricalRoles";
+import type { CatalogCopySourceValue } from "../../hooks/useCatalogHandlers";
+
+export interface CatalogCopySourceOption {
+  value: CatalogCopySourceValue;
+  label: string;
+}
 
 interface ModelingCatalogFormPanelProps {
   isCatalogSubScreen: boolean;
@@ -61,6 +67,8 @@ interface ModelingCatalogFormPanelProps {
   setCatalogPinElectricalRoleDrafts: (value: ConnectorPinElectricalRoleDrafts) => void;
   catalogPinElectricalRoleSelection: number[];
   setCatalogPinElectricalRoleSelection: (value: number[]) => void;
+  catalogCopySourceOptions: CatalogCopySourceOption[];
+  copyCatalogFromSource: (value: CatalogCopySourceValue) => void;
   catalogFormError: string | null;
 }
 
@@ -116,6 +124,8 @@ export function ModelingCatalogFormPanel({
   setCatalogPinElectricalRoleDrafts,
   catalogPinElectricalRoleSelection,
   setCatalogPinElectricalRoleSelection,
+  catalogCopySourceOptions,
+  copyCatalogFromSource,
   catalogFormError
 }: ModelingCatalogFormPanelProps): ReactElement | null {
   void _openCreateCatalogForm;
@@ -166,6 +176,28 @@ export function ModelingCatalogFormPanel({
           catalogFormMode === "create" ? "Create catalog item" : "Edit catalog item",
           catalogFormMode
         )}
+        {catalogFormMode === "create" && catalogCopySourceOptions.length > 0 ? (
+          <label>
+            Copy from
+            <select
+              aria-label="Copy from catalog reference"
+              value=""
+              onChange={(event) => {
+                const value = event.target.value as CatalogCopySourceValue;
+                if (value.length > 0) {
+                  copyCatalogFromSource(value);
+                }
+              }}
+            >
+              <option value="">Select a reference...</option>
+              {catalogCopySourceOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
         <label>
           Manufacturer reference
           <input

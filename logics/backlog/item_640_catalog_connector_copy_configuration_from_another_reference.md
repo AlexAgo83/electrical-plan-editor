@@ -1,10 +1,10 @@
 ## item_640_catalog_connector_copy_configuration_from_another_reference - Catalog connector: copy configuration from another reference
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Operator workflow and runtime integration
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -62,6 +62,7 @@ Goal: faster catalog creation, less re-typing, fewer errors.
 - Hybrid rationale: Derived from request `req_154_catalog_copy_from_reference` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_154_catalog_copy_from_reference.md`.
 - Generated locally by logics-manager.
+- Task `task_149_catalog_connector_copy_configuration_from_another_reference` was finished via `logics-manager flow finish task` on 2026-06-26.
 
 # Tasks
 - `task_149_catalog_connector_copy_configuration_from_another_reference`

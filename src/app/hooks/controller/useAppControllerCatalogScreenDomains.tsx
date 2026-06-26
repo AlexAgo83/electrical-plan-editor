@@ -15,10 +15,13 @@ import type { CatalogHandlersModel } from "../useCatalogHandlers";
 import type { EntityFormsStateModel } from "../useEntityFormsState";
 import type { ImportExportStatus, WorkspaceCurrencyCode } from "../../types/app-controller";
 import type { FileFeedbackDialogModel } from "../networkImportExportTypes";
+import type { AppState } from "../../../store";
+import type { CatalogCopySourceOption } from "../../components/workspace/ModelingCatalogFormPanel";
 
 interface UseAppControllerCatalogScreenDomainsParams {
   isCatalogSubScreen: boolean;
   catalogItems: CatalogItem[];
+  appState: AppState;
   connectors: Connector[];
   splices: Splice[];
   wires: Wire[];
@@ -59,6 +62,7 @@ interface UseAppControllerCatalogScreenDomainsResult {
 export function useAppControllerCatalogScreenDomains({
   isCatalogSubScreen,
   catalogItems,
+  appState,
   connectors,
   splices,
   wires,
@@ -87,6 +91,30 @@ export function useAppControllerCatalogScreenDomains({
 }: UseAppControllerCatalogScreenDomainsParams): UseAppControllerCatalogScreenDomainsResult {
   const [activeCatalogTableView, setActiveCatalogTableView] = useState<CatalogTableView>("items");
   const isCatalogItemsView = activeCatalogTableView === "items";
+  const catalogCopySourceOptions: CatalogCopySourceOption[] = appState.networks.allIds.flatMap((networkId) => {
+    const network = appState.networks.byId[networkId];
+    const sourceCatalogItems =
+      appState.activeNetworkId === networkId
+        ? appState.catalogItems
+        : appState.networkStates[networkId]?.catalogItems;
+    if (network === undefined || sourceCatalogItems === undefined) {
+      return [];
+    }
+
+    return sourceCatalogItems.allIds.flatMap((catalogItemId) => {
+      const item = sourceCatalogItems.byId[catalogItemId];
+      if (item === undefined) {
+        return [];
+      }
+
+      return [
+        {
+          value: catalogHandlers.getCatalogCopySourceValue(networkId, catalogItemId),
+          label: `${network.name} / ${item.manufacturerReference}${item.name === undefined ? "" : ` (${item.name})`}`
+        }
+      ];
+    });
+  });
 
   const catalogModelingLeftColumnContent = (
     <ModelingCatalogListPanel
@@ -173,6 +201,8 @@ export function useAppControllerCatalogScreenDomains({
         setCatalogPinElectricalRoleDrafts={formsState.setCatalogPinElectricalRoleDrafts}
         catalogPinElectricalRoleSelection={formsState.catalogPinElectricalRoleSelection}
         setCatalogPinElectricalRoleSelection={formsState.setCatalogPinElectricalRoleSelection}
+        catalogCopySourceOptions={catalogCopySourceOptions}
+        copyCatalogFromSource={catalogHandlers.copyCatalogFromSource}
         catalogFormError={formsState.catalogFormError}
       />
     </section>

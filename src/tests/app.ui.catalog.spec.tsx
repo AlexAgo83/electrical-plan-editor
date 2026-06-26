@@ -1,6 +1,7 @@
 import { act, fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { appActions, appReducer, createInitialState } from "../store";
+import type { NetworkId } from "../core/entities";
 import {
   asCatalogItemId,
   asConnectorId,
@@ -14,9 +15,125 @@ import {
 } from "./helpers/app-ui-test-utils";
 import { getConnectorLayoutKeyingControls, getConnectorLayoutKeyingRow } from "./helpers/app-ui-form-test-utils";
 
+function asNetworkId(value: string): NetworkId {
+  return value as NetworkId;
+}
+
 describe("App integration UI - catalog", () => {
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  it("copies catalog connector configuration from another network without mutating the source", () => {
+    const targetNetworkId = createInitialState().activeNetworkId as NetworkId;
+    const sourceNetworkId = asNetworkId("net-source");
+    const sourceCatalogItemId = asCatalogItemId("CAT-SOURCE");
+    let state = appReducer(
+      createInitialState(),
+      appActions.createNetwork({
+        id: sourceNetworkId,
+        name: "Source network",
+        technicalId: "NET-SRC",
+        createdAt: "2026-06-01T00:00:00.000Z",
+        updatedAt: "2026-06-01T00:00:00.000Z"
+      })
+    );
+    state = appReducer(
+      state,
+      appActions.upsertCatalogItem({
+        id: sourceCatalogItemId,
+        manufacturerReference: "SRC-REF",
+        connectionCount: 6,
+        name: "Source connector",
+        unitPriceExclTax: 12.5,
+        url: "https://example.com/src-ref",
+        additionalAccessories: [{ accessoryReference: "LOCK-1", accessoryName: "Secondary lock" }],
+        connectorDefaults: {
+          allSameTerminals: true,
+          defaultTerminal: {
+            terminalReference: "TERM-1",
+            terminalName: "Terminal",
+            sealReference: "SEAL-1",
+            sealName: "Seal"
+          },
+          plugs: [{ plugReference: "PLUG-1", quantity: 2, plugName: "Plug" }],
+          rearBackshell: { enabled: true, lengthMm: 55 },
+          pinElectricalRoles: {
+            1: { role: "source", currentA: 8, label: "Feed" }
+          }
+        },
+        connectorLayout: {
+          version: 1,
+          units: "grid",
+          width: 6,
+          height: 5,
+          shellShape: "circle",
+          keyings: [{ side: "top", shape: "square", color: "#ff8800", position: 2 }],
+          ways: [
+            { cavityIndex: 1, x: 2, y: 2, shape: "square", label: "A1" },
+            { cavityIndex: 2, x: 4, y: 2, shape: "slot", strokeStyle: "dashed", label: "A2" }
+          ]
+        },
+        fuseBoxConfig: {
+          pairs: [
+            { pairIndex: 0, pinA: 1, pinB: 2 },
+            { pairIndex: 1, pinA: 3, pinB: 4 }
+          ]
+        }
+      })
+    );
+    state = appReducer(state, appActions.selectNetwork(targetNetworkId));
+    state = appReducer(
+      state,
+      appActions.upsertCatalogItem({
+        id: asCatalogItemId("CAT-COLLISION"),
+        manufacturerReference: "SRC-REF-COPY",
+        connectionCount: 2
+      })
+    );
+
+    const { store } = renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("catalog");
+
+    const catalogPanel = getPanelByHeading("Catalog");
+    fireEvent.click(within(catalogPanel).getByRole("button", { name: "New" }));
+
+    const catalogFormPanel = getPanelByHeading("Create catalog item");
+    fireEvent.change(within(catalogFormPanel).getByLabelText("Copy from catalog reference"), {
+      target: { value: `${sourceNetworkId}:${sourceCatalogItemId}` }
+    });
+
+    expect(within(catalogFormPanel).getByLabelText("Manufacturer reference")).toHaveValue("SRC-REF-COPY-2");
+    expect(within(catalogFormPanel).getByLabelText("Connection count")).toHaveValue(6);
+    expect(within(catalogFormPanel).getByLabelText("Fuse box")).toBeChecked();
+    expect(within(catalogFormPanel).getByLabelText("Name")).toHaveValue("Source connector");
+    expect(within(catalogFormPanel).getByLabelText("Additional accessories")).toBeChecked();
+    expect(within(catalogFormPanel).getByLabelText("Connector material defaults")).toBeChecked();
+    expect(within(catalogFormPanel).getByLabelText("Pin electric roles")).toBeChecked();
+    expect(within(catalogFormPanel).getByLabelText("Connector physical layout")).toBeChecked();
+    expect(within(getPanelByHeading("Additional accessories")).getByLabelText("Accessory reference")).toHaveValue("LOCK-1");
+    expect(within(getPanelByHeading("Connector material defaults")).getByLabelText("Default terminal reference")).toHaveValue("TERM-1");
+    expect(within(getPanelByHeading("Connector material defaults")).getByLabelText("Rear backshell length (mm)")).toHaveValue(55);
+    expect(within(getPanelByHeading("Connector physical layout")).getByText("6 ways")).toBeInTheDocument();
+
+    fireEvent.change(within(getPanelByHeading("Additional accessories")).getByLabelText("Accessory reference"), {
+      target: { value: "LOCK-COPY" }
+    });
+    fireEvent.click(within(catalogFormPanel).getByRole("button", { name: "Create" }));
+
+    const copied = store
+      .getState()
+      .catalogItems.allIds.map((id) => store.getState().catalogItems.byId[id])
+      .find((item) => item?.manufacturerReference === "SRC-REF-COPY-2");
+    expect(copied?.additionalAccessories).toEqual([{ accessoryReference: "LOCK-COPY", accessoryName: "Secondary lock" }]);
+    expect(copied?.connectorDefaults?.defaultTerminal?.terminalReference).toBe("TERM-1");
+    expect(copied?.connectorLayout?.keyings?.[0]?.color).toBe("#ff8800");
+    expect(copied?.fuseBoxConfig?.pairs).toHaveLength(3);
+    expect(store.getState().networkStates[sourceNetworkId]?.catalogItems.byId[sourceCatalogItemId]?.additionalAccessories).toEqual([
+      { accessoryReference: "LOCK-1", accessoryName: "Secondary lock" }
+    ]);
   });
 
   it("enforces catalog-first connector creation and supports catalog creation with URL validation", () => {

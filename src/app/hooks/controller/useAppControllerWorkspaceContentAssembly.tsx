@@ -414,6 +414,7 @@ export function useAppControllerWorkspaceContentAssembly({
   } = useAppControllerCatalogScreenDomains({
     isCatalogSubScreen: state.isCatalogSubScreen,
     catalogItems: entities.catalogItems,
+    appState: state.appState,
     connectors: entities.connectors,
     splices: entities.splices,
     wires: entities.wires,

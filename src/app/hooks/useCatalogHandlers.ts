@@ -1,5 +1,12 @@
 import type { FormEvent } from "react";
-import type { CatalogAdditionalAccessory, CatalogItem, CatalogItemId, ConnectorLayout, FuseBoxConfig } from "../../core/entities";
+import type {
+  CatalogAdditionalAccessory,
+  CatalogItem,
+  CatalogItemId,
+  ConnectorLayout,
+  FuseBoxConfig,
+  NetworkId
+} from "../../core/entities";
 import { normalizeConnectorLayout } from "../../core/connectorLayout";
 import {
   formatPinElectricalRoleDrafts,
@@ -19,6 +26,8 @@ type DispatchAction = (
     trackHistory?: boolean;
   }
 ) => void;
+
+export type CatalogCopySourceValue = `${NetworkId}:${CatalogItemId}`;
 
 interface UseCatalogHandlersParams {
   store: AppStore;
@@ -100,6 +109,26 @@ function hasConnectorMaterialDefaults(item: CatalogItem): boolean {
   );
 }
 
+function cloneCatalogFormValue<T>(value: T): T {
+  return structuredClone(value);
+}
+
+function getCatalogCopySourceValue(networkId: NetworkId, catalogItemId: CatalogItemId): CatalogCopySourceValue {
+  return `${networkId}:${catalogItemId}` as CatalogCopySourceValue;
+}
+
+function parseCatalogCopySourceValue(value: string): { networkId: NetworkId; catalogItemId: CatalogItemId } | null {
+  const separatorIndex = value.indexOf(":");
+  if (separatorIndex < 1 || separatorIndex === value.length - 1) {
+    return null;
+  }
+
+  return {
+    networkId: value.slice(0, separatorIndex) as NetworkId,
+    catalogItemId: value.slice(separatorIndex + 1) as CatalogItemId
+  };
+}
+
 export function useCatalogHandlers({
   store,
   dispatchAction,
@@ -153,6 +182,79 @@ export function useCatalogHandlers({
   setCatalogPinElectricalRoleSelection = () => {},
   setCatalogFormError
 }: UseCatalogHandlersParams) {
+  function applyCatalogItemToForm(item: CatalogItem, manufacturerReference: string): void {
+    setCatalogManufacturerReference(manufacturerReference);
+    setCatalogConnectionCount(String(item.connectionCount));
+    setCatalogName(item.name ?? "");
+    setCatalogUnitPriceExclTax(item.unitPriceExclTax === undefined ? "" : String(item.unitPriceExclTax));
+    setCatalogUrl(item.url ?? "");
+    setCatalogAdditionalAccessories(cloneCatalogFormValue(item.additionalAccessories ?? []));
+    setCatalogShowAdditionalAccessories((item.additionalAccessories?.length ?? 0) > 0);
+    setCatalogShowConnectorMaterialDefaults(hasConnectorMaterialDefaults(item));
+    setCatalogAllSameTerminals(item.connectorDefaults?.allSameTerminals === true);
+    setCatalogDefaultTerminalReference(item.connectorDefaults?.defaultTerminal?.terminalReference ?? "");
+    setCatalogDefaultTerminalName(item.connectorDefaults?.defaultTerminal?.terminalName ?? "");
+    setCatalogDefaultSealReference(item.connectorDefaults?.defaultTerminal?.sealReference ?? "");
+    setCatalogDefaultSealName(item.connectorDefaults?.defaultTerminal?.sealName ?? "");
+    setCatalogPlugDefinitionsText(
+      item.connectorDefaults?.plugs
+        ?.map((plug) => [plug.plugReference, plug.quantity, plug.plugName ?? ""].join(","))
+        .join("\n") ?? ""
+    );
+    setCatalogRearBackshellEnabled(item.connectorDefaults?.rearBackshell?.enabled === true);
+    setCatalogRearBackshellLengthMm(
+      item.connectorDefaults?.rearBackshell?.lengthMm === undefined
+        ? "40"
+        : String(item.connectorDefaults.rearBackshell.lengthMm)
+    );
+    setCatalogConnectorLayout(cloneCatalogFormValue(item.connectorLayout));
+    setCatalogShowConnectorPhysicalLayout(item.connectorLayout !== undefined);
+    setCatalogIsFuseBox(item.fuseBoxConfig !== undefined);
+    setCatalogShowPinElectricalRoles(item.connectorDefaults?.pinElectricalRoles !== undefined);
+    setCatalogPinElectricalRoleDrafts(
+      formatPinElectricalRoleDrafts(item.connectorDefaults?.pinElectricalRoles, item.connectionCount)
+    );
+    setCatalogPinElectricalRoleSelection([]);
+    setCatalogFormError(null);
+  }
+
+  function buildUniqueCatalogCopyReference(sourceReference: string): string {
+    const base = `${sourceReference.trim() || "CATALOG"}-COPY`;
+    const usedReferences = new Set(
+      store
+        .getState()
+        .catalogItems.allIds.map((id) => store.getState().catalogItems.byId[id]?.manufacturerReference.trim().toLowerCase())
+        .filter((reference): reference is string => reference !== undefined && reference.length > 0)
+    );
+
+    if (!usedReferences.has(base.toLowerCase())) {
+      return base;
+    }
+
+    for (let suffix = 2; suffix < 10_000; suffix += 1) {
+      const candidate = `${base}-${suffix}`;
+      if (!usedReferences.has(candidate.toLowerCase())) {
+        return candidate;
+      }
+    }
+
+    return `${base}-${Date.now()}`;
+  }
+
+  function findCatalogCopySource(value: string): CatalogItem | undefined {
+    const parsed = parseCatalogCopySourceValue(value);
+    if (parsed === null) {
+      return undefined;
+    }
+
+    const state = store.getState();
+    if (state.activeNetworkId === parsed.networkId) {
+      return state.catalogItems.byId[parsed.catalogItemId];
+    }
+
+    return state.networkStates[parsed.networkId]?.catalogItems.byId[parsed.catalogItemId];
+  }
+
   function clearCatalogMaterialDefaults(): void {
     setCatalogAllSameTerminals(false);
     setCatalogDefaultTerminalReference("");
@@ -207,40 +309,19 @@ export function useCatalogHandlers({
   function startCatalogEdit(item: CatalogItem): void {
     setCatalogFormMode("edit");
     setEditingCatalogItemId(item.id);
-    setCatalogManufacturerReference(item.manufacturerReference);
-    setCatalogConnectionCount(String(item.connectionCount));
-    setCatalogName(item.name ?? "");
-    setCatalogUnitPriceExclTax(item.unitPriceExclTax === undefined ? "" : String(item.unitPriceExclTax));
-    setCatalogUrl(item.url ?? "");
-    setCatalogAdditionalAccessories(item.additionalAccessories ?? []);
-    setCatalogShowAdditionalAccessories((item.additionalAccessories?.length ?? 0) > 0);
-    setCatalogShowConnectorMaterialDefaults(hasConnectorMaterialDefaults(item));
-    setCatalogAllSameTerminals(item.connectorDefaults?.allSameTerminals === true);
-    setCatalogDefaultTerminalReference(item.connectorDefaults?.defaultTerminal?.terminalReference ?? "");
-    setCatalogDefaultTerminalName(item.connectorDefaults?.defaultTerminal?.terminalName ?? "");
-    setCatalogDefaultSealReference(item.connectorDefaults?.defaultTerminal?.sealReference ?? "");
-    setCatalogDefaultSealName(item.connectorDefaults?.defaultTerminal?.sealName ?? "");
-    setCatalogPlugDefinitionsText(
-      item.connectorDefaults?.plugs
-        ?.map((plug) => [plug.plugReference, plug.quantity, plug.plugName ?? ""].join(","))
-        .join("\n") ?? ""
-    );
-    setCatalogRearBackshellEnabled(item.connectorDefaults?.rearBackshell?.enabled === true);
-    setCatalogRearBackshellLengthMm(
-      item.connectorDefaults?.rearBackshell?.lengthMm === undefined
-        ? "40"
-        : String(item.connectorDefaults.rearBackshell.lengthMm)
-    );
-    setCatalogConnectorLayout(item.connectorLayout);
-    setCatalogShowConnectorPhysicalLayout(item.connectorLayout !== undefined);
-    setCatalogIsFuseBox(item.fuseBoxConfig !== undefined);
-    setCatalogShowPinElectricalRoles(item.connectorDefaults?.pinElectricalRoles !== undefined);
-    setCatalogPinElectricalRoleDrafts(
-      formatPinElectricalRoleDrafts(item.connectorDefaults?.pinElectricalRoles, item.connectionCount)
-    );
-    setCatalogPinElectricalRoleSelection([]);
-    setCatalogFormError(null);
+    applyCatalogItemToForm(item, item.manufacturerReference);
     dispatchAction(appActions.select({ kind: "catalog", id: item.id }), { trackHistory: false });
+  }
+
+  function copyCatalogFromSource(value: string): void {
+    const source = findCatalogCopySource(value);
+    if (source === undefined) {
+      return;
+    }
+
+    setCatalogFormMode("create");
+    setEditingCatalogItemId(null);
+    applyCatalogItemToForm(source, buildUniqueCatalogCopyReference(source.manufacturerReference));
   }
 
   function handleCatalogSubmit(event: FormEvent<HTMLFormElement>): void {
@@ -444,6 +525,8 @@ export function useCatalogHandlers({
     clearCatalogForm,
     cancelCatalogEdit,
     startCatalogEdit,
+    copyCatalogFromSource,
+    getCatalogCopySourceValue,
     handleCatalogSubmit,
     handleCatalogDelete
   };
