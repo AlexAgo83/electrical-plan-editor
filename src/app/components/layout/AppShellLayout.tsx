@@ -237,6 +237,7 @@ export function AppShellLayout({
   const [isSettingsSearchDocked, setIsSettingsSearchDocked] = useState(false);
   const [isSettingsSearchPresentationActive, setIsSettingsSearchPresentationActive] = useState(false);
   const [settingsSearchDockProgress, setSettingsSearchDockProgress] = useState(0);
+  const [isNetworkPickerOpen, setIsNetworkPickerOpen] = useState(false);
   const isQuickEntityNavigationDockedRef = useRef(false);
   const isQuickEntityNavigationPresentationActiveRef = useRef(false);
   const quickEntityNavigationDockThresholdRef = useRef<number | null>(null);
@@ -258,6 +259,20 @@ export function AppShellLayout({
   useEffect(() => {
     isSettingsSearchDockedRef.current = isSettingsSearchDocked;
   }, [isSettingsSearchDocked]);
+
+  useEffect(() => {
+    if (!isNetworkPickerOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsNetworkPickerOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isNetworkPickerOpen]);
 
   useEffect(() => {
     isSettingsSearchPresentationActiveRef.current = isSettingsSearchPresentationActive;
@@ -439,31 +454,65 @@ export function AppShellLayout({
   const shouldMountDockedEntityNavigation =
     shouldOfferDockedEntityNavigation && isQuickEntityNavigationPresentationActive;
   const shouldMountDockedSettingsSearch = isSettingsScreen && isSettingsSearchPresentationActive;
+  const closeNetworkPicker = () => setIsNetworkPickerOpen(false);
   const headerCenterNavigation = isHarnessAssemblyScreen ? (
     headerHarnessAssemblyFunctionalScopeNavigation
   ) : (
     <div className="header-docked-network-nav">
       {activeNetwork === null ? null : (
-        <label className="header-docked-network-selector">
+        <>
+        <button
+          type="button"
+          className="filter-chip header-docked-network-picker-button"
+          aria-haspopup="dialog"
+          aria-expanded={isNetworkPickerOpen}
+          onClick={() => setIsNetworkPickerOpen(true)}
+          title={`Active plan: ${activeNetwork.name}`}
+        >
           <span className="network-summary-active-network-icon" aria-hidden="true" />
-          <select
-            aria-label={`Active plan: ${activeNetwork.name}. Change active plan`}
-            value={activeNetwork.id}
-            onChange={(event) => {
-              const nextNetworkId = event.target.value as NetworkId;
-              if (nextNetworkId !== activeNetwork.id && networks.some((network) => network.id === nextNetworkId)) {
-                onSelectActiveNetwork(nextNetworkId);
-              }
-            }}
-            disabled={networks.length < 2}
-          >
-            {networks.map((network) => (
-              <option key={network.id} value={network.id}>
-                {network.name} ({network.technicalId})
-              </option>
-            ))}
-          </select>
-        </label>
+          <span className="header-docked-network-picker-label">{activeNetwork.name}</span>
+        </button>
+        {isNetworkPickerOpen ? (
+          <div className="header-network-picker-backdrop" role="presentation" onMouseDown={closeNetworkPicker}>
+            <section
+              className="header-network-picker-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="header-network-picker-title"
+              onMouseDown={(event) => event.stopPropagation()}
+            >
+              <header className="header-network-picker-header">
+                <h2 id="header-network-picker-title">Select active plan</h2>
+                <button type="button" className="header-network-picker-close-button" aria-label="Close" onClick={closeNetworkPicker}>
+                  ×
+                </button>
+              </header>
+              <div className="header-network-picker-list">
+                {networks.map((network) => {
+                  const isActive = network.id === activeNetwork.id;
+                  return (
+                    <button
+                      key={network.id}
+                      type="button"
+                      className={`header-network-picker-option${isActive ? " is-active" : ""}`}
+                      aria-pressed={isActive}
+                      onClick={() => {
+                        if (!isActive) {
+                          onSelectActiveNetwork(network.id);
+                        }
+                        closeNetworkPicker();
+                      }}
+                    >
+                      <span className="header-network-picker-option-name">{network.name}</span>
+                      <span className="technical-id">{network.technicalId}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          </div>
+        ) : null}
+        </>
       )}
       <NetworkSummaryQuickEntityNavigation
         variant="header"

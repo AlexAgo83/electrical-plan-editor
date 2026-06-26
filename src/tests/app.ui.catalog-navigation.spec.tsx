@@ -118,7 +118,6 @@ describe("App integration UI - catalog navigation", () => {
 
   it("shows an active-network selector in docked quick navigation", async () => {
     const baseState = createUiIntegrationState();
-    const activeNetworkId = baseState.activeNetworkId;
     const stateWithSecondNetwork = appReducer(
       baseState,
       appActions.createNetwork(
@@ -156,13 +155,15 @@ describe("App integration UI - catalog navigation", () => {
     });
 
     await waitFor(() => expect(document.querySelector(".header-docked-nav-shell")).toHaveClass("is-visible"));
-    const dockedSelectorShell = document.querySelector(".header-docked-network-selector");
-    expect(dockedSelectorShell).not.toBeNull();
-    const selector = within(dockedSelectorShell as HTMLElement).getByLabelText(/Active plan: Main network \(Sample\)/i);
-    expect(selector).toHaveValue(activeNetworkId);
+    const pickerButton = screen.getByRole("button", { name: /Main network \(Sample\)/i });
+    expect(pickerButton).toHaveAttribute("aria-haspopup", "dialog");
+    fireEvent.click(pickerButton);
 
-    fireEvent.change(selector, { target: { value: "net-other" } });
+    const pickerDialog = screen.getByRole("dialog", { name: "Select active plan" });
+    expect(within(pickerDialog).getByRole("button", { name: /Main network \(Sample\)/i })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(within(pickerDialog).getByRole("button", { name: /Other network/i }));
     expect(store.getState().activeNetworkId).toBe("net-other");
+    expect(screen.queryByRole("dialog", { name: "Select active plan" })).not.toBeInTheDocument();
   });
 
   it("compacts header actions as soon as docked quick navigation blends in", async () => {
