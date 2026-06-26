@@ -994,8 +994,7 @@ export function ModelingSecondaryTables({
                         "Length (mm)",
                         "Untwisted length (mm)",
                       ];
-                  const twistGroupCounts =
-                    buildWireTwistGroupExportCounts(sortedVisibleWires);
+                  const twistGroupCounts = buildWireTwistGroupExportCounts(wires);
                   const rows = sortedVisibleWires.map((wire) => {
                     const begin = describeWireEndpointCsvParts(wire.endpointA);
                     const end = describeWireEndpointCsvParts(wire.endpointB);
