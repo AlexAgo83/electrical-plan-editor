@@ -1,27 +1,27 @@
 ## task_145_colocated_splice_rendering_and_network_scope_entity_prefix_display - Colocated splice rendering and network-scope entity prefix display
 > From version: 1.16.7
 > Schema version: 1.0
-> Status: In Progress
+> Status: Done
 > Understanding: 95
 > Confidence: 88
-> Progress: 95%
+> Progress: 100%
 > Complexity: High
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Definition of Done (DoD)
-- [ ] Add a pure colocated-splice grouping/layout helper that resolves placed splices to physical segment positions, groups same-segment same-position splices, treats opposite `fromNodeId` descriptions as equivalent, and returns deterministic display-only offsets along the carrier segment normal.
-- [ ] Integrate the helper into Network Summary 2D graph/callout rendering so colocated splice symbols render symmetrically on both sides of the carrier segment, with spacing derived from the rendered splice symbol size and no persisted `Splice.placement` mutation.
-- [ ] Render a short colocated-splice link line by default, add a persistent settings toggle to hide it, and ensure SVG/PNG/PDF/human-readable plan exports honor the same setting.
-- [ ] Anchor colocated splice labels and callouts to the displaced symbol positions rather than the true physical center point.
-- [ ] Add `Network.entityPrefix` (or the final agreed field name) to the core model, persistence normalization, workspace save/load, network import/export, and Network scope form editing.
-- [ ] Add prefix auto-detection for existing workspaces/imports when connector/node/splice/segment/wire IDs consistently share an obvious prefix such as `LAT-` or `PRI-`, leaving the field blank when detection is ambiguous.
-- [ ] Add shared prefix-aware display helpers for connector, node, splice, segment, and wire IDs. The helpers must hide the active network prefix in UI and human-readable exports when the setting is off, but never alter canonical stored IDs or AI-agent JSON output.
-- [ ] Update creation/edit flows and technical ID suggestion paths so new entities in a prefixed network store IDs with the prefix anchored in `technicalId`.
-- [ ] Add a harness assembly / multi-network-only disambiguation hint when hidden prefixes produce duplicate-looking bare IDs across networks.
-- [ ] Add i18n entries for the new settings, Network scope prefix field, and any visible disambiguation/link-line labels.
-- [ ] All acceptance criteria AC1-AC16 are covered.
-- [ ] Validation passes (code + Logics gates).
+- [x] Add a pure colocated-splice grouping/layout helper that resolves placed splices to physical segment positions, groups same-segment same-position splices, treats opposite `fromNodeId` descriptions as equivalent, and returns deterministic display-only offsets along the carrier segment normal.
+- [x] Integrate the helper into Network Summary 2D graph/callout rendering so colocated splice symbols render symmetrically on both sides of the carrier segment, with spacing derived from the rendered splice symbol size and no persisted `Splice.placement` mutation.
+- [x] Render a short colocated-splice link line by default, add a persistent settings toggle to hide it, and ensure SVG/PNG/PDF/human-readable plan exports honor the same setting.
+- [x] Anchor colocated splice labels and callouts to the displaced symbol positions rather than the true physical center point.
+- [x] Add `Network.entityPrefix` (or the final agreed field name) to the core model, persistence normalization, workspace save/load, network import/export, and Network scope form editing.
+- [x] Add prefix auto-detection for existing workspaces/imports when connector/node/splice/segment/wire IDs consistently share an obvious prefix such as `LAT-` or `PRI-`, leaving the field blank when detection is ambiguous.
+- [x] Add shared prefix-aware display helpers for connector, node, splice, segment, and wire IDs. The helpers must hide the active network prefix in UI and human-readable exports when the setting is off, but never alter canonical stored IDs or AI-agent JSON output.
+- [x] Update creation/edit flows and technical ID suggestion paths so new entities in a prefixed network store IDs with the prefix anchored in `technicalId`.
+- [x] Add a harness assembly / multi-network-only disambiguation hint when hidden prefixes produce duplicate-looking bare IDs across networks.
+- [x] Add i18n entries for the new settings, Network scope prefix field, and any visible disambiguation/link-line labels.
+- [x] All acceptance criteria AC1-AC16 are covered.
+- [x] Validation passes (code + Logics gates).
 
 # Backlog
 - `item_636_colocated_splice_rendering_and_network_scope_entity_prefix_display`
@@ -77,10 +77,15 @@
   - harness assembly / multi-network duplicate-looking labels get a disambiguation hint, while ordinary single-network views do not.
 - Run `npm run -s typecheck`, `npm run -s lint`, focused vitest suites for the new helpers and touched UI/persistence/export paths, and broader `npm run -s test:ci:fast` if feasible.
 - Logics gates: run `logics-manager lint --require-status` and `logics-manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability`.
+- Finish workflow executed on 2026-06-26.
+- Linked backlog/request close verification passed.
 
 # Report
 - Implemented and validated (typecheck, eslint, `test:ci:fast`, `test:ci:ui`, Logics lint + audit all green).
 - Colocated splice rendering: `buildRenderedFloatingSplices` now clusters placed splices into
+- Finished on 2026-06-26.
+- Linked backlog item(s): `item_636_colocated_splice_rendering_and_network_scope_entity_prefix_display`
+- Related request(s): `req_150_colocated_splice_rendering_and_network_scope_entity_prefix_display`
   colocation groups by canonical along-segment ratio (reverse-`fromNodeId` equivalent), keeps
   distinct points on the existing even along-segment spread, and offsets truly colocated splices
   symmetrically along the carrier-segment normal with spacing derived from the splice symbol size
@@ -116,3 +121,21 @@
 - Backlog: `item_636_colocated_splice_rendering_and_network_scope_entity_prefix_display`
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
+
+# AC Traceability
+- request-AC1 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC2 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC3 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC4 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC5 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC6 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC7 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC8 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC9 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC10 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC11 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC12 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC13 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC14 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC15 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC16 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.

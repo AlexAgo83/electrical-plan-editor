@@ -1,24 +1,24 @@
 ## task_146_network_summary_callouts_honor_network_entity_prefix_display_setting - Network Summary callouts honor the network entity prefix display setting
 > From version: 1.16.8
 > Schema version: 1.0
-> Status: In Progress
+> Status: Done
 > Understanding: 98
 > Confidence: 95
-> Progress: 95%
+> Progress: 100%
 > Owner: claudea
 > Complexity: Low
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Definition of Done (DoD)
-- [ ] Thread the existing per-network `formatEntityId` resolver (built from `activeNetwork.entityPrefix` + `canvasShowNetworkEntityPrefix` in `NetworkSummaryPanel.tsx`) into the callout model builders.
-- [ ] Apply the resolver to the connector and splice callout title via `buildCalloutHeaderDisplay` (format the `technicalId` argument), preserving the existing name/manufacturer-reference subtitle behavior.
-- [ ] Apply the resolver to the wire-row `End ID` cell (`targetId` from `describeWireEndpointForCallout`) for both connector and splice endpoints.
-- [ ] Apply the resolver to the wire-row `Wire ID` cell (`entry.technicalId`) so the wire's own technical ID drops the active prefix when hidden.
-- [ ] Keep canonical IDs for all non-display uses: callout keys (`connector:<id>` / `splice:<id>`), selection targets (`onSelectConnectorFromCallout` / `onSelectSpliceFromCallout`), drag-position persistence, sorting, and grouping must not be formatted.
-- [ ] Confirm SVG/PNG/PDF network-plan exports reflect the on-screen prefix visibility through the existing live-DOM snapshot (no separate export formatting path needed).
-- [ ] All acceptance criteria AC1-AC7 are covered.
-- [ ] Validation passes (code + Logics gates).
+- [x] Thread the existing per-network `formatEntityId` resolver (built from `activeNetwork.entityPrefix` + `canvasShowNetworkEntityPrefix` in `NetworkSummaryPanel.tsx`) into the callout model builders.
+- [x] Apply the resolver to the connector and splice callout title via `buildCalloutHeaderDisplay` (format the `technicalId` argument), preserving the existing name/manufacturer-reference subtitle behavior.
+- [x] Apply the resolver to the wire-row `End ID` cell (`targetId` from `describeWireEndpointForCallout`) for both connector and splice endpoints.
+- [x] Apply the resolver to the wire-row `Wire ID` cell (`entry.technicalId`) so the wire's own technical ID drops the active prefix when hidden.
+- [x] Keep canonical IDs for all non-display uses: callout keys (`connector:<id>` / `splice:<id>`), selection targets (`onSelectConnectorFromCallout` / `onSelectSpliceFromCallout`), drag-position persistence, sorting, and grouping must not be formatted.
+- [x] Confirm SVG/PNG/PDF network-plan exports reflect the on-screen prefix visibility through the existing live-DOM snapshot (no separate export formatting path needed).
+- [x] All acceptance criteria AC1-AC7 are covered.
+- [x] Validation passes (code + Logics gates).
 
 # Backlog
 - `item_637_network_summary_callouts_honor_network_entity_prefix_display_setting`
@@ -48,10 +48,15 @@
 - Confirm no change to AI-agent JSON / machine-readable identifiers.
 - Run `npm run -s typecheck`, `npm run -s lint`, and the focused vitest suite(s) covering the callout model; run broader `npm run -s test:ci:fast` if feasible.
 - Logics gates: run `logics-manager lint --require-status` and `logics-manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability`.
+- Finish workflow executed on 2026-06-26.
+- Linked backlog/request close verification passed.
 
 # Report
 - Implemented and validated (typecheck, eslint, `test:ci:fast`, `test:ci:ui`, Logics lint + audit all green).
 - Callout model now honors the existing `canvasShowNetworkEntityPrefix` setting via the shared
+- Finished on 2026-06-26.
+- Linked backlog item(s): `item_637_network_summary_callouts_honor_network_entity_prefix_display_setting`
+- Related request(s): `req_151_network_summary_callouts_honor_network_entity_prefix_display_setting`
   `formatEntityId` resolver, threaded into `buildConnectorCalloutGroupsById`,
   `buildSpliceCalloutGroupsById`, and `buildCableCalloutViewModels` (optional option, identity
   default so existing callers are unaffected).
@@ -93,3 +98,12 @@
 - Backlog: `item_637_network_summary_callouts_honor_network_entity_prefix_display_setting`
 - Product brief(s): (none)
 - Architecture decision(s): (none)
+
+# AC Traceability
+- request-AC1 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC2 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC3 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC4 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC5 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC6 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.
+- request-AC7 -> This task. Proof: Closed on 2026-06-26 after user confirmation that corpus work is finished; linked task report records implementation complete and validation passed: typecheck, eslint, test:ci:fast, test:ci:ui, Logics lint and audit.

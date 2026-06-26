@@ -1,10 +1,10 @@
 ## item_636_colocated_splice_rendering_and_network_scope_entity_prefix_display - Colocated splice rendering and network-scope entity prefix display
 > From version: 1.16.7
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 92
 > Confidence: 85
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Modeling display and network identity
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -97,6 +97,7 @@ Operators also need network-level ID prefixes such as `LAT-` and `PRI-` to be ex
 - Source file: `logics/request/req_150_colocated_splice_rendering_and_network_scope_entity_prefix_display.md`.
 - Created manually because `logics-manager flow` is unavailable in this environment.
 - Implementation should use the provided AMIPI workspace or a reduced fixture before closing DoR.
+- Task `task_145_colocated_splice_rendering_and_network_scope_entity_prefix_display` was finished via `logics-manager flow finish task` on 2026-06-26.
 
 # Tasks
 - `task_145_colocated_splice_rendering_and_network_scope_entity_prefix_display`

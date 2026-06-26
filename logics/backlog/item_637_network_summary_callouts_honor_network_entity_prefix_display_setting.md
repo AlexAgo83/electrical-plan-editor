@@ -1,10 +1,10 @@
 ## item_637_network_summary_callouts_honor_network_entity_prefix_display_setting - Network Summary callouts honor the network entity prefix display setting
 > From version: 1.16.8
 > Schema version: 1.0
-> Status: In Progress
+> Status: Done
 > Understanding: 98
 > Confidence: 95
-> Progress: 95%
+> Progress: 100%
 > Complexity: Low
 > Theme: Modeling display and network identity
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -72,6 +72,7 @@ Callouts are the primary on-plan documentation surface. When operators hide the 
 - Source file: `logics/request/req_151_network_summary_callouts_honor_network_entity_prefix_display_setting.md`.
 - Created manually because `logics-manager flow` is unavailable in this environment (the published 2.12.12 package ships `cli.py` referencing `logics_manager.flow` but omits the module).
 - Direct follow-up to the `task_145` scope note: callouts were intentionally left on canonical IDs and can adopt the same `formatEntityIdForDisplay` / `formatEntityId` seam.
+- Task `task_146_network_summary_callouts_honor_network_entity_prefix_display_setting` was finished via `logics-manager flow finish task` on 2026-06-26.
 
 # Tasks
 - `task_146_network_summary_callouts_honor_network_entity_prefix_display_setting`

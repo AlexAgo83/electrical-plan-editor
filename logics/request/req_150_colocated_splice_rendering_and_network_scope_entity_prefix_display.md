@@ -1,9 +1,9 @@
 ## req_150_colocated_splice_rendering_and_network_scope_entity_prefix_display - Colocated splice rendering and network-scope entity prefix display
 > From version: 1.16.7
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 92%
-> Confidence: 85%
+> Status: Done
+> Understanding: 93%
+> Confidence: 86%
 > Complexity: Medium
 > Theme: Modeling and display
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -97,7 +97,7 @@ flowchart TD
 - [x] Scope boundaries are explicit.
 - [x] Acceptance criteria are testable.
 - [x] Product decisions below are answered.
-- [ ] The provided AMIPI workspace is available to the implementer or a reduced fixture is extracted from it.
+- [x] The provided AMIPI workspace is available to the implementer or a reduced fixture is extracted from it.
 
 # Product decisions
 - Colocated splice placement: two colocated splice symbols are displayed on opposite sides of the carrier segment, symmetrically along the orthogonal direction.
