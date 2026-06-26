@@ -145,6 +145,47 @@ describe("App integration UI - analysis go-to wire actions", () => {
     expect(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Wire$/, hidden: true })).toHaveClass("is-active");
   });
 
+  it("shows connector synthesis wire section, color, twist group, and functional tag", () => {
+    const baseState = createUiIntegrationState();
+    const wire = baseState.wires.byId[asWireId("W1")];
+    if (wire === undefined) {
+      throw new Error("Expected wire W1 in base integration state.");
+    }
+    const withDetailedWire = appReducer(
+      baseState,
+      appActions.saveWire({
+        ...wire,
+        sectionMm2: 2.5,
+        colorMode: "catalog",
+        primaryColorId: "RD",
+        secondaryColorId: "BU",
+        twistGroupLabel: "TW-A",
+        functionalDomainTag: "12V power"
+      })
+    );
+
+    renderAppWithState(withDetailedWire);
+
+    switchScreenDrawerAware("analysis");
+    switchSubScreenDrawerAware("connector");
+
+    const connectorsPanel = getPanelByHeading("Connectors");
+    fireEvent.click(within(connectorsPanel).getByText("Connector 1"));
+
+    const connectorAnalysisPanel = getPanelByHeading("Connector analysis");
+    fireEvent.click(within(connectorAnalysisPanel).getByRole("button", { name: "Synthesis" }));
+
+    expect(within(connectorAnalysisPanel).getByRole("button", { name: /Section/ })).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByRole("button", { name: /Color/ })).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByRole("button", { name: /Twist group/ })).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByRole("button", { name: /Functional tag/ })).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByText("2.5")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByText("RD/BU")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByText("TW-A")).toBeInTheDocument();
+    expect(within(connectorAnalysisPanel).getByText("12V power")).toBeInTheDocument();
+    expect(connectorAnalysisPanel.querySelectorAll('[title="Red / Blue"]').length).toBeGreaterThanOrEqual(2);
+  });
+
   it("opens destination editing from connector synthesis Destination references", () => {
     renderAppWithState(createUiIntegrationState());
 

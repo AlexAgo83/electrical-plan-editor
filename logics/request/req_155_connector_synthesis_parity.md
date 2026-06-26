@@ -1,7 +1,7 @@
 ## req_155_connector_synthesis_parity - Connector synthesis: parity with splice (add section, color, twist, tag)
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 95
 > Confidence: 92
 > Complexity: Low

@@ -9,7 +9,7 @@ import { getTableAriaSort } from "../../lib/accessibility";
 import { formatOccupantRefForDisplay, parseWireOccupantRef } from "../../lib/app-utils-networking";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
-import { renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
+import { getWireColorCsvValue, renderWireColorPrefixMarker } from "../../lib/wireColorPresentation";
 import {
   formatPinElectricalRoleDrafts,
   hasInvalidPinElectricalRoleDraft,
@@ -74,7 +74,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
   void _setConnectorSynthesisSort;
   void _getSortIndicator;
   type ConnectorAnalysisTableSortField = "name" | "technicalId" | "manufacturerReference" | "cavityCount" | "occupiedCount";
-  type ConnectorSynthesisTableSortField = "name" | "technicalId" | "localWay" | "destination" | "lengthMm";
+  type ConnectorSynthesisTableSortField = "name" | "technicalId" | "sectionMm2" | "color" | "twistGroup" | "functionalTag" | "localWay" | "destination" | "lengthMm";
   const isMobileViewport = useIsMobileViewport();
   const [connectorTableSort, setConnectorTableSort] = useState<{ field: ConnectorAnalysisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
   const [connectorSynthesisTableSort, setConnectorSynthesisTableSort] = useState<{ field: ConnectorSynthesisTableSortField; direction: "asc" | "desc" }>({ field: "name", direction: "asc" });
@@ -122,13 +122,17 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         (row, field) => {
           if (field === "name") return row.wireName;
           if (field === "technicalId") return row.wireTechnicalId;
+          if (field === "sectionMm2") return row.sectionMm2;
+          if (field === "color") return getWireColorCsvValue(wireById.get(row.wireId) ?? { colorMode: "catalog", primaryColorId: null, secondaryColorId: null, freeColorLabel: null });
+          if (field === "twistGroup") return row.twistGroupLabel ?? "";
+          if (field === "functionalTag") return row.functionalDomainTag ?? "";
           if (field === "localWay") return row.localEndpointLabel;
           if (field === "destination") return row.remoteEndpointLabel;
           return row.lengthMm;
         },
         (row) => `${row.wireId}-${row.localEndpointLabel}`
       ),
-    [connectorSynthesisTableSort, sortedConnectorSynthesisRows]
+    [connectorSynthesisTableSort, sortedConnectorSynthesisRows, wireById]
   );
   const connectorListSortIndicator = (field: ConnectorAnalysisTableSortField) =>
     connectorTableSort.field === field ? (connectorTableSort.direction === "asc" ? "▲" : "▼") : "";
@@ -561,10 +565,14 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           }
           downloadCsvFile(
             `analysis-connector-synthesis-${selectedConnector?.technicalId ?? "selection"}`,
-              ["Wire", "Technical ID", "Local way", "Destination", "Length (mm)"],
+              ["Wire", "Technical ID", "Section (mm²)", "Color", "Twist group", "Functional tag", "Local way", "Destination", "Length (mm)"],
             sortedConnectorSynthesisRowsByColumns.map((row) => [
               row.wireName,
               row.wireTechnicalId,
+              row.sectionMm2,
+              getWireColorCsvValue(wireById.get(row.wireId) ?? { colorMode: "catalog", primaryColorId: null, secondaryColorId: null, freeColorLabel: null }),
+              row.twistGroupLabel ?? "",
+              row.functionalDomainTag ?? "",
               row.localEndpointLabel,
               row.remoteEndpointLabel,
               row.lengthMm
@@ -775,6 +783,10 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
               {isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{connectorSynthesisSortIndicator("technicalId")}</span>
             </button>
           </th>
+          <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "sectionMm2")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "sectionMm2", direction: current.field === "sectionMm2" && current.direction === "asc" ? "desc" : "asc" }))}>Section (mm²) <span className="sort-indicator">{connectorSynthesisSortIndicator("sectionMm2")}</span></button></th>
+          <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "color")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "color", direction: current.field === "color" && current.direction === "asc" ? "desc" : "asc" }))}>Color <span className="sort-indicator">{connectorSynthesisSortIndicator("color")}</span></button></th>
+          <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "twistGroup")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "twistGroup", direction: current.field === "twistGroup" && current.direction === "asc" ? "desc" : "asc" }))}>Twist group <span className="sort-indicator">{connectorSynthesisSortIndicator("twistGroup")}</span></button></th>
+          <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "functionalTag")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "functionalTag", direction: current.field === "functionalTag" && current.direction === "asc" ? "desc" : "asc" }))}>Functional tag <span className="sort-indicator">{connectorSynthesisSortIndicator("functionalTag")}</span></button></th>
           <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "localWay")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "localWay", direction: current.field === "localWay" && current.direction === "asc" ? "desc" : "asc" }))}>Local way <span className="sort-indicator">{connectorSynthesisSortIndicator("localWay")}</span></button></th>
           <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "destination")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "destination", direction: current.field === "destination" && current.direction === "asc" ? "desc" : "asc" }))}>Destination <span className="sort-indicator">{connectorSynthesisSortIndicator("destination")}</span></button></th>
           <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{connectorSynthesisSortIndicator("lengthMm")}</span></button></th>
@@ -799,6 +811,15 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
             <td className="technical-id">
               {row.wireTechnicalId}
             </td>
+            <td>{row.sectionMm2}</td>
+            <td>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }}>
+                {renderWireColorPrefixMarker(wire)}
+                <span className="technical-id">{wire === undefined ? "" : getWireColorCsvValue(wire)}</span>
+              </span>
+            </td>
+            <td>{row.twistGroupLabel ?? ""}</td>
+            <td>{row.functionalDomainTag ?? ""}</td>
             <td>{row.localEndpointLabel}</td>
             <td>{renderDestinationReference(row)}</td>
             <td>{row.lengthMm}</td>

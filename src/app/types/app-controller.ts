@@ -22,6 +22,9 @@ export interface ConnectorSynthesisRow {
   wireId: WireId;
   wireName: string;
   wireTechnicalId: string;
+  sectionMm2: number;
+  twistGroupLabel?: string;
+  functionalDomainTag?: string;
   localEndpointLabel: string;
   remoteEndpointLabel: string;
   remoteEndpoint: WireEndpoint;
