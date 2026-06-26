@@ -246,6 +246,7 @@ export function AppShellLayout({
   const isSettingsSearchPresentationActiveRef = useRef(false);
   const settingsSearchDockThresholdRef = useRef<number | null>(null);
   const networkPickerButtonRef = useRef<HTMLButtonElement | null>(null);
+  const networkPickerMenuRef = useRef<HTMLDivElement | null>(null);
   const shouldOfferDockedEntityNavigation =
     hasActiveNetwork &&
     (isModelingScreen || isAnalysisScreen || (isHarnessAssemblyScreen && headerHarnessAssemblyFunctionalScopeNavigation !== null));
@@ -267,13 +268,38 @@ export function AppShellLayout({
       return;
     }
 
+    const isEventInsideNetworkPicker = (target: EventTarget | null): boolean => {
+      if (!(target instanceof Node)) {
+        return false;
+      }
+      return (
+        networkPickerButtonRef.current?.contains(target) === true ||
+        networkPickerMenuRef.current?.contains(target) === true
+      );
+    };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setIsNetworkPickerOpen(false);
       }
     };
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!isEventInsideNetworkPicker(event.target)) {
+        setIsNetworkPickerOpen(false);
+      }
+    };
+    const handleFocusIn = (event: FocusEvent) => {
+      if (!isEventInsideNetworkPicker(event.target)) {
+        setIsNetworkPickerOpen(false);
+      }
+    };
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    document.addEventListener("focusin", handleFocusIn, true);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("pointerdown", handlePointerDown, true);
+      document.removeEventListener("focusin", handleFocusIn, true);
+    };
   }, [isNetworkPickerOpen]);
 
   useEffect(() => {
@@ -487,7 +513,13 @@ export function AppShellLayout({
           <span className="network-summary-active-network-icon" aria-hidden="true" />
         </button>
         {isNetworkPickerOpen ? (
-          <div className="header-network-picker-menu" role="menu" aria-label="Select active plan" style={networkPickerMenuStyle}>
+          <div
+            ref={networkPickerMenuRef}
+            className="header-network-picker-menu"
+            role="menu"
+            aria-label="Select active plan"
+            style={networkPickerMenuStyle}
+          >
             {networks.map((network) => {
               const isActive = network.id === activeNetwork.id;
               return (

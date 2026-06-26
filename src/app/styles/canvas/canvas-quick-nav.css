@@ -126,6 +126,15 @@
   padding: 0;
 }
 
+.header-docked-network-picker-button:hover,
+.header-docked-network-picker-button:focus-visible,
+.header-docked-network-picker-button[aria-expanded="true"] {
+  border-color: var(--color-accent);
+  background:
+    linear-gradient(color-mix(in srgb, var(--color-accent) 18%, transparent), color-mix(in srgb, var(--color-accent) 18%, transparent)),
+    var(--color-surface, #fff);
+}
+
 .header-network-picker-menu {
   position: fixed;
   z-index: 5000;
@@ -137,7 +146,9 @@
   padding: 0.5rem;
   border: 2px solid var(--color-accent);
   border-radius: 8px;
-  background: var(--color-surface);
+  background:
+    linear-gradient(var(--color-surface, #fff), var(--color-surface, #fff)),
+    #fff;
   box-shadow:
     0 20px 70px rgb(15 23 42 / 0.42),
     0 0 0 1px rgb(255 255 255 / 0.28) inset;
@@ -152,7 +163,9 @@
   padding: 0.55rem 0.65rem;
   border: 1px solid var(--color-border-muted);
   border-radius: 6px;
-  background: var(--color-surface-muted);
+  background:
+    linear-gradient(var(--color-surface-muted, #f8fafc), var(--color-surface-muted, #f8fafc)),
+    #fff;
   color: var(--color-text);
   text-align: left;
   cursor: pointer;
@@ -162,7 +175,9 @@
 .header-network-picker-option:focus-visible,
 .header-network-picker-option.is-active {
   border-color: var(--color-accent);
-  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
+  background:
+    linear-gradient(color-mix(in srgb, var(--color-accent) 18%, var(--color-surface, #fff)), color-mix(in srgb, var(--color-accent) 18%, var(--color-surface, #fff))),
+    #fff;
 }
 
 .header-network-picker-option-name {

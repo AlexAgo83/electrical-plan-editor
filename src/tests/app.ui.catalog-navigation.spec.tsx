@@ -161,7 +161,12 @@ describe("App integration UI - catalog navigation", () => {
 
     const pickerMenu = screen.getByRole("menu", { name: "Select active plan" });
     expect(within(pickerMenu).getByRole("menuitemradio", { name: /Main network \(Sample\)/i })).toHaveAttribute("aria-checked", "true");
-    fireEvent.click(within(pickerMenu).getByRole("menuitemradio", { name: /Other network/i }));
+    fireEvent.pointerDown(document.body);
+    expect(screen.queryByRole("menu", { name: "Select active plan" })).not.toBeInTheDocument();
+
+    fireEvent.click(pickerButton);
+    const reopenedPickerMenu = screen.getByRole("menu", { name: "Select active plan" });
+    fireEvent.click(within(reopenedPickerMenu).getByRole("menuitemradio", { name: /Other network/i }));
     expect(store.getState().activeNetworkId).toBe("net-other");
     expect(screen.queryByRole("menu", { name: "Select active plan" })).not.toBeInTheDocument();
   });
