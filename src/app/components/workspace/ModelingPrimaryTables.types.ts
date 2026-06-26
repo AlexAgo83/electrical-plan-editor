@@ -1,3 +1,4 @@
+import type { Dispatch, SetStateAction } from "react";
 import type {
   CatalogItem,
   CatalogItemId,
@@ -17,6 +18,7 @@ import type {
   SortDirection,
   SortState,
 } from "../../types/app-controller";
+import type { TableColumnPreferences } from "../../hooks/uiPreferencesStorage";
 import type { PinRoleMassEditUpdate } from "./PinRoleMassEditPanel";
 
 export interface ModelingPrimaryTablesProps {
@@ -34,6 +36,8 @@ export interface ModelingPrimaryTablesProps {
   ) => void;
   onOpenBatchSelectionDialog: () => void;
   onDeleteSelectedInBatchMode: () => void;
+  tableColumnPreferences: TableColumnPreferences;
+  setTableColumnPreferences: Dispatch<SetStateAction<TableColumnPreferences>>;
   isConnectorSubScreen: boolean;
   connectorFormMode: "idle" | "create" | "edit";
   onOpenCreateConnector: () => void;

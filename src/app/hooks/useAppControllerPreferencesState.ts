@@ -23,6 +23,7 @@ import type {
   WorkspaceCurrencyCode,
   WorkspacePanelsLayoutMode
 } from "../types/app-controller";
+import type { TableColumnPreferences } from "./uiPreferencesStorage";
 
 export function useAppControllerPreferencesState() {
   const [locale, setLocale] = useState<AppLocale>("en");
@@ -90,6 +91,7 @@ export function useAppControllerPreferencesState() {
   const [showMultiNetworkFunctionalAnalysisPanel, setShowMultiNetworkFunctionalAnalysisPanel] = useState(true);
   const [workspacePanelsLayoutMode, setWorkspacePanelsLayoutMode] = useState<WorkspacePanelsLayoutMode>("singleColumn");
   const [workspaceWideScreen, setWorkspaceWideScreen] = useState(false);
+  const [tableColumnPreferences, setTableColumnPreferences] = useState<TableColumnPreferences>({});
   const [preferencesHydrated, setPreferencesHydrated] = useState(false);
 
   return {
@@ -207,6 +209,8 @@ export function useAppControllerPreferencesState() {
     setWorkspacePanelsLayoutMode,
     workspaceWideScreen,
     setWorkspaceWideScreen,
+    tableColumnPreferences,
+    setTableColumnPreferences,
     preferencesHydrated,
     setPreferencesHydrated
   };

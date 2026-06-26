@@ -122,6 +122,8 @@ interface UseAppControllerModelingAnalysisScreenDomainsParams {
   activeNetwork: AnalysisSliceParams["activeNetwork"];
   tabularExportFormat: ModelingSliceParams["tabularExportFormat"];
   wireExportLengthPreferences: ModelingSliceParams["wireExportLengthPreferences"];
+  tableColumnPreferences: ModelingSliceParams["tableColumnPreferences"];
+  setTableColumnPreferences: ModelingSliceParams["setTableColumnPreferences"];
   hideWireAnalysisRoutePanel: AnalysisSliceParams["hideWireAnalysisRoutePanel"];
   showMultiNetworkFunctionalAnalysisPanel: AnalysisSliceParams["showMultiNetworkFunctionalAnalysisPanel"];
   isMultiNetworkFunctionalAnalysisOpen: AnalysisSliceParams["isMultiNetworkFunctionalAnalysisOpen"];
@@ -270,6 +272,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
   wireTechnicalIdAlreadyUsed,
   tabularExportFormat,
   wireExportLengthPreferences,
+  tableColumnPreferences,
+  setTableColumnPreferences,
   hideWireAnalysisRoutePanel,
   showMultiNetworkFunctionalAnalysisPanel,
   isMultiNetworkFunctionalAnalysisOpen,
@@ -963,6 +967,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
         onSetBatchSelectionForVisible: setBatchSelectionForVisible,
         onOpenBatchSelectionDialog: () => setIsBatchSelectionDialogOpen(true),
         onDeleteSelectedInBatchMode: handleDeleteSelectedInBatchMode,
+        tableColumnPreferences,
+        setTableColumnPreferences,
         catalogItems: entities.catalogItems,
         openCatalogSubScreen,
         onSelectCatalogItem: handleSelectCatalogItemReference,

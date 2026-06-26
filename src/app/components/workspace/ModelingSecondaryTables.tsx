@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import { useEffect, useMemo, useRef, useState, type Dispatch, type ReactElement, type SetStateAction } from "react";
 import { getWireColorSortValue } from "../../../core/cableColors";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
@@ -54,6 +54,8 @@ import type {
   TabularExportFormat,
 } from "../../types/app-controller";
 import { EntityReferenceButton } from "./EntityReferenceButton";
+import { ConfigurableTableColumnsControl, type ConfigurableTableColumn } from "./ConfigurableTableColumns";
+import type { TableColumnPreferences } from "../../hooks/uiPreferencesStorage";
 
 interface ModelingSecondaryTablesProps {
   activeBatchScope: ModelingBatchSelectionScope | null;
@@ -70,6 +72,8 @@ interface ModelingSecondaryTablesProps {
   ) => void;
   onOpenBatchSelectionDialog: () => void;
   onDeleteSelectedInBatchMode: () => void;
+  tableColumnPreferences: TableColumnPreferences;
+  setTableColumnPreferences: Dispatch<SetStateAction<TableColumnPreferences>>;
   isSegmentSubScreen: boolean;
   segmentFormMode: "idle" | "create" | "edit";
   onOpenCreateSegment: () => void;
@@ -141,6 +145,8 @@ export function ModelingSecondaryTables({
   onSetBatchSelectionForVisible,
   onOpenBatchSelectionDialog,
   onDeleteSelectedInBatchMode,
+  tableColumnPreferences,
+  setTableColumnPreferences,
   isSegmentSubScreen,
   segmentFormMode,
   onOpenCreateSegment,
@@ -212,9 +218,11 @@ export function ModelingSecondaryTables({
   const segmentRowRefs = useRef<
     Partial<Record<SegmentId, HTMLTableRowElement | null>>
   >({});
+  const segmentTableRef = useRef<HTMLTableElement | null>(null);
   const wireRowRefs = useRef<
     Partial<Record<WireId, HTMLTableRowElement | null>>
   >({});
+  const wireTableRef = useRef<HTMLTableElement | null>(null);
   const lastAutoFocusedSegmentIdRef = useRef<SegmentId | null>(null);
   const lastAutoFocusedWireIdRef = useRef<WireId | null>(null);
   const isMobileViewport = useIsMobileViewport();
@@ -235,6 +243,24 @@ export function ModelingSecondaryTables({
   const showSegmentSubNetworkColumn = segmentSubNetworkFilter !== "default";
   const showWireRouteModeColumn =
     wireRouteFilter === "all" && !isMobileViewport;
+  const segmentColumns: ConfigurableTableColumn[] = [
+    { id: "id", label: "ID", hideable: false },
+    { id: "nodeA", label: "Node A" },
+    { id: "nodeB", label: "Node B" },
+    { id: "lengthMm", label: "Length" },
+    ...(showSegmentSubNetworkColumn ? [{ id: "subNetwork", label: "Sub-network" }] : []),
+  ];
+  const wireColumns: ConfigurableTableColumn[] = [
+    { id: "name", label: "Name", hideable: false },
+    { id: "technicalId", label: "Technical ID" },
+    { id: "functionalDomainTag", label: "Functional tag" },
+    { id: "twistGroupLabel", label: "Twist group" },
+    { id: "color", label: "Color" },
+    { id: "endpointA", label: "Endpoint A" },
+    { id: "endpointB", label: "Endpoint B" },
+    { id: "sectionMm2", label: "Section" },
+    { id: "lengthMm", label: "Length" },
+  ];
   const segmentFilterPlaceholder =
     segmentFilterField === "id"
       ? "Segment ID"
@@ -555,6 +581,14 @@ export function ModelingSecondaryTables({
                 <span className="table-export-icon" aria-hidden="true" />
                 CSV
               </button>
+              <ConfigurableTableColumnsControl
+                tableId="modeling-segments"
+                tableRef={segmentTableRef}
+                columns={segmentColumns}
+                leadingColumnCount={isSegmentBatchMode ? 1 : 0}
+                tableColumnPreferences={tableColumnPreferences}
+                setTableColumnPreferences={setTableColumnPreferences}
+              />
               {onOpenSegmentOnboardingHelp !== undefined ? (
                 <button
                   type="button"
@@ -630,7 +664,7 @@ export function ModelingSecondaryTables({
           </>
         ) : (
           <>
-            <table className="data-table">
+            <table className="data-table" ref={segmentTableRef}>
               <thead>
                 <tr>
                   {isSegmentBatchMode ? (
@@ -1115,6 +1149,14 @@ export function ModelingSecondaryTables({
                 <span className="table-export-icon" aria-hidden="true" />
                 {tabularExportFormat.toUpperCase()}
               </button>
+              <ConfigurableTableColumnsControl
+                tableId="modeling-wires"
+                tableRef={wireTableRef}
+                columns={wireColumns}
+                leadingColumnCount={isWireBatchMode ? 1 : 0}
+                tableColumnPreferences={tableColumnPreferences}
+                setTableColumnPreferences={setTableColumnPreferences}
+              />
               {onOpenWireOnboardingHelp !== undefined ? (
                 <button
                   type="button"
@@ -1179,7 +1221,7 @@ export function ModelingSecondaryTables({
           </>
         ) : (
           <>
-            <table className="data-table">
+            <table className="data-table" ref={wireTableRef}>
               <thead>
                 <tr>
                   {isWireBatchMode ? (

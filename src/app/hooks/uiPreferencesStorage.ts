@@ -19,7 +19,7 @@ import {
   DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT
 } from "../lib/wireExportLength";
 
-const UI_PREFERENCES_SCHEMA_VERSION = 18;
+const UI_PREFERENCES_SCHEMA_VERSION = 19;
 const UI_PREFERENCES_STORAGE_KEY = "electrical-plan-editor.ui-preferences.v1";
 
 type TableDensity = "comfortable" | "compact";
@@ -27,6 +27,13 @@ type TableFontSizePreference = TableFontSize;
 type WorkspacePanelsLayoutPreference = WorkspacePanelsLayoutMode;
 type SortField = "name" | "technicalId" | "lengthMm";
 type SortDirection = "asc" | "desc";
+
+export interface TableColumnPreference {
+  order: string[];
+  hidden: string[];
+}
+
+export type TableColumnPreferences = Record<string, TableColumnPreference>;
 
 export interface UiPreferencesPayload {
   schemaVersion: number;
@@ -87,6 +94,7 @@ export interface UiPreferencesPayload {
   showMultiNetworkFunctionalAnalysisPanel: boolean;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
   workspaceWideScreen: boolean;
+  tableColumnPreferences: TableColumnPreferences;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -267,6 +275,35 @@ function migrateUiPreferencesFromV17(candidate: Record<string, unknown>): Record
   };
 }
 
+function migrateUiPreferencesFromV18(candidate: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...candidate,
+    tableColumnPreferences: {},
+    schemaVersion: 19
+  };
+}
+
+function normalizeTableColumnPreferences(value: unknown): TableColumnPreferences {
+  if (!isRecord(value)) {
+    return {};
+  }
+
+  const result: TableColumnPreferences = {};
+  for (const [tableId, rawPreference] of Object.entries(value)) {
+    if (!isRecord(rawPreference)) {
+      continue;
+    }
+    const order = Array.isArray(rawPreference.order)
+      ? rawPreference.order.filter((columnId): columnId is string => typeof columnId === "string")
+      : [];
+    const hidden = Array.isArray(rawPreference.hidden)
+      ? rawPreference.hidden.filter((columnId): columnId is string => typeof columnId === "string")
+      : [];
+    result[tableId] = { order, hidden };
+  }
+  return result;
+}
+
 function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayload> | null {
   if (!isRecord(parsed)) {
     return null;
@@ -369,10 +406,16 @@ function migrateUiPreferencesPayload(parsed: unknown): Partial<UiPreferencesPayl
       version = 18;
       continue;
     }
+    if (version === 18) {
+      migrated = migrateUiPreferencesFromV18(migrated);
+      version = 19;
+      continue;
+    }
     return null;
   }
 
   migrated.schemaVersion = UI_PREFERENCES_SCHEMA_VERSION;
+  migrated.tableColumnPreferences = normalizeTableColumnPreferences(migrated.tableColumnPreferences);
   return migrated;
 }
 

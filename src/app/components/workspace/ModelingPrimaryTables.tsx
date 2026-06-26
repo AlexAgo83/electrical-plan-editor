@@ -21,6 +21,7 @@ import type { SortDirection } from "../../types/app-controller";
 import { EntityReferenceButton } from "./EntityReferenceButton";
 import type { ModelingPrimaryTablesProps } from "./ModelingPrimaryTables.types";
 import { PinRoleMassEditDialog } from "./PinRoleMassEditDialog";
+import { ConfigurableTableColumnsControl, type ConfigurableTableColumn } from "./ConfigurableTableColumns";
 
 export function ModelingPrimaryTables({
   activeBatchScope,
@@ -31,6 +32,8 @@ export function ModelingPrimaryTables({
   onSetBatchSelectionForVisible,
   onOpenBatchSelectionDialog,
   onDeleteSelectedInBatchMode,
+  tableColumnPreferences,
+  setTableColumnPreferences,
   isConnectorSubScreen,
   connectorFormMode,
   onOpenCreateConnector,
@@ -109,12 +112,15 @@ export function ModelingPrimaryTables({
   const connectorRowRefs = useRef<
     Partial<Record<ConnectorId, HTMLTableRowElement | null>>
   >({});
+  const connectorTableRef = useRef<HTMLTableElement | null>(null);
   const spliceRowRefs = useRef<
     Partial<Record<SpliceId, HTMLTableRowElement | null>>
   >({});
+  const spliceTableRef = useRef<HTMLTableElement | null>(null);
   const nodeRowRefs = useRef<
     Partial<Record<NodeId, HTMLTableRowElement | null>>
   >({});
+  const nodeTableRef = useRef<HTMLTableElement | null>(null);
   const lastAutoFocusedConnectorIdRef = useRef<ConnectorId | null>(null);
   const lastAutoFocusedSpliceIdRef = useRef<SpliceId | null>(null);
   const lastAutoFocusedNodeIdRef = useRef<NodeId | null>(null);
@@ -143,6 +149,27 @@ export function ModelingPrimaryTables({
       ? null
       : (visibleNodes.find((node) => node.id === selectedNodeId) ?? null);
   const showNodeKindColumn = nodeKindFilter === "all";
+  const connectorColumns: ConfigurableTableColumn[] = [
+    { id: "name", label: "Name", hideable: false },
+    { id: "technicalId", label: "Technical ID" },
+    { id: "manufacturerReference", label: "Mfr Ref" },
+    { id: "cavityCount", label: "Ways" },
+    { id: "occupiedCount", label: "Occupied" },
+  ];
+  const spliceColumns: ConfigurableTableColumn[] = [
+    { id: "name", label: "Name", hideable: false },
+    { id: "technicalId", label: "Technical ID" },
+    { id: "manufacturerReference", label: "Mfr Ref" },
+    { id: "hostSegment", label: "Segment" },
+    { id: "offsetMm", label: "Offset" },
+    { id: "connectedWireCount", label: "Connected wires" },
+  ];
+  const nodeColumns: ConfigurableTableColumn[] = [
+    { id: "id", label: "ID", hideable: false },
+    ...(showNodeKindColumn ? [{ id: "kind", label: "Kind" }] : []),
+    { id: "reference", label: "Reference" },
+    { id: "linkedSegments", label: "Linked segments" },
+  ];
   const catalogItemById = useMemo(
     () => new Map(catalogItems.map((item) => [item.id, item] as const)),
     [catalogItems],
@@ -544,6 +571,14 @@ export function ModelingPrimaryTables({
                 <span className="table-export-icon" aria-hidden="true" />
                 CSV
               </button>
+              <ConfigurableTableColumnsControl
+                tableId="modeling-connectors"
+                tableRef={connectorTableRef}
+                columns={connectorColumns}
+                leadingColumnCount={isConnectorBatchMode ? 1 : 0}
+                tableColumnPreferences={tableColumnPreferences}
+                setTableColumnPreferences={setTableColumnPreferences}
+              />
               {onOpenConnectorOnboardingHelp !== undefined ? (
                 <button
                   type="button"
@@ -617,7 +652,7 @@ export function ModelingPrimaryTables({
           </>
         ) : (
           <>
-            <table className="data-table">
+            <table className="data-table" ref={connectorTableRef}>
               <thead>
                 <tr>
                   {isConnectorBatchMode ? (
@@ -1029,6 +1064,14 @@ export function ModelingPrimaryTables({
                 <span className="table-export-icon" aria-hidden="true" />
                 CSV
               </button>
+              <ConfigurableTableColumnsControl
+                tableId="modeling-splices"
+                tableRef={spliceTableRef}
+                columns={spliceColumns}
+                leadingColumnCount={isSpliceBatchMode ? 1 : 0}
+                tableColumnPreferences={tableColumnPreferences}
+                setTableColumnPreferences={setTableColumnPreferences}
+              />
               {onOpenSpliceOnboardingHelp !== undefined ? (
                 <button
                   type="button"
@@ -1098,7 +1141,7 @@ export function ModelingPrimaryTables({
           </>
         ) : (
           <>
-            <table className="data-table">
+            <table className="data-table" ref={spliceTableRef}>
               <thead>
                 <tr>
                   {isSpliceBatchMode ? (
@@ -1503,6 +1546,14 @@ export function ModelingPrimaryTables({
                 <span className="table-export-icon" aria-hidden="true" />
                 CSV
               </button>
+              <ConfigurableTableColumnsControl
+                tableId="modeling-nodes"
+                tableRef={nodeTableRef}
+                columns={nodeColumns}
+                leadingColumnCount={isNodeBatchMode ? 1 : 0}
+                tableColumnPreferences={tableColumnPreferences}
+                setTableColumnPreferences={setTableColumnPreferences}
+              />
               {onOpenNodeOnboardingHelp !== undefined ? (
                 <button
                   type="button"
@@ -1576,7 +1627,7 @@ export function ModelingPrimaryTables({
           </>
         ) : (
           <>
-            <table className="data-table">
+            <table className="data-table" ref={nodeTableRef}>
               <thead>
                 <tr>
                   {isNodeBatchMode ? (

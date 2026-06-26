@@ -143,47 +143,22 @@
   width: min(22rem, calc(100vw - 1rem));
   max-height: min(24rem, calc(100vh - 5rem));
   overflow: auto;
-  padding: 0.5rem;
-  border: 2px solid var(--color-accent);
-  border-radius: 8px;
-  background:
-    linear-gradient(var(--color-surface, #fff), var(--color-surface, #fff)),
-    #fff;
-  box-shadow:
-    0 20px 70px rgb(15 23 42 / 0.42),
-    0 0 0 1px rgb(255 255 255 / 0.28) inset;
 }
 
 .header-network-picker-option {
-  display: grid;
+  display: grid !important;
   grid-template-columns: minmax(0, 1fr) max-content;
-  align-items: center;
   gap: 0.75rem;
-  width: 100%;
-  padding: 0.55rem 0.65rem;
-  border: 1px solid var(--color-border-muted);
-  border-radius: 6px;
-  background:
-    linear-gradient(var(--color-surface-muted, #f8fafc), var(--color-surface-muted, #f8fafc)),
-    #fff;
-  color: var(--color-text);
-  text-align: left;
-  cursor: pointer;
-}
-
-.header-network-picker-option:hover,
-.header-network-picker-option:focus-visible,
-.header-network-picker-option.is-active {
-  border-color: var(--color-accent);
-  background:
-    linear-gradient(color-mix(in srgb, var(--color-accent) 18%, var(--color-surface, #fff)), color-mix(in srgb, var(--color-accent) 18%, var(--color-surface, #fff))),
-    #fff;
 }
 
 .header-network-picker-option-name {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-column-menu-option {
   white-space: nowrap;
 }
 

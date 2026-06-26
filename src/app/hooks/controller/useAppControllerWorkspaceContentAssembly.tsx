@@ -244,6 +244,8 @@ export function useAppControllerWorkspaceContentAssembly({
         strippingAllowanceMm: models.preferencesState.wireExportStrippingAllowanceMm,
         twistedPairLengthCoefficient: models.preferencesState.wireExportTwistedPairLengthCoefficient
       },
+      tableColumnPreferences: models.preferencesState.tableColumnPreferences,
+      setTableColumnPreferences: models.preferencesState.setTableColumnPreferences,
       hideWireAnalysisRoutePanel: models.preferencesState.hideWireAnalysisRoutePanel,
       showMultiNetworkFunctionalAnalysisPanel: models.preferencesState.showMultiNetworkFunctionalAnalysisPanel,
       isMultiNetworkFunctionalAnalysisOpen,
@@ -422,6 +424,8 @@ export function useAppControllerWorkspaceContentAssembly({
     workspaceCurrencyCode: state.workspaceCurrencyCode,
     catalogHandlers: models.catalogHandlers,
     formsState: models.formsState,
+    tableColumnPreferences: models.preferencesState.tableColumnPreferences,
+    setTableColumnPreferences: models.preferencesState.setTableColumnPreferences,
     catalogManufacturerReferenceAlreadyUsed: handlers.catalogManufacturerReferenceAlreadyUsed,
     handleExportCatalogCsv: domains.workspaceNetworkDomain.handleExportCatalogCsv,
     handleOpenCatalogCsvImportPicker: domains.workspaceNetworkDomain.handleOpenCatalogCsvImportPicker,

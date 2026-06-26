@@ -102,6 +102,7 @@ export function useAppControllerUiPreferencesBindings({
     showMultiNetworkFunctionalAnalysisPanel: preferencesState.showMultiNetworkFunctionalAnalysisPanel,
     workspacePanelsLayoutMode: preferencesState.workspacePanelsLayoutMode,
     workspaceWideScreen: preferencesState.workspaceWideScreen,
+    tableColumnPreferences: preferencesState.tableColumnPreferences,
     preferencesHydrated: preferencesState.preferencesHydrated,
     setLocale: preferencesState.setLocale,
     setTableDensity: preferencesState.setTableDensity,
@@ -183,6 +184,7 @@ export function useAppControllerUiPreferencesBindings({
     setShowMultiNetworkFunctionalAnalysisPanel: preferencesState.setShowMultiNetworkFunctionalAnalysisPanel,
     setWorkspacePanelsLayoutMode: preferencesState.setWorkspacePanelsLayoutMode,
     setWorkspaceWideScreen: preferencesState.setWorkspaceWideScreen,
+    setTableColumnPreferences: preferencesState.setTableColumnPreferences,
     setThemeMode: preferencesState.setThemeMode,
     setPreferencesHydrated: preferencesState.setPreferencesHydrated
   });

@@ -7,7 +7,7 @@ import {
   normalizeWireExportTwistedPairLengthCoefficient
 } from "../lib/wireExportLength";
 import { readUiPreferences, writeUiPreferences } from "../hooks/uiPreferencesStorage";
-import type { UiPreferencesPayload } from "../hooks/uiPreferencesStorage";
+import type { TableColumnPreferences, UiPreferencesPayload } from "../hooks/uiPreferencesStorage";
 import type {
   AppLocale,
   CanvasCalloutTextSize,
@@ -171,6 +171,7 @@ interface UseUiPreferencesOptions {
   showMultiNetworkFunctionalAnalysisPanel: boolean;
   workspacePanelsLayoutMode: WorkspacePanelsLayoutPreference;
   workspaceWideScreen: boolean;
+  tableColumnPreferences: TableColumnPreferences;
   preferencesHydrated: boolean;
   setThemeMode: (mode: ThemeMode) => void;
   setLocale: (value: AppLocale) => void;
@@ -253,6 +254,7 @@ interface UseUiPreferencesOptions {
   setShowMultiNetworkFunctionalAnalysisPanel: (value: boolean) => void;
   setWorkspacePanelsLayoutMode: (value: WorkspacePanelsLayoutPreference) => void;
   setWorkspaceWideScreen: (value: boolean) => void;
+  setTableColumnPreferences: (value: TableColumnPreferences) => void;
   setPreferencesHydrated: (value: boolean) => void;
 }
 
@@ -419,6 +421,7 @@ export function useUiPreferences({
   showMultiNetworkFunctionalAnalysisPanel,
   workspacePanelsLayoutMode,
   workspaceWideScreen,
+  tableColumnPreferences,
   preferencesHydrated,
   setThemeMode,
   setLocale,
@@ -501,6 +504,7 @@ export function useUiPreferences({
   setShowMultiNetworkFunctionalAnalysisPanel,
   setWorkspacePanelsLayoutMode,
   setWorkspaceWideScreen,
+  setTableColumnPreferences,
   setPreferencesHydrated
 }: UseUiPreferencesOptions): void {
   useEffect(() => {
@@ -693,6 +697,7 @@ export function useUiPreferences({
       );
       setWorkspacePanelsLayoutMode(normalizeWorkspacePanelsLayoutMode(preferences.workspacePanelsLayoutMode));
       setWorkspaceWideScreen(typeof preferences.workspaceWideScreen === "boolean" ? preferences.workspaceWideScreen : false);
+      setTableColumnPreferences(preferences.tableColumnPreferences ?? {});
     }
 
     setPreferencesHydrated(true);
@@ -780,7 +785,8 @@ export function useUiPreferences({
     setWireSort,
     setConnectorSynthesisSort,
     setWorkspacePanelsLayoutMode,
-    setWorkspaceWideScreen
+    setWorkspaceWideScreen,
+    setTableColumnPreferences
   ]);
 
   useEffect(() => {
@@ -845,7 +851,8 @@ export function useUiPreferences({
       hideWireAnalysisRoutePanel,
       showMultiNetworkFunctionalAnalysisPanel,
       workspacePanelsLayoutMode,
-      workspaceWideScreen
+      workspaceWideScreen,
+      tableColumnPreferences
     };
 
     writeUiPreferences(payload);
@@ -892,6 +899,7 @@ export function useUiPreferences({
     showShortcutHints,
     tableDensity,
     tableFontSize,
+    tableColumnPreferences,
     workspaceCurrencyCode,
     workspaceTaxEnabled,
     workspaceTaxRatePercent,

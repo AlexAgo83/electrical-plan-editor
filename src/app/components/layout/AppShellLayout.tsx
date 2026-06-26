@@ -515,7 +515,7 @@ export function AppShellLayout({
         {isNetworkPickerOpen ? (
           <div
             ref={networkPickerMenuRef}
-            className="header-network-picker-menu"
+            className="panel header-network-picker-menu"
             role="menu"
             aria-label="Select active plan"
             style={networkPickerMenuStyle}
@@ -527,7 +527,7 @@ export function AppShellLayout({
                   key={network.id}
                   type="button"
                   role="menuitemradio"
-                  className={`header-network-picker-option${isActive ? " is-active" : ""}`}
+                  className={`network-summary-view-menu-item header-network-picker-option${isActive ? " is-active" : ""}`}
                   aria-checked={isActive}
                   onClick={() => {
                     if (!isActive) {

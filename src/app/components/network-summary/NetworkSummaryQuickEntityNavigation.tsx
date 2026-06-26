@@ -105,7 +105,7 @@ export function NetworkSummaryQuickEntityNavigation({
             title="AI Agent"
           >
             <span className="action-button-icon network-summary-quick-entity-nav-icon is-ai-agent" aria-hidden="true" />
-            <span className="network-summary-quick-entity-nav-label">AI Agent</span>
+            {variant === "header" ? null : <span className="network-summary-quick-entity-nav-label">AI Agent</span>}
           </button>
         ) : null}
       </div>

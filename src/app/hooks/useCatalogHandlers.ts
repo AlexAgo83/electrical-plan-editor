@@ -114,7 +114,7 @@ function cloneCatalogFormValue<T>(value: T): T {
 }
 
 function getCatalogCopySourceValue(networkId: NetworkId, catalogItemId: CatalogItemId): CatalogCopySourceValue {
-  return `${networkId}:${catalogItemId}` as CatalogCopySourceValue;
+  return `${networkId}:${catalogItemId}`;
 }
 
 function parseCatalogCopySourceValue(value: string): { networkId: NetworkId; catalogItemId: CatalogItemId } | null {

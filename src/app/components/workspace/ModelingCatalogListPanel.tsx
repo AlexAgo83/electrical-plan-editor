@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type Dispatch, type ReactElement, type RefObject, type SetStateAction } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type Dispatch, type ReactElement, type RefObject, type SetStateAction } from "react";
 import type { CatalogItem, CatalogItemId, Wire } from "../../../core/entities";
 import { buildWireEndpointReferenceEntries, type WireEndpointReferenceEntry } from "../../../core/wireReferences";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
@@ -8,7 +8,9 @@ import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import { formatPriceWithCurrencySymbol } from "../../lib/pricing";
 import type { ImportExportStatus, WorkspaceCurrencyCode } from "../../types/app-controller";
 import type { FileFeedbackDialogModel } from "../../hooks/networkImportExportTypes";
+import type { TableColumnPreferences } from "../../hooks/uiPreferencesStorage";
 import { FileFeedbackDialog } from "../dialogs/FileFeedbackDialog";
+import { ConfigurableTableColumnsControl, type ConfigurableTableColumn } from "./ConfigurableTableColumns";
 import { EntityReferenceButton } from "./EntityReferenceButton";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
@@ -32,6 +34,8 @@ interface ModelingCatalogListPanelProps {
   isSelectedCatalogItemReferenced: boolean;
   activeView: CatalogTableView;
   setActiveView: Dispatch<SetStateAction<CatalogTableView>>;
+  tableColumnPreferences: TableColumnPreferences;
+  setTableColumnPreferences: Dispatch<SetStateAction<TableColumnPreferences>>;
   wires: Wire[];
   onOpenCreateCatalogItem: () => void;
   onEditCatalogItem: (item: CatalogItem) => void;
@@ -57,6 +61,8 @@ export function ModelingCatalogListPanel({
   isSelectedCatalogItemReferenced,
   activeView,
   setActiveView,
+  tableColumnPreferences,
+  setTableColumnPreferences,
   wires,
   onOpenCreateCatalogItem,
   onEditCatalogItem,
@@ -74,6 +80,7 @@ export function ModelingCatalogListPanel({
 }: ModelingCatalogListPanelProps): ReactElement {
   void isSelectedCatalogItemReferenced;
   const isMobileViewport = useIsMobileViewport();
+  const catalogItemsTableRef = useRef<HTMLTableElement>(null);
   const [filterField, setFilterField] = useState<CatalogFilterField>("any");
   const [filterQuery, setFilterQuery] = useState("");
   const [sortState, setSortState] = useState<{ field: CatalogSortField; direction: SortDirection }>({
@@ -131,6 +138,12 @@ export function ModelingCatalogListPanel({
     }));
   const wireReferenceEntries = useMemo(() => buildWireEndpointReferenceEntries(wires), [wires]);
   const isItemsView = activeView === "items";
+  const catalogItemColumns: ConfigurableTableColumn[] = [
+    { id: "manufacturerReference", label: "Manufacturer ref" },
+    { id: "name", label: "Name" },
+    { id: "connectionCount", label: "Connections" },
+    { id: "unitPriceExclTax", label: "Unit price" }
+  ];
 
   return (
     <>
@@ -176,6 +189,15 @@ export function ModelingCatalogListPanel({
                 <span>Export CSV</span>
               </button>
             ) : null}
+            {isItemsView ? (
+              <ConfigurableTableColumnsControl
+                tableId="catalog-items"
+                tableRef={catalogItemsTableRef}
+                columns={catalogItemColumns}
+                tableColumnPreferences={tableColumnPreferences}
+                setTableColumnPreferences={setTableColumnPreferences}
+              />
+            ) : null}
             {onOpenCatalogOnboardingHelp !== undefined ? (
               <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenCatalogOnboardingHelp}>
                 <span className="action-button-icon is-help" aria-hidden="true" />
@@ -210,6 +232,8 @@ export function ModelingCatalogListPanel({
           kind="connection"
           entries={wireReferenceEntries.connection}
           wires={wires}
+          tableColumnPreferences={tableColumnPreferences}
+          setTableColumnPreferences={setTableColumnPreferences}
           onOpenWireReference={onOpenWireReference}
           onUpdateWireEndpointReferenceName={onUpdateWireEndpointReferenceName}
         />
@@ -219,6 +243,8 @@ export function ModelingCatalogListPanel({
           kind="seal"
           entries={wireReferenceEntries.seal}
           wires={wires}
+          tableColumnPreferences={tableColumnPreferences}
+          setTableColumnPreferences={setTableColumnPreferences}
           onOpenWireReference={onOpenWireReference}
           onUpdateWireEndpointReferenceName={onUpdateWireEndpointReferenceName}
         />
@@ -246,26 +272,26 @@ export function ModelingCatalogListPanel({
         </>
       ) : (
         <>
-          <table className="data-table">
+          <table className="data-table" ref={catalogItemsTableRef}>
             <thead>
               <tr>
-                <th aria-sort={getTableAriaSort(sortState, "manufacturerReference")}>
+                <th data-column-id="manufacturerReference" aria-sort={getTableAriaSort(sortState, "manufacturerReference")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("manufacturerReference")}>
                     {isMobileViewport ? "Mnf ref" : "Manufacturer ref"}{" "}
                     <span className="sort-indicator">{sortIndicator("manufacturerReference")}</span>
                   </button>
                 </th>
-                <th aria-sort={getTableAriaSort(sortState, "name")}>
+                <th data-column-id="name" aria-sort={getTableAriaSort(sortState, "name")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("name")}>
                     Name <span className="sort-indicator">{sortIndicator("name")}</span>
                   </button>
                 </th>
-                <th aria-sort={getTableAriaSort(sortState, "connectionCount")}>
+                <th data-column-id="connectionCount" aria-sort={getTableAriaSort(sortState, "connectionCount")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("connectionCount")}>
                     {isMobileViewport ? "Con." : "Connections"} <span className="sort-indicator">{sortIndicator("connectionCount")}</span>
                   </button>
                 </th>
-                <th aria-sort={getTableAriaSort(sortState, "unitPriceExclTax")}>
+                <th data-column-id="unitPriceExclTax" aria-sort={getTableAriaSort(sortState, "unitPriceExclTax")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("unitPriceExclTax")}>
                     {isMobileViewport ? "Price" : `Unit price HT (${workspaceCurrencyCode})`}{" "}
                     <span className="sort-indicator">{sortIndicator("unitPriceExclTax")}</span>
@@ -292,10 +318,10 @@ export function ModelingCatalogListPanel({
                       }
                     }}
                   >
-                    <td className="technical-id">{item.manufacturerReference}</td>
-                    <td>{item.name ?? ""}</td>
-                    <td>{item.connectionCount}</td>
-                    <td>{formatPriceWithCurrencySymbol(item.unitPriceExclTax, workspaceCurrencyCode)}</td>
+                    <td data-column-id="manufacturerReference" className="technical-id">{item.manufacturerReference}</td>
+                    <td data-column-id="name">{item.name ?? ""}</td>
+                    <td data-column-id="connectionCount">{item.connectionCount}</td>
+                    <td data-column-id="unitPriceExclTax">{formatPriceWithCurrencySymbol(item.unitPriceExclTax, workspaceCurrencyCode)}</td>
                   </tr>
                 );
               })}
@@ -383,6 +409,8 @@ function WireEndpointReferenceNamesTable({
   kind,
   entries,
   wires,
+  tableColumnPreferences,
+  setTableColumnPreferences,
   onOpenWireReference,
   onUpdateWireEndpointReferenceName
 }: {
@@ -390,9 +418,12 @@ function WireEndpointReferenceNamesTable({
   kind: "connection" | "seal";
   entries: WireEndpointReferenceEntry[];
   wires: Wire[];
+  tableColumnPreferences: TableColumnPreferences;
+  setTableColumnPreferences: Dispatch<SetStateAction<TableColumnPreferences>>;
   onOpenWireReference: (wire: Wire) => void;
   onUpdateWireEndpointReferenceName: WireEndpointReferenceNameHandler;
 }): ReactElement {
+  const tableRef = useRef<HTMLTableElement>(null);
   const [draftsByReference, setDraftsByReference] = useState<Record<string, string>>({});
   const draftResetPayload = JSON.stringify(entries.map((entry) => [entry.reference, entry.name ?? ""]));
   const firstWireByReference = useMemo(() => {
@@ -426,14 +457,28 @@ function WireEndpointReferenceNamesTable({
 
   return (
     <>
-      <h3 className="list-subheading">{heading}</h3>
-      <table className="data-table catalog-reference-table">
+      <div className="analysis-wire-route-header catalog-usage-header">
+        <h3 className="list-subheading">{heading}</h3>
+        <ConfigurableTableColumnsControl
+          tableId={`catalog-${kind}-references`}
+          tableRef={tableRef}
+          columns={[
+            { id: "reference", label: "Reference" },
+            { id: "name", label: "Name" },
+            { id: "quantity", label: "Count" },
+            { id: "actions", label: "Actions", hideable: false }
+          ]}
+          tableColumnPreferences={tableColumnPreferences}
+          setTableColumnPreferences={setTableColumnPreferences}
+        />
+      </div>
+      <table className="data-table catalog-reference-table" ref={tableRef}>
         <thead>
           <tr>
-            <th>Reference</th>
-            <th>Name</th>
-            <th>Count</th>
-            <th className="validation-actions-cell">Actions</th>
+            <th data-column-id="reference">Reference</th>
+            <th data-column-id="name">Name</th>
+            <th data-column-id="quantity">Count</th>
+            <th data-column-id="actions" className="validation-actions-cell">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -442,7 +487,7 @@ function WireEndpointReferenceNamesTable({
             const linkedWire = firstWireByReference.get(entry.reference.trim().toLocaleLowerCase());
             return (
               <tr key={entry.reference} className="data-table-editable-row">
-                <td className="technical-id">
+                <td data-column-id="reference" className="technical-id">
                   {linkedWire !== undefined ? (
                     <EntityReferenceButton
                       className="technical-id"
@@ -455,7 +500,7 @@ function WireEndpointReferenceNamesTable({
                     entry.reference
                   )}
                 </td>
-                <td>
+                <td data-column-id="name">
                   <input
                     className="data-table-text-input"
                     aria-label={`${heading} name for ${entry.reference}`}
@@ -471,8 +516,8 @@ function WireEndpointReferenceNamesTable({
                     placeholder="Optional"
                   />
                 </td>
-                <td>{entry.quantity}</td>
-                <td className="validation-actions-cell">
+                <td data-column-id="quantity">{entry.quantity}</td>
+                <td data-column-id="actions" className="validation-actions-cell">
                   <button
                     type="button"
                     aria-label="Save"

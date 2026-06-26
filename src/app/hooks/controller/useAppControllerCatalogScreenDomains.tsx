@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type ReactElement, type RefObject } from "react";
+import { useState, type ChangeEvent, type Dispatch, type ReactElement, type RefObject, type SetStateAction } from "react";
 import type {
   CatalogItem,
   CatalogItemId,
@@ -17,6 +17,7 @@ import type { ImportExportStatus, WorkspaceCurrencyCode } from "../../types/app-
 import type { FileFeedbackDialogModel } from "../networkImportExportTypes";
 import type { AppState } from "../../../store";
 import type { CatalogCopySourceOption } from "../../components/workspace/ModelingCatalogFormPanel";
+import type { TableColumnPreferences } from "../uiPreferencesStorage";
 
 interface UseAppControllerCatalogScreenDomainsParams {
   isCatalogSubScreen: boolean;
@@ -48,6 +49,8 @@ interface UseAppControllerCatalogScreenDomainsParams {
     reference: string,
     nextName: string
   ) => Promise<boolean | { apply: () => void }> | boolean | { apply: () => void };
+  tableColumnPreferences: TableColumnPreferences;
+  setTableColumnPreferences: Dispatch<SetStateAction<TableColumnPreferences>>;
   modelingLeftColumnContent: ReactElement | null;
   modelingFormsColumnContent: ReactElement | null;
   analysisWorkspaceContent: ReactElement | null;
@@ -85,6 +88,8 @@ export function useAppControllerCatalogScreenDomains({
   onOpenSpliceFromCatalogAnalysis,
   onOpenWireReference,
   onUpdateWireEndpointReferenceName,
+  tableColumnPreferences,
+  setTableColumnPreferences,
   modelingLeftColumnContent,
   modelingFormsColumnContent,
   analysisWorkspaceContent
@@ -130,6 +135,8 @@ export function useAppControllerCatalogScreenDomains({
       }
       activeView={activeCatalogTableView}
       setActiveView={setActiveCatalogTableView}
+      tableColumnPreferences={tableColumnPreferences}
+      setTableColumnPreferences={setTableColumnPreferences}
       wires={wires}
       onOpenCreateCatalogItem={catalogHandlers.resetCatalogForm}
       onEditCatalogItem={catalogHandlers.startCatalogEdit}

@@ -1,13 +1,14 @@
 ## task_148_configurable_visible_columns_in_data_tables - Configurable and reorderable columns in data tables
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 95%
 > Confidence: 92%
 > Progress: 0%
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+> Owner: Codex
 
 # Definition of Done (DoD)
 - [ ] The backlog scope is implemented.
