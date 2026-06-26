@@ -76,6 +76,7 @@ const WAY_STROKE_STYLE_OPTIONS: Array<{ value: ConnectorLayoutWayStrokeStyle; la
 ];
 
 const WAY_SIZE_OPTIONS: Array<{ value: ConnectorLayoutWaySize; label: string }> = [
+  { value: "small", label: "Small (0.5 x)" },
   { value: "normal", label: "Normal" },
   { value: "big", label: "Big (2 x 2)" }
 ];

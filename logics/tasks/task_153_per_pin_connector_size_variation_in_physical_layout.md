@@ -1,18 +1,19 @@
 ## task_153_per_pin_connector_size_variation_in_physical_layout - Per-pin connector size variation in physical layout
 > From version: 1.16.11
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 92
 > Confidence: 88
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+> Owner: Codex
 
 # Definition of Done (DoD)
-- [ ] The backlog scope is implemented.
-- [ ] Acceptance criteria are covered.
-- [ ] Validation passes.
+- [x] The backlog scope is implemented.
+- [x] Acceptance criteria are covered.
+- [x] Validation passes.
 
 # Backlog
 - `item_644_per_pin_connector_size_variation_in_physical_layout`
@@ -27,9 +28,14 @@
 # Validation
 - Run `python3 -m logics_manager lint --require-status`.
 - Run `python3 -m logics_manager flow finish task task_153_per_pin_connector_size_variation_in_physical_layout.md` after implementation.
+- Finish workflow executed on 2026-06-26.
+- Linked backlog/request close verification passed.
 
 # Report
 - Implementation complete.
+- Finished on 2026-06-26.
+- Linked backlog item(s): `item_644_per_pin_connector_size_variation_in_physical_layout`
+- Related request(s): `req_158_per_pin_connector_size_variation_in_physical_layout`
 
 # AI Context
 - Summary: Implement per-pin connector size variation in physical layout.

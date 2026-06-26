@@ -21,7 +21,7 @@ import {
   getConnectorLayoutShellStrokeWidth,
   getConnectorLayoutShellShape,
   getConnectorLayoutWayRenderCenter,
-  getConnectorLayoutWaySpan,
+  getConnectorLayoutWaySizeScale,
   getConnectorLayoutWayDisplayLabel,
   resolveConnectorLayout
 } from "../../../core/connectorLayout";
@@ -77,9 +77,9 @@ function renderPhysicalWayShape(
 ): ReactElement {
   const className = `connector-physical-way-shape${isOccupied ? " is-occupied" : ""}${
     isWireHighlighted ? " is-wire-highlighted" : ""
-  }${way.strokeStyle === "dashed" ? " is-dashed" : ""}${way.size === "big" ? " is-big" : ""}`;
+  }${way.strokeStyle === "dashed" ? " is-dashed" : ""}${way.size === "big" ? " is-big" : ""}${way.size === "small" ? " is-small" : ""}`;
   const scale = getPhysicalWayRenderScale(cellPadding);
-  const sizeScale = getConnectorLayoutWaySpan(way);
+  const sizeScale = getConnectorLayoutWaySizeScale(way);
   if (way.shape === "square") {
     const size = 0.6 * scale * sizeScale;
     return <rect className={className} x={-size / 2} y={-size / 2} width={size} height={size} rx={0.08 * scale} />;

@@ -1,7 +1,7 @@
 ## req_158_per_pin_connector_size_variation_in_physical_layout - Per-pin connector size variation in physical layout
 > From version: 1.16.11
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 92%
 > Confidence: 88%
 > Complexity: Low

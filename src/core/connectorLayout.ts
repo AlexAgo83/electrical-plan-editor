@@ -81,6 +81,9 @@ function normalizeWayStrokeStyle(value: unknown): ConnectorLayoutWayStrokeStyle 
 }
 
 function normalizeWaySize(value: unknown): ConnectorLayoutWaySize | undefined {
+  if (value === "small") {
+    return "small";
+  }
   if (value === "big") {
     return "big";
   }
@@ -88,6 +91,13 @@ function normalizeWaySize(value: unknown): ConnectorLayoutWaySize | undefined {
 }
 
 export function getConnectorLayoutWaySpan(way: Pick<ConnectorLayoutWay, "size">): number {
+  return way.size === "big" ? 2 : 1;
+}
+
+export function getConnectorLayoutWaySizeScale(way: Pick<ConnectorLayoutWay, "size">): number {
+  if (way.size === "small") {
+    return 0.5;
+  }
   return way.size === "big" ? 2 : 1;
 }
 
@@ -507,7 +517,8 @@ export function normalizeConnectorLayout(
     const fallbackWay = buildFallbackWay(cavityIndex, safeCount);
     const strokeStyle = normalizeWayStrokeStyle(candidate.strokeStyle);
     const normalizedSize = normalizeWaySize(candidate.size);
-    const size = normalizedSize === "big" && width >= 2 && height >= 2 ? normalizedSize : undefined;
+    const size: ConnectorLayoutWaySize | undefined =
+      normalizedSize === "big" && width >= 2 && height >= 2 ? normalizedSize : normalizedSize === "small" ? "small" : undefined;
     const sizingContext = { size };
     normalizedByIndex.set(cavityIndex, {
       cavityIndex,
@@ -715,7 +726,7 @@ export function canUpdateConnectorLayoutWay(
   if (currentWay === undefined) {
     return false;
   }
-  const candidateSize: ConnectorLayoutWaySize | undefined = patch.size === "big" ? "big" : undefined;
+  const candidateSize: ConnectorLayoutWaySize | undefined = patch.size === "big" || patch.size === "small" ? patch.size : undefined;
   const candidate = {
     ...currentWay,
     ...(patch.size !== undefined ? { size: candidateSize } : {}),

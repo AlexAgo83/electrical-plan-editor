@@ -13,7 +13,7 @@ import {
   getConnectorLayoutKeyingAnchor,
   getConnectorLayoutShellCornerRadius,
   getConnectorLayoutShellStrokeWidth,
-  getConnectorLayoutWaySpan,
+  getConnectorLayoutWaySizeScale,
   getConnectorLayoutWayDisplayLabel
 } from "../../../core/connectorLayout";
 
@@ -39,10 +39,10 @@ export function renderConnectorLayoutWay(way: ConnectorLayoutWay, isSelected: bo
   const commonProps = {
     className: `connector-layout-way-shape${isSelected ? " is-selected" : ""}${
       way.strokeStyle === "dashed" ? " is-dashed" : ""
-    }${way.size === "big" ? " is-big" : ""}`
+    }${way.size === "big" ? " is-big" : ""}${way.size === "small" ? " is-small" : ""}`
   };
   const scale = getWayRenderScale(getConnectorLayoutCellPadding(layout));
-  const sizeScale = getConnectorLayoutWaySpan(way);
+  const sizeScale = getConnectorLayoutWaySizeScale(way);
   if (way.shape === "square") {
     const size = 0.56 * scale * sizeScale;
     return <rect {...commonProps} x={-size / 2} y={-size / 2} width={size} height={size} rx={0.08 * scale} />;

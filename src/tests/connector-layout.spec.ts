@@ -13,6 +13,7 @@ import {
   getConnectorLayoutShellShape,
   canUpdateConnectorLayoutWay,
   getConnectorLayoutWayOccupiedCells,
+  getConnectorLayoutWaySizeScale,
   getConnectorLayoutWayDisplayLabel,
   addConnectorLayoutKeying,
   moveConnectorLayoutWay,
@@ -127,6 +128,23 @@ describe("connector layout", () => {
       { x: 3, y: 2 },
       { x: 3, y: 3 }
     ]);
+  });
+
+  it("normalizes small ways as half-size one-cell footprints", () => {
+    const layout = normalizeConnectorLayout(
+      {
+        version: 1,
+        units: "grid",
+        width: 2,
+        height: 2,
+        ways: [{ cavityIndex: 1, x: 2, y: 2, shape: "round", size: "small" }]
+      },
+      1
+    );
+
+    expect(layout?.ways[0]).toEqual({ cavityIndex: 1, x: 2, y: 2, shape: "round", size: "small" });
+    expect(layout?.ways[0] === undefined ? [] : getConnectorLayoutWayOccupiedCells(layout.ways[0])).toEqual([{ x: 2, y: 2 }]);
+    expect(layout?.ways[0] === undefined ? 0 : getConnectorLayoutWaySizeScale(layout.ways[0])).toBe(0.5);
   });
 
   it("prevents big ways from overlapping other occupied cells", () => {

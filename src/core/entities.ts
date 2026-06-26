@@ -137,7 +137,7 @@ export interface CatalogAdditionalAccessory {
 
 export type ConnectorLayoutWayShape = "round" | "square" | "slot";
 export type ConnectorLayoutWayStrokeStyle = "solid" | "dashed";
-export type ConnectorLayoutWaySize = "normal" | "big";
+export type ConnectorLayoutWaySize = "small" | "normal" | "big";
 export type ConnectorLayoutKeyingSide = "none" | "top" | "right" | "bottom" | "left";
 export type ConnectorLayoutKeyingShape = "arrow" | "square" | "round" | "diamond";
 export type ConnectorLayoutShellShape = "square" | "circle";

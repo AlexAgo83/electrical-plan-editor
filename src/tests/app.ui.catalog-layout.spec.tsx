@@ -168,6 +168,13 @@ describe("App integration UI - catalog layout", () => {
     expect(within(catalogLayoutPanel).getByLabelText("Y")).toHaveValue(1);
     const shapeLineSelect = within(catalogLayoutPanel).getByLabelText("Line style");
     expect(shapeLineSelect).toHaveValue("solid");
+    const smallWaySizeSelect = within(catalogLayoutPanel).getByLabelText("Way size");
+    expect(smallWaySizeSelect).toHaveValue("normal");
+    fireEvent.change(smallWaySizeSelect, {
+      target: { value: "small" }
+    });
+    expect(smallWaySizeSelect).toHaveValue("small");
+    expect(catalogLayoutPanel.querySelector(".connector-layout-way-shape.is-selected.is-small")).not.toBeNull();
     fireEvent.change(shapeLineSelect, {
       target: { value: "dashed" }
     });

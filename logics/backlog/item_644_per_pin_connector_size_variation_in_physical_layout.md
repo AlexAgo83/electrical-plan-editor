@@ -1,10 +1,10 @@
 ## item_644_per_pin_connector_size_variation_in_physical_layout - Per-pin connector size variation in physical layout
 > From version: 1.16.11
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Operator workflow and runtime integration
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -61,6 +61,7 @@ Goal: visually distinguish power vs signal cavities at a glance, improving plan 
 - Hybrid rationale: Derived from request `req_158_per_pin_connector_size_variation_in_physical_layout` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_158_per_pin_connector_size_variation_in_physical_layout.md`.
 - Generated locally by logics-manager.
+- Task `task_153_per_pin_connector_size_variation_in_physical_layout` was finished via `logics-manager flow finish task` on 2026-06-26.
 
 # Tasks
 - `task_153_per_pin_connector_size_variation_in_physical_layout`

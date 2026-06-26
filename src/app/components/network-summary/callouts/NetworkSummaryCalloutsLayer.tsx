@@ -19,7 +19,7 @@ import {
   getConnectorLayoutShellStrokeWidth,
   getConnectorLayoutShellShape,
   getConnectorLayoutWayRenderCenter,
-  getConnectorLayoutWaySpan,
+  getConnectorLayoutWaySizeScale,
   getConnectorLayoutWayDisplayLabel
 } from "../../../../core/connectorLayout";
 import {
@@ -259,7 +259,7 @@ export function renderConnectorLayoutDrawing(
         ))}
         {layout.ways.map((way) => {
           const wayCenter = getConnectorLayoutWayRenderCenter(way);
-          const waySizeScale = getConnectorLayoutWaySpan(way);
+          const waySizeScale = getConnectorLayoutWaySizeScale(way);
           const label = getConnectorLayoutWayDisplayLabel(way);
           const labelClassName = `network-callout-connector-way-label${label.length > 2 ? " is-long-label" : ""}`;
           const labelFontSize = label.length > 2 ? 4.7 : 5.8;
@@ -269,7 +269,7 @@ export function renderConnectorLayoutDrawing(
           const isUnused = wireId === undefined;
           const wayClassName = `network-callout-connector-way${isWireHighlighted ? " is-wire-highlighted" : ""}${
             isUnused ? " is-unused" : ""
-          }${way.strokeStyle === "dashed" ? " is-dashed" : ""}${way.size === "big" ? " is-big" : ""}`;
+          }${way.strokeStyle === "dashed" ? " is-dashed" : ""}${way.size === "big" ? " is-big" : ""}${way.size === "small" ? " is-small" : ""}`;
           const handleSelectCavityWire = (event: ReactMouseEvent<SVGGElement>): void => {
             if (!canSelectWire) {
               return;
