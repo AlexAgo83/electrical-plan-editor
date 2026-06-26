@@ -464,52 +464,37 @@ export function AppShellLayout({
         <button
           type="button"
           className="filter-chip header-docked-network-picker-button"
-          aria-haspopup="dialog"
+          aria-haspopup="menu"
           aria-expanded={isNetworkPickerOpen}
-          onClick={() => setIsNetworkPickerOpen(true)}
+          aria-label={`Active plan: ${activeNetwork.name}. Change active plan`}
+          onClick={() => setIsNetworkPickerOpen((current) => !current)}
           title={`Active plan: ${activeNetwork.name}`}
         >
           <span className="network-summary-active-network-icon" aria-hidden="true" />
-          <span className="header-docked-network-picker-label">{activeNetwork.name}</span>
         </button>
         {isNetworkPickerOpen ? (
-          <div className="header-network-picker-backdrop" role="presentation" onMouseDown={closeNetworkPicker}>
-            <section
-              className="header-network-picker-dialog"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="header-network-picker-title"
-              onMouseDown={(event) => event.stopPropagation()}
-            >
-              <header className="header-network-picker-header">
-                <h2 id="header-network-picker-title">Select active plan</h2>
-                <button type="button" className="header-network-picker-close-button" aria-label="Close" onClick={closeNetworkPicker}>
-                  ×
+          <div className="header-network-picker-menu" role="menu" aria-label="Select active plan">
+            {networks.map((network) => {
+              const isActive = network.id === activeNetwork.id;
+              return (
+                <button
+                  key={network.id}
+                  type="button"
+                  role="menuitemradio"
+                  className={`header-network-picker-option${isActive ? " is-active" : ""}`}
+                  aria-checked={isActive}
+                  onClick={() => {
+                    if (!isActive) {
+                      onSelectActiveNetwork(network.id);
+                    }
+                    closeNetworkPicker();
+                  }}
+                >
+                  <span className="header-network-picker-option-name">{network.name}</span>
+                  <span className="technical-id">{network.technicalId}</span>
                 </button>
-              </header>
-              <div className="header-network-picker-list">
-                {networks.map((network) => {
-                  const isActive = network.id === activeNetwork.id;
-                  return (
-                    <button
-                      key={network.id}
-                      type="button"
-                      className={`header-network-picker-option${isActive ? " is-active" : ""}`}
-                      aria-pressed={isActive}
-                      onClick={() => {
-                        if (!isActive) {
-                          onSelectActiveNetwork(network.id);
-                        }
-                        closeNetworkPicker();
-                      }}
-                    >
-                      <span className="header-network-picker-option-name">{network.name}</span>
-                      <span className="technical-id">{network.technicalId}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
+              );
+            })}
           </div>
         ) : null}
         </>

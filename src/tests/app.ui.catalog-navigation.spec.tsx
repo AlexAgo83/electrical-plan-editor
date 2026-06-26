@@ -156,14 +156,14 @@ describe("App integration UI - catalog navigation", () => {
 
     await waitFor(() => expect(document.querySelector(".header-docked-nav-shell")).toHaveClass("is-visible"));
     const pickerButton = screen.getByRole("button", { name: /Main network \(Sample\)/i });
-    expect(pickerButton).toHaveAttribute("aria-haspopup", "dialog");
+    expect(pickerButton).toHaveAttribute("aria-haspopup", "menu");
     fireEvent.click(pickerButton);
 
-    const pickerDialog = screen.getByRole("dialog", { name: "Select active plan" });
-    expect(within(pickerDialog).getByRole("button", { name: /Main network \(Sample\)/i })).toHaveAttribute("aria-pressed", "true");
-    fireEvent.click(within(pickerDialog).getByRole("button", { name: /Other network/i }));
+    const pickerMenu = screen.getByRole("menu", { name: "Select active plan" });
+    expect(within(pickerMenu).getByRole("menuitemradio", { name: /Main network \(Sample\)/i })).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(within(pickerMenu).getByRole("menuitemradio", { name: /Other network/i }));
     expect(store.getState().activeNetworkId).toBe("net-other");
-    expect(screen.queryByRole("dialog", { name: "Select active plan" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("menu", { name: "Select active plan" })).not.toBeInTheDocument();
   });
 
   it("compacts header actions as soon as docked quick navigation blends in", async () => {
