@@ -41,7 +41,7 @@
 
 # Scope
 - In: per-table column picker UI, visibility state, persistence migration, applied to all 5 tables.
-- Out: column reordering, column resizing, saved column presets/views, export honoring visibility (separate concerns).
+- Out: column reordering (see [[req_157_reorder_table_columns]]), column resizing, saved column presets/views, export honoring visibility (separate concerns).
 
 # Risks / Open questions
 - Each table's hardcoded JSX must be made visibility-aware; lowest-risk path is to introduce a per-table column descriptor (id, label, locked, render) and drive both header and body from it — a non-trivial refactor across 5 tables.
