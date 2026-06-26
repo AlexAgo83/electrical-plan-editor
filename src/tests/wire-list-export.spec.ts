@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { CatalogItem, CatalogItemId, Connector, ConnectorId, Splice, SpliceId, Wire, WireId } from "../core/entities";
+import type { CatalogItem, CatalogItemId, Connector, ConnectorId, NodeId, Splice, SpliceId, Wire, WireId } from "../core/entities";
 import { buildWireListSheet } from "../app/lib/wireListExport";
 import { formatEntityIdForDisplay } from "../core/networkEntityPrefix";
 
@@ -17,6 +17,10 @@ function asSpliceId(value: string): SpliceId {
 
 function asWireId(value: string): WireId {
   return value as WireId;
+}
+
+function asNodeId(value: string): NodeId {
+  return value as NodeId;
 }
 
 describe("buildWireListSheet", () => {
@@ -88,6 +92,10 @@ describe("buildWireListSheet", () => {
     ];
 
     const sheet = buildWireListSheet("Wires", wires, connectors, splices, catalogItems);
+    const firstRow = sheet.rows[0];
+    const secondRow = sheet.rows[1];
+    expect(firstRow).toBeDefined();
+    expect(secondRow).toBeDefined();
 
     expect(sheet.headers).toEqual([
       "Technical ID",
@@ -109,9 +117,19 @@ describe("buildWireListSheet", () => {
       "End connection name",
       "End seal ref",
       "End seal name",
-      "Length (mm)"
+      "Length (mm)",
+      "Untwisted length (mm)",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "Entity type",
+      "Entity ID",
+      "Entity name",
+      "Internal ID"
     ]);
-    expect(sheet.rows[0]).toEqual([
+    expect(firstRow!.slice(0, 20)).toEqual([
       "W-001",
       "Wire 1",
       "",
@@ -133,7 +151,9 @@ describe("buildWireListSheet", () => {
       "",
       140
     ]);
-    expect(sheet.rows[1]).toEqual([
+    expect(firstRow![20]).toBe("");
+    expect(firstRow!.slice(26)).toEqual(["Connector", "C-1", "Connector 1", "C1"]);
+    expect(secondRow!.slice(0, 20)).toEqual([
       "W-002",
       "Wire 2",
       "",
@@ -155,6 +175,8 @@ describe("buildWireListSheet", () => {
       "Manual seal",
       190
     ]);
+    expect(secondRow![20]).toBe("");
+    expect(secondRow!.slice(26)).toEqual(["Splice", "S-1", "Splice 1", "S1"]);
   });
 
   it("resolves splice-end connection refs from manual ref, catalog material, then splice manufacturerReference", () => {
@@ -405,8 +427,9 @@ describe("buildWireListSheet", () => {
     ];
 
     const defaultSheet = buildWireListSheet("Wires", wires, connectors, splices, []);
-    // Length (mm) is the last column (index 19) after splitting ref/name columns.
+    // Length stays at index 19; untwisted length is appended next to it.
     expect(defaultSheet.rows.map((row) => row[19])).toEqual([1040, 1115, 1115, 1040]);
+    expect(defaultSheet.rows.map((row) => row[20])).toEqual(["", 1040, 1040, ""]);
     expect(wires.map((wire) => wire.lengthMm)).toEqual([1000, 1000, 1000, 1000]);
 
     const customSheet = buildWireListSheet("Wires", wires, connectors, splices, [], {
@@ -414,6 +437,52 @@ describe("buildWireListSheet", () => {
       twistedPairLengthCoefficient: 1.08
     });
     expect(customSheet.rows.map((row) => row[19])).toEqual([1050, 1130, 1130, 1050]);
+    expect(customSheet.rows.map((row) => row[20])).toEqual(["", 1050, 1050, ""]);
+  });
+
+  it("adds connector, splice, and node references starting at column AA", () => {
+    const connectors: Connector[] = [
+      { id: asConnectorId("C1"), name: "Connector 1", technicalId: "NET-C-1", cavityCount: 2 }
+    ];
+    const splices: Splice[] = [{ id: asSpliceId("S1"), name: "Splice 1", technicalId: "NET-S-1", portCount: 2 }];
+    const wires: Wire[] = [
+      {
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "NET-W-001",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 100,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
+
+    const sheet = buildWireListSheet(
+      "Wires",
+      wires,
+      connectors,
+      splices,
+      [],
+      {},
+      (id) => formatEntityIdForDisplay(id, "NET-", false),
+      [
+        { id: asNodeId("NET-N1"), kind: "intermediate", label: "Node 1" },
+        { id: asNodeId("NET-N-C1"), kind: "connector", connectorId: asConnectorId("C1") }
+      ]
+    );
+
+    expect(sheet.headers[26]).toBe("Entity type");
+    expect(sheet.headers.slice(26, 30)).toEqual(["Entity type", "Entity ID", "Entity name", "Internal ID"]);
+    expect(sheet.rows.map((row) => row.slice(26, 30))).toEqual([
+      ["Connector", "C-1", "Connector 1", "C1"],
+      ["Splice", "S-1", "Splice 1", "S1"],
+      ["Node", "N-C1", "Connector 1", "NET-N-C1"],
+      ["Node", "N1", "Node 1", "NET-N1"]
+    ]);
   });
 
   it("hides the active network prefix in human-readable IDs when the formatter strips it (AC9)", () => {

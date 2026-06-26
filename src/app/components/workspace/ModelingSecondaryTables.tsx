@@ -21,9 +21,13 @@ import {
 import {
   buildWireTwistGroupExportCounts,
   resolveWireExportLengthMm,
+  resolveWireUntwistedExportLengthMm,
   type WireExportLengthPreferences,
 } from "../../lib/wireExportLength";
-import { resolveWireExportEndpointMaterials } from "../../lib/wireListExport";
+import {
+  appendWireReferenceTable,
+  resolveWireExportEndpointMaterials,
+} from "../../lib/wireListExport";
 import { TabularExportPreviewDialog } from "../dialogs/TabularExportPreviewDialog";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
@@ -32,6 +36,7 @@ import type {
   CatalogItemId,
   Connector,
   ConnectorId,
+  NetworkNode,
   NodeId,
   Segment,
   SegmentId,
@@ -105,6 +110,7 @@ interface ModelingSecondaryTablesProps {
   wireExportLengthPreferences: WireExportLengthPreferences;
   catalogItems: CatalogItem[];
   connectors: Connector[];
+  nodes: NetworkNode[];
   splices: Splice[];
   wires: Wire[];
   visibleWires: Wire[];
@@ -169,6 +175,7 @@ export function ModelingSecondaryTables({
   wireExportLengthPreferences,
   catalogItems,
   connectors,
+  nodes,
   splices,
   wires,
   visibleWires,
@@ -964,6 +971,7 @@ export function ModelingSecondaryTables({
                         "End seal name",
                         "Section (mm²)",
                         "Length (mm)",
+                        "Untwisted length (mm)",
                         "Route mode",
                       ]
                     : [
@@ -984,6 +992,7 @@ export function ModelingSecondaryTables({
                         "End seal name",
                         "Section (mm²)",
                         "Length (mm)",
+                        "Untwisted length (mm)",
                       ];
                   const twistGroupCounts =
                     buildWireTwistGroupExportCounts(sortedVisibleWires);
@@ -1029,6 +1038,11 @@ export function ModelingSecondaryTables({
                           twistGroupCounts,
                           wireExportLengthPreferences,
                         ),
+                        resolveWireUntwistedExportLengthMm(
+                          wire,
+                          twistGroupCounts,
+                          wireExportLengthPreferences,
+                        ),
                         wire.isRouteLocked ? "Locked" : "Auto",
                       ];
                     }
@@ -1055,12 +1069,24 @@ export function ModelingSecondaryTables({
                         twistGroupCounts,
                         wireExportLengthPreferences,
                       ),
+                      resolveWireUntwistedExportLengthMm(
+                        wire,
+                        twistGroupCounts,
+                        wireExportLengthPreferences,
+                      ),
                     ];
                   });
-                  const sheet = {
-                    name: "Modeling Wires",
+                  const sheetContent = appendWireReferenceTable(
                     headers,
                     rows,
+                    connectors,
+                    splices,
+                    nodes,
+                  );
+                  const sheet = {
+                    name: "Modeling Wires",
+                    headers: sheetContent.headers,
+                    rows: sheetContent.rows,
                     freezeHeaderRow: true,
                     autoFilter: true,
                   } satisfies TabularWorksheetExport;

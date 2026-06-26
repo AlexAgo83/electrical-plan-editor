@@ -351,6 +351,9 @@ export function useNetworkImportExport({
         const splices = networkState.splices.allIds
           .map((id) => networkState.splices.byId[id])
           .filter((s) => s !== undefined);
+        const nodes = networkState.nodes.allIds
+          .map((id) => networkState.nodes.byId[id])
+          .filter((node) => node !== undefined);
         const wires = networkState.wires.allIds
           .map((id) => networkState.wires.byId[id])
           .filter((w) => w !== undefined);
@@ -400,7 +403,8 @@ export function useNetworkImportExport({
                 id,
                 network.entityPrefix,
                 groupedWirePreferences?.showNetworkEntityPrefix ?? true
-              )
+              ),
+            nodes
           )
         );
       }
@@ -456,6 +460,9 @@ export function useNetworkImportExport({
         const splices = networkState.splices.allIds
           .map((id) => networkState.splices.byId[id])
           .filter((splice) => splice !== undefined);
+        const nodes = networkState.nodes.allIds
+          .map((id) => networkState.nodes.byId[id])
+          .filter((node) => node !== undefined);
         const wires = networkState.wires.allIds
           .map((id) => networkState.wires.byId[id])
           .filter((wire) => wire !== undefined);
@@ -476,7 +483,8 @@ export function useNetworkImportExport({
                 id,
                 network.entityPrefix,
                 groupedWirePreferences?.showNetworkEntityPrefix ?? true
-              )
+              ),
+            nodes
           )
         );
       }

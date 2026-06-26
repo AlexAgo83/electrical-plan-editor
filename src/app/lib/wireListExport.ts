@@ -1,9 +1,11 @@
 import { resolveConnectorTerminalMaterial } from "../../core/connectorCatalogMaterials";
-import type { CatalogItem, Connector, Splice, Wire, WireEndpoint } from "../../core/entities";
+import type { CatalogItem, Connector, NetworkNode, Splice, Wire, WireEndpoint } from "../../core/entities";
+import type { CsvCellValue } from "./csv";
 import type { TabularWorksheetExport } from "./tabularExport";
 import {
   buildWireTwistGroupExportCounts,
   resolveWireExportLengthMm,
+  resolveWireUntwistedExportLengthMm,
   type WireExportLengthPreferences
 } from "./wireExportLength";
 
@@ -26,6 +28,16 @@ interface ResolvedEndpointMaterial {
   reference: string;
   name?: string;
 }
+
+interface ReferenceTableRow {
+  type: string;
+  id: string;
+  name: string;
+  internalId: string;
+}
+
+const REFERENCE_TABLE_START_COLUMN_INDEX = 26;
+const REFERENCE_TABLE_HEADERS = ["Entity type", "Entity ID", "Entity name", "Internal ID"];
 
 export interface ResolvedWireExportEndpointMaterials {
   connectionRef: string;
@@ -208,6 +220,90 @@ function resolveEndpoint(
   };
 }
 
+function buildReferenceTableRows(
+  connectors: Connector[],
+  splices: Splice[],
+  nodes: NetworkNode[],
+  connectorById: ReadonlyMap<string, Connector>,
+  spliceById: ReadonlyMap<string, Splice>,
+  formatEntityId: (id: string) => string
+): CsvCellValue[][] {
+  const rows: ReferenceTableRow[] = [
+    ...[...connectors]
+      .sort((a, b) => a.technicalId.localeCompare(b.technicalId, undefined, { sensitivity: "base" }))
+      .map((connector) => ({
+        type: "Connector",
+        id: formatEntityId(connector.technicalId),
+        name: connector.name,
+        internalId: connector.id
+      })),
+    ...[...splices]
+      .sort((a, b) => a.technicalId.localeCompare(b.technicalId, undefined, { sensitivity: "base" }))
+      .map((splice) => ({
+        type: "Splice",
+        id: formatEntityId(splice.technicalId),
+        name: splice.name,
+        internalId: splice.id
+      })),
+    ...[...nodes]
+      .sort((a, b) => a.id.localeCompare(b.id, undefined, { sensitivity: "base" }))
+      .map((node) => ({
+        type: "Node",
+        id: formatEntityId(node.id),
+        name: resolveNodeReferenceName(node, connectorById, spliceById),
+        internalId: node.id
+      }))
+  ];
+
+  return rows.map((row) => [row.type, row.id, row.name, row.internalId]);
+}
+
+export function appendWireReferenceTable(
+  headers: string[],
+  rows: CsvCellValue[][],
+  connectors: Connector[],
+  splices: Splice[],
+  nodes: NetworkNode[],
+  formatEntityId: (id: string) => string = (id) => id
+): { headers: string[]; rows: CsvCellValue[][] } {
+  const connectorById = new Map(connectors.map((connector) => [connector.id, connector]));
+  const spliceById = new Map(splices.map((splice) => [splice.id, splice]));
+  const referenceRows = buildReferenceTableRows(connectors, splices, nodes, connectorById, spliceById, formatEntityId);
+  const spacerColumnCount = Math.max(0, REFERENCE_TABLE_START_COLUMN_INDEX - headers.length);
+  const nextHeaders = [
+    ...headers,
+    ...Array.from({ length: spacerColumnCount }, () => ""),
+    ...REFERENCE_TABLE_HEADERS
+  ];
+  const maxRowCount = Math.max(rows.length, referenceRows.length);
+  return {
+    headers: nextHeaders,
+    rows: Array.from({ length: maxRowCount }, (_, index) => [
+      ...(rows[index] ?? Array.from({ length: headers.length }, () => "")),
+      ...Array.from({ length: spacerColumnCount }, () => ""),
+      ...(referenceRows[index] ?? ["", "", "", ""])
+    ])
+  };
+}
+
+function resolveNodeReferenceName(
+  node: NetworkNode,
+  connectorById: ReadonlyMap<string, Connector>,
+  spliceById: ReadonlyMap<string, Splice>
+): string {
+  if (node.kind === "intermediate") {
+    return node.label;
+  }
+  if (node.kind === "splice") {
+    return spliceById.get(node.spliceId)?.name ?? "";
+  }
+  if (node.kind === "connectorBackshellHelper") {
+    const connectorName = connectorById.get(node.connectorId)?.name ?? "";
+    return node.label?.trim() || (connectorName.length > 0 ? `${connectorName} backshell` : "");
+  }
+  return connectorById.get(node.connectorId)?.name ?? "";
+}
+
 export function buildWireListSheet(
   sheetName: string,
   wires: Wire[],
@@ -215,13 +311,14 @@ export function buildWireListSheet(
   splices: Splice[],
   catalogItems: CatalogItem[],
   exportLengthPreferences: WireExportLengthPreferences = {},
-  formatEntityId: (id: string) => string = (id) => id
+  formatEntityId: (id: string) => string = (id) => id,
+  nodes: NetworkNode[] = []
 ): TabularWorksheetExport {
   const connectorById = new Map(connectors.map((c) => [c.id, c]));
   const spliceById = new Map(splices.map((s) => [s.id, s]));
   const catalogItemById = new Map(catalogItems.map((item) => [item.id, item]));
 
-  const headers = [
+  const baseHeaders = [
     "Technical ID",
     "Name",
     "Twist group",
@@ -241,7 +338,8 @@ export function buildWireListSheet(
     "End connection name",
     "End seal ref",
     "End seal name",
-    "Length (mm)"
+    "Length (mm)",
+    "Untwisted length (mm)"
   ];
 
   const sortedWires = [...wires].sort((a, b) =>
@@ -249,7 +347,7 @@ export function buildWireListSheet(
   );
   const twistGroupCounts = buildWireTwistGroupExportCounts(sortedWires);
 
-  const rows = sortedWires.map((wire) => {
+  const wireRows = sortedWires.map((wire) => {
     const begin = resolveEndpoint(wire, "A", connectorById, spliceById);
     const end = resolveEndpoint(wire, "B", connectorById, spliceById);
     const beginMaterials = resolveWireExportEndpointMaterials(wire, "A", connectorById, spliceById, catalogItemById);
@@ -274,9 +372,11 @@ export function buildWireListSheet(
       endMaterials.connectionName,
       endMaterials.sealRef,
       endMaterials.sealName,
-      resolveWireExportLengthMm(wire, twistGroupCounts, exportLengthPreferences)
+      resolveWireExportLengthMm(wire, twistGroupCounts, exportLengthPreferences),
+      resolveWireUntwistedExportLengthMm(wire, twistGroupCounts, exportLengthPreferences)
     ];
   });
+  const { headers, rows } = appendWireReferenceTable(baseHeaders, wireRows, connectors, splices, nodes, formatEntityId);
 
   return {
     name: sheetName,

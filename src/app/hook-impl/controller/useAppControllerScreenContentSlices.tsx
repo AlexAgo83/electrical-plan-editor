@@ -516,6 +516,7 @@ export function buildModelingScreenContentSlice(
     wireExportLengthPreferences: params.wireExportLengthPreferences,
     catalogItems: params.catalogItems,
     connectors: params.connectors,
+    nodes: params.nodes,
     splices: params.splices,
     wires: params.wires,
     visibleWires: params.visibleWires,

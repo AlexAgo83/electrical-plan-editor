@@ -9,9 +9,10 @@ import { downloadTabularCsvOrXlsxFile, downloadTabularWorkbookFile, type Tabular
 import { getWireColorCsvValue, renderWireColorCellValue } from "../../lib/wireColorPresentation";
 import {
   buildWireTwistGroupExportCounts,
-  resolveWireExportLengthMm
+  resolveWireExportLengthMm,
+  resolveWireUntwistedExportLengthMm
 } from "../../lib/wireExportLength";
-import { resolveWireExportEndpointMaterials } from "../../lib/wireListExport";
+import { appendWireReferenceTable, resolveWireExportEndpointMaterials } from "../../lib/wireListExport";
 import type { AnalysisWorkspaceContentProps } from "./AnalysisWorkspaceContent.types";
 import { TabularExportPreviewDialog } from "../dialogs/TabularExportPreviewDialog";
 import { EntityReferenceButton } from "./EntityReferenceButton";
@@ -33,6 +34,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     wireExportLengthPreferences,
     catalogItems,
     connectors,
+    nodes,
     segments,
     nodeLabelById,
     splices,
@@ -212,6 +214,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   "End seal name",
                   "Section (mm²)",
                   "Length (mm)",
+                  "Untwisted length (mm)",
                   "Route mode"
                 ]
               : [
@@ -231,7 +234,8 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   "End seal ref",
                   "End seal name",
                   "Section (mm²)",
-                  "Length (mm)"
+                  "Length (mm)",
+                  "Untwisted length (mm)"
                 ];
             const twistGroupCounts = buildWireTwistGroupExportCounts(sortedVisibleWires);
             const rows = sortedVisibleWires.map((wire) => {
@@ -260,6 +264,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   endMaterials.sealName,
                   wire.sectionMm2,
                   resolveWireExportLengthMm(wire, twistGroupCounts, wireExportLengthPreferences),
+                  resolveWireUntwistedExportLengthMm(wire, twistGroupCounts, wireExportLengthPreferences),
                   wire.isRouteLocked ? "Locked" : "Auto"
                 ];
               }
@@ -281,10 +286,18 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 endMaterials.sealRef,
                 endMaterials.sealName,
                 wire.sectionMm2,
-                resolveWireExportLengthMm(wire, twistGroupCounts, wireExportLengthPreferences)
+                resolveWireExportLengthMm(wire, twistGroupCounts, wireExportLengthPreferences),
+                resolveWireUntwistedExportLengthMm(wire, twistGroupCounts, wireExportLengthPreferences)
               ];
             });
-            const sheet = { name: "Analysis Wires", headers, rows, freezeHeaderRow: true, autoFilter: true } satisfies TabularWorksheetExport;
+            const sheetContent = appendWireReferenceTable(headers, rows, connectors, splices, nodes);
+            const sheet = {
+              name: "Analysis Wires",
+              headers: sheetContent.headers,
+              rows: sheetContent.rows,
+              freezeHeaderRow: true,
+              autoFilter: true
+            } satisfies TabularWorksheetExport;
             const filenameBase = [
               "wire-list",
               normalizeFileNamePart(activeNetwork?.name) ?? normalizeFileNamePart(activeNetwork?.technicalId),

@@ -56,3 +56,18 @@ export function resolveWireExportLengthMm(
 
   return Math.round(baseLengthMm * coefficient + strippingAllowanceMm * 2);
 }
+
+export function resolveWireUntwistedExportLengthMm(
+  wire: Wire,
+  twistGroupCounts: ReadonlyMap<string, number>,
+  preferences: WireExportLengthPreferences = {}
+): number | "" {
+  const twistGroupLabel = normalizeWireTwistGroupExportLabel(wire.twistGroupLabel);
+  if (twistGroupLabel === null || (twistGroupCounts.get(twistGroupLabel) ?? 0) < 2) {
+    return "";
+  }
+
+  const baseLengthMm = Number.isFinite(wire.lengthMm) ? wire.lengthMm : 0;
+  const strippingAllowanceMm = normalizeWireExportStrippingAllowanceMm(preferences.strippingAllowanceMm);
+  return Math.round(baseLengthMm + strippingAllowanceMm * 2);
+}
