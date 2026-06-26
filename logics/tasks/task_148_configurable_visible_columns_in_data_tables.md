@@ -1,19 +1,19 @@
 ## task_148_configurable_visible_columns_in_data_tables - Configurable and reorderable columns in data tables
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 95%
 > Confidence: 92%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 > Owner: Codex
 
 # Definition of Done (DoD)
-- [ ] The backlog scope is implemented.
-- [ ] Acceptance criteria are covered.
-- [ ] Validation passes.
+- [x] The backlog scope is implemented.
+- [x] Acceptance criteria are covered.
+- [x] Validation passes.
 
 # Backlog
 - `item_639_configurable_visible_columns_in_data_tables`
@@ -31,9 +31,14 @@
 # Validation
 - Run `python3 -m logics_manager lint --require-status`.
 - Run `python3 -m logics_manager flow finish task task_148_configurable_visible_columns_in_data_tables.md` after implementation.
+- Finish workflow executed on 2026-06-26.
+- Linked backlog/request close verification passed.
 
 # Report
 - Implementation complete.
+- Finished on 2026-06-26.
+- Linked backlog item(s): `item_639_configurable_visible_columns_in_data_tables`
+- Related request(s): `req_153_configurable_table_columns`
 
 # AI Context
 - Summary: Implement the combined slice — per-table column-descriptor refactor of all 5 tables driving column visibility ("Columns ▾") AND desktop drag-and-drop reordering, persisted in one UI-preferences migration. Absorbs task_152.

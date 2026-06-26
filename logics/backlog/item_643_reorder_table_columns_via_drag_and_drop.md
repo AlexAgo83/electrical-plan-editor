@@ -1,10 +1,10 @@
 ## item_643_reorder_table_columns_via_drag_and_drop - Reorder table columns via drag-and-drop
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Operator workflow and runtime integration
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -61,6 +61,7 @@ Goal: usability comfort, light UI personalization.
 - Hybrid rationale: Derived from request `req_157_reorder_table_columns` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_157_reorder_table_columns.md`.
 - Generated locally by logics-manager.
+- Task `task_152_reorder_table_columns_via_drag_and_drop` was finished via `logics-manager flow finish task` on 2026-06-26.
 
 # Tasks
 - `task_152_reorder_table_columns_via_drag_and_drop`

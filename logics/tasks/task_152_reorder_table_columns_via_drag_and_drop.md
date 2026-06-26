@@ -1,19 +1,19 @@
 ## task_152_reorder_table_columns_via_drag_and_drop - Reorder table columns via drag-and-drop
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 95
 > Confidence: 90
-> Progress: 0
+> Progress: 100%
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
 
 # Definition of Done (DoD)
 - **MERGED INTO [[task_148_configurable_visible_columns_in_data_tables]]** (decision 2026-06-26): column reordering is delivered as part of the combined "configurable + reorderable columns" task, on the shared per-table column-descriptor refactor. Do NOT implement this task standalone — its acceptance criteria (below, retained for traceability) are now covered by task_148 (AC6–AC8). Closed-as-merged once task_148 ships.
-- [ ] The backlog scope is implemented (via task_148).
-- [ ] Acceptance criteria are covered (via task_148 AC6–AC8).
-- [ ] Validation passes (via task_148).
+- [x] The backlog scope is implemented (via task_148).
+- [x] Acceptance criteria are covered (via task_148 AC6–AC8).
+- [x] Validation passes (via task_148).
 
 # Backlog
 - `item_643_reorder_table_columns_via_drag_and_drop`
@@ -28,9 +28,14 @@
 # Validation
 - Run `python3 -m logics_manager lint --require-status`.
 - Run `python3 -m logics_manager flow finish task task_152_reorder_table_columns_via_drag_and_drop.md` after implementation.
+- Finish workflow executed on 2026-06-26.
+- Linked backlog/request close verification passed.
 
 # Report
 - Implementation complete.
+- Finished on 2026-06-26.
+- Linked backlog item(s): `item_643_reorder_table_columns_via_drag_and_drop`
+- Related request(s): `req_153_configurable_table_columns`, `req_157_reorder_table_columns`
 
 # AI Context
 - Summary: Implement reorder table columns via drag-and-drop.

@@ -1,7 +1,7 @@
 ## req_157_reorder_table_columns - Reorder table columns via drag-and-drop
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 95
 > Confidence: 90
 > Complexity: Medium

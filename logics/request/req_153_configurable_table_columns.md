@@ -1,7 +1,7 @@
 ## req_153_configurable_table_columns - Configurable and reorderable columns in data tables
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 95
 > Confidence: 92
 > Complexity: Medium

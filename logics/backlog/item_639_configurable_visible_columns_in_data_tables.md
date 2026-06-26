@@ -1,10 +1,10 @@
 ## item_639_configurable_visible_columns_in_data_tables - Configurable visible columns in data tables
 > From version: 1.16.10
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Operator workflow and runtime integration
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -61,6 +61,7 @@ Goal: better readability per business context, less visual noise.
 - Hybrid rationale: Derived from request `req_153_configurable_table_columns` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_153_configurable_table_columns.md`.
 - Generated locally by logics-manager.
+- Task `task_148_configurable_visible_columns_in_data_tables` was finished via `logics-manager flow finish task` on 2026-06-26.
 
 # Tasks
 - `task_148_configurable_visible_columns_in_data_tables`
