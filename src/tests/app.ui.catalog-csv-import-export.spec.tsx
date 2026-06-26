@@ -57,6 +57,7 @@ describe("App integration UI - catalog CSV import/export", () => {
       "Endpoint refs",
       "Seal refs",
       "Export CSV",
+      "Columns ▾",
       "Help"
     ]);
     const exportButton = within(headerToolsRows[0] as HTMLElement).getByRole("button", { name: "Export CSV" });

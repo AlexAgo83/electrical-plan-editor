@@ -367,21 +367,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   useHoverDescriptionTitles(locale);
 
   useAppControllerThemeSyncEffect({ store, themeMode });
-  const validationModel = useValidationModel({
-    state,
-    connectors,
-    splices,
-    nodes,
-    segments,
-    wires,
-    connectorMap,
-    spliceMap,
-    segmentMap,
-    connectorNodeByConnectorId,
-    spliceNodeBySpliceId,
-    isValidationScreen,
-    spliceSectionImbalanceRatioPercent
-  });
+  const validationModel = useValidationModel({ state, connectors, splices, nodes, segments, wires, connectorMap, spliceMap, segmentMap, connectorNodeByConnectorId, spliceNodeBySpliceId, isValidationScreen, spliceSectionImbalanceRatioPercent });
   const {
     validationIssues,
     orderedValidationIssues,
@@ -392,40 +378,14 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     getFocusedValidationIssueByCursor
   } = validationModel;
 
-  const entityCountBySubScreen: Record<SubScreenId, number> = {
-    catalog: catalogItems.length,
-    connector: connectors.length,
-    splice: splices.length,
-    node: nodes.length,
-    segment: segments.length,
-    wire: wires.length
-  };
+  const entityCountBySubScreen: Record<SubScreenId, number> = { catalog: catalogItems.length, connector: connectors.length, splice: splices.length, node: nodes.length, segment: segments.length, wire: wires.length };
   const hasActiveNetwork = activeNetwork !== null;
   useEffect(() => {
     if (hasActiveNetwork && (isModelingScreen || isAnalysisScreen)) {
       preloadNetworkSummaryWorkspaceUiModules();
     }
   }, [hasActiveNetwork, isAnalysisScreen, isModelingScreen]);
-  const {
-    isCurrentWorkspaceEmpty,
-    hasBuiltInSampleState,
-    toasts,
-    notifyToast,
-    dismissToast,
-    saveStatus,
-    isUndoAvailable,
-    isRedoAvailable,
-    undoHistoryEntries,
-    dispatchAction,
-    handleUndo,
-    handleRedo,
-    replaceStateWithHistory,
-    lastError,
-    bootRecoveryMessage,
-    clearPersistenceHealth,
-    commitBootRecovery,
-    workspaceFileStorage
-  } = useAppControllerWorkspaceRuntime({
+  const { isCurrentWorkspaceEmpty, hasBuiltInSampleState, toasts, notifyToast, dismissToast, saveStatus, isUndoAvailable, isRedoAvailable, undoHistoryEntries, dispatchAction, handleUndo, handleRedo, replaceStateWithHistory, lastError, bootRecoveryMessage, clearPersistenceHealth, commitBootRecovery, workspaceFileStorage } = useAppControllerWorkspaceRuntime({
     store,
     state,
     restoreViewportOnUndo,
