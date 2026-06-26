@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Draft
 > Understanding: 95
-> Confidence: 85
+> Confidence: 92
 > Complexity: Low
 > Theme: navigation
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -20,7 +20,8 @@
 # Decisions
 - Add a **compact network selector into the docked nav strip**, adjacent to the counter chips, shown when the nav is docked (during scroll).
 - Reuse the existing `onSelectActiveNetwork` callback and active-network state; do not introduce a second source of truth.
-- **Desktop-only fallback**: if adding the control overloads the docked button row, integrate it for desktop mode only (hide on mobile/narrow viewports). The existing nav already has responsive/compact-label behavior to follow.
+- **Form factor = reuse the existing native `<select>`** (decision 2026-06-26): render the same control as `NetworkSummaryHeader.tsx:102-113`, wrapped in the same `.network-summary-active-network-selector` label, so it inherits existing styling and naturally matches the `filter-chip` button height (min-height ~1.85rem in the docked strip). No button-with-menu — least code, visual consistency.
+- **Desktop-only fallback governed by the existing 1040px breakpoint** in `canvas-quick-nav.css` (the same threshold that already hides nav labels on the way to the compact strip); below it the docked selector is omitted, counters stay intact.
 
 # Acceptance criteria
 - AC1: When the nav strip is docked on scroll, a network selector is visible next to the counters and lets the user switch the active network without scrolling back up.
@@ -40,9 +41,9 @@
 - Out: redesigning the counters strip; multi-network simultaneous view; changing the in-content selector behavior.
 
 # Risks / Open questions
-- Horizontal space in the docked row is the main constraint — confirm the breakpoint/threshold for the desktop-only fallback against existing nav responsive rules.
-- Visual form factor: compact `<select>` vs a button-with-menu — pick whatever matches the existing chip styling and stays within the row height.
-- Ensure the docked selector and the in-content selector stay in sync (single state source).
+- RESOLVED — breakpoint: reuse the existing 1040px threshold in `canvas-quick-nav.css` for the desktop-only fallback; no new breakpoint.
+- RESOLVED — form factor: reuse the existing native `<select>` (same `.network-summary-active-network-selector` label), matches `filter-chip` height; no custom menu.
+- RESOLVED — single source of truth: both selectors call the same `onSelectActiveNetwork` and read `activeNetworkId`; no second state.
 
 # Companion docs
 - Product brief(s): (none yet)

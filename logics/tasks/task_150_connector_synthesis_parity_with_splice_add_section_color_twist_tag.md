@@ -2,8 +2,8 @@
 > From version: 1.16.10
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 95
+> Confidence: 92
 > Progress: 0%
 > Complexity: Medium
 > Theme: Implementation delivery
@@ -22,7 +22,7 @@
 - AC2: New columns are sortable (sort field type extended; `sortByTableColumns()` handles them).
 - AC3: CSV export of the connector synthesis includes the new columns in matching order.
 - AC4: Color rendering reuses the existing `renderWireColorPrefixMarker()` helper for consistency with other wire displays.
-- AC5: When configurable column visibility ([[req_153_configurable_table_columns]]) is available, the new synthesis columns are individually toggleable; otherwise they render by default.
+- AC5: The new synthesis columns render unconditionally — the analysis synthesis tables are independent of the req_153 modeling-table column model (no shared column-id scheme); per-synthesis-column toggling is out of scope (separate future extension).
 
 # Validation
 - Run `python3 -m logics_manager lint --require-status`.

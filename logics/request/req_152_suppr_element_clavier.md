@@ -2,8 +2,8 @@
 > From version: 1.16.10
 > Schema version: 1.0
 > Status: Draft
-> Understanding: 90
-> Confidence: 85
+> Understanding: 95
+> Confidence: 92
 > Complexity: Low
 > Theme: edition-plan
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -17,6 +17,7 @@
 - A global keyboard handler already exists: `src/app/hooks/useKeyboardShortcuts.ts` (`window.addEventListener("keydown")`) with an `isEditableElement()` guard that ignores keystrokes inside `input/textarea/select`/contenteditable. → the new key plugs in here, the anti-typing guard is already covered.
 - Each kind already has its delete handler: `handleConnectorDelete`, `handleSpliceDelete`, `handleNodeDelete`, `handleSegmentDelete`, `handleWireDelete` (+ cascade variants for connector/splice). → route by `selected.kind`, no new deletion logic.
 - A confirmation infrastructure exists: `useConfirmDialogController` (`requestConfirmation`) + `ConfirmDialog`. → reused, nothing to build.
+- The cascade delete handlers ALREADY build a cascade-aware confirmation: `useConnectorHandlers.ts:468-478` and `useSpliceHandlers.ts:358-369` pass `message`, `variant: "deleteCascade"`, `summaryCategories`, and `summaryNote` (built in `deleteImpact.ts:185-193`). → routing the keyboard delete through these handlers inherits the cascade messaging automatically; no new message-building work.
 
 # Decisions
 - Active keys: `Delete` **and** `Backspace`.
@@ -40,7 +41,7 @@
 - Out: changing the behavior of the existing delete buttons; multi-selection (only one element is selected at a time today).
 
 # Risks / Open questions
-- Confirmation behavior for cascade deletions: the `ConfirmDialog` should ideally surface the cascade effect (impacted wires/segments) for `node`/`connector`/`splice`.
+- RESOLVED — cascade confirmation: the connector/splice cascade handlers already surface the impact (`message` + `summaryCategories` + `summaryNote`, `deleteImpact.ts:185-193`). The keyboard path reuses the same handlers, so the cascade effect is shown without extra work.
 
 # Companion docs
 - Product brief(s): (none yet)

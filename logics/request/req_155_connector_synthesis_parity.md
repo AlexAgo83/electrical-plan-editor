@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Draft
 > Understanding: 95
-> Confidence: 85
+> Confidence: 92
 > Complexity: Low
 > Theme: analysis
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -22,14 +22,15 @@
 # Decisions
 - Add to connector synthesis: **Section (mm²)**, **Color**, **Twist group**, **Functional tag** — wire fields already rendered elsewhere, for a genuinely homogeneous synthesis.
 - Exclude the splice-only covered-length columns (no connector equivalent).
-- Column on/off toggling depends on [[req_153_configurable_table_columns]] (configurable visible columns). When that is available, the new columns plug into it; until then they render unconditionally.
+- **Independent of [[req_153_configurable_table_columns]]** (clarified by research 2026-06-26): the analysis synthesis tables (`AnalysisConnectorWorkspacePanels.tsx`) are SEPARATE components from the 5 modeling tables req_153 refactors — no shared column-id model, no shared rendering helpers. req_153 explicitly scopes out the synthesis tables. So this slice renders the new columns **unconditionally**; per-column toggling of synthesis columns is a future, separate extension, NOT a dependency here.
+- The new wire fields are not yet propagated into the synthesis row: `ConnectorSynthesisRow` (`app-controller.ts:21-29`) and the builder (`useEntityListModel.ts:79-109`) carry only 7 core fields today; `sectionMm2`, `twistGroupLabel`, `functionalDomainTag` (Wire entity) must be added to both.
 
 # Acceptance criteria
 - AC1: The connector synthesis table shows a Section (mm²) column populated from `wire.sectionMm2`, plus Color, Twist group, and Functional tag columns.
 - AC2: New columns are sortable (sort field type extended; `sortByTableColumns()` handles them).
 - AC3: CSV export of the connector synthesis includes the new columns in matching order.
 - AC4: Color rendering reuses the existing `renderWireColorPrefixMarker()` helper for consistency with other wire displays.
-- AC5: When configurable column visibility ([[req_153_configurable_table_columns]]) is available, the new synthesis columns are individually toggleable; otherwise they render by default.
+- AC5: The new synthesis columns render unconditionally (the analysis synthesis tables are independent of the req_153 modeling-table column model; per-synthesis-column toggling is out of scope, a separate future extension).
 
 # Definition of Ready (DoR)
 - [x] Problem statement is explicit and user impact is clear.
@@ -42,9 +43,9 @@
 - Out: splice-only covered-length columns; unifying connector/splice synthesis into one shared builder; the column-visibility mechanism itself (owned by req_153).
 
 # Risks / Open questions
-- No shared synthesis builder exists (connector and splice build rows separately in `useEntityListModel.ts`) — changes stay on the connector path; optional later refactor to share.
-- Field naming/source for "twist group" and "functional tag" on the wire must match what the wire table already uses (`twistGroupLabel`, `functionalDomainTag`).
-- Coupling with req_153: agree on a shared column-id scheme so synthesis columns participate in the same visibility model.
+- No shared synthesis builder exists (connector and splice build rows separately in `useEntityListModel.ts`) — changes stay on the connector path; optional later refactor to share. (accepted)
+- RESOLVED — field names: `twistGroupLabel` and `functionalDomainTag` are the correct Wire entity fields (same as the wire table); add them to `ConnectorSynthesisRow` and the row builder.
+- RESOLVED — no coupling with req_153: synthesis tables are separate from the modeling tables (no shared column-id model); this slice is independent and renders columns unconditionally.
 
 # Companion docs
 - Product brief(s): (none yet)
