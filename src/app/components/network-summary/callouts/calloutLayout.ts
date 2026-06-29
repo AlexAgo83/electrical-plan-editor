@@ -207,17 +207,70 @@ function getCalloutSubtitleFontSize(calloutTextSize: CanvasCalloutTextSize): num
   }
 }
 
-export function buildCalloutHeaderDisplay(name: string, technicalId: string): { title: string; subtitle: string } {
+const TECHNICAL_ID_SEPARATORS = [" ", "\t", "·", "-", ":", "_"];
+
+/**
+ * Remove a leading technical-ID token from a free-form entity name so the
+ * callout header does not repeat the ID. Operators sometimes bake the entity's
+ * own ID into its name (e.g. a splice named `AV-EP-01 Epissure Masse`), which
+ * would otherwise render as `EP-01 · AV-EP-01 Epissure Masse`.
+ *
+ * `candidateIds` should list the IDs to match against in priority order — both
+ * the raw/canonical ID (e.g. `AV-EP-01`) and the prefix-stripped display ID
+ * (e.g. `EP-01`). A token is only stripped when it sits at the start of the
+ * name and is followed by a separator or the end of the string, so names that
+ * merely start with similar text are never truncated.
+ */
+function stripLeadingTechnicalIdFromName(name: string, candidateIds: readonly string[]): string {
   const trimmedName = name.trim();
+  if (trimmedName.length === 0) {
+    return trimmedName;
+  }
+  for (const candidate of candidateIds) {
+    const id = candidate.trim();
+    if (id.length === 0 || !trimmedName.startsWith(id)) {
+      continue;
+    }
+    const remainder = trimmedName.slice(id.length);
+    if (remainder.length === 0) {
+      // The name is exactly the technical ID; there is no label to keep.
+      return "";
+    }
+    if (!TECHNICAL_ID_SEPARATORS.includes(remainder[0]!)) {
+      continue;
+    }
+    let cut = 0;
+    while (cut < remainder.length && TECHNICAL_ID_SEPARATORS.includes(remainder[cut]!)) {
+      cut += 1;
+    }
+    const label = remainder.slice(cut).trim();
+    // Adopt the stripped label only when something meaningful remains;
+    // otherwise leave the original name intact (it was only the ID followed by
+    // separators).
+    return label.length > 0 ? label : trimmedName;
+  }
+  return trimmedName;
+}
+
+export function buildCalloutHeaderDisplay(
+  name: string,
+  technicalId: string,
+  rawTechnicalId?: string,
+): { title: string; subtitle: string } {
   const trimmedTechnicalId = technicalId.trim();
+  const candidateIds =
+    rawTechnicalId === undefined
+      ? [trimmedTechnicalId]
+      : [rawTechnicalId.trim(), trimmedTechnicalId];
+  const displayName = stripLeadingTechnicalIdFromName(name, candidateIds);
   if (trimmedTechnicalId.length > 0) {
-    if (trimmedName.length > 0 && trimmedTechnicalId !== trimmedName) {
-      return { title: `${trimmedTechnicalId} · ${trimmedName}`, subtitle: "" };
+    if (displayName.length > 0 && trimmedTechnicalId !== displayName) {
+      return { title: `${trimmedTechnicalId} · ${displayName}`, subtitle: "" };
     }
     return { title: trimmedTechnicalId, subtitle: "" };
   }
-  if (trimmedName.length > 0) {
-    return { title: trimmedName, subtitle: "" };
+  if (displayName.length > 0) {
+    return { title: displayName, subtitle: "" };
   }
   return { title: "(unnamed)", subtitle: "" };
 }

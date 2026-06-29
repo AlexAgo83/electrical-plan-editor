@@ -339,7 +339,11 @@ export function buildCableCalloutViewModels({
       continue;
     }
     const catalogItem = connector.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId);
-    const header = buildCalloutHeaderDisplay(connector.name, formatEntityId(connector.technicalId));
+    const header = buildCalloutHeaderDisplay(
+      connector.name,
+      formatEntityId(connector.technicalId),
+      connector.technicalId,
+    );
     const connectorReferenceValue = connector.manufacturerReference?.trim() ?? "";
     const connectorReference = connectorReferenceValue.length > 0 ? `ref : ${connectorReferenceValue}` : "";
     models.push({
@@ -399,7 +403,11 @@ export function buildCableCalloutViewModels({
     if (groups.length === 0) {
       continue;
     }
-    const header = buildCalloutHeaderDisplay(splice.name, formatEntityId(splice.technicalId));
+    const header = buildCalloutHeaderDisplay(
+      splice.name,
+      formatEntityId(splice.technicalId),
+      splice.technicalId,
+    );
     const spliceReferenceValue = splice.manufacturerReference?.trim() ?? "";
     const spliceReference = spliceReferenceValue.length > 0 ? `ref : ${spliceReferenceValue}` : "";
     models.push({
