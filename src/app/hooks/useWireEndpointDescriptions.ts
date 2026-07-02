@@ -1,23 +1,27 @@
 import { useCallback } from "react";
+import { resolveConnectorCavityDisplayLabel } from "../../core/connectorLayout";
 import { portIndexToSpliceSide } from "../../core/directionalSplice";
-import type { Connector, ConnectorId, Splice, SpliceId, WireEndpoint } from "../../core/entities";
+import type { CatalogItem, CatalogItemId, Connector, ConnectorId, Splice, SpliceId, WireEndpoint } from "../../core/entities";
 import { resolveSplicePortMode } from "../../core/splicePortMode";
 
 interface UseWireEndpointDescriptionsParams {
   connectorMap: Map<ConnectorId, Connector>;
+  catalogItemMap: Map<CatalogItemId, CatalogItem>;
   spliceMap: Map<SpliceId, Splice>;
 }
 
-export function useWireEndpointDescriptions({ connectorMap, spliceMap }: UseWireEndpointDescriptionsParams) {
+export function useWireEndpointDescriptions({ connectorMap, catalogItemMap, spliceMap }: UseWireEndpointDescriptionsParams) {
   const describeWireEndpoint = useCallback(
     (endpoint: WireEndpoint): string => {
       if (endpoint.kind === "connectorCavity") {
         const connector = connectorMap.get(endpoint.connectorId);
+        const catalogItem = connector?.catalogItemId === undefined ? undefined : catalogItemMap.get(connector.catalogItemId);
+        const cavityLabel = resolveConnectorCavityDisplayLabel(connector, catalogItem, endpoint.cavityIndex);
         if (connector === undefined) {
-          return `Connector ${endpoint.connectorId} / C${endpoint.cavityIndex}`;
+          return `Connector ${endpoint.connectorId} / ${cavityLabel}`;
         }
 
-        return `${connector.name} (${connector.technicalId}) / C${endpoint.cavityIndex}`;
+        return `${connector.name} (${connector.technicalId}) / ${cavityLabel}`;
       }
 
       const splice = spliceMap.get(endpoint.spliceId);
@@ -31,14 +35,16 @@ export function useWireEndpointDescriptions({ connectorMap, spliceMap }: UseWire
 
       return `${splice.name} (${splice.technicalId}) / P${endpoint.portIndex}`;
     },
-    [connectorMap, spliceMap]
+    [catalogItemMap, connectorMap, spliceMap]
   );
 
   const describeWireEndpointId = useCallback(
     (endpoint: WireEndpoint): string => {
       if (endpoint.kind === "connectorCavity") {
-        const connectorTechnicalId = connectorMap.get(endpoint.connectorId)?.technicalId ?? String(endpoint.connectorId);
-        return `${connectorTechnicalId} / C${endpoint.cavityIndex}`;
+        const connector = connectorMap.get(endpoint.connectorId);
+        const connectorTechnicalId = connector?.technicalId ?? String(endpoint.connectorId);
+        const catalogItem = connector?.catalogItemId === undefined ? undefined : catalogItemMap.get(connector.catalogItemId);
+        return `${connectorTechnicalId} / ${resolveConnectorCavityDisplayLabel(connector, catalogItem, endpoint.cavityIndex)}`;
       }
 
       const spliceTechnicalId = spliceMap.get(endpoint.spliceId)?.technicalId ?? String(endpoint.spliceId);
@@ -48,16 +54,18 @@ export function useWireEndpointDescriptions({ connectorMap, spliceMap }: UseWire
       }
       return `${spliceTechnicalId} / P${endpoint.portIndex}`;
     },
-    [connectorMap, spliceMap]
+    [catalogItemMap, connectorMap, spliceMap]
   );
 
   const describeWireEndpointCsvParts = useCallback(
     (endpoint: WireEndpoint): { endpointId: string; pin: string } => {
       if (endpoint.kind === "connectorCavity") {
-        const connectorTechnicalId = connectorMap.get(endpoint.connectorId)?.technicalId ?? String(endpoint.connectorId);
+        const connector = connectorMap.get(endpoint.connectorId);
+        const connectorTechnicalId = connector?.technicalId ?? String(endpoint.connectorId);
+        const catalogItem = connector?.catalogItemId === undefined ? undefined : catalogItemMap.get(connector.catalogItemId);
         return {
           endpointId: connectorTechnicalId,
-          pin: `C${endpoint.cavityIndex}`
+          pin: resolveConnectorCavityDisplayLabel(connector, catalogItem, endpoint.cavityIndex)
         };
       }
 
@@ -71,7 +79,7 @@ export function useWireEndpointDescriptions({ connectorMap, spliceMap }: UseWire
             : `P${endpoint.portIndex}`
       };
     },
-    [connectorMap, spliceMap]
+    [catalogItemMap, connectorMap, spliceMap]
   );
 
   return {

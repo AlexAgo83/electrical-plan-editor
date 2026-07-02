@@ -1,4 +1,6 @@
 import type {
+  CatalogItem,
+  Connector,
   ConnectorLayout,
   ConnectorLayoutKeying,
   ConnectorLayoutKeyingPlacement,
@@ -637,6 +639,24 @@ export function resolveEditedConnectorLayout(
 
 export function getConnectorLayoutWayDisplayLabel(way: Pick<ConnectorLayoutWay, "cavityIndex" | "label">): string {
   return way.label ?? `C${way.cavityIndex}`;
+}
+
+export function getConnectorCavityFallbackLabel(cavityIndex: number): string {
+  return `C${cavityIndex}`;
+}
+
+export function resolveConnectorCavityDisplayLabel(
+  connector: Pick<Connector, "catalogItemId" | "cavityCount"> | undefined,
+  catalogItem: Pick<CatalogItem, "connectorLayout"> | undefined,
+  cavityIndex: number
+): string {
+  if (connector === undefined || !Number.isInteger(cavityIndex) || cavityIndex < 1) {
+    return getConnectorCavityFallbackLabel(cavityIndex);
+  }
+
+  const layout = resolveConnectorLayout(catalogItem?.connectorLayout, connector.cavityCount);
+  const way = layout.ways.find((candidate) => candidate.cavityIndex === cavityIndex);
+  return way === undefined ? getConnectorCavityFallbackLabel(cavityIndex) : getConnectorLayoutWayDisplayLabel(way);
 }
 
 export function moveConnectorLayoutWay(

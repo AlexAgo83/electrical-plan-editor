@@ -1,4 +1,5 @@
 import { resolveConnectorTerminalMaterial } from "../../core/connectorCatalogMaterials";
+import { resolveConnectorCavityDisplayLabel } from "../../core/connectorLayout";
 import type { CatalogItem, Connector, NetworkNode, Splice, Wire, WireEndpoint } from "../../core/entities";
 import type { CsvCellValue } from "./csv";
 import type { TabularWorksheetExport } from "./tabularExport";
@@ -201,15 +202,17 @@ function resolveEndpoint(
   wire: Wire,
   side: "A" | "B",
   connectorById: Map<string, Connector>,
-  spliceById: Map<string, Splice>
+  spliceById: Map<string, Splice>,
+  catalogItemById: Map<string, CatalogItem>
 ): ResolvedEndpoint {
   const endpoint = side === "A" ? wire.endpointA : wire.endpointB;
   if (endpoint.kind === "connectorCavity") {
     const connector = connectorById.get(endpoint.connectorId);
+    const catalogItem = connector?.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId);
     return {
       type: "Connector",
       ref: connector?.technicalId ?? endpoint.connectorId,
-      position: `C${endpoint.cavityIndex}`
+      position: resolveConnectorCavityDisplayLabel(connector, catalogItem, endpoint.cavityIndex)
     };
   }
   const splice = spliceById.get(endpoint.spliceId);
@@ -348,8 +351,8 @@ export function buildWireListSheet(
   const twistGroupCounts = buildWireTwistGroupExportCounts(sortedWires);
 
   const wireRows = sortedWires.map((wire) => {
-    const begin = resolveEndpoint(wire, "A", connectorById, spliceById);
-    const end = resolveEndpoint(wire, "B", connectorById, spliceById);
+    const begin = resolveEndpoint(wire, "A", connectorById, spliceById, catalogItemById);
+    const end = resolveEndpoint(wire, "B", connectorById, spliceById, catalogItemById);
     const beginMaterials = resolveWireExportEndpointMaterials(wire, "A", connectorById, spliceById, catalogItemById);
     const endMaterials = resolveWireExportEndpointMaterials(wire, "B", connectorById, spliceById, catalogItemById);
     return [

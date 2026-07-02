@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG } from "../../../core/cableColors";
+import { getConnectorCavityFallbackLabel, resolveConnectorCavityDisplayLabel } from "../../../core/connectorLayout";
 import {
   FUNCTIONAL_FILTER_12V_POWER,
   FUNCTIONAL_FILTER_48V,
@@ -78,6 +79,25 @@ function resolveWireEndpointCatalogDefaults(params: {
     sealReference: connector?.applyCatalogSeals === false ? undefined : material?.sealReference,
     sealName: connector?.applyCatalogSeals === false ? undefined : material?.sealName
   };
+}
+
+function resolveWireEndpointPhysicalLabelPreview(params: {
+  connectorId: string;
+  cavityIndexText: string;
+  connectors: readonly Connector[];
+  catalogItems: readonly CatalogItem[];
+}): string | null {
+  const cavityIndex = Number(params.cavityIndexText);
+  if (!Number.isInteger(cavityIndex) || cavityIndex < 1 || params.connectorId.length === 0) {
+    return null;
+  }
+
+  const connector = params.connectors.find((candidate) => candidate.id === params.connectorId);
+  const catalogItem = connector?.catalogItemId === undefined
+    ? undefined
+    : params.catalogItems.find((candidate) => candidate.id === connector.catalogItemId);
+  const resolvedLabel = resolveConnectorCavityDisplayLabel(connector, catalogItem, cavityIndex);
+  return resolvedLabel === getConnectorCavityFallbackLabel(cavityIndex) ? null : resolvedLabel;
 }
 
 export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactElement {
@@ -286,10 +306,22 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     connectors,
     catalogItems
   });
+  const endpointAPhysicalLabelPreview = resolveWireEndpointPhysicalLabelPreview({
+    connectorId: wireEndpointAConnectorId,
+    cavityIndexText: wireEndpointACavityIndex,
+    connectors,
+    catalogItems
+  });
   const endpointBCatalogDefaults = resolveWireEndpointCatalogDefaults({
     kind: wireEndpointBKind,
     connectorId: wireEndpointBConnectorId,
     cavityIndex: wireEndpointBCavityIndex,
+    connectors,
+    catalogItems
+  });
+  const endpointBPhysicalLabelPreview = resolveWireEndpointPhysicalLabelPreview({
+    connectorId: wireEndpointBConnectorId,
+    cavityIndexText: wireEndpointBCavityIndex,
     connectors,
     catalogItems
   });
@@ -493,6 +525,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               Way index
               <input type="number" min={1} step={1} value={wireEndpointACavityIndex} onChange={(event) => setWireEndpointACavityIndex(event.target.value)} />
             </label>
+            {endpointAPhysicalLabelPreview !== null ? (
+              <small className="inline-help">Physical label: {endpointAPhysicalLabelPreview}</small>
+            ) : null}
             {wireEndpointASlotHint !== null ? (
               <small className={wireEndpointASlotHint.tone === "error" ? "inline-error" : "inline-help"}>{wireEndpointASlotHint.message}</small>
             ) : null}
@@ -614,6 +649,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               Way index
               <input type="number" min={1} step={1} value={wireEndpointBCavityIndex} onChange={(event) => setWireEndpointBCavityIndex(event.target.value)} />
             </label>
+            {endpointBPhysicalLabelPreview !== null ? (
+              <small className="inline-help">Physical label: {endpointBPhysicalLabelPreview}</small>
+            ) : null}
             {wireEndpointBSlotHint !== null ? (
               <small className={wireEndpointBSlotHint.tone === "error" ? "inline-error" : "inline-help"}>{wireEndpointBSlotHint.message}</small>
             ) : null}

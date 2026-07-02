@@ -351,6 +351,76 @@ describe("buildWireListSheet", () => {
     expect(sheet.rows[1]?.[7]).not.toBe(10);
   });
 
+  it("uses physical layout labels for connector endpoint positions and falls back to C-prefixed indexes", () => {
+    const catalogItems: CatalogItem[] = [
+      {
+        id: asCatalogItemId("CAT-LABELED"),
+        manufacturerReference: "LABELED-CONN",
+        connectionCount: 2,
+        connectorLayout: {
+          version: 1,
+          units: "grid",
+          width: 2,
+          height: 1,
+          ways: [
+            { cavityIndex: 1, x: 1, y: 1, shape: "round", label: "A10" },
+            { cavityIndex: 2, x: 2, y: 1, shape: "round" }
+          ]
+        }
+      }
+    ];
+    const connectors: Connector[] = [
+      {
+        id: asConnectorId("CT1"),
+        name: "CT1",
+        technicalId: "CT1",
+        cavityCount: 2,
+        catalogItemId: asCatalogItemId("CAT-LABELED")
+      }
+    ];
+    const splices: Splice[] = [
+      {
+        id: asSpliceId("S1"),
+        name: "Splice 1",
+        technicalId: "S-1",
+        portCount: 2
+      }
+    ];
+    const wires: Wire[] = [
+      {
+        id: asWireId("W1"),
+        name: "Wire 1",
+        technicalId: "W-001",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("CT1"), cavityIndex: 1 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 1 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 100,
+        sectionMm2: 1,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W2"),
+        name: "Wire 2",
+        technicalId: "W-002",
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("CT1"), cavityIndex: 2 },
+        endpointB: { kind: "splicePort", spliceId: asSpliceId("S1"), portIndex: 2 },
+        primaryColorId: null,
+        secondaryColorId: null,
+        routeSegmentIds: [],
+        lengthMm: 100,
+        sectionMm2: 1,
+        isRouteLocked: false
+      }
+    ];
+
+    const sheet = buildWireListSheet("Wires", wires, connectors, splices, catalogItems);
+
+    expect(sheet.rows[0]?.[7]).toBe("A10");
+    expect(sheet.rows[1]?.[7]).toBe("C2");
+  });
+
   it("adds export-only stripping allowance and twisted-pair coefficient to wire lengths", () => {
     const connectors: Connector[] = [
       {

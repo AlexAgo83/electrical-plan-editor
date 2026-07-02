@@ -288,6 +288,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
   const isNodeSubScreen = activeSubScreen === "node";
   const isSegmentSubScreen = activeSubScreen === "segment";
   const isWireSubScreen = activeSubScreen === "wire";
+  const catalogItemMap = useMemo(() => new Map(catalogItems.map((catalogItem) => [catalogItem.id, catalogItem])), [catalogItems]);
   const {
     appShellClassName,
     workspaceShellStyle,
@@ -302,7 +303,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     headerOffsetPx,
     canvasResetZoomPercentInput
   });
-  const { describeWireEndpoint, describeWireEndpointId, describeWireEndpointCsvParts } = useWireEndpointDescriptions({ connectorMap, spliceMap });
+  const { describeWireEndpoint, describeWireEndpointId, describeWireEndpointCsvParts } = useWireEndpointDescriptions({ connectorMap, catalogItemMap, spliceMap });
   useAppControllerCanvasStateSyncEffects({
     activeNetworkId,
     nodes,

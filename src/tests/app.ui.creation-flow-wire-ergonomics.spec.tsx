@@ -1,6 +1,9 @@
 import { fireEvent, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
+import { appActions, appReducer } from "../store";
 import {
+  asCatalogItemId,
+  asConnectorId,
   createUiIntegrationDenseWiresState,
   getPanelByHeading,
   renderAppWithState,
@@ -11,6 +14,57 @@ import { clickNewFromPanel, getInspectorPanelIfVisible } from "./helpers/app-ui-
 
 describe("App integration UI - creation flow wire ergonomics", () => {
   beforeEach(() => localStorage.clear());
+
+  it("shows the physical layout label beside numeric connector way indexes", () => {
+    const catalogItemId = asCatalogItemId("CAT-LABELED");
+    const state = appReducer(
+      appReducer(
+        createUiIntegrationDenseWiresState(),
+        appActions.upsertCatalogItem({
+          id: catalogItemId,
+          manufacturerReference: "LABELED-CONN",
+          connectionCount: 6,
+          connectorLayout: {
+            version: 1,
+            units: "grid",
+            width: 2,
+            height: 3,
+            ways: [
+              { cavityIndex: 1, x: 1, y: 1, shape: "round" },
+              { cavityIndex: 2, x: 2, y: 1, shape: "round" },
+              { cavityIndex: 3, x: 1, y: 2, shape: "round" },
+              { cavityIndex: 4, x: 2, y: 2, shape: "round" },
+              { cavityIndex: 5, x: 1, y: 3, shape: "round", label: "A10" },
+              { cavityIndex: 6, x: 2, y: 3, shape: "round" }
+            ]
+          }
+        })
+      ),
+      appActions.upsertConnector({
+        id: asConnectorId("C1"),
+        name: "Connector 1",
+        technicalId: "C-1",
+        cavityCount: 6,
+        catalogItemId
+      })
+    );
+
+    renderAppWithState(state);
+    fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
+    switchScreenDrawerAware("modeling");
+    switchSubScreenDrawerAware("wire");
+
+    clickNewFromPanel("Wires");
+    const createWirePanel = getPanelByHeading("Create Wire");
+    const endpointAFieldset = within(createWirePanel).getByRole("group", { name: "Endpoint A" });
+
+    fireEvent.change(within(endpointAFieldset).getByLabelText("Connector"), { target: { value: "C1" } });
+    expect(within(endpointAFieldset).getByLabelText("Way index")).toHaveValue(5);
+    expect(within(endpointAFieldset).getByText("Physical label: A10")).toBeInTheDocument();
+
+    fireEvent.change(within(endpointAFieldset).getByLabelText("Way index"), { target: { value: "6" } });
+    expect(within(endpointAFieldset).queryByText(/Physical label:/)).not.toBeInTheDocument();
+  });
 
   it("prefills the next free endpoint way/port in wire create mode and keeps manual edits until context changes", () => {
     renderAppWithState(createUiIntegrationDenseWiresState());
