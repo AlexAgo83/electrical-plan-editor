@@ -331,6 +331,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     segments,
     wires,
     connectorMap,
+    catalogItemMap,
     spliceMap,
     selectedConnector,
     selectedSplice,

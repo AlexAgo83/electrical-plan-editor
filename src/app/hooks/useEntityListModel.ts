@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { getWireColorSearchText } from "../../core/cableColors";
+import { resolveConnectorCavityDisplayLabel } from "../../core/connectorLayout";
 import { portIndexToSpliceSide } from "../../core/directionalSplice";
-import type { Connector, ConnectorId, NetworkNode, NodeId, Segment, Splice, SpliceId, Wire, WireRouteEndpointDetail } from "../../core/entities";
+import type { CatalogItem, CatalogItemId, Connector, ConnectorId, NetworkNode, NodeId, Segment, Splice, SpliceId, Wire, WireRouteEndpointDetail } from "../../core/entities";
 import { resolveSplicePortMode } from "../../core/splicePortMode";
 import { selectConnectorCavityStatuses, selectSplicePortStatuses, type AppState } from "../../store";
 import { normalizeSearch, sortById, sortByNameAndTechnicalId } from "../lib/app-utils-shared";
@@ -23,6 +24,7 @@ interface UseEntityListModelParams {
   segments: Segment[];
   wires: Wire[];
   connectorMap: Map<ConnectorId, Connector>;
+  catalogItemMap: Map<CatalogItemId, CatalogItem>;
   spliceMap: Map<SpliceId, Splice>;
   selectedConnector: Connector | null;
   selectedSplice: Splice | null;
@@ -44,6 +46,7 @@ export function useEntityListModel({
   segments,
   wires,
   connectorMap,
+  catalogItemMap,
   spliceMap,
   selectedConnector,
   selectedSplice,
@@ -80,6 +83,8 @@ export function useEntityListModel({
     if (selectedConnector === null) {
       return [];
     }
+    const selectedConnectorCatalogItem =
+      selectedConnector.catalogItemId === undefined ? undefined : catalogItemMap.get(selectedConnector.catalogItemId);
     return wires.flatMap((wire) => {
       const entries: ConnectorSynthesisRow[] = [];
       if (wire.endpointA.kind === "connectorCavity" && wire.endpointA.connectorId === selectedConnector.id) {
@@ -90,7 +95,7 @@ export function useEntityListModel({
           sectionMm2: wire.sectionMm2,
           twistGroupLabel: wire.twistGroupLabel,
           functionalDomainTag: wire.functionalDomainTag,
-          localEndpointLabel: `C${wire.endpointA.cavityIndex}`,
+          localEndpointLabel: resolveConnectorCavityDisplayLabel(selectedConnector, selectedConnectorCatalogItem, wire.endpointA.cavityIndex),
           remoteEndpointLabel: describeWireEndpoint(wire.endpointB),
           remoteEndpoint: wire.endpointB,
           lengthMm: wire.lengthMm
@@ -104,7 +109,7 @@ export function useEntityListModel({
           sectionMm2: wire.sectionMm2,
           twistGroupLabel: wire.twistGroupLabel,
           functionalDomainTag: wire.functionalDomainTag,
-          localEndpointLabel: `C${wire.endpointB.cavityIndex}`,
+          localEndpointLabel: resolveConnectorCavityDisplayLabel(selectedConnector, selectedConnectorCatalogItem, wire.endpointB.cavityIndex),
           remoteEndpointLabel: describeWireEndpoint(wire.endpointA),
           remoteEndpoint: wire.endpointA,
           lengthMm: wire.lengthMm
@@ -112,7 +117,7 @@ export function useEntityListModel({
       }
       return entries;
     });
-  }, [describeWireEndpoint, selectedConnector, wires]);
+  }, [catalogItemMap, describeWireEndpoint, selectedConnector, wires]);
 
   const spliceSynthesisRows = useMemo<SpliceSynthesisRow[]>(() => {
     if (selectedSplice === null) {
