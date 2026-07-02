@@ -18,6 +18,7 @@ import {
 } from "../app/components/network-summary/callouts/calloutModel";
 import { formatEntityIdForDisplay } from "../core/networkEntityPrefix";
 import {
+  asCatalogItemId,
   asConnectorId,
   asNodeId,
   asSegmentId,
@@ -176,6 +177,63 @@ describe("network summary callout entity prefix display", () => {
     const entry = groups.flatMap((group) => group.entries)[0];
     expect(entry?.technicalId).toBe("LAT-W1");
     expect(entry?.targetId).toBe("LAT-S1");
+  });
+
+  it("uses physical layout labels for connector callout local and target pins", () => {
+    const catalogItemId = asCatalogItemId("CAT-LABELED");
+    const connector: Connector = {
+      id: asConnectorId("C-LABELED"),
+      name: "Labeled connector",
+      technicalId: "C-LABELED",
+      cavityCount: 2,
+      catalogItemId
+    };
+    const catalogItem: CatalogItem = {
+      id: catalogItemId,
+      manufacturerReference: "LABELED-CONN",
+      connectionCount: 2,
+      connectorLayout: {
+        version: 1,
+        units: "grid",
+        width: 2,
+        height: 1,
+        ways: [
+          { cavityIndex: 1, x: 1, y: 1, shape: "round", label: "A10" },
+          { cavityIndex: 2, x: 2, y: 1, shape: "round" }
+        ]
+      }
+    };
+    const splice: Splice = {
+      id: asSpliceId("S1"),
+      name: "Splice",
+      technicalId: "S1",
+      portCount: 1
+    };
+    const wire: Wire = {
+      id: asWireId("W1"),
+      name: "Wire",
+      technicalId: "W1",
+      endpointA: { kind: "connectorCavity", connectorId: connector.id, cavityIndex: 1 },
+      endpointB: { kind: "splicePort", spliceId: splice.id, portIndex: 1 },
+      primaryColorId: null,
+      secondaryColorId: null,
+      routeSegmentIds: [],
+      lengthMm: 100,
+      sectionMm2: 0.5,
+      isRouteLocked: false
+    };
+    const connectorMap = new Map([[connector.id, connector]]);
+    const catalogItemMap = new Map([[catalogItem.id, catalogItem]]);
+    const spliceMap = new Map([[splice.id, splice]]);
+    const wires = [wire];
+
+    const connectorGroups = buildConnectorCalloutGroupsById({ connectorMap, catalogItemMap, spliceMap, wires }).get(connector.id) ?? [];
+    expect(connectorGroups[0]?.label).toBe("A10");
+    expect(connectorGroups[0]?.cavityIndex).toBe(1);
+    expect(connectorGroups[1]?.label).toBe("C2");
+
+    const spliceGroups = buildSpliceCalloutGroupsById({ connectorMap, catalogItemMap, spliceMap, wires }).get(splice.id) ?? [];
+    expect(spliceGroups[0]?.entries[0]?.targetPin).toBe("A10");
   });
 
   it("hides the prefix in connector and splice callout titles while keeping canonical keys", () => {

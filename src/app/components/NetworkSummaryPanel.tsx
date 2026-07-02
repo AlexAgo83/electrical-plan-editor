@@ -314,27 +314,30 @@ export function NetworkSummaryPanel({
     const prefix = activeNetwork?.entityPrefix;
     return (id: string): string => formatEntityIdForDisplay(id, prefix, showNetworkEntityPrefix);
   }, [activeNetwork?.entityPrefix, showNetworkEntityPrefix]);
+  const catalogItemMap = useMemo(() => new Map(catalogItems.map((catalogItem) => [catalogItem.id, catalogItem])), [catalogItems]);
 
   const connectorCalloutGroupsById = useMemo(
     () =>
       buildConnectorCalloutGroupsById({
         connectorMap,
+        catalogItemMap,
         spliceMap,
         wires,
         formatEntityId
       }),
-    [connectorMap, spliceMap, wires, formatEntityId]
+    [connectorMap, catalogItemMap, spliceMap, wires, formatEntityId]
   );
 
   const spliceCalloutGroupsById = useMemo(
     () =>
       buildSpliceCalloutGroupsById({
         connectorMap,
+        catalogItemMap,
         spliceMap,
         wires,
         formatEntityId
       }),
-    [connectorMap, spliceMap, wires, formatEntityId]
+    [connectorMap, catalogItemMap, spliceMap, wires, formatEntityId]
   );
 
   const renderedFloatingSplices = useMemo(

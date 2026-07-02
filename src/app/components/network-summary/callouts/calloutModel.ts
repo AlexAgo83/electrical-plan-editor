@@ -9,7 +9,7 @@ import type {
   SpliceId,
   Wire
 } from "../../../../core/entities";
-import { resolveEditedConnectorLayout } from "../../../../core/connectorLayout";
+import { resolveConnectorCavityDisplayLabel, resolveEditedConnectorLayout } from "../../../../core/connectorLayout";
 import { portIndexToSpliceSide } from "../../../../core/directionalSplice";
 import { resolveSplicePortMode } from "../../../../core/splicePortMode";
 import type { NetworkCalloutContentMode, NodePosition } from "../../../types/app-controller";
@@ -57,14 +57,17 @@ interface WireColorSwatches {
 function describeWireEndpointForCallout(
   endpoint: Wire["endpointA"],
   connectorMap: Map<ConnectorId, Connector>,
+  catalogItemMap: Map<CatalogItem["id"], CatalogItem>,
   spliceMap: Map<SpliceId, Splice>,
   formatEntityId: FormatEntityId
 ): CalloutTarget {
   if (endpoint.kind === "connectorCavity") {
-    const connectorTechnicalId = connectorMap.get(endpoint.connectorId)?.technicalId ?? String(endpoint.connectorId);
+    const connector = connectorMap.get(endpoint.connectorId);
+    const connectorTechnicalId = connector?.technicalId ?? String(endpoint.connectorId);
+    const catalogItem = connector?.catalogItemId === undefined ? undefined : catalogItemMap.get(connector.catalogItemId);
     return {
       targetId: formatEntityId(connectorTechnicalId),
-      targetPin: `C${endpoint.cavityIndex}`
+      targetPin: resolveConnectorCavityDisplayLabel(connector, catalogItem, endpoint.cavityIndex)
     };
   }
   const splice = spliceMap.get(endpoint.spliceId);
@@ -119,6 +122,7 @@ function sortCalloutEntries(entries: CalloutEntry[]): void {
 
 interface BuildCalloutGroupsOptions {
   connectorMap: Map<ConnectorId, Connector>;
+  catalogItemMap?: Map<CatalogItem["id"], CatalogItem>;
   spliceMap: Map<SpliceId, Splice>;
   wires: Wire[];
   formatEntityId?: FormatEntityId;
@@ -126,17 +130,23 @@ interface BuildCalloutGroupsOptions {
 
 export function buildConnectorCalloutGroupsById({
   connectorMap,
+  catalogItemMap = new Map(),
   spliceMap,
   wires,
   formatEntityId = identityFormatEntityId
 }: BuildCalloutGroupsOptions): Map<ConnectorId, CalloutGroup[]> {
   const map = new Map<ConnectorId, CalloutGroup[]>();
   for (const connector of connectorMap.values()) {
-    const groups = Array.from({ length: Math.max(0, connector.cavityCount) }, (_, index) => ({
-      key: `connector:${connector.id}:C${index + 1}`,
-      label: `C${index + 1}`,
-      entries: [] as CalloutEntry[]
-    }));
+    const catalogItem = connector.catalogItemId === undefined ? undefined : catalogItemMap.get(connector.catalogItemId);
+    const groups = Array.from({ length: Math.max(0, connector.cavityCount) }, (_, index) => {
+      const cavityIndex = index + 1;
+      return {
+        key: `connector:${connector.id}:C${cavityIndex}`,
+        label: resolveConnectorCavityDisplayLabel(connector, catalogItem, cavityIndex),
+        cavityIndex,
+        entries: [] as CalloutEntry[]
+      };
+    });
     map.set(connector.id, groups);
   }
 
@@ -157,7 +167,7 @@ export function buildConnectorCalloutGroupsById({
       if (groupIndex >= groups.length) {
         continue;
       }
-      const target = describeWireEndpointForCallout(targetEndpoint, connectorMap, spliceMap, formatEntityId);
+      const target = describeWireEndpointForCallout(targetEndpoint, connectorMap, catalogItemMap, spliceMap, formatEntityId);
       const colorSwatches = resolveWireColorSwatches(wire);
       groups[groupIndex]?.entries.push(createCalloutEntry(wire, target, colorSwatches, formatEntityId));
     }
@@ -174,6 +184,7 @@ export function buildConnectorCalloutGroupsById({
 
 export function buildSpliceCalloutGroupsById({
   connectorMap,
+  catalogItemMap = new Map(),
   spliceMap,
   wires,
   formatEntityId = identityFormatEntityId
@@ -206,7 +217,7 @@ export function buildSpliceCalloutGroupsById({
         entriesBySpliceAndPort.set(localEndpoint.spliceId, entriesByPort);
       }
       const currentEntries = entriesByPort.get(localEndpoint.portIndex) ?? [];
-      const target = describeWireEndpointForCallout(targetEndpoint, connectorMap, spliceMap, formatEntityId);
+      const target = describeWireEndpointForCallout(targetEndpoint, connectorMap, catalogItemMap, spliceMap, formatEntityId);
       const colorSwatches = resolveWireColorSwatches(wire);
       currentEntries.push(createCalloutEntry(wire, target, colorSwatches, formatEntityId));
       entriesByPort.set(localEndpoint.portIndex, currentEntries);

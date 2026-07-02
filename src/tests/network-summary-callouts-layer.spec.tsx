@@ -31,7 +31,8 @@ describe("NetworkSummaryCalloutsLayer", () => {
         groups: [
           {
             key: "connector:C1:C1",
-            label: "C1",
+            label: "A10",
+            cavityIndex: 1,
             entries: [
               {
                 wireId: "W1",
@@ -47,7 +48,7 @@ describe("NetworkSummaryCalloutsLayer", () => {
               }
             ]
           },
-          { key: "connector:C1:C2", label: "C2", entries: [] }
+          { key: "connector:C1:C2", label: "C2", cavityIndex: 2, entries: [] }
         ],
         isDeemphasized: false,
         isSelected: false

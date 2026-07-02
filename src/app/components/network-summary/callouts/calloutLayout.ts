@@ -21,6 +21,7 @@ export interface CalloutEntry {
 export interface CalloutGroup {
   key: string;
   label: string;
+  cavityIndex?: number;
   entries: CalloutEntry[];
 }
 

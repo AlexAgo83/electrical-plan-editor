@@ -61,7 +61,7 @@ export function getHighlightedConnectorCavityIndexes(
     if (!group.entries.some((entry) => entry.wireId === selectedWireId)) {
       continue;
     }
-    const cavityIndex = Number(/^C(\d+)$/.exec(group.label)?.[1] ?? Number.NaN);
+    const cavityIndex = group.cavityIndex ?? Number(/^C(\d+)$/.exec(group.label)?.[1] ?? Number.NaN);
     if (Number.isInteger(cavityIndex) && cavityIndex > 0) {
       highlightedCavityIndexes.add(cavityIndex);
     }
@@ -75,7 +75,7 @@ export function getConnectorCavityWireIdByIndex(groups: CableCalloutViewModel["g
   const wireIdByCavityIndex = new Map<number, Wire["id"]>();
 
   for (const group of groups) {
-    const cavityIndex = Number(/^C(\d+)$/.exec(group.label)?.[1] ?? Number.NaN);
+    const cavityIndex = group.cavityIndex ?? Number(/^C(\d+)$/.exec(group.label)?.[1] ?? Number.NaN);
     const wireId = group.entries[0]?.wireId;
     if (Number.isInteger(cavityIndex) && cavityIndex > 0 && wireId !== undefined) {
       wireIdByCavityIndex.set(cavityIndex, wireId as Wire["id"]);
