@@ -25,7 +25,62 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": "warn"
+      "react-refresh/only-export-components": "warn",
+      "no-restricted-imports": [
+        "error",
+        { paths: [{ name: "exceljs", allowTypeImports: true, message: "Use the lazy tabular export adapter." }] }
+      ],
+      "no-restricted-syntax": [
+        "error",
+        { selector: "ImportExpression[source.value='exceljs']", message: "Import exceljs only from tabularExport.ts." }
+      ]
+    }
+  },
+  {
+    files: ["src/store/**/*.{ts,tsx}", "src/app/hooks/**/*.{ts,tsx}", "src/app/components/*.{ts,tsx}"],
+    rules: {
+      "max-lines": ["error", { max: 500, skipBlankLines: false, skipComments: false }]
+    }
+  },
+  {
+    files: [
+      "src/app/hooks/useNetworkImportExport.ts",
+      "src/app/hooks/controller/useAppControllerWorkspaceContentAssembly.tsx",
+      "src/app/hooks/useConnectorHandlers.ts",
+      "src/app/hooks/useCatalogHandlers.ts"
+    ],
+    rules: {
+      "max-lines": ["error", { max: 750, skipBlankLines: false, skipComments: false }]
+    }
+  },
+  {
+    files: ["src/app/AppController.tsx"],
+    rules: {
+      "max-lines": ["error", { max: 1100, skipBlankLines: false, skipComments: false }]
+    }
+  },
+  {
+    files: ["src/app/components/NetworkSummaryPanel.tsx"],
+    rules: {
+      "max-lines": ["error", { max: 1020, skipBlankLines: false, skipComments: false }]
+    }
+  },
+  {
+    files: ["src/app/lib/tabularExport.ts"],
+    rules: {
+      "no-restricted-syntax": "off"
+    }
+  },
+  {
+    files: ["src/tests/app.ui.*.spec.tsx"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.name=/^(it|test)$/][arguments.length>=3]",
+          message: "Per-test timeouts require an explicit eslint suppression with a retirement rationale."
+        }
+      ]
     }
   },
   {

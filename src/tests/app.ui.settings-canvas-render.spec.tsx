@@ -75,6 +75,8 @@ describe("App integration UI - settings canvas render", () => {
     });
     expect(labelRotationSelect).toBeEnabled();
   });
+  // Persistence and remount regression; remove the timeout when setup cost is reduced.
+  // eslint-disable-next-line no-restricted-syntax
   it(
     "auto-rotates segment labels with segment angle when enabled and persists the preference",
     () => {

@@ -44,11 +44,8 @@ function collectAssertions(report) {
 }
 
 const { top, rest: userArgs } = parseTopArg(process.argv.slice(2));
-const parsedTimeoutMs = Number.parseInt(process.env.SLOW_TOP_TEST_TIMEOUT_MS ?? "", 10);
-const timeoutMs = Number.isInteger(parsedTimeoutMs) && parsedTimeoutMs > 0 ? parsedTimeoutMs : 15000;
-const parsedReportTimeoutMs = Number.parseInt(process.env.SLOW_TOP_REPORT_TIMEOUT_MS ?? "", 10);
-const reportTimeoutMs =
-  Number.isInteger(parsedReportTimeoutMs) && parsedReportTimeoutMs > 0 ? parsedReportTimeoutMs : 600000;
+const timeoutMs = 15000;
+const reportTimeoutMs = 600000;
 const timeoutArgs = [];
 if (!hasVitestArg(userArgs, "testTimeout")) {
   timeoutArgs.push(`--testTimeout=${timeoutMs}`);

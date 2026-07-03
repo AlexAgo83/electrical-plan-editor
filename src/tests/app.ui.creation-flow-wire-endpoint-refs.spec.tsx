@@ -15,6 +15,8 @@ import { appActions, appReducer } from "../store";
 describe("App integration UI - creation flow wire endpoint references", () => {
   beforeEach(() => localStorage.clear());
 
+  // Wide endpoint lifecycle regression; remove the timeout when split into focused flows.
+  // eslint-disable-next-line no-restricted-syntax
   it("supports optional wire side connection and seal references with trim, non-destructive endpoint type changes, and clear on save", () => {
     const { store } = renderAppWithState(createUiIntegrationWideEndpointsState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
@@ -97,6 +99,8 @@ describe("App integration UI - creation flow wire endpoint references", () => {
     }
   }, 20000);
 
+  // Multiple draft/save/cancel cycles; remove the timeout when the fixture setup is shared.
+  // eslint-disable-next-line no-restricted-syntax
   it("swaps wire edit endpoints as a draft action between Save and Cancel edit and preserves side metadata on save only", () => {
     const { store } = renderAppWithState(createUiIntegrationState());
     fireEvent.click(screen.getByRole("button", { name: "Close onboarding" }));
@@ -167,6 +171,8 @@ describe("App integration UI - creation flow wire endpoint references", () => {
     expect(savedWire?.endpointBSealReference).toBeUndefined();
   }, 10000);
 
+  // Wide fuse form integration path; remove the timeout when the flow is decomposed.
+  // eslint-disable-next-line no-restricted-syntax
   it(
     "supports fuse mode with catalog linkage, preserves save/cancel semantics, and shows fuse metadata in wire list and analysis",
     () => {

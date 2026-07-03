@@ -2,10 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
 
-const MAIN_CHUNK_WARN_BYTES = Number(process.env.BUNDLE_MAIN_WARN_BYTES ?? 500 * 1024);
-const INITIAL_GZIP_WARN_BYTES = Number(process.env.BUNDLE_INITIAL_GZIP_WARN_BYTES ?? 130 * 1024);
-const TOTAL_GZIP_WARN_BYTES = Number(process.env.BUNDLE_TOTAL_GZIP_WARN_BYTES ?? 850 * 1024);
-const TOP_CHUNK_COUNT = Number(process.env.BUNDLE_TOP_CHUNK_COUNT ?? 8);
+const MAIN_CHUNK_WARN_BYTES = 500 * 1024;
+const INITIAL_GZIP_WARN_BYTES = 130 * 1024;
+const TOTAL_GZIP_WARN_BYTES = 850 * 1024;
+const TOP_CHUNK_COUNT = 8;
 
 function formatKiB(bytes) {
   return `${(bytes / 1024).toFixed(2)} KiB`;

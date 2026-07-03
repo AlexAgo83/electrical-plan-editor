@@ -76,6 +76,8 @@ describe("App integration UI - catalog scroll behavior", () => {
     }
   });
 
+  // Wide async panel flow; remove the timeout when the catalog fixture is narrowed.
+  // eslint-disable-next-line no-restricted-syntax
   it("scrolls to the connector material defaults panel when enabling it", async () => {
     const scrollSpy = installScrollIntoViewSpy();
 
@@ -130,6 +132,8 @@ describe("App integration UI - catalog scroll behavior", () => {
     }
   });
 
+  // Async scroll guard spans selection and mutation observers; remove after helper extraction.
+  // eslint-disable-next-line no-restricted-syntax
   it("does not scroll to the catalog form when selecting a row directly", async () => {
     const scrollSpy = installScrollIntoViewSpy();
 

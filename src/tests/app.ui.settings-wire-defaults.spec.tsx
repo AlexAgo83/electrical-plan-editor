@@ -14,6 +14,8 @@ describe("App integration UI - settings wire/create defaults", () => {
     localStorage.clear();
   });
 
+  // Cross-screen defaults regression; remove the timeout when the scenario is split.
+  // eslint-disable-next-line no-restricted-syntax
   it(
     "persists global defaults for wire section and auto-create linked nodes and reuses them in create forms",
     () => {

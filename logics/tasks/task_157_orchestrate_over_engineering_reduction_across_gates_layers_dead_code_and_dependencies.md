@@ -4,7 +4,7 @@
 > Status: In progress
 > Understanding: 95
 > Confidence: 90
-> Progress: 5
+> Progress: 20
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -47,6 +47,7 @@
 
 # Report
 - Implementation complete.
+- Stage 1 complete: replaced bespoke line-cap, ExcelJS boundary, and UI timeout scripts with ESLint rules; removed redundant pin-role gate, hardcoded UI lane list, unused report knobs, full coverage report, and remark-gfm. Deliberate violations confirmed all three ESLint rules fail. Validation: lint, typecheck, segmentation check (69 UI / 157 total specs), and 14 Home tests passed.
 
 # AI Context
 - Summary: Orchestrate over-engineering reduction across gates, layers, dead code, and dependencies

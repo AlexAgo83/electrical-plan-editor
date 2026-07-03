@@ -46,11 +46,11 @@ const LEVEL_TWO_HEADING_MATCHER = /^ {0,3}##\s+(.+?)\s*#*\s*$/;
 const CHANGELOG_TITLE_MATCHER = /^ {0,3}#\s+Changelog\s+\(`[^`]+`\)\s*#*\s*$/i;
 
 const MarkdownBlock = lazy(async () => {
-  const [{ default: ReactMarkdown }, { default: remarkGfm }] = await Promise.all([import("react-markdown"), import("remark-gfm")]);
+  const { default: ReactMarkdown } = await import("react-markdown");
 
   return {
     default: function LoadedMarkdownBlock({ content }: { content: string }): ReactElement {
-      return <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>;
+      return <ReactMarkdown>{content}</ReactMarkdown>;
     }
   };
 });

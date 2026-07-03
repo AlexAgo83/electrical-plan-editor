@@ -2,11 +2,8 @@ import { spawnSync } from "node:child_process";
 import path from "node:path";
 
 const segmentedRunnerEntrypoint = path.resolve(process.cwd(), "scripts/quality/run-vitest-segmented.mjs");
-const parsedTimeoutMs = Number.parseInt(process.env.UI_COVERAGE_TEST_TIMEOUT_MS ?? "", 10);
-const timeoutMs = Number.isInteger(parsedTimeoutMs) && parsedTimeoutMs > 0 ? parsedTimeoutMs : 15000;
-const parsedReportTimeoutMs = Number.parseInt(process.env.UI_COVERAGE_REPORT_TIMEOUT_MS ?? "", 10);
-const reportTimeoutMs =
-  Number.isInteger(parsedReportTimeoutMs) && parsedReportTimeoutMs > 0 ? parsedReportTimeoutMs : 600000;
+const timeoutMs = 15000;
+const reportTimeoutMs = 600000;
 const runnerArgs = [
   segmentedRunnerEntrypoint,
   "ui",
