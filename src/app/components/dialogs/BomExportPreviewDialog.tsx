@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactElement } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import { useModalDialog } from "../../hooks/useModalDialog";
 import type { ActiveBomPreviewState } from "../../hooks/controller/useAppControllerBomExportHandlers";
 import type { CsvCellValue } from "../../lib/csv";
 import type { TabularWorksheetExport } from "../../lib/tabularExport";
@@ -13,14 +14,6 @@ interface BomExportPreviewDialogProps {
   onOpenConnector: (connectorId: ConnectorId) => void;
   onConfirm: () => void;
   onCancel: () => void;
-}
-
-function getFocusableElements(container: HTMLElement): HTMLElement[] {
-  return Array.from(
-    container.querySelectorAll<HTMLElement>(
-      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    )
-  ).filter((element) => !element.hasAttribute("hidden") && element.getAttribute("aria-hidden") !== "true");
 }
 
 function formatPreviewCell(value: CsvCellValue): string {
@@ -53,9 +46,8 @@ export function BomExportPreviewDialog({
   onConfirm,
   onCancel
 }: BomExportPreviewDialogProps): ReactElement | null {
-  const dialogRef = useRef<HTMLElement | null>(null);
   const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
-  const previousFocusedElementRef = useRef<HTMLElement | null>(null);
+  const { dialogRef, onKeyDown } = useModalDialog<HTMLElement>({ isOpen, onClose: onCancel, initialFocusRef: cancelButtonRef });
   const previousPreviewRef = useRef(preview);
   const [activeSheetIndex, setActiveSheetIndex] = useState(0);
   const titleId = "bom-export-preview-title";
@@ -76,72 +68,9 @@ export function BomExportPreviewDialog({
     }
   }, [preview]);
 
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    previousFocusedElementRef.current =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    cancelButtonRef.current?.focus();
-
-    return () => {
-      const previousFocusedElement = previousFocusedElementRef.current;
-      if (previousFocusedElement?.isConnected) {
-        previousFocusedElement.focus();
-      }
-      previousFocusedElementRef.current = null;
-    };
-  }, [isOpen]);
-
   if (!isOpen) {
     return null;
   }
-
-  const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLElement>): void => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      event.stopPropagation();
-      onCancel();
-      return;
-    }
-
-    if (event.key !== "Tab") {
-      return;
-    }
-
-    const dialogElement = dialogRef.current;
-    if (dialogElement === null) {
-      return;
-    }
-
-    const focusableElements = getFocusableElements(dialogElement);
-    if (focusableElements.length === 0) {
-      event.preventDefault();
-      dialogElement.focus();
-      return;
-    }
-
-    const firstFocusable = focusableElements[0];
-    const lastFocusable = focusableElements[focusableElements.length - 1];
-    if (firstFocusable === undefined || lastFocusable === undefined) {
-      return;
-    }
-
-    const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    if (event.shiftKey) {
-      if (activeElement === firstFocusable || activeElement === dialogElement) {
-        event.preventDefault();
-        lastFocusable.focus();
-      }
-      return;
-    }
-
-    if (activeElement === lastFocusable) {
-      event.preventDefault();
-      firstFocusable.focus();
-    }
-  };
 
   return (
     <div className={themeHostClassName ? `confirm-dialog-layer ${themeHostClassName}` : "confirm-dialog-layer"} role="presentation">
@@ -154,7 +83,7 @@ export function BomExportPreviewDialog({
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         tabIndex={-1}
-        onKeyDown={handleDialogKeyDown}
+        onKeyDown={onKeyDown}
       >
         <header className="confirm-dialog-header bom-preview-dialog-header">
           <h2 id={titleId}>BOM preview</h2>

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactElement } from "react";
+import { useEffect, useRef, useState, type ReactElement } from "react";
+import { useModalDialog } from "../../hooks/useModalDialog";
 import type { OverwriteCandidate } from "../../../adapters/portability";
 
 export type OverwriteDecision = "overwrite" | "skip" | "keep-both";
@@ -9,14 +10,6 @@ interface ImportOverwriteDialogProps {
   themeHostClassName?: string;
   onConfirm: (decisions: Map<string, OverwriteDecision>) => void;
   onCancel: () => void;
-}
-
-function getFocusableElements(container: HTMLElement): HTMLElement[] {
-  return Array.from(
-    container.querySelectorAll<HTMLElement>(
-      'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    )
-  ).filter((element) => !element.hasAttribute("hidden") && element.getAttribute("aria-hidden") !== "true");
 }
 
 const MATCH_REASON_LABELS: Record<OverwriteCandidate["matchReason"], string> = {
@@ -41,9 +34,8 @@ export function ImportOverwriteDialog({
   onConfirm,
   onCancel
 }: ImportOverwriteDialogProps): ReactElement | null {
-  const dialogRef = useRef<HTMLElement | null>(null);
   const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
-  const previousFocusedElementRef = useRef<HTMLElement | null>(null);
+  const { dialogRef, onKeyDown } = useModalDialog<HTMLElement>({ isOpen, onClose: onCancel, initialFocusRef: cancelButtonRef });
 
   const [decisions, setDecisions] = useState<Map<string, OverwriteDecision>>(() => {
     const initial = new Map<string, OverwriteDecision>();
@@ -64,17 +56,6 @@ export function ImportOverwriteDialog({
     }
     setDecisions(next);
     setManuallyDecided(new Set());
-    previousFocusedElementRef.current =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    cancelButtonRef.current?.focus();
-
-    return () => {
-      const previousFocusedElement = previousFocusedElementRef.current;
-      if (previousFocusedElement?.isConnected) {
-        previousFocusedElement.focus();
-      }
-      previousFocusedElementRef.current = null;
-    };
   }, [isOpen, candidates]);
 
   if (!isOpen) {
@@ -116,50 +97,6 @@ export function ImportOverwriteDialog({
     onConfirm(decisions);
   };
 
-  const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLElement>): void => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      event.stopPropagation();
-      onCancel();
-      return;
-    }
-
-    if (event.key !== "Tab") {
-      return;
-    }
-
-    const dialogElement = dialogRef.current;
-    if (dialogElement === null) {
-      return;
-    }
-
-    const focusableElements = getFocusableElements(dialogElement);
-    if (focusableElements.length === 0) {
-      event.preventDefault();
-      return;
-    }
-
-    const firstFocusable = focusableElements[0];
-    const lastFocusable = focusableElements[focusableElements.length - 1];
-    if (firstFocusable === undefined || lastFocusable === undefined) {
-      return;
-    }
-
-    const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    if (event.shiftKey) {
-      if (activeElement === firstFocusable || activeElement === dialogElement) {
-        event.preventDefault();
-        lastFocusable.focus();
-      }
-      return;
-    }
-
-    if (activeElement === lastFocusable) {
-      event.preventDefault();
-      firstFocusable.focus();
-    }
-  };
-
   return (
     <div
       className={
@@ -183,7 +120,7 @@ export function ImportOverwriteDialog({
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         tabIndex={-1}
-        onKeyDown={handleDialogKeyDown}
+        onKeyDown={onKeyDown}
       >
         <header className="confirm-dialog-header">
           <h2 id={titleId}>Similar networks detected</h2>

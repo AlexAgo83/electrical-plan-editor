@@ -4,7 +4,7 @@
 > Status: In progress
 > Understanding: 95
 > Confidence: 90
-> Progress: 74
+> Progress: 82
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -53,6 +53,7 @@
 - Stage 4a complete: consolidated three filesystem timestamp implementations into exportFileName.toFilesystemSafeTimestamp (UTC deterministic, invalid-input fallback retained) and replaced repeated recent-change field comparisons with one field-group helper while preserving output tests. Attempted renderMemoCompare removal was reverted after render-containment tests exposed 18 unstable callback props and one unstable derived object; retaining it prevents measurable rerender regressions until producers are stabilized. Validation: lint, typecheck, 25 timestamp/change-label/render-containment tests passed.
 - Stage 4b: introduced shared useModalDialog focus/Escape/Tab/restore mechanism and migrated ConfirmDialog plus the two workspace tool dialogs, deleting 300+ duplicated lines. 29 focused confirmation, pin-role, and multi-network dialog tests passed. Remaining preview/choice/import dialogs stay open in this task for the next migration batch.
 - Stage 4c: migrated ChoiceDialog and FileFeedbackDialog to useModalDialog; 15 focused import/recompute/choice tests passed with lint and typecheck.
+- Stage 4d complete: all interactive *Dialog components now delegate focus setup/restore, Escape, and Tab cycling to useModalDialog; confirm-on-enter and closeOnBackdrop remain options. Dialog refactor total since 38024c5b: +179/-947, net -768 lines. Validation: lint, typecheck, 41 focused preview/import/delete tests passed; grep finds zero old dialog trap helpers.
 
 # AI Context
 - Summary: Orchestrate over-engineering reduction across gates, layers, dead code, and dependencies

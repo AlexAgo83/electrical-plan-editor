@@ -1,4 +1,5 @@
-import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactElement } from "react";
+import { useRef, type ReactElement } from "react";
+import { useModalDialog } from "../../hooks/useModalDialog";
 import type { ConfirmDialogIntent } from "../../types/confirm-dialog";
 import type { DeleteDependencySummaryCategory, DeleteImpactDialogVariant } from "../../types/delete-impact-dialog";
 
@@ -19,14 +20,6 @@ interface DeleteImpactDialogProps {
   onCancel: () => void;
 }
 
-function getFocusableElements(container: HTMLElement): HTMLElement[] {
-  return Array.from(
-    container.querySelectorAll<HTMLElement>(
-      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    )
-  ).filter((element) => !element.hasAttribute("hidden") && element.getAttribute("aria-hidden") !== "true");
-}
-
 export function DeleteImpactDialog({
   isOpen,
   themeHostClassName,
@@ -43,65 +36,16 @@ export function DeleteImpactDialog({
   onConfirm,
   onCancel
 }: DeleteImpactDialogProps): ReactElement | null {
-  const dialogRef = useRef<HTMLElement | null>(null);
   const primaryButtonRef = useRef<HTMLButtonElement | null>(null);
   const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
-  const previousFocusedElementRef = useRef<HTMLElement | null>(null);
-  const enterConfirmationArmedRef = useRef(false);
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    previousFocusedElementRef.current =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    if (variant === "deleteCascade") {
-      cancelButtonRef.current?.focus();
-    } else {
-      primaryButtonRef.current?.focus();
-    }
-
-    return () => {
-      const previousFocusedElement = previousFocusedElementRef.current;
-      if (previousFocusedElement?.isConnected) {
-        previousFocusedElement.focus();
-      } else {
-        const fallbackFocusTarget = document.querySelector<HTMLElement>(
-          ".header-settings-toggle, .header-nav-toggle, .header-ops-toggle, button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])"
-        );
-        fallbackFocusTarget?.focus();
-      }
-      previousFocusedElementRef.current = null;
-    };
-  }, [isOpen, title, variant]);
-
-  useEffect(() => {
-    if (!isOpen || !confirmOnEnter) {
-      enterConfirmationArmedRef.current = false;
-      return;
-    }
-
-    enterConfirmationArmedRef.current = false;
-
-    const armEnterConfirmation = () => {
-      enterConfirmationArmedRef.current = true;
-      window.removeEventListener("keyup", armEnterConfirmation, true);
-    };
-
-    const fallbackTimer = window.setTimeout(() => {
-      enterConfirmationArmedRef.current = true;
-      window.removeEventListener("keyup", armEnterConfirmation, true);
-    }, 0);
-
-    window.addEventListener("keyup", armEnterConfirmation, true);
-
-    return () => {
-      window.clearTimeout(fallbackTimer);
-      window.removeEventListener("keyup", armEnterConfirmation, true);
-      enterConfirmationArmedRef.current = false;
-    };
-  }, [isOpen, confirmOnEnter, title]);
+  const { dialogRef, onKeyDown } = useModalDialog<HTMLElement>({
+    isOpen,
+    onClose: onCancel,
+    initialFocusRef: variant === "deleteCascade" ? cancelButtonRef : primaryButtonRef,
+    onConfirm,
+    confirmOnEnter,
+    identity: `${title}:${variant}`
+  });
 
   if (!isOpen) {
     return null;
@@ -115,61 +59,6 @@ export function DeleteImpactDialog({
         : "is-neutral";
   const titleId = `delete-impact-dialog-title-${title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
   const descriptionId = `${titleId}-description`;
-
-  const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLElement>): void => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      event.stopPropagation();
-      onCancel();
-      return;
-    }
-
-    if (event.key === "Enter" && confirmOnEnter) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (!enterConfirmationArmedRef.current) {
-        return;
-      }
-      onConfirm();
-      return;
-    }
-
-    if (event.key !== "Tab") {
-      return;
-    }
-
-    const dialogElement = dialogRef.current;
-    if (dialogElement === null) {
-      return;
-    }
-
-    const focusableElements = getFocusableElements(dialogElement);
-    if (focusableElements.length === 0) {
-      event.preventDefault();
-      dialogElement.focus();
-      return;
-    }
-
-    const firstFocusable = focusableElements[0];
-    const lastFocusable = focusableElements[focusableElements.length - 1];
-    if (firstFocusable === undefined || lastFocusable === undefined) {
-      return;
-    }
-
-    const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    if (event.shiftKey) {
-      if (activeElement === firstFocusable || activeElement === dialogElement) {
-        event.preventDefault();
-        lastFocusable.focus();
-      }
-      return;
-    }
-
-    if (activeElement === lastFocusable) {
-      event.preventDefault();
-      firstFocusable.focus();
-    }
-  };
 
   return (
     <div className={themeHostClassName ? `confirm-dialog-layer ${themeHostClassName}` : "confirm-dialog-layer"} role="presentation">
@@ -192,7 +81,7 @@ export function DeleteImpactDialog({
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         tabIndex={-1}
-        onKeyDown={handleDialogKeyDown}
+        onKeyDown={onKeyDown}
       >
         <header className="confirm-dialog-header">
           <h2 id={titleId}>{title}</h2>

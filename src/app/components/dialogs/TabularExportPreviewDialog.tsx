@@ -1,4 +1,5 @@
-import { useEffect, useState, type KeyboardEvent as ReactKeyboardEvent, type ReactElement } from "react";
+import { useEffect, useState, type ReactElement } from "react";
+import { useModalDialog } from "../../hooks/useModalDialog";
 import type { CsvCellValue } from "../../lib/csv";
 import type { TabularWorksheetExport } from "../../lib/tabularExport";
 
@@ -31,6 +32,7 @@ export function TabularExportPreviewDialog({
   onCancel
 }: TabularExportPreviewDialogProps): ReactElement | null {
   const [activeSheetIndex, setActiveSheetIndex] = useState(0);
+  const { dialogRef, onKeyDown } = useModalDialog<HTMLElement>({ isOpen, onClose: onCancel, identity: title });
 
   useEffect(() => {
     if (isOpen) {
@@ -49,25 +51,18 @@ export function TabularExportPreviewDialog({
     return null;
   }
 
-  const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLElement>): void => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      event.stopPropagation();
-      onCancel();
-    }
-  };
-
   return (
     <div className={themeHostClassName ? `confirm-dialog-layer ${themeHostClassName}` : "confirm-dialog-layer"} role="presentation">
       <button type="button" className="confirm-dialog-backdrop" aria-label={`Close ${title}`} onClick={onCancel} />
       <section
+        ref={dialogRef}
         className="confirm-dialog panel bom-preview-dialog is-neutral"
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         tabIndex={-1}
-        onKeyDown={handleDialogKeyDown}
+        onKeyDown={onKeyDown}
       >
         <header className="confirm-dialog-header bom-preview-dialog-header">
           <h2 id={titleId}>{title}</h2>

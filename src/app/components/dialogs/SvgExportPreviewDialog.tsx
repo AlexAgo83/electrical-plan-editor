@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactElement } from "react";
+import { useLayoutEffect, useRef, type ReactElement } from "react";
+import { useModalDialog } from "../../hooks/useModalDialog";
 import type { ThemeMode } from "../../../store";
 import { getThemeClassNames, THEME_MODE_OPTIONS } from "../../lib/themeModes";
 import type { SvgExportPreviewState, SvgPreviewOptions } from "../network-summary/export/useNetworkSummaryExportActions";
@@ -14,14 +15,6 @@ interface SvgExportPreviewDialogProps {
   onCancel: () => void;
 }
 
-function getFocusableElements(container: HTMLElement): HTMLElement[] {
-  return Array.from(
-    container.querySelectorAll<HTMLElement>(
-      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    )
-  ).filter((element) => !element.hasAttribute("hidden") && element.getAttribute("aria-hidden") !== "true");
-}
-
 export function SvgExportPreviewDialog({
   isOpen,
   themeHostClassName,
@@ -32,29 +25,11 @@ export function SvgExportPreviewDialog({
   onConfirm,
   onCancel
 }: SvgExportPreviewDialogProps): ReactElement | null {
-  const dialogRef = useRef<HTMLElement | null>(null);
   const previewShellRef = useRef<HTMLDivElement | null>(null);
   const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
-  const previousFocusedElementRef = useRef<HTMLElement | null>(null);
+  const { dialogRef, onKeyDown } = useModalDialog<HTMLElement>({ isOpen, onClose: onCancel, initialFocusRef: cancelButtonRef });
   const titleId = "svg-export-preview-title";
   const descriptionId = "svg-export-preview-description";
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
-    previousFocusedElementRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    cancelButtonRef.current?.focus();
-
-    return () => {
-      const previousFocusedElement = previousFocusedElementRef.current;
-      if (previousFocusedElement?.isConnected) {
-        previousFocusedElement.focus();
-      }
-      previousFocusedElementRef.current = null;
-    };
-  }, [isOpen]);
 
   useLayoutEffect(() => {
     if (!isOpen || preview === null) {
@@ -76,45 +51,6 @@ export function SvgExportPreviewDialog({
   const previewFormatLabel = preview.format.toUpperCase();
   const previewTitle = `${previewFormatLabel} preview`;
   const previewAriaLabel = `${previewFormatLabel} export preview`;
-
-  const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLElement>): void => {
-    if (event.key === "Escape") {
-      event.preventDefault();
-      event.stopPropagation();
-      onCancel();
-      return;
-    }
-
-    if (event.key !== "Tab") {
-      return;
-    }
-
-    const dialogElement = dialogRef.current;
-    if (dialogElement === null) {
-      return;
-    }
-
-    const focusableElements = getFocusableElements(dialogElement);
-    const firstFocusable = focusableElements[0];
-    const lastFocusable = focusableElements[focusableElements.length - 1];
-    if (firstFocusable === undefined || lastFocusable === undefined) {
-      return;
-    }
-
-    const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    if (event.shiftKey) {
-      if (activeElement === firstFocusable || activeElement === dialogElement) {
-        event.preventDefault();
-        lastFocusable.focus();
-      }
-      return;
-    }
-
-    if (activeElement === lastFocusable) {
-      event.preventDefault();
-      firstFocusable.focus();
-    }
-  };
 
   const handleFrameChange = (includeFrame: boolean): void => {
     onPreviewOptionsChange({
@@ -175,7 +111,7 @@ export function SvgExportPreviewDialog({
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         tabIndex={-1}
-        onKeyDown={handleDialogKeyDown}
+        onKeyDown={onKeyDown}
       >
         <header className="confirm-dialog-header bom-preview-dialog-header">
           <h2 id={titleId}>{previewTitle}</h2>
