@@ -1,5 +1,20 @@
 function areArraysShallowEqual(left: readonly unknown[], right: readonly unknown[]): boolean {
-  return left.length === right.length && left.every((value, index) => Object.is(value, right[index]));
+  return (
+    left.length === right.length &&
+    left.every((value, index) => {
+      const rightValue = right[index];
+      if (Object.is(value, rightValue)) {
+        return true;
+      }
+      return (
+        value !== null &&
+        rightValue !== null &&
+        Object.getPrototypeOf(value) === Object.prototype &&
+        Object.getPrototypeOf(rightValue) === Object.prototype &&
+        arePlainObjectsShallowEqual(value as Record<string, unknown>, rightValue as Record<string, unknown>)
+      );
+    })
+  );
 }
 
 function areMapsShallowEqual(left: ReadonlyMap<unknown, unknown>, right: ReadonlyMap<unknown, unknown>): boolean {

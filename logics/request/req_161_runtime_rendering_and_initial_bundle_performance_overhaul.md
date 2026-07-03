@@ -1,7 +1,7 @@
 ## req_161_runtime_rendering_and_initial_bundle_performance_overhaul - Runtime rendering and initial bundle performance overhaul
 > From version: 1.17.2
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
 > Complexity: High

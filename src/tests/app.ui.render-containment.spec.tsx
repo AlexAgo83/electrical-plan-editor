@@ -27,7 +27,20 @@ const renderCounts = {
 
 let previousPrimaryProps: ComponentProps<typeof ModelingPrimaryTables> | null = null;
 let changedPrimaryProps: string[] = [];
+let previousNetworkSummaryProps: ComponentProps<typeof NetworkSummaryPanel> | null = null;
+let networkSummaryDiffReasons: string[] = [];
 const CountedNetworkSummaryPanel = memo((props: ComponentProps<typeof NetworkSummaryPanel>) => {
+  if (previousNetworkSummaryProps !== null) {
+    networkSummaryDiffReasons = Object.keys(props).filter((key) => {
+      const previousValue = previousNetworkSummaryProps?.[key as keyof ComponentProps<typeof NetworkSummaryPanel>];
+      const nextValue = props[key as keyof ComponentProps<typeof NetworkSummaryPanel>];
+      if (Object.is(previousValue, nextValue) || (typeof previousValue === "function" && typeof nextValue === "function")) {
+        return false;
+      }
+      return !arePanelMemoPropsEqual({ value: previousValue }, { value: nextValue });
+    });
+  }
+  previousNetworkSummaryProps = props;
   renderCounts.networkSummary += 1;
   return <NetworkSummaryPanel {...props} />;
 }, arePanelMemoPropsEqual);
@@ -70,6 +83,7 @@ function resetCounts(): void {
   renderCounts.primaryTables = 0;
   renderCounts.secondaryTables = 0;
   renderCounts.formsColumn = 0;
+  networkSummaryDiffReasons = [];
   changedPrimaryProps = [];
 }
 
@@ -130,6 +144,8 @@ describe("App integration UI - render containment", () => {
     fireEvent.change(within(connectorPanel).getByLabelText("Functional name"), { target: { value: "Connector typed" } });
 
     expect(renderCounts.formsColumn).toBeGreaterThan(0);
+    expect(networkSummaryDiffReasons).toEqual([]);
+    expect(renderCounts.networkSummary).toBe(0);
     expect(renderCounts.primaryTables).toBe(0);
     expect(renderCounts.secondaryTables).toBe(0);
   });

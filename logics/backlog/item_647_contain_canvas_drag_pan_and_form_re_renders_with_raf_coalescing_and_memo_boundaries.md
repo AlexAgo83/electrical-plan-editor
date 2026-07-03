@@ -1,10 +1,10 @@
 ## item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries - Contain canvas drag/pan and form re-renders with rAF coalescing and memo boundaries
 > From version: 1.17.2
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 75
+> Progress: 100%
 > Complexity: High
 > Theme: Runtime performance and bundle efficiency
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
