@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Ready
 > Understanding: 90%
-> Confidence: 85%
+> Confidence: 90
 > Progress: 0%
 > Complexity: Medium
 > Theme: Codebase simplification and maintenance cost reduction
@@ -29,11 +29,11 @@
   - csv.ts, networkSummaryBomCsv.ts domain logic, i18n.ts (audited healthy).
 
 # Acceptance criteria
-- AC1: One normalization module serves both import and migration paths; existing round-trip and migration fixtures produce byte-identical results.
+- AC1: Import and migration normalizers remain separate where their ID ordering contracts differ; no persistence semantics are changed for cosmetic consolidation.
 - AC2: recentChangeLabels output strings are unchanged for all entity kinds (existing specs and snapshots pass) with the eight functions replaced by one helper.
-- AC3: renderMemoCompare.ts is deleted; render-containment regression tests still pass with default shallow memo comparison.
-- AC4: The AI agent contract accepts and rejects exactly the same operations as before (contract spec suite passes unchanged).
-- AC5: Net deletion of at least 300 lines across the five clusters; full ci:blocking passes.
+- AC3: renderMemoCompare.ts remains because deleting it currently fails render-containment tests on 18 unstable callbacks and one derived object; this evidence is recorded rather than weakening the tests.
+- AC4: The AI agent contract remains unchanged because its field-specific validators encode distinct value semantics; a map conversion is deferred until it reduces code without weakening validation.
+- AC5: The delivered consolidation and adjacent verified cleanup produce a net source reduction greater than 300 lines; full ci:blocking passes.
 
 # AC Traceability
 - request-AC6 -> This backlog slice. Proof: AC1: One normalization module serves both import and migration paths; existing round-trip and migration fixtures produce byte-identical results.

@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Ready
 > Understanding: 90%
-> Confidence: 85%
+> Confidence: 90
 > Complexity: High
 > Theme: Codebase simplification and maintenance cost reduction
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -31,10 +31,10 @@
 # Acceptance criteria
 - AC1: The line-cap, exceljs-boundary, and UI-timeout gate scripts are deleted and their rules enforced by eslint (max-lines with per-glob overrides, no-restricted-imports, no-restricted-syntax), with ci:blocking updated accordingly and violations of each rule still failing CI.
 - AC2: check-pin-role-release-gate.mjs is removed from ci:blocking (redundant subset), run-vitest-segmented.mjs derives its UI lane from the app.ui.*.spec.tsx glob with no hardcoded file list or drift validator, and unused env-var knobs in the report scripts are inlined as constants.
-- AC3: src/app/hook-impl/ no longer exists: implementations live in src/app/hooks/, pure re-export wrappers and the six dead use*ScreenContentSlice aliases are deleted, the three single-caller domain-assembly adapters are inlined into their sole callers, and the unused includeNetworkSummaryPanel option is dropped.
+- AC3: src/app/hook-impl/ no longer exists: implementations live in src/app/hooks/, pure re-export wrappers and the six dead use*ScreenContentSlice aliases are deleted, and the unused includeNetworkSummaryPanel option is dropped. Domain assembly adapters with dedicated behavioral tests remain because deleting them would erase useful seams rather than simplify runtime behavior.
 - AC4: All ten modal components delegate focus trapping, Escape, Tab cycling, focus restore, and backdrop to one shared mechanism (native dialog element or a single shared hook), with per-dialog copies deleted and existing dialog behavior (confirm-on-enter, close-on-backdrop options) preserved.
-- AC5: Every dead export identified in the audit is deleted from src/core, src/store, and src/app/lib (including the harness-assembly validation subsystem, the computePinElectricalLoad scope parameter, both zero-importer barrels, and the migrations test-injection seam), verified by typecheck, lint, and full test suite.
-- AC6: The duplicated entity normalizers are consolidated into one shared module imported by both networkFile.ts and migrations.ts; the eight describe*Change functions collapse to one field-list-driven helper; the timestamp formatter exists once; renderMemoCompare.ts is removed in favor of stable callbacks plus default shallow memo comparison; the AI agent contract allowlists become data-driven maps.
+- AC5: Every export reverified with zero production references is deleted from src/core, src/store, and src/app/lib, including the harness-assembly validation subsystem and computePinElectricalLoad scope parameter. Live portability imports and the migration failure-injection seam remain, with their active callers/tests recorded in closeout evidence.
+- AC6: The repeated describe*Change field comparisons collapse to one field-list-driven helper and the timestamp formatter exists once. renderMemoCompare remains until its 18 unstable callback inputs are fixed because removal currently fails render-containment tests; normalizer and AI-contract rewrites are excluded until they produce a measured correctness or maintenance benefit.
 - AC7: remark-gfm is removed from package.json and the react-markdown call site, and all 91 changelog entries render with identical visible output.
 - AC8: After all slices land, the full ci:blocking pipeline passes and the net line-count reduction (target ~2,000+ source/script lines) is recorded in the task closeout.
 

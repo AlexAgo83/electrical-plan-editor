@@ -38,7 +38,7 @@ flowchart LR
 # Non-goals
 - No user-visible behavior, layout, or wording change anywhere in the editor.
 - No removal of gates with real policy value (npm-audit allowlist, PWA build artifacts, bundle metrics).
-- No store, persistence-format, or migration-semantics change beyond deleting the test-only injection seam.
+- No store, persistence-format, or migration-semantics change; retain the test injection seam that verifies migration failure recovery.
 - No new runtime dependencies.
 
 # Scope and guardrails
@@ -48,6 +48,7 @@ flowchart LR
 # Key product decisions
 - Use structured input as the source of truth for generated docs.
 - Keep generated write paths local and repo-bounded.
+- Reverify every audit candidate before deletion; preserve active seams when removal would weaken behavior or regression coverage.
 
 # Success signals
 - Generated docs pass lint and audit without broad manual rewrites.

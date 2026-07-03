@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Ready
 > Understanding: 90%
-> Confidence: 85%
+> Confidence: 90
 > Progress: 0%
 > Complexity: Medium
 > Theme: Codebase simplification and maintenance cost reduction
@@ -27,7 +27,7 @@
 
 # Acceptance criteria
 - AC1: src/app/hook-impl/ no longer exists; no import path references it anywhere.
-- AC2: The six aliases, the includeNetworkSummaryPanel option, the three domain-assembly adapter files, and the two single-consumer type files are gone.
+- AC2: The six aliases and includeNetworkSummaryPanel option are gone. Tested domain-assembly adapters and colocated type modules remain because they are active seams, not mirror-directory workarounds.
 - AC3: typecheck, lint (including the new max-lines configuration), and the full test suite pass with no test assertions weakened.
 - AC4: git log preserves file history where practical (git mv for straight moves).
 

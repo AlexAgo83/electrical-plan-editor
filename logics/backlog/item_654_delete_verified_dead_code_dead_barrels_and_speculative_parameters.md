@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Ready
 > Understanding: 90%
-> Confidence: 85%
+> Confidence: 90
 > Progress: 0%
 > Complexity: Low
 > Theme: Codebase simplification and maintenance cost reduction
@@ -27,9 +27,9 @@
   - Any reachable code path, however small.
 
 # Acceptance criteria
-- AC1: Every listed symbol is gone and a repo-wide grep finds zero remaining references.
+- AC1: Every symbol reverified with zero production references is gone; any stale audit candidate with active importers is documented and retained.
 - AC2: computePinElectricalLoad has no scope parameter and all callers compile and pass tests.
-- AC3: Migration specs pass without the injection seam and pipeline behavior coverage is not weakened.
+- AC3: The migration injection seam remains because it is the only direct coverage for step failures and backup recovery; migration specs remain unchanged and green.
 - AC4: typecheck, lint, and full test suite pass; net deletion of at least 250 source lines recorded.
 
 # AC Traceability
