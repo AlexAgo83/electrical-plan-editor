@@ -37,6 +37,7 @@
 | [prod_011_pin_level_current_dimensioning](product/prod_011_pin_level_current_dimensioning.md) | Editing surfaces | Settled |  |  | product/prod_011_pin_level_current_dimensioning.md |
 | [prod_012_editor_responsiveness_and_load_time_performance](product/prod_012_editor_responsiveness_and_load_time_performance.md) | Editor responsiveness and load-time performance | Settled |  |  | product/prod_012_editor_responsiveness_and_load_time_performance.md |
 | [prod_013_codebase_simplification_and_tooling_consolidation](product/prod_013_codebase_simplification_and_tooling_consolidation.md) | Codebase simplification and tooling consolidation | Proposed |  |  | product/prod_013_codebase_simplification_and_tooling_consolidation.md |
+| [prod_014_ci_speed_and_developer_feedback_latency](product/prod_014_ci_speed_and_developer_feedback_latency.md) | CI speed and developer feedback latency | Proposed |  |  | product/prod_014_ci_speed_and_developer_feedback_latency.md |
 
 ## Requests
 
@@ -206,6 +207,7 @@
 | [req_160_physical_layout_way_labels_in_endpoints](request/req_160_physical_layout_way_labels_in_endpoints.md) | Afficher les labels de voies du physical layout dans les endpoints | Done |  |  | request/req_160_physical_layout_way_labels_in_endpoints.md |
 | [req_161_runtime_rendering_and_initial_bundle_performance_overhaul](request/req_161_runtime_rendering_and_initial_bundle_performance_overhaul.md) | Runtime rendering and initial bundle performance overhaul | Done |  |  | request/req_161_runtime_rendering_and_initial_bundle_performance_overhaul.md |
 | [req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code](request/req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code.md) | Over-engineering reduction: replace bespoke gates with eslint, collapse mirror layers, delete dead code | Draft |  |  | request/req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code.md |
+| [req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers](request/req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers.md) | CI wall-clock reduction: parallel jobs, PR-scoped coverage, runner utilization, cached browsers | Draft |  |  | request/req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers.md |
 
 ## Backlog
 
@@ -871,6 +873,10 @@
 | [item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters](backlog/item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters.md) | Delete verified dead code, dead barrels, and speculative parameters | Ready |  | 0% | backlog/item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters.md |
 | [item_655_consolidate_duplicated_logic_into_single_shared_implementations](backlog/item_655_consolidate_duplicated_logic_into_single_shared_implementations.md) | Consolidate duplicated logic into single shared implementations | Ready |  | 0% | backlog/item_655_consolidate_duplicated_logic_into_single_shared_implementations.md |
 | [item_656_drop_remark_gfm_from_the_changelog_renderer](backlog/item_656_drop_remark_gfm_from_the_changelog_renderer.md) | Drop remark-gfm from the changelog renderer | Ready |  | 0% | backlog/item_656_drop_remark_gfm_from_the_changelog_renderer.md |
+| [item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation](backlog/item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation.md) | Split the serial CI job into parallel blocking lanes with concurrency cancellation | Ready |  | 0% | backlog/item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation.md |
+| [item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs](backlog/item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs.md) | Scope coverage instrumentation to main and drop it from PR runs | Ready |  | 0% | backlog/item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs.md |
+| [item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane](backlog/item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane.md) | Match test-runner parallelism to runner hardware and shard the UI lane | Ready |  | 0% | backlog/item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane.md |
+| [item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path](backlog/item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path.md) | Cache Playwright browsers and pip setup; gate e2e cost on the PR path | Ready |  | 0% | backlog/item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path.md |
 
 ## Tasks
 
@@ -1030,3 +1036,4 @@
 | [task_155_afficher_les_labels_de_voies_du_physical_layout_dans_les_endpoints](tasks/task_155_afficher_les_labels_de_voies_du_physical_layout_dans_les_endpoints.md) | Afficher les labels de voies du physical layout dans les endpoints | Done | codex | 100% | tasks/task_155_afficher_les_labels_de_voies_du_physical_layout_dans_les_endpoints.md |
 | [task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul](tasks/task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul.md) | Global | Done | codex | 100% | tasks/task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul.md |
 | [task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies](tasks/task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies.md) | Orchestrate over-engineering reduction across gates, layers, dead code, and dependencies | Ready |  | 0% | tasks/task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies.md |
+| [task_158_orchestrate_ci_wall_clock_reduction](tasks/task_158_orchestrate_ci_wall_clock_reduction.md) | Orchestrate CI wall-clock reduction | Ready |  | 0% | tasks/task_158_orchestrate_ci_wall_clock_reduction.md |

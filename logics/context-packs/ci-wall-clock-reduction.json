@@ -1,0 +1,316 @@
+{
+  "budgets": {
+    "max_docs": 24,
+    "max_docs_per_ref": 4
+  },
+  "changed_paths": [],
+  "command": "logics-manager sync context-pack req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path task_158_orchestrate_ci_wall_clock_reduction --mode summary-only --profile normal --handoff",
+  "companion_docs": [
+    {
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation",
+          "item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs",
+          "item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane",
+          "item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path"
+        ],
+        "prod": [
+          "prod_014_ci_speed_and_developer_feedback_latency"
+        ],
+        "req": [
+          "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers"
+        ],
+        "task": [
+          "task_158_orchestrate_ci_wall_clock_reduction"
+        ]
+      },
+      "path": "logics/product/prod_014_ci_speed_and_developer_feedback_latency.md",
+      "ref": "prod_014_ci_speed_and_developer_feedback_latency",
+      "status": "Proposed",
+      "title": "CI speed and developer feedback latency"
+    }
+  ],
+  "docs": [
+    {
+      "ai_context": {
+        "keywords": "request-chain-scaffold, ci wall-clock reduction: parallel jobs, pr-scoped coverage, runner utilization, cached browsers, development-ready",
+        "skip when": "The change is unrelated to this scaffolded request chain.",
+        "summary": "CI wall-clock reduction: parallel jobs, PR-scoped coverage, runner utilization, cached browsers",
+        "use when": "You need to implement or review the scaffolded workflow for CI wall-clock reduction: parallel jobs, PR-scoped coverage, runner utilization, cached browsers."
+      },
+      "kind": "request",
+      "linked_refs": {
+        "item": [
+          "item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation",
+          "item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs",
+          "item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane",
+          "item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path"
+        ],
+        "prod": [
+          "prod_014_ci_speed_and_developer_feedback_latency"
+        ],
+        "req": [
+          "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers"
+        ]
+      },
+      "path": "logics/request/req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers.md",
+      "ref": "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers",
+      "schema_version": "1.0",
+      "status": "Draft",
+      "title": "CI wall-clock reduction: parallel jobs, PR-scoped coverage, runner utilization, cached browsers"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, split the serial ci job into parallel blocking lanes with concurrency cancellation, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Split the serial CI job into parallel blocking lanes with concurrency cancellation",
+        "use when": "Implementing the scaffolded slice for Split the serial CI job into parallel blocking lanes with concurrency cancellation."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation"
+        ],
+        "prod": [
+          "prod_014_ci_speed_and_developer_feedback_latency"
+        ],
+        "req": [
+          "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers"
+        ],
+        "task": [
+          "task_158_orchestrate_ci_wall_clock_reduction"
+        ]
+      },
+      "path": "logics/backlog/item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation.md",
+      "ref": "item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Split the serial CI job into parallel blocking lanes with concurrency cancellation"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, scope coverage instrumentation to main and drop it from pr runs, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Scope coverage instrumentation to main and drop it from PR runs",
+        "use when": "Implementing the scaffolded slice for Scope coverage instrumentation to main and drop it from PR runs."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs"
+        ],
+        "prod": [
+          "prod_014_ci_speed_and_developer_feedback_latency"
+        ],
+        "req": [
+          "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers"
+        ],
+        "task": [
+          "task_158_orchestrate_ci_wall_clock_reduction"
+        ]
+      },
+      "path": "logics/backlog/item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs.md",
+      "ref": "item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Scope coverage instrumentation to main and drop it from PR runs"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, match test-runner parallelism to runner hardware and shard the ui lane, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Match test-runner parallelism to runner hardware and shard the UI lane",
+        "use when": "Implementing the scaffolded slice for Match test-runner parallelism to runner hardware and shard the UI lane."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane"
+        ],
+        "prod": [
+          "prod_014_ci_speed_and_developer_feedback_latency"
+        ],
+        "req": [
+          "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers"
+        ],
+        "task": [
+          "task_158_orchestrate_ci_wall_clock_reduction"
+        ]
+      },
+      "path": "logics/backlog/item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane.md",
+      "ref": "item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Match test-runner parallelism to runner hardware and shard the UI lane"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-task, request-chain-scaffold, orchestration",
+        "skip when": "Working on one isolated sibling slice.",
+        "summary": "Orchestrate CI wall-clock reduction",
+        "use when": "Coordinating implementation of a scaffolded request chain."
+      },
+      "kind": "task",
+      "linked_refs": {
+        "item": [
+          "item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation",
+          "item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs",
+          "item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane",
+          "item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path"
+        ],
+        "prod": [
+          "prod_014_ci_speed_and_developer_feedback_latency"
+        ],
+        "req": [
+          "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers"
+        ],
+        "task": [
+          "task_158_orchestrate_ci_wall_clock_reduction"
+        ]
+      },
+      "path": "logics/tasks/task_158_orchestrate_ci_wall_clock_reduction.md",
+      "ref": "task_158_orchestrate_ci_wall_clock_reduction",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Orchestrate CI wall-clock reduction"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, cache playwright browsers and pip setup; gate e2e cost on the pr path, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Cache Playwright browsers and pip setup; gate e2e cost on the PR path",
+        "use when": "Implementing the scaffolded slice for Cache Playwright browsers and pip setup; gate e2e cost on the PR path."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path"
+        ],
+        "prod": [
+          "prod_014_ci_speed_and_developer_feedback_latency"
+        ],
+        "req": [
+          "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers"
+        ],
+        "task": [
+          "task_158_orchestrate_ci_wall_clock_reduction"
+        ]
+      },
+      "path": "logics/backlog/item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path.md",
+      "ref": "item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Cache Playwright browsers and pip setup; gate e2e cost on the PR path"
+    }
+  ],
+  "estimates": {
+    "char_count": 7823,
+    "companion_doc_count": 1,
+    "doc_count": 6
+  },
+  "generated_at": "2026-07-03T17:25:40Z",
+  "handoff": {
+    "companion_doc_count": 1,
+    "enabled": true,
+    "source_refs": [
+      "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers",
+      "item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation",
+      "item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs",
+      "item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane",
+      "item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path",
+      "task_158_orchestrate_ci_wall_clock_reduction"
+    ],
+    "validation_summary_count": 1
+  },
+  "mode": "summary-only",
+  "profile": "normal",
+  "ref": "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers,item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation,item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs,item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane,item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path,task_158_orchestrate_ci_wall_clock_reduction",
+  "refs": [
+    "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers",
+    "item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation",
+    "item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs",
+    "item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane",
+    "item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path",
+    "task_158_orchestrate_ci_wall_clock_reduction"
+  ],
+  "release": {
+    "blocking_reasons": [
+      "ci: evidence targets a different version",
+      "production_deployment: evidence targets a different version"
+    ],
+    "configured": true,
+    "contract_path": "logics/release/contract.json",
+    "guidance": [
+      "Release readiness must come from project-owned evidence, not conversational memory.",
+      "Use release status or validate before preparing or claiming release readiness.",
+      "Publication-oriented actions are explicit operator actions and are separate from safe read/validate actions."
+    ],
+    "next_action": "ci: evidence targets a different version",
+    "publication_actions": [
+      "GitHub release publication",
+      "external publication"
+    ],
+    "required_gates": [
+      {
+        "blocking_reason": null,
+        "id": "version_metadata",
+        "required": true,
+        "state": "preparing",
+        "status": "passed"
+      },
+      {
+        "blocking_reason": null,
+        "id": "changelog",
+        "required": true,
+        "state": "preparing",
+        "status": "passed"
+      },
+      {
+        "blocking_reason": null,
+        "id": "local_validation",
+        "required": true,
+        "state": "local_validation",
+        "status": "passed"
+      },
+      {
+        "blocking_reason": null,
+        "id": "git_push",
+        "required": true,
+        "state": "pushed",
+        "status": "passed"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "ci",
+        "required": true,
+        "state": "ci_verification",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "production_deployment",
+        "required": true,
+        "state": "external_publication",
+        "status": "stale"
+      }
+    ],
+    "safe_actions": [
+      "logics-manager release status",
+      "logics-manager release plan <version>",
+      "logics-manager release validate <version>"
+    ],
+    "state": "blocked",
+    "target_version": "1.18.0"
+  },
+  "validation_summary": [
+    {
+      "items": [
+        "- Run `python3 -m logics_manager lint --require-status`.",
+        "- Run scaffold command tests."
+      ],
+      "path": "logics/tasks/task_158_orchestrate_ci_wall_clock_reduction.md",
+      "ref": "task_158_orchestrate_ci_wall_clock_reduction"
+    }
+  ]
+}

@@ -1,0 +1,185 @@
+{
+  "title": "CI wall-clock reduction: parallel jobs, PR-scoped coverage, runner utilization, cached browsers",
+  "references": [
+    ".github/workflows/ci.yml",
+    "package.json",
+    "scripts/quality/run-vitest-segmented.mjs",
+    "scripts/quality/run-playwright-e2e.mjs",
+    "playwright.config.ts",
+    "vite.config.ts"
+  ],
+  "request": {
+    "complexity": "Medium",
+    "theme": "CI speed and feedback latency",
+    "needs": [
+      "Pull-request CI feedback must get dramatically faster: today a single ubuntu-latest job runs the entire ci:blocking chain serially (lint, typecheck, seven quality gates, unit tests with coverage, UI tests, Playwright e2e, production build, PWA gate), so wall-clock time is the sum of every step instead of the slowest parallel lane.",
+      "Coverage instrumentation must stop taxing every pull request: test:ci:fast always runs with --coverage, which slows the unit lane substantially while the coverage numbers are only consumed on main.",
+      "The test runners must actually use the runner hardware: vitest lanes are pinned to --maxWorkers=2 on 4-vCPU ubuntu-latest runners.",
+      "Repeated per-run setup cost must be cached: Playwright chromium (--with-deps) is downloaded on every run and logics-manager is pip-installed from scratch.",
+      "Superseded runs must not consume queue time: pushing a new commit to a PR must cancel the in-flight run for that PR."
+    ],
+    "context": [
+      ".github/workflows/ci.yml defines a single job named validate (timeout 30 minutes) that checks out, installs Node 20 + Python + logics-manager, npm ci, runs informational logics lint/audit steps, installs the Playwright chromium browser with system deps, then runs npm run ci:blocking followed by informational bundle metrics and the PWA gate.",
+      "ci:blocking in package.json chains: logics-manager lint/sync/audit, eslint, tsc --noEmit, dependency-audit gate, vitest segmentation check, four modularization/governance gates, the exceljs boundary gate, the pin-role release gate, test:ci:fast -- --coverage, test:ci:ui, test:e2e, vite build (build:vite), and the PWA artifact gate — strictly serial.",
+      "test:ci:fast and test:ci:ui both pass --pool=forks --maxWorkers=2 --testTimeout=15000; ubuntu-latest standard runners expose 4 vCPUs, so half the cores sit idle during the longest steps. The maxWorkers=2 choice is not documented anywhere as a flakiness or memory mitigation, so it must be validated rather than assumed safe to raise.",
+      "scripts/quality/run-vitest-segmented.mjs splits specs into a fast lane and a UI lane (71 app.ui.*.spec.tsx files) and runs UI chunks of 8 files sequentially in-process; vitest natively supports --shard for splitting a lane across parallel jobs.",
+      "The workflow has no concurrency group, so superseded PR pushes queue full runs behind each other; there is no cache for ~/.cache/ms-playwright (browser re-downloaded every run, roughly one to two minutes) nor for the pip install.",
+      "The e2e step (tests/e2e, 2 Playwright specs today) requires the production build via run-playwright-e2e.mjs; the vitest UI suites already cover most user flows in jsdom, so e2e on every PR is the slowest step with the least marginal signal.",
+      "A companion request (req_162, over-engineering reduction) already covers replacing the bespoke quality-gate scripts with eslint rules and de-hardcoding run-vitest-segmented.mjs; this request must not duplicate that scope — it may only exploit vitest --shard once available, and its job layout must stay correct whether req_162 lands before or after.",
+      "Constraint: the set of blocking checks must not weaken — every currently blocking verification must still block merges after the split; only scheduling, caching, and coverage placement change."
+    ],
+    "acceptance_criteria": [
+      "AC1: The CI workflow runs ci:blocking's verifications as parallel jobs (at minimum: static checks + quality gates, unit lane, UI lane, e2e + build + PWA) with wall-clock time equal to the slowest lane, and every previously blocking check still required for merge.",
+      "AC2: Pull-request runs execute the unit lane without coverage instrumentation; coverage still runs (and can fail) on main pushes or a scheduled job, with the coverage-off-PR policy documented in the workflow.",
+      "AC3: vitest worker count matches runner capacity: --maxWorkers raised from 2 (to 4 or unset) after a validation pass confirming no new flakiness or OOM across three consecutive green runs, or the 2-worker pin is kept and documented with the observed failure that justifies it.",
+      "AC4: Playwright browser binaries are cached keyed on the @playwright/test version, and the logics-manager pip install is cached; cache-hit runs skip both downloads.",
+      "AC5: A concurrency group cancels in-flight runs for the same PR ref on new pushes, while main runs are never cancelled.",
+      "AC6: End-to-end wall-clock for a typical PR run drops by at least 40% versus the recorded pre-change baseline, with before/after run durations recorded in the task closeout."
+    ]
+  },
+  "product": {
+    "title": "CI speed and developer feedback latency",
+    "overview": "Cut pull-request CI wall-clock time by parallelizing the serial blocking chain, scoping coverage to main, using the runner hardware fully, and caching per-run setup — without weakening any blocking verification.",
+    "goals": [
+      "PR feedback in minutes, bounded by the slowest parallel lane rather than the sum of all steps.",
+      "Zero redundant per-run setup cost (browser downloads, pip installs) on cache hits.",
+      "Coverage and other main-only signals removed from the PR critical path.",
+      "No superseded run consuming runner time."
+    ],
+    "non_goals": [
+      "No weakening of the blocking check set — everything that blocks merge today still blocks merge.",
+      "No change to test content, assertions, or the fast/UI lane split semantics.",
+      "No replacement of the quality-gate scripts themselves (owned by the over-engineering reduction request).",
+      "No self-hosted or larger paid runners."
+    ]
+  },
+  "backlog_items": [
+    {
+      "title": "Split the serial CI job into parallel blocking lanes with concurrency cancellation",
+      "priority": "High",
+      "complexity": "Medium",
+      "theme": "CI speed and feedback latency",
+      "request_acs": ["AC1", "AC5", "AC6"],
+      "problem": [
+        "The single validate job runs every ci:blocking step serially, so total wall-clock is the sum of lint, typecheck, seven gates, three test suites, the production build, and the PWA gate.",
+        "Without a concurrency group, each push to an open PR queues a full new run behind the in-flight one instead of cancelling it."
+      ],
+      "scope_in": [
+        "Record the pre-change baseline first: durations of the last five main/PR runs, per-step timings from one representative run.",
+        "Restructure .github/workflows/ci.yml into parallel jobs, for example: checks (logics gates, eslint, typecheck, dependency-audit, segmentation check, modularization/governance/boundary gates), unit (test:ci:fast), ui (test:ci:ui), e2e-build (vite build, test:e2e, quality:pwa, bundle metrics report); factor the shared setup (checkout, setup-node with npm cache, npm ci) into each job or a composite action.",
+        "Split the ci:blocking package script into per-lane scripts so each job runs exactly its slice and local ci:local still runs the full serial chain for developers.",
+        "Add a concurrency block: group per workflow+ref, cancel-in-progress true for pull requests, false for main.",
+        "Declare every new job a required status check (branch protection or merge queue configuration documented in the closeout) so the blocking set is provably unchanged.",
+        "Stay compatible with req_162: reference gate scripts through the per-lane npm scripts so their later replacement by eslint rules only shrinks the checks lane."
+      ],
+      "scope_out": [
+        "Changing what any gate or test verifies.",
+        "Sharding within a lane (separate backlog item).",
+        "The release-deploy and Teams-notification workflows."
+      ],
+      "acceptance_criteria": [
+        "AC1: PR CI wall-clock equals the slowest lane; a run's job graph shows the lanes executing concurrently.",
+        "AC2: Every check that blocked merges before the split still blocks merges (required-checks list captured before/after in the closeout).",
+        "AC3: Pushing twice in quick succession to a PR cancels the first run; two rapid pushes to main both complete.",
+        "AC4: npm run ci:local still runs the full serial chain unchanged for local use.",
+        "AC5: Baseline and post-change durations recorded; this item plus the coverage item together meet the 40% request-level target."
+      ]
+    },
+    {
+      "title": "Scope coverage instrumentation to main and drop it from PR runs",
+      "priority": "High",
+      "complexity": "Low",
+      "theme": "CI speed and feedback latency",
+      "request_acs": ["AC2", "AC6"],
+      "problem": [
+        "test:ci:fast always runs with --coverage, paying V8 instrumentation and report generation on every PR while the coverage output is only consumed on main (informational UI coverage report is already workflow_dispatch-only).",
+        "Coverage instrumentation typically adds 30-60% to unit-lane duration, sitting directly on the PR critical path."
+      ],
+      "scope_in": [
+        "Run the unit lane without --coverage on pull_request events; keep coverage (with the existing thresholds and reporters, including the @vitest/coverage-v8 config in vite.config.ts) on main pushes and workflow_dispatch.",
+        "Express the split via workflow-level conditionals or two npm scripts (test:ci:fast vs test:ci:fast:coverage) so the intent is readable in package.json.",
+        "Document the policy with a comment in ci.yml stating where coverage runs and why.",
+        "Measure and record unit-lane duration with and without coverage in the closeout."
+      ],
+      "scope_out": [
+        "Changing coverage thresholds, reporters, or included files.",
+        "Adding coverage gating that does not exist today."
+      ],
+      "acceptance_criteria": [
+        "AC1: PR runs execute the unit lane with no coverage artifacts produced; main runs still produce them and fail on regression exactly as today.",
+        "AC2: Unit-lane duration on PRs drops measurably versus the recorded coverage-on baseline.",
+        "AC3: The policy is documented in ci.yml and package.json scripts are self-describing."
+      ]
+    },
+    {
+      "title": "Match test-runner parallelism to runner hardware and shard the UI lane",
+      "priority": "Medium",
+      "complexity": "Medium",
+      "theme": "CI speed and feedback latency",
+      "request_acs": ["AC3", "AC6"],
+      "problem": [
+        "Both vitest lanes pin --maxWorkers=2 on 4-vCPU runners with no documented justification, leaving half the cores idle during the longest steps.",
+        "The UI lane (71 jsdom-heavy spec files) is the single longest test lane and runs its 8-file chunks sequentially inside one job, while vitest --shard could split it across parallel matrix jobs."
+      ],
+      "scope_in": [
+        "Raise --maxWorkers to match runner cores (4, or unset to let vitest decide) for both lanes; validate over at least three consecutive green CI runs watching for OOM kills, worker crashes, and new flaky failures; if instability appears, bisect (3 workers) and document the ceiling with the observed failure mode.",
+        "Shard the UI lane across a 2-3 job matrix using vitest --shard=i/n once the lane's file list is glob-derived (coordinate with req_162 item on run-vitest-segmented.mjs; if that lands later, shard over the existing lane list without duplicating its refactor).",
+        "Keep the segmentation check green: total spec coverage across shards must equal the unsharded lane (no file skipped, none double-counted as a gap).",
+        "Record per-lane before/after durations in the closeout."
+      ],
+      "scope_out": [
+        "Changing --pool=forks or testTimeout values.",
+        "Rewriting run-vitest-segmented.mjs beyond what sharding strictly needs (owned by req_162).",
+        "Sharding the fast lane or e2e (not the bottleneck)."
+      ],
+      "acceptance_criteria": [
+        "AC1: Worker count matches runner capacity or the lower pin is documented with observed evidence; three consecutive green runs at the chosen setting.",
+        "AC2: The UI lane runs as parallel shards whose union covers exactly the same spec files as before, verified by the segmentation check.",
+        "AC3: UI-lane wall-clock (longest shard) is at least 40% below the unsharded baseline."
+      ]
+    },
+    {
+      "title": "Cache Playwright browsers and pip setup; gate e2e cost on the PR path",
+      "priority": "Medium",
+      "complexity": "Low",
+      "theme": "CI speed and feedback latency",
+      "request_acs": ["AC4", "AC6"],
+      "problem": [
+        "npx playwright install --with-deps chromium re-downloads the browser on every run (roughly one to two minutes) because ~/.cache/ms-playwright is never cached.",
+        "logics-manager is pip-installed from the network on every run.",
+        "The e2e step forces a production build and browser boot on every PR while the two existing e2e specs mostly duplicate flows the vitest UI suites already cover in jsdom."
+      ],
+      "scope_in": [
+        "Cache ~/.cache/ms-playwright with actions/cache keyed on the @playwright/test version from package-lock.json; on cache hit run npx playwright install chromium (no --with-deps re-download) or skip install entirely if the binary check passes; keep --with-deps only for the cold path.",
+        "Cache the pip install (actions/setup-python built-in pip cache keyed on the logics-manager version, or pin the version for cache stability).",
+        "Decide and implement the e2e placement on the PR path: keep it blocking (default, since the parallel-lanes item removes it from the critical path if another lane is slower) or move it to main-only/non-blocking on PRs — decide from the measured lane timings after the parallel split lands, and record the decision and numbers in the closeout.",
+        "Verify cold-path behavior: a cache miss still produces a green run."
+      ],
+      "scope_out": [
+        "Removing or rewriting any e2e spec.",
+        "Caching node_modules beyond the existing setup-node npm cache."
+      ],
+      "acceptance_criteria": [
+        "AC1: A cache-hit run performs no Playwright browser download and no pip network install, visible in step logs and timings.",
+        "AC2: A cache-miss (cold) run still completes green.",
+        "AC3: The e2e placement decision is recorded with the lane timings that justify it, and merges remain blocked by e2e wherever it is declared blocking."
+      ]
+    }
+  ],
+  "orchestration_task": {
+    "title": "Orchestrate CI wall-clock reduction",
+    "plan": [
+      "Capture the baseline first: last five run durations plus per-step timings from one representative run; store in the task journal (AC6 depends on it).",
+      "Land the parallel-lanes split with concurrency cancellation (biggest structural win); update branch-protection required checks the same day so merges stay gated.",
+      "Land the coverage-off-PR item immediately after — it is a one-line-per-lane change once the lanes exist.",
+      "Land caching (Playwright + pip) next; verify one cold and one warm run.",
+      "Land worker-count raise and UI-lane sharding last, with the three-green-runs validation window; coordinate the shard mechanics with req_162's segmented-runner refactor to avoid double work.",
+      "Close out with before/after wall-clock table (per lane and total), the required-checks diff, and the e2e placement decision; validate and close the request chain."
+    ]
+  },
+  "context_pack": {
+    "out": "logics/context-packs/ci-wall-clock-reduction.json",
+    "mode": "summary-only",
+    "profile": "normal"
+  }
+}
