@@ -2,14 +2,15 @@
 > From version: 1.18.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 95
+> Confidence: 90
 > Progress: 0%
 > Complexity: High
 > Theme: Canvas-first workspace UX
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
 
 # Problem
+- **BRANCH RULE: implement on the dedicated branch `feat/canvas-fullbleed`, never on `main` — this experiment may not be validated and must be droppable by deleting the branch. See `task_160` Implementation notes before writing any code.**
 - The canvas is a grid child inside workspace-content, so it can never act as the spatial background the workflows want; every screen frames it differently and selection lives in tables.
 - Fit-to-content, zoom, and centering measure the canvas container; if the canvas becomes the full viewport with docks floating over it, all of them mis-target unless they learn about occluded edges.
 - Any layout inversion attempted without a hard flag-off guarantee risks the working product for every user.

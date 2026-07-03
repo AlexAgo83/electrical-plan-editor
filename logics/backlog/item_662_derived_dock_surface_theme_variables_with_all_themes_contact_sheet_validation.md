@@ -2,14 +2,15 @@
 > From version: 1.18.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 95
+> Confidence: 90
 > Progress: 0%
 > Complexity: Medium
 > Theme: Canvas-first workspace UX
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
 
 # Problem
+- **BRANCH RULE: implement on the dedicated branch `feat/canvas-fullbleed`, never on `main` — this experiment may not be validated and must be droppable by deleting the branch. See `task_160` Implementation notes before writing any code.**
 - The app ships ~30 themes across ~27 override CSS files; translucent docks over an arbitrary themed canvas can silently become unreadable in any of them, and a per-theme styling pass is unaffordable and unmaintainable.
 - Midrange themes are the danger zone: canvas and panel surfaces converge in luminance, so blur alone does not guarantee text contrast.
 

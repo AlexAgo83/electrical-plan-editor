@@ -2,14 +2,15 @@
 > From version: 1.18.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 95
+> Confidence: 90
 > Progress: 0%
 > Complexity: High
 > Theme: Canvas-first workspace UX
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
 
 # Problem
+- **BRANCH RULE: implement on the dedicated branch `feat/canvas-fullbleed`, never on `main` — this experiment may not be validated and must be droppable by deleting the branch. See `task_160` Implementation notes before writing any code.**
 - Analysis is the biggest payoff of the model: the graph already supports highlighted wires/routes, but the highlight lives inside a boxed panel next to tables instead of lighting up the actual network on screen.
 - At real scale the fit lands near 23% zoom: dimension labels turn to noise, a five-connector co-located cluster overlaps unreadably, and flat lists of attached entities exceed what any dock can show.
 - Entity lists across five analysis sub-screens (connectors, wires, splices, nodes, segments) each frame their own tables, multiplying navigation instead of funneling through one canvas.

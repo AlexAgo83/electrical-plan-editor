@@ -2,14 +2,15 @@
 > From version: 1.18.1
 > Schema version: 1.0
 > Status: Ready
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 95
+> Confidence: 90
 > Progress: 0%
 > Complexity: High
 > Theme: Canvas-first workspace UX
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
 
 # Problem
+- **BRANCH RULE: implement on the dedicated branch `feat/canvas-fullbleed`, never on `main` — this experiment may not be validated and must be droppable by deleting the branch. See `task_160` Implementation notes before writing any code.**
 - Responsive panel styles key on @media viewport width (900 px breakpoint), so a panel placed in a 340 px dock on a wide screen keeps its wide layout and overflows; the app already owns narrow renderings but measures the wrong dimension.
 - Detail chains today spread horizontally as stacked side-by-side panels; a dock cannot afford columns, so depth must replace width or the inspector becomes unusable.
 - Embedded wide tables (an entity's attached wires, occupancy grids) physically cannot fit a dock; at real scale the densest connector carries 27 wires.
