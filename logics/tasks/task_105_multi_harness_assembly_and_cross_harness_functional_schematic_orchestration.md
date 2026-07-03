@@ -8,6 +8,7 @@
 > Complexity: High
 > Theme: Multi-Harness Modeling and Functional Schematic
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+> Non-semantic edit: refreshed Mermaid signatures
 
 # Context
 This orchestration task executes the multi-harness delivery bundle from `req_122`.
@@ -30,7 +31,7 @@ The main execution constraints are:
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|multi-harness-assembly-cross-harness|items-591-to-595|assembly-links-trace-ui-validation|npm-run-typecheck
+%% logics-signature: task|multi-harness-assembly-and-cross-harness|item-591-harness-assembly-data-model-per|1-confirm-implementation-surfaces-and-co|npm-run-s-typecheck
 flowchart LR
     Backlog[Items 591 to 595] --> Wave1[Wave 1 assembly model]
     Wave1 --> Wave2[Wave 2 connector links]

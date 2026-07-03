@@ -8,6 +8,7 @@
 > Complexity: High
 > Theme: Multi-Harness Modeling
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
+> Non-semantic edit: refreshed Mermaid signatures
 
 # Problem
 Operators need to connect two harnesses by declaring that one connector from one harness is physically paired with one connector from another harness. Continuity must be deterministic and physical-only: pin `1` maps to pin `1`, pin `2` to pin `2`, and so on. A connector can participate in only one inter-harness link in the first version.
@@ -27,7 +28,7 @@ Operators need to connect two harnesses by declaring that one connector from one
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|inter-harness-connector-links|req-122-multi-harness|physical-link-symmetric-pins|ac1-link-two-connectors
+%% logics-signature: backlog|inter-harness-connector-links-and-symmet|req-122-multi-harness-super-category-and|operators-need-to-connect-two-harnesses|ac1-the-operator-can-define-one
 flowchart TD
     Request[req 122 multi harness] --> Problem[Need physical connector bridge]
     Problem --> Scope[Connector link and pin continuity]

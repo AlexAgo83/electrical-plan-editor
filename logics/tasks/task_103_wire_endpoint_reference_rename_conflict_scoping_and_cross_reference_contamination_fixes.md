@@ -8,6 +8,7 @@
 > Complexity: High
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+> Non-semantic edit: refreshed Mermaid signatures
 
 # Context
 - Derived from backlog item `item_589_wire_endpoint_reference_rename_conflict_scoping_and_cross_reference_contamination_fixes`.
@@ -19,7 +20,7 @@
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|wire-endpoint-reference-rename-conflict-|item-589-wire-endpoint-reference-rename-|1-confirm-scope-dependencies-and-linked|run-the-relevant-automated-tests-for
+%% logics-signature: task|wire-endpoint-reference-rename-conflict-|item-589-wire-endpoint-reference-rename-|1-inspect-the-current-save-time-rename|npm-run-typecheck
 stateDiagram-v2
     state "item_589_wire_endpoint_reference_rename_co" as Backlog
     state "1. Confirm scope dependencies and linked" as Scope

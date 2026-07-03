@@ -7,6 +7,7 @@
 > Complexity: Large
 > Theme: Multi-Harness Modeling and Functional Traceability
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
+> Non-semantic edit: refreshed Mermaid signatures
 
 # Needs
 - Add a new modeling level above an individual harness/network so several harnesses can be grouped into one higher-level assembly.
@@ -157,7 +158,7 @@ Decision: use physical-only connector links. This keeps the source of truth tech
 
 ```mermaid
 %% logics-kind: request
-%% logics-signature: request|multi-harness-super-category|assembly-groups-harnesses|connector-link-continuity|functional-schematic-crosses-harnesses
+%% logics-signature: request|multi-harness-super-category-and-cross-h|add-a-new-modeling-level-above|ac1-the-application-can-create-and
 flowchart TD
     Assembly[Harness assembly] --> H1[Harness / Network A]
     Assembly --> H2[Harness / Network B]

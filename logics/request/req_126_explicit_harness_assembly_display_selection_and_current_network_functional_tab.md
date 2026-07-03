@@ -30,7 +30,7 @@ A separate tab is the preferred solution for the current-network functional grap
 
 ```mermaid
 %% logics-kind: request
-%% logics-signature: request|explicit-harness-assembly-display-selection|assembly-selector-drives-assembly-graph|current-network-tab-drives-single-network-graph
+%% logics-signature: request|explicit-harness-assembly-display-select|let-the-operator-explicitly-choose-which|ac1-the-harness-assembly-functional-grap
 flowchart TD
     Operator[Operator] --> Workspace[Harness assembly workspace]
     Workspace --> AssemblySelector[Displayed assembly selector]

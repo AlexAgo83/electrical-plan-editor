@@ -8,6 +8,7 @@
 > Complexity: High
 > Theme: Functional Schematic
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
+> Non-semantic edit: refreshed Mermaid signatures
 
 # Problem
 The existing functional schematic derivation is limited to one harness/network. The new assembly workflow needs a filtered trace that starts from one or more selected master connectors, follows wires inside a harness, crosses physical interconnectors through symmetric pins, and continues until natural continuity ends or a terminal connector is reached.
@@ -27,7 +28,7 @@ The existing functional schematic derivation is limited to one harness/network. 
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|cross-harness-functional-trace|req-122-multi-harness|trace-from-master-connectors|ac1-trace-crosses-links
+%% logics-signature: backlog|cross-harness-functional-trace-derivatio|req-122-multi-harness-super-category-and|the-existing-functional-schematic-deriva|ac1-the-trace-derivation-can-start
 flowchart TD
     Request[req 122 multi harness] --> Problem[Trace must cross harnesses]
     Problem --> Scope[Derivation from master connectors]

@@ -8,6 +8,7 @@
 > Complexity: High
 > Theme: Functional Schematic UI
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
+> Non-semantic edit: refreshed Mermaid signatures
 
 # Problem
 Operators need a readable assembly-level functional schematic that shows a filtered trace across several harnesses. The UI must show interconnector crossings as dedicated blocks, color each wire by harness ownership, and allow navigation from an interconnector block to both linked connectors and both harnesses.
@@ -27,7 +28,7 @@ Operators need a readable assembly-level functional schematic that shows a filte
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|aggregated-functional-schematic-ui|req-122-multi-harness|interconnector-blocks-harness-colors|ac1-render-assembly-trace
+%% logics-signature: backlog|aggregated-functional-schematic-ui-inter|req-122-multi-harness-super-category-and|operators-need-a-readable-assembly-level|ac1-the-ui-exposes-an-assembly-level
 flowchart TD
     Request[req 122 multi harness] --> Problem[Need readable assembly trace]
     Problem --> Scope[UI blocks and harness colors]

@@ -8,6 +8,7 @@
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
+> Non-semantic edit: refreshed Mermaid signatures
 
 # Problem
 The `Harness assembly` workspace currently lets the active network implicitly choose which assembly graph is displayed. This makes the view unpredictable: selecting an assembly in the manager can still display another assembly, and navigation that changes the active network can unexpectedly change the graph.
@@ -33,7 +34,7 @@ Operators need a deterministic assembly workspace where one explicit selector ch
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|explicit-harness-assembly-display-selection|req-126-explicit-selector|decouple-active-network|current-network-functional-tab
+%% logics-signature: backlog|explicit-harness-assembly-display-select|req-126-explicit-harness-assembly-displa|the-harness-assembly-workspace-currently|ac1-the-harness-assembly-functional-grap
 flowchart TD
     Request[req 126 display selection] --> Selector[Shared assembly selector]
     Selector --> SavedAssembly[Saved assembly data]

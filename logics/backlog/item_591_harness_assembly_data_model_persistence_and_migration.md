@@ -8,6 +8,7 @@
 > Complexity: High
 > Theme: Multi-Harness Modeling
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
+> Non-semantic edit: refreshed Mermaid signatures
 
 # Problem
 The application needs a first-class `Harness assembly` level above the existing `Network` model so several harnesses can be grouped without changing the meaning of an individual network. Existing saved data must continue to load unchanged, while new assembly data must persist through local storage and import/export.
@@ -26,7 +27,7 @@ The application needs a first-class `Harness assembly` level above the existing 
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|harness-assembly-data-model|req-122-multi-harness|assembly-groups-networks|ac1-assembly-persists
+%% logics-signature: backlog|harness-assembly-data-model-persistence-|req-122-multi-harness-super-category-and|the-application-needs-a-first-class-harn|ac1-the-application-can-create-and
 flowchart TD
     Request[req 122 multi harness] --> Problem[Need assembly above network]
     Problem --> Scope[Data model and persistence]

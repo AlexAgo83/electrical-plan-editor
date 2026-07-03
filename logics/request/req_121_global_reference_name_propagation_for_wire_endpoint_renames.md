@@ -42,7 +42,7 @@ Scope boundaries:
 
 ```mermaid
 %% logics-kind: request
-%% logics-signature: request|global-reference-name-propagation-for-|restore-the-intended-global-naming-mod|ac1-a-confirmed-name-choice-for-one
+%% logics-signature: request|global-reference-name-propagation-for-wi|restore-the-intended-global-naming-model|ac1-when-the-operator-confirms-a
 flowchart TD
     Trigger[Save wire endpoint name] --> Detect[Detect conflict on same kind and same reference]
     Detect --> Decide[Operator chooses winning name]

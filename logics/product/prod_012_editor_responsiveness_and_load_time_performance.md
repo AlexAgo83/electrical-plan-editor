@@ -6,9 +6,23 @@
 > Related task: `task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
+> Non-semantic edit: refreshed Mermaid signatures
 
 # Overview
 Keep the local-first editor responsive while modeling large networks and cut first-load JavaScript, without changing any modeling behavior or persistence guarantees.
+
+```mermaid
+%% logics-kind: product
+flowchart LR
+    User[User edits large network] --> Render[Render containment]
+    User --> Locale[Locale observer gating]
+    User --> Persist[Idle persistence]
+    Load[First app load] --> Split[Route level splitting]
+    Render --> Smooth[Smoother modeling]
+    Locale --> Smooth
+    Persist --> Smooth
+    Split --> Faster[Faster initial load]
+```
 
 # Goals
 - Smooth canvas drag/pan and form typing on large networks by containing re-renders to the components that actually changed.

@@ -20,7 +20,7 @@
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|global-reference-name-propagation-for-wi|item-590-global-reference-name-propagati|1-confirm-scope-dependencies-and-linked|run-the-relevant-automated-tests-for
+%% logics-signature: task|global-reference-name-propagation-for-wi|item-590-global-reference-name-propagati|1-inspect-the-current-reference-name-syn|npm-run-typecheck
 stateDiagram-v2
     state "item_590_global_reference_name_propagation" as Backlog
     state "1. Confirm scope dependencies and linked" as Scope

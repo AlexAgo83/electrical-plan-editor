@@ -8,6 +8,7 @@
 > Complexity: Medium
 > Theme: UI
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+> Non-semantic edit: refreshed Mermaid signatures
 
 # Context
 Implement the UI and controller changes defined in `logics/backlog/item_598_explicit_harness_assembly_display_selection_and_current_network_functional_tab.md`.
@@ -18,7 +19,7 @@ The current active network still needs a functional graph view, but it must live
 
 ```mermaid
 %% logics-kind: task
-%% logics-signature: task|explicit-harness-assembly-display-selection|item-598|selector-state-tabs-warning-export|npm-run-typecheck
+%% logics-signature: task|explicit-harness-assembly-display-select|item-598-explicit-harness-assembly-displ|1-confirm-scope|run-targeted-tests-for-the-changed
 flowchart TD
     Backlog[Backlog item 598] --> Inspect[Inspect current graph selection]
     Inspect --> Selector[Add shared assembly selector state]

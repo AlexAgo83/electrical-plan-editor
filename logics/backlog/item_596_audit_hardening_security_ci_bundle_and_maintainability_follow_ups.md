@@ -8,7 +8,7 @@
 > Complexity: High
 > Theme: Quality
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Non-semantic edit: Removed references to a deleted root-level audit report file.
+> Non-semantic edit: Removed references to a deleted root-level audit report file.; refreshed Mermaid signatures
 
 # Problem
 - Turn the May 12 project audit findings into a coordinated hardening effort instead of leaving them as disconnected maintenance notes.
@@ -31,7 +31,7 @@
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|audit-hardening-security-ci-bundle-and-m|req-124-audit-hardening-security-ci-bund|turn-the-project-audit-findings-from|ac1-dependency-security-findings-from-np
+%% logics-signature: backlog|audit-hardening-security-ci-bundle-and-m|req-124-audit-hardening-security-ci-bund|turn-the-may-12-project-audit|ac1-dependency-security-findings-from-np
 flowchart TD
     Request[req_124_audit_hardening_security_ci_bundle] --> Problem[Turn the project audit findings from]
     Problem --> Security[Patch dependency security findings]

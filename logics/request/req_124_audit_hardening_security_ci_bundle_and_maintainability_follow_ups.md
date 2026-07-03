@@ -44,7 +44,7 @@ Scope boundaries:
 
 ```mermaid
 %% logics-kind: request
-%% logics-signature: request|audit-hardening-security-ci-bundle-and-m|turn-the-project-audit-findings-from|ac1-dependency-security-findings-from-np
+%% logics-signature: request|audit-hardening-security-ci-bundle-and-m|turn-the-may-12-project-audit|ac1-dependency-security-findings-from-np
 flowchart TD
     Audit[Project audit report] --> Triage[Group findings into hardening slices]
     Triage --> Security[Dependency security updates]

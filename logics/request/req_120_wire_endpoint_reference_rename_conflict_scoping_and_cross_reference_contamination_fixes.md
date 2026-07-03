@@ -7,6 +7,7 @@
 > Complexity: High
 > Theme: UI
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
+> Non-semantic edit: refreshed Mermaid signatures
 
 # Needs
 - Correct the save-time conflict detection for `connection` and `seal` reference naming so a wire endpoint only compares names that belong to the same normalized reference and same reference kind.
@@ -40,7 +41,7 @@ Scope boundaries:
 
 ```mermaid
 %% logics-kind: request
-%% logics-signature: request|wire-endpoint-reference-rename-conflict|correct-the-save-time-conflict-detect|ac1-conflict-detection-only-compares
+%% logics-signature: request|wire-endpoint-reference-rename-conflict-|correct-the-save-time-conflict-detection|ac1-save-time-conflict-detection-only-co
 flowchart TD
     Trigger[Wire endpoint rename save] --> Detect[Detect same kind and same reference only]
     Trigger --> Resolve[Resolve chosen name for matching reference group]

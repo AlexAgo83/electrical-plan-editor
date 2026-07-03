@@ -8,6 +8,7 @@
 > Complexity: High
 > Theme: Validation and Export
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
+> Non-semantic edit: refreshed Mermaid signatures
 
 # Problem
 The multi-harness workflow adds new persisted entities and cross-harness references. The system needs validation, import/export compatibility, and regression coverage so broken links, deleted harnesses, mismatched pins, and legacy data do not corrupt assemblies or functional traces.
@@ -26,7 +27,7 @@ The multi-harness workflow adds new persisted entities and cross-harness referen
 
 ```mermaid
 %% logics-kind: backlog
-%% logics-signature: backlog|multi-harness-validation-import-export|req-122-multi-harness|references-and-round-trip|ac1-validation-reports-issues
+%% logics-signature: backlog|multi-harness-validation-import-export-a|req-122-multi-harness-super-category-and|the-multi-harness-workflow-adds-new-pers|ac1-validation-reports-broken-harness-re
 flowchart TD
     Request[req 122 multi harness] --> Problem[Need safe cross references]
     Problem --> Scope[Validation and round trip]
