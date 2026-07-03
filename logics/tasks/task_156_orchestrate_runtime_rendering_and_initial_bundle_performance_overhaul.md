@@ -4,7 +4,7 @@
 > Status: In progress
 > Understanding: 95
 > Confidence: 90
-> Progress: 70
+> Progress: 85
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -17,7 +17,7 @@
 - [x] 1. Land the locale-observer gating slice first (lowest risk, immediate win multiplied by every render): implemented, i18n suites passed, backlog closed.
 - [x] 2. Land the bundle code-splitting slice: removed app manualChunks, moved app bootstrap behind dynamic entry import, verified exceljs/PWA/e2e, re-baselined budgets.
 - [ ] 3. Land the render-containment slice: rAF coalescing in useCanvasInteractionHandlers, memo boundaries on workspace containers with stabilized props at the AppController seam, render-count regression harness; validate drag/pan feel via the built app on the sample networks.
-- [ ] 4. Land the persistence idle-scheduling slice last: idle-scheduled steady-state writes, unchanged sync flush semantics, duration instrumentation.
+- [x] 4. Land the persistence idle-scheduling slice last: idle-scheduled steady-state writes, unchanged sync flush semantics, duration instrumentation.
 - [ ] 5. Run the full ci:blocking pipeline; capture final bundle metrics and render-count evidence in the task closeout; validate and close the request chain.
 - [ ] GATE: do not close until lint, audit, and scaffold validation pass.
 
@@ -86,6 +86,8 @@
 - Validation: `npx vitest run src/tests/app.ui.render-containment.spec.tsx src/tests/canvas-interaction-handlers.hook.spec.ts src/tests/app.ui.navigation-canvas-interactions.spec.tsx --pool=forks --maxWorkers=2 --testTimeout=15000`; `npm run -s quality:ui-modularization`; `npm run -s quality:hooks-modularization`; `npm run -s typecheck`; `npm run -s lint`.
 - Slice `item_647` partial: shared panel memo comparator added; render-count coverage now also proves modeling tables stay flat during connector form typing while the owning form column renders.
 - Remaining `item_647` gap: NetworkSummaryPanel still receives recreated non-canvas props during form typing; finish with AppController seam stabilization before closing this backlog item.
+- Slice `item_650` delivered: debounced steady-state saves now run through requestIdleCallback with a setTimeout fallback; sync pagehide/visibility/detach flush still cancels pending idle work and writes immediately.
+- Validation: `npx vitest run src/tests/store.persistence-durability.spec.ts src/tests/store.create-store.spec.ts src/tests/app.ui.persistence-feedback.spec.tsx --pool=forks --maxWorkers=2 --testTimeout=15000`; `npm run -s quality:ui-timeout-governance`; `npm run -s typecheck`; `npm run -s lint`.
 
 # AI Context
 - Summary: Orchestrate runtime rendering and initial bundle performance overhaul

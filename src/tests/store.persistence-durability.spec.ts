@@ -96,20 +96,81 @@ describe("attachPersistenceSync durability", () => {
     expect(save).not.toHaveBeenCalled();
   });
 
-  it("does not perform an extra save on detach in synchronous mode (AC4)", () => {
+  it("does not perform an extra save on detach after an idle save has run (AC4)", () => {
+    vi.useFakeTimers();
     const store = createAppStore(createInitialState());
     const save = vi.fn().mockReturnValue({ ok: true as const });
     const saveSync = vi.fn().mockReturnValue({ ok: true as const });
     const detach = attachPersistenceSync(store, { save, saveSync, debounceMs: 0 });
 
-    dispatchConnector(store, "C1");
-    expect(save).toHaveBeenCalledTimes(1);
+    try {
+      dispatchConnector(store, "C1");
+      expect(save).not.toHaveBeenCalled();
 
-    detach();
+      vi.runOnlyPendingTimers();
+      expect(save).toHaveBeenCalledTimes(1);
 
-    // No pending timer in synchronous mode, so detach adds no save.
-    expect(save).toHaveBeenCalledTimes(1);
-    expect(saveSync).not.toHaveBeenCalled();
+      detach();
+
+      expect(save).toHaveBeenCalledTimes(1);
+      expect(saveSync).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("runs steady-state saves through idle scheduling instead of the subscription callback", () => {
+    const store = createAppStore(createInitialState());
+    const save = vi.fn().mockReturnValue({ ok: true as const });
+    const idleCallbackRef: { current: (() => void) | null } = { current: null };
+    const requestIdleCallback = vi.fn((callback: () => void) => {
+      idleCallbackRef.current = callback;
+      return 1;
+    });
+    const cancelIdleCallback = vi.fn();
+    Object.defineProperty(window, "requestIdleCallback", { configurable: true, value: requestIdleCallback });
+    Object.defineProperty(window, "cancelIdleCallback", { configurable: true, value: cancelIdleCallback });
+    const detach = attachPersistenceSync(store, { save, saveSync: vi.fn().mockReturnValue({ ok: true as const }), debounceMs: 0 });
+
+    try {
+      dispatchConnector(store, "C1");
+
+      expect(requestIdleCallback).toHaveBeenCalledTimes(1);
+      expect(save).not.toHaveBeenCalled();
+
+      if (idleCallbackRef.current === null) {
+        throw new Error("Expected a scheduled idle callback.");
+      }
+      idleCallbackRef.current();
+      expect(save).toHaveBeenCalledTimes(1);
+    } finally {
+      detach();
+      delete (window as unknown as Record<string, unknown>).requestIdleCallback;
+      delete (window as unknown as Record<string, unknown>).cancelIdleCallback;
+    }
+  });
+
+  it("debounces a burst of edits into one idle save", () => {
+    vi.useFakeTimers();
+    const store = createAppStore(createInitialState());
+    const save = vi.fn().mockReturnValue({ ok: true as const });
+    const detach = attachPersistenceSync(store, { save, saveSync: vi.fn().mockReturnValue({ ok: true as const }), debounceMs: 20 });
+
+    try {
+      dispatchConnector(store, "C1");
+      vi.advanceTimersByTime(10);
+      dispatchConnector(store, "C2");
+      vi.advanceTimersByTime(10);
+      dispatchConnector(store, "C3");
+
+      expect(save).not.toHaveBeenCalled();
+      vi.runOnlyPendingTimers();
+      vi.runOnlyPendingTimers();
+      expect(save).toHaveBeenCalledTimes(1);
+    } finally {
+      detach();
+      vi.useRealTimers();
+    }
   });
 
   it("removes its lifecycle listeners on detach (AC7)", () => {

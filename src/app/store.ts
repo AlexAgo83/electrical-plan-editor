@@ -15,6 +15,22 @@ interface AttachPersistenceSyncOptions {
 }
 
 const DEFAULT_PERSISTENCE_DEBOUNCE_MS = 200;
+type IdleCallbackHandle = ReturnType<typeof setTimeout> | number;
+
+function requestPersistenceIdleCallback(callback: () => void): IdleCallbackHandle {
+  if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+    return window.requestIdleCallback(callback);
+  }
+  return setTimeout(callback, 0);
+}
+
+function cancelPersistenceIdleCallback(handle: IdleCallbackHandle): void {
+  if (typeof window !== "undefined" && "cancelIdleCallback" in window && typeof handle === "number") {
+    window.cancelIdleCallback(handle);
+    return;
+  }
+  clearTimeout(handle);
+}
 
 function mapPersistenceResultToMessage(result: SaveStateResult): string | null {
   if (!result.ok) {
@@ -47,6 +63,7 @@ export function attachPersistenceSync(store: AppStore, options?: AttachPersisten
   let isApplyingPersistenceFeedback = false;
   let saveSequence = 0;
   let pendingTimerId: ReturnType<typeof setTimeout> | null = null;
+  let pendingIdleId: IdleCallbackHandle | null = null;
 
   function applyPersistenceFeedback(saveResult: SaveStateResult): void {
     const nextState = store.getState();
@@ -85,11 +102,12 @@ export function attachPersistenceSync(store: AppStore, options?: AttachPersisten
     isApplyingPersistenceFeedback = false;
   }
 
-  function flushPendingSave(): void {
-    pendingTimerId = null;
+  function runPendingSave(): void {
+    pendingIdleId = null;
     const currentState = store.getState();
     const currentSequence = saveSequence + 1;
     saveSequence = currentSequence;
+    const startedAt = typeof performance === "undefined" ? 0 : performance.now();
 
     void Promise.resolve(save(currentState))
       .then((saveResult) => {
@@ -105,7 +123,25 @@ export function attachPersistenceSync(store: AppStore, options?: AttachPersisten
         }
 
         applyWriteFailureFeedback();
+      })
+      .finally(() => {
+        if (
+          typeof performance !== "undefined" &&
+          import.meta.env.DEV &&
+          typeof localStorage !== "undefined" &&
+          localStorage.getItem("debug:persistence") === "true"
+        ) {
+          console.debug(`[persistence] steady-state save took ${(performance.now() - startedAt).toFixed(1)}ms`);
+        }
       });
+  }
+
+  function flushPendingSave(): void {
+    pendingTimerId = null;
+    if (pendingIdleId !== null) {
+      cancelPersistenceIdleCallback(pendingIdleId);
+    }
+    pendingIdleId = requestPersistenceIdleCallback(runPendingSave);
   }
 
   // Synchronous flush for page-lifecycle transitions and detach. A pending
@@ -114,12 +150,18 @@ export function attachPersistenceSync(store: AppStore, options?: AttachPersisten
   // must be synchronous because the page can be discarded before any awaited
   // microtask runs.
   function flushPendingSaveSync(): void {
-    if (pendingTimerId === null) {
+    if (pendingTimerId === null && pendingIdleId === null) {
       return;
     }
 
-    clearTimeout(pendingTimerId);
+    if (pendingTimerId !== null) {
+      clearTimeout(pendingTimerId);
+    }
     pendingTimerId = null;
+    if (pendingIdleId !== null) {
+      cancelPersistenceIdleCallback(pendingIdleId);
+      pendingIdleId = null;
+    }
     // Invalidate any in-flight async save so its late feedback cannot clobber this one.
     saveSequence += 1;
 
@@ -168,6 +210,10 @@ export function attachPersistenceSync(store: AppStore, options?: AttachPersisten
     if (pendingTimerId !== null) {
       clearTimeout(pendingTimerId);
       pendingTimerId = null;
+    }
+    if (pendingIdleId !== null) {
+      cancelPersistenceIdleCallback(pendingIdleId);
+      pendingIdleId = null;
     }
     if (supportsDomLifecycle) {
       window.removeEventListener("pagehide", handlePageHide);
