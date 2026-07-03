@@ -54,6 +54,30 @@ export default tseslint.config(
     }
   },
   {
+    files: ["src/app/hooks/controller/useAppControllerModelingAnalysisScreenDomains.tsx"],
+    rules: { "max-lines": ["error", { max: 1557, skipBlankLines: false, skipComments: false }] }
+  },
+  {
+    files: ["src/app/hooks/controller/useAppControllerNetworkSummaryPanelDomain.tsx"],
+    rules: { "max-lines": ["error", { max: 825, skipBlankLines: false, skipComments: false }] }
+  },
+  {
+    files: ["src/app/hooks/controller/useAppControllerScreenContentSlices.tsx"],
+    rules: { "max-lines": ["error", { max: 1201, skipBlankLines: false, skipComments: false }] }
+  },
+  {
+    files: ["src/app/hooks/useUiPreferences.ts"],
+    rules: { "max-lines": ["error", { max: 920, skipBlankLines: false, skipComments: false }] }
+  },
+  {
+    files: ["src/app/hooks/useWireHandlers.ts"],
+    rules: { "max-lines": ["error", { max: 971, skipBlankLines: false, skipComments: false }] }
+  },
+  {
+    files: ["src/app/hooks/validation/buildValidationIssues.ts"],
+    rules: { "max-lines": ["error", { max: 869, skipBlankLines: false, skipComments: false }] }
+  },
+  {
     files: ["src/app/AppController.tsx"],
     rules: {
       "max-lines": ["error", { max: 1100, skipBlankLines: false, skipComments: false }]

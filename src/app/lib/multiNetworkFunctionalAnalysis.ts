@@ -22,7 +22,7 @@ import { findHiddenPrefixCollisions } from "../../core/networkEntityPrefix";
 import {
   appendElectricalDimensioningIssues,
   ELECTRICAL_DIMENSIONING_CATEGORY
-} from "../hook-impl/validation/appendElectricalDimensioningIssues";
+} from "../hooks/validation/appendElectricalDimensioningIssues";
 import type { ValidationIssue } from "../types/app-controller";
 
 export type MultiNetworkFunctionalAnalysisScope = "current" | "assembly" | "custom";

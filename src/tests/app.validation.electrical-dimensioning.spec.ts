@@ -9,7 +9,7 @@ import type {
   Wire,
   WireId
 } from "../core/entities";
-import { appendElectricalDimensioningIssues, ELECTRICAL_DIMENSIONING_CATEGORY } from "../app/hook-impl/validation/appendElectricalDimensioningIssues";
+import { appendElectricalDimensioningIssues, ELECTRICAL_DIMENSIONING_CATEGORY } from "../app/hooks/validation/appendElectricalDimensioningIssues";
 import type { ValidationIssue } from "../app/types/app-controller";
 import { createSampleNetworkState } from "../store";
 

@@ -28,6 +28,7 @@ export function appendElectricalDimensioningIssues(
 ): void {
   const { connectors, splices, wires, catalogItems, network } = params;
 
+
   const catalogItemsById = new Map<CatalogItemId, CatalogItem>();
   for (const item of catalogItems) {
     catalogItemsById.set(item.id, item);
