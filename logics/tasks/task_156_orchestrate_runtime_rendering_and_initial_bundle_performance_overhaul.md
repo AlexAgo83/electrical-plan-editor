@@ -4,7 +4,7 @@
 > Status: In progress
 > Understanding: 95
 > Confidence: 90
-> Progress: 25
+> Progress: 50
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -15,7 +15,7 @@
 
 # Plan
 - [x] 1. Land the locale-observer gating slice first (lowest risk, immediate win multiplied by every render): implemented, i18n suites passed, backlog closed.
-- [ ] 2. Land the bundle code-splitting slice: remove app manualChunks, verify exceljs boundary and e2e screens, re-baseline budgets in report-bundle-metrics.mjs, record before/after metrics.
+- [x] 2. Land the bundle code-splitting slice: removed app manualChunks, moved app bootstrap behind dynamic entry import, verified exceljs/PWA/e2e, re-baselined budgets.
 - [ ] 3. Land the render-containment slice: rAF coalescing in useCanvasInteractionHandlers, memo boundaries on workspace containers with stabilized props at the AppController seam, render-count regression harness; validate drag/pan feel via the built app on the sample networks.
 - [ ] 4. Land the persistence idle-scheduling slice last: idle-scheduled steady-state writes, unchanged sync flush semantics, duration instrumentation.
 - [ ] 5. Run the full ci:blocking pipeline; capture final bundle metrics and render-count evidence in the task closeout; validate and close the request chain.
@@ -77,6 +77,9 @@
 # Report
 - Slice `item_648` delivered: base locale now restores once without attaching the DOM translation observer; attribute-only mutations translate only the mutated element attributes.
 - Validation: `npx vitest run src/tests/app.locale-dom-translation.spec.tsx src/tests/app.ui.settings-locale.spec.tsx --pool=forks --maxWorkers=2 --testTimeout=15000`; `npm run -s lint`; `npm run -s typecheck`.
+- Slice `item_649` delivered: app-code manual chunks removed, app bootstrap moved behind dynamic import from `main.tsx`, and bundle metrics now fail on budget regression.
+- Bundle metrics: baseline initial JS gzip 317 KiB; post-slice initial JS gzip 121.75 KiB across 4 index modules; largest initial chunk 258.07 KiB raw; total JS gzip 824.30 KiB across 136 chunks.
+- Validation: `npm run -s build:bundle:report`; `npm run -s typecheck`; `npm run -s lint`; `npm run -s quality:exceljs-boundary`; `npm run -s quality:pwa`; `npx vitest run src/tests/app.ui.settings-locale.spec.tsx src/tests/app.ui.persistence-feedback.spec.tsx --pool=forks --maxWorkers=2 --testTimeout=15000`; `npm run -s test:e2e`.
 
 # AI Context
 - Summary: Orchestrate runtime rendering and initial bundle performance overhaul

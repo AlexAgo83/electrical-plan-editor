@@ -1,10 +1,10 @@
 ## item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets - Restore route-level code splitting and re-baseline bundle budgets
 > From version: 1.17.2
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Runtime performance and bundle efficiency
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.

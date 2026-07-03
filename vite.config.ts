@@ -93,24 +93,6 @@ export default defineConfig(({ mode }) => {
             if (id.includes("/src/app/lib/aiAgent") || id.includes("/src/app/components/workspace/ModelingAiAgentPanel")) {
               return "feature-ai-agent";
             }
-            if (id.includes("/src/app/lib/i18n")) {
-              return "app-i18n";
-            }
-            if (id.includes("/src/core/")) {
-              return "domain-core";
-            }
-            if (id.includes("/src/store/")) {
-              return "domain-store";
-            }
-            if (id.includes("/src/adapters/")) {
-              return "app-adapters";
-            }
-            if (id.includes("/src/app/hooks/controller/") || id.includes("/src/app/hook-impl/controller/")) {
-              return "app-controller-domain";
-            }
-            if (id.includes("/src/app/hooks/") || id.includes("/src/app/hook-impl/")) {
-              return "app-hooks";
-            }
             return undefined;
           }
         }

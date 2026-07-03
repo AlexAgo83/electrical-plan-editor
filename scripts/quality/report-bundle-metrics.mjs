@@ -3,7 +3,8 @@ import path from "node:path";
 import { gzipSync } from "node:zlib";
 
 const MAIN_CHUNK_WARN_BYTES = Number(process.env.BUNDLE_MAIN_WARN_BYTES ?? 500 * 1024);
-const TOTAL_GZIP_WARN_BYTES = Number(process.env.BUNDLE_TOTAL_GZIP_WARN_BYTES ?? 220 * 1024);
+const INITIAL_GZIP_WARN_BYTES = Number(process.env.BUNDLE_INITIAL_GZIP_WARN_BYTES ?? 130 * 1024);
+const TOTAL_GZIP_WARN_BYTES = Number(process.env.BUNDLE_TOTAL_GZIP_WARN_BYTES ?? 850 * 1024);
 const TOP_CHUNK_COUNT = Number(process.env.BUNDLE_TOP_CHUNK_COUNT ?? 8);
 
 function formatKiB(bytes) {
@@ -87,7 +88,7 @@ function classifyAsset(asset) {
   return tags.join(", ");
 }
 
-console.log("[bundle:metrics] informational non-blocking budget report");
+console.log("[bundle:metrics] budget report");
 console.log(
   `[bundle:metrics] entry JS chunk: ${entryScriptChunk.fileName} (${formatKiB(entryScriptChunk.rawBytes)} raw / ${formatKiB(entryScriptChunk.gzipBytes)} gzip)`
 );
@@ -104,7 +105,7 @@ console.log(
   `[bundle:metrics] total JS gzip: ${formatKiB(totalJsGzipBytes)} across ${jsAssets.length} chunks`
 );
 console.log(
-  `[bundle:metrics] warning budgets: largest initial chunk <= ${formatKiB(MAIN_CHUNK_WARN_BYTES)} raw, total JS gzip <= ${formatKiB(TOTAL_GZIP_WARN_BYTES)}`
+  `[bundle:metrics] budgets: largest initial chunk <= ${formatKiB(MAIN_CHUNK_WARN_BYTES)} raw, initial JS gzip <= ${formatKiB(INITIAL_GZIP_WARN_BYTES)}, total JS gzip <= ${formatKiB(TOTAL_GZIP_WARN_BYTES)}`
 );
 console.log(`[bundle:metrics] top ${topChunks.length} JS chunks:`);
 for (const asset of topChunks) {
@@ -113,15 +114,19 @@ for (const asset of topChunks) {
   );
 }
 
+const budgetFailures = [];
 if (largestInitialChunk.rawBytes > MAIN_CHUNK_WARN_BYTES) {
-  console.warn(
-    `[bundle:metrics] warning: largest initial chunk exceeds budget by ${formatKiB(largestInitialChunk.rawBytes - MAIN_CHUNK_WARN_BYTES)}`
-  );
+  budgetFailures.push(`largest initial chunk exceeds budget by ${formatKiB(largestInitialChunk.rawBytes - MAIN_CHUNK_WARN_BYTES)}`);
+}
+if (initialJsGzipBytes > INITIAL_GZIP_WARN_BYTES) {
+  budgetFailures.push(`initial JS gzip exceeds budget by ${formatKiB(initialJsGzipBytes - INITIAL_GZIP_WARN_BYTES)}`);
 }
 if (totalJsGzipBytes > TOTAL_GZIP_WARN_BYTES) {
-  console.warn(
-    `[bundle:metrics] warning: total JS gzip exceeds budget by ${formatKiB(totalJsGzipBytes - TOTAL_GZIP_WARN_BYTES)}`
-  );
+  budgetFailures.push(`total JS gzip exceeds budget by ${formatKiB(totalJsGzipBytes - TOTAL_GZIP_WARN_BYTES)}`);
 }
 
-process.exit(0);
+for (const failure of budgetFailures) {
+  console.error(`[bundle:metrics] budget failure: ${failure}`);
+}
+
+process.exit(budgetFailures.length === 0 ? 0 : 1);
