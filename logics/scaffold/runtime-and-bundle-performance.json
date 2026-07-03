@@ -1,0 +1,190 @@
+{
+  "title": "Runtime rendering and initial bundle performance overhaul",
+  "references": [
+    "src/app/AppController.tsx",
+    "src/app/hooks/useAppSnapshot.ts",
+    "src/app/hooks/useCanvasState.ts",
+    "src/app/hooks/useCanvasInteractionHandlers.ts",
+    "src/app/hooks/useAppLocaleDomTranslation.ts",
+    "src/app/store.ts",
+    "src/adapters/persistence/localStorage.ts",
+    "vite.config.ts",
+    "scripts/quality/report-bundle-metrics.mjs"
+  ],
+  "request": {
+    "complexity": "High",
+    "theme": "Runtime performance and bundle efficiency",
+    "needs": [
+      "Dragging a node or panning the network canvas must stay smooth on large networks: pointer-move interactions must not re-render the whole application tree on every mouse event.",
+      "Typing in modeling or catalog form fields must not trigger reconciliation of unrelated workspace panels (tables, network summary, statistics).",
+      "The locale DOM-translation MutationObserver must not add a full-subtree scan cost after every render when the active locale is the base locale (en), and attribute mutations must not re-walk entire subtrees in any locale.",
+      "First-load JavaScript must respect the bundle budgets already enforced informationally by scripts/quality/report-bundle-metrics.mjs: today the largest initial chunk (app-controller-domain, 722 KiB raw / 177 KiB gzip) exceeds the 500 KiB raw budget and total JS gzip (817 KiB) exceeds the 220 KiB budget.",
+      "Persisting the workspace must not block the main thread with a synchronous full-state JSON serialization on every edit; the existing synchronous flush on pagehide/visibilitychange must be preserved so no data is lost."
+    ],
+    "context": [
+      "AppController.tsx is the single store subscriber via useAppSnapshot, which returns the full immutable state without selectors; all transient UI state (form fields, canvas offset/scale, manual node positions) lives in useState hooks called from AppController, so every keystroke and every pointer-move during drag/pan re-renders the entire component tree.",
+      "No component under src/app/components uses React.memo today; heavy panels rely on internal useMemo which limits recomputation but not reconciliation.",
+      "useCanvasInteractionHandlers.handleNetworkMouseMove calls setManualNodePositions/setNetworkOffset once per raw mouse event with no requestAnimationFrame coalescing.",
+      "useAppLocaleDomTranslation attaches a MutationObserver on document.body (subtree + childList + characterData + attributes) and walks changed subtrees with a TreeWalker doing per-text-node dictionary lookups; in locale en the walk is a near-no-op restore pass, and an attribute mutation triggers a full translateSubtree of the mutated element.",
+      "vite.config.ts manualChunks forces all of src/app/hooks/controller and src/app/hook-impl/controller into one app-controller-domain chunk that is loaded initially, defeating the route-level code splitting provided by the lazy workspace screens in appUiModules.tsx.",
+      "src/adapters/persistence/localStorage.ts serializes the entire multi-network state with JSON.stringify and writes it synchronously to localStorage on every store change (200 ms debounce in attachPersistenceSync); flushPendingSaveSync on pagehide is deliberate and documented and must survive any refactor.",
+      "The bundle budget report is informational (non-blocking) today; exceljs is already lazy-only and excluded from service-worker precache and must remain so (quality:exceljs-boundary gate)."
+    ],
+    "acceptance_criteria": [
+      "AC1: During node drag and canvas pan, canvas view state updates are coalesced to at most one React commit per animation frame, and the commit is contained below a memo boundary so workspace panels outside the canvas (tables, forms columns, statistics) do not re-render per frame.",
+      "AC2: Typing into a modeling or catalog form field re-renders only the owning form column; memoized boundaries around the other workspace containers keep their render counts flat, proven by a render-count regression test.",
+      "AC3: When the active locale is the base locale (en), the DOM-translation MutationObserver is not attached (or is disconnected) and locale switching to/from fr still restores and translates all text and translatable attributes correctly.",
+      "AC4: In locale fr, an attribute-only mutation translates only the affected element's translatable attributes without re-walking the element's entire subtree.",
+      "AC5: The production build has no app-controller-domain initial mega-chunk: controller hook code loads with the workspace screens that use it, the largest initial JS chunk is under the 500 KiB raw budget, and initial JS gzip decreases by at least 30% versus the 317 KiB baseline recorded by report-bundle-metrics.mjs.",
+      "AC6: Bundle budgets in report-bundle-metrics.mjs are re-baselined to values the new build actually meets (including a distinct initial-JS budget), and the report clearly fails those budgets on regression.",
+      "AC7: Steady-state persistence writes happen off the critical input path (async scheduling of serialization) while the synchronous flush on pagehide/visibilitychange and on detach is preserved, with existing persistence quota/failure feedback messages unchanged.",
+      "AC8: Existing unit, UI, and e2e suites pass unchanged in behavior; new regression coverage exists for render containment, locale-observer gating, and persistence flush semantics."
+    ]
+  },
+  "product": {
+    "title": "Editor responsiveness and load-time performance",
+    "overview": "Keep the local-first editor responsive while modeling large networks and cut first-load JavaScript, without changing any modeling behavior or persistence guarantees.",
+    "goals": [
+      "Smooth canvas drag/pan and form typing on large networks by containing re-renders to the components that actually changed.",
+      "Eliminate avoidable DOM-translation overhead in the base locale.",
+      "Restore effective route-level code splitting so first load only ships what the visible screen needs.",
+      "Move steady-state persistence serialization off the critical input path without weakening the page-lifecycle data-loss guarantees."
+    ],
+    "non_goals": [
+      "No visual or functional change to modeling, validation, import/export, or undo/redo behavior.",
+      "No replacement of the custom store with an external state library.",
+      "No migration of persistence storage backend (localStorage remains the store; IndexedDB is out of scope).",
+      "No change to the exceljs lazy-loading boundary or PWA offline strategy."
+    ]
+  },
+  "backlog_items": [
+    {
+      "title": "Contain canvas drag/pan and form re-renders with rAF coalescing and memo boundaries",
+      "priority": "High",
+      "complexity": "High",
+      "theme": "Runtime performance and bundle efficiency",
+      "request_acs": ["AC1", "AC2", "AC8"],
+      "problem": [
+        "All transient UI state (canvas offset/scale/manual node positions, every form field) lives in useState hooks called from AppController, the single subscriber to the full store snapshot.",
+        "No component under src/app/components is wrapped in React.memo, so every keystroke and every raw mouse event during drag/pan reconciles the entire application tree.",
+        "handleNetworkMouseMove dispatches setState once per mouse event with no requestAnimationFrame coalescing, so drag/pan degrades first on large networks."
+      ],
+      "scope_in": [
+        "Coalesce pointer-move driven canvas state updates (manualNodePositions, networkOffset) to one commit per animation frame in useCanvasInteractionHandlers, flushing any pending frame on pointer-up so the committed positions are exact.",
+        "Introduce React.memo boundaries on the workspace containers (src/app/components/containers/*) and the heavy panels they host (NetworkSummaryPanel, modeling tables, forms columns), with stable prop objects (useMemo/useCallback) at the AppController seam so the boundaries actually hold.",
+        "Move canvas-transient state consumption below the memo boundary of the canvas panel so per-frame commits re-render only the canvas subtree.",
+        "Add a render-count regression test (React Profiler or render-spy components) proving that a form keystroke and a simulated drag frame do not re-render the other workspace containers."
+      ],
+      "scope_out": [
+        "Selector-based store subscriptions (splitting useAppSnapshot into per-slice subscriptions) — larger refactor, only if memo boundaries prove insufficient.",
+        "Any behavior change to snap-to-grid, drag thresholds, selection, or undo/redo semantics.",
+        "Virtualization of tables or SVG element culling."
+      ],
+      "acceptance_criteria": [
+        "AC1: A continuous drag or pan produces at most one canvas state commit per animation frame, verified by a test driving multiple synthetic mouse-move events inside one frame.",
+        "AC2: Pointer-up flushes the last pending frame so final node positions match the last mouse position exactly (snap-to-grid behavior unchanged).",
+        "AC3: A keystroke in a catalog or modeling form field does not re-render NetworkSummaryPanel, modeling tables, or other workspace containers, proven by a render-count regression test.",
+        "AC4: A drag frame does not re-render workspace panels outside the canvas subtree, proven by the same regression harness.",
+        "AC5: All existing canvas interaction, forms, and e2e suites pass without behavioral changes."
+      ]
+    },
+    {
+      "title": "Gate the locale DOM-translation observer in base locale and scope attribute re-walks",
+      "priority": "High",
+      "complexity": "Low",
+      "theme": "Runtime performance and bundle efficiency",
+      "request_acs": ["AC3", "AC4", "AC8"],
+      "problem": [
+        "useAppLocaleDomTranslation observes document.body for all subtree/childList/characterData/attribute mutations and walks changed subtrees after every render, multiplying the cost of the full-tree re-render problem.",
+        "In locale en the observer work is a near-no-op restore pass on nodes that are already in the base language, yet it still runs on every mutation.",
+        "An attribute mutation calls translateSubtree on the element, re-walking its entire subtree when only the element's own translatable attributes could have changed."
+      ],
+      "scope_in": [
+        "Do not attach the MutationObserver when locale is en; on switching en -> fr run the initial full translateSubtree pass and attach the observer; on fr -> en run one restore pass then disconnect.",
+        "Handle the attributes mutation type by translating only the mutated element's translatable attributes (translateElementAttributes) instead of walking the subtree.",
+        "Unit tests covering: en session performs no observer work on DOM mutations; fr -> en -> fr round-trip restores base text and re-translates; attribute-only mutation in fr does not visit descendant text nodes."
+      ],
+      "scope_out": [
+        "Any change to the translation dictionary, translateTextValue semantics, or data-locale-exempt behavior.",
+        "Migrating away from DOM-based translation to component-level i18n."
+      ],
+      "acceptance_criteria": [
+        "AC1: With locale en, no MutationObserver is connected for translation and DOM mutations trigger no translation work, verified by unit test.",
+        "AC2: Switching en -> fr translates the existing document and newly added nodes; switching back to en restores all base-language text and attributes, including nodes added while fr was active.",
+        "AC3: In fr, an attribute-only mutation translates only that element's aria-label/aria-description/placeholder/title and does not traverse its descendants, verified by test instrumentation.",
+        "AC4: Existing i18n and locale-switch test suites pass unchanged."
+      ]
+    },
+    {
+      "title": "Restore route-level code splitting and re-baseline bundle budgets",
+      "priority": "High",
+      "complexity": "Medium",
+      "theme": "Runtime performance and bundle efficiency",
+      "request_acs": ["AC5", "AC6", "AC8"],
+      "problem": [
+        "vite.config.ts manualChunks forces all controller hooks (src/app/hooks/controller, src/app/hook-impl/controller) plus other app-wide groupings into named chunks; app-controller-domain (722 KiB raw / 177 KiB gzip) is loaded initially even though most of it belongs to lazily loaded workspace screens.",
+        "Initial JS is 317 KiB gzip across 7 chunks; the informational budget report flags both the largest-initial-chunk budget (500 KiB raw) and the total-JS-gzip budget (220 KiB) as exceeded, and the total budget is currently unattainable, so the report is permanently red and useless as a regression signal."
+      ],
+      "scope_in": [
+        "Remove app-code manualChunks rules (domain-core, domain-store, app-adapters, app-controller-domain, app-hooks, app-i18n) and let Rollup split along the existing dynamic imports in appUiModules.tsx; keep vendor-react, vendor-pwa, and the feature-ai-agent isolation.",
+        "Verify the exceljs boundary still holds (lazy-only, excluded from precache) and quality:exceljs-boundary stays green.",
+        "Re-baseline scripts/quality/report-bundle-metrics.mjs budgets to post-split reality: add a distinct initial-JS-gzip budget, set the total-JS-gzip budget to an attainable ceiling, and keep the report failing loudly when a budget regresses.",
+        "Record before/after metrics (initial gzip, largest initial chunk, chunk count) in the task closeout."
+      ],
+      "scope_out": [
+        "Splitting the monolithic index CSS file per route.",
+        "Changing the service-worker precache strategy or moving changelogs to runtime caching.",
+        "Reducing react-markdown/remark-gfm weight."
+      ],
+      "acceptance_criteria": [
+        "AC1: The production build contains no initial JS chunk above 500 KiB raw, and controller hook code is loaded with the lazy workspace screens that consume it rather than at startup.",
+        "AC2: Initial JS gzip (index.html module chunks) is at least 30% below the 317 KiB baseline, as measured by report-bundle-metrics.mjs.",
+        "AC3: report-bundle-metrics.mjs enforces re-baselined budgets including a dedicated initial-JS-gzip budget, and all budgets pass on the new build.",
+        "AC4: exceljs remains lazy-only and precache-excluded (quality:exceljs-boundary and quality:pwa pass), and all screens still load correctly in the built app (e2e suite green)."
+      ]
+    },
+    {
+      "title": "Move steady-state persistence serialization off the critical input path",
+      "priority": "Medium",
+      "complexity": "Medium",
+      "theme": "Runtime performance and bundle efficiency",
+      "request_acs": ["AC7", "AC8"],
+      "problem": [
+        "Every store change schedules (200 ms debounce) a JSON.stringify of the entire multi-network state followed by a synchronous localStorage.setItem on the main thread; on large workspaces this causes a per-edit jank spike right after the user stops typing or dragging.",
+        "The synchronous flush on pagehide/visibilitychange/detach is a deliberate data-loss guard and must not be weakened."
+      ],
+      "scope_in": [
+        "Schedule the debounced steady-state serialization+write during idle time (requestIdleCallback with a setTimeout fallback) so it does not compete with input handling, keeping the existing debounce and save-sequence invalidation logic.",
+        "Preserve flushPendingSaveSync exactly: synchronous serialize+write on pagehide, visibilitychange-hidden, and detach, including invalidation of in-flight async saves.",
+        "Keep the persistence feedback messages (write failure, quota exceeded, near-quota warning) and their set/clear semantics unchanged.",
+        "Add a lightweight duration measurement (dev-only or debug-gated) around the serialize+write so future regressions are observable."
+      ],
+      "scope_out": [
+        "IndexedDB or any storage backend migration.",
+        "Per-network delta serialization or state schema changes.",
+        "Web worker offloading of serialization."
+      ],
+      "acceptance_criteria": [
+        "AC1: Steady-state saves run via idle scheduling and never execute synchronously inside the store-subscription callback, verified by unit test on attachPersistenceSync.",
+        "AC2: pagehide, visibilitychange-hidden, and detach still perform a synchronous flush that wins over any in-flight async save (existing sequence-invalidation tests still pass).",
+        "AC3: Quota/failure/near-quota feedback messages behave exactly as before, covered by the existing persistence feedback tests.",
+        "AC4: A rapid burst of edits results in a bounded number of writes (debounce preserved), verified by test."
+      ]
+    }
+  ],
+  "orchestration_task": {
+    "title": "Orchestrate runtime rendering and initial bundle performance overhaul",
+    "plan": [
+      "Land the locale-observer gating slice first (lowest risk, immediate win multiplied by every render): implement, run i18n suites, close.",
+      "Land the bundle code-splitting slice: remove app manualChunks, verify exceljs boundary and e2e screens, re-baseline budgets in report-bundle-metrics.mjs, record before/after metrics.",
+      "Land the render-containment slice: rAF coalescing in useCanvasInteractionHandlers, memo boundaries on workspace containers with stabilized props at the AppController seam, render-count regression harness; validate drag/pan feel via the built app on the sample networks.",
+      "Land the persistence idle-scheduling slice last: idle-scheduled steady-state writes, unchanged sync flush semantics, duration instrumentation.",
+      "Run the full ci:blocking pipeline; capture final bundle metrics and render-count evidence in the task closeout; validate and close the request chain."
+    ]
+  },
+  "context_pack": {
+    "out": "logics/context-packs/runtime-and-bundle-performance.json",
+    "mode": "summary-only",
+    "profile": "normal"
+  }
+}

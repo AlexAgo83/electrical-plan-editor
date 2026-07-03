@@ -1,0 +1,320 @@
+{
+  "budgets": {
+    "max_docs": 24,
+    "max_docs_per_ref": 4
+  },
+  "changed_paths": [],
+  "command": "logics-manager sync context-pack req_161_runtime_rendering_and_initial_bundle_performance_overhaul item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets item_650_move_steady_state_persistence_serialization_off_the_critical_input_path task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul --mode summary-only --profile normal --handoff",
+  "companion_docs": [
+    {
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries",
+          "item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks",
+          "item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets",
+          "item_650_move_steady_state_persistence_serialization_off_the_critical_input_path"
+        ],
+        "prod": [
+          "prod_012_editor_responsiveness_and_load_time_performance"
+        ],
+        "req": [
+          "req_161_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ],
+        "task": [
+          "task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ]
+      },
+      "path": "logics/product/prod_012_editor_responsiveness_and_load_time_performance.md",
+      "ref": "prod_012_editor_responsiveness_and_load_time_performance",
+      "status": "Proposed",
+      "title": "Editor responsiveness and load-time performance"
+    }
+  ],
+  "docs": [
+    {
+      "ai_context": {
+        "keywords": "request-chain-scaffold, runtime rendering and initial bundle performance overhaul, development-ready",
+        "skip when": "The change is unrelated to this scaffolded request chain.",
+        "summary": "Runtime rendering and initial bundle performance overhaul",
+        "use when": "You need to implement or review the scaffolded workflow for Runtime rendering and initial bundle performance overhaul."
+      },
+      "kind": "request",
+      "linked_refs": {
+        "item": [
+          "item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries",
+          "item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks",
+          "item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets",
+          "item_650_move_steady_state_persistence_serialization_off_the_critical_input_path"
+        ],
+        "prod": [
+          "prod_012_editor_responsiveness_and_load_time_performance"
+        ],
+        "req": [
+          "req_161_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ]
+      },
+      "path": "logics/request/req_161_runtime_rendering_and_initial_bundle_performance_overhaul.md",
+      "ref": "req_161_runtime_rendering_and_initial_bundle_performance_overhaul",
+      "schema_version": "1.0",
+      "status": "Draft",
+      "title": "Runtime rendering and initial bundle performance overhaul"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, contain canvas drag/pan and form re-renders with raf coalescing and memo boundaries, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Contain canvas drag/pan and form re-renders with rAF coalescing and memo boundaries",
+        "use when": "Implementing the scaffolded slice for Contain canvas drag/pan and form re-renders with rAF coalescing and memo boundaries."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries"
+        ],
+        "prod": [
+          "prod_012_editor_responsiveness_and_load_time_performance"
+        ],
+        "req": [
+          "req_161_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ],
+        "task": [
+          "task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ]
+      },
+      "path": "logics/backlog/item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries.md",
+      "ref": "item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Contain canvas drag/pan and form re-renders with rAF coalescing and memo boundaries"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, gate the locale dom-translation observer in base locale and scope attribute re-walks, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Gate the locale DOM-translation observer in base locale and scope attribute re-walks",
+        "use when": "Implementing the scaffolded slice for Gate the locale DOM-translation observer in base locale and scope attribute re-walks."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks"
+        ],
+        "prod": [
+          "prod_012_editor_responsiveness_and_load_time_performance"
+        ],
+        "req": [
+          "req_161_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ],
+        "task": [
+          "task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ]
+      },
+      "path": "logics/backlog/item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks.md",
+      "ref": "item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Gate the locale DOM-translation observer in base locale and scope attribute re-walks"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, restore route-level code splitting and re-baseline bundle budgets, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Restore route-level code splitting and re-baseline bundle budgets",
+        "use when": "Implementing the scaffolded slice for Restore route-level code splitting and re-baseline bundle budgets."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets"
+        ],
+        "prod": [
+          "prod_012_editor_responsiveness_and_load_time_performance"
+        ],
+        "req": [
+          "req_161_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ],
+        "task": [
+          "task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ]
+      },
+      "path": "logics/backlog/item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets.md",
+      "ref": "item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Restore route-level code splitting and re-baseline bundle budgets"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-task, request-chain-scaffold, orchestration",
+        "skip when": "Working on one isolated sibling slice.",
+        "summary": "Orchestrate runtime rendering and initial bundle performance overhaul",
+        "use when": "Coordinating implementation of a scaffolded request chain."
+      },
+      "kind": "task",
+      "linked_refs": {
+        "item": [
+          "item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries",
+          "item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks",
+          "item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets",
+          "item_650_move_steady_state_persistence_serialization_off_the_critical_input_path"
+        ],
+        "prod": [
+          "prod_012_editor_responsiveness_and_load_time_performance"
+        ],
+        "req": [
+          "req_161_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ],
+        "task": [
+          "task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ]
+      },
+      "path": "logics/tasks/task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul.md",
+      "ref": "task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Orchestrate runtime rendering and initial bundle performance overhaul"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, move steady-state persistence serialization off the critical input path, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Move steady-state persistence serialization off the critical input path",
+        "use when": "Implementing the scaffolded slice for Move steady-state persistence serialization off the critical input path."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_650_move_steady_state_persistence_serialization_off_the_critical_input_path"
+        ],
+        "prod": [
+          "prod_012_editor_responsiveness_and_load_time_performance"
+        ],
+        "req": [
+          "req_161_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ],
+        "task": [
+          "task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul"
+        ]
+      },
+      "path": "logics/backlog/item_650_move_steady_state_persistence_serialization_off_the_critical_input_path.md",
+      "ref": "item_650_move_steady_state_persistence_serialization_off_the_critical_input_path",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Move steady-state persistence serialization off the critical input path"
+    }
+  ],
+  "estimates": {
+    "char_count": 7981,
+    "companion_doc_count": 1,
+    "doc_count": 6
+  },
+  "generated_at": "2026-07-03T14:07:26Z",
+  "handoff": {
+    "companion_doc_count": 1,
+    "enabled": true,
+    "source_refs": [
+      "req_161_runtime_rendering_and_initial_bundle_performance_overhaul",
+      "item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries",
+      "item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks",
+      "item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets",
+      "item_650_move_steady_state_persistence_serialization_off_the_critical_input_path",
+      "task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul"
+    ],
+    "validation_summary_count": 1
+  },
+  "mode": "summary-only",
+  "profile": "normal",
+  "ref": "req_161_runtime_rendering_and_initial_bundle_performance_overhaul,item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries,item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks,item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets,item_650_move_steady_state_persistence_serialization_off_the_critical_input_path,task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul",
+  "refs": [
+    "req_161_runtime_rendering_and_initial_bundle_performance_overhaul",
+    "item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries",
+    "item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks",
+    "item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets",
+    "item_650_move_steady_state_persistence_serialization_off_the_critical_input_path",
+    "task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul"
+  ],
+  "release": {
+    "blocking_reasons": [
+      "version_metadata: evidence targets a different version",
+      "changelog: evidence targets a different version",
+      "local_validation: evidence targets a different version",
+      "git_push: evidence targets a different version",
+      "ci: evidence targets a different version",
+      "production_deployment: evidence targets a different version"
+    ],
+    "configured": true,
+    "contract_path": "logics/release/contract.json",
+    "guidance": [
+      "Release readiness must come from project-owned evidence, not conversational memory.",
+      "Use release status or validate before preparing or claiming release readiness.",
+      "Publication-oriented actions are explicit operator actions and are separate from safe read/validate actions."
+    ],
+    "next_action": "version_metadata: evidence targets a different version",
+    "publication_actions": [
+      "GitHub release publication",
+      "external publication"
+    ],
+    "required_gates": [
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "version_metadata",
+        "required": true,
+        "state": "preparing",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "changelog",
+        "required": true,
+        "state": "preparing",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "local_validation",
+        "required": true,
+        "state": "local_validation",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "git_push",
+        "required": true,
+        "state": "pushed",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "ci",
+        "required": true,
+        "state": "ci_verification",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "production_deployment",
+        "required": true,
+        "state": "external_publication",
+        "status": "stale"
+      }
+    ],
+    "safe_actions": [
+      "logics-manager release status",
+      "logics-manager release plan <version>",
+      "logics-manager release validate <version>"
+    ],
+    "state": "blocked",
+    "target_version": "1.17.2"
+  },
+  "validation_summary": [
+    {
+      "items": [
+        "- Run `python3 -m logics_manager lint --require-status`.",
+        "- Run scaffold command tests."
+      ],
+      "path": "logics/tasks/task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul.md",
+      "ref": "task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul"
+    }
+  ]
+}
