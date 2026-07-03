@@ -60,7 +60,7 @@ describe("App integration UI - settings canvas callouts", () => {
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(0);
     const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
     expect(connectorNode).not.toBeNull();
-    fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 220, clientY: 140 });
+    fireEvent.click(connectorNode as Element);
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(1);
 
     switchScreenDrawerAware("settings");
@@ -87,7 +87,7 @@ describe("App integration UI - settings canvas callouts", () => {
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(0);
     const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
     expect(connectorNode).not.toBeNull();
-    fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 220, clientY: 140 });
+    fireEvent.click(connectorNode as Element);
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(1);
   });
 
@@ -163,7 +163,7 @@ describe("App integration UI - settings canvas callouts", () => {
     expect(connectorLayoutNode?.querySelector(".network-node-hitbox")).toBeNull();
     const connectorLayoutShell = connectorLayoutNode?.querySelector(".network-callout-connector-shell");
     expect(connectorLayoutShell).not.toBeNull();
-    fireEvent.mouseDown(connectorLayoutShell as Element, { button: 0, clientX: 220, clientY: 140 });
+    fireEvent.click(connectorLayoutShell as Element);
     expect(connectorLayoutNode).toHaveClass("is-selected");
 
     switchScreenDrawerAware("settings");
@@ -287,7 +287,7 @@ describe("App integration UI - settings canvas callouts", () => {
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(0);
     const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
     expect(connectorNode).not.toBeNull();
-    fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 220, clientY: 140 });
+    fireEvent.click(connectorNode as Element);
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(1);
   });
 

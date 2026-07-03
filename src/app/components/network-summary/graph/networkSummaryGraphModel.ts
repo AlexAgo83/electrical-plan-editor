@@ -9,6 +9,7 @@ import type {
   SegmentId,
   Splice,
   SpliceId,
+  Wire,
   WireId
 } from "../../../../core/entities";
 import { resolveSplicePlacementFromEntities, type ResolvedSplicePlacement } from "../../../../core/splicePlacement";
@@ -46,6 +47,31 @@ export interface SegmentWirePartialCoverage {
   segmentId: SegmentId;
   spliceId: SpliceId;
   coveredLengthMm: number;
+}
+
+export function getSelectedWirePartialCoverage(
+  wires: readonly Wire[],
+  selectedWireId: WireId | null
+): SegmentWirePartialCoverage[] {
+  if (selectedWireId === null) {
+    return [];
+  }
+  const selectedWire = wires.find((wire) => wire.id === selectedWireId);
+  if (selectedWire === undefined) {
+    return [];
+  }
+  const coverage: SegmentWirePartialCoverage[] = [];
+  const addEndpointCoverage = (
+    detail: typeof selectedWire.routeEndpointDetailA,
+    endpoint: typeof selectedWire.endpointA
+  ): void => {
+    if (detail !== undefined && endpoint.kind === "splicePort") {
+      coverage.push({ segmentId: detail.segmentId, spliceId: endpoint.spliceId, coveredLengthMm: detail.coveredLengthMm });
+    }
+  };
+  addEndpointCoverage(selectedWire.routeEndpointDetailA, selectedWire.endpointA);
+  addEndpointCoverage(selectedWire.routeEndpointDetailB, selectedWire.endpointB);
+  return coverage;
 }
 
 export interface RenderedSegmentModel {

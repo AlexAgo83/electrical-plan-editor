@@ -2,12 +2,13 @@ import { useRef, useState, type MouseEvent as ReactMouseEvent, type WheelEvent a
 import { unstable_batchedUpdates } from "react-dom";
 import type { NodeId, SegmentId } from "../../core/entities";
 import { appActions } from "../../store";
-import { NETWORK_MAX_SCALE, NETWORK_MIN_SCALE, clamp } from "../lib/app-utils-shared";
 import {
   applyGroupDragDelta,
   buildDragStopPersistence,
   buildRenderedLayoutPositionSnapshot,
+  getStoredNodePosition,
   getSvgCoordinates,
+  getZoomedNetworkView,
   shouldFreezeRenderedLayoutPositions
 } from "../lib/canvasInteractionGeometry";
 import { logPerfDuration } from "../lib/perfDebug";
@@ -76,18 +77,6 @@ export function useCanvasInteractionHandlers({
 
   function clearSelectedCanvasNodes(): void {
     setSelectedCanvasNodeIds((previous) => (previous.size === 0 ? previous : new Set<NodeId>()));
-  }
-
-  function getStoredNodePosition(nodeId: NodeId): NodePosition | null {
-    const position = manualNodePositions[nodeId] ?? networkNodePositions[nodeId] ?? state.nodePositions[nodeId];
-    if (position === undefined) {
-      return null;
-    }
-
-    return {
-      x: position.x,
-      y: position.y
-    };
   }
 
   function handleNetworkSegmentClick(segmentId: SegmentId): void {
@@ -243,14 +232,7 @@ export function useCanvasInteractionHandlers({
   }
 
   function getCanvasSvgCoordinates(svgElement: SVGSVGElement, clientX: number, clientY: number): NodePosition | null {
-    return getSvgCoordinates(svgElement, clientX, clientY, {
-      networkViewWidth,
-      networkViewHeight,
-      networkOffset,
-      networkScale,
-      networkRenderScale,
-      snapNodesToGrid
-    });
+    return getSvgCoordinates(svgElement, clientX, clientY, { networkViewWidth, networkViewHeight, networkOffset, networkScale, networkRenderScale, snapNodesToGrid });
   }
 
   function handleNetworkNodeMouseDown(event: ReactMouseEvent<SVGGElement>, nodeId: NodeId): void {
@@ -285,7 +267,7 @@ export function useCanvasInteractionHandlers({
     const selectedNodeIds = shouldPreserveCanvasSelection ? Array.from(selectedCanvasNodeIds) : [nodeId];
     const originPositions = {} as Record<NodeId, NodePosition>;
     for (const selectedNodeId of selectedNodeIds) {
-      const position = getStoredNodePosition(selectedNodeId);
+      const position = getStoredNodePosition(selectedNodeId, { manualNodePositions, networkNodePositions, persistedNodePositions: state.nodePositions });
       if (position !== null) {
         originPositions[selectedNodeId] = position;
       }
@@ -297,7 +279,9 @@ export function useCanvasInteractionHandlers({
     }
     const layoutFreezePositions =
       shouldFreezeRenderedLayoutPositions(nodes, state.nodePositions)
-        ? buildRenderedLayoutPositionSnapshot(nodes, getStoredNodePosition)
+        ? buildRenderedLayoutPositionSnapshot(nodes, (nodeId) =>
+            getStoredNodePosition(nodeId, { manualNodePositions, networkNodePositions, persistedNodePositions: state.nodePositions })
+          )
         : null;
 
     draggingNodeGroupRef.current = {
@@ -324,12 +308,7 @@ export function useCanvasInteractionHandlers({
     event.preventDefault();
     shouldSuppressNextCanvasClickRef.current = false;
     isPanningNetworkActiveRef.current = false;
-    panStartRef.current = {
-      clientX: event.clientX,
-      clientY: event.clientY,
-      offsetX: networkOffset.x,
-      offsetY: networkOffset.y
-    };
+    panStartRef.current = { clientX: event.clientX, clientY: event.clientY, offsetX: networkOffset.x, offsetY: networkOffset.y };
   }
 
   function handleNetworkWheel(event: ReactWheelEvent<SVGSVGElement>): void {
@@ -344,22 +323,13 @@ export function useCanvasInteractionHandlers({
       return;
     }
 
-    const nextScale = clamp(networkScale * (target === "in" ? 1.12 : 0.88), NETWORK_MIN_SCALE, NETWORK_MAX_SCALE);
-    if (nextScale === networkScale) {
+    const nextView = getZoomedNetworkView({ target, networkViewWidth, networkViewHeight, networkOffset, networkScale, networkRenderScale });
+    if (nextView === null) {
       return;
     }
 
-    const viewCenterX = networkViewWidth / 2;
-    const viewCenterY = networkViewHeight / 2;
-    const centerModelX = (viewCenterX - networkOffset.x) / (networkScale * networkRenderScale);
-    const centerModelY = (viewCenterY - networkOffset.y) / (networkScale * networkRenderScale);
-    const nextEffectiveScale = nextScale * networkRenderScale;
-
-    setNetworkScale(nextScale);
-    setNetworkOffset({
-      x: viewCenterX - centerModelX * nextEffectiveScale,
-      y: viewCenterY - centerModelY * nextEffectiveScale
-    });
+    setNetworkScale(nextView.scale);
+    setNetworkOffset(nextView.offset);
   }
 
   function handleNetworkMouseMove(event: ReactMouseEvent<SVGSVGElement>): void {
@@ -520,17 +490,5 @@ export function useCanvasInteractionHandlers({
     }
   }
 
-  return {
-    handleNetworkSegmentClick,
-    handleNetworkNodeActivate,
-    handleNetworkCanvasClick,
-    handleNetworkNodeMouseDown,
-    handleNetworkCanvasMouseDown,
-    handleNetworkWheel,
-    handleZoomAction,
-    handleNetworkMouseMove,
-    stopNetworkNodeDrag,
-    selectedCanvasNodeIds,
-    clearSelectedCanvasNodes
-  };
+  return { handleNetworkSegmentClick, handleNetworkNodeActivate, handleNetworkCanvasClick, handleNetworkNodeMouseDown, handleNetworkCanvasMouseDown, handleNetworkWheel, handleZoomAction, handleNetworkMouseMove, stopNetworkNodeDrag, selectedCanvasNodeIds, clearSelectedCanvasNodes };
 }

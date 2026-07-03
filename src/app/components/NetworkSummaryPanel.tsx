@@ -35,9 +35,9 @@ import {
 } from "./network-summary/callouts/calloutLayout";
 import {
   buildRenderedFloatingSplices,
+  getSelectedWirePartialCoverage,
   buildRenderedNodes,
   buildRenderedSegments,
-  type SegmentWirePartialCoverage,
 } from "./network-summary/graph/networkSummaryGraphModel";
 import { type SvgPreviewOptions, useNetworkSummaryExportActions } from "./network-summary/export/useNetworkSummaryExportActions";
 import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
@@ -190,11 +190,7 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
 
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
   const networkCanvasShellRef = useRef<HTMLDivElement | null>(null);
-  const graphStats = [
-    { label: "Graph nodes", value: routingGraphNodeCount },
-    { label: "Graph segments", value: routingGraphSegmentCount },
-    { label: "Adjacency entries", value: totalEdgeEntries }
-  ];
+  const graphStats = [{ label: "Graph nodes", value: routingGraphNodeCount }, { label: "Graph segments", value: routingGraphSegmentCount }, { label: "Adjacency entries", value: totalEdgeEntries }];
   const dialogThemeHostClassName = ["app-shell", ...getThemeClassNames(themeMode)].join(" ");
   const globalRenderScale = 1 + clampNumber(globalRenderScalePercent, 0, 300) / 100;
   const effectiveScale = networkScale > 0 ? networkScale : 1;
@@ -672,33 +668,7 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
     visibleModelMaxY
   ]);
 
-  // A wire that terminates on a floating splice only traverses part of that endpoint
-  // segment; expose those covered lengths so the highlight can be drawn partially.
-  const selectedWirePartialCoverage = useMemo<SegmentWirePartialCoverage[]>(() => {
-    if (selectedWireId === null) {
-      return [];
-    }
-    const selectedWire = wires.find((wire) => wire.id === selectedWireId);
-    if (selectedWire === undefined) {
-      return [];
-    }
-    const coverage: SegmentWirePartialCoverage[] = [];
-    const addEndpointCoverage = (
-      detail: typeof selectedWire.routeEndpointDetailA,
-      endpoint: typeof selectedWire.endpointA
-    ): void => {
-      if (detail !== undefined && endpoint.kind === "splicePort") {
-        coverage.push({
-          segmentId: detail.segmentId,
-          spliceId: endpoint.spliceId,
-          coveredLengthMm: detail.coveredLengthMm,
-        });
-      }
-    };
-    addEndpointCoverage(selectedWire.routeEndpointDetailA, selectedWire.endpointA);
-    addEndpointCoverage(selectedWire.routeEndpointDetailB, selectedWire.endpointB);
-    return coverage;
-  }, [selectedWireId, wires]);
+  const selectedWirePartialCoverage = useMemo(() => getSelectedWirePartialCoverage(wires, selectedWireId), [selectedWireId, wires]);
 
   const renderedSegments = useMemo(
     () =>

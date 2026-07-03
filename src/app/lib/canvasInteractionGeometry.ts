@@ -1,5 +1,5 @@
 import type { NetworkNode, NodeId } from "../../core/entities";
-import { NETWORK_GRID_STEP, snapToGrid } from "./app-utils-shared";
+import { NETWORK_GRID_STEP, NETWORK_MAX_SCALE, NETWORK_MIN_SCALE, clamp, snapToGrid } from "./app-utils-shared";
 import type { NodePosition } from "../types/app-controller";
 
 interface SvgCoordinatesOptions {
@@ -9,6 +9,21 @@ interface SvgCoordinatesOptions {
   networkScale: number;
   networkRenderScale: number;
   snapNodesToGrid: boolean;
+}
+
+interface StoredNodePositionOptions {
+  manualNodePositions: Record<NodeId, NodePosition>;
+  networkNodePositions: Record<NodeId, NodePosition>;
+  persistedNodePositions: Record<NodeId, NodePosition>;
+}
+
+interface ZoomViewOptions {
+  target: "in" | "out";
+  networkViewWidth: number;
+  networkViewHeight: number;
+  networkOffset: NodePosition;
+  networkScale: number;
+  networkRenderScale: number;
 }
 
 export function getLocalSvgPoint(
@@ -47,6 +62,32 @@ export function getSvgCoordinates(
   return {
     x: options.snapNodesToGrid ? snapToGrid(modelX, NETWORK_GRID_STEP) : modelX,
     y: options.snapNodesToGrid ? snapToGrid(modelY, NETWORK_GRID_STEP) : modelY
+  };
+}
+
+export function getStoredNodePosition(nodeId: NodeId, options: StoredNodePositionOptions): NodePosition | null {
+  const position =
+    options.manualNodePositions[nodeId] ?? options.networkNodePositions[nodeId] ?? options.persistedNodePositions[nodeId];
+  return position === undefined ? null : { x: position.x, y: position.y };
+}
+
+export function getZoomedNetworkView(options: ZoomViewOptions): { scale: number; offset: NodePosition } | null {
+  const scale = clamp(options.networkScale * (options.target === "in" ? 1.12 : 0.88), NETWORK_MIN_SCALE, NETWORK_MAX_SCALE);
+  if (scale === options.networkScale) {
+    return null;
+  }
+
+  const viewCenterX = options.networkViewWidth / 2;
+  const viewCenterY = options.networkViewHeight / 2;
+  const centerModelX = (viewCenterX - options.networkOffset.x) / (options.networkScale * options.networkRenderScale);
+  const centerModelY = (viewCenterY - options.networkOffset.y) / (options.networkScale * options.networkRenderScale);
+  const nextEffectiveScale = scale * options.networkRenderScale;
+  return {
+    scale,
+    offset: {
+      x: viewCenterX - centerModelX * nextEffectiveScale,
+      y: viewCenterY - centerModelY * nextEffectiveScale
+    }
   };
 }
 

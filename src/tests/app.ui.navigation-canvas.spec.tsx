@@ -256,8 +256,9 @@ describe("App integration UI - navigation and canvas", () => {
     fireEvent.click(within(wiresPanel).getByText("Wire 1"));
 
     switchSubScreenDrawerAware("segment");
-    expect(within(segmentsPanel).getByText("SEG-A").closest("tr")).toHaveClass("is-wire-highlighted");
-    expect(within(segmentsPanel).getByText("SEG-B").closest("tr")).toHaveClass("is-wire-highlighted");
+    const refreshedSegmentsPanel = getPanelByHeading("Segments");
+    expect(within(refreshedSegmentsPanel).getByText("SEG-A").closest("tr")).toHaveClass("is-wire-highlighted");
+    expect(within(refreshedSegmentsPanel).getByText("SEG-B").closest("tr")).toHaveClass("is-wire-highlighted");
   });
 
   it("exposes sort state via aria-sort in modeling connector table headers", () => {

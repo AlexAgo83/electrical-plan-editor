@@ -85,21 +85,17 @@ describe("App integration UI - network summary callouts and viewport persistence
 
     let networkSummaryPanel = getPanelByHeading("Network summary");
     openViewMenu(networkSummaryPanel);
-    const networkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
     fireEvent.click(within(networkSummaryPanel).getByRole("button", { name: "Callouts" }));
 
     const connectorCallout = networkSummaryPanel.querySelector('[aria-label^="Select connector"]');
     expect(connectorCallout).not.toBeNull();
-    fireEvent.mouseDown(connectorCallout as Element, { button: 0, clientX: 220, clientY: 140 });
-    fireEvent.mouseUp(networkSvg);
+    fireEvent.click(connectorCallout as Element);
     expect(getPanelByHeading("Connector analysis")).toBeInTheDocument();
 
     networkSummaryPanel = getPanelByHeading("Network summary");
-    const refreshedNetworkSvg = within(networkSummaryPanel).getByLabelText("2D network diagram");
     const spliceCallout = networkSummaryPanel.querySelector('[aria-label^="Select splice"]');
     expect(spliceCallout).not.toBeNull();
-    fireEvent.mouseDown(spliceCallout as Element, { button: 0, clientX: 220, clientY: 140 });
-    fireEvent.mouseUp(refreshedNetworkSvg);
+    fireEvent.click(spliceCallout as Element);
     expect(getPanelByHeading("Splice analysis")).toBeInTheDocument();
   });
 
@@ -267,7 +263,7 @@ describe("App integration UI - network summary callouts and viewport persistence
 
     const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
     expect(connectorNode).not.toBeNull();
-    fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 200, clientY: 150 });
+    fireEvent.click(connectorNode as Element);
     expect(networkSummaryPanel.querySelector(".network-node.connector.is-selected")).not.toBeNull();
   });
 
@@ -296,7 +292,7 @@ describe("App integration UI - network summary callouts and viewport persistence
 
     const connectorNode = networkSummaryPanel.querySelector(".network-node.connector");
     expect(connectorNode).not.toBeNull();
-    fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 220, clientY: 140 });
+    fireEvent.click(connectorNode as Element);
     expect(networkSummaryPanel.querySelectorAll(".network-callout-frame")).toHaveLength(1);
 
     switchScreenDrawerAware("settings");
