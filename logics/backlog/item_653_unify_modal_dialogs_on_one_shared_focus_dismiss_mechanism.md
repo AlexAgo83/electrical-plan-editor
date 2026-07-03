@@ -1,10 +1,10 @@
 ## item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism - Unify modal dialogs on one shared focus/dismiss mechanism
 > From version: 1.18.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Codebase simplification and maintenance cost reduction
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -33,6 +33,10 @@
 # AC Traceability
 - request-AC4 -> This backlog slice. Proof: AC1: One mechanism (native dialog or one shared hook) owns focus trap, Escape, Tab cycling, and focus restore; zero per-dialog copies remain, verified by grepping for the old trap patterns.
 - request-AC8 -> This backlog slice. Proof: AC2: All ten dialogs open, trap focus, close on Escape, respect closeOnBackdrop/confirmOnEnter options, and restore focus to the invoking control, covered by the existing UI test suites.
+- request-AC3 -> This backlog slice. Evidence needed: src/app/hook-impl/ no longer exists: implementations live in src/app/hooks/, pure re-export wrappers and the six dead use*ScreenContentSlice aliases are deleted, and the unused includeNetworkSummaryPanel option is dropped. Domain assembly adapters with dedicated behavioral tests remain because deleting them would erase useful seams rather than simplify runtime behavior.
+- request-AC5 -> This backlog slice. Evidence needed: Every export reverified with zero production references is deleted from src/core, src/store, and src/app/lib, including the harness-assembly validation subsystem and computePinElectricalLoad scope parameter. Live portability imports and the migration failure-injection seam remain, with their active callers/tests recorded in closeout evidence.
+- request-AC6 -> This backlog slice. Evidence needed: The repeated describe*Change field comparisons collapse to one field-list-driven helper and the timestamp formatter exists once. renderMemoCompare remains until its 18 unstable callback inputs are fixed because removal currently fails render-containment tests; normalizer and AI-contract rewrites are excluded until they produce a measured correctness or maintenance benefit.
+- request-AC7 -> This backlog slice. Evidence needed: remark-gfm is removed from package.json and the react-markdown call site, and all 91 changelog entries render with identical visible output.
 
 # Decision framing
 - Product framing: Not needed
@@ -54,3 +58,9 @@
 # Priority
 - Priority: Medium
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Tasks
+- `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies`
+
+# Notes
+- Task `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies` was finished via `logics-manager flow finish task` on 2026-07-03.

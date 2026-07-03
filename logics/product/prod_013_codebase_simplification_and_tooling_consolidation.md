@@ -2,7 +2,7 @@
 > Date: 2026-07-03
 > Status: Accepted
 > Related request: `req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code`
-> Related backlog: `item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy`, `item_652_collapse_the_hooks_hook_impl_mirror_directory`, `item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism`, `item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters`, `item_655_consolidate_duplicated_logic_into_single_shared_implementations`, `item_656_drop_remark_gfm_from_the_changelog_renderer`
+> Related backlog: `item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy`
 > Related task: `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
@@ -55,5 +55,5 @@ flowchart LR
 - Context-pack output can be handed to an implementation agent directly.
 
 # References
-- Product back-reference: `req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code`
+- Product back-reference: `item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy`
 - Task back-reference: `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies`

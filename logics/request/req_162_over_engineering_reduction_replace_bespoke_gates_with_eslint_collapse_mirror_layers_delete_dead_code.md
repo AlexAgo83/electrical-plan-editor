@@ -1,7 +1,7 @@
 ## req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code - Over-engineering reduction: replace bespoke gates with eslint, collapse mirror layers, delete dead code
 > From version: 1.18.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 90
 > Complexity: High

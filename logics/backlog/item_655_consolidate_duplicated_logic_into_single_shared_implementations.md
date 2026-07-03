@@ -1,10 +1,10 @@
 ## item_655_consolidate_duplicated_logic_into_single_shared_implementations - Consolidate duplicated logic into single shared implementations
 > From version: 1.18.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 90
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Codebase simplification and maintenance cost reduction
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -38,6 +38,10 @@
 # AC Traceability
 - request-AC6 -> This backlog slice. Proof: AC1: One normalization module serves both import and migration paths; existing round-trip and migration fixtures produce byte-identical results.
 - request-AC8 -> This backlog slice. Proof: AC2: recentChangeLabels output strings are unchanged for all entity kinds (existing specs and snapshots pass) with the eight functions replaced by one helper.
+- request-AC3 -> This backlog slice. Evidence needed: src/app/hook-impl/ no longer exists: implementations live in src/app/hooks/, pure re-export wrappers and the six dead use*ScreenContentSlice aliases are deleted, and the unused includeNetworkSummaryPanel option is dropped. Domain assembly adapters with dedicated behavioral tests remain because deleting them would erase useful seams rather than simplify runtime behavior.
+- request-AC4 -> This backlog slice. Evidence needed: All ten modal components delegate focus trapping, Escape, Tab cycling, focus restore, and backdrop to one shared mechanism (native dialog element or a single shared hook), with per-dialog copies deleted and existing dialog behavior (confirm-on-enter, close-on-backdrop options) preserved.
+- request-AC5 -> This backlog slice. Evidence needed: Every export reverified with zero production references is deleted from src/core, src/store, and src/app/lib, including the harness-assembly validation subsystem and computePinElectricalLoad scope parameter. Live portability imports and the migration failure-injection seam remain, with their active callers/tests recorded in closeout evidence.
+- request-AC7 -> This backlog slice. Evidence needed: remark-gfm is removed from package.json and the react-markdown call site, and all 91 changelog entries render with identical visible output.
 
 # Decision framing
 - Product framing: Not needed
@@ -59,3 +63,9 @@
 # Priority
 - Priority: Medium
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Tasks
+- `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies`
+
+# Notes
+- Task `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies` was finished via `logics-manager flow finish task` on 2026-07-03.

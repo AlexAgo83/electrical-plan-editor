@@ -1,10 +1,10 @@
 ## item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters - Delete verified dead code, dead barrels, and speculative parameters
 > From version: 1.18.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 90
-> Progress: 0%
+> Progress: 100%
 > Complexity: Low
 > Theme: Codebase simplification and maintenance cost reduction
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -35,6 +35,10 @@
 # AC Traceability
 - request-AC5 -> This backlog slice. Proof: AC1: Every listed symbol is gone and a repo-wide grep finds zero remaining references.
 - request-AC8 -> This backlog slice. Proof: AC2: computePinElectricalLoad has no scope parameter and all callers compile and pass tests.
+- request-AC3 -> This backlog slice. Evidence needed: src/app/hook-impl/ no longer exists: implementations live in src/app/hooks/, pure re-export wrappers and the six dead use*ScreenContentSlice aliases are deleted, and the unused includeNetworkSummaryPanel option is dropped. Domain assembly adapters with dedicated behavioral tests remain because deleting them would erase useful seams rather than simplify runtime behavior.
+- request-AC4 -> This backlog slice. Evidence needed: All ten modal components delegate focus trapping, Escape, Tab cycling, focus restore, and backdrop to one shared mechanism (native dialog element or a single shared hook), with per-dialog copies deleted and existing dialog behavior (confirm-on-enter, close-on-backdrop options) preserved.
+- request-AC6 -> This backlog slice. Evidence needed: The repeated describe*Change field comparisons collapse to one field-list-driven helper and the timestamp formatter exists once. renderMemoCompare remains until its 18 unstable callback inputs are fixed because removal currently fails render-containment tests; normalizer and AI-contract rewrites are excluded until they produce a measured correctness or maintenance benefit.
+- request-AC7 -> This backlog slice. Evidence needed: remark-gfm is removed from package.json and the react-markdown call site, and all 91 changelog entries render with identical visible output.
 
 # Decision framing
 - Product framing: Not needed
@@ -56,3 +60,9 @@
 # Priority
 - Priority: Medium
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Tasks
+- `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies`
+
+# Notes
+- Task `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies` was finished via `logics-manager flow finish task` on 2026-07-03.

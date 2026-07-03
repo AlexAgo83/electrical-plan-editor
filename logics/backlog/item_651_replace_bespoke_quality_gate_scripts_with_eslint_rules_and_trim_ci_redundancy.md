@@ -1,10 +1,10 @@
 ## item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy - Replace bespoke quality-gate scripts with eslint rules and trim CI redundancy
 > From version: 1.18.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Codebase simplification and maintenance cost reduction
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -37,6 +37,10 @@
 - request-AC1 -> This backlog slice. Proof: AC1: Adding a file over the line cap in a governed directory, a static exceljs import outside the adapter, or a per-test timeout in a UI spec each fails eslint (and thus ci:blocking), demonstrated by a temporary violation during development.
 - request-AC2 -> This backlog slice. Proof: AC2: The six replaced gate scripts, their package.json entries, and their ci:blocking steps are gone; npm run lint covers the same rules.
 - request-AC8 -> This backlog slice. Proof: AC3: run-vitest-segmented.mjs contains no hardcoded spec-file list and no drift validator; UI lane membership follows the app.ui.*.spec.tsx glob and total lane coverage is unchanged (segmentation check passes).
+- request-AC4 -> This backlog slice. Evidence needed: All ten modal components delegate focus trapping, Escape, Tab cycling, focus restore, and backdrop to one shared mechanism (native dialog element or a single shared hook), with per-dialog copies deleted and existing dialog behavior (confirm-on-enter, close-on-backdrop options) preserved.
+- request-AC5 -> This backlog slice. Evidence needed: Every export reverified with zero production references is deleted from src/core, src/store, and src/app/lib, including the harness-assembly validation subsystem and computePinElectricalLoad scope parameter. Live portability imports and the migration failure-injection seam remain, with their active callers/tests recorded in closeout evidence.
+- request-AC6 -> This backlog slice. Evidence needed: The repeated describe*Change field comparisons collapse to one field-list-driven helper and the timestamp formatter exists once. renderMemoCompare remains until its 18 unstable callback inputs are fixed because removal currently fails render-containment tests; normalizer and AI-contract rewrites are excluded until they produce a measured correctness or maintenance benefit.
+- request-AC7 -> This backlog slice. Evidence needed: remark-gfm is removed from package.json and the react-markdown call site, and all 91 changelog entries render with identical visible output.
 
 # Decision framing
 - Product framing: Not needed
@@ -58,3 +62,9 @@
 # Priority
 - Priority: High
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Tasks
+- `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies`
+
+# Notes
+- Task `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies` was finished via `logics-manager flow finish task` on 2026-07-03.
