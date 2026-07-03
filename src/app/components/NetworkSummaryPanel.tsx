@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  memo,
   useMemo,
   useRef,
   type CSSProperties,
@@ -50,7 +51,7 @@ function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-export function NetworkSummaryPanel({
+function NetworkSummaryPanelComponent({
   handleZoomAction,
   fitNetworkToContent,
   showNetworkInfoPanels,
@@ -1014,3 +1015,5 @@ export function NetworkSummaryPanel({
     </section>
   );
 }
+
+export const NetworkSummaryPanel = memo(NetworkSummaryPanelComponent);

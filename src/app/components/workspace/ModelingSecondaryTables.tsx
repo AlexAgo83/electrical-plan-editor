@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type Dispatch, type ReactElement, type SetStateAction } from "react";
+import { memo, useEffect, useMemo, useRef, useState, type Dispatch, type ReactElement, type SetStateAction } from "react";
 import { getWireColorSortValue } from "../../../core/cableColors";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
@@ -136,7 +136,7 @@ interface ModelingSecondaryTablesProps {
   activeNetworkName?: string | null;
 }
 
-export function ModelingSecondaryTables({
+function ModelingSecondaryTablesComponent({
   activeBatchScope,
   batchSelectionIds,
   onEnterBatchMode,
@@ -1628,3 +1628,5 @@ export function ModelingSecondaryTables({
     </>
   );
 }
+
+export const ModelingSecondaryTables = memo(ModelingSecondaryTablesComponent);

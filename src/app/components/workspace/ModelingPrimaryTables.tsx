@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import {
@@ -23,7 +23,7 @@ import type { ModelingPrimaryTablesProps } from "./ModelingPrimaryTables.types";
 import { PinRoleMassEditDialog } from "./PinRoleMassEditDialog";
 import { ConfigurableTableColumnsControl, type ConfigurableTableColumn } from "./ConfigurableTableColumns";
 
-export function ModelingPrimaryTables({
+function ModelingPrimaryTablesComponent({
   activeBatchScope,
   batchSelectionIds,
   onEnterBatchMode,
@@ -1899,3 +1899,5 @@ export function ModelingPrimaryTables({
     </>
   );
 }
+
+export const ModelingPrimaryTables = memo(ModelingPrimaryTablesComponent);

@@ -4,7 +4,7 @@
 > Status: In progress
 > Understanding: 95
 > Confidence: 90
-> Progress: 60
+> Progress: 65
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -82,6 +82,8 @@
 - Validation: `npm run -s build:bundle:report`; `npm run -s typecheck`; `npm run -s lint`; `npm run -s quality:exceljs-boundary`; `npm run -s quality:pwa`; `npx vitest run src/tests/app.ui.settings-locale.spec.tsx src/tests/app.ui.persistence-feedback.spec.tsx --pool=forks --maxWorkers=2 --testTimeout=15000`; `npm run -s test:e2e`.
 - Slice `item_647` partial: canvas drag/pan state updates now coalesce through one requestAnimationFrame scheduler and flush on interaction stop.
 - Validation: `npx vitest run src/tests/canvas-interaction-handlers.hook.spec.ts src/tests/app.ui.navigation-canvas-interactions.spec.tsx --pool=forks --maxWorkers=2 --testTimeout=15000`; `npm run -s quality:hooks-modularization`; `npm run -s typecheck`; `npm run -s lint`.
+- Slice `item_647` partial: memo boundaries added for NetworkSummaryPanel and modeling table/form columns; render-count coverage proves non-canvas modeling panels stay flat during a coalesced pan frame.
+- Validation: `npx vitest run src/tests/app.ui.render-containment.spec.tsx src/tests/canvas-interaction-handlers.hook.spec.ts src/tests/app.ui.navigation-canvas-interactions.spec.tsx --pool=forks --maxWorkers=2 --testTimeout=15000`; `npm run -s quality:ui-modularization`; `npm run -s quality:hooks-modularization`; `npm run -s typecheck`; `npm run -s lint`.
 
 # AI Context
 - Summary: Orchestrate runtime rendering and initial bundle performance overhaul

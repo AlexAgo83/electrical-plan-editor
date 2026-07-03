@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { memo, type ReactElement } from "react";
 import { ModelingBatchContextDialog } from "./ModelingBatchContextPanel";
 import { ModelingConnectorFormPanel } from "./ModelingConnectorFormPanel";
 import { ModelingNodeFormPanel } from "./ModelingNodeFormPanel";
@@ -9,7 +9,7 @@ import { ModelingWireFormPanel } from "./ModelingWireFormPanel";
 
 export type { ModelingFormsColumnProps } from "./ModelingFormsColumn.types";
 
-export function ModelingFormsColumn(
+function ModelingFormsColumnComponent(
   props: ModelingFormsColumnProps,
 ): ReactElement {
   const batchSelectionDialog =
@@ -43,3 +43,5 @@ export function ModelingFormsColumn(
     </>
   );
 }
+
+export const ModelingFormsColumn = memo(ModelingFormsColumnComponent);
