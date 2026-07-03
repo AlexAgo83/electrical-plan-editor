@@ -44,6 +44,7 @@ import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicP
 import { SvgExportPreviewDialog } from "./dialogs/SvgExportPreviewDialog";
 import { PreviewLoadingDialog } from "./dialogs/PreviewLoadingDialog";
 import { snapToGrid } from "../lib/app-utils-shared";
+import { logPerfDuration } from "../lib/perfDebug";
 import { arePanelMemoPropsEqual } from "../lib/renderMemoCompare";
 import { getThemeClassNames } from "../lib/themeModes";
 import type { NetworkSummaryPanelHandle, NetworkSummaryPanelProps } from "./network-summary/NetworkSummaryPanel.types";
@@ -174,6 +175,16 @@ function NetworkSummaryPanelComponent({
   showFunctionalSchematic = true,
   imperativeRef
 }: NetworkSummaryPanelProps): ReactElement {
+  const renderStartedAt = performance.now();
+  useEffect(() => {
+    logPerfDuration("render+commit NetworkSummaryPanel", renderStartedAt, {
+      nodes: nodes.length,
+      segments: segments.length,
+      wires: wires.length,
+      callouts: showCableCallouts
+    });
+  });
+
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
   const networkCanvasShellRef = useRef<HTMLDivElement | null>(null);
   const graphStats = [

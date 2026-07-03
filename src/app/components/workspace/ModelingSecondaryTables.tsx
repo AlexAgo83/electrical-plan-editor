@@ -6,6 +6,7 @@ import {
   focusElementWithoutScroll,
   sortByTableColumns,
 } from "../../lib/app-utils-shared";
+import { logPerfDuration } from "../../lib/perfDebug";
 import { arePanelMemoPropsEqual } from "../../lib/renderMemoCompare";
 import { downloadCsvFile } from "../../lib/csv";
 import { normalizeFileNamePart } from "../../lib/exportFileName";
@@ -200,6 +201,15 @@ function ModelingSecondaryTablesComponent({
   onOpenWireOnboardingHelp,
   activeNetworkName,
 }: ModelingSecondaryTablesProps): ReactElement {
+  const renderStartedAt = performance.now();
+  useEffect(() => {
+    logPerfDuration("render+commit ModelingSecondaryTables", renderStartedAt, {
+      segments: visibleSegments.length,
+      wires: visibleWires.length,
+      activeSubScreen: isSegmentSubScreen ? "segment" : isWireSubScreen ? "wire" : "other"
+    });
+  });
+
   void _getSortIndicator;
   type SegmentTableSortField =
     | "id"

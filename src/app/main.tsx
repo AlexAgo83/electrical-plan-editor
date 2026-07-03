@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { installLongTaskPerfLogger } from "./lib/perfDebug";
 import { registerServiceWorker } from "./pwa/registerServiceWorker";
 
 const container = document.getElementById("root");
@@ -8,6 +9,7 @@ if (container === null) {
 }
 
 document.title = "e-Plan Editor";
+installLongTaskPerfLogger();
 
 void import("./App").then(({ App }) => {
   createRoot(container).render(

@@ -5,6 +5,7 @@ import {
   focusElementWithoutScroll,
   sortByTableColumns,
 } from "../../lib/app-utils-shared";
+import { logPerfDuration } from "../../lib/perfDebug";
 import { arePanelMemoPropsEqual } from "../../lib/renderMemoCompare";
 import { downloadCsvFile } from "../../lib/csv";
 import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
@@ -96,6 +97,16 @@ function ModelingPrimaryTablesComponent({
   onDeleteNode,
   onOpenNodeOnboardingHelp,
 }: ModelingPrimaryTablesProps): ReactElement {
+  const renderStartedAt = performance.now();
+  useEffect(() => {
+    logPerfDuration("render+commit ModelingPrimaryTables", renderStartedAt, {
+      connectors: visibleConnectors.length,
+      splices: visibleSplices.length,
+      nodes: visibleNodes.length,
+      activeSubScreen: isConnectorSubScreen ? "connector" : isSpliceSubScreen ? "splice" : isNodeSubScreen ? "node" : "other"
+    });
+  });
+
   type ConnectorTableSortField =
     | "name"
     | "technicalId"
