@@ -28,7 +28,8 @@ jobs:
         with:
           python-version: "3.x"
           cache: pip
-      - run: python3 -m pip install logics-manager
+          cache-dependency-path: .github/requirements-ci.txt
+      - run: python3 -m pip install -r .github/requirements-ci.txt
       - run: npm ci
       - name: Logics and static analysis
         run: |
