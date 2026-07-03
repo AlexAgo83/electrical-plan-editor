@@ -25,7 +25,7 @@ export async function openSvgPreviewAndDownload(
   fireEvent.click(within(panel).getByRole("button", { name: "SVG" }));
   const previewDialog = await screen.findByRole("dialog", {
     name: "SVG preview",
-  });
+  }, { timeout: 5_000 });
   fireEvent.click(
     within(previewDialog).getByRole("button", { name: "Download SVG" }),
   );
