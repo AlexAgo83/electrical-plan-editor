@@ -1,15 +1,27 @@
 import type { ProfilerOnRenderCallback } from "react";
 
 const PERF_LOG_THRESHOLD_MS = 16;
+const PERF_DEBUG_STORAGE_KEY = "debug:perf";
 
-function isPerfDebugEnabled(): boolean {
+export function isPerfDebugEnabled(): boolean {
   if (!import.meta.env.DEV) {
     return false;
   }
   try {
-    return globalThis.localStorage?.getItem("debug:perf") !== "false";
+    return globalThis.localStorage?.getItem(PERF_DEBUG_STORAGE_KEY) === "true";
   } catch {
-    return true;
+    return false;
+  }
+}
+
+export function setPerfDebugEnabled(enabled: boolean): void {
+  try {
+    globalThis.localStorage?.setItem(PERF_DEBUG_STORAGE_KEY, enabled ? "true" : "false");
+  } catch {
+    // Ignore storage failures; debug logging is optional.
+  }
+  if (enabled) {
+    installLongTaskPerfLogger();
   }
 }
 
@@ -37,12 +49,15 @@ export const logReactRender: ProfilerOnRenderCallback = (id, phase, actualDurati
 let longTaskLoggerInstalled = false;
 
 export function installLongTaskPerfLogger(): void {
-  if (longTaskLoggerInstalled || !isPerfDebugEnabled() || typeof PerformanceObserver === "undefined") {
+  if (longTaskLoggerInstalled || !import.meta.env.DEV || typeof PerformanceObserver === "undefined") {
     return;
   }
   longTaskLoggerInstalled = true;
   try {
     new PerformanceObserver((list) => {
+      if (!isPerfDebugEnabled()) {
+        return;
+      }
       for (const entry of list.getEntries()) {
         console.info(`[perf] longtask: ${entry.duration.toFixed(1)}ms`, {
           startTime: Number(entry.startTime.toFixed(1))

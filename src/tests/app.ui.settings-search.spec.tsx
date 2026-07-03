@@ -25,6 +25,22 @@ describe("App integration UI - settings search", () => {
     expect(document.querySelector("mark.settings-search-highlight")).toBeNull();
   });
 
+  it("keeps performance debug console logs disabled until enabled in settings", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+
+    const globalPreferencesPanel = getPanelByHeading("Global preferences");
+    const perfDebugToggle = within(globalPreferencesPanel).getByLabelText("Enable performance debug console logs");
+
+    expect(perfDebugToggle).not.toBeChecked();
+    expect(localStorage.getItem("debug:perf")).toBeNull();
+
+    fireEvent.click(perfDebugToggle);
+
+    expect(perfDebugToggle).toBeChecked();
+    expect(localStorage.getItem("debug:perf")).toBe("true");
+  });
+
   it("shows no-match feedback without changing settings values", () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("settings");

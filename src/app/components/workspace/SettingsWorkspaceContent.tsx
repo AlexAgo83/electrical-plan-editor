@@ -8,6 +8,7 @@ import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
 import { THEME_MODE_OPTIONS } from "../../lib/themeModes";
 import { getAiProviderLabel, type AiProviderId } from "../../lib/aiSettings";
+import { isPerfDebugEnabled, setPerfDebugEnabled } from "../../lib/perfDebug";
 import type { AiSettingsModel } from "../../hooks/useAiSettings";
 import type { WorkspaceFileStorageStatus } from "../../hooks/useWorkspaceFileStorage";
 import { SettingsLabelText } from "../settings/SettingsLabelText";
@@ -336,6 +337,7 @@ export function SettingsWorkspaceContent({
 }: SettingsWorkspaceContentProps): ReactElement {
   const activeAiProviderConfig = aiSettings.settings.providers[aiSettings.settings.provider];
   const { settingsSearchQuery, setSettingsSearchQuery } = useSettingsSearchDock();
+  const [perfDebugLoggingEnabled, setPerfDebugLoggingEnabled] = useState(() => isPerfDebugEnabled());
   const normalizedSettingsSearch = normalizeSettingsSearch(settingsSearchQuery);
   const matchedSectionCounts = SETTINGS_SECTIONS.map((section) => ({
     id: section.id,
@@ -417,6 +419,10 @@ export function SettingsWorkspaceContent({
   const renderSettingLabel = (text: string): ReactNode => (
     <SettingsLabelText text={text} normalizedQuery={normalizedSettingsSearch} />
   );
+  const handlePerfDebugLoggingChange = (enabled: boolean): void => {
+    setPerfDebugLoggingEnabled(enabled);
+    setPerfDebugEnabled(enabled);
+  };
   const formatWorkspaceSavedAt = (iso: string | null): string => {
     if (iso === null) {
       return "Not saved to a workspace file yet";
@@ -1323,6 +1329,14 @@ export function SettingsWorkspaceContent({
               onChange={(event) => setWorkspaceWideScreen(event.target.checked)}
             />
             {renderSettingLabel("Wide screen (remove app max width cap)")}
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={perfDebugLoggingEnabled}
+              onChange={(event) => handlePerfDebugLoggingChange(event.target.checked)}
+            />
+            {renderSettingLabel("Enable performance debug console logs")}
           </label>
           <label className="settings-field">
             {renderSettingLabel("Default wire section (mm²)")}

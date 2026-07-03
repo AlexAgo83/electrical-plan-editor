@@ -96,6 +96,7 @@ export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
       "Show multi-network functional analysis panel",
       "Workspace panels layout",
       "Wide screen (remove app max width cap)",
+      "Enable performance debug console logs",
       "Default wire section (mm²)",
       "Default auto-create linked nodes for connectors",
       "Directional splice imbalance limit (%)",
