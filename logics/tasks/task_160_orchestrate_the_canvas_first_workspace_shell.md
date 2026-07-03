@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Ready
 > Understanding: 95
-> Confidence: 90
+> Confidence: 91
 > Progress: 0%
 > Complexity: Medium
 > Theme: Implementation delivery
@@ -69,8 +69,8 @@ Definition of "ready for review": pilot + themes items done on the branch, flag-
 - Implementation complete.
 
 # AI Context
-- Summary: Orchestrate the canvas-first workspace shell
-- Keywords: scaffolded-task, request-chain-scaffold, orchestration
+- Summary: Orchestrate the canvas-first workspace shell. BRANCH RULE: all code on the dedicated branch feat/canvas-fullbleed, never main — the experiment may be dropped without trace.
+- Keywords: scaffolded-task, request-chain-scaffold, orchestration, canvas-bleed, feature-flag, feat/canvas-fullbleed
 - Use when: Coordinating implementation of a scaffolded request chain.
 - Skip when: Working on one isolated sibling slice.
 

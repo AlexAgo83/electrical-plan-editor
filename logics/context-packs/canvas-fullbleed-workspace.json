@@ -1,36 +1,11 @@
 {
   "budgets": {
-    "max_docs": 24,
-    "max_docs_per_ref": 4
+    "max_docs": 8,
+    "max_docs_per_ref": 8
   },
   "changed_paths": [],
-  "command": "logics-manager sync context-pack req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation item_663_dock_content_system_container_queries_inspector_host_drill_in_stack item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering task_160_orchestrate_the_canvas_first_workspace_shell --mode summary-only --profile normal --handoff",
-  "companion_docs": [
-    {
-      "kind": "product",
-      "linked_refs": {
-        "item": [
-          "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag",
-          "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation",
-          "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack",
-          "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering"
-        ],
-        "prod": [
-          "prod_015_canvas_first_workspace_shell"
-        ],
-        "req": [
-          "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui"
-        ],
-        "task": [
-          "task_160_orchestrate_the_canvas_first_workspace_shell"
-        ]
-      },
-      "path": "logics/product/prod_015_canvas_first_workspace_shell.md",
-      "ref": "prod_015_canvas_first_workspace_shell",
-      "status": "Proposed",
-      "title": "Canvas-first workspace shell"
-    }
-  ],
+  "command": "logics-manager sync context-pack req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui --mode full --profile deep",
+  "companion_docs": [],
   "docs": [
     {
       "ai_context": {
@@ -57,6 +32,24 @@
       "path": "logics/request/req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui.md",
       "ref": "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui",
       "schema_version": "1.0",
+      "sections": {
+        "Acceptance criteria": [
+          "- AC1: With the preference off (default), the rendered workspace is unchanged \u2014 the existing shell regression suite passes without modification and no canvas-bleed class token or CSS applies.",
+          "- AC2: With the preference on, Network Scope renders the canvas as a fixed full-viewport background with the network table as a left-dock overlay and the scope form as a right-dock overlay; fit-to-content, zoom, and centering target the visible safe area between open docks (dynamic insets), not the full window.",
+          "- AC3: In bleed mode, canvas interactions survive the overlay routing: callout and node dragging work (acceptance test #1), wheel over a panel scrolls the panel while wheel over the canvas zooms, and clicks between panels reach the canvas.",
+          "- AC4: Wide panel content adapts to dock width via container-width rules, not compression: forms stack single-column with accordion sections at ~440 px, embedded wide tables render as key-value rows with a truncation escape to a central panel, and detail chains render as a breadcrumbed drill-in stack in the right dock with no third column ever.",
+          "- AC5: Every shipped theme is readable in bleed mode through derived dock-surface variables with an opacity floor \u2014 no per-theme CSS beyond point overrides justified by a generated all-themes contact sheet, which is produced by a rerunnable script.",
+          "- AC6: The Analysis screen runs full-bleed with route/entity highlighting on the background canvas and inspector details in the right-dock drill-in, and the canvas declutters at low zoom (dimension labels hidden below a threshold, co-located connector clusters collapsed to a count badge) validated against a real-scale network of at least 30 connectors and 150 wires."
+        ],
+        "Needs": [
+          "- The network canvas must become the application background on canvas-centric screens, with all other UI floating above it as overlay layers (reference model: Figma/Miro \u2014 the canvas is the world, the UI is an overlay). Today the canvas is a grid child inside workspace-content, squeezed alongside sidebars, tables, and forms.",
+          "- The new layout must ship as an opt-in mode behind a persisted settings preference: flag off means zero render or behavior difference, so the existing workspace keeps working untouched and rollback is instant.",
+          "- Entity work must flow canvas-first: click an entity on the canvas, its inspector opens in a right dock, edit, Escape collapses it \u2014 replacing the table-to-canvas round-trips.",
+          "- Wide panels must be transformed for dock width, never compressed: forms stack in a single column with accordion sections, embedded wide tables become key-value rows with truncation, side-by-side detail panels become a drill-in stack with breadcrumb. Depth replaces width; there is never a third column.",
+          "- All ~30 existing themes must stay readable in the new mode without per-theme rework: dock surfaces derive from existing theme variables, with readability guaranteed by construction (opacity floor), not by luck.",
+          "- The model must hold at real scale: a real user-exported production network (~30 connectors, 150 wires, 18 splices, 47 segments, very horizontal aspect ratio ~3.5:1) fits at roughly 23% zoom, which demands zoom-level decluttering (hide dimension labels below a threshold, collapse co-located connector clusters into a count badge, truncate long attached-wire lists)."
+        ]
+      },
       "status": "Draft",
       "title": "Full-bleed canvas workspace: canvas as application background behind a feature flag, docks as overlay UI"
     },
@@ -85,6 +78,21 @@
       "path": "logics/backlog/item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag.md",
       "ref": "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag",
       "schema_version": "1.0",
+      "sections": {
+        "Acceptance criteria": [
+          "- AC1: Flag off produces a byte-identical class list and unchanged rendering; the pre-existing shell regression suite passes unmodified.",
+          "- AC2: Flag on, Network Scope shows the canvas as full-viewport background with both docks floating over it; toggling the flag live switches modes without losing selection or canvas state.",
+          "- AC3: Fit-to-content and centering land the network inside the visible area between open docks, and re-fit correctly when a dock collapses or expands.",
+          "- AC4: Callout dragging, node dragging, canvas click-to-select, dock scrolling, and canvas wheel-zoom all work in bleed mode, verified by the new flag-on regression pass.",
+          "- AC5: Reverting the experiment is a deletion-only diff: preference, token, mode CSS, insets parameter."
+        ],
+        "Problem": [
+          "- **BRANCH RULE: implement on the dedicated branch `feat/canvas-fullbleed`, never on `main` \u2014 this experiment may not be validated and must be droppable by deleting the branch. See `task_160` Implementation notes before writing any code.**",
+          "- The canvas is a grid child inside workspace-content, so it can never act as the spatial background the workflows want; every screen frames it differently and selection lives in tables.",
+          "- Fit-to-content, zoom, and centering measure the canvas container; if the canvas becomes the full viewport with docks floating over it, all of them mis-target unless they learn about occluded edges.",
+          "- Any layout inversion attempted without a hard flag-off guarantee risks the working product for every user."
+        ]
+      },
       "status": "Ready",
       "title": "Canvas-bleed foundations and Network Scope pilot behind a settings flag"
     },
@@ -113,6 +121,19 @@
       "path": "logics/backlog/item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation.md",
       "ref": "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation",
       "schema_version": "1.0",
+      "sections": {
+        "Acceptance criteria": [
+          "- AC1: All dock/overlay surfaces in bleed mode style exclusively through the semantic variables; no theme-specific selectors inside the mode CSS beyond recorded point overrides.",
+          "- AC2: The contact-sheet script runs from the repo and outputs one labeled screenshot per shipped theme of the flag-on pilot screen.",
+          "- AC3: Every theme is readable on the contact sheet (dock text on dock surface, header legible over canvas), with point overrides listed in the closeout for any theme that needed one.",
+          "- AC4: With reduced transparency requested, docks render fully opaque with no blur."
+        ],
+        "Problem": [
+          "- **BRANCH RULE: implement on the dedicated branch `feat/canvas-fullbleed`, never on `main` \u2014 this experiment may not be validated and must be droppable by deleting the branch. See `task_160` Implementation notes before writing any code.**",
+          "- The app ships ~30 themes across ~27 override CSS files; translucent docks over an arbitrary themed canvas can silently become unreadable in any of them, and a per-theme styling pass is unaffordable and unmaintainable.",
+          "- Midrange themes are the danger zone: canvas and panel surfaces converge in luminance, so blur alone does not guarantee text contrast."
+        ]
+      },
       "status": "Ready",
       "title": "Derived dock-surface theme variables with all-themes contact-sheet validation"
     },
@@ -141,39 +162,22 @@
       "path": "logics/backlog/item_663_dock_content_system_container_queries_inspector_host_drill_in_stack.md",
       "ref": "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack",
       "schema_version": "1.0",
-      "status": "Ready",
-      "title": "Dock content system: container queries, inspector host, drill-in stack"
-    },
-    {
-      "ai_context": {
-        "keywords": "scaffolded-task, request-chain-scaffold, orchestration",
-        "skip when": "Working on one isolated sibling slice.",
-        "summary": "Orchestrate the canvas-first workspace shell",
-        "use when": "Coordinating implementation of a scaffolded request chain."
-      },
-      "kind": "task",
-      "linked_refs": {
-        "item": [
-          "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag",
-          "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation",
-          "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack",
-          "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering"
+      "sections": {
+        "Acceptance criteria": [
+          "- AC1: A panel rendered inside a 340 px dock on a wide viewport uses its narrow layout, driven by container width; the same panel full-width still renders wide.",
+          "- AC2: A three-level drill-in (entity, sub-entity, sub-sub-entity) navigates via breadcrumb clicks, Back, and Escape, with the parent entity staying highlighted on the canvas and never a third column.",
+          "- AC3: A sheet embedding a 27-row wide table shows truncated key-value rows with a working view-all escape to a central panel.",
+          "- AC4: A pinned sheet persists as a floating card while the dock navigates to another entity, and both remain readable and dismissable."
         ],
-        "prod": [
-          "prod_015_canvas_first_workspace_shell"
-        ],
-        "req": [
-          "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui"
-        ],
-        "task": [
-          "task_160_orchestrate_the_canvas_first_workspace_shell"
+        "Problem": [
+          "- **BRANCH RULE: implement on the dedicated branch `feat/canvas-fullbleed`, never on `main` \u2014 this experiment may not be validated and must be droppable by deleting the branch. See `task_160` Implementation notes before writing any code.**",
+          "- Responsive panel styles key on @media viewport width (900 px breakpoint), so a panel placed in a 340 px dock on a wide screen keeps its wide layout and overflows; the app already owns narrow renderings but measures the wrong dimension.",
+          "- Detail chains today spread horizontally as stacked side-by-side panels; a dock cannot afford columns, so depth must replace width or the inspector becomes unusable.",
+          "- Embedded wide tables (an entity's attached wires, occupancy grids) physically cannot fit a dock; at real scale the densest connector carries 27 wires."
         ]
       },
-      "path": "logics/tasks/task_160_orchestrate_the_canvas_first_workspace_shell.md",
-      "ref": "task_160_orchestrate_the_canvas_first_workspace_shell",
-      "schema_version": "1.0",
       "status": "Ready",
-      "title": "Orchestrate the canvas-first workspace shell"
+      "title": "Dock content system: container queries, inspector host, drill-in stack"
     },
     {
       "ai_context": {
@@ -200,39 +204,86 @@
       "path": "logics/backlog/item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering.md",
       "ref": "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering",
       "schema_version": "1.0",
+      "sections": {
+        "Acceptance criteria": [
+          "- AC1: Flag on, every Analysis sub-screen renders full-bleed: left-dock lists with type chips and search, right-dock drill-in sheets, canvas as background; flag off, the current Analysis layout is untouched.",
+          "- AC2: Selecting a wire highlights its complete route on the background canvas while its sheet opens in the dock; selecting from the canvas drives the same loop.",
+          "- AC3: Below the decluttering thresholds, dimension labels hide and co-located connector clusters render as a count badge that expands on zoom or click; above the thresholds, current rendering is unchanged.",
+          "- AC4: The real-scale validation run is recorded with screenshots at fit zoom, confirming readable orientation at ~23% zoom on a 30-connector/150-wire network."
+        ],
+        "Problem": [
+          "- **BRANCH RULE: implement on the dedicated branch `feat/canvas-fullbleed`, never on `main` \u2014 this experiment may not be validated and must be droppable by deleting the branch. See `task_160` Implementation notes before writing any code.**",
+          "- Analysis is the biggest payoff of the model: the graph already supports highlighted wires/routes, but the highlight lives inside a boxed panel next to tables instead of lighting up the actual network on screen.",
+          "- At real scale the fit lands near 23% zoom: dimension labels turn to noise, a five-connector co-located cluster overlaps unreadably, and flat lists of attached entities exceed what any dock can show.",
+          "- Entity lists across five analysis sub-screens (connectors, wires, splices, nodes, segments) each frame their own tables, multiplying navigation instead of funneling through one canvas."
+        ]
+      },
       "status": "Ready",
       "title": "Analysis screen full-bleed with route highlighting and low-zoom decluttering"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-task, request-chain-scaffold, orchestration, canvas-bleed, feature-flag, feat/canvas-fullbleed",
+        "skip when": "Working on one isolated sibling slice.",
+        "summary": "Orchestrate the canvas-first workspace shell. BRANCH RULE: all code on the dedicated branch feat/canvas-fullbleed, never main \u2014 the experiment may be dropped without trace.",
+        "use when": "Coordinating implementation of a scaffolded request chain."
+      },
+      "kind": "task",
+      "linked_refs": {
+        "item": [
+          "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag",
+          "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation",
+          "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack",
+          "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering"
+        ],
+        "prod": [
+          "prod_015_canvas_first_workspace_shell"
+        ],
+        "req": [
+          "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui"
+        ],
+        "task": [
+          "task_160_orchestrate_the_canvas_first_workspace_shell"
+        ]
+      },
+      "path": "logics/tasks/task_160_orchestrate_the_canvas_first_workspace_shell.md",
+      "ref": "task_160_orchestrate_the_canvas_first_workspace_shell",
+      "schema_version": "1.0",
+      "sections": {
+        "Context": [
+          "- Orchestrate the scaffolded request chain and keep sibling implementation slices linked.",
+          "- **BRANCH RULE (read first): all implementation work for this chain happens on a dedicated branch (suggested: `feat/canvas-fullbleed`), never on `main`. This is an exploratory UX mode that may NOT be validated \u2014 the whole experiment can be dropped after review. Commit early and often on the branch; do not merge, rebase onto main, or open a PR until the product owner explicitly approves the pilot. If the experiment is rejected, the branch is deleted and `main` stays untouched.**",
+          "- The design exploration behind this chain lives in `logics/external/` (CR, mockups, real network exports) \u2014 unversioned and possibly absent on your machine. Everything needed to implement is restated in `req_164`'s context and the backlog items; do not block on that folder."
+        ],
+        "Validation": [
+          "- Run `python3 -m logics_manager lint --require-status`.",
+          "- Run scaffold command tests.",
+          "- Confirm every code commit for this chain is on `feat/canvas-fullbleed` (never `main`)."
+        ]
+      },
+      "status": "Ready",
+      "title": "Orchestrate the canvas-first workspace shell"
     }
   ],
   "estimates": {
-    "char_count": 8026,
-    "companion_doc_count": 1,
+    "char_count": 17905,
+    "companion_doc_count": 0,
     "doc_count": 6
   },
-  "generated_at": "2026-07-03T19:52:43Z",
+  "generated_at": "2026-07-03T20:10:01Z",
   "handoff": {
-    "companion_doc_count": 1,
-    "enabled": true,
+    "companion_doc_count": 0,
+    "enabled": false,
     "source_refs": [
-      "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui",
-      "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag",
-      "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation",
-      "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack",
-      "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering",
-      "task_160_orchestrate_the_canvas_first_workspace_shell"
+      "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui"
     ],
-    "validation_summary_count": 1
+    "validation_summary_count": 0
   },
-  "mode": "summary-only",
-  "profile": "normal",
-  "ref": "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui,item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag,item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation,item_663_dock_content_system_container_queries_inspector_host_drill_in_stack,item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering,task_160_orchestrate_the_canvas_first_workspace_shell",
+  "mode": "full",
+  "profile": "deep",
+  "ref": "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui",
   "refs": [
-    "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui",
-    "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag",
-    "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation",
-    "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack",
-    "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering",
-    "task_160_orchestrate_the_canvas_first_workspace_shell"
+    "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui"
   ],
   "release": {
     "blocking_reasons": [
@@ -307,14 +358,5 @@
     "state": "blocked",
     "target_version": "1.18.1"
   },
-  "validation_summary": [
-    {
-      "items": [
-        "- Run `python3 -m logics_manager lint --require-status`.",
-        "- Run scaffold command tests."
-      ],
-      "path": "logics/tasks/task_160_orchestrate_the_canvas_first_workspace_shell.md",
-      "ref": "task_160_orchestrate_the_canvas_first_workspace_shell"
-    }
-  ]
+  "validation_summary": []
 }

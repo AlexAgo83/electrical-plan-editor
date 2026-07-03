@@ -6,9 +6,23 @@
 > Related task: `task_160_orchestrate_the_canvas_first_workspace_shell`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
+> Non-semantic edit: added the overview Mermaid diagram (three-layer mode vs legacy, flag switch, branch containment).
 
 # Overview
 Invert the workspace hierarchy on canvas-centric screens: the canvas becomes the application background and all other UI floats above it (Figma/Miro model), shipped as an opt-in CSS-first mode behind a persisted settings flag with zero impact when off. Wide panels transform into dock-shaped content via container queries and drill-in navigation; all ~30 themes are covered by derived surface variables validated with a screenshot contact sheet.
+
+```mermaid
+flowchart TB
+  subgraph mode["canvas-bleed mode (flag ON, canvas-centric screen)"]
+    L3["Layer 3 — modals & drawers (unchanged)"]
+    L2["Layer 2 — overlay panels: left dock (lists) · right dock (inspector drill-in) · floating toolbar — pointer-events none on container, auto on panels"]
+    L1["Layer 1 — canvas background: position fixed inset 0 z-0 — fit/zoom/center target the safe area between docks"]
+    L3 --> L2 --> L1
+  end
+  flag["canvasFullBleed preference (Settings, default OFF)"] -->|"appends canvas-bleed token to appShellClassName"| mode
+  flag -->|OFF| legacy["Existing grid workspace — byte-identical, zero render diff"]
+  mode -.->|"experiment rejected: delete preference + token + mode CSS (work stays on feat/canvas-fullbleed branch)"| legacy
+```
 
 # Goals
 - The canvas is the primary selection and orientation surface: click an entity to inspect it, see routes light up across the whole screen, navigate anywhere with a palette.
