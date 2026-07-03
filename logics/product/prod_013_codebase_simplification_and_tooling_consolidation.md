@@ -6,9 +6,28 @@
 > Related task: `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
+> Confidence: 8
+> Non-semantic edit: added overview Mermaid diagram
 
 # Overview
 Cut ~2,500 lines of bespoke tooling, mirror layers, dead code, and duplication identified by a verified repo-wide audit, replacing custom enforcement with standard eslint rules and native platform features, without changing any user-visible behavior.
+
+```mermaid
+%% logics-kind: product
+flowchart LR
+    Gates[Bespoke quality gates] --> Eslint[eslint rules]
+    Eslint --> Mirror[hooks/hook-impl collapse]
+    Dead[Dead code and barrels] --> Delete[Verified deletions]
+    Dup[Duplicated logic] --> Shared[Single shared implementations]
+    Modals[Ten hand-rolled modals] --> Dialog[Native dialog mechanism]
+    Gfm[remark-gfm dependency] --> Drop[Dependency removal]
+    Eslint --> Lean[Leaner maintainable codebase]
+    Mirror --> Lean
+    Delete --> Lean
+    Shared --> Lean
+    Dialog --> Lean
+    Drop --> Lean
+```
 
 # Goals
 - Enforce architectural rules with standard eslint configuration instead of bespoke CI scripts, so rules surface in-editor and cost nothing to maintain.

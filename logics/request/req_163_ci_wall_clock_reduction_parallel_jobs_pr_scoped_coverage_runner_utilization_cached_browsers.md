@@ -1,7 +1,7 @@
 ## req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers - CI wall-clock reduction: parallel jobs, PR-scoped coverage, runner utilization, cached browsers
 > From version: 1.18.0
 > Schema version: 1.0
-> Status: Draft
+> Status: Ready
 > Understanding: 90%
 > Confidence: 85%
 > Complexity: Medium

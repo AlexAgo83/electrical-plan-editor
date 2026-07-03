@@ -6,9 +6,27 @@
 > Related task: `task_158_orchestrate_ci_wall_clock_reduction`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
+> Confidence: 8
+> Non-semantic edit: added overview Mermaid diagram
 
 # Overview
 Cut pull-request CI wall-clock time by parallelizing the serial blocking chain, scoping coverage to main, using the runner hardware fully, and caching per-run setup — without weakening any blocking verification.
+
+```mermaid
+%% logics-kind: product
+flowchart LR
+    PR[PR push] --> Lanes[Parallel blocking lanes]
+    PR --> Cancel[Cancel superseded runs]
+    Lanes --> Unit[Unit lane without coverage]
+    Lanes --> UI[Sharded UI lane full workers]
+    Lanes --> E2E[e2e build PWA lane]
+    Cache[Playwright and pip caches] --> Lanes
+    Unit --> Fast[PR feedback in minutes]
+    UI --> Fast
+    E2E --> Fast
+    Cancel --> Fast
+    Main[main push] --> Coverage[Coverage still enforced]
+```
 
 # Goals
 - PR feedback in minutes, bounded by the slowest parallel lane rather than the sum of all steps.
