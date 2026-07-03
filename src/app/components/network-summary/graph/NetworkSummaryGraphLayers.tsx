@@ -4,6 +4,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactElement,
   type ReactNode,
+  startTransition,
   useRef
 } from "react";
 import type { NetworkNode, NodeId, SegmentId, SpliceId, WireId } from "../../../../core/entities";
@@ -215,13 +216,13 @@ export function NetworkSummaryGraphLayers({
         onMouseDown={(event) => onNodeMouseDown(event, node.id)}
         onKeyDown={(event) => handleNetworkNodeKeyDown(event, node.id, onNodeActivate)}
         onClick={(event) => {
-          // Selection/editing is handled on mouse-down to support immediate drag interactions.
-          // Keep click from bubbling to future parent click handlers.
           event.stopPropagation();
           if (event.detail >= 2 || isRepeatedClick(`node:${node.id}`)) {
             onNodeActivate(node.id);
             onOpenInspectorForSelection();
+            return;
           }
+          startTransition(() => onNodeActivate(node.id));
         }}
         onDoubleClick={(event) => {
           event.preventDefault();

@@ -96,6 +96,7 @@ describe("App integration UI - navigation canvas interactions", () => {
     fireEvent.mouseDown(connectorNode as Element, { button: 0, clientX: 180, clientY: 120 });
     fireEvent.mouseMove(networkSvg, { clientX: 182, clientY: 121 });
     fireEvent.mouseUp(networkSvg, { clientX: 182, clientY: 121 });
+    fireEvent.click(connectorNode as Element);
     rectSpy.mockRestore();
 
     expect(store.getState().nodePositions[asNodeId("N-C1")]).toEqual({ x: 60, y: 80 });

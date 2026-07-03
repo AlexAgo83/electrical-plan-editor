@@ -63,6 +63,7 @@ export function useCanvasInteractionHandlers({
   const [selectedCanvasNodeIds, setSelectedCanvasNodeIds] = useState<Set<NodeId>>(new Set());
   const draggingNodeGroupRef = useRef<DraggingNodeGroupState | null>(null);
   const isPanningNetworkActiveRef = useRef(false);
+  const shouldSuppressNextNodeClickRef = useRef(false);
   const shouldSuppressNextCanvasClickRef = useRef(false);
   const { flushPendingCanvasFrame, latestManualNodePositionsRef, scheduleManualNodePositionsUpdate, scheduleNetworkOffsetUpdate } =
     useCanvasFrameScheduler({ manualNodePositions, networkOffset, setManualNodePositions, setNetworkOffset });
@@ -109,6 +110,11 @@ export function useCanvasInteractionHandlers({
   }
 
   function handleNetworkNodeActivate(nodeId: NodeId): void {
+    if (shouldSuppressNextNodeClickRef.current) {
+      shouldSuppressNextNodeClickRef.current = false;
+      return;
+    }
+
     if (interactionMode !== "select") {
       return;
     }
@@ -256,9 +262,6 @@ export function useCanvasInteractionHandlers({
     }
 
     const shouldPreserveCanvasSelection = selectedCanvasNodeIds.has(nodeId);
-    if (!shouldPreserveCanvasSelection) {
-      handleNetworkNodeActivate(nodeId);
-    }
     if (lockEntityMovement) {
       return;
     }
@@ -451,6 +454,7 @@ export function useCanvasInteractionHandlers({
     flushPendingCanvasFrame();
     const draggingNodeGroup = draggingNodeGroupRef.current;
     if (draggingNodeGroup !== null) {
+      shouldSuppressNextNodeClickRef.current = draggingNodeGroup.hasStartedDrag;
       const persistence = buildDragStopPersistence(draggingNodeGroup, latestManualNodePositionsRef.current);
       if (persistence !== null) {
         persistNodePositions(persistence.positions);
