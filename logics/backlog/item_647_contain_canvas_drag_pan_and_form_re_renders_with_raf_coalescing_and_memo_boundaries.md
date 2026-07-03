@@ -1,13 +1,14 @@
 ## item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries - Contain canvas drag/pan and form re-renders with rAF coalescing and memo boundaries
 > From version: 1.17.2
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 40
 > Complexity: High
 > Theme: Runtime performance and bundle efficiency
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
+> Owner: codex
 
 # Problem
 - All transient UI state (canvas offset/scale/manual node positions, every form field) lives in useState hooks called from AppController, the single subscriber to the full store snapshot.

@@ -12,6 +12,7 @@ import {
 } from "../lib/canvasInteractionGeometry";
 import type { NodePosition } from "../types/app-controller";
 import type { DraggingNodeGroupState, UseCanvasInteractionHandlersParams } from "../types/canvas-interactions";
+import { useCanvasFrameScheduler } from "./useCanvasFrameScheduler";
 
 const NODE_DRAG_START_THRESHOLD_PX = 4;
 const PAN_CLICK_SUPPRESSION_THRESHOLD_PX = 4;
@@ -62,6 +63,8 @@ export function useCanvasInteractionHandlers({
   const [selectedCanvasNodeIds, setSelectedCanvasNodeIds] = useState<Set<NodeId>>(new Set());
   const draggingNodeGroupRef = useRef<DraggingNodeGroupState | null>(null);
   const shouldSuppressNextCanvasClickRef = useRef(false);
+  const { flushPendingCanvasFrame, latestManualNodePositionsRef, scheduleManualNodePositionsUpdate, scheduleNetworkOffsetUpdate } =
+    useCanvasFrameScheduler({ manualNodePositions, networkOffset, setManualNodePositions, setNetworkOffset });
 
   function clearSelectedCanvasNodes(): void {
     setSelectedCanvasNodeIds((previous) => (previous.size === 0 ? previous : new Set<NodeId>()));
@@ -361,7 +364,7 @@ export function useCanvasInteractionHandlers({
       const deltaX = coordinates.x - draggingNodeGroup.anchorStartPosition.x;
       const deltaY = coordinates.y - draggingNodeGroup.anchorStartPosition.y;
       const nextPositions = applyGroupDragDelta(draggingNodeGroup.originPositions, deltaX, deltaY, snapNodesToGrid);
-      setManualNodePositions((previous) => {
+      scheduleManualNodePositionsUpdate((previous) => {
         let changed = false;
         for (const [nodeId, nextPosition] of Object.entries(nextPositions) as Array<[NodeId, NodePosition]>) {
           const previousPosition = previous[nodeId];
@@ -407,7 +410,7 @@ export function useCanvasInteractionHandlers({
       }
       const nextOffsetX = panStartRef.current.offsetX + deltaX;
       const nextOffsetY = panStartRef.current.offsetY + deltaY;
-      setNetworkOffset((current) => {
+      scheduleNetworkOffsetUpdate((current) => {
         if (Math.abs(current.x - nextOffsetX) <= 0.0001 && Math.abs(current.y - nextOffsetY) <= 0.0001) {
           return current;
         }
@@ -423,7 +426,7 @@ export function useCanvasInteractionHandlers({
     if (coordinates === null) {
       return;
     }
-    setManualNodePositions((previous) => {
+    scheduleManualNodePositionsUpdate((previous) => {
       const previousPosition = previous[draggingNodeId];
       if (
         previousPosition !== undefined &&
@@ -440,9 +443,10 @@ export function useCanvasInteractionHandlers({
   }
 
   function stopNetworkNodeDrag(): void {
+    flushPendingCanvasFrame();
     const draggingNodeGroup = draggingNodeGroupRef.current;
     if (draggingNodeGroup !== null) {
-      const persistence = buildDragStopPersistence(draggingNodeGroup, manualNodePositions);
+      const persistence = buildDragStopPersistence(draggingNodeGroup, latestManualNodePositionsRef.current);
       if (persistence !== null) {
         persistNodePositions(persistence.positions);
         setManualNodePositions((previous) => {
