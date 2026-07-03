@@ -768,6 +768,13 @@ export function buildModelingScreenContentSlice(
     modelingBatchSelection: params.modelingBatchSelection,
   } satisfies ModelingFormsColumnProps;
 
+  const showPrimaryTables =
+    params.isConnectorSubScreen ||
+    params.isSpliceSubScreen ||
+    params.isNodeSubScreen;
+  const showSecondaryTables =
+    params.isSegmentSubScreen || params.isWireSubScreen;
+
   return {
     modelingPrimaryTablesProps,
     modelingSecondaryTablesProps,
@@ -780,12 +787,16 @@ export function buildModelingScreenContentSlice(
         wireHandlers={params.wireHandlers}
       >
         <>
-          <params.ModelingPrimaryTablesComponent
-            {...modelingPrimaryTablesProps}
-          />
-          <params.ModelingSecondaryTablesComponent
-            {...modelingSecondaryTablesProps}
-          />
+          {showPrimaryTables ? (
+            <params.ModelingPrimaryTablesComponent
+              {...modelingPrimaryTablesProps}
+            />
+          ) : null}
+          {showSecondaryTables ? (
+            <params.ModelingSecondaryTablesComponent
+              {...modelingSecondaryTablesProps}
+            />
+          ) : null}
         </>
       </ModelingController>
     ),
