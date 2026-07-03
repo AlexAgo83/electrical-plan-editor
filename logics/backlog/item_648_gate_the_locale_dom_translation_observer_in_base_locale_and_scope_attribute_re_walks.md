@@ -1,10 +1,10 @@
 ## item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks - Gate the locale DOM-translation observer in base locale and scope attribute re-walks
 > From version: 1.17.2
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Low
 > Theme: Runtime performance and bundle efficiency
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.

@@ -1,19 +1,20 @@
 ## task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul - Orchestrate runtime rendering and initial bundle performance overhaul
 > From version: 1.17.2
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 95
 > Confidence: 90
-> Progress: 0%
+> Progress: 25
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+> Owner: codex
 
 # Context
 - Orchestrate the scaffolded request chain and keep sibling implementation slices linked.
 
 # Plan
-- [ ] 1. Land the locale-observer gating slice first (lowest risk, immediate win multiplied by every render): implement, run i18n suites, close.
+- [x] 1. Land the locale-observer gating slice first (lowest risk, immediate win multiplied by every render): implemented, i18n suites passed, backlog closed.
 - [ ] 2. Land the bundle code-splitting slice: remove app manualChunks, verify exceljs boundary and e2e screens, re-baseline budgets in report-bundle-metrics.mjs, record before/after metrics.
 - [ ] 3. Land the render-containment slice: rAF coalescing in useCanvasInteractionHandlers, memo boundaries on workspace containers with stabilized props at the AppController seam, render-count regression harness; validate drag/pan feel via the built app on the sample networks.
 - [ ] 4. Land the persistence idle-scheduling slice last: idle-scheduled steady-state writes, unchanged sync flush semantics, duration instrumentation.
@@ -74,7 +75,8 @@
 - Run `npm run ci:blocking` after each slice lands; capture `npm run build:bundle:report` output before/after the bundle slice.
 
 # Report
-- Not started — pending implementation of the four backlog slices.
+- Slice `item_648` delivered: base locale now restores once without attaching the DOM translation observer; attribute-only mutations translate only the mutated element attributes.
+- Validation: `npx vitest run src/tests/app.locale-dom-translation.spec.tsx src/tests/app.ui.settings-locale.spec.tsx --pool=forks --maxWorkers=2 --testTimeout=15000`; `npm run -s lint`; `npm run -s typecheck`.
 
 # AI Context
 - Summary: Orchestrate runtime rendering and initial bundle performance overhaul

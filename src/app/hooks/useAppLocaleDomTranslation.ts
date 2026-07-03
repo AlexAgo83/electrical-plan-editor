@@ -153,6 +153,10 @@ export function useAppLocaleDomTranslation(locale: AppLocale): void {
     document.documentElement.lang = locale;
     translateSubtree(document, locale);
 
+    if (locale === "en") {
+      return;
+    }
+
     const observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
         if (mutation.type === "childList") {
@@ -166,7 +170,7 @@ export function useAppLocaleDomTranslation(locale: AppLocale): void {
         }
 
         if (mutation.type === "attributes" && mutation.target instanceof Element) {
-          translateSubtree(mutation.target, locale);
+          translateElementAttributes(mutation.target, locale);
         }
       }
     });
