@@ -1,6 +1,6 @@
 ## prod_013_codebase_simplification_and_tooling_consolidation - Codebase simplification and tooling consolidation
 > Date: 2026-07-03
-> Status: Proposed
+> Status: Accepted
 > Related request: `req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code`
 > Related backlog: `item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy`, `item_652_collapse_the_hooks_hook_impl_mirror_directory`, `item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism`, `item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters`, `item_655_consolidate_duplicated_logic_into_single_shared_implementations`, `item_656_drop_remark_gfm_from_the_changelog_renderer`
 > Related task: `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies`
