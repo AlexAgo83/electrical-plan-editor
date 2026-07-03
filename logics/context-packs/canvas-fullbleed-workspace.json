@@ -1,0 +1,320 @@
+{
+  "budgets": {
+    "max_docs": 24,
+    "max_docs_per_ref": 4
+  },
+  "changed_paths": [],
+  "command": "logics-manager sync context-pack req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation item_663_dock_content_system_container_queries_inspector_host_drill_in_stack item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering task_160_orchestrate_the_canvas_first_workspace_shell --mode summary-only --profile normal --handoff",
+  "companion_docs": [
+    {
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag",
+          "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation",
+          "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack",
+          "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering"
+        ],
+        "prod": [
+          "prod_015_canvas_first_workspace_shell"
+        ],
+        "req": [
+          "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui"
+        ],
+        "task": [
+          "task_160_orchestrate_the_canvas_first_workspace_shell"
+        ]
+      },
+      "path": "logics/product/prod_015_canvas_first_workspace_shell.md",
+      "ref": "prod_015_canvas_first_workspace_shell",
+      "status": "Proposed",
+      "title": "Canvas-first workspace shell"
+    }
+  ],
+  "docs": [
+    {
+      "ai_context": {
+        "keywords": "request-chain-scaffold, full-bleed canvas workspace: canvas as application background behind a feature flag, docks as overlay ui, development-ready",
+        "skip when": "The change is unrelated to this scaffolded request chain.",
+        "summary": "Full-bleed canvas workspace: canvas as application background behind a feature flag, docks as overlay UI",
+        "use when": "You need to implement or review the scaffolded workflow for Full-bleed canvas workspace: canvas as application background behind a feature flag, docks as overlay UI."
+      },
+      "kind": "request",
+      "linked_refs": {
+        "item": [
+          "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag",
+          "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation",
+          "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack",
+          "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering"
+        ],
+        "prod": [
+          "prod_015_canvas_first_workspace_shell"
+        ],
+        "req": [
+          "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui"
+        ]
+      },
+      "path": "logics/request/req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui.md",
+      "ref": "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui",
+      "schema_version": "1.0",
+      "status": "Draft",
+      "title": "Full-bleed canvas workspace: canvas as application background behind a feature flag, docks as overlay UI"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, canvas-bleed foundations and network scope pilot behind a settings flag, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Canvas-bleed foundations and Network Scope pilot behind a settings flag",
+        "use when": "Implementing the scaffolded slice for Canvas-bleed foundations and Network Scope pilot behind a settings flag."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag"
+        ],
+        "prod": [
+          "prod_015_canvas_first_workspace_shell"
+        ],
+        "req": [
+          "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui"
+        ],
+        "task": [
+          "task_160_orchestrate_the_canvas_first_workspace_shell"
+        ]
+      },
+      "path": "logics/backlog/item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag.md",
+      "ref": "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Canvas-bleed foundations and Network Scope pilot behind a settings flag"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, derived dock-surface theme variables with all-themes contact-sheet validation, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Derived dock-surface theme variables with all-themes contact-sheet validation",
+        "use when": "Implementing the scaffolded slice for Derived dock-surface theme variables with all-themes contact-sheet validation."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation"
+        ],
+        "prod": [
+          "prod_015_canvas_first_workspace_shell"
+        ],
+        "req": [
+          "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui"
+        ],
+        "task": [
+          "task_160_orchestrate_the_canvas_first_workspace_shell"
+        ]
+      },
+      "path": "logics/backlog/item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation.md",
+      "ref": "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Derived dock-surface theme variables with all-themes contact-sheet validation"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, dock content system: container queries, inspector host, drill-in stack, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Dock content system: container queries, inspector host, drill-in stack",
+        "use when": "Implementing the scaffolded slice for Dock content system: container queries, inspector host, drill-in stack."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack"
+        ],
+        "prod": [
+          "prod_015_canvas_first_workspace_shell"
+        ],
+        "req": [
+          "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui"
+        ],
+        "task": [
+          "task_160_orchestrate_the_canvas_first_workspace_shell"
+        ]
+      },
+      "path": "logics/backlog/item_663_dock_content_system_container_queries_inspector_host_drill_in_stack.md",
+      "ref": "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Dock content system: container queries, inspector host, drill-in stack"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-task, request-chain-scaffold, orchestration",
+        "skip when": "Working on one isolated sibling slice.",
+        "summary": "Orchestrate the canvas-first workspace shell",
+        "use when": "Coordinating implementation of a scaffolded request chain."
+      },
+      "kind": "task",
+      "linked_refs": {
+        "item": [
+          "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag",
+          "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation",
+          "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack",
+          "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering"
+        ],
+        "prod": [
+          "prod_015_canvas_first_workspace_shell"
+        ],
+        "req": [
+          "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui"
+        ],
+        "task": [
+          "task_160_orchestrate_the_canvas_first_workspace_shell"
+        ]
+      },
+      "path": "logics/tasks/task_160_orchestrate_the_canvas_first_workspace_shell.md",
+      "ref": "task_160_orchestrate_the_canvas_first_workspace_shell",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Orchestrate the canvas-first workspace shell"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, analysis screen full-bleed with route highlighting and low-zoom decluttering, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Analysis screen full-bleed with route highlighting and low-zoom decluttering",
+        "use when": "Implementing the scaffolded slice for Analysis screen full-bleed with route highlighting and low-zoom decluttering."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering"
+        ],
+        "prod": [
+          "prod_015_canvas_first_workspace_shell"
+        ],
+        "req": [
+          "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui"
+        ],
+        "task": [
+          "task_160_orchestrate_the_canvas_first_workspace_shell"
+        ]
+      },
+      "path": "logics/backlog/item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering.md",
+      "ref": "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Analysis screen full-bleed with route highlighting and low-zoom decluttering"
+    }
+  ],
+  "estimates": {
+    "char_count": 8026,
+    "companion_doc_count": 1,
+    "doc_count": 6
+  },
+  "generated_at": "2026-07-03T19:52:43Z",
+  "handoff": {
+    "companion_doc_count": 1,
+    "enabled": true,
+    "source_refs": [
+      "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui",
+      "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag",
+      "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation",
+      "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack",
+      "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering",
+      "task_160_orchestrate_the_canvas_first_workspace_shell"
+    ],
+    "validation_summary_count": 1
+  },
+  "mode": "summary-only",
+  "profile": "normal",
+  "ref": "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui,item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag,item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation,item_663_dock_content_system_container_queries_inspector_host_drill_in_stack,item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering,task_160_orchestrate_the_canvas_first_workspace_shell",
+  "refs": [
+    "req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui",
+    "item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag",
+    "item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation",
+    "item_663_dock_content_system_container_queries_inspector_host_drill_in_stack",
+    "item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering",
+    "task_160_orchestrate_the_canvas_first_workspace_shell"
+  ],
+  "release": {
+    "blocking_reasons": [
+      "version_metadata: evidence targets a different version",
+      "changelog: evidence targets a different version",
+      "local_validation: evidence targets a different version",
+      "git_push: evidence targets a different version",
+      "ci: evidence targets a different version",
+      "production_deployment: evidence targets a different version"
+    ],
+    "configured": true,
+    "contract_path": "logics/release/contract.json",
+    "guidance": [
+      "Release readiness must come from project-owned evidence, not conversational memory.",
+      "Use release status or validate before preparing or claiming release readiness.",
+      "Publication-oriented actions are explicit operator actions and are separate from safe read/validate actions."
+    ],
+    "next_action": "version_metadata: evidence targets a different version",
+    "publication_actions": [
+      "GitHub release publication",
+      "external publication"
+    ],
+    "required_gates": [
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "version_metadata",
+        "required": true,
+        "state": "preparing",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "changelog",
+        "required": true,
+        "state": "preparing",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "local_validation",
+        "required": true,
+        "state": "local_validation",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "git_push",
+        "required": true,
+        "state": "pushed",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "ci",
+        "required": true,
+        "state": "ci_verification",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "production_deployment",
+        "required": true,
+        "state": "external_publication",
+        "status": "stale"
+      }
+    ],
+    "safe_actions": [
+      "logics-manager release status",
+      "logics-manager release plan <version>",
+      "logics-manager release validate <version>"
+    ],
+    "state": "blocked",
+    "target_version": "1.18.1"
+  },
+  "validation_summary": [
+    {
+      "items": [
+        "- Run `python3 -m logics_manager lint --require-status`.",
+        "- Run scaffold command tests."
+      ],
+      "path": "logics/tasks/task_160_orchestrate_the_canvas_first_workspace_shell.md",
+      "ref": "task_160_orchestrate_the_canvas_first_workspace_shell"
+    }
+  ]
+}

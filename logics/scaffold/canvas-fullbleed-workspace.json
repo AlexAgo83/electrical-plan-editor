@@ -1,0 +1,207 @@
+{
+  "title": "Full-bleed canvas workspace: canvas as application background behind a feature flag, docks as overlay UI",
+  "references": [
+    "src/app/components/layout/AppShellLayout.tsx",
+    "src/app/hooks/useAppControllerShellDerivedState.ts",
+    "src/app/hooks/useUiPreferences.ts",
+    "src/app/components/network-summary/NetworkSummaryCanvasPanel.tsx",
+    "src/app/components/InspectorContextPanel.tsx",
+    "src/app/components/network-summary/NetworkSummaryQuickEntityNavigation.tsx",
+    "src/app/styles/workspace/workspace-panels-and-responsive/action-icons-and-responsive-overrides.css",
+    "src/app/styles/base/base-theme-overrides/network-canvas-entity-theme-variables.css",
+    "src/store/types.ts",
+    "src/tests/app.ui.workspace-shell-regression.spec.tsx"
+  ],
+  "request": {
+    "complexity": "High",
+    "theme": "Canvas-first workspace UX",
+    "needs": [
+      "The network canvas must become the application background on canvas-centric screens, with all other UI floating above it as overlay layers (reference model: Figma/Miro — the canvas is the world, the UI is an overlay). Today the canvas is a grid child inside workspace-content, squeezed alongside sidebars, tables, and forms.",
+      "The new layout must ship as an opt-in mode behind a persisted settings preference: flag off means zero render or behavior difference, so the existing workspace keeps working untouched and rollback is instant.",
+      "Entity work must flow canvas-first: click an entity on the canvas, its inspector opens in a right dock, edit, Escape collapses it — replacing the table-to-canvas round-trips.",
+      "Wide panels must be transformed for dock width, never compressed: forms stack in a single column with accordion sections, embedded wide tables become key-value rows with truncation, side-by-side detail panels become a drill-in stack with breadcrumb. Depth replaces width; there is never a third column.",
+      "All ~30 existing themes must stay readable in the new mode without per-theme rework: dock surfaces derive from existing theme variables, with readability guaranteed by construction (opacity floor), not by luck.",
+      "The model must hold at real scale: a real user-exported production network (~30 connectors, 150 wires, 18 splices, 47 segments, very horizontal aspect ratio ~3.5:1) fits at roughly 23% zoom, which demands zoom-level decluttering (hide dimension labels below a threshold, collapse co-located connector clusters into a count badge, truncate long attached-wire lists)."
+    ],
+    "context": [
+      "This request absorbs an unversioned design exploration (2026-07-03, working folder logics/external/: a full CR, six target-UX HTML mockups rendered to PNG, current-app captures, and real workspace exports used as the stress-test dataset). Because that folder is not versioned, this corpus is the durable record of its findings; the key ones are restated below.",
+      "Target architecture is three layers. Background layer (z-0): the canvas uses position: fixed; inset: 0, mounted only on canvas-centric screens. Panel layer: a full-screen container with pointer-events: none where each panel restores pointer-events: auto, so clicks between panels reach the canvas; panels are floating cards with backdrop-filter. Modal/drawer layer: unchanged, already above everything. The app already has half this vocabulary (fixed navigation drawers, ops panel, blurred backdrops, canvas floating controls); the canvas is the part still trapped in the grid.",
+      "Navigation model from the mockups: a ~48 px left icon rail replaces tabs (Home, Modeling, Scope, Analysis, Validation, Stats, Settings); an ultra-thin (~40 px) translucent header carries the active-network picker, breadcrumb, and global stats; a left dock hosts entity lists and a right dock hosts the inspector/forms, both collapsible to edge handles; Cmd+backslash hides/shows all panels (Tab was considered and withdrawn — it breaks keyboard-accessibility focus traversal); Cmd+K opens a direct-navigation palette that centers the canvas on any entity and opens its inspector (builds on the existing NetworkSummaryQuickEntityNavigation).",
+      "Screen-by-screen audit verdicts: full-bleed for Network Scope (pilot), Harness Assembly, Analysis (biggest win: route highlighting lights up the whole background canvas), and Validation (click an issue to center the canvas on the offending entity and open its inspector). Central-panel mode (dense content in a near-full panel over a neutral background) for Modeling tables, Statistics, Settings, Home, and Catalog. Every existing panel maps to one of {background mode, left dock, right dock, floating bar/card, central panel, dialog}; nothing in the inventory resists the model.",
+      "Real-scale stress test findings (mockup rendered from a real network export): fit-to-content lands at ~23% zoom, so dimension labels must hide below a zoom threshold and splice labels soften; one physical cluster of five co-located connectors overlaps unreadably and must collapse into a count badge below a threshold; the densest connector carries 27 attached wires, so the inspector accordion needs truncation with a view-all escape; search plus entity-type filter chips in the left dock are essential beyond ~30 entities.",
+      "Feature-flag mechanics verified against the code: useAppControllerShellDerivedState builds appShellClassName as a preference-driven token list (table-density-compact, workspace-wide-screen, theme classes) — the mode is one more token (canvas-bleed) applied only when the flag is on and the active screen supports it; useUiPreferences already manages persisted booleans with localStorage hydration, so the flag is one more preference plus a Settings toggle. CSS-first: same component tree, same state, only the layout layer changes under .app-shell.canvas-bleed.",
+      "The one place the flag crosses into logic is the safe area — the most structural risk. useNetworkSummaryViewportSizeChange and fit-to-content measure the container; in full bleed the viewport is the whole screen but open docks occlude part of it, so fit, zoom, Cmd+K centering, and center-on-issue must target the genuinely visible area via dynamic insets (measured dock widths when the flag is on, zero otherwise).",
+      "Wide-panel transformation verified against the code: existing responsive styles trigger on @media (max-width: 900px) — viewport width — so the app already knows how to render every panel narrow but measures the wrong thing; a panel inside a 340 px dock on a 1920 px screen stays in wide mode. The fix is container queries: the dock gets container-type: inline-size and the narrow rules migrate to @container, including the visible-column threshold of ConfigurableTableColumns. Two fixed dock widths (~340 px for analysis sheets, ~440 px for heavy forms), no free resizing. InspectorContextPanel already plays the inspector role conceptually and becomes the dock's single host (breadcrumb, drill-in stack, accordions); existing panels become its content, not its neighbors. 2D content (connector physical view, grids) never goes in the dock — background mode or floating card.",
+      "Themes verified against the code: ~30 ThemeMode values across ~27 override CSS files make any per-theme pass unaffordable. The mode introduces a handful of semantic variables (--dock-surface, --dock-border, --dock-blur, --canvas-scrim) defined once at shell level and derived from existing theme variables via color-mix, with an opacity floor of at least ~85% so dock text always sits on the panel surface. Dark and light themes are safe by construction; the risky cases are midrange themes where canvas and panel converge in luminance — that is what the optional scrim is for. prefers-reduced-transparency gets an opaque fallback through the same variable. Validation is a Playwright contact sheet (one screenshot per theme of the pilot screen, flag on), not eyeballing.",
+      "Honest list of what the model breaks (kept out of this request's scope but recorded): the 9-step onboarding tour works by scrolling the page to a target panel and must be rebuilt as a spotlight pattern; small screens need a redesign of their own (docks become a three-state bottom sheet, the rail a bottom tab bar) — noting that full bleed is also mobile's biggest upside since the plan becomes the screen; Settings/Home reorganization is an independent effort.",
+      "Anti-pattern explicitly refused: a second shell (AppShellLayoutV2). Two shells diverge within weeks and the flag becomes unremovable. One shell, one CSS mode, one insets parameter — abandoning the experiment must reduce to deleting a token, a CSS block, and a preference."
+    ],
+    "acceptance_criteria": [
+      "AC1: With the preference off (default), the rendered workspace is unchanged — the existing shell regression suite passes without modification and no canvas-bleed class token or CSS applies.",
+      "AC2: With the preference on, Network Scope renders the canvas as a fixed full-viewport background with the network table as a left-dock overlay and the scope form as a right-dock overlay; fit-to-content, zoom, and centering target the visible safe area between open docks (dynamic insets), not the full window.",
+      "AC3: In bleed mode, canvas interactions survive the overlay routing: callout and node dragging work (acceptance test #1), wheel over a panel scrolls the panel while wheel over the canvas zooms, and clicks between panels reach the canvas.",
+      "AC4: Wide panel content adapts to dock width via container-width rules, not compression: forms stack single-column with accordion sections at ~440 px, embedded wide tables render as key-value rows with a truncation escape to a central panel, and detail chains render as a breadcrumbed drill-in stack in the right dock with no third column ever.",
+      "AC5: Every shipped theme is readable in bleed mode through derived dock-surface variables with an opacity floor — no per-theme CSS beyond point overrides justified by a generated all-themes contact sheet, which is produced by a rerunnable script.",
+      "AC6: The Analysis screen runs full-bleed with route/entity highlighting on the background canvas and inspector details in the right-dock drill-in, and the canvas declutters at low zoom (dimension labels hidden below a threshold, co-located connector clusters collapsed to a count badge) validated against a real-scale network of at least 30 connectors and 150 wires.",
+      "AC7: Removing the experiment reduces to deleting the preference, the class token, and the mode CSS — no component forks, no second shell, and no behavior change for flag-off users at any point."
+    ]
+  },
+  "product": {
+    "title": "Canvas-first workspace shell",
+    "overview": "Invert the workspace hierarchy on canvas-centric screens: the canvas becomes the application background and all other UI floats above it (Figma/Miro model), shipped as an opt-in CSS-first mode behind a persisted settings flag with zero impact when off. Wide panels transform into dock-shaped content via container queries and drill-in navigation; all ~30 themes are covered by derived surface variables validated with a screenshot contact sheet.",
+    "goals": [
+      "The canvas is the primary selection and orientation surface: click an entity to inspect it, see routes light up across the whole screen, navigate anywhere with a palette.",
+      "One shell, one mode: the flag adds a class token and an insets parameter, never a parallel layout implementation.",
+      "Every panel keeps its capability when it moves: transformation by content type (single-column forms, key-value rows, drill-in depth) instead of horizontal compression.",
+      "Theme coverage by construction: derived translucent surfaces with an opacity floor, point overrides only on contact-sheet-proven failures.",
+      "The model is proven at real scale (30+ connectors, 150+ wires) before expanding beyond the pilot screen."
+    ],
+    "non_goals": [
+      "No mobile/PWA bottom-sheet redesign — recorded as the follow-up with the biggest upside, but a chapter of its own.",
+      "No onboarding-tour rewrite beyond keeping it functional flag-off; the spotlight rebuild is a separate effort.",
+      "No Settings or Home reorganization (relocating preferences, hub redesign) — independent of full bleed.",
+      "No Harness Assembly or Validation screen conversion in this request; the audit verdicts stand for later requests.",
+      "No new theme and no free-form dock resizing or floating window management.",
+      "No Tab shortcut for hiding panels — it breaks keyboard-accessibility focus traversal; the hide-all binding avoids Tab."
+    ]
+  },
+  "backlog_items": [
+    {
+      "title": "Canvas-bleed foundations and Network Scope pilot behind a settings flag",
+      "priority": "High",
+      "complexity": "High",
+      "theme": "Canvas-first workspace UX",
+      "request_acs": ["AC1", "AC2", "AC3", "AC7"],
+      "problem": [
+        "The canvas is a grid child inside workspace-content, so it can never act as the spatial background the workflows want; every screen frames it differently and selection lives in tables.",
+        "Fit-to-content, zoom, and centering measure the canvas container; if the canvas becomes the full viewport with docks floating over it, all of them mis-target unless they learn about occluded edges.",
+        "Any layout inversion attempted without a hard flag-off guarantee risks the working product for every user."
+      ],
+      "scope_in": [
+        "Add a persisted canvasFullBleed boolean to the UI preferences (localStorage hydration like existing booleans) with a toggle in Settings, default off.",
+        "Emit a canvas-bleed token from the appShellClassName token list only when the flag is on and the active screen is Network Scope.",
+        "Write the mode CSS: under .app-shell.canvas-bleed the network summary canvas panel goes position: fixed; inset: 0; z-index 0; the Network Scope panels (network table left, scope form right) become floating dock cards; an overlay container uses pointer-events: none with panels restoring pointer-events: auto.",
+        "Implement dynamic safe-area insets: measure open dock widths and feed them to the viewport-size hook and fit-to-content so fit, zoom, and centering target the visible area; insets are zero when the flag is off.",
+        "Define unambiguous wheel routing: wheel over a dock scrolls the dock, wheel over the canvas zooms.",
+        "Dock collapse/expand with edge handles when collapsed.",
+        "Add a flag-on pass to the shell regression suite asserting callout and node dragging on Network Scope (acceptance test #1), plus the safe-area fit assertions; the existing flag-off suite stays untouched and green."
+      ],
+      "scope_out": [
+        "Any other screen (Analysis, Validation, Harness Assembly, Modeling).",
+        "The icon rail, thin header, Cmd+K palette, and hide-all shortcut — navigation chrome comes after the pilot proves the layer model.",
+        "Theme surface derivation (own backlog item).",
+        "Wide-panel content transformation (own backlog item) — the scope form already fits a dock as-is."
+      ],
+      "acceptance_criteria": [
+        "AC1: Flag off produces a byte-identical class list and unchanged rendering; the pre-existing shell regression suite passes unmodified.",
+        "AC2: Flag on, Network Scope shows the canvas as full-viewport background with both docks floating over it; toggling the flag live switches modes without losing selection or canvas state.",
+        "AC3: Fit-to-content and centering land the network inside the visible area between open docks, and re-fit correctly when a dock collapses or expands.",
+        "AC4: Callout dragging, node dragging, canvas click-to-select, dock scrolling, and canvas wheel-zoom all work in bleed mode, verified by the new flag-on regression pass.",
+        "AC5: Reverting the experiment is a deletion-only diff: preference, token, mode CSS, insets parameter."
+      ]
+    },
+    {
+      "title": "Derived dock-surface theme variables with all-themes contact-sheet validation",
+      "priority": "High",
+      "complexity": "Medium",
+      "theme": "Canvas-first workspace UX",
+      "request_acs": ["AC5"],
+      "problem": [
+        "The app ships ~30 themes across ~27 override CSS files; translucent docks over an arbitrary themed canvas can silently become unreadable in any of them, and a per-theme styling pass is unaffordable and unmaintainable.",
+        "Midrange themes are the danger zone: canvas and panel surfaces converge in luminance, so blur alone does not guarantee text contrast."
+      ],
+      "scope_in": [
+        "Define the mode's semantic variables once at shell level: --dock-surface, --dock-border, --dock-blur, --canvas-scrim, derived from existing theme surface variables via color-mix with an opacity floor of at least ~85%.",
+        "Honor prefers-reduced-transparency by resolving --dock-surface to fully opaque and --dock-blur to none through the same variables.",
+        "Build a rerunnable Playwright contact-sheet script: screenshot the pilot screen flag-on in every ThemeMode value, compose a thumbnail grid artifact for review.",
+        "Apply point overrides (one --dock-surface line per failing theme) only for themes the contact sheet proves unreadable, and record which themes needed them and why."
+      ],
+      "scope_out": [
+        "Any new theme, any change to existing theme palettes or canvas entity colors.",
+        "Automated contrast scoring — a human reviews the contact sheet; automation can come later if reviews become frequent."
+      ],
+      "acceptance_criteria": [
+        "AC1: All dock/overlay surfaces in bleed mode style exclusively through the semantic variables; no theme-specific selectors inside the mode CSS beyond recorded point overrides.",
+        "AC2: The contact-sheet script runs from the repo and outputs one labeled screenshot per shipped theme of the flag-on pilot screen.",
+        "AC3: Every theme is readable on the contact sheet (dock text on dock surface, header legible over canvas), with point overrides listed in the closeout for any theme that needed one.",
+        "AC4: With reduced transparency requested, docks render fully opaque with no blur."
+      ]
+    },
+    {
+      "title": "Dock content system: container queries, inspector host, drill-in stack",
+      "priority": "Medium",
+      "complexity": "High",
+      "theme": "Canvas-first workspace UX",
+      "request_acs": ["AC4"],
+      "problem": [
+        "Responsive panel styles key on @media viewport width (900 px breakpoint), so a panel placed in a 340 px dock on a wide screen keeps its wide layout and overflows; the app already owns narrow renderings but measures the wrong dimension.",
+        "Detail chains today spread horizontally as stacked side-by-side panels; a dock cannot afford columns, so depth must replace width or the inspector becomes unusable.",
+        "Embedded wide tables (an entity's attached wires, occupancy grids) physically cannot fit a dock; at real scale the densest connector carries 27 wires."
+      ],
+      "scope_in": [
+        "Give docks container-type: inline-size and migrate the panel-level responsive rules consumed inside docks from @media to @container, including the ConfigurableTableColumns visible-column threshold.",
+        "Two fixed dock widths: ~340 px standard (analysis sheets), ~440 px wide (heavy entity forms); the dock picks per content type, no free resize.",
+        "Make InspectorContextPanel the right dock's single host: clickable breadcrumb, drill-in stack with Back/Escape navigation, accordion sections for sub-details, the drilled entity highlighted on the canvas.",
+        "Transformation rules as reusable dock primitives: embedded wide tables render as key-value rows with truncation ('view all' opens the real table as a central panel); 2D content (connector physical view, grids) is never docked — it stays a background mode or floating card.",
+        "Pinning: detach the current detail sheet as a small floating card to compare two entities without a second column."
+      ],
+      "scope_out": [
+        "Converting the Modeling forms column or any screen's actual content to the dock — this item builds the system; screens adopt it in their own items.",
+        "The AI agent panel relocation (folds in when its screen converts).",
+        "Batch-selection floating bar (belongs to the screen that needs it)."
+      ],
+      "acceptance_criteria": [
+        "AC1: A panel rendered inside a 340 px dock on a wide viewport uses its narrow layout, driven by container width; the same panel full-width still renders wide.",
+        "AC2: A three-level drill-in (entity, sub-entity, sub-sub-entity) navigates via breadcrumb clicks, Back, and Escape, with the parent entity staying highlighted on the canvas and never a third column.",
+        "AC3: A sheet embedding a 27-row wide table shows truncated key-value rows with a working view-all escape to a central panel.",
+        "AC4: A pinned sheet persists as a floating card while the dock navigates to another entity, and both remain readable and dismissable."
+      ]
+    },
+    {
+      "title": "Analysis screen full-bleed with route highlighting and low-zoom decluttering",
+      "priority": "Medium",
+      "complexity": "High",
+      "theme": "Canvas-first workspace UX",
+      "request_acs": ["AC6"],
+      "problem": [
+        "Analysis is the biggest payoff of the model: the graph already supports highlighted wires/routes, but the highlight lives inside a boxed panel next to tables instead of lighting up the actual network on screen.",
+        "At real scale the fit lands near 23% zoom: dimension labels turn to noise, a five-connector co-located cluster overlaps unreadably, and flat lists of attached entities exceed what any dock can show.",
+        "Entity lists across five analysis sub-screens (connectors, wires, splices, nodes, segments) each frame their own tables, multiplying navigation instead of funneling through one canvas."
+      ],
+      "scope_in": [
+        "Extend the canvas-bleed token to the Analysis screen: entity lists in the left dock with search and entity-type filter chips, analysis detail sheets in the right-dock drill-in (built on the dock content system), route/entity highlighting rendered on the background canvas.",
+        "Zoom-level decluttering on the summary canvas: hide dimension labels below a zoom threshold, soften splice labels, collapse co-located connector clusters into a count badge below a threshold with expansion on zoom-in or click.",
+        "Selection loop: choosing an entity in the left dock or on the canvas centers/highlights it and opens its sheet; wire selection lights the full route across the background.",
+        "Validate the whole screen against a real-scale network (30+ connectors, 150+ wires, 18+ splices) and record findings in the closeout.",
+        "Add the flag-on regression pass for Analysis (selection loop, highlighting, decluttering thresholds)."
+      ],
+      "scope_out": [
+        "Validation, Harness Assembly, and Modeling screen conversions (later requests; audit verdicts recorded in the product brief).",
+        "The Cmd+K palette and icon rail (navigation chrome, separate effort).",
+        "Changes to analysis computations or route models — presentation only."
+      ],
+      "acceptance_criteria": [
+        "AC1: Flag on, every Analysis sub-screen renders full-bleed: left-dock lists with type chips and search, right-dock drill-in sheets, canvas as background; flag off, the current Analysis layout is untouched.",
+        "AC2: Selecting a wire highlights its complete route on the background canvas while its sheet opens in the dock; selecting from the canvas drives the same loop.",
+        "AC3: Below the decluttering thresholds, dimension labels hide and co-located connector clusters render as a count badge that expands on zoom or click; above the thresholds, current rendering is unchanged.",
+        "AC4: The real-scale validation run is recorded with screenshots at fit zoom, confirming readable orientation at ~23% zoom on a 30-connector/150-wire network."
+      ]
+    }
+  ],
+  "orchestration_task": {
+    "title": "Orchestrate the canvas-first workspace shell",
+    "plan": [
+      "Land the foundations + Network Scope pilot first: flag, token, mode CSS, safe-area insets, wheel/pointer routing, and the flag-on regression pass (acceptance test #1: callout/node dragging). Nothing else starts until the pilot proves the three-layer model on real interactions.",
+      "Land the theme variables + contact sheet immediately after the pilot renders: it is the cheapest item and unblocks honest visual review of everything that follows.",
+      "Build the dock content system next (container queries, InspectorContextPanel host, drill-in, truncation, pinning) — it gates Analysis and every future screen conversion.",
+      "Convert Analysis last, on top of the dock system, including low-zoom decluttering; validate at real scale and record the findings.",
+      "Hold the line on scope: mobile bottom sheets, onboarding spotlight rewrite, Settings/Home reorganization, and further screen conversions are recorded non-goals — spin them as new requests, do not let them creep in.",
+      "Close out with the flag-on/flag-off regression evidence, the all-themes contact sheet, the real-scale validation screenshots, and a keep/expand/remove recommendation for the flag; validate and close the request chain."
+    ]
+  },
+  "context_pack": {
+    "out": "logics/context-packs/canvas-fullbleed-workspace.json",
+    "mode": "summary-only",
+    "profile": "normal"
+  }
+}
