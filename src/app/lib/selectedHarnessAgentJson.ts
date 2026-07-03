@@ -20,6 +20,7 @@ import {
   resolveConnectorTerminalMaterial
 } from "../../core/connectorCatalogMaterials";
 import type { AppState, NetworkScopedState } from "../../store";
+import { toFilesystemSafeTimestamp } from "./exportFileName";
 
 export const SELECTED_HARNESS_AGENT_JSON_SCHEMA_VERSION = "1.0";
 export const SELECTED_HARNESS_AGENT_JSON_EXPORT_KIND = "electrical-plan-editor.selected-harness-agent-json";
@@ -723,18 +724,6 @@ function buildProtectionRecord(
     to: { catalogItemId: catalogItem.id }
   });
   return { ...protection, catalogItem };
-}
-
-function pad2(value: number): string {
-  return value.toString().padStart(2, "0");
-}
-
-function toFilesystemSafeTimestamp(exportedAtIso: string): string {
-  const exportedAt = new Date(exportedAtIso);
-  if (Number.isNaN(exportedAt.getTime())) {
-    return exportedAtIso.replace(/\.\d{3}(?=Z$)/, "").replace(/[:.]/g, "-").replace("T", "_").replace(/Z$/i, "");
-  }
-  return `${exportedAt.getFullYear()}-${pad2(exportedAt.getMonth() + 1)}-${pad2(exportedAt.getDate())}_${pad2(exportedAt.getHours())}-${pad2(exportedAt.getMinutes())}-${pad2(exportedAt.getSeconds())}`;
 }
 
 export function buildSelectedHarnessAgentJsonFilename(harness: Pick<HarnessAssembly, "technicalId">, exportedAtIso: string): string {

@@ -488,36 +488,32 @@ function joinChangeDetails(details: string[]): string | null {
   return details.slice(0, 3).join(" / ");
 }
 
+type ChangeFieldGroup = readonly [label: string, fields: readonly string[]];
+
+function describeChangedFields(previous: object, next: object, groups: readonly ChangeFieldGroup[]): string {
+  const previousRecord = previous as Record<string, unknown>;
+  const nextRecord = next as Record<string, unknown>;
+  const details = groups
+    .filter(([, fields]) => fields.some((field) => valuesDiffer(previousRecord[field], nextRecord[field])))
+    .map(([label]) => label);
+  return joinChangeDetails(details) ?? "No field delta";
+}
+
 function describeCatalogChange(action: Extract<AppAction, { type: "catalog/upsert" }>, previousState: AppState): string | null {
   const previousItem = previousState.catalogItems.byId[action.payload.id];
   if (previousItem === undefined) {
     return `${action.payload.connectionCount}-connection item`;
   }
 
-  const details: string[] = [];
-  if (previousItem.manufacturerReference !== action.payload.manufacturerReference || previousItem.name !== action.payload.name) {
-    details.push("Identity");
-  }
-  if (previousItem.connectionCount !== action.payload.connectionCount) {
-    details.push("Connection count");
-  }
-  if (previousItem.unitPriceExclTax !== action.payload.unitPriceExclTax) {
-    details.push("Pricing");
-  }
-  if (previousItem.url !== action.payload.url) {
-    details.push("Supplier link");
-  }
-  if (valuesDiffer(previousItem.additionalAccessories, action.payload.additionalAccessories)) {
-    details.push("Accessories");
-  }
-  if (valuesDiffer(previousItem.connectorDefaults, action.payload.connectorDefaults)) {
-    details.push("Terminal defaults");
-  }
-  if (valuesDiffer(previousItem.connectorLayout, action.payload.connectorLayout)) {
-    details.push("Physical layout");
-  }
-
-  return joinChangeDetails(details) ?? "No field delta";
+  return describeChangedFields(previousItem, action.payload, [
+    ["Identity", ["manufacturerReference", "name"]],
+    ["Connection count", ["connectionCount"]],
+    ["Pricing", ["unitPriceExclTax"]],
+    ["Supplier link", ["url"]],
+    ["Accessories", ["additionalAccessories"]],
+    ["Terminal defaults", ["connectorDefaults"]],
+    ["Physical layout", ["connectorLayout"]]
+  ]);
 }
 
 function describeNetworkChange(action: Extract<AppAction, { type: "network/update" }>, previousState: AppState): string | null {
@@ -526,24 +522,13 @@ function describeNetworkChange(action: Extract<AppAction, { type: "network/updat
     return null;
   }
 
-  const details: string[] = [];
-  if (previousNetwork.technicalId !== action.payload.technicalId || previousNetwork.name !== action.payload.name) {
-    details.push("Identity");
-  }
-  if (previousNetwork.description !== action.payload.description || previousNetwork.author !== action.payload.author) {
-    details.push("Metadata");
-  }
-  if (previousNetwork.projectCode !== action.payload.projectCode || previousNetwork.exportNotes !== action.payload.exportNotes) {
-    details.push("Export cartouche");
-  }
-  if (previousNetwork.logoUrl !== action.payload.logoUrl) {
-    details.push("Logo");
-  }
-  if (previousNetwork.voltageV !== action.payload.voltageV) {
-    details.push("Voltage");
-  }
-
-  return joinChangeDetails(details) ?? "No field delta";
+  return describeChangedFields(previousNetwork, action.payload, [
+    ["Identity", ["technicalId", "name"]],
+    ["Metadata", ["description", "author"]],
+    ["Export cartouche", ["projectCode", "exportNotes"]],
+    ["Logo", ["logoUrl"]],
+    ["Voltage", ["voltageV"]]
+  ]);
 }
 
 function describeHarnessAssemblyChange(action: Extract<AppAction, { type: "harnessAssembly/upsert" }>, previousState: AppState): string | null {
@@ -552,21 +537,12 @@ function describeHarnessAssemblyChange(action: Extract<AppAction, { type: "harne
     return `${action.payload.members.length} member network(s)`;
   }
 
-  const details: string[] = [];
-  if (previousAssembly.technicalId !== action.payload.technicalId || previousAssembly.name !== action.payload.name) {
-    details.push("Identity");
-  }
-  if (valuesDiffer(previousAssembly.members, action.payload.members)) {
-    details.push("Members");
-  }
-  if (valuesDiffer(previousAssembly.masterConnectorRefs, action.payload.masterConnectorRefs)) {
-    details.push("Master connectors");
-  }
-  if (valuesDiffer(previousAssembly.connectorLinks, action.payload.connectorLinks)) {
-    details.push("Connector links");
-  }
-
-  return joinChangeDetails(details) ?? "No field delta";
+  return describeChangedFields(previousAssembly, action.payload, [
+    ["Identity", ["technicalId", "name"]],
+    ["Members", ["members"]],
+    ["Master connectors", ["masterConnectorRefs"]],
+    ["Connector links", ["connectorLinks"]]
+  ]);
 }
 
 function describeConnectorChange(action: Extract<AppAction, { type: "connector/upsert" }>, previousState: AppState): string | null {
@@ -575,37 +551,14 @@ function describeConnectorChange(action: Extract<AppAction, { type: "connector/u
     return `${action.payload.cavityCount}-cavity connector`;
   }
 
-  const details: string[] = [];
-  if (previousConnector.technicalId !== action.payload.technicalId || previousConnector.name !== action.payload.name) {
-    details.push("Identity");
-  }
-  if (previousConnector.cavityCount !== action.payload.cavityCount) {
-    details.push("Cavity count");
-  }
-  if (
-    previousConnector.catalogItemId !== action.payload.catalogItemId ||
-    previousConnector.manufacturerReference !== action.payload.manufacturerReference
-  ) {
-    details.push("Catalog link");
-  }
-  if (
-    previousConnector.isMainHarnessConnector !== action.payload.isMainHarnessConnector ||
-    previousConnector.isTerminalConnector !== action.payload.isTerminalConnector
-  ) {
-    details.push("Harness role");
-  }
-  if (
-    previousConnector.applyCatalogPlugs !== action.payload.applyCatalogPlugs ||
-    previousConnector.applyCatalogSeals !== action.payload.applyCatalogSeals ||
-    valuesDiffer(previousConnector.terminalOverrides, action.payload.terminalOverrides)
-  ) {
-    details.push("Terminal defaults");
-  }
-  if (valuesDiffer(previousConnector.cableCalloutPosition, action.payload.cableCalloutPosition)) {
-    details.push("Callout position");
-  }
-
-  return joinChangeDetails(details) ?? "No field delta";
+  return describeChangedFields(previousConnector, action.payload, [
+    ["Identity", ["technicalId", "name"]],
+    ["Cavity count", ["cavityCount"]],
+    ["Catalog link", ["catalogItemId", "manufacturerReference"]],
+    ["Harness role", ["isMainHarnessConnector", "isTerminalConnector"]],
+    ["Terminal defaults", ["applyCatalogPlugs", "applyCatalogSeals", "terminalOverrides"]],
+    ["Callout position", ["cableCalloutPosition"]]
+  ]);
 }
 
 function describeSpliceChange(action: Extract<AppAction, { type: "splice/upsert" }>, previousState: AppState): string | null {
@@ -614,27 +567,13 @@ function describeSpliceChange(action: Extract<AppAction, { type: "splice/upsert"
     return `${action.payload.portCount}-port splice`;
   }
 
-  const details: string[] = [];
-  if (previousSplice.technicalId !== action.payload.technicalId || previousSplice.name !== action.payload.name) {
-    details.push("Identity");
-  }
-  if (previousSplice.portCount !== action.payload.portCount) {
-    details.push("Port count");
-  }
-  if (previousSplice.portMode !== action.payload.portMode || previousSplice.sideInverted !== action.payload.sideInverted) {
-    details.push("Port mode");
-  }
-  if (
-    previousSplice.catalogItemId !== action.payload.catalogItemId ||
-    previousSplice.manufacturerReference !== action.payload.manufacturerReference
-  ) {
-    details.push("Catalog link");
-  }
-  if (valuesDiffer(previousSplice.cableCalloutPosition, action.payload.cableCalloutPosition)) {
-    details.push("Callout position");
-  }
-
-  return joinChangeDetails(details) ?? "No field delta";
+  return describeChangedFields(previousSplice, action.payload, [
+    ["Identity", ["technicalId", "name"]],
+    ["Port count", ["portCount"]],
+    ["Port mode", ["portMode", "sideInverted"]],
+    ["Catalog link", ["catalogItemId", "manufacturerReference"]],
+    ["Callout position", ["cableCalloutPosition"]]
+  ]);
 }
 
 function describeWireChange(
@@ -648,51 +587,28 @@ function describeWireChange(
     return endpointA !== null && endpointB !== null ? `${endpointA} -> ${endpointB}` : "New wire";
   }
 
-  const details: string[] = [];
-  if (previousWire.technicalId !== action.payload.technicalId || previousWire.name !== action.payload.name) {
-    details.push("Identity");
-  }
-  if (valuesDiffer(previousWire.endpointA, action.payload.endpointA) || valuesDiffer(previousWire.endpointB, action.payload.endpointB)) {
-    details.push("Endpoints");
-  }
-  if (
-    previousWire.sectionMm2 !== action.payload.sectionMm2 ||
-    previousWire.currentA !== action.payload.currentA ||
-    previousWire.material !== action.payload.material
-  ) {
-    details.push("Electrical spec");
-  }
-  if (
-    previousWire.colorMode !== action.payload.colorMode ||
-    previousWire.primaryColorId !== action.payload.primaryColorId ||
-    previousWire.secondaryColorId !== action.payload.secondaryColorId ||
-    previousWire.freeColorLabel !== action.payload.freeColorLabel
-  ) {
-    details.push("Color");
-  }
-  if (
-    previousWire.endpointAConnectionReference !== action.payload.endpointAConnectionReference ||
-    previousWire.endpointAConnectionName !== action.payload.endpointAConnectionName ||
-    previousWire.endpointASealReference !== action.payload.endpointASealReference ||
-    previousWire.endpointASealName !== action.payload.endpointASealName ||
-    previousWire.endpointBConnectionReference !== action.payload.endpointBConnectionReference ||
-    previousWire.endpointBConnectionName !== action.payload.endpointBConnectionName ||
-    previousWire.endpointBSealReference !== action.payload.endpointBSealReference ||
-    previousWire.endpointBSealName !== action.payload.endpointBSealName
-  ) {
-    details.push("Terminations");
-  }
-  if (previousWire.twistGroupLabel !== action.payload.twistGroupLabel || previousWire.functionalDomainTag !== action.payload.functionalDomainTag) {
-    details.push("Tags");
-  }
-  if (valuesDiffer(previousWire.protection, action.payload.protection)) {
-    details.push("Protection");
-  }
-  if ("routeSegmentIds" in action.payload && valuesDiffer(previousWire.routeSegmentIds, action.payload.routeSegmentIds)) {
-    details.push("Route");
-  }
-
-  return joinChangeDetails(details) ?? "No field delta";
+  return describeChangedFields(previousWire, action.payload, [
+    ["Identity", ["technicalId", "name"]],
+    ["Endpoints", ["endpointA", "endpointB"]],
+    ["Electrical spec", ["sectionMm2", "currentA", "material"]],
+    ["Color", ["colorMode", "primaryColorId", "secondaryColorId", "freeColorLabel"]],
+    [
+      "Terminations",
+      [
+        "endpointAConnectionReference",
+        "endpointAConnectionName",
+        "endpointASealReference",
+        "endpointASealName",
+        "endpointBConnectionReference",
+        "endpointBConnectionName",
+        "endpointBSealReference",
+        "endpointBSealName"
+      ]
+    ],
+    ["Tags", ["twistGroupLabel", "functionalDomainTag"]],
+    ["Protection", ["protection"]],
+    ["Route", ["routeSegmentIds"]]
+  ]);
 }
 
 function describeNodeChange(action: Extract<AppAction, { type: "node/upsert" }>, previousState: AppState): string | null {
@@ -701,15 +617,10 @@ function describeNodeChange(action: Extract<AppAction, { type: "node/upsert" }>,
     return `${action.payload.kind} node`;
   }
 
-  const details: string[] = [];
-  if (previousNode.kind !== action.payload.kind) {
-    details.push("Node kind");
-  }
-  if (valuesDiffer(previousNode, action.payload)) {
-    details.push(action.payload.kind === "intermediate" ? "Intermediate label" : "Endpoint binding");
-  }
-
-  return joinChangeDetails(details) ?? "No field delta";
+  return describeChangedFields(previousNode, action.payload, [
+    ["Node kind", ["kind"]],
+    [action.payload.kind === "intermediate" ? "Intermediate label" : "Endpoint binding", ["label", "connectorId", "spliceId"]]
+  ]);
 }
 
 function describeSegmentChange(action: Extract<AppAction, { type: "segment/upsert" }>, previousState: AppState): string | null {
@@ -720,18 +631,11 @@ function describeSegmentChange(action: Extract<AppAction, { type: "segment/upser
     return endpointA !== null && endpointB !== null ? `${endpointA} -> ${endpointB}` : `${action.payload.lengthMm} mm segment`;
   }
 
-  const details: string[] = [];
-  if (previousSegment.nodeA !== action.payload.nodeA || previousSegment.nodeB !== action.payload.nodeB) {
-    details.push("Endpoints");
-  }
-  if (previousSegment.lengthMm !== action.payload.lengthMm) {
-    details.push("Length");
-  }
-  if (previousSegment.subNetworkTag !== action.payload.subNetworkTag) {
-    details.push("Sub-network");
-  }
-
-  return joinChangeDetails(details) ?? "No field delta";
+  return describeChangedFields(previousSegment, action.payload, [
+    ["Endpoints", ["nodeA", "nodeB"]],
+    ["Length", ["lengthMm"]],
+    ["Sub-network", ["subNetworkTag"]]
+  ]);
 }
 
 function describeRecentChangeDetail(action: AppAction, previousState: AppState): string | null {

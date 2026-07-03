@@ -6,6 +6,7 @@ import {
   migratePersistedPayloadDetailed
 } from "../../adapters/persistence/migrations";
 import { parseJsonSafe } from "../../adapters/persistence/json";
+import { toFilesystemSafeTimestamp } from "./exportFileName";
 
 export const WORKSPACE_FILE_PAYLOAD_KIND = "electrical-plan-editor.workspace-file";
 export const WORKSPACE_FILE_SCHEMA_VERSION = 1;
@@ -186,19 +187,5 @@ export function parseWorkspaceFilePayload(rawJson: string, nowIso: string = new 
 export function buildWorkspaceFileName(
   exportedAtIso: string = new Date().toISOString()
 ): string {
-  const date = new Date(exportedAtIso);
-  const safeTimestamp = Number.isNaN(date.getTime())
-    ? exportedAtIso.replace(/\.\d{3}(?=Z$)/, "").replace(/[:.]/g, "-").replace("T", "_").replace(/Z$/i, "")
-    : [
-        date.getUTCFullYear(),
-        String(date.getUTCMonth() + 1).padStart(2, "0"),
-        String(date.getUTCDate()).padStart(2, "0")
-      ].join("-") +
-      "_" +
-      [
-        String(date.getUTCHours()).padStart(2, "0"),
-        String(date.getUTCMinutes()).padStart(2, "0"),
-        String(date.getUTCSeconds()).padStart(2, "0")
-      ].join("-");
-  return `electrical-workspace-${safeTimestamp}.epe.json`;
+  return `electrical-workspace-${toFilesystemSafeTimestamp(exportedAtIso)}.epe.json`;
 }

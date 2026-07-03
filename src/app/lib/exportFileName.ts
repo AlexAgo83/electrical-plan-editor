@@ -20,12 +20,12 @@ export function toFilesystemSafeTimestamp(exportedAtIso: string): string {
     return exportedAtIso.replace(/\.\d{3}(?=Z$)/, "").replace(/[:.]/g, "-").replace("T", "_").replace(/Z$/i, "");
   }
 
-  const year = exportedAt.getFullYear();
-  const month = pad2(exportedAt.getMonth() + 1);
-  const day = pad2(exportedAt.getDate());
-  const hour = pad2(exportedAt.getHours());
-  const minute = pad2(exportedAt.getMinutes());
-  const second = pad2(exportedAt.getSeconds());
+  const year = exportedAt.getUTCFullYear();
+  const month = pad2(exportedAt.getUTCMonth() + 1);
+  const day = pad2(exportedAt.getUTCDate());
+  const hour = pad2(exportedAt.getUTCHours());
+  const minute = pad2(exportedAt.getUTCMinutes());
+  const second = pad2(exportedAt.getUTCSeconds());
   return `${year}-${month}-${day}_${hour}-${minute}-${second}`;
 }
 
