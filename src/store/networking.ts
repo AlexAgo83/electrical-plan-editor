@@ -1,28 +1,22 @@
 import type { NetworkId } from "../core/entities";
 import { cloneNetworkSummaryViewState, type AppState, type NetworkScopedState } from "./types";
 
-function cloneEntityState<T, Id extends string>(state: { byId: Record<Id, T>; allIds: Id[] }): {
-  byId: Record<Id, T>;
-  allIds: Id[];
-} {
-  return {
-    byId: { ...state.byId },
-    allIds: [...state.allIds]
-  };
-}
-
 export function extractScopedState(state: AppState): NetworkScopedState {
   const existingScoped = state.activeNetworkId === null ? undefined : state.networkStates[state.activeNetworkId];
+  // ponytail: share slice references instead of cloning. Reducers replace slices
+  // immutably and the mutation-heavy migration paths (catalog.ts) clone their own
+  // copies first, so this per-dispatch snapshot never needs defensive copies —
+  // cloning 6 collections on every action caused periodic GC pauses during drags.
   return {
-    catalogItems: cloneEntityState(state.catalogItems),
-    connectors: cloneEntityState(state.connectors),
-    splices: cloneEntityState(state.splices),
-    nodes: cloneEntityState(state.nodes),
-    segments: cloneEntityState(state.segments),
-    wires: cloneEntityState(state.wires),
-    nodePositions: { ...state.nodePositions },
-    connectorCavityOccupancy: { ...state.connectorCavityOccupancy },
-    splicePortOccupancy: { ...state.splicePortOccupancy },
+    catalogItems: state.catalogItems,
+    connectors: state.connectors,
+    splices: state.splices,
+    nodes: state.nodes,
+    segments: state.segments,
+    wires: state.wires,
+    nodePositions: state.nodePositions,
+    connectorCavityOccupancy: state.connectorCavityOccupancy,
+    splicePortOccupancy: state.splicePortOccupancy,
     networkSummaryViewState: cloneNetworkSummaryViewState(existingScoped?.networkSummaryViewState)
   };
 }

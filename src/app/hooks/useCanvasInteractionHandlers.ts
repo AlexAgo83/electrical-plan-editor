@@ -63,6 +63,11 @@ export function useCanvasInteractionHandlers({
 }: UseCanvasInteractionHandlersParams) {
   const [selectedCanvasNodeIds, setSelectedCanvasNodeIds] = useState<Set<NodeId>>(new Set());
   const draggingNodeGroupRef = useRef<DraggingNodeGroupState | null>(null);
+  // Mirror of draggingNodeId cleared synchronously on drag stop: queued mousemove
+  // events otherwise run against the stale closure state and teleport the node to
+  // a cursor position sampled after the mouse was released.
+  const draggingNodeIdRef = useRef<NodeId | null>(draggingNodeId);
+  draggingNodeIdRef.current = draggingNodeId;
   const isPanningNetworkActiveRef = useRef(false);
   const shouldSuppressNextNodeClickRef = useRef(false);
   const shouldSuppressNextCanvasClickRef = useRef(false);
@@ -372,6 +377,7 @@ export function useCanvasInteractionHandlers({
           }
 
           draggingNodeGroup.hasStartedDrag = true;
+          draggingNodeIdRef.current = draggingNodeGroup.anchorNodeId;
           setDraggingNodeId(draggingNodeGroup.anchorNodeId);
         }
 
@@ -409,7 +415,8 @@ export function useCanvasInteractionHandlers({
         return;
       }
 
-      if (draggingNodeId === null) {
+      const activeDraggingNodeId = draggingNodeIdRef.current;
+      if (activeDraggingNodeId === null) {
         if (panStartRef.current === null) {
           return;
         }
@@ -452,7 +459,7 @@ export function useCanvasInteractionHandlers({
         return;
       }
       scheduleManualNodePositionsUpdate((previous) => {
-        const previousPosition = previous[draggingNodeId];
+        const previousPosition = previous[activeDraggingNodeId];
         if (
           previousPosition !== undefined &&
           Math.abs(previousPosition.x - coordinates.x) <= 0.0001 &&
@@ -462,7 +469,7 @@ export function useCanvasInteractionHandlers({
         }
         return {
           ...previous,
-          [draggingNodeId]: coordinates
+          [activeDraggingNodeId]: coordinates
         };
       });
     } finally {
@@ -494,8 +501,10 @@ export function useCanvasInteractionHandlers({
         }
 
         draggingNodeGroupRef.current = null;
+        draggingNodeIdRef.current = null;
         setDraggingNodeId(null);
-      } else if (draggingNodeId !== null) {
+      } else if (draggingNodeIdRef.current !== null || draggingNodeId !== null) {
+        draggingNodeIdRef.current = null;
         setDraggingNodeId(null);
       }
 
