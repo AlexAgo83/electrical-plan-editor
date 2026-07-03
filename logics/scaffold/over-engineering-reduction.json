@@ -1,0 +1,268 @@
+{
+  "title": "Over-engineering reduction: replace bespoke gates with eslint, collapse mirror layers, delete dead code",
+  "references": [
+    "scripts/quality/check-ui-modularization.mjs",
+    "scripts/quality/check-hooks-modularization.mjs",
+    "scripts/quality/check-store-modularization.mjs",
+    "scripts/quality/check-ui-timeout-governance.mjs",
+    "scripts/quality/check-exceljs-boundary.mjs",
+    "scripts/quality/check-pin-role-release-gate.mjs",
+    "scripts/quality/run-vitest-segmented.mjs",
+    "src/app/hooks/useUiPreferences.ts",
+    "src/app/hook-impl/controller/useAppControllerScreenContentSlices.tsx",
+    "src/app/components/dialogs/ConfirmDialog.tsx",
+    "src/app/lib/recentChangeLabels.ts",
+    "src/app/lib/renderMemoCompare.ts",
+    "src/app/lib/aiAgentOperationContract.ts",
+    "src/adapters/portability/networkFile.ts",
+    "src/adapters/persistence/migrations.ts",
+    "src/core/harnessAssembly.ts",
+    "src/core/splicePlacement.ts",
+    "package.json",
+    "eslint.config.js"
+  ],
+  "request": {
+    "complexity": "High",
+    "theme": "Codebase simplification and maintenance cost reduction",
+    "needs": [
+      "The custom quality-gate scripts that re-implement rules eslint already expresses (per-file line caps, import boundaries, per-test timeout bans, hardcoded test-file lists) must be replaced by standard eslint configuration so the rules are enforced in-editor, maintained by one tool, and ~750 lines of bespoke script code disappear.",
+      "The src/app/hooks -> src/app/hook-impl mirror directory, created solely to evade the 500-line hooks gate, must be collapsed back into one directory: pure re-export wrappers, single-caller domain-assembly adapters, dead compatibility aliases, and single-consumer type files all removed once the gate no longer forces them.",
+      "The ten modal components that each hand-roll focus trapping, Escape handling, Tab cycling, focus restore, and a button backdrop must share one mechanism (native dialog.showModal() or a single shared hook) instead of ten copies.",
+      "All verified dead code (zero references outside src/tests) in src/core, src/store, and src/app/lib must be deleted, including the test-only harness-assembly validation subsystem and speculative parameters whose non-default branches are unreachable.",
+      "Near-verbatim duplicated logic must be consolidated: entity normalizers copied between networkFile.ts and migrations.ts, eight describe*Change field-diff functions, three hand-rolled timestamp formatters, the 96-line custom React.memo comparator, and the parallel per-entity allowlist branches in the AI agent operation contract.",
+      "The remark-gfm dependency must be dropped: zero GFM syntax exists across all 91 changelog files, so react-markdown alone renders everything actually used."
+    ],
+    "context": [
+      "A repo-wide over-engineering audit (2026-07-03, five parallel verified passes) identified ~2,500 removable lines across 17 findings; every dead-export claim was verified by grepping src/ excluding src/tests.",
+      "The root cause of the largest cluster is scripts/quality/hooks-modularization-gate-core.mjs: its 500-line cap scans only src/app/hooks/, which pushed implementations into a shadow src/app/hook-impl/ tree behind one-line re-export wrappers (useUiPreferences.ts, useWireHandlers.ts, useAppControllerModelingAnalysisScreenDomains.tsx, useAppControllerNetworkSummaryPanelDomain.tsx, buildValidationIssues.ts, useAppControllerScreenContentSlices.tsx), plus three single-caller domain-assembly adapters and six dead use*ScreenContentSlice aliases retained for a migration that already completed.",
+      "eslint.config.js currently configures none of the rules the gate scripts enforce: max-lines covers the line caps, no-restricted-imports covers the exceljs boundary, and a no-restricted-syntax selector on it/test calls with 3+ arguments covers the timeout governance AST walk.",
+      "check-pin-role-release-gate.mjs runs vitest on 8 spec files that are a strict subset of the full suite ci:blocking runs two steps later; run-vitest-segmented.mjs maintains a hardcoded 71-entry UI_LANE_TEST_FILES list plus a validator that exists only to detect drift from the app.ui.*.spec.tsx glob it could use directly, and hand-rolls chunking vitest provides via --shard.",
+      "Ten dialog components (ConfirmDialog, ChoiceDialog, DeleteImpactDialog, FileFeedbackDialog, ImportOverwriteDialog, BomExportPreviewDialog, SvgExportPreviewDialog, MultiNetworkFunctionalAnalysisDialog, PinRoleMassEditDialog, OnboardingModal) each implement their own focus trap, Escape handler, Tab cycling, focus restore, and button-element backdrop; no shared useModal/useFocusTrap hook exists.",
+      "Verified dead in src/core and src/store: the harness-assembly validation subsystem (validateHarnessAssembly and its types, ~145 lines, test-only), computeRouteLengthWithEndpointDetails, clampSplicePlacementOffset, getWireRouteEndpointDetail, isPlacedSplice, updateConnectorLayoutKeyingSide, updateConnectorLayoutKeyingPosition, applyEntityPrefix, getCatalogItemById, selectNetworkById, selectThemeMode, and the speculative scope parameter of computePinElectricalLoad whose assembly branch only throws NotImplementedScopeError.",
+      "Duplication clusters: normalizeWire*/normalizeConnector*/normalizeSplice*/normalizeConnectorTerminalOverrides/normalizeNodePositions are copy-pasted between src/adapters/portability/networkFile.ts (lines 109-352) and src/adapters/persistence/migrations.ts (lines 80-288); recentChangeLabels.ts lines 491-737 hold eight near-identical before/after field-diff functions; a filesystem-safe timestamp formatter exists three times (exportFileName.ts has the correct one with NaN guard); renderMemoCompare.ts is a 96-line nested comparator that treats all functions as equal to paper over unstable callback identities; aiAgentOperationContract.ts lines 471-624 hold per-entity field allowlists as parallel branches that could be data-driven maps.",
+      "Also verified: lib/app-utils.ts is a zero-importer re-export barrel; adapters/portability/index.ts is bypassed by every caller; migrations.ts carries a test-only migrationStepOverrides injection seam that only ever overrides two no-op version-bump steps; roughly ten env-var knobs in scripts/quality/report-*.mjs are set nowhere in the repo, .env files, or CI.",
+      "Explicitly out of scope because verified healthy: the MinHeap (real Dijkstra queue), exceljs (real multi-sheet styled xlsx), npm overrides (security pins documented in check-npm-audit-allowlist.mjs), legacy v0-v3 migrations (localStorage app, old data genuinely exists), i18n.ts, csv.ts, config/environment.ts, check-npm-audit-allowlist.mjs, check-pwa-build-artifacts.mjs, report-bundle-metrics.mjs core logic.",
+      "A separate work stream is currently fixing tests; this corpus must not assume a green baseline at scaffold time, and implementation should rebase on a green main before starting."
+    ],
+    "acceptance_criteria": [
+      "AC1: The line-cap, exceljs-boundary, and UI-timeout gate scripts are deleted and their rules enforced by eslint (max-lines with per-glob overrides, no-restricted-imports, no-restricted-syntax), with ci:blocking updated accordingly and violations of each rule still failing CI.",
+      "AC2: check-pin-role-release-gate.mjs is removed from ci:blocking (redundant subset), run-vitest-segmented.mjs derives its UI lane from the app.ui.*.spec.tsx glob with no hardcoded file list or drift validator, and unused env-var knobs in the report scripts are inlined as constants.",
+      "AC3: src/app/hook-impl/ no longer exists: implementations live in src/app/hooks/, pure re-export wrappers and the six dead use*ScreenContentSlice aliases are deleted, the three single-caller domain-assembly adapters are inlined into their sole callers, and the unused includeNetworkSummaryPanel option is dropped.",
+      "AC4: All ten modal components delegate focus trapping, Escape, Tab cycling, focus restore, and backdrop to one shared mechanism (native dialog element or a single shared hook), with per-dialog copies deleted and existing dialog behavior (confirm-on-enter, close-on-backdrop options) preserved.",
+      "AC5: Every dead export identified in the audit is deleted from src/core, src/store, and src/app/lib (including the harness-assembly validation subsystem, the computePinElectricalLoad scope parameter, both zero-importer barrels, and the migrations test-injection seam), verified by typecheck, lint, and full test suite.",
+      "AC6: The duplicated entity normalizers are consolidated into one shared module imported by both networkFile.ts and migrations.ts; the eight describe*Change functions collapse to one field-list-driven helper; the timestamp formatter exists once; renderMemoCompare.ts is removed in favor of stable callbacks plus default shallow memo comparison; the AI agent contract allowlists become data-driven maps.",
+      "AC7: remark-gfm is removed from package.json and the react-markdown call site, and all 91 changelog entries render with identical visible output.",
+      "AC8: After all slices land, the full ci:blocking pipeline passes and the net line-count reduction (target ~2,000+ source/script lines) is recorded in the task closeout."
+    ]
+  },
+  "product": {
+    "title": "Codebase simplification and tooling consolidation",
+    "overview": "Cut ~2,500 lines of bespoke tooling, mirror layers, dead code, and duplication identified by a verified repo-wide audit, replacing custom enforcement with standard eslint rules and native platform features, without changing any user-visible behavior.",
+    "goals": [
+      "Enforce architectural rules with standard eslint configuration instead of bespoke CI scripts, so rules surface in-editor and cost nothing to maintain.",
+      "Collapse structural workarounds (the hooks/hook-impl mirror) that exist only to satisfy a gate, restoring one honest directory layout.",
+      "Delete verified dead code and speculative flexibility; consolidate copy-pasted logic into single shared implementations.",
+      "Reduce dependency surface where the platform or existing code already covers the need."
+    ],
+    "non_goals": [
+      "No user-visible behavior, layout, or wording change anywhere in the editor.",
+      "No removal of gates with real policy value (npm-audit allowlist, PWA build artifacts, bundle metrics).",
+      "No store, persistence-format, or migration-semantics change beyond deleting the test-only injection seam.",
+      "No new runtime dependencies."
+    ]
+  },
+  "backlog_items": [
+    {
+      "title": "Replace bespoke quality-gate scripts with eslint rules and trim CI redundancy",
+      "priority": "High",
+      "complexity": "Medium",
+      "theme": "Codebase simplification and maintenance cost reduction",
+      "request_acs": ["AC1", "AC2", "AC8"],
+      "problem": [
+        "Six custom gate scripts (~750 lines) re-implement rules eslint expresses natively: three modularization gates are per-file line caps plus file-existence pinning, the UI timeout gate is a hand-rolled TypeScript AST walk with an 11-entry prose allowlist, and the exceljs boundary gate regex-scans every source file.",
+        "check-pin-role-release-gate.mjs reruns 8 specs that ci:blocking's full suite covers two steps later; run-vitest-segmented.mjs hardcodes a 71-file UI test list plus a drift validator instead of using the glob, and hand-rolls chunking vitest ships as --shard.",
+        "Roughly ten env-var knobs across report-ui-coverage.mjs, report-full-coverage.mjs, report-slowest-tests.mjs, and report-bundle-metrics.mjs are set nowhere; coverage:full:report is not referenced by CI."
+      ],
+      "scope_in": [
+        "Add eslint max-lines with per-glob overrides reproducing the current line caps for src/app/hooks, src/app/components, and src/store; delete the three modularization gate scripts and their gate-core helpers plus their package.json scripts and ci:blocking entries.",
+        "Add eslint no-restricted-imports (exceljs outside the designated adapter) and no-restricted-syntax (static exceljs import in the adapter; it/test calls with a third timeout argument in UI specs, honoring the existing allowlist as eslint-disable comments); delete check-exceljs-boundary.mjs and check-ui-timeout-governance.mjs.",
+        "Delete check-pin-role-release-gate.mjs and its ci:blocking entry; replace UI_LANE_TEST_FILES and validateLaneContract in run-vitest-segmented.mjs with a glob-derived list; evaluate vitest --shard for the chunk loop and adopt it if it preserves current lane semantics.",
+        "Inline the never-set env-var knobs in the report scripts as constants; collapse the two coverage wrappers to package.json one-liners where nothing else remains.",
+        "Update src/tests/quality.ui-modularization.spec.ts (which tests gate internals) to match the new enforcement mechanism or delete it if eslint config makes it redundant."
+      ],
+      "scope_out": [
+        "check-npm-audit-allowlist.mjs, check-pwa-build-artifacts.mjs, report-bundle-metrics.mjs core logic (real policy gates with no eslint equivalent).",
+        "Changing any current line-cap value or boundary rule — enforcement moves, thresholds stay.",
+        "The vitest fast/ui lane split itself (segmentation stays; only its bookkeeping shrinks)."
+      ],
+      "acceptance_criteria": [
+        "AC1: Adding a file over the line cap in a governed directory, a static exceljs import outside the adapter, or a per-test timeout in a UI spec each fails eslint (and thus ci:blocking), demonstrated by a temporary violation during development.",
+        "AC2: The six replaced gate scripts, their package.json entries, and their ci:blocking steps are gone; npm run lint covers the same rules.",
+        "AC3: run-vitest-segmented.mjs contains no hardcoded spec-file list and no drift validator; UI lane membership follows the app.ui.*.spec.tsx glob and total lane coverage is unchanged (segmentation check passes).",
+        "AC4: No env-var knob remains in scripts/quality that is set nowhere in repo, .env.example, or CI.",
+        "AC5: Full ci:blocking passes."
+      ]
+    },
+    {
+      "title": "Collapse the hooks/hook-impl mirror directory",
+      "priority": "High",
+      "complexity": "Medium",
+      "theme": "Codebase simplification and maintenance cost reduction",
+      "request_acs": ["AC3", "AC8"],
+      "problem": [
+        "src/app/hook-impl/ exists only because the hooks modularization gate scanned src/app/hooks/ with a 500-line cap: six wrapper files are pure re-exports, and the pattern is already inconsistent (appendElectricalDimensioningIssues is imported from hook-impl directly).",
+        "Three single-caller domain-assembly adapters (ModelingAnalysis, Aux, WorkspaceHandlers) each build a callback object and delegate to exactly one hook for exactly one parent, re-declaring parameter interfaces (~30-40 boilerplate lines each).",
+        "Six use*ScreenContentSlice compatibility aliases (useAppControllerScreenContentSlices.tsx lines 1211-1220) have zero callers; the includeNetworkSummaryPanel option is never passed by any caller so its early-return guard is unreachable; workspaceHandlerTypes.ts and workspaceFileStorageTypes.ts each have exactly one importer."
+      ],
+      "scope_in": [
+        "Depends on the eslint-gate backlog item landing first (the new max-lines overrides must accommodate the merged file sizes, e.g. a higher cap or per-file disable for the large controller hooks).",
+        "Move every src/app/hook-impl/ implementation into src/app/hooks/ preserving module names; delete the six re-export wrappers and update all import paths repo-wide (source and tests).",
+        "Inline useAppControllerModelingAnalysisDomainAssembly, useAppControllerAuxDomainAssembly, and useAppControllerWorkspaceHandlersDomainAssembly into their sole callers, dropping the re-declared param interfaces.",
+        "Delete the six dead use*ScreenContentSlice aliases, the includeNetworkSummaryPanel option and its unreachable guard, and inline workspaceHandlerTypes.ts / workspaceFileStorageTypes.ts into their single consumers (leave spliceHandlerTypes.ts and networkImportExportTypes.ts, which have 3+ consumers)."
+      ],
+      "scope_out": [
+        "The prop-explosion refactor of useAppControllerModelingHandlersAssembly (passing formsState objects through the orchestrator) — behavior-adjacent, deferred to its own slice if ever prioritized.",
+        "Any change to hook logic, memoization, or ordering — this is a pure move/inline/delete slice.",
+        "Renaming hooks or changing their public signatures beyond the deleted dead options."
+      ],
+      "acceptance_criteria": [
+        "AC1: src/app/hook-impl/ no longer exists; no import path references it anywhere.",
+        "AC2: The six aliases, the includeNetworkSummaryPanel option, the three domain-assembly adapter files, and the two single-consumer type files are gone.",
+        "AC3: typecheck, lint (including the new max-lines configuration), and the full test suite pass with no test assertions weakened.",
+        "AC4: git log preserves file history where practical (git mv for straight moves)."
+      ]
+    },
+    {
+      "title": "Unify modal dialogs on one shared focus/dismiss mechanism",
+      "priority": "Medium",
+      "complexity": "Medium",
+      "theme": "Codebase simplification and maintenance cost reduction",
+      "request_acs": ["AC4", "AC8"],
+      "problem": [
+        "Ten modal components each hand-roll the same focus trap, Escape handler, Tab cycling, initial-focus and focus-restore logic, and a button-element backdrop (~50 redundant lines each, ~500 total).",
+        "No shared useModal or useFocusTrap hook exists, so every new dialog copies the pattern again and accessibility fixes must be applied ten times."
+      ],
+      "scope_in": [
+        "Prefer the native dialog element with showModal(): free focus trapping, Escape via the cancel event, and ::backdrop styling; fall back to one shared useModalDialog hook only if native dialog conflicts with existing styling or test infrastructure (spike on ConfirmDialog first, then decide once for all ten).",
+        "Migrate all ten dialogs (ConfirmDialog, ChoiceDialog, DeleteImpactDialog, FileFeedbackDialog, ImportOverwriteDialog, BomExportPreviewDialog, SvgExportPreviewDialog, MultiNetworkFunctionalAnalysisDialog, PinRoleMassEditDialog, OnboardingModal) to the chosen mechanism, deleting the per-dialog trap/Escape/restore code.",
+        "Preserve existing per-dialog options with real callers (confirmOnEnter, closeOnBackdrop, detailsLabel) and current focus-restore behavior on close.",
+        "Keep existing dialog test suites green; adapt queries only where the DOM structure legitimately changes (dialog element vs div)."
+      ],
+      "scope_out": [
+        "Visual redesign of any dialog; backdrop appearance must stay equivalent.",
+        "Non-modal popovers, tooltips, or the settings drawer.",
+        "New accessibility features beyond what the shared mechanism gives for free."
+      ],
+      "acceptance_criteria": [
+        "AC1: One mechanism (native dialog or one shared hook) owns focus trap, Escape, Tab cycling, and focus restore; zero per-dialog copies remain, verified by grepping for the old trap patterns.",
+        "AC2: All ten dialogs open, trap focus, close on Escape, respect closeOnBackdrop/confirmOnEnter options, and restore focus to the invoking control, covered by the existing UI test suites.",
+        "AC3: Net line count across the ten dialog files decreases by at least 350 lines.",
+        "AC4: Full ci:blocking passes."
+      ]
+    },
+    {
+      "title": "Delete verified dead code, dead barrels, and speculative parameters",
+      "priority": "Medium",
+      "complexity": "Low",
+      "theme": "Codebase simplification and maintenance cost reduction",
+      "request_acs": ["AC5", "AC8"],
+      "problem": [
+        "src/core and src/store carry ~296 lines with zero production references, all grep-verified: the harness-assembly validation subsystem (test-only), computeRouteLengthWithEndpointDetails, clampSplicePlacementOffset, getWireRouteEndpointDetail, isPlacedSplice, updateConnectorLayoutKeyingSide/Position, applyEntityPrefix, getCatalogItemById, selectNetworkById, selectThemeMode.",
+        "computePinElectricalLoad takes a scope parameter every caller leaves at the default; the assembly branch just throws NotImplementedScopeError.",
+        "lib/app-utils.ts (33 lines) has zero importers; adapters/portability/index.ts is bypassed by every caller; migrations.ts carries a migrationStepOverrides test-injection seam that only ever overrides two no-op version-bump steps."
+      ],
+      "scope_in": [
+        "Delete every listed dead export and its now-orphaned types/helpers; delete tests that exist solely to exercise deleted code (the harness-assembly validation spec).",
+        "Remove the scope parameter, PinElectricalLoadScope type, and NotImplementedScopeError from computePinElectricalLoad, updating its callers and tests.",
+        "Delete lib/app-utils.ts and adapters/portability/index.ts; point any stragglers at the concrete modules.",
+        "Remove migrationStepOverrides and setPersistenceMigrationStepOverrideForTests from migrations.ts and rewrite the affected specs to assert pipeline behavior without the injection seam.",
+        "Re-verify each deletion with a fresh repo-wide grep at implementation time (the audit predates parallel test-fixing work)."
+      ],
+      "scope_out": [
+        "Internal-only exports that are used within their own file (isEditedConnectorLayout, hasEntityPrefix, etc.) — dropping the export keyword saves nothing.",
+        "Legacy v0-v3 migration branches (localStorage app; old data genuinely exists).",
+        "Any reachable code path, however small."
+      ],
+      "acceptance_criteria": [
+        "AC1: Every listed symbol is gone and a repo-wide grep finds zero remaining references.",
+        "AC2: computePinElectricalLoad has no scope parameter and all callers compile and pass tests.",
+        "AC3: Migration specs pass without the injection seam and pipeline behavior coverage is not weakened.",
+        "AC4: typecheck, lint, and full test suite pass; net deletion of at least 250 source lines recorded."
+      ]
+    },
+    {
+      "title": "Consolidate duplicated logic into single shared implementations",
+      "priority": "Medium",
+      "complexity": "Medium",
+      "theme": "Codebase simplification and maintenance cost reduction",
+      "request_acs": ["AC6", "AC8"],
+      "problem": [
+        "Entity normalizers (normalizeWire*, normalizeConnector*, normalizeSplice*, normalizeConnectorTerminalOverrides, normalizeNodePositions) are copy-pasted between src/adapters/portability/networkFile.ts:109-352 and src/adapters/persistence/migrations.ts:80-288 (~130 duplicated lines that can drift independently).",
+        "src/app/lib/recentChangeLabels.ts:491-737 holds eight near-identical describe*Change functions, each re-implementing the compare-old-vs-new-field-push-detail loop (~120 collapsible lines).",
+        "A filesystem-safe timestamp formatter exists three times; only exportFileName.toFilesystemSafeTimestamp has the NaN guard.",
+        "renderMemoCompare.ts is a 96-line hand-rolled nested comparator used as a React.memo equality function that treats all functions as equal to compensate for unstable callback identities.",
+        "aiAgentOperationContract.ts:471-624 encodes per-entity safe-update field allowlists as parallel code branches instead of data-driven maps (~80 collapsible lines)."
+      ],
+      "scope_in": [
+        "Extract one shared entity-normalization module under src/adapters/ imported by both networkFile.ts and migrations.ts, byte-identical output on both paths verified by existing import/migration fixtures.",
+        "Collapse the eight describe*Change functions into one field-diff helper driven by a per-entity field descriptor list, preserving every existing label string exactly (snapshot-covered).",
+        "Replace the two duplicate timestamp formatters with calls to exportFileName.toFilesystemSafeTimestamp.",
+        "Stabilize the callback props feeding the memoized panels with useCallback at the AppController seam, switch the panels to React.memo default shallow comparison, and delete renderMemoCompare.ts; prove no render-containment regression with the existing render-count tests.",
+        "Convert the per-entity allowlist branches in aiAgentOperationContract.ts to a data-driven map keyed by entity kind, preserving the exact accepted/rejected field sets (contract spec-covered)."
+      ],
+      "scope_out": [
+        "Any change to normalization semantics, change-label wording, timestamp format, or contract field sets — pure consolidation.",
+        "The broader render-containment work tracked by the runtime-performance corpus; only the comparator replacement is in scope here.",
+        "csv.ts, networkSummaryBomCsv.ts domain logic, i18n.ts (audited healthy)."
+      ],
+      "acceptance_criteria": [
+        "AC1: One normalization module serves both import and migration paths; existing round-trip and migration fixtures produce byte-identical results.",
+        "AC2: recentChangeLabels output strings are unchanged for all entity kinds (existing specs and snapshots pass) with the eight functions replaced by one helper.",
+        "AC3: renderMemoCompare.ts is deleted; render-containment regression tests still pass with default shallow memo comparison.",
+        "AC4: The AI agent contract accepts and rejects exactly the same operations as before (contract spec suite passes unchanged).",
+        "AC5: Net deletion of at least 300 lines across the five clusters; full ci:blocking passes."
+      ]
+    },
+    {
+      "title": "Drop remark-gfm from the changelog renderer",
+      "priority": "Low",
+      "complexity": "Low",
+      "theme": "Codebase simplification and maintenance cost reduction",
+      "request_acs": ["AC7", "AC8"],
+      "problem": [
+        "remark-gfm ships in the production dependency tree solely for the changelog renderer, but a grep across all 91 changelog files found zero GFM constructs (no tables, no strikethrough, no task lists, no autolinks beyond what CommonMark covers).",
+        "react-markdown alone renders the headings, lists, bold, and code spans the changelogs actually use."
+      ],
+      "scope_in": [
+        "Remove the remarkPlugins={[remarkGfm]} usage from HomeWorkspaceContent.tsx and remove remark-gfm from package.json dependencies.",
+        "Add a lightweight guard (changelog lint step or unit test) that fails if a future changelog introduces GFM-only syntax, so the regression is caught at authoring time rather than as silently-unrendered markup.",
+        "Visually verify a representative sample of changelog entries renders identically (the existing changelog-feed spec plus manual spot check recorded in closeout)."
+      ],
+      "scope_out": [
+        "Replacing react-markdown itself with a custom renderer — separate decision, only worth it if bundle size becomes a priority.",
+        "Rewriting any changelog content."
+      ],
+      "acceptance_criteria": [
+        "AC1: remark-gfm is absent from package.json and package-lock.json; npm install and the production build succeed.",
+        "AC2: All existing changelog rendering tests pass and rendered output is visually identical for current entries.",
+        "AC3: A guard exists that fails CI (or the changelog test) if GFM-only syntax appears in a future changelog file."
+      ]
+    }
+  ],
+  "orchestration_task": {
+    "title": "Orchestrate over-engineering reduction across gates, layers, dead code, and dependencies",
+    "plan": [
+      "Rebase on a green main first (a parallel work stream is fixing tests); re-verify each audit claim with a fresh grep before deleting anything.",
+      "Land the eslint-gate slice first — it is the root-cause unlock: the hooks-mirror slice cannot merge while the 500-line gate still scans src/app/hooks/.",
+      "Land the hooks/hook-impl collapse immediately after, while the eslint override configuration is fresh; use git mv to preserve history.",
+      "Land the dead-code deletion slice next (lowest risk, independent); then the consolidation slice (normalizers, describe*Change, timestamp, comparator, contract maps), which touches the same adapters and benefits from the dead code being gone.",
+      "Land the dialog unification slice (spike native dialog on ConfirmDialog, then roll the chosen mechanism across all ten) and the remark-gfm drop in either order — both independent.",
+      "After each slice: run the affected suites plus lint and typecheck; after the final slice run full ci:blocking, record the net line-count delta (target ~2,000+) and before/after scripts/quality inventory in the task closeout; validate and close the request chain."
+    ]
+  },
+  "context_pack": {
+    "out": "logics/context-packs/over-engineering-reduction.json",
+    "mode": "summary-only",
+    "profile": "normal"
+  }
+}

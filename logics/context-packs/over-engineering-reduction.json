@@ -1,0 +1,386 @@
+{
+  "budgets": {
+    "max_docs": 32,
+    "max_docs_per_ref": 4
+  },
+  "changed_paths": [],
+  "command": "logics-manager sync context-pack req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy item_652_collapse_the_hooks_hook_impl_mirror_directory item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters item_655_consolidate_duplicated_logic_into_single_shared_implementations item_656_drop_remark_gfm_from_the_changelog_renderer task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies --mode summary-only --profile normal --handoff",
+  "companion_docs": [
+    {
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy",
+          "item_652_collapse_the_hooks_hook_impl_mirror_directory",
+          "item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism",
+          "item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters",
+          "item_655_consolidate_duplicated_logic_into_single_shared_implementations",
+          "item_656_drop_remark_gfm_from_the_changelog_renderer"
+        ],
+        "prod": [
+          "prod_013_codebase_simplification_and_tooling_consolidation"
+        ],
+        "req": [
+          "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code"
+        ],
+        "task": [
+          "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
+        ]
+      },
+      "path": "logics/product/prod_013_codebase_simplification_and_tooling_consolidation.md",
+      "ref": "prod_013_codebase_simplification_and_tooling_consolidation",
+      "status": "Proposed",
+      "title": "Codebase simplification and tooling consolidation"
+    }
+  ],
+  "docs": [
+    {
+      "ai_context": {
+        "keywords": "request-chain-scaffold, over-engineering reduction: replace bespoke gates with eslint, collapse mirror layers, delete dead code, development-ready",
+        "skip when": "The change is unrelated to this scaffolded request chain.",
+        "summary": "Over-engineering reduction: replace bespoke gates with eslint, collapse mirror layers, delete dead code",
+        "use when": "You need to implement or review the scaffolded workflow for Over-engineering reduction: replace bespoke gates with eslint, collapse mirror layers, delete dead code."
+      },
+      "kind": "request",
+      "linked_refs": {
+        "item": [
+          "item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy",
+          "item_652_collapse_the_hooks_hook_impl_mirror_directory",
+          "item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism",
+          "item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters",
+          "item_655_consolidate_duplicated_logic_into_single_shared_implementations",
+          "item_656_drop_remark_gfm_from_the_changelog_renderer"
+        ],
+        "prod": [
+          "prod_013_codebase_simplification_and_tooling_consolidation"
+        ],
+        "req": [
+          "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code"
+        ]
+      },
+      "path": "logics/request/req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code.md",
+      "ref": "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code",
+      "schema_version": "1.0",
+      "status": "Draft",
+      "title": "Over-engineering reduction: replace bespoke gates with eslint, collapse mirror layers, delete dead code"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, replace bespoke quality-gate scripts with eslint rules and trim ci redundancy, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Replace bespoke quality-gate scripts with eslint rules and trim CI redundancy",
+        "use when": "Implementing the scaffolded slice for Replace bespoke quality-gate scripts with eslint rules and trim CI redundancy."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy"
+        ],
+        "prod": [
+          "prod_013_codebase_simplification_and_tooling_consolidation"
+        ],
+        "req": [
+          "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code"
+        ],
+        "task": [
+          "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
+        ]
+      },
+      "path": "logics/backlog/item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy.md",
+      "ref": "item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Replace bespoke quality-gate scripts with eslint rules and trim CI redundancy"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, collapse the hooks/hook-impl mirror directory, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Collapse the hooks/hook-impl mirror directory",
+        "use when": "Implementing the scaffolded slice for Collapse the hooks/hook-impl mirror directory."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_652_collapse_the_hooks_hook_impl_mirror_directory"
+        ],
+        "prod": [
+          "prod_013_codebase_simplification_and_tooling_consolidation"
+        ],
+        "req": [
+          "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code"
+        ],
+        "task": [
+          "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
+        ]
+      },
+      "path": "logics/backlog/item_652_collapse_the_hooks_hook_impl_mirror_directory.md",
+      "ref": "item_652_collapse_the_hooks_hook_impl_mirror_directory",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Collapse the hooks/hook-impl mirror directory"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, unify modal dialogs on one shared focus/dismiss mechanism, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Unify modal dialogs on one shared focus/dismiss mechanism",
+        "use when": "Implementing the scaffolded slice for Unify modal dialogs on one shared focus/dismiss mechanism."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism"
+        ],
+        "prod": [
+          "prod_013_codebase_simplification_and_tooling_consolidation"
+        ],
+        "req": [
+          "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code"
+        ],
+        "task": [
+          "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
+        ]
+      },
+      "path": "logics/backlog/item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism.md",
+      "ref": "item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Unify modal dialogs on one shared focus/dismiss mechanism"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-task, request-chain-scaffold, orchestration",
+        "skip when": "Working on one isolated sibling slice.",
+        "summary": "Orchestrate over-engineering reduction across gates, layers, dead code, and dependencies",
+        "use when": "Coordinating implementation of a scaffolded request chain."
+      },
+      "kind": "task",
+      "linked_refs": {
+        "item": [
+          "item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy",
+          "item_652_collapse_the_hooks_hook_impl_mirror_directory",
+          "item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism",
+          "item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters",
+          "item_655_consolidate_duplicated_logic_into_single_shared_implementations",
+          "item_656_drop_remark_gfm_from_the_changelog_renderer"
+        ],
+        "prod": [
+          "prod_013_codebase_simplification_and_tooling_consolidation"
+        ],
+        "req": [
+          "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code"
+        ],
+        "task": [
+          "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
+        ]
+      },
+      "path": "logics/tasks/task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies.md",
+      "ref": "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Orchestrate over-engineering reduction across gates, layers, dead code, and dependencies"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, delete verified dead code, dead barrels, and speculative parameters, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Delete verified dead code, dead barrels, and speculative parameters",
+        "use when": "Implementing the scaffolded slice for Delete verified dead code, dead barrels, and speculative parameters."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters"
+        ],
+        "prod": [
+          "prod_013_codebase_simplification_and_tooling_consolidation"
+        ],
+        "req": [
+          "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code"
+        ],
+        "task": [
+          "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
+        ]
+      },
+      "path": "logics/backlog/item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters.md",
+      "ref": "item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Delete verified dead code, dead barrels, and speculative parameters"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, consolidate duplicated logic into single shared implementations, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Consolidate duplicated logic into single shared implementations",
+        "use when": "Implementing the scaffolded slice for Consolidate duplicated logic into single shared implementations."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_655_consolidate_duplicated_logic_into_single_shared_implementations"
+        ],
+        "prod": [
+          "prod_013_codebase_simplification_and_tooling_consolidation"
+        ],
+        "req": [
+          "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code"
+        ],
+        "task": [
+          "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
+        ]
+      },
+      "path": "logics/backlog/item_655_consolidate_duplicated_logic_into_single_shared_implementations.md",
+      "ref": "item_655_consolidate_duplicated_logic_into_single_shared_implementations",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Consolidate duplicated logic into single shared implementations"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, drop remark-gfm from the changelog renderer, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Drop remark-gfm from the changelog renderer",
+        "use when": "Implementing the scaffolded slice for Drop remark-gfm from the changelog renderer."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_656_drop_remark_gfm_from_the_changelog_renderer"
+        ],
+        "prod": [
+          "prod_013_codebase_simplification_and_tooling_consolidation"
+        ],
+        "req": [
+          "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code"
+        ],
+        "task": [
+          "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
+        ]
+      },
+      "path": "logics/backlog/item_656_drop_remark_gfm_from_the_changelog_renderer.md",
+      "ref": "item_656_drop_remark_gfm_from_the_changelog_renderer",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Drop remark-gfm from the changelog renderer"
+    }
+  ],
+  "estimates": {
+    "char_count": 10656,
+    "companion_doc_count": 1,
+    "doc_count": 8
+  },
+  "generated_at": "2026-07-03T17:20:51Z",
+  "handoff": {
+    "companion_doc_count": 1,
+    "enabled": true,
+    "source_refs": [
+      "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code",
+      "item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy",
+      "item_652_collapse_the_hooks_hook_impl_mirror_directory",
+      "item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism",
+      "item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters",
+      "item_655_consolidate_duplicated_logic_into_single_shared_implementations",
+      "item_656_drop_remark_gfm_from_the_changelog_renderer",
+      "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
+    ],
+    "validation_summary_count": 1
+  },
+  "mode": "summary-only",
+  "profile": "normal",
+  "ref": "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code,item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy,item_652_collapse_the_hooks_hook_impl_mirror_directory,item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism,item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters,item_655_consolidate_duplicated_logic_into_single_shared_implementations,item_656_drop_remark_gfm_from_the_changelog_renderer,task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies",
+  "refs": [
+    "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code",
+    "item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy",
+    "item_652_collapse_the_hooks_hook_impl_mirror_directory",
+    "item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism",
+    "item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters",
+    "item_655_consolidate_duplicated_logic_into_single_shared_implementations",
+    "item_656_drop_remark_gfm_from_the_changelog_renderer",
+    "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
+  ],
+  "release": {
+    "blocking_reasons": [
+      "version_metadata: evidence targets a different version",
+      "changelog: evidence targets a different version",
+      "local_validation: evidence targets a different version",
+      "git_push: evidence targets a different version",
+      "ci: evidence targets a different version",
+      "production_deployment: evidence targets a different version"
+    ],
+    "configured": true,
+    "contract_path": "logics/release/contract.json",
+    "guidance": [
+      "Release readiness must come from project-owned evidence, not conversational memory.",
+      "Use release status or validate before preparing or claiming release readiness.",
+      "Publication-oriented actions are explicit operator actions and are separate from safe read/validate actions."
+    ],
+    "next_action": "version_metadata: evidence targets a different version",
+    "publication_actions": [
+      "GitHub release publication",
+      "external publication"
+    ],
+    "required_gates": [
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "version_metadata",
+        "required": true,
+        "state": "preparing",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "changelog",
+        "required": true,
+        "state": "preparing",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "local_validation",
+        "required": true,
+        "state": "local_validation",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "git_push",
+        "required": true,
+        "state": "pushed",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "ci",
+        "required": true,
+        "state": "ci_verification",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "production_deployment",
+        "required": true,
+        "state": "external_publication",
+        "status": "stale"
+      }
+    ],
+    "safe_actions": [
+      "logics-manager release status",
+      "logics-manager release plan <version>",
+      "logics-manager release validate <version>"
+    ],
+    "state": "blocked",
+    "target_version": "1.18.0"
+  },
+  "validation_summary": [
+    {
+      "items": [
+        "- Run `python3 -m logics_manager lint --require-status`.",
+        "- Run scaffold command tests."
+      ],
+      "path": "logics/tasks/task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies.md",
+      "ref": "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
+    }
+  ]
+}
