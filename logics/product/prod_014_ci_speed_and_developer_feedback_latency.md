@@ -1,6 +1,6 @@
 ## prod_014_ci_speed_and_developer_feedback_latency - CI speed and developer feedback latency
 > Date: 2026-07-03
-> Status: Accepted
+> Status: Settled
 > Related request: `req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers`
 > Related backlog: `item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation`, `item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs`, `item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane`, `item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path`
 > Related task: `task_158_orchestrate_ci_wall_clock_reduction`

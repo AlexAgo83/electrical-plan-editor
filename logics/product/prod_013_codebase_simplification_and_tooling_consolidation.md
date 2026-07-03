@@ -1,6 +1,6 @@
 ## prod_013_codebase_simplification_and_tooling_consolidation - Codebase simplification and tooling consolidation
 > Date: 2026-07-03
-> Status: Accepted
+> Status: Settled
 > Related request: `req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code`
 > Related backlog: `item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy`
 > Related task: `task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies`
