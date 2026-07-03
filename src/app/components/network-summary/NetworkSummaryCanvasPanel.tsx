@@ -1,10 +1,12 @@
-import type {
-  CSSProperties,
-  MouseEvent as ReactMouseEvent,
-  ReactElement,
-  RefObject,
-  WheelEvent as ReactWheelEvent
+import {
+  useEffect,
+  type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
+  type ReactElement,
+  type RefObject,
+  type WheelEvent as ReactWheelEvent
 } from "react";
+import { logPerfDuration } from "../../lib/perfDebug";
 import type { NetworkNode, NodeId, SegmentId, SpliceId, Wire } from "../../../core/entities";
 import type { CanvasCalloutTextSize, CanvasLabelSizeMode, CanvasLabelStrokeMode, NodePosition } from "../../types/app-controller";
 import { NetworkSummaryCalloutLeaders, NetworkSummaryCalloutsLayer } from "./callouts/NetworkSummaryCalloutsLayer";
@@ -167,6 +169,14 @@ export function NetworkSummaryCanvasPanel({
   onActivateFloatingSplice,
   onSelectWireFromConnectorPin
 }: NetworkSummaryCanvasPanelProps): ReactElement {
+  const renderStartedAt = performance.now();
+  useEffect(() => {
+    logPerfDuration("render+commit NetworkSummaryCanvasPanel", renderStartedAt, {
+      nodes: nodes.length,
+      segments: renderedSegments.length,
+      callouts: renderedCableCallouts.length
+    });
+  });
   return (
     <>
       <div className="network-summary-canvas-region">

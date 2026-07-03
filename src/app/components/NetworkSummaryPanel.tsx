@@ -44,7 +44,7 @@ import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicP
 import { SvgExportPreviewDialog } from "./dialogs/SvgExportPreviewDialog";
 import { PreviewLoadingDialog } from "./dialogs/PreviewLoadingDialog";
 import { snapToGrid } from "../lib/app-utils-shared";
-import { logPerfDuration } from "../lib/perfDebug";
+import { logPerfDuration, usePerfChangedProps } from "../lib/perfDebug";
 import { arePanelMemoPropsEqual } from "../lib/renderMemoCompare";
 import { getThemeClassNames } from "../lib/themeModes";
 import type { NetworkSummaryPanelHandle, NetworkSummaryPanelProps } from "./network-summary/NetworkSummaryPanel.types";
@@ -53,7 +53,9 @@ function clampNumber(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-function NetworkSummaryPanelComponent({
+function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactElement {
+  usePerfChangedProps("NetworkSummaryPanel", props as unknown as Record<string, unknown>);
+  const {
   handleZoomAction,
   fitNetworkToContent,
   showNetworkInfoPanels,
@@ -174,7 +176,7 @@ function NetworkSummaryPanelComponent({
   catalogItems,
   showFunctionalSchematic = true,
   imperativeRef
-}: NetworkSummaryPanelProps): ReactElement {
+  } = props;
   const renderStartedAt = performance.now();
   useEffect(() => {
     logPerfDuration("render+commit NetworkSummaryPanel", renderStartedAt, {

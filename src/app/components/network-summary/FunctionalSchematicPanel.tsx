@@ -1,4 +1,5 @@
-import { memo, useCallback, useMemo, useRef, useState, type ReactElement } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
+import { logPerfDuration } from "../../lib/perfDebug";
 import type { CatalogItem, Connector, ConnectorId, Network, Segment, Splice, SpliceId, Wire } from "../../../core/entities";
 import {
   buildFunctionalSchematicGraph,
@@ -734,6 +735,13 @@ function FunctionalSchematicPanelComponent({
   onOpenOnboardingHelp,
   onboardingPanelKey
 }: FunctionalSchematicPanelProps): ReactElement {
+  const renderStartedAt = performance.now();
+  useEffect(() => {
+    logPerfDuration("render+commit FunctionalSchematicPanel", renderStartedAt, {
+      wires: wires.length,
+      segments: segments.length
+    });
+  });
   const [activeFilter, setActiveFilter] = useState<FunctionalDomainFilter>("all");
   const [hoveredEdgeId, setHoveredEdgeId] = useState<string | null>(null);
   const [showGrid, setShowGrid] = useState(true);

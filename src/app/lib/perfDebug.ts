@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import type { ProfilerOnRenderCallback } from "react";
 
 const PERF_LOG_THRESHOLD_MS = 16;
@@ -45,6 +46,19 @@ export const logReactRender: ProfilerOnRenderCallback = (id, phase, actualDurati
     commitDelay: Number((commitTime - startTime).toFixed(1))
   });
 };
+
+// ponytail: dev-only diagnostic, logs which prop identities changed between renders
+export function usePerfChangedProps(label: string, props: Record<string, unknown>): void {
+  const previousRef = useRef<Record<string, unknown> | null>(null);
+  if (isPerfDebugEnabled()) {
+    const previous = previousRef.current;
+    if (previous !== null) {
+      const changed = Object.keys(props).filter((key) => !Object.is(previous[key], props[key]));
+      console.info(`[perf] changed props ${label}:`, changed.length > 0 ? changed.join(", ") : "(none)");
+    }
+  }
+  previousRef.current = props;
+}
 
 let longTaskLoggerInstalled = false;
 

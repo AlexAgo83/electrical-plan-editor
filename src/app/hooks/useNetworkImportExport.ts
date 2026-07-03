@@ -123,7 +123,9 @@ export function useNetworkImportExport({
       const unchanged = next.length === previous.length && next.every((networkId, index) => previous[index] === networkId);
       return unchanged ? previous : next;
     });
-  }, [activeNetworkId, networks]);
+    // ponytail: selectedExportNetworkIds in deps keeps the active-network fallback
+    // firing when the selection empties, now that `networks` identity is stable.
+  }, [activeNetworkId, networks, selectedExportNetworkIds]);
 
   function toggleSelectedExportNetwork(networkId: NetworkId): void {
     setSelectedExportNetworkIds((previous) => {

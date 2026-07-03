@@ -60,6 +60,11 @@ function createCollectionSelector<T, Id extends string>() {
 
 const selectRoutingNodes = createCollectionSelector<NetworkNode, NodeId>();
 const selectRoutingSegments = createCollectionSelector<Segment, SegmentId>();
+const selectMemoizedConnectors = createCollectionSelector<Connector, ConnectorId>();
+const selectMemoizedCatalogItems = createCollectionSelector<CatalogItem, CatalogItemId>();
+const selectMemoizedNetworks = createCollectionSelector<Network, NetworkId>();
+const selectMemoizedSplices = createCollectionSelector<Splice, SpliceId>();
+const selectMemoizedWires = createCollectionSelector<Wire, WireId>();
 const selectMemoizedRoutingGraphIndex = (() => {
   let previousNodes: NetworkNode[] | null = null;
   let previousSegments: Segment[] | null = null;
@@ -81,15 +86,15 @@ const selectMemoizedRoutingGraphIndex = (() => {
 })();
 
 export function selectConnectors(state: AppState): Connector[] {
-  return selectCollection(state.connectors.byId, state.connectors.allIds);
+  return selectMemoizedConnectors(state.connectors.byId, state.connectors.allIds);
 }
 
 export function selectCatalogItems(state: AppState): CatalogItem[] {
-  return selectCollection(state.catalogItems.byId, state.catalogItems.allIds);
+  return selectMemoizedCatalogItems(state.catalogItems.byId, state.catalogItems.allIds);
 }
 
 export function selectNetworks(state: AppState): Network[] {
-  return selectCollection(state.networks.byId, state.networks.allIds);
+  return selectMemoizedNetworks(state.networks.byId, state.networks.allIds);
 }
 
 export function selectNetworkById(state: AppState, id: NetworkId): Network | undefined {
@@ -109,19 +114,19 @@ export function selectActiveNetwork(state: AppState): Network | null {
 }
 
 export function selectSplices(state: AppState): Splice[] {
-  return selectCollection(state.splices.byId, state.splices.allIds);
+  return selectMemoizedSplices(state.splices.byId, state.splices.allIds);
 }
 
 export function selectNodes(state: AppState): NetworkNode[] {
-  return selectCollection(state.nodes.byId, state.nodes.allIds);
+  return selectRoutingNodes(state.nodes.byId, state.nodes.allIds);
 }
 
 export function selectSegments(state: AppState): Segment[] {
-  return selectCollection(state.segments.byId, state.segments.allIds);
+  return selectRoutingSegments(state.segments.byId, state.segments.allIds);
 }
 
 export function selectWires(state: AppState): Wire[] {
-  return selectCollection(state.wires.byId, state.wires.allIds);
+  return selectMemoizedWires(state.wires.byId, state.wires.allIds);
 }
 
 export function selectNodePositions(state: AppState): AppState["nodePositions"] {
@@ -332,7 +337,13 @@ export interface SubNetworkSummary {
   totalLengthMm: number;
 }
 
+let previousSubNetworkSegments: AppState["segments"] | null = null;
+let previousSubNetworkSummaries: SubNetworkSummary[] | null = null;
+
 export function selectSubNetworkSummaries(state: AppState): SubNetworkSummary[] {
+  if (previousSubNetworkSegments === state.segments && previousSubNetworkSummaries !== null) {
+    return previousSubNetworkSummaries;
+  }
   const byTag = new Map<string, SubNetworkSummary>();
 
   for (const segmentId of state.segments.allIds) {
@@ -360,7 +371,9 @@ export function selectSubNetworkSummaries(state: AppState): SubNetworkSummary[] 
     });
   }
 
-  return [...byTag.values()].sort((left, right) => left.tag.localeCompare(right.tag));
+  previousSubNetworkSegments = state.segments;
+  previousSubNetworkSummaries = [...byTag.values()].sort((left, right) => left.tag.localeCompare(right.tag));
+  return previousSubNetworkSummaries;
 }
 
 export function selectRoutingGraphIndex(state: AppState): RoutingGraphIndex {
