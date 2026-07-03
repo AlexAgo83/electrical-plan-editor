@@ -153,4 +153,15 @@ describe("App integration UI - render containment", () => {
     expect(renderCounts.primaryTables).toBe(0);
     expect(renderCounts.secondaryTables).toBe(0);
   });
+
+  it("does not mount inactive modeling tables", () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("modeling");
+
+    expect(getPanelByHeading("Connectors")).toBeInTheDocument();
+    expect(document.querySelector('[data-onboarding-panel="modeling-splices"]')).toBeNull();
+    expect(document.querySelector('[data-onboarding-panel="modeling-nodes"]')).toBeNull();
+    expect(document.querySelector('[data-onboarding-panel="modeling-segments"]')).toBeNull();
+    expect(document.querySelector('[data-onboarding-panel="modeling-wires"]')).toBeNull();
+  });
 });

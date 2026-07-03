@@ -210,12 +210,16 @@ function NetworkSummaryPanelComponent({
   const calloutLeaderStrokeWidth = clampNumber(1.25 * normalizedNodeStrokeScale, 0.82, 1.7);
   const calloutLeaderDashFirst = clampNumber(1.7 * normalizedNodeStrokeScale, 1.1, 2.3);
   const calloutLeaderDashSecond = clampNumber(2.4 * normalizedNodeStrokeScale, 1.56, 3.24);
-  const networkSvgStrokeVariables = {
-    "--network-segment-stroke-width": `${segmentStrokeWidth}`,
-    "--network-segment-stroke-emphasis-width": `${segmentStrokeEmphasisWidth}`,
-    "--network-callout-leader-stroke-width": `${calloutLeaderStrokeWidth}`,
-    "--network-callout-leader-dasharray": `${calloutLeaderDashFirst} ${calloutLeaderDashSecond}`
-  } as CSSProperties;
+  const networkSvgStrokeVariables = useMemo(
+    () =>
+      ({
+        "--network-segment-stroke-width": `${segmentStrokeWidth}`,
+        "--network-segment-stroke-emphasis-width": `${segmentStrokeEmphasisWidth}`,
+        "--network-callout-leader-stroke-width": `${calloutLeaderStrokeWidth}`,
+        "--network-callout-leader-dasharray": `${calloutLeaderDashFirst} ${calloutLeaderDashSecond}`
+      }) as CSSProperties,
+    [calloutLeaderDashFirst, calloutLeaderDashSecond, calloutLeaderStrokeWidth, segmentStrokeEmphasisWidth, segmentStrokeWidth]
+  );
   const useStrokeInvariantLines = resizeBehaviorMode === "visibleAreaOnly";
   const visibleModelMinX = (0 - networkOffset.x) / effectiveRenderScale;
   const visibleModelMaxX = (networkViewWidth - networkOffset.x) / effectiveRenderScale;
@@ -227,8 +231,14 @@ function NetworkSummaryPanelComponent({
   const gridEndY = Math.ceil(visibleModelMaxY / networkGridStep) * networkGridStep;
   const verticalGridLineCount = Math.max(0, Math.ceil((gridEndX - gridStartX) / networkGridStep) + 1);
   const horizontalGridLineCount = Math.max(0, Math.ceil((gridEndY - gridStartY) / networkGridStep) + 1);
-  const gridXPositions = Array.from({ length: verticalGridLineCount }, (_, index) => gridStartX + index * networkGridStep);
-  const gridYPositions = Array.from({ length: horizontalGridLineCount }, (_, index) => gridStartY + index * networkGridStep);
+  const gridXPositions = useMemo(
+    () => Array.from({ length: verticalGridLineCount }, (_, index) => gridStartX + index * networkGridStep),
+    [gridStartX, networkGridStep, verticalGridLineCount]
+  );
+  const gridYPositions = useMemo(
+    () => Array.from({ length: horizontalGridLineCount }, (_, index) => gridStartY + index * networkGridStep),
+    [gridStartY, horizontalGridLineCount, networkGridStep]
+  );
   const handleGlobalRenderScalePercentChange = useNetworkSummaryRenderScaleControls({
     effectiveScale,
     globalRenderScalePercent,

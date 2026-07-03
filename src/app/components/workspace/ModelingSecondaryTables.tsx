@@ -243,12 +243,12 @@ function ModelingSecondaryTablesComponent({
   const isSegmentBatchMode = activeBatchScope === "segment";
   const isWireBatchMode = activeBatchScope === "wire";
   const focusedSegment =
-    selectedSegmentId === null
+    !isSegmentSubScreen || selectedSegmentId === null
       ? null
       : (visibleSegments.find((segment) => segment.id === selectedSegmentId) ??
         null);
   const focusedWire =
-    selectedWireId === null
+    !isWireSubScreen || selectedWireId === null
       ? null
       : (visibleWires.find((wire) => wire.id === selectedWireId) ?? null);
   const showSegmentSubNetworkColumn = segmentSubNetworkFilter !== "default";
@@ -368,8 +368,11 @@ function ModelingSecondaryTablesComponent({
     );
   }, [_wireSort]);
   const sortedVisibleSegments = useMemo(
-    () =>
-      sortByTableColumns(
+    () => {
+      if (!isSegmentSubScreen) {
+        return [];
+      }
+      return sortByTableColumns(
         visibleSegments,
         segmentTableSort,
         (segment, field) => {
@@ -383,12 +386,16 @@ function ModelingSecondaryTablesComponent({
           return subNetwork;
         },
         (segment) => segment.id,
-      ),
-    [nodeLabelById, segmentTableSort, visibleSegments],
+      );
+    },
+    [isSegmentSubScreen, nodeLabelById, segmentTableSort, visibleSegments],
   );
   const sortedVisibleWires = useMemo(
-    () =>
-      sortByTableColumns(
+    () => {
+      if (!isWireSubScreen) {
+        return [];
+      }
+      return sortByTableColumns(
         visibleWires,
         wireTableSort,
         (wire, field) => {
@@ -404,8 +411,9 @@ function ModelingSecondaryTablesComponent({
           return wire.isRouteLocked ? "Locked" : "Auto";
         },
         (wire) => wire.id,
-      ),
-    [describeWireEndpoint, visibleWires, wireTableSort],
+      );
+    },
+    [describeWireEndpoint, isWireSubScreen, visibleWires, wireTableSort],
   );
   const visibleSegmentIds = useMemo(
     () => sortedVisibleSegments.map((segment) => segment.id),
@@ -553,9 +561,9 @@ function ModelingSecondaryTablesComponent({
 
   return (
     <>
+      {isSegmentSubScreen ? (
       <article
         className="panel"
-        hidden={!isSegmentSubScreen}
         data-onboarding-panel="modeling-segments"
       >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
@@ -982,10 +990,11 @@ function ModelingSecondaryTablesComponent({
           )}
         </div>
       </article>
+      ) : null}
 
+      {isWireSubScreen ? (
       <article
         className="panel"
-        hidden={!isWireSubScreen}
         data-onboarding-panel="modeling-wires"
       >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
@@ -1617,6 +1626,7 @@ function ModelingSecondaryTablesComponent({
           )}
         </div>
       </article>
+      ) : null}
       {wireExportPreview !== null ? (
         <TabularExportPreviewDialog
           isOpen={wireExportPreview !== null}

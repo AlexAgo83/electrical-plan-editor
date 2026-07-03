@@ -146,18 +146,18 @@ function ModelingPrimaryTablesComponent({
   const isSpliceBatchMode = activeBatchScope === "splice";
   const isNodeBatchMode = activeBatchScope === "node";
   const focusedConnector =
-    selectedConnectorId === null
+    !isConnectorSubScreen || selectedConnectorId === null
       ? null
       : (visibleConnectors.find(
           (connector) => connector.id === selectedConnectorId,
         ) ?? null);
   const focusedSplice =
-    selectedSpliceId === null
+    !isSpliceSubScreen || selectedSpliceId === null
       ? null
       : (visibleSplices.find((splice) => splice.id === selectedSpliceId) ??
         null);
   const focusedNode =
-    selectedNodeId === null
+    !isNodeSubScreen || selectedNodeId === null
       ? null
       : (visibleNodes.find((node) => node.id === selectedNodeId) ?? null);
   const showNodeKindColumn = nodeKindFilter === "all";
@@ -321,8 +321,11 @@ function ModelingPrimaryTablesComponent({
     );
   }, [nodeIdSortDirection]);
   const sortedVisibleConnectors = useMemo(
-    () =>
-      sortByTableColumns(
+    () => {
+      if (!isConnectorSubScreen) {
+        return [];
+      }
+      return sortByTableColumns(
         visibleConnectors,
         connectorTableSort,
         (connector, field) => {
@@ -334,10 +337,14 @@ function ModelingPrimaryTablesComponent({
           return connectorOccupiedCountById.get(connector.id) ?? 0;
         },
         (connector) => connector.id,
-      ),
-    [connectorOccupiedCountById, connectorTableSort, visibleConnectors],
+      );
+    },
+    [connectorOccupiedCountById, connectorTableSort, isConnectorSubScreen, visibleConnectors],
   );
   const spliceConnectedWireCountById = useMemo(() => {
+    if (!isSpliceSubScreen) {
+      return new Map<SpliceId, number>();
+    }
     const result = new Map<SpliceId, number>();
     for (const wire of wires) {
       if (wire.endpointA.kind === "splicePort") {
@@ -354,10 +361,13 @@ function ModelingPrimaryTablesComponent({
       }
     }
     return result;
-  }, [wires]);
+  }, [isSpliceSubScreen, wires]);
   const sortedVisibleSplices = useMemo(
-    () =>
-      sortByTableColumns(
+    () => {
+      if (!isSpliceSubScreen) {
+        return [];
+      }
+      return sortByTableColumns(
         visibleSplices,
         spliceTableSort,
         (splice, field) => {
@@ -372,8 +382,10 @@ function ModelingPrimaryTablesComponent({
           return spliceConnectedWireCountById.get(splice.id) ?? 0;
         },
         (splice) => splice.id,
-      ),
+      );
+    },
     [
+      isSpliceSubScreen,
       resolveSplicePlacementPresentation,
       spliceConnectedWireCountById,
       spliceTableSort,
@@ -381,8 +393,11 @@ function ModelingPrimaryTablesComponent({
     ],
   );
   const sortedVisibleNodes = useMemo(
-    () =>
-      sortByTableColumns(
+    () => {
+      if (!isNodeSubScreen) {
+        return [];
+      }
+      return sortByTableColumns(
         visibleNodes,
         nodeTableSort,
         (node, field) => {
@@ -392,8 +407,9 @@ function ModelingPrimaryTablesComponent({
           return segmentsCountByNodeId.get(node.id) ?? 0;
         },
         (node) => node.id,
-      ),
-    [describeNode, nodeTableSort, segmentsCountByNodeId, visibleNodes],
+      );
+    },
+    [describeNode, isNodeSubScreen, nodeTableSort, segmentsCountByNodeId, visibleNodes],
   );
   const visibleConnectorIds = useMemo(
     () => sortedVisibleConnectors.map((connector) => connector.id),
@@ -553,11 +569,12 @@ function ModelingPrimaryTablesComponent({
 
   return (
     <>
-      <article
-        className="panel"
-        hidden={!isConnectorSubScreen}
-        data-onboarding-panel="modeling-connectors"
-      >
+      {isConnectorSubScreen ? (
+        <>
+          <article
+            className="panel"
+            data-onboarding-panel="modeling-connectors"
+          >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
           <h2>Connectors</h2>
           <div className="list-panel-header-tools">
@@ -1021,20 +1038,22 @@ function ModelingPrimaryTablesComponent({
           )}
         </div>
       </article>
-      <PinRoleMassEditDialog
-        isOpen={isPinRoleMassEditOpen}
-        activeNetwork={activeNetwork}
-        connectors={connectors}
-        splices={splices}
-        wires={wires}
-        catalogItems={catalogItems}
-        onApplyPinRoleMassEdit={onApplyPinRoleMassEdit}
-        onClose={() => setIsPinRoleMassEditOpen(false)}
-      />
+          <PinRoleMassEditDialog
+            isOpen={isPinRoleMassEditOpen}
+            activeNetwork={activeNetwork}
+            connectors={connectors}
+            splices={splices}
+            wires={wires}
+            catalogItems={catalogItems}
+            onApplyPinRoleMassEdit={onApplyPinRoleMassEdit}
+            onClose={() => setIsPinRoleMassEditOpen(false)}
+          />
+        </>
+      ) : null}
 
+      {isSpliceSubScreen ? (
       <article
         className="panel"
-        hidden={!isSpliceSubScreen}
         data-onboarding-panel="modeling-splices"
       >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
@@ -1521,10 +1540,11 @@ function ModelingPrimaryTablesComponent({
           )}
         </div>
       </article>
+      ) : null}
 
+      {isNodeSubScreen ? (
       <article
         className="panel"
-        hidden={!isNodeSubScreen}
         data-onboarding-panel="modeling-nodes"
       >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
@@ -1908,6 +1928,7 @@ function ModelingPrimaryTablesComponent({
           )}
         </div>
       </article>
+      ) : null}
     </>
   );
 }
