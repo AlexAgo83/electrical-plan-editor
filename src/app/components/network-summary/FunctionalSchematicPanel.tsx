@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState, type ReactElement } from "react";
+import { memo, useCallback, useMemo, useRef, useState, type ReactElement } from "react";
 import type { CatalogItem, Connector, ConnectorId, Network, Segment, Splice, SpliceId, Wire } from "../../../core/entities";
 import {
   buildFunctionalSchematicGraph,
@@ -703,7 +703,7 @@ function resolveFunctionalEdgeLabelPositions(
     });
 }
 
-export function FunctionalSchematicPanel({
+function FunctionalSchematicPanelComponent({
   network,
   wires,
   segments,
@@ -1187,3 +1187,6 @@ export function FunctionalSchematicPanel({
     </section>
   );
 }
+
+// ponytail: memo so canvas pan/drag renders of the parent skip this whole subtree
+export const FunctionalSchematicPanel = memo(FunctionalSchematicPanelComponent);
