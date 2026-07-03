@@ -10,70 +10,119 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  validate:
+  quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
+    timeout-minutes: 15
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
-
-      - name: Install Logics Manager
-        run: python3 -m pip install logics-manager
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Logics docs lint (status required, informational)
-        run: logics-manager lint --require-status
-        continue-on-error: true
-
-      - name: Workflow audit strict AC (informational, non-blocking)
+          cache: pip
+      - run: python3 -m pip install logics-manager
+      - run: npm ci
+      - name: Logics and static analysis
         run: |
-          logics-manager audit --legacy-cutoff-version 1.1.0 --group-by-doc || {
-            status=$?
-            echo "::notice::Workflow audit strict AC reported findings and exited with ${status}; keeping this informational check non-blocking."
-          }
+          logics-manager lint --require-status
+          logics-manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability
+          npm run -s lint
+          npm run -s typecheck
+          npm run -s quality:dependency-audit
+          npm run -s test:ci:segmentation:check
 
-      - name: Workflow audit JSON (informational, non-blocking)
-        run: |
-          logics-manager audit --format json || {
-            status=$?
-            echo "::notice::Workflow audit JSON reported findings and exited with ${status}; keeping this informational check non-blocking."
-          }
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Fast tests without PR coverage overhead
+        if: ${{ github.event_name == 'pull_request' }}
+        run: npm run -s test:ci:fast
+      - name: Fast tests with main coverage
+        if: ${{ github.event_name != 'pull_request' }}
+        run: npm run -s test:ci:fast -- --coverage
 
-      - name: Install Playwright browser
+  ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run -s test:ci:ui:shard -- --shard=${{ matrix.shard }}/3
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
+      - name: Install Chromium system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - run: npm run -s test:e2e
 
-      - name: Blocking project CI
-        run: npm run ci:blocking
-
-      - name: Bundle metrics report (informational, non-blocking)
-        if: ${{ success() }}
-        run: npm run bundle:metrics:report
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run -s build:vite
+      - run: npm run -s quality:pwa
+      - name: Bundle metrics report
+        run: npm run -s bundle:metrics:report
         continue-on-error: true
 
-      - name: PWA build artifact quality gate
-        run: npm run quality:pwa
-
-      - name: UI coverage report (informational, non-blocking)
-        if: ${{ success() && github.event_name == 'workflow_dispatch' }}
-        run: npm run coverage:ui:report
-        continue-on-error: true
-
-      - name: UI slow test top-N (informational, non-blocking)
-        if: ${{ success() && github.event_name == 'workflow_dispatch' }}
-        run: npm run test:ci:ui:slow-top
-        continue-on-error: true
+  validate:
+    if: ${{ always() }}
+    needs: [quality, unit, ui, e2e, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every blocking lane
+        env:
+          NEEDS: ${{ toJson(needs) }}
+        run: |
+          echo "$NEEDS"
+          test "${{ needs.quality.result }}" = success
+          test "${{ needs.unit.result }}" = success
+          test "${{ needs.ui.result }}" = success
+          test "${{ needs.e2e.result }}" = success
+          test "${{ needs.build.result }}" = success

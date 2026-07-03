@@ -95,6 +95,10 @@ if (lane === "ui") {
   process.exit(runVitestInChunks(userArgs, uiLaneTestFiles, UI_CHUNK_SIZE));
 }
 
+if (lane === "ui-shard") {
+  process.exit(runVitest([...userArgs, ...uiLaneTestFiles]));
+}
+
 if (lane === "fast") {
   const excludeArgs = uiLaneTestFiles.map((filePath) => `--exclude=${filePath}`);
   process.exit(runVitest([...userArgs, ...excludeArgs]));
@@ -104,5 +108,5 @@ if (lane === "ui-slow-top") {
   process.exit(runUiSlowTop(userArgs));
 }
 
-console.error("[test:ci:segmentation] unknown lane. Use one of: check, fast, ui, ui-slow-top.");
+console.error("[test:ci:segmentation] unknown lane. Use one of: check, fast, ui, ui-shard, ui-slow-top.");
 process.exit(1);

@@ -4,7 +4,7 @@
 > Status: In progress
 > Understanding: 95
 > Confidence: 90
-> Progress: 5
+> Progress: 70
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -45,6 +45,7 @@
 
 # Report
 - Implementation complete.
+- Baseline captured from PR run 28352671607: validate ran 9m59s total; setup 20s, Playwright install 24s, serial Blocking project CI 9m06s. Last five CI runs took 8m08s, 10m04s, 9m51s, 10m19s, and 10m02s. Implemented parallel quality/unit/ui(3 shards)/e2e/build lanes with validate aggregator, PR-only cancellation, coverage-free PR unit tests, main coverage retention, Playwright browser cache, pip cache, and 4-worker UI shards. Local shard 1/3: 23 files, 138 tests, 25.22s.
 
 # AI Context
 - Summary: Orchestrate CI wall-clock reduction

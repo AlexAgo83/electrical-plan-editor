@@ -23,6 +23,7 @@
     "test:ci:segmentation:check": "node scripts/quality/run-vitest-segmented.mjs check",
     "test:ci:fast": "env LAYOUT_RESPONSIVENESS_BUDGET_MS=25000 node scripts/quality/run-vitest-segmented.mjs fast --pool=forks --maxWorkers=2 --testTimeout=15000",
     "test:ci:ui": "node scripts/quality/run-vitest-segmented.mjs ui --pool=forks --maxWorkers=2 --testTimeout=15000",
+    "test:ci:ui:shard": "node scripts/quality/run-vitest-segmented.mjs ui-shard --pool=forks --maxWorkers=4 --testTimeout=15000",
     "test:ci:slow-top": "node scripts/quality/report-slowest-tests.mjs --top=10",
     "test:ci:ui:slow-top": "node scripts/quality/run-vitest-segmented.mjs ui-slow-top --top=10",
     "test:e2e": "node scripts/quality/run-playwright-e2e.mjs",
