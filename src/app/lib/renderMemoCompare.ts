@@ -1,3 +1,7 @@
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && Object.getPrototypeOf(value) === Object.prototype;
+}
+
 function areArraysShallowEqual(left: readonly unknown[], right: readonly unknown[]): boolean {
   return (
     left.length === right.length &&
@@ -7,11 +11,7 @@ function areArraysShallowEqual(left: readonly unknown[], right: readonly unknown
         return true;
       }
       return (
-        value !== null &&
-        rightValue !== null &&
-        Object.getPrototypeOf(value) === Object.prototype &&
-        Object.getPrototypeOf(rightValue) === Object.prototype &&
-        arePlainObjectsShallowEqual(value as Record<string, unknown>, rightValue as Record<string, unknown>)
+        isPlainRecord(value) && isPlainRecord(rightValue) && arePlainObjectsShallowEqual(value, rightValue)
       );
     })
   );
@@ -53,11 +53,7 @@ function arePlainObjectsShallowEqual(left: Record<string, unknown>, right: Recor
         return true;
       }
       return (
-        leftValue !== null &&
-        rightValue !== null &&
-        Object.getPrototypeOf(leftValue) === Object.prototype &&
-        Object.getPrototypeOf(rightValue) === Object.prototype &&
-        arePlainObjectsShallowEqual(leftValue as Record<string, unknown>, rightValue as Record<string, unknown>)
+        isPlainRecord(leftValue) && isPlainRecord(rightValue) && arePlainObjectsShallowEqual(leftValue, rightValue)
       );
     })
   );
@@ -86,11 +82,9 @@ export function arePanelMemoPropsEqual<TProps extends Record<string, unknown>>(p
       continue;
     }
     if (
-      previousValue !== null &&
-      nextValue !== null &&
-      Object.getPrototypeOf(previousValue) === Object.prototype &&
-      Object.getPrototypeOf(nextValue) === Object.prototype &&
-      arePlainObjectsShallowEqual(previousValue as Record<string, unknown>, nextValue as Record<string, unknown>)
+      isPlainRecord(previousValue) &&
+      isPlainRecord(nextValue) &&
+      arePlainObjectsShallowEqual(previousValue, nextValue)
     ) {
       continue;
     }

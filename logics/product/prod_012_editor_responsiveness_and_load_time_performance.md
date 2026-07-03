@@ -1,6 +1,6 @@
 ## prod_012_editor_responsiveness_and_load_time_performance - Editor responsiveness and load-time performance
 > Date: 2026-07-03
-> Status: Proposed
+> Status: Settled
 > Related request: `req_161_runtime_rendering_and_initial_bundle_performance_overhaul`
 > Related backlog: `item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries`, `item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks`, `item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets`, `item_650_move_steady_state_persistence_serialization_off_the_critical_input_path`
 > Related task: `task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul`

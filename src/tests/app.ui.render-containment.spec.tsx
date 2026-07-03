@@ -94,6 +94,10 @@ describe("App integration UI - render containment", () => {
     installCountedRegistry();
   });
 
+  it("compares nested plain records without throwing on undefined transitions", () => {
+    expect(arePanelMemoPropsEqual({ value: { nested: undefined } }, { value: { nested: { id: "next" } } })).toBe(false);
+  });
+
   it("keeps non-canvas modeling panels flat during a coalesced pan frame", () => {
     const frameCallbackRef: { current: FrameRequestCallback | null } = { current: null };
     vi.spyOn(window, "requestAnimationFrame").mockImplementation((callback: FrameRequestCallback) => {

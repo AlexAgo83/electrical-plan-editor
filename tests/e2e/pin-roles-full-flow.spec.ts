@@ -2,12 +2,17 @@ import type { Locator, Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
 async function dismissOnboardingIfVisible(page: Page): Promise<void> {
-  const closeOnboardingButton = page.getByRole("button", { name: "Close onboarding", exact: true });
-  if (!(await closeOnboardingButton.isVisible({ timeout: 3_000 }).catch(() => false))) {
+  const onboardingDialog = page.locator(".onboarding-modal");
+  if (!(await onboardingDialog.isVisible({ timeout: 1_500 }).catch(() => false))) {
     return;
   }
-  await closeOnboardingButton.click();
-  await expect(closeOnboardingButton).toHaveCount(0);
+  const closeOnboardingButton = page.getByRole("button", { name: "Close onboarding", exact: true });
+  if (await closeOnboardingButton.isVisible().catch(() => false)) {
+    await closeOnboardingButton.click({ force: true });
+  } else {
+    await page.keyboard.press("Escape");
+  }
+  await expect(onboardingDialog).toHaveCount(0);
 }
 
 async function findVisibleSidebarButtonByText(
@@ -84,6 +89,7 @@ test("pin roles full flow covers mass edit and multi-network analysis surfaces",
   await dismissOnboardingIfVisible(page);
 
   await switchMainScreen(page, "Modeling");
+  await dismissOnboardingIfVisible(page);
   await page.getByRole("button", { name: "Mass edit" }).click();
   const massEditDialog = page.getByRole("dialog", { name: "Pin role mass edit" });
   const massEditPanel = massEditDialog.locator(".pin-role-mass-edit-panel");
