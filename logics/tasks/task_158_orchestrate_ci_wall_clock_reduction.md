@@ -4,7 +4,7 @@
 > Status: In progress
 > Understanding: 95
 > Confidence: 90
-> Progress: 70
+> Progress: 85
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -14,11 +14,11 @@
 - Orchestrate the scaffolded request chain and keep sibling implementation slices linked.
 
 # Plan
-- [ ] 1. Capture the baseline first: last five run durations plus per-step timings from one representative run; store in the task journal (AC6 depends on it).
-- [ ] 2. Land the parallel-lanes split with concurrency cancellation (biggest structural win); update branch-protection required checks the same day so merges stay gated.
-- [ ] 3. Land the coverage-off-PR item immediately after — it is a one-line-per-lane change once the lanes exist.
-- [ ] 4. Land caching (Playwright + pip) next; verify one cold and one warm run.
-- [ ] 5. Land worker-count raise and UI-lane sharding last, with the three-green-runs validation window; coordinate the shard mechanics with req_162's segmented-runner refactor to avoid double work.
+- [x] 1. Capture the baseline first: last five run durations plus per-step timings from one representative run; store in the task journal (AC6 depends on it).
+- [ ] 2. Land the parallel-lanes split with concurrency cancellation; implementation is committed, but the required-check configuration must be verified after publication.
+- [x] 3. Land the coverage-off-PR item immediately after — PR units run without coverage and main retains the coverage gate.
+- [ ] 4. Land caching (Playwright + pip) next; implementation is committed, but cold/warm GitHub cache evidence requires publication.
+- [ ] 5. Land worker-count raise and UI-lane sharding last; local sharding is green, while the required three consecutive GitHub runs remain pending.
 - [ ] 6. Close out with before/after wall-clock table (per lane and total), the required-checks diff, and the e2e placement decision; validate and close the request chain.
 - [ ] GATE: do not close until lint, audit, and scaffold validation pass.
 
@@ -34,18 +34,21 @@
 - [ ] Validation passes.
 
 # AC Traceability
-- request-AC1 -> This task. Proof: scaffold command generated the request-chain corpus.
-- request-AC4 -> This task. Proof: optional context-pack handoff is supported.
-- request-AC6 -> This task. Proof: dry-run and collision checks bound file changes.
-- request-AC8 -> This task. Proof: CLI help documents the one-pass scaffold workflow.
+- request-AC1 -> This task. Proof pending publication: the workflow now defines parallel quality, unit, three UI shards, E2E, and build lanes behind the stable `validate` aggregator.
+- request-AC2 -> This task. Proof: workflow conditions run unit coverage on main only; pull requests use the non-instrumented unit command.
+- request-AC3 -> This task. Proof pending publication: UI shards use four workers and pass locally; three consecutive GitHub runs are still required.
+- request-AC4 -> This task. Proof pending publication: Playwright and pip cache steps are defined; one cold and one warm GitHub run must confirm cache hits.
+- request-AC5 -> This task. Proof: the workflow concurrency expression cancels pull-request supersessions while assigning unique non-cancelling groups to main runs.
+- request-AC6 -> This task. Proof pending publication: baseline is recorded below; a post-change pull-request run must demonstrate the requested 40% wall-clock reduction.
 
 # Validation
-- Run `python3 -m logics_manager lint --require-status`.
-- Run scaffold command tests.
+- Local validation passed on 2026-07-03: YAML parsing, UI shard 1/3 (23 files, 138 tests), and the complete `npm run -s ci:local` portal (1,055 Vitest tests, 3 E2E tests, coverage, build, PWA gate).
+- Remote validation is intentionally pending because the commits have not been pushed: required-check preservation, three green runs, cache hit behavior, and post-change wall-clock cannot be proven locally.
 
 # Report
 - Implementation complete.
 - Baseline captured from PR run 28352671607: validate ran 9m59s total; setup 20s, Playwright install 24s, serial Blocking project CI 9m06s. Last five CI runs took 8m08s, 10m04s, 9m51s, 10m19s, and 10m02s. Implemented parallel quality/unit/ui(3 shards)/e2e/build lanes with validate aggregator, PR-only cancellation, coverage-free PR unit tests, main coverage retention, Playwright browser cache, pip cache, and 4-worker UI shards. Local shard 1/3: 23 files, 138 tests, 25.22s.
+- Local closeout gate passed in full. The task remains open at 85% solely for publication-dependent evidence; no remote timing or cache claim is inferred from local results.
 
 # AI Context
 - Summary: Orchestrate CI wall-clock reduction
