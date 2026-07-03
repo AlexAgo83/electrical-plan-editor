@@ -1,6 +1,12 @@
 import type { Locator, Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
+async function disableOnboardingAutoOpen(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("electrical-plan-editor.onboarding.auto-open-enabled.v1", "false");
+  });
+}
+
 async function dismissOnboardingIfVisible(page: Page): Promise<void> {
   const closeOnboardingButton = page.getByRole("button", { name: "Close onboarding", exact: true });
   if (!(await closeOnboardingButton.isVisible({ timeout: 3_000 }).catch(() => false))) {
@@ -23,6 +29,7 @@ async function getColumnIndexByHeaderLabel(panel: Locator, headerLabel: string):
 }
 
 test("bootstraps a comprehensive sample network on first launch", async ({ page }) => {
+  await disableOnboardingAutoOpen(page);
   const findVisibleSidebarButtonByText = async (
     selector: ".workspace-nav-row" | ".workspace-nav-row.secondary",
     text: string
@@ -108,6 +115,7 @@ test("bootstraps a comprehensive sample network on first launch", async ({ page 
 
 test("create -> route -> recompute flow works end-to-end", async ({ page }) => {
   test.setTimeout(60_000);
+  await disableOnboardingAutoOpen(page);
   const findVisibleSidebarButtonByText = async (
     selector: ".workspace-nav-row" | ".workspace-nav-row.secondary",
     text: string
