@@ -4,7 +4,7 @@
 > Status: In progress
 > Understanding: 95
 > Confidence: 90
-> Progress: 68
+> Progress: 74
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -52,6 +52,7 @@
 - Stage 3 complete: deleted 501 lines / added 14 (net -487) of grep-verified dead code: unused splice-placement helpers, connector-layout mutators, selectors/catalog helper, applyEntityPrefix, test-only harness validation subsystem, app-utils barrel, and speculative pin-load scope. Kept adapters/portability index (multiple production importers) and migrationStepOverrides (active failure-path coverage), correcting stale audit claims rather than deleting live safety coverage. Validation: lint, typecheck, and 27 focused tests passed.
 - Stage 4a complete: consolidated three filesystem timestamp implementations into exportFileName.toFilesystemSafeTimestamp (UTC deterministic, invalid-input fallback retained) and replaced repeated recent-change field comparisons with one field-group helper while preserving output tests. Attempted renderMemoCompare removal was reverted after render-containment tests exposed 18 unstable callback props and one unstable derived object; retaining it prevents measurable rerender regressions until producers are stabilized. Validation: lint, typecheck, 25 timestamp/change-label/render-containment tests passed.
 - Stage 4b: introduced shared useModalDialog focus/Escape/Tab/restore mechanism and migrated ConfirmDialog plus the two workspace tool dialogs, deleting 300+ duplicated lines. 29 focused confirmation, pin-role, and multi-network dialog tests passed. Remaining preview/choice/import dialogs stay open in this task for the next migration batch.
+- Stage 4c: migrated ChoiceDialog and FileFeedbackDialog to useModalDialog; 15 focused import/recompute/choice tests passed with lint and typecheck.
 
 # AI Context
 - Summary: Orchestrate over-engineering reduction across gates, layers, dead code, and dependencies
