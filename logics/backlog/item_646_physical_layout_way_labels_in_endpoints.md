@@ -1,4 +1,4 @@
-## item_646_afficher_les_labels_de_voies_du_physical_layout_dans_les_endpoints - Afficher les labels de voies du physical layout dans les endpoints
+## item_646_physical_layout_way_labels_in_endpoints - Display physical layout way labels in endpoints
 > From version: 1.17.1
 > Schema version: 1.0
 > Status: Done
@@ -51,12 +51,12 @@ Operators can define physical connector way labels in the catalog layout, but wi
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
 - Request: `req_160_physical_layout_way_labels_in_endpoints`
-- Primary task(s): `task_155_afficher_les_labels_de_voies_du_physical_layout_dans_les_endpoints`
+- Primary task(s): `task_155_physical_layout_way_labels_in_endpoints`
 
 # AI Context
-- Summary: Afficher les labels de voies du physical layout dans les endpoints
-- Keywords: backlog-groom, request, afficher les labels de voies du physical layout dans les endpoints, bounded slice
-- Use when: Use when implementing or reviewing the delivery slice for Afficher les labels de voies du physical layout dans les endpoints.
+- Summary: Display physical layout way labels in endpoints
+- Keywords: backlog-groom, request, physical layout way labels, endpoints, bounded slice
+- Use when: Implementing or reviewing physical layout way labels in endpoints.
 - Skip when: Skip when the change is unrelated to this delivery slice or its linked request.
 
 # Priority
@@ -67,7 +67,7 @@ Operators can define physical connector way labels in the catalog layout, but wi
 - Hybrid rationale: Derived from request `req_160_physical_layout_way_labels_in_endpoints` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_160_physical_layout_way_labels_in_endpoints.md`.
 - Generated locally by logics-manager.
-- Task `task_155_afficher_les_labels_de_voies_du_physical_layout_dans_les_endpoints` was finished via `logics-manager flow finish task` on 2026-07-02.
+- Task `task_155_physical_layout_way_labels_in_endpoints` was finished via `logics-manager flow finish task` on 2026-07-02.
 
 # Tasks
-- `task_155_afficher_les_labels_de_voies_du_physical_layout_dans_les_endpoints`
+- `task_155_physical_layout_way_labels_in_endpoints`

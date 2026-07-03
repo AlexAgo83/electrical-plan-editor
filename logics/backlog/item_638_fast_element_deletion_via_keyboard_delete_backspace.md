@@ -8,6 +8,7 @@
 > Complexity: High
 > Theme: Operator workflow and runtime integration
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
+> Non-semantic edit: Renamed the linked request reference in English.
 
 # Problem
 Let the user delete the selected plan element with the `Delete` and `Backspace` keys, without going through a secondary action (a button in a table).
@@ -42,7 +43,7 @@ Goal: editing speed, natural interaction close to classic drawing tools.
 # Links
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
-- Request: `logics/request/req_152_suppr_element_clavier.md`
+- Request: `logics/request/req_152_fast_element_deletion_via_keyboard.md`
 - Primary task(s): (none yet)
 
 # AI Context
@@ -56,8 +57,8 @@ Goal: editing speed, natural interaction close to classic drawing tools.
 - Urgency:
 
 # Notes
-- Hybrid rationale: Derived from request `req_152_suppr_element_clavier` and kept bounded to one coherent delivery slice.
-- Source file: `logics/request/req_152_suppr_element_clavier.md`.
+- Hybrid rationale: Derived from request `req_152_fast_element_deletion_via_keyboard` and kept bounded to one coherent delivery slice.
+- Source file: `logics/request/req_152_fast_element_deletion_via_keyboard.md`.
 - Generated locally by logics-manager.
 - Task `task_147_fast_element_deletion_via_keyboard_delete_backspace` was finished via `logics-manager flow finish task` on 2026-06-26.
 

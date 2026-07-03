@@ -35,7 +35,7 @@
 - Implementation complete.
 - Finished on 2026-06-26.
 - Linked backlog item(s): `item_638_fast_element_deletion_via_keyboard_delete_backspace`
-- Related request(s): `req_152_suppr_element_clavier`
+- Related request(s): `req_152_fast_element_deletion_via_keyboard`
 
 # AI Context
 - Summary: Implement fast element deletion via keyboard (delete/backspace).
@@ -44,7 +44,7 @@
 - Skip when: The work is still at the request or backlog shaping stage.
 
 # Links
-- Request: `req_152_suppr_element_clavier`
+- Request: `req_152_fast_element_deletion_via_keyboard`
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
 

@@ -1,8 +1,8 @@
-## req_160_physical_layout_way_labels_in_endpoints - Afficher les labels de voies du physical layout dans les endpoints
+## req_160_physical_layout_way_labels_in_endpoints - Display physical layout way labels in endpoints
 > From version: 1.17.1
 > Schema version: 1.0
 > Status: Done
-> Understanding: Lorsqu'un label de voie est configuré dans le physical layout d'un connecteur, les affichages d'endpoints doivent utiliser ce label à la place du libellé numérique C1/C2. Les formulaires qui saisissent encore l'index numérique doivent afficher à côté le label associé pour éviter les confusions. Les index numériques restent la source de vérité métier.
+> Understanding: When a way label is configured in a connector's physical layout, endpoint displays must use it instead of the numeric C1/C2 label. Forms that still accept a numeric index must show the associated label beside it to avoid confusion. Numeric indexes remain the domain source of truth.
 > Confidence: high
 > Complexity: Medium
 > Theme: Operator workflow and endpoint readability
@@ -41,10 +41,10 @@
 - `tests/python/test_logics_manager_cli.py`
 
 # AI Context
-- Summary: Draft a bounded request for afficher les labels de voies du physical layout dans les endpoints.
+- Summary: Draft a bounded request for displaying physical layout way labels in endpoints.
 - Keywords: request-draft, logics-manager, python runtime, bundled CLI
 - Use when: You need a new bounded request doc for the Logics workflow.
 - Skip when: The work already has an existing request or should go straight to a backlog slice.
 
 # Backlog
-- `item_646_afficher_les_labels_de_voies_du_physical_layout_dans_les_endpoints`
+- `item_646_physical_layout_way_labels_in_endpoints`
