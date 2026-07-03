@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Done
 > Understanding: 90%
-> Confidence: 85%
+> Confidence: 90
 > Progress: 100%
 > Complexity: Medium
 > Theme: Runtime performance and bundle efficiency
@@ -53,3 +53,6 @@
 # Priority
 - Priority: Medium
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Notes
+- Task `task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul` was finished via `logics-manager flow finish task` on 2026-07-03.

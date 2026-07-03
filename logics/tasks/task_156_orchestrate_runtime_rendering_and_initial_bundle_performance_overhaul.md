@@ -1,10 +1,10 @@
 ## task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul - Orchestrate runtime rendering and initial bundle performance overhaul
 > From version: 1.17.2
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 95
 > Confidence: 90
-> Progress: 100
+> Progress: 100%
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -18,8 +18,8 @@
 - [x] 2. Land the bundle code-splitting slice: removed app manualChunks, moved app bootstrap behind dynamic entry import, verified exceljs/PWA/e2e, re-baselined budgets.
 - [x] 3. Land the render-containment slice: rAF coalescing in useCanvasInteractionHandlers, memo boundaries on heavy workspace panels, stabilized panel memo props, render-count regression harness.
 - [x] 4. Land the persistence idle-scheduling slice last: idle-scheduled steady-state writes, unchanged sync flush semantics, duration instrumentation.
-- [ ] 5. Run the full ci:blocking pipeline; capture final bundle metrics and render-count evidence in the task closeout; validate and close the request chain.
-- [ ] GATE: do not close until lint, audit, and scaffold validation pass.
+- [x] 5. Run the full ci:blocking pipeline; capture final bundle metrics and render-count evidence in the task closeout; validate and close the request chain.
+- [x] GATE: do not close until lint, audit, and scaffold validation pass.
 
 # Implementation notes (solution paths and known pitfalls)
 
@@ -65,14 +65,20 @@
 - [x] Validation passes.
 
 # AC Traceability
-- request-AC1 -> This task. Proof: scaffold command generated the request-chain corpus.
-- request-AC4 -> This task. Proof: optional context-pack handoff is supported.
-- request-AC6 -> This task. Proof: dry-run and collision checks bound file changes.
-- request-AC8 -> This task. Proof: CLI help documents the one-pass scaffold workflow.
+- request-AC1 -> This task. Proof: `src/app/hooks/useCanvasFrameScheduler.ts`, `src/app/hooks/useCanvasInteractionHandlers.ts`, and `src/tests/canvas-interaction-handlers.hook.spec.ts` coalesce drag/pan updates to one animation-frame commit and flush the final pending position.
+- request-AC2 -> This task. Proof: `src/app/lib/renderMemoCompare.ts`, `src/app/components/NetworkSummaryPanel.tsx`, `src/app/components/workspace/ModelingPrimaryTables.tsx`, `src/app/components/workspace/ModelingSecondaryTables.tsx`, `src/app/components/workspace/ModelingFormsColumn.tsx`, and `src/tests/app.ui.render-containment.spec.tsx` keep non-owning panels flat during connector form typing.
+- request-AC3 -> This task. Proof: `src/app/hooks/useAppLocaleDomTranslation.ts` skips attaching the MutationObserver in `en`, while `src/tests/app.locale-dom-translation.spec.tsx` verifies en/fr/en restoration and translated attributes.
+- request-AC4 -> This task. Proof: `src/app/hooks/useAppLocaleDomTranslation.ts` translates only mutated element attributes for attribute-only mutations, covered by `src/tests/app.locale-dom-translation.spec.tsx`.
+- request-AC5 -> This task. Proof: `vite.config.ts`, `src/app/main.tsx`, and `scripts/quality/report-bundle-metrics.mjs` removed the initial app-controller mega-chunk; build metrics recorded largest initial chunk 258.07 KiB raw and initial JS gzip 121.75 KiB versus 317 KiB baseline.
+- request-AC6 -> This task. Proof: `scripts/quality/report-bundle-metrics.mjs` enforces re-baselined total and initial JS gzip budgets and failed during validation when budgets/segmentation were incomplete.
+- request-AC7 -> This task. Proof: `src/app/store.ts` schedules steady-state persistence through idle callbacks with synchronous pagehide/visibility/detach flush preserved, covered by `src/tests/store.persistence-durability.spec.ts`.
+- request-AC8 -> This task. Proof: final `npm run -s ci:blocking` passed, including Logics lint/status, npm audit allowlist, segmented Vitest, coverage, UI chunks, Playwright e2e, production build, and PWA artifact gate.
 
 # Validation
 - Run `python3 -m logics_manager lint --require-status`.
 - Run `npm run ci:blocking` after each slice lands; capture `npm run build:bundle:report` output before/after the bundle slice.
+- Finish workflow executed on 2026-07-03.
+- Linked backlog/request close verification passed.
 
 # Report
 - Slice `item_648` delivered: base locale now restores once without attaching the DOM translation observer; attribute-only mutations translate only the mutated element attributes.
@@ -87,6 +93,9 @@
 - Slice `item_647` delivered: shared panel memo comparator now covers function prop churn, shallow arrays/maps/sets, and shallow records; render-count coverage proves NetworkSummaryPanel and modeling tables stay flat during connector form typing while the owning form column renders.
 - Slice `item_650` delivered: debounced steady-state saves now run through requestIdleCallback with a setTimeout fallback; sync pagehide/visibility/detach flush still cancels pending idle work and writes immediately.
 - Validation: `npx vitest run src/tests/store.persistence-durability.spec.ts src/tests/store.create-store.spec.ts src/tests/app.ui.persistence-feedback.spec.tsx --pool=forks --maxWorkers=2 --testTimeout=15000`; `npm run -s quality:ui-timeout-governance`; `npm run -s typecheck`; `npm run -s lint`.
+- Finished on 2026-07-03.
+- Linked backlog item(s): `item_647_contain_canvas_drag_pan_and_form_re_renders_with_raf_coalescing_and_memo_boundaries`, `item_648_gate_the_locale_dom_translation_observer_in_base_locale_and_scope_attribute_re_walks`, `item_649_restore_route_level_code_splitting_and_re_baseline_bundle_budgets`, `item_650_move_steady_state_persistence_serialization_off_the_critical_input_path`
+- Related request(s): `req_161_runtime_rendering_and_initial_bundle_performance_overhaul`
 
 # AI Context
 - Summary: Orchestrate runtime rendering and initial bundle performance overhaul
