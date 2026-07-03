@@ -464,10 +464,3 @@ export function bootstrapCatalogForScopedState(scoped: NetworkScopedState): Netw
 
   return nextScoped;
 }
-
-export function getCatalogItemById(
-  catalogItems: EntityState<CatalogItem, CatalogItemId>,
-  id: CatalogItemId | undefined
-): CatalogItem | undefined {
-  return id === undefined ? undefined : catalogItems.byId[id];
-}

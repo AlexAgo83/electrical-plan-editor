@@ -4,7 +4,7 @@
 > Status: In progress
 > Understanding: 95
 > Confidence: 90
-> Progress: 35
+> Progress: 50
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -49,6 +49,7 @@
 - Implementation complete.
 - Stage 1 complete: replaced bespoke line-cap, ExcelJS boundary, and UI timeout scripts with ESLint rules; removed redundant pin-role gate, hardcoded UI lane list, unused report knobs, full coverage report, and remark-gfm. Deliberate violations confirmed all three ESLint rules fail. Validation: lint, typecheck, segmentation check (69 UI / 157 total specs), and 14 Home tests passed.
 - Stage 2a complete: moved all seven hook-impl implementations into src/app/hooks, removed six re-export wrappers, deleted six dead use*ScreenContentSlice aliases, and removed includeNetworkSummaryPanel. Added exact no-growth ESLint budgets for the formerly hidden oversized files. Validation: lint, typecheck, and 52 focused validation/navigation/settings tests passed.
+- Stage 3 complete: deleted 501 lines / added 14 (net -487) of grep-verified dead code: unused splice-placement helpers, connector-layout mutators, selectors/catalog helper, applyEntityPrefix, test-only harness validation subsystem, app-utils barrel, and speculative pin-load scope. Kept adapters/portability index (multiple production importers) and migrationStepOverrides (active failure-path coverage), correcting stale audit claims rather than deleting live safety coverage. Validation: lint, typecheck, and 27 focused tests passed.
 
 # AI Context
 - Summary: Orchestrate over-engineering reduction across gates, layers, dead code, and dependencies

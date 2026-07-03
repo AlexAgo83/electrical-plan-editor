@@ -107,16 +107,13 @@ export function PinRoleMassEditPanel({
 
   const catalogItemsById = useMemo(() => new Map(catalogItems.map((item) => [item.id, item])), [catalogItems]);
   const rows = useMemo<MassEditRow[]>(() => {
-    const load = computePinElectricalLoad(
-      {
+    const load = computePinElectricalLoad({
         networkId: activeNetwork?.id,
         connectors,
         splices,
         wires,
         catalogItemsById
-      },
-      { kind: "currentNetwork" }
-    );
+      });
     const wireById = new Map(wires.map((wire) => [wire.id, wire]));
     const loadByPin = new Map<string, { loadA: number; overLoaded: boolean }>();
     for (const branchLoad of load.branchLoadByWire.values()) {

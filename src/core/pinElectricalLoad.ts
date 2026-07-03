@@ -63,23 +63,12 @@ export interface PinElectricalLoadResult {
   warnings: EngineWarning[];
 }
 
-export type PinElectricalLoadScope =
-  | { kind: "currentNetwork" }
-  | { kind: "assembly"; networkIds: NetworkId[] };
-
 export interface PinElectricalLoadInput {
   networkId?: NetworkId;
   connectors: readonly Connector[];
   splices: readonly Splice[];
   wires: readonly Wire[];
   catalogItemsById: ReadonlyMap<CatalogItemId, CatalogItem>;
-}
-
-export class NotImplementedScopeError extends Error {
-  constructor(kind: string) {
-    super(`pinElectricalLoad scope '${kind}' is not implemented yet`);
-    this.name = "NotImplementedScopeError";
-  }
 }
 
 function pinKey(connectorId: ConnectorId, cavityIndex: number): string {
@@ -474,12 +463,6 @@ function computeCurrentNetwork(input: PinElectricalLoadInput): PinElectricalLoad
   return result;
 }
 
-export function computePinElectricalLoad(
-  input: PinElectricalLoadInput,
-  scope: PinElectricalLoadScope = { kind: "currentNetwork" }
-): PinElectricalLoadResult {
-  if (scope.kind === "currentNetwork") {
-    return computeCurrentNetwork(input);
-  }
-  throw new NotImplementedScopeError(scope.kind);
+export function computePinElectricalLoad(input: PinElectricalLoadInput): PinElectricalLoadResult {
+  return computeCurrentNetwork(input);
 }

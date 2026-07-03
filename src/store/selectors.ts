@@ -18,7 +18,7 @@ import { resolveSplicePortMode } from "../core/splicePortMode";
 import { buildRoutingGraphIndex, type RoutingGraphIndex } from "../core/graph";
 import { findShortestRoute, type ShortestRouteResult } from "../core/pathfinding";
 import { normalizeManufacturerReferenceKey } from "./catalog";
-import type { AppError, AppState, SelectionState, ThemeMode } from "./types";
+import type { AppError, AppState, SelectionState } from "./types";
 
 function selectCollection<T, Id extends string>(
   byId: Record<Id, T>,
@@ -97,10 +97,6 @@ export function selectNetworks(state: AppState): Network[] {
   return selectMemoizedNetworks(state.networks.byId, state.networks.allIds);
 }
 
-export function selectNetworkById(state: AppState, id: NetworkId): Network | undefined {
-  return state.networks.byId[id];
-}
-
 export function selectActiveNetworkId(state: AppState): NetworkId | null {
   return state.activeNetworkId;
 }
@@ -163,10 +159,6 @@ export function selectSelection(state: AppState): SelectionState | null {
 
 export function selectLastError(state: AppState): AppError | null {
   return state.ui.lastError;
-}
-
-export function selectThemeMode(state: AppState): ThemeMode {
-  return state.ui.themeMode;
 }
 
 export function selectNetworkTechnicalIdTaken(

@@ -10,7 +10,6 @@ import type {
   WireId
 } from "../core/entities";
 import {
-  NotImplementedScopeError,
   computePinElectricalLoad,
   type PinElectricalLoadInput
 } from "../core/pinElectricalLoad";
@@ -282,13 +281,5 @@ describe("computePinElectricalLoad — currentNetwork", () => {
     const a = computePinElectricalLoad(input);
     const b = computePinElectricalLoad(input);
     expect([...a.deviceBalance.entries()]).toEqual([...b.deviceBalance.entries()]);
-  });
-});
-
-describe("computePinElectricalLoad — assembly scope", () => {
-  it("throws NotImplementedScopeError until item_614", () => {
-    expect(() =>
-      computePinElectricalLoad(emptyInput(), { kind: "assembly", networkIds: [] })
-    ).toThrow(NotImplementedScopeError);
   });
 });

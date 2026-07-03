@@ -766,15 +766,12 @@ function FunctionalSchematicPanelComponent({
   const wireMap = useMemo(() => new Map(wires.map((wire) => [wire.id, wire])), [wires]);
   const electricalLoad = useMemo(
     () =>
-      computePinElectricalLoad(
-        {
+      computePinElectricalLoad({
           connectors: Array.from(connectorMap.values()),
           splices: Array.from(spliceMap.values()),
           wires,
           catalogItemsById: catalogItemMap
-        },
-        { kind: "currentNetwork" }
-      ),
+        }),
     [catalogItemMap, connectorMap, spliceMap, wires]
   );
   const getEdgeCurrentLabel = useCallback(

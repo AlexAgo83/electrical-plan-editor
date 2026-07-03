@@ -5,7 +5,6 @@ import type {
   Splice,
   SpliceId,
   SplicePlacement,
-  Wire,
   WireRouteEndpointDetail
 } from "./entities";
 
@@ -36,10 +35,6 @@ export interface UnresolvedSplicePlacement {
 }
 
 export type SplicePlacementResolution = ResolvedSplicePlacement | UnresolvedSplicePlacement;
-
-export function isPlacedSplice(resolution: SplicePlacementResolution): resolution is ResolvedSplicePlacement {
-  return resolution.status === "placed";
-}
 
 export function resolveSplicePlacementFromEntities(
   splice: Splice,
@@ -126,86 +121,6 @@ export function isSameSplicePlacement(
     left.fromNodeId === right.fromNodeId &&
     left.offsetMm === right.offsetMm
   );
-}
-
-export function clampSplicePlacementOffset(placement: SplicePlacement, segmentLengthMm: number): SplicePlacement {
-  if (placement.offsetMm <= segmentLengthMm) {
-    return placement;
-  }
-
-  return {
-    ...placement,
-    offsetMm: segmentLengthMm
-  };
-}
-
-/**
- * Wire length contract: middle segments count at full length while the first and
- * last segments are replaced by their covered portions when endpoint detail
- * exists. A single-segment route with detail on both endpoints counts the
- * covered portion once (both details describe the same traversal).
- */
-export function computeRouteLengthWithEndpointDetails(
-  routeSegmentIds: SegmentId[],
-  getSegmentLengthMm: (segmentId: SegmentId) => number | undefined,
-  detailA: WireRouteEndpointDetail | undefined,
-  detailB: WireRouteEndpointDetail | undefined
-): number | null {
-  if (routeSegmentIds.length === 0) {
-    return detailA === undefined && detailB === undefined ? 0 : null;
-  }
-
-  const firstSegmentId = routeSegmentIds[0];
-  const lastSegmentId = routeSegmentIds[routeSegmentIds.length - 1];
-  if (detailA !== undefined && detailA.segmentId !== firstSegmentId) {
-    return null;
-  }
-  if (detailB !== undefined && detailB.segmentId !== lastSegmentId) {
-    return null;
-  }
-
-  if (routeSegmentIds.length === 1) {
-    const segmentLengthMm = firstSegmentId === undefined ? undefined : getSegmentLengthMm(firstSegmentId);
-    if (segmentLengthMm === undefined) {
-      return null;
-    }
-    if (detailA !== undefined) {
-      return detailA.coveredLengthMm;
-    }
-    if (detailB !== undefined) {
-      return detailB.coveredLengthMm;
-    }
-    return segmentLengthMm;
-  }
-
-  let totalLengthMm = 0;
-  for (let index = 0; index < routeSegmentIds.length; index += 1) {
-    const segmentId = routeSegmentIds[index];
-    if (segmentId === undefined) {
-      return null;
-    }
-
-    if (index === 0 && detailA !== undefined) {
-      totalLengthMm += detailA.coveredLengthMm;
-      continue;
-    }
-    if (index === routeSegmentIds.length - 1 && detailB !== undefined) {
-      totalLengthMm += detailB.coveredLengthMm;
-      continue;
-    }
-
-    const segmentLengthMm = getSegmentLengthMm(segmentId);
-    if (segmentLengthMm === undefined) {
-      return null;
-    }
-    totalLengthMm += segmentLengthMm;
-  }
-
-  return totalLengthMm;
-}
-
-export function getWireRouteEndpointDetail(wire: Wire, side: "A" | "B"): WireRouteEndpointDetail | undefined {
-  return side === "A" ? wire.routeEndpointDetailA : wire.routeEndpointDetailB;
 }
 
 export function normalizeWireRouteEndpointDetail(value: unknown): WireRouteEndpointDetail | undefined {

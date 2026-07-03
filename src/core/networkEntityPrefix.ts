@@ -125,20 +125,6 @@ export function stripEntityPrefix(id: string, prefix: string | undefined): strin
 }
 
 /**
- * Anchors `prefix` onto `id`, avoiding a double prefix when the ID already
- * carries it. Used so new-entity creation stores prefixed canonical IDs.
- */
-export function applyEntityPrefix(id: string, prefix: string | undefined): string {
-  if (prefix === undefined || prefix.length === 0) {
-    return id;
-  }
-  if (hasEntityPrefix(id, prefix)) {
-    return id;
-  }
-  return `${prefix}${id}`;
-}
-
-/**
  * Display formatting for a canonical entity ID. When the prefix display is shown
  * (or there is no prefix) the canonical ID is returned unchanged; when hidden,
  * the active network prefix is stripped for legibility. Canonical IDs are never

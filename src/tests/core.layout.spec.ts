@@ -4,10 +4,12 @@ import {
   countSegmentNodeOverlaps,
   countSegmentNodeClearanceViolations,
   countSegmentCrossings,
-  createNodePositionMap,
+  createNodePositionMap
+} from "../app/lib/app-utils-layout";
+import {
   NETWORK_VIEW_HEIGHT,
   NETWORK_VIEW_WIDTH
-} from "../app/lib/app-utils";
+} from "../app/lib/app-utils-shared";
 import type { NodePosition } from "../app/types/app-controller";
 import { isVisualConflictRankBetter } from "../app/lib/layout/scoring";
 import { createSampleNetworkState } from "../store";

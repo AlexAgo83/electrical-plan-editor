@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  applyEntityPrefix,
   detectNetworkEntityPrefix,
   findHiddenPrefixCollisions,
   formatEntityIdForDisplay,
@@ -48,13 +47,10 @@ describe("detectNetworkEntityPrefix", () => {
 });
 
 describe("prefix display helpers", () => {
-  it("detects, strips and applies prefixes case-insensitively", () => {
+  it("detects and strips prefixes case-insensitively", () => {
     expect(hasEntityPrefix("LAT-N-01", "lat-")).toBe(true);
     expect(stripEntityPrefix("LAT-N-01", "LAT-")).toBe("N-01");
     expect(stripEntityPrefix("N-01", "LAT-")).toBe("N-01");
-    expect(applyEntityPrefix("N-01", "LAT-")).toBe("LAT-N-01");
-    expect(applyEntityPrefix("LAT-N-01", "LAT-")).toBe("LAT-N-01");
-    expect(applyEntityPrefix("N-01", undefined)).toBe("N-01");
   });
 
   it("formats IDs honoring the show/hide setting", () => {

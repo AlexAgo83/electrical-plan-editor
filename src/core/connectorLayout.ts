@@ -829,42 +829,6 @@ export function updateConnectorLayoutCellPadding(layout: ConnectorLayout, cellPa
   };
 }
 
-export function updateConnectorLayoutKeyingSide(
-  layout: ConnectorLayout,
-  side: ConnectorLayoutKeyingSide
-): ConnectorLayout {
-  const normalizedSide = normalizeKeyingSide(side);
-  if (normalizedSide === "none") {
-    return { ...layout, keying: undefined, keyings: [] };
-  }
-  return {
-    ...layout,
-    keying: undefined,
-    keyings: [
-      normalizeKeying(
-        {
-          side: normalizedSide,
-          position: getConnectorLayoutKeyingSide(layout) === normalizedSide ? getConnectorLayoutKeyingPosition(layout) : undefined
-        },
-        layout.width,
-        layout.height,
-        getConnectorLayoutShellPadding(layout)
-      )
-    ].filter((keying): keying is ConnectorLayoutKeying => keying !== null)
-  };
-}
-
-export function updateConnectorLayoutKeyingPosition(layout: ConnectorLayout, position: number): ConnectorLayout {
-  const side = getConnectorLayoutKeyingSide(layout);
-  return {
-    ...layout,
-    keying: undefined,
-    keyings: [normalizeKeying({ side, position }, layout.width, layout.height, getConnectorLayoutShellPadding(layout))].filter(
-      (keying): keying is ConnectorLayoutKeying => keying !== null
-    )
-  };
-}
-
 export function addConnectorLayoutKeying(layout: ConnectorLayout): ConnectorLayout {
   const defaultPosition = getDefaultKeyingPosition(DEFAULT_KEYING_SIDE, layout.width, layout.height);
   const shellPadding = getConnectorLayoutShellPadding(layout);

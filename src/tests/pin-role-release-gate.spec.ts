@@ -47,16 +47,13 @@ describe("pin role release gate", () => {
     const catalogItemsById = new Map(catalogItems.map((item) => [item.id, item]));
 
     const currentNetworkMs = measureMedianMs(() => {
-      computePinElectricalLoad(
-        {
+      computePinElectricalLoad({
           networkId: largestNetworkId,
           connectors: entityValues(scoped.connectors),
           splices: entityValues(scoped.splices),
           wires: entityValues(scoped.wires),
           catalogItemsById
-        },
-        { kind: "currentNetwork" }
-      );
+        });
     });
     const multiNetworkViewMs = measureMedianMs(() => {
       buildMultiNetworkFunctionalAnalysisModel({
