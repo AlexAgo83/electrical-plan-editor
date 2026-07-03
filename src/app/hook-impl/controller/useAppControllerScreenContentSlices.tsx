@@ -8,6 +8,7 @@ import type {
 import type { NetworkSummaryPanelHandle } from "../../components/network-summary/NetworkSummaryPanel.types";
 import type { AppStore } from "../../../store";
 import { ModelingController } from "../../components/controller/ModelingController";
+import { DeferredPanel } from "../../components/DeferredPanel";
 import type { AppControllerModelingHandlersOrchestrator } from "../../hooks/controller/useAppControllerModelingHandlersOrchestrator";
 
 type NetworkSummaryPanelProps = ComponentProps<
@@ -788,14 +789,18 @@ export function buildModelingScreenContentSlice(
       >
         <>
           {showPrimaryTables ? (
-            <params.ModelingPrimaryTablesComponent
-              {...modelingPrimaryTablesProps}
-            />
+            <DeferredPanel>
+              <params.ModelingPrimaryTablesComponent
+                {...modelingPrimaryTablesProps}
+              />
+            </DeferredPanel>
           ) : null}
           {showSecondaryTables ? (
-            <params.ModelingSecondaryTablesComponent
-              {...modelingSecondaryTablesProps}
-            />
+            <DeferredPanel>
+              <params.ModelingSecondaryTablesComponent
+                {...modelingSecondaryTablesProps}
+              />
+            </DeferredPanel>
           ) : null}
         </>
       </ModelingController>

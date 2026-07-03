@@ -41,6 +41,7 @@ import {
 } from "./network-summary/graph/networkSummaryGraphModel";
 import { type SvgPreviewOptions, useNetworkSummaryExportActions } from "./network-summary/export/useNetworkSummaryExportActions";
 import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicPanel";
+import { DeferredPanel } from "./DeferredPanel";
 import { SvgExportPreviewDialog } from "./dialogs/SvgExportPreviewDialog";
 import { PreviewLoadingDialog } from "./dialogs/PreviewLoadingDialog";
 import { snapToGrid } from "../lib/app-utils-shared";
@@ -994,6 +995,7 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
         />
       </section>
       {showRoutePreviewPanel ? (
+        <DeferredPanel>
         <NetworkRoutePreviewPanel
           nodes={nodes}
           describeNode={describeNode}
@@ -1003,8 +1005,10 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
           setRoutePreviewEndNodeId={setRoutePreviewEndNodeId}
           routePreview={routePreview}
         />
+        </DeferredPanel>
       ) : null}
       {showFunctionalSchematic ? (
+        <DeferredPanel>
         <FunctionalSchematicPanel
           network={activeNetwork}
           wires={wires}
@@ -1020,6 +1024,7 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
           exportIncludeFrame={exportIncludeFrame}
           exportIncludeCartouche={exportIncludeCartouche}
         />
+        </DeferredPanel>
       ) : null}
       <SvgExportPreviewDialog
         isOpen={activeSvgPreview !== null}
