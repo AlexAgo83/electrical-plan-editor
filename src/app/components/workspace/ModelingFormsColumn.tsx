@@ -1,4 +1,5 @@
 import { memo, type ReactElement } from "react";
+import { arePanelMemoPropsEqual } from "../../lib/renderMemoCompare";
 import { ModelingBatchContextDialog } from "./ModelingBatchContextPanel";
 import { ModelingConnectorFormPanel } from "./ModelingConnectorFormPanel";
 import { ModelingNodeFormPanel } from "./ModelingNodeFormPanel";
@@ -44,4 +45,4 @@ function ModelingFormsColumnComponent(
   );
 }
 
-export const ModelingFormsColumn = memo(ModelingFormsColumnComponent);
+export const ModelingFormsColumn = memo(ModelingFormsColumnComponent, arePanelMemoPropsEqual);

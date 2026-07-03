@@ -7,7 +7,10 @@ import { setAppUiModulesEagerRegistryForTests } from "../app/components/appUiMod
 import { ModelingFormsColumn } from "../app/components/workspace/ModelingFormsColumn";
 import { ModelingPrimaryTables } from "../app/components/workspace/ModelingPrimaryTables";
 import { ModelingSecondaryTables } from "../app/components/workspace/ModelingSecondaryTables";
+import { arePanelMemoPropsEqual } from "../app/lib/renderMemoCompare";
+import { appActions, appReducer } from "../store";
 import {
+  asNodeId,
   createUiIntegrationState,
   getPanelByHeading,
   renderAppWithState,
@@ -24,11 +27,10 @@ const renderCounts = {
 
 let previousPrimaryProps: ComponentProps<typeof ModelingPrimaryTables> | null = null;
 let changedPrimaryProps: string[] = [];
-
 const CountedNetworkSummaryPanel = memo((props: ComponentProps<typeof NetworkSummaryPanel>) => {
   renderCounts.networkSummary += 1;
   return <NetworkSummaryPanel {...props} />;
-});
+}, arePanelMemoPropsEqual);
 
 const CountedModelingPrimaryTables = memo((props: ComponentProps<typeof ModelingPrimaryTables>) => {
   if (previousPrimaryProps !== null) {
@@ -41,17 +43,17 @@ const CountedModelingPrimaryTables = memo((props: ComponentProps<typeof Modeling
   previousPrimaryProps = props;
   renderCounts.primaryTables += 1;
   return <ModelingPrimaryTables {...props} />;
-});
+}, arePanelMemoPropsEqual);
 
 const CountedModelingSecondaryTables = memo((props: ComponentProps<typeof ModelingSecondaryTables>) => {
   renderCounts.secondaryTables += 1;
   return <ModelingSecondaryTables {...props} />;
-});
+}, arePanelMemoPropsEqual);
 
 const CountedModelingFormsColumn = memo((props: ComponentProps<typeof ModelingFormsColumn>) => {
   renderCounts.formsColumn += 1;
   return <ModelingFormsColumn {...props} />;
-});
+}, arePanelMemoPropsEqual);
 
 function installCountedRegistry(): void {
   setAppUiModulesEagerRegistryForTests({
@@ -108,5 +110,27 @@ describe("App integration UI - render containment", () => {
     expect(renderCounts.primaryTables).toBe(0);
     expect(renderCounts.secondaryTables).toBe(0);
     expect(renderCounts.formsColumn).toBe(0);
+  });
+
+  it("keeps canvas and tables flat during a connector form keystroke", () => {
+    const positionedState = appReducer(
+      createUiIntegrationState(),
+      appActions.setNodePositions({
+        [asNodeId("N-C1")]: { x: 60, y: 80 },
+        [asNodeId("N-MID")]: { x: 220, y: 180 },
+        [asNodeId("N-S1")]: { x: 420, y: 220 }
+      })
+    );
+    renderAppWithState(positionedState);
+    switchScreenDrawerAware("modeling");
+
+    fireEvent.click(within(getPanelByHeading("Connectors")).getByRole("button", { name: "New" }));
+    const connectorPanel = getPanelByHeading("Create Connector");
+    resetCounts();
+    fireEvent.change(within(connectorPanel).getByLabelText("Functional name"), { target: { value: "Connector typed" } });
+
+    expect(renderCounts.formsColumn).toBeGreaterThan(0);
+    expect(renderCounts.primaryTables).toBe(0);
+    expect(renderCounts.secondaryTables).toBe(0);
   });
 });

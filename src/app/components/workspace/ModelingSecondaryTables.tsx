@@ -6,6 +6,7 @@ import {
   focusElementWithoutScroll,
   sortByTableColumns,
 } from "../../lib/app-utils-shared";
+import { arePanelMemoPropsEqual } from "../../lib/renderMemoCompare";
 import { downloadCsvFile } from "../../lib/csv";
 import { normalizeFileNamePart } from "../../lib/exportFileName";
 import {
@@ -1629,4 +1630,4 @@ function ModelingSecondaryTablesComponent({
   );
 }
 
-export const ModelingSecondaryTables = memo(ModelingSecondaryTablesComponent);
+export const ModelingSecondaryTables = memo(ModelingSecondaryTablesComponent, arePanelMemoPropsEqual);

@@ -4,7 +4,7 @@
 > Status: In progress
 > Understanding: 95
 > Confidence: 90
-> Progress: 65
+> Progress: 70
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -84,6 +84,8 @@
 - Validation: `npx vitest run src/tests/canvas-interaction-handlers.hook.spec.ts src/tests/app.ui.navigation-canvas-interactions.spec.tsx --pool=forks --maxWorkers=2 --testTimeout=15000`; `npm run -s quality:hooks-modularization`; `npm run -s typecheck`; `npm run -s lint`.
 - Slice `item_647` partial: memo boundaries added for NetworkSummaryPanel and modeling table/form columns; render-count coverage proves non-canvas modeling panels stay flat during a coalesced pan frame.
 - Validation: `npx vitest run src/tests/app.ui.render-containment.spec.tsx src/tests/canvas-interaction-handlers.hook.spec.ts src/tests/app.ui.navigation-canvas-interactions.spec.tsx --pool=forks --maxWorkers=2 --testTimeout=15000`; `npm run -s quality:ui-modularization`; `npm run -s quality:hooks-modularization`; `npm run -s typecheck`; `npm run -s lint`.
+- Slice `item_647` partial: shared panel memo comparator added; render-count coverage now also proves modeling tables stay flat during connector form typing while the owning form column renders.
+- Remaining `item_647` gap: NetworkSummaryPanel still receives recreated non-canvas props during form typing; finish with AppController seam stabilization before closing this backlog item.
 
 # AI Context
 - Summary: Orchestrate runtime rendering and initial bundle performance overhaul

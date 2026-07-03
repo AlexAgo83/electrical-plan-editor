@@ -44,6 +44,7 @@ import { FunctionalSchematicPanel } from "./network-summary/FunctionalSchematicP
 import { SvgExportPreviewDialog } from "./dialogs/SvgExportPreviewDialog";
 import { PreviewLoadingDialog } from "./dialogs/PreviewLoadingDialog";
 import { snapToGrid } from "../lib/app-utils-shared";
+import { arePanelMemoPropsEqual } from "../lib/renderMemoCompare";
 import { getThemeClassNames } from "../lib/themeModes";
 import type { NetworkSummaryPanelHandle, NetworkSummaryPanelProps } from "./network-summary/NetworkSummaryPanel.types";
 
@@ -1016,4 +1017,4 @@ function NetworkSummaryPanelComponent({
   );
 }
 
-export const NetworkSummaryPanel = memo(NetworkSummaryPanelComponent);
+export const NetworkSummaryPanel = memo(NetworkSummaryPanelComponent, arePanelMemoPropsEqual);

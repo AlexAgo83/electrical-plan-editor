@@ -5,6 +5,7 @@ import {
   focusElementWithoutScroll,
   sortByTableColumns,
 } from "../../lib/app-utils-shared";
+import { arePanelMemoPropsEqual } from "../../lib/renderMemoCompare";
 import { downloadCsvFile } from "../../lib/csv";
 import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
@@ -1900,4 +1901,4 @@ function ModelingPrimaryTablesComponent({
   );
 }
 
-export const ModelingPrimaryTables = memo(ModelingPrimaryTablesComponent);
+export const ModelingPrimaryTables = memo(ModelingPrimaryTablesComponent, arePanelMemoPropsEqual);
