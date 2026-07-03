@@ -8,6 +8,7 @@
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+> Non-semantic edit: Restored historical AC traceability proof.
 
 # Definition of Done (DoD)
 - [x] In `src/store/reducer/helpers/directionalSpliceSide.ts`, replace the x-only L/R inference with an axis-aware computation: project the exit node's position onto the carrier-segment direction vector (splice->endpoint) and pick the side from the sign along that axis, so vertical and near-vertical carriers resolve correctly.
@@ -60,3 +61,19 @@
 - Request: `req_148_directional_splice_side_resolution_must_support_vertical_and_near_vertical_carrier_segments`
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: For a directional splice on a vertical carrier segment, a wire whose route exits toward one segment endpoint resolves to one side, and a wire exiting toward the opposite endpoint resolves to the other side; the splice callout then shows wires on both ports matching their real physical directions.
+- request-AC2 -> This task. Evidence needed: The resolution is axis-aware: side is determined by the exit node's position relative to the splice along the carrier segment direction (handling vertical and near-vertical segments), not by an x-only comparison. Horizontal and diagonal carrier segments keep their current correct behavior.
+- request-AC3 -> This task. Evidence needed: Loading the reported workspace and recomputing yields `PRI-S-06`, `PRI-S-07`, and `PRI-S-16` with wires split across both ports according to their routes (up/toward-trunk vs down/toward-connector), and the Network Summary splice callout matches the per-wire route direction highlight.
+- request-AC4 -> This task. Evidence needed: When `spliceSideLocked === true` with a defined `spliceSideOverride`, the operator's locked side is preserved and never overwritten by the geometric resolver.
+- request-AC5 -> This task. Evidence needed: `sideInverted === true` still mirrors the resolved side as it does today, for all carrier-segment orientations.
+- request-AC6 -> This task. Evidence needed: Edge cases remain deterministic: zero-length or degenerate carrier vectors, wires whose only route segment is the carrier segment (terminating directly at a segment endpoint connector), splices with all wires genuinely on one side, and multiple splices on the same segment.
+- request-AC7 -> This task. Evidence needed: Targeted tests cover vertical, near-vertical, horizontal, and diagonal carrier segments, the two-direction split, `sideInverted`, `spliceSideLocked`, and a regression fixture reproducing the `PRI-S-06`/`PRI-S-07`/`PRI-S-16` defect; tests fail on the current x-only logic and pass after the fix.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`

@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Done
 > Understanding: 90%
-> Confidence: 85%
+> Confidence: 85
 > Progress: 100%
 > Complexity: High
 > Theme: Operator workflow and runtime integration
@@ -32,6 +32,12 @@ Goal: usability comfort, light UI personalization.
 - request-AC3 -> This backlog slice. Proof: AC3: Column order persists across reloads via UI preferences (versioned migration, safe default = natural order).
 - request-AC4 -> This backlog slice. Proof: AC4: Reordering interoperates with column visibility ([[req_153_configurable_table_columns]]): hidden columns are skipped in display but their position is preserved if re-shown.
 - request-AC5 -> This backlog slice. Proof: AC5: Sorting and existing filter-driven conditional columns keep working after a reorder (no regression).
+- request-AC6 -> This backlog slice. Evidence needed: In each table, the user can drag a column header to a new position; header + body cells move together; the identifier column is movable.
+- request-AC7 -> This backlog slice. Evidence needed: Column order persists across reloads via the same UI-preferences migration; reorder interoperates with hiding (a hidden column keeps its position when re-shown).
+- request-AC8 -> This backlog slice. Evidence needed: Sorting keeps working after hide/reorder (sort stays keyed by column field, not position).
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC8 -> This backlog slice. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
 
 # Decision framing
 - Product framing: Not needed

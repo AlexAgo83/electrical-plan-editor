@@ -8,6 +8,7 @@
 > Complexity: Low
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+> Non-semantic edit: Restored historical AC traceability proof.
 > Owner: Codex
 
 # Definition of Done (DoD)
@@ -62,3 +63,17 @@
 - Request: `req_159_callout_header_duplicate_technical_id_prefix_in_name`
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: A splice named `AV-EP-01 Epissure Masse` with technicalId `AV-EP-01` renders header `EP-01 · Epissure Masse` (prefix shown once, label only).
+- request-AC2 -> This task. Evidence needed: A name that starts with the stripped ID (e.g. `EP-01 Epissure Masse`) also yields `EP-01 · Epissure Masse`.
+- request-AC3 -> This task. Evidence needed: A name with no embedded ID (e.g. `Epissure Masse`) is unchanged: `EP-01 · Epissure Masse`.
+- request-AC4 -> This task. Evidence needed: The same de-duplication applies to connector callouts.
+- request-AC5 -> This task. Evidence needed: If the name equals exactly the ID (raw or stripped), only the stripped ID is shown (no trailing ` · `), and a name that would become empty after stripping is left intact.
+- request-AC6 -> This task. Evidence needed: No table cell / row content changes; only the callout title is affected.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`

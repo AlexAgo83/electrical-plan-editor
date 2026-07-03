@@ -8,6 +8,7 @@
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+> Non-semantic edit: Restored historical AC traceability proof.
 
 # Definition of Done (DoD)
 - [x] Add a full-network recompute path that wraps `recomputeAllWiresForNetwork` (`src/store/reducer/helpers/wireTransitions.ts`) and produces a structured change report: snapshot wires before, recompute, then diff each wire for route change (`routeSegmentIds`), length change (`lengthMm`), and directional splice side change (compare `spliceSideOverride`/`portIndex` on endpoint A and B, reusing the `describeEndpointSide` before/after pattern from `spliceNodeMigration.ts`). Define a `WireRecomputeReportEntry` type (kind, wireId, technicalId, before/after) with deterministic ordering.
@@ -63,3 +64,21 @@
 - Request: `req_149_network_scope_manual_recompute_action_with_scrollable_change_report`
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: In network scope, while editing a network, a recompute action button is shown next to the Cancel button (edit mode only; not shown in create mode). It uses the app icon/button conventions and is keyboard and screen-reader accessible.
+- request-AC2 -> This task. Evidence needed: Activating the button recomputes all wire routes and directional splice sides for the focused network and persists the corrected wires (same result the incidental recompute path produces), with corrected `portIndex` / `spliceSideOverride` for affected directional splices.
+- request-AC3 -> This task. Evidence needed: After recompute, a popup lists every change found, grouped or labeled by kind (route rewritten, length changed, directional splice side A/B re-inferred), each entry naming the wire technical ID and showing before/after values where applicable.
+- request-AC4 -> This task. Evidence needed: The popup is scrollable — with many entries the list scrolls within a bounded dialog height and never pushes content off-screen or beyond the viewport, including on small/mobile viewports. The header and close action remain visible while the list scrolls.
+- request-AC5 -> This task. Evidence needed: When the recompute finds no changes, the popup shows an explicit no-change message instead of an empty or broken-looking dialog.
+- request-AC6 -> This task. Evidence needed: If the recompute fails for any wire (e.g. an invalid locked route), the operator is shown a clear error message and no partial/inconsistent state is committed.
+- request-AC7 -> This task. Evidence needed: The existing splice "floating" migration report popup becomes scrollable through the same shared styling fix (regression-checked), so long migration reports are also readable.
+- request-AC8 -> This task. Evidence needed: Targeted tests cover the change-report builder (before/after diff for route, length, and side changes), the no-change empty state, the edit-mode-only button visibility, and the dialog scroll-region styling/markup.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC6 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC7 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC8 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`

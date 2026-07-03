@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Done
 > Understanding: 100%
-> Confidence: 100%
+> Confidence: 100
 > Progress: 100%
 > Complexity: Low
 > Theme: Operator workflow and runtime integration
@@ -54,8 +54,8 @@ flowchart TD
 # Links
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
-- Request: `logics/request/req_143_network_summary_backshell_nodes_must_display_node_reference_not_connector_suffix.md`
-- Primary task(s): (none yet)
+- Request: `req_143_network_summary_backshell_nodes_must_display_node_reference_not_connector_suffix`
+- Primary task(s): `task_159_network_summary_backshell_nodes_must_display_node_reference_instead_of_connector_technical_id_suffix`
 
 # AI Context
 - Summary: Network summary backshell nodes must display node reference instead of connector technical ID suffix
@@ -71,6 +71,7 @@ flowchart TD
 - Hybrid rationale: Derived from request `req_143_network_summary_backshell_nodes_must_display_node_reference_not_connector_suffix` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_143_network_summary_backshell_nodes_must_display_node_reference_not_connector_suffix.md`.
 - Generated locally by logics-manager.
+- Task `task_159_network_summary_backshell_nodes_must_display_node_reference_instead_of_connector_technical_id_suffix` was finished via `logics-manager flow finish task` on 2026-07-03.
 
 # Delivery status
 - Done.
@@ -84,3 +85,6 @@ flowchart TD
 - AC3: `resolveBackshellHelperNodeReference()` keeps `${connector technicalId}-BS` only as the final fallback.
 - AC4: `useNodeDescriptions` now emits `Backshell helper (AR-N21)` from the same reference resolver used by `Network summary`, so descriptive text stays aligned.
 - AC5: `use-node-descriptions.spec.ts` verifies connector and splice descriptions remain `Connector 1 (C-1)` and `Splice 1 (S-1)`.
+
+# Tasks
+- `task_159_network_summary_backshell_nodes_must_display_node_reference_instead_of_connector_technical_id_suffix`

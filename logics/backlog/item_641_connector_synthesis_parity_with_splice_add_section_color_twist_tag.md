@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Done
 > Understanding: 90%
-> Confidence: 85%
+> Confidence: 85
 > Progress: 100%
 > Complexity: High
 > Theme: Operator workflow and runtime integration
@@ -33,6 +33,12 @@ Goal: more homogeneous and more usable synthesis.
 - request-AC3 -> This backlog slice. Proof: AC3: CSV export of the connector synthesis includes the new columns in matching order.
 - request-AC4 -> This backlog slice. Proof: AC4: Color rendering reuses the existing `renderWireColorPrefixMarker()` helper for consistency with other wire displays.
 - request-AC5 -> This backlog slice. Proof: AC5: When configurable column visibility ([[req_153_configurable_table_columns]]) is available, the new synthesis columns are individually toggleable; otherwise they render by default.
+- request-AC6 -> This backlog slice. Evidence needed: In each table, the user can drag a column header to a new position; header + body cells move together; the identifier column is movable.
+- request-AC7 -> This backlog slice. Evidence needed: Column order persists across reloads via the same UI-preferences migration; reorder interoperates with hiding (a hidden column keeps its position when re-shown).
+- request-AC8 -> This backlog slice. Evidence needed: Sorting keeps working after hide/reorder (sort stays keyed by column field, not position).
+- request-AC6 -> This backlog slice. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC7 -> This backlog slice. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC8 -> This backlog slice. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
 
 # Decision framing
 - Product framing: Not needed

@@ -8,6 +8,7 @@
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+> Non-semantic edit: Restored historical AC traceability proof.
 > Owner: Codex
 
 # Definition of Done (DoD)
@@ -46,3 +47,13 @@
 - Request: `req_152_suppr_element_clavier`
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: A selected element (any `kind`) is deleted by pressing `Delete` or `Backspace`, after confirmation.
+- request-AC2 -> This task. Evidence needed: The keystroke is ignored if no element is selected, or if focus is inside an `input/textarea/select`/contenteditable.
+- request-AC3 -> This task. Evidence needed: Confirmation uses the existing `ConfirmDialog`; cancelling leaves the element intact.
+- request-AC4 -> This task. Evidence needed: Deletion routes to the correct handler based on `selected.kind`, including cascade cases (connector/splice).
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`

@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Archived
 > Understanding: 94%
-> Confidence: 88%
+> Confidence: 88
 > Progress: 0% (archived before implementation)
 > Complexity: High
 > Theme: Implementation delivery
@@ -74,3 +74,15 @@ flowchart TD
 - Request: `req_129_app_controller_decomposition_plan`
 - Product brief(s): (none yet)
 - Architecture decision(s): `adr_009_app_controller_decomposition_plan`
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: Each wave defined in ADR-009 has a corresponding task or follow-up doc when work starts.
+- request-AC2 -> This task. Evidence needed: After each wave, the retired controller hook(s) are removed from `ALLOWED_HOOKS_OVERSIZE` and the gate still passes.
+- request-AC3 -> This task. Evidence needed: After each wave, the corresponding `app.ui.*` Vitest specs stay green and at least one controller-boundary spec is added or extended.
+- request-AC4 -> This task. Evidence needed: After Wave 4, the locked budget for `src/app/AppController.tsx` in `LOCKED_LINE_BUDGETS` is lowered to the new ceiling (rounded up to the next 50-line boundary).
+- request-AC5 -> This task. Evidence needed: The dual-state invariant (`networkStates[activeNetworkId]` synchronized with root slices) remains covered by `store.reducer.sync-invariant.spec.ts` and continues to pass.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`

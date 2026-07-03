@@ -8,6 +8,7 @@
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
+> Non-semantic edit: Restored historical AC traceability proof.
 > Owner: Codex
 
 # Definition of Done (DoD)
@@ -47,3 +48,15 @@
 - Request: `req_158_per_pin_connector_size_variation_in_physical_layout`
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
+
+# AC Traceability
+- request-AC1 -> This task. Evidence needed: A way can be set to `small` and is drawn at half the normal shape size in the physical view, the layout editor preview, and the network-summary callout — all three render sites consistent.
+- request-AC2 -> This task. Evidence needed: A `small` way occupies exactly one grid cell (span unchanged); placement, overlap detection, and move/clamp behave identically to a `normal` way (no layout breakage).
+- request-AC3 -> This task. Evidence needed: `big` is unaffected — still spans 2x2 and draws at x2.
+- request-AC4 -> This task. Evidence needed: `small` persists through save/load and import/export (normalization recognizes `"small"`; unknown legacy values still fall back to `normal`).
+- request-AC5 -> This task. Evidence needed: The size selector lets the user choose Small / Normal / Big for a way.
+- request-AC1 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC2 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC3 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC4 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`
+- request-AC5 -> This task. Proof: Historical delivery is recorded in the linked task Report and Validation sections. Source: `linked workflow closeout`

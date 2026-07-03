@@ -36,8 +36,8 @@
 | [prod_010_network_statistics_dashboard](product/prod_010_network_statistics_dashboard.md) | Network Statistics Dashboard | Settled |  |  | product/prod_010_network_statistics_dashboard.md |
 | [prod_011_pin_level_current_dimensioning](product/prod_011_pin_level_current_dimensioning.md) | Editing surfaces | Settled |  |  | product/prod_011_pin_level_current_dimensioning.md |
 | [prod_012_editor_responsiveness_and_load_time_performance](product/prod_012_editor_responsiveness_and_load_time_performance.md) | Editor responsiveness and load-time performance | Settled |  |  | product/prod_012_editor_responsiveness_and_load_time_performance.md |
-| [prod_013_codebase_simplification_and_tooling_consolidation](product/prod_013_codebase_simplification_and_tooling_consolidation.md) | Codebase simplification and tooling consolidation | Proposed |  |  | product/prod_013_codebase_simplification_and_tooling_consolidation.md |
-| [prod_014_ci_speed_and_developer_feedback_latency](product/prod_014_ci_speed_and_developer_feedback_latency.md) | CI speed and developer feedback latency | Proposed |  |  | product/prod_014_ci_speed_and_developer_feedback_latency.md |
+| [prod_013_codebase_simplification_and_tooling_consolidation](product/prod_013_codebase_simplification_and_tooling_consolidation.md) | Codebase simplification and tooling consolidation | Accepted |  |  | product/prod_013_codebase_simplification_and_tooling_consolidation.md |
+| [prod_014_ci_speed_and_developer_feedback_latency](product/prod_014_ci_speed_and_developer_feedback_latency.md) | CI speed and developer feedback latency | Accepted |  |  | product/prod_014_ci_speed_and_developer_feedback_latency.md |
 
 ## Requests
 
@@ -1037,3 +1037,4 @@
 | [task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul](tasks/task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul.md) | Global | Done | codex | 100% | tasks/task_156_orchestrate_runtime_rendering_and_initial_bundle_performance_overhaul.md |
 | [task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies](tasks/task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies.md) | Orchestrate over-engineering reduction across gates, layers, dead code, and dependencies | Ready |  | 0% | tasks/task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies.md |
 | [task_158_orchestrate_ci_wall_clock_reduction](tasks/task_158_orchestrate_ci_wall_clock_reduction.md) | Orchestrate CI wall-clock reduction | Ready |  | 0% | tasks/task_158_orchestrate_ci_wall_clock_reduction.md |
+| [task_159_network_summary_backshell_nodes_must_display_node_reference_instead_of_connector_technical_id_suffix](tasks/task_159_network_summary_backshell_nodes_must_display_node_reference_instead_of_connector_technical_id_suffix.md) | Network summary backshell nodes must display node reference instead of connector technical ID suffix | Done | Codex | 100% | tasks/task_159_network_summary_backshell_nodes_must_display_node_reference_instead_of_connector_technical_id_suffix.md |
