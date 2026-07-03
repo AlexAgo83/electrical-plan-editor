@@ -37,6 +37,7 @@
 # Decision framing
 - Product framing: Not needed
 - Architecture framing: Not needed
+- DECIDED: use the native dialog element with showModal() (jsdom 29 in this repo supports it). Migration order is fixed: ConfirmDialog first, run its spec suite; if and only if showModal/close or the cancel event fails under jsdom, fall back to ONE shared useModalDialog hook for all ten dialogs. Never ship a mix of both mechanisms. Per dialog: keep the exact same rendered content and CSS class names, map Escape to the dialog cancel event, keep closeOnBackdrop by handling click on the dialog backdrop area, keep confirmOnEnter as-is. Run each dialog's existing spec file immediately after migrating it, before touching the next one. If a spec fails, fix the migration, never the assertion.
 
 # Links
 - Product brief(s): `prod_013_codebase_simplification_and_tooling_consolidation`

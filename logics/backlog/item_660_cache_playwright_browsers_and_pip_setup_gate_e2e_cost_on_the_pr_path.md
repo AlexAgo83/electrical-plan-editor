@@ -36,6 +36,7 @@
 # Decision framing
 - Product framing: Not needed
 - Architecture framing: Not needed
+- DECIDED: e2e STAYS BLOCKING on PRs, in its own parallel lane (item_657 already takes it off the critical path); do not move it to main-only. Cache config: actions/cache on ~/.cache/ms-playwright with key playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}; on cache hit run npx playwright install chromium (no --with-deps), on miss run npx playwright install --with-deps chromium. Pip: use actions/setup-python built-in pip cache and pin logics-manager to the version currently in CI logs. Verify one cold run (delete cache in Actions UI) and one warm run are both green before closing.
 
 # Links
 - Product brief(s): `prod_014_ci_speed_and_developer_feedback_latency`

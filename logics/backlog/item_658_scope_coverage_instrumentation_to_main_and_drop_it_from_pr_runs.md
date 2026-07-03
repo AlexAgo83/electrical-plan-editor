@@ -35,6 +35,7 @@
 # Decision framing
 - Product framing: Not needed
 - Architecture framing: Not needed
+- DECIDED: add package.json script test:ci:fast:coverage = current fast lane with --coverage; test:ci:fast loses --coverage. In ci.yml the unit job runs test:ci:fast:coverage when github.event_name != 'pull_request', else test:ci:fast. That is the whole change; do not touch vitest coverage config in vite.config.ts.
 
 # Links
 - Product brief(s): `prod_014_ci_speed_and_developer_feedback_latency`

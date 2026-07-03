@@ -4,35 +4,8 @@
     "max_docs_per_ref": 4
   },
   "changed_paths": [],
-  "command": "logics-manager sync context-pack req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy item_652_collapse_the_hooks_hook_impl_mirror_directory item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters item_655_consolidate_duplicated_logic_into_single_shared_implementations item_656_drop_remark_gfm_from_the_changelog_renderer task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies --mode summary-only --profile normal --handoff",
-  "companion_docs": [
-    {
-      "kind": "product",
-      "linked_refs": {
-        "item": [
-          "item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy",
-          "item_652_collapse_the_hooks_hook_impl_mirror_directory",
-          "item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism",
-          "item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters",
-          "item_655_consolidate_duplicated_logic_into_single_shared_implementations",
-          "item_656_drop_remark_gfm_from_the_changelog_renderer"
-        ],
-        "prod": [
-          "prod_013_codebase_simplification_and_tooling_consolidation"
-        ],
-        "req": [
-          "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code"
-        ],
-        "task": [
-          "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
-        ]
-      },
-      "path": "logics/product/prod_013_codebase_simplification_and_tooling_consolidation.md",
-      "ref": "prod_013_codebase_simplification_and_tooling_consolidation",
-      "status": "Proposed",
-      "title": "Codebase simplification and tooling consolidation"
-    }
-  ],
+  "command": "logics-manager sync context-pack req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy item_652_collapse_the_hooks_hook_impl_mirror_directory item_653_unify_modal_dialogs_on_one_shared_focus_dismiss_mechanism item_654_delete_verified_dead_code_dead_barrels_and_speculative_parameters item_655_consolidate_duplicated_logic_into_single_shared_implementations item_656_drop_remark_gfm_from_the_changelog_renderer task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies --mode summary-only --profile normal",
+  "companion_docs": [],
   "docs": [
     {
       "ai_context": {
@@ -61,7 +34,7 @@
       "path": "logics/request/req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code.md",
       "ref": "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code",
       "schema_version": "1.0",
-      "status": "Draft",
+      "status": "Ready",
       "title": "Over-engineering reduction: replace bespoke gates with eslint, collapse mirror layers, delete dead code"
     },
     {
@@ -267,14 +240,14 @@
     }
   ],
   "estimates": {
-    "char_count": 10656,
-    "companion_doc_count": 1,
+    "char_count": 9640,
+    "companion_doc_count": 0,
     "doc_count": 8
   },
-  "generated_at": "2026-07-03T17:20:51Z",
+  "generated_at": "2026-07-03T17:34:09Z",
   "handoff": {
-    "companion_doc_count": 1,
-    "enabled": true,
+    "companion_doc_count": 0,
+    "enabled": false,
     "source_refs": [
       "req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code",
       "item_651_replace_bespoke_quality_gate_scripts_with_eslint_rules_and_trim_ci_redundancy",
@@ -285,7 +258,7 @@
       "item_656_drop_remark_gfm_from_the_changelog_renderer",
       "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
     ],
-    "validation_summary_count": 1
+    "validation_summary_count": 0
   },
   "mode": "summary-only",
   "profile": "normal",
@@ -302,12 +275,11 @@
   ],
   "release": {
     "blocking_reasons": [
-      "version_metadata: evidence targets a different version",
-      "changelog: evidence targets a different version",
-      "local_validation: evidence targets a different version",
-      "git_push: evidence targets a different version",
-      "ci: evidence targets a different version",
-      "production_deployment: evidence targets a different version"
+      "version_metadata: evidence targets a different commit",
+      "changelog: evidence targets a different commit",
+      "local_validation: evidence targets a different commit",
+      "git_push: evidence targets a different commit",
+      "ci: evidence targets a different commit"
     ],
     "configured": true,
     "contract_path": "logics/release/contract.json",
@@ -316,53 +288,53 @@
       "Use release status or validate before preparing or claiming release readiness.",
       "Publication-oriented actions are explicit operator actions and are separate from safe read/validate actions."
     ],
-    "next_action": "version_metadata: evidence targets a different version",
+    "next_action": "version_metadata: evidence targets a different commit",
     "publication_actions": [
       "GitHub release publication",
       "external publication"
     ],
     "required_gates": [
       {
-        "blocking_reason": "evidence targets a different version",
+        "blocking_reason": "evidence targets a different commit",
         "id": "version_metadata",
         "required": true,
         "state": "preparing",
         "status": "stale"
       },
       {
-        "blocking_reason": "evidence targets a different version",
+        "blocking_reason": "evidence targets a different commit",
         "id": "changelog",
         "required": true,
         "state": "preparing",
         "status": "stale"
       },
       {
-        "blocking_reason": "evidence targets a different version",
+        "blocking_reason": "evidence targets a different commit",
         "id": "local_validation",
         "required": true,
         "state": "local_validation",
         "status": "stale"
       },
       {
-        "blocking_reason": "evidence targets a different version",
+        "blocking_reason": "evidence targets a different commit",
         "id": "git_push",
         "required": true,
         "state": "pushed",
         "status": "stale"
       },
       {
-        "blocking_reason": "evidence targets a different version",
+        "blocking_reason": "evidence targets a different commit",
         "id": "ci",
         "required": true,
         "state": "ci_verification",
         "status": "stale"
       },
       {
-        "blocking_reason": "evidence targets a different version",
+        "blocking_reason": null,
         "id": "production_deployment",
         "required": true,
         "state": "external_publication",
-        "status": "stale"
+        "status": "passed"
       }
     ],
     "safe_actions": [
@@ -373,14 +345,5 @@
     "state": "blocked",
     "target_version": "1.18.0"
   },
-  "validation_summary": [
-    {
-      "items": [
-        "- Run `python3 -m logics_manager lint --require-status`.",
-        "- Run scaffold command tests."
-      ],
-      "path": "logics/tasks/task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies.md",
-      "ref": "task_157_orchestrate_over_engineering_reduction_across_gates_layers_dead_code_and_dependencies"
-    }
-  ]
+  "validation_summary": []
 }

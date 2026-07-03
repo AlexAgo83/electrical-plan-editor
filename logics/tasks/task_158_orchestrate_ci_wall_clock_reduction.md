@@ -55,3 +55,6 @@
 - Request: `req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers`
 - Product brief(s): `prod_014_ci_speed_and_developer_feedback_latency`
 - Architecture decision(s): (none yet)
+
+# Notes
+- IMPLEMENTER RULES (mandatory): work ONE backlog item at a time, in the plan order; read each item's Decision notes first — lane layout, cache keys, worker counts, and e2e placement are already decided, do not re-decide them. Record the baseline run durations BEFORE any change (AC6 is unverifiable otherwise). Every currently blocking check must still block merges after your changes — diff the required-checks list before/after and paste it in the task report. Test workflow changes on a draft PR before merging. If a decision note contradicts the actual repo state, STOP and record it instead of improvising.

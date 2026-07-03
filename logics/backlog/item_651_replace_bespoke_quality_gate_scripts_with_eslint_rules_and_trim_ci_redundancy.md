@@ -41,6 +41,7 @@
 # Decision framing
 - Product framing: Not needed
 - Architecture framing: Not needed
+- DECIDED, no discretion for the implementer: (1) the eslint max-lines cap is 500 for src/store, src/app/hooks, and src/app/components, copied verbatim from MAX_LINES/HOOKS_MODULARIZATION_MAX_LINES/UI_MODULARIZATION_MAX_LINES in the gate scripts before deleting them; also port the per-file LOCKED_LINE_BUDGETS entries from ui-modularization-gate-core.mjs as per-file eslint overrides with the same numbers. Do NOT invent new thresholds. (2) Use max-lines with skipBlankLines:false, skipComments:false to match the gates' raw line counts. (3) Verify each rule by introducing a deliberate violation, confirming npm run lint fails, then reverting it. Never delete a gate script before its eslint replacement is proven to fail on a violation.
 
 # Links
 - Product brief(s): `prod_013_codebase_simplification_and_tooling_consolidation`

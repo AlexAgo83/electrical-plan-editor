@@ -57,3 +57,6 @@
 - Request: `req_162_over_engineering_reduction_replace_bespoke_gates_with_eslint_collapse_mirror_layers_delete_dead_code`
 - Product brief(s): `prod_013_codebase_simplification_and_tooling_consolidation`
 - Architecture decision(s): (none yet)
+
+# Notes
+- IMPLEMENTER RULES (mandatory): work ONE backlog item at a time, in the plan order; read the item's Decision notes before writing any code — every open choice is already decided there. Never touch files outside the item's scope_in. Never weaken, delete, or snapshot-regenerate a test to make it pass. After each item: npm run lint && npm run typecheck && the affected spec suites, then commit with one commit per item (prefix refactor: or chore:). If anything in the docs contradicts what you find in the code, STOP and record the discrepancy in the task report instead of improvising.

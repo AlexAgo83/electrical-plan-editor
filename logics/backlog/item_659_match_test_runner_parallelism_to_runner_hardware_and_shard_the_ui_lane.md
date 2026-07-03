@@ -36,6 +36,7 @@
 # Decision framing
 - Product framing: Not needed
 - Architecture framing: Not needed
+- DECIDED values: --maxWorkers=4 for both lanes; UI lane sharded across a 2-job matrix with vitest --shard=1/2 and --shard=2/2. Validation protocol is mandatory: after raising workers, 3 consecutive green CI runs before merging; if any run shows OOM/worker crash/new flake, drop to --maxWorkers=3 and repeat; if still unstable revert to 2 and write the observed failure into this note. Shard union must equal the current lane exactly — test:ci:segmentation:check must stay green on every shard configuration.
 
 # Links
 - Product brief(s): `prod_014_ci_speed_and_developer_feedback_latency`

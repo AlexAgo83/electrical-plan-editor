@@ -34,6 +34,7 @@
 # Decision framing
 - Product framing: Not needed
 - Architecture framing: Not needed
+- DECIDED: the GFM guard is a vitest unit test (extend src/tests/changelog-feed.spec.ts) that loads every changelog markdown file and fails if any line matches GFM-only syntax: /^\s*\|.*\|/ (tables), /~~[^~]+~~/ (strikethrough), /^\s*[-*] \[[ xX]\]/ (task lists). Exact steps: remove remarkPlugins usage in HomeWorkspaceContent.tsx, npm uninstall remark-gfm, add the guard test, run the changelog spec suite and npm run build. Nothing else.
 
 # Links
 - Product brief(s): `prod_013_codebase_simplification_and_tooling_consolidation`

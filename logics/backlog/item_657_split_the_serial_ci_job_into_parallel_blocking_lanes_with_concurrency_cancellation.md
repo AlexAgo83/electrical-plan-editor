@@ -41,6 +41,7 @@
 # Decision framing
 - Product framing: Not needed
 - Architecture framing: Not needed
+- DECIDED lane layout, copy exactly: job1 'checks' = logics-manager steps + npm run lint + npm run typecheck + quality:dependency-audit + test:ci:segmentation:check + the modularization/governance/boundary gate scripts (or their eslint successors); job2 'unit' = test:ci:fast; job3 'ui' = test:ci:ui; job4 'e2e-build' = build:vite + test:e2e + quality:pwa + bundle:metrics:report(non-blocking). Each job repeats: checkout, setup-node (node 20, cache npm), npm ci. Concurrency block verbatim: group: ci-${{ github.workflow }}-${{ github.ref }}, cancel-in-progress: ${{ github.event_name == 'pull_request' }}. Keep ci:local as the full serial chain in package.json — do not delete ci:blocking, split it into ci:lane:* scripts the jobs call. Before starting, record the last 5 CI run durations in the task report (baseline for AC6).
 
 # Links
 - Product brief(s): `prod_014_ci_speed_and_developer_feedback_latency`

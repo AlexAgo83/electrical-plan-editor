@@ -42,6 +42,7 @@
 # Decision framing
 - Product framing: Not needed
 - Architecture framing: Not needed
+- GUARDRAILS: consolidation must be output-identical. Rule for every cluster: existing specs and snapshots are the oracle — if a snapshot or fixture diff appears, your refactor is wrong; NEVER regenerate snapshots or edit fixtures to make tests pass. Shared normalizers go in a new file src/adapters/entityNormalization.ts imported by both networkFile.ts and migrations.ts. For recentChangeLabels keep every output string byte-identical (copy label text verbatim into the field descriptor list). Do the five clusters as five separate commits, each ending with the affected spec suites green.
 
 # Links
 - Product brief(s): `prod_013_codebase_simplification_and_tooling_consolidation`

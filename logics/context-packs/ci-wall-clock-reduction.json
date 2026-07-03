@@ -4,33 +4,8 @@
     "max_docs_per_ref": 4
   },
   "changed_paths": [],
-  "command": "logics-manager sync context-pack req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path task_158_orchestrate_ci_wall_clock_reduction --mode summary-only --profile normal --handoff",
-  "companion_docs": [
-    {
-      "kind": "product",
-      "linked_refs": {
-        "item": [
-          "item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation",
-          "item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs",
-          "item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane",
-          "item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path"
-        ],
-        "prod": [
-          "prod_014_ci_speed_and_developer_feedback_latency"
-        ],
-        "req": [
-          "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers"
-        ],
-        "task": [
-          "task_158_orchestrate_ci_wall_clock_reduction"
-        ]
-      },
-      "path": "logics/product/prod_014_ci_speed_and_developer_feedback_latency.md",
-      "ref": "prod_014_ci_speed_and_developer_feedback_latency",
-      "status": "Proposed",
-      "title": "CI speed and developer feedback latency"
-    }
-  ],
+  "command": "logics-manager sync context-pack req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path task_158_orchestrate_ci_wall_clock_reduction --mode summary-only --profile normal",
+  "companion_docs": [],
   "docs": [
     {
       "ai_context": {
@@ -57,7 +32,7 @@
       "path": "logics/request/req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers.md",
       "ref": "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers",
       "schema_version": "1.0",
-      "status": "Draft",
+      "status": "Ready",
       "title": "CI wall-clock reduction: parallel jobs, PR-scoped coverage, runner utilization, cached browsers"
     },
     {
@@ -205,14 +180,14 @@
     }
   ],
   "estimates": {
-    "char_count": 7823,
-    "companion_doc_count": 1,
+    "char_count": 6999,
+    "companion_doc_count": 0,
     "doc_count": 6
   },
-  "generated_at": "2026-07-03T17:25:40Z",
+  "generated_at": "2026-07-03T17:34:09Z",
   "handoff": {
-    "companion_doc_count": 1,
-    "enabled": true,
+    "companion_doc_count": 0,
+    "enabled": false,
     "source_refs": [
       "req_163_ci_wall_clock_reduction_parallel_jobs_pr_scoped_coverage_runner_utilization_cached_browsers",
       "item_657_split_the_serial_ci_job_into_parallel_blocking_lanes_with_concurrency_cancellation",
@@ -221,7 +196,7 @@
       "item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path",
       "task_158_orchestrate_ci_wall_clock_reduction"
     ],
-    "validation_summary_count": 1
+    "validation_summary_count": 0
   },
   "mode": "summary-only",
   "profile": "normal",
@@ -236,8 +211,11 @@
   ],
   "release": {
     "blocking_reasons": [
-      "ci: evidence targets a different version",
-      "production_deployment: evidence targets a different version"
+      "version_metadata: evidence targets a different commit",
+      "changelog: evidence targets a different commit",
+      "local_validation: evidence targets a different commit",
+      "git_push: evidence targets a different commit",
+      "ci: evidence targets a different commit"
     ],
     "configured": true,
     "contract_path": "logics/release/contract.json",
@@ -246,53 +224,53 @@
       "Use release status or validate before preparing or claiming release readiness.",
       "Publication-oriented actions are explicit operator actions and are separate from safe read/validate actions."
     ],
-    "next_action": "ci: evidence targets a different version",
+    "next_action": "version_metadata: evidence targets a different commit",
     "publication_actions": [
       "GitHub release publication",
       "external publication"
     ],
     "required_gates": [
       {
-        "blocking_reason": null,
+        "blocking_reason": "evidence targets a different commit",
         "id": "version_metadata",
         "required": true,
         "state": "preparing",
-        "status": "passed"
+        "status": "stale"
       },
       {
-        "blocking_reason": null,
+        "blocking_reason": "evidence targets a different commit",
         "id": "changelog",
         "required": true,
         "state": "preparing",
-        "status": "passed"
+        "status": "stale"
       },
       {
-        "blocking_reason": null,
+        "blocking_reason": "evidence targets a different commit",
         "id": "local_validation",
         "required": true,
         "state": "local_validation",
-        "status": "passed"
+        "status": "stale"
       },
       {
-        "blocking_reason": null,
+        "blocking_reason": "evidence targets a different commit",
         "id": "git_push",
         "required": true,
         "state": "pushed",
-        "status": "passed"
+        "status": "stale"
       },
       {
-        "blocking_reason": "evidence targets a different version",
+        "blocking_reason": "evidence targets a different commit",
         "id": "ci",
         "required": true,
         "state": "ci_verification",
         "status": "stale"
       },
       {
-        "blocking_reason": "evidence targets a different version",
+        "blocking_reason": null,
         "id": "production_deployment",
         "required": true,
         "state": "external_publication",
-        "status": "stale"
+        "status": "passed"
       }
     ],
     "safe_actions": [
@@ -303,14 +281,5 @@
     "state": "blocked",
     "target_version": "1.18.0"
   },
-  "validation_summary": [
-    {
-      "items": [
-        "- Run `python3 -m logics_manager lint --require-status`.",
-        "- Run scaffold command tests."
-      ],
-      "path": "logics/tasks/task_158_orchestrate_ci_wall_clock_reduction.md",
-      "ref": "task_158_orchestrate_ci_wall_clock_reduction"
-    }
-  ]
+  "validation_summary": []
 }

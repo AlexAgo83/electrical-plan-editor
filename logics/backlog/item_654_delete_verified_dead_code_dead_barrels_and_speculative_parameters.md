@@ -39,6 +39,7 @@
 # Decision framing
 - Product framing: Not needed
 - Architecture framing: Not needed
+- GUARDRAILS: before deleting each symbol, re-run: grep -rn '<symbolName>' src/ --include='*.ts' --include='*.tsx'. If the only hits are the definition and src/tests, delete symbol + its tests. If ANY other hit appears (the audit predates parallel work), SKIP that symbol and record it in the task report instead of forcing the deletion. Delete strictly the symbols listed in the problem statement, nothing more. After each file is processed run npm run typecheck. Do not chase newly-orphaned private helpers beyond the same file.
 
 # Links
 - Product brief(s): `prod_013_codebase_simplification_and_tooling_consolidation`

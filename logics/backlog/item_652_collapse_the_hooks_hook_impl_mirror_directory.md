@@ -38,6 +38,7 @@
 # Decision framing
 - Product framing: Not needed
 - Architecture framing: Not needed
+- GUARDRAILS: this is a pure move/inline/delete slice. Use git mv for every file move. Update imports mechanically (replace app/hook-impl/ with app/hooks/ in import paths repo-wide, source AND tests). Do NOT rename any hook, do NOT change any hook body, do NOT reorder hook calls, do NOT touch memoization. If typecheck fails after a move, the fix is always an import path, never a code change. Work file by file and run npm run typecheck after each move. This item MUST land after item_651 (the eslint max-lines overrides must already allow the merged file sizes).
 
 # Links
 - Product brief(s): `prod_013_codebase_simplification_and_tooling_consolidation`
