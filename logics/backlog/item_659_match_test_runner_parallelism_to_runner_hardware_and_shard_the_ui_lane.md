@@ -1,10 +1,10 @@
 ## item_659_match_test_runner_parallelism_to_runner_hardware_and_shard_the_ui_lane - Match test-runner parallelism to runner hardware and shard the UI lane
 > From version: 1.18.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Medium
 > Theme: CI speed and feedback latency
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -53,3 +53,6 @@
 # Priority
 - Priority: Medium
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Notes
+- Task `task_158_orchestrate_ci_wall_clock_reduction` was finished via `logics-manager flow finish task` on 2026-07-03.

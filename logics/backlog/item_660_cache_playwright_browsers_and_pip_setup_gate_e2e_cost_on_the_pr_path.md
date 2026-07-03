@@ -1,10 +1,10 @@
 ## item_660_cache_playwright_browsers_and_pip_setup_gate_e2e_cost_on_the_pr_path - Cache Playwright browsers and pip setup; gate e2e cost on the PR path
 > From version: 1.18.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Low
 > Theme: CI speed and feedback latency
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -53,3 +53,6 @@
 # Priority
 - Priority: Medium
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Notes
+- Task `task_158_orchestrate_ci_wall_clock_reduction` was finished via `logics-manager flow finish task` on 2026-07-03.

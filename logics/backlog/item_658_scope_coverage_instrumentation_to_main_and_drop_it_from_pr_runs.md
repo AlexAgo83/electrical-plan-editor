@@ -1,10 +1,10 @@
 ## item_658_scope_coverage_instrumentation_to_main_and_drop_it_from_pr_runs - Scope coverage instrumentation to main and drop it from PR runs
 > From version: 1.18.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Low
 > Theme: CI speed and feedback latency
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -52,3 +52,6 @@
 # Priority
 - Priority: High
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Notes
+- Task `task_158_orchestrate_ci_wall_clock_reduction` was finished via `logics-manager flow finish task` on 2026-07-03.
