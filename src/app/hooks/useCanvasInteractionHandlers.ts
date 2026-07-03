@@ -62,6 +62,7 @@ export function useCanvasInteractionHandlers({
 }: UseCanvasInteractionHandlersParams) {
   const [selectedCanvasNodeIds, setSelectedCanvasNodeIds] = useState<Set<NodeId>>(new Set());
   const draggingNodeGroupRef = useRef<DraggingNodeGroupState | null>(null);
+  const isPanningNetworkActiveRef = useRef(false);
   const shouldSuppressNextCanvasClickRef = useRef(false);
   const { flushPendingCanvasFrame, latestManualNodePositionsRef, scheduleManualNodePositionsUpdate, scheduleNetworkOffsetUpdate } =
     useCanvasFrameScheduler({ manualNodePositions, networkOffset, setManualNodePositions, setNetworkOffset });
@@ -303,13 +304,13 @@ export function useCanvasInteractionHandlers({
 
     event.preventDefault();
     shouldSuppressNextCanvasClickRef.current = false;
+    isPanningNetworkActiveRef.current = false;
     panStartRef.current = {
       clientX: event.clientX,
       clientY: event.clientY,
       offsetX: networkOffset.x,
       offsetY: networkOffset.y
     };
-    setIsPanningNetwork(true);
   }
 
   function handleNetworkWheel(event: ReactWheelEvent<SVGSVGElement>): void {
@@ -407,6 +408,10 @@ export function useCanvasInteractionHandlers({
         PAN_CLICK_SUPPRESSION_THRESHOLD_PX
       ) {
         shouldSuppressNextCanvasClickRef.current = true;
+        if (!isPanningNetworkActiveRef.current) {
+          isPanningNetworkActiveRef.current = true;
+          setIsPanningNetwork(true);
+        }
       }
       const nextOffsetX = panStartRef.current.offsetX + deltaX;
       const nextOffsetY = panStartRef.current.offsetY + deltaY;
@@ -470,7 +475,10 @@ export function useCanvasInteractionHandlers({
 
     if (panStartRef.current !== null) {
       panStartRef.current = null;
-      setIsPanningNetwork(false);
+      if (isPanningNetworkActiveRef.current) {
+        isPanningNetworkActiveRef.current = false;
+        setIsPanningNetwork(false);
+      }
     }
   }
 

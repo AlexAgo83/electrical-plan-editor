@@ -110,6 +110,19 @@ describe("useCanvasInteractionHandlers", () => {
     expect(setNetworkOffset).toHaveBeenCalledWith({ x: 30, y: 0 } satisfies NodePosition);
   });
 
+  it("does not enter panning state for a plain canvas click", () => {
+    const setIsPanningNetwork = vi.fn();
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const { result } = renderHook(() => useHarness({ setIsPanningNetwork }));
+
+    act(() => {
+      result.current.handleNetworkCanvasMouseDown(createSvgEvent(svg, 10, 10) as never);
+      result.current.stopNetworkNodeDrag();
+    });
+
+    expect(setIsPanningNetwork).not.toHaveBeenCalled();
+  });
+
   it("flushes the last pending pan position when stopping interaction", () => {
     const setNetworkOffset = vi.fn();
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
