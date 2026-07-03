@@ -73,6 +73,8 @@ export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
       "Show only selected connector/splice callout",
       "Show wire names in callout table",
       "Keep connector/splice/node shape size constant while zooming",
+      "Show colocated splice link line",
+      "Show network entity ID prefix",
       "Node shape target size (%)",
       "Include background in PNG export",
       "Include frame in SVG/PNG export",

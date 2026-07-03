@@ -66,6 +66,11 @@ describe("App integration UI - settings search", () => {
       expect(within(settingsNavigation).getByRole("button", { name: "Catalog & BOM setup2" })).toBeInTheDocument();
       expect(within(settingsNavigation).getByRole("button", { name: "AI provider0" })).toHaveClass("is-dimmed");
       expect(within(getPanelByHeading("Catalog & BOM setup")).getAllByText(/tax/i, { selector: "mark.settings-search-highlight" }).length).toBeGreaterThan(0);
+
+      fireEvent.change(screen.getByLabelText("Search settings"), { target: { value: "prefix" } });
+
+      expect(within(settingsNavigation).getByRole("button", { name: "Canvas tools preferences1" })).toBeInTheDocument();
+      expect(within(getPanelByHeading("Canvas tools preferences")).getByText("prefix", { selector: "mark.settings-search-highlight" })).toBeInTheDocument();
     } finally {
       if (originalScrollIntoViewDescriptor === undefined) {
         Reflect.deleteProperty(HTMLElement.prototype, "scrollIntoView");
