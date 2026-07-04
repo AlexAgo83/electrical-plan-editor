@@ -45,6 +45,7 @@ flowchart TB
 
 # Key product decisions
 - Archived on 2026-07-04: redesign idea rejected after visual review; implementation branch `feat/canvas-fullbleed` was deleted and no code from this chain should be pursued.
+- Replacement concept retained for a future request: restart from Modeling-first, not Network Scope or a separate Analysis screen. Keep primary navigation in the fixed header, make the plan/canvas the full-screen background below it, anchor primary tables on a left dock with compact single-column and wide existing-table modes, mirror compact/wide behavior for details/forms on a right dock, allow either dock to expand on demand to roughly two thirds of the viewport, define a simple conflict rule so both docks cannot consume the canvas simultaneously, and move canvas controls into a dedicated toolbar that avoids open docks.
 - Use structured input as the source of truth for generated docs.
 - Keep generated write paths local and repo-bounded.
 
