@@ -1,10 +1,10 @@
 ## task_160_orchestrate_the_canvas_first_workspace_shell - Orchestrate the canvas-first workspace shell
 > From version: 1.18.1
 > Schema version: 1.0
-> Status: Ready
+> Status: Archived
 > Understanding: 95
 > Confidence: 91
-> Progress: 0%
+> Progress: 0
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
@@ -31,14 +31,18 @@
 - `item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering`
 
 # Definition of Done (DoD)
-- [ ] Generated request, product, backlog, and task docs are present.
-- [ ] Context-pack handoff is available when requested.
-- [ ] Validation passes.
+- [x] Generated request, product, backlog, and task docs are present.
+- [x] Context-pack handoff is available when requested.
+- [x] Archive validation passes.
 
 # AC Traceability
 - request-AC1 -> This task. Proof: scaffold command generated the request-chain corpus.
+- request-AC2 -> This task. Proof: archived by product-owner rejection on 2026-07-04 after visual review; no implementation from this rejected redesign chain should be pursued.
+- request-AC3 -> This task. Proof: archived by product-owner rejection on 2026-07-04 after visual review; no implementation from this rejected redesign chain should be pursued.
 - request-AC4 -> This task. Proof: optional context-pack handoff is supported.
+- request-AC5 -> This task. Proof: archived by product-owner rejection on 2026-07-04 after visual review; no implementation from this rejected redesign chain should be pursued.
 - request-AC6 -> This task. Proof: dry-run and collision checks bound file changes.
+- request-AC7 -> This task. Proof: implementation branch `feat/canvas-fullbleed` was deleted on 2026-07-04; the experiment is rejected and no code remains on that branch.
 - request-AC8 -> This task. Proof: CLI help documents the one-pass scaffold workflow.
 
 # Implementation notes for the executing agent
@@ -66,7 +70,8 @@ Definition of "ready for review": pilot + themes items done on the branch, flag-
 - Confirm every code commit for this chain is on `feat/canvas-fullbleed` (never `main`).
 
 # Report
-- Implementation complete.
+- Implementation stopped.
+- Archived on 2026-07-04: redesign idea rejected by product owner after visual review; implementation branch feat/canvas-fullbleed was deleted and no code from this chain should be pursued.
 
 # AI Context
 - Summary: Orchestrate the canvas-first workspace shell. BRANCH RULE: all code on the dedicated branch feat/canvas-fullbleed, never main — the experiment may be dropped without trace.

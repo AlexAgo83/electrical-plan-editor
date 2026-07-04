@@ -1,9 +1,9 @@
 ## req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui - Full-bleed canvas workspace: canvas as application background behind a feature flag, docks as overlay UI
 > From version: 1.18.1
 > Schema version: 1.0
-> Status: Draft
-> Understanding: 90%
-> Confidence: 85%
+> Status: Archived
+> Understanding: 90
+> Confidence: 85
 > Complexity: High
 > Theme: Canvas-first workspace UX
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -71,3 +71,6 @@
 - `item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation`
 - `item_663_dock_content_system_container_queries_inspector_host_drill_in_stack`
 - `item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering`
+
+# Notes
+- Archived on 2026-07-04: redesign idea rejected by product owner after visual review; implementation branch feat/canvas-fullbleed was deleted and no code from this chain should be pursued.

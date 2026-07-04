@@ -1,10 +1,10 @@
 ## item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation - Derived dock-surface theme variables with all-themes contact-sheet validation
 > From version: 1.18.1
 > Schema version: 1.0
-> Status: Ready
+> Status: Archived
 > Understanding: 95
 > Confidence: 90
-> Progress: 0%
+> Progress: 0
 > Complexity: Medium
 > Theme: Canvas-first workspace UX
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -36,6 +36,7 @@
 # Decision framing
 - Product framing: Not needed
 - Architecture framing: Not needed
+- Archived on 2026-07-04: redesign idea rejected by product owner after visual review; implementation branch feat/canvas-fullbleed was deleted and no code from this chain should be pursued.
 
 # Links
 - Product brief(s): `prod_015_canvas_first_workspace_shell`

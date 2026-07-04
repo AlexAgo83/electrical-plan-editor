@@ -1,6 +1,6 @@
 ## prod_015_canvas_first_workspace_shell - Canvas-first workspace shell
 > Date: 2026-07-03
-> Status: Proposed
+> Status: Archived
 > Related request: `req_164_full_bleed_canvas_workspace_canvas_as_application_background_behind_a_feature_flag_docks_as_overlay_ui`
 > Related backlog: `item_661_canvas_bleed_foundations_and_network_scope_pilot_behind_a_settings_flag`, `item_662_derived_dock_surface_theme_variables_with_all_themes_contact_sheet_validation`, `item_663_dock_content_system_container_queries_inspector_host_drill_in_stack`, `item_664_analysis_screen_full_bleed_with_route_highlighting_and_low_zoom_decluttering`
 > Related task: `task_160_orchestrate_the_canvas_first_workspace_shell`
@@ -44,6 +44,7 @@ flowchart TB
 - Out: unrelated workflow docs and implementation of generated tasks.
 
 # Key product decisions
+- Archived on 2026-07-04: redesign idea rejected after visual review; implementation branch `feat/canvas-fullbleed` was deleted and no code from this chain should be pursued.
 - Use structured input as the source of truth for generated docs.
 - Keep generated write paths local and repo-bounded.
 
