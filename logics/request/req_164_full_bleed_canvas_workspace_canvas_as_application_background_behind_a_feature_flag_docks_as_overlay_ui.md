@@ -2,8 +2,8 @@
 > From version: 1.18.1
 > Schema version: 1.0
 > Status: Archived
-> Understanding: 92
-> Confidence: 87
+> Understanding: 93
+> Confidence: 88
 > Complexity: High
 > Theme: Canvas-first workspace UX
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -76,3 +76,4 @@
 - Archived on 2026-07-04: redesign idea rejected by product owner after visual review; implementation branch feat/canvas-fullbleed was deleted and no code from this chain should be pursued.
 - Replacement concept recorded on 2026-07-04 after rejection: if this redesign is reconsidered, start from Modeling-first, not Network Scope or a separate Analysis screen. Keep the top navigation inside the fixed header; remove free-floating page navigation panels. Make the plan/canvas the full-screen background below the header. Anchor primary tables on the left dock with two modes: compact single-column list with less information, and wide mode reusing the existing full table; allow on-demand expansion up to roughly two thirds of the viewport. Mirror the same compact/wide behavior on the right dock for details, inspector, and edit forms, expandable from the right up to roughly two thirds. Define conflict behavior so both docks cannot consume the whole canvas at once. Move canvas controls to a dedicated canvas toolbar that avoids open docks, likely bottom-center or bottom-right. Treat this as a future replacement request, not a continuation of this archived chain.
 - Scope correction recorded on 2026-07-04: any future replacement request must start with Modeling screens only. They are the only current screens that display the canvas, so Network Scope, Home, Settings, Statistics, Validation, Harness Assembly, and any separate Analysis concept stay out of scope unless a later request first makes them canvas-bearing screens.
+- Final handoff note before context loss, 2026-07-04: do not reuse this archived corpus as an implementation plan. Its obsolete assumptions are: Network Scope as pilot, a separate Analysis target, fixed narrow docks only, page-level floating navigation, and broad app-wide conversion. The corrected future plan is a new Modeling-only request: keep top navigation in the fixed header; use the existing Modeling canvas as the full-screen background below the header; left dock hosts primary Modeling tables such as Catalog, Connectors, Splices, Nodes, Segments, and Wires; right dock hosts details, inspector, and edit forms; both docks have compact and wide modes; compact mode is single-column with less information; wide mode reuses the existing table/form surface; either dock can expand on demand to roughly two thirds of the viewport; define a simple conflict rule for simultaneous wide docks; canvas controls move to a dedicated toolbar that avoids open docks; Network Scope and non-canvas screens stay out of scope. Preserve the archived status and create a fresh request if this is restarted.
