@@ -2,8 +2,8 @@
 > From version: 1.18.1
 > Schema version: 1.0
 > Status: Archived
-> Understanding: 91
-> Confidence: 86
+> Understanding: 92
+> Confidence: 87
 > Complexity: High
 > Theme: Canvas-first workspace UX
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -75,3 +75,4 @@
 # Notes
 - Archived on 2026-07-04: redesign idea rejected by product owner after visual review; implementation branch feat/canvas-fullbleed was deleted and no code from this chain should be pursued.
 - Replacement concept recorded on 2026-07-04 after rejection: if this redesign is reconsidered, start from Modeling-first, not Network Scope or a separate Analysis screen. Keep the top navigation inside the fixed header; remove free-floating page navigation panels. Make the plan/canvas the full-screen background below the header. Anchor primary tables on the left dock with two modes: compact single-column list with less information, and wide mode reusing the existing full table; allow on-demand expansion up to roughly two thirds of the viewport. Mirror the same compact/wide behavior on the right dock for details, inspector, and edit forms, expandable from the right up to roughly two thirds. Define conflict behavior so both docks cannot consume the whole canvas at once. Move canvas controls to a dedicated canvas toolbar that avoids open docks, likely bottom-center or bottom-right. Treat this as a future replacement request, not a continuation of this archived chain.
+- Scope correction recorded on 2026-07-04: any future replacement request must start with Modeling screens only. They are the only current screens that display the canvas, so Network Scope, Home, Settings, Statistics, Validation, Harness Assembly, and any separate Analysis concept stay out of scope unless a later request first makes them canvas-bearing screens.

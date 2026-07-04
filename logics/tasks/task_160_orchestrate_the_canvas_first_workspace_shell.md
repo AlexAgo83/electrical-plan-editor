@@ -2,7 +2,7 @@
 > From version: 1.18.1
 > Schema version: 1.0
 > Status: Archived
-> Understanding: 96
+> Understanding: 97
 > Confidence: 91
 > Progress: 0
 > Complexity: Medium
@@ -73,6 +73,7 @@ Definition of "ready for review": pilot + themes items done on the branch, flag-
 - Implementation stopped.
 - Archived on 2026-07-04: redesign idea rejected by product owner after visual review; implementation branch feat/canvas-fullbleed was deleted and no code from this chain should be pursued.
 - Post-rejection redesign note recorded on 2026-07-04: the better target is a Modeling-first shell with header navigation, full-screen canvas background, expandable compact/wide left tables, expandable compact/wide right details, and relocated canvas controls. This is retained only as historical guidance for a future replacement request.
+- Scope correction recorded on 2026-07-04: future redesign work should target Modeling screens only, because those are the current canvas-bearing screens. Do not restart from Network Scope or a separate Analysis concept.
 
 # AI Context
 - Summary: Orchestrate the canvas-first workspace shell. BRANCH RULE: all code on the dedicated branch feat/canvas-fullbleed, never main — the experiment may be dropped without trace.
