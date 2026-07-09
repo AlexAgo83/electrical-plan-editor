@@ -28,7 +28,8 @@ export const CABLE_COLOR_CATALOG: CableColorDefinition[] = [
   { id: "BG", label: "Beige", hex: "#C8B27D" },
   { id: "LB", label: "Light Blue", hex: "#4FC3F7" },
   { id: "LG", label: "Light Green", hex: "#66BB6A" },
-  { id: "AM", label: "Amber", hex: "#FFB300" }
+  { id: "AM", label: "Amber", hex: "#FFB300" },
+  { id: "SA", label: "Salmon", hex: "#FA8072" }
 ];
 
 export const CABLE_COLOR_BY_ID: Record<string, CableColorDefinition> = Object.fromEntries(
