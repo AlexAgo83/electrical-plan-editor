@@ -137,7 +137,7 @@ export interface NetworkScopedState {
   segments: EntityState<Segment, SegmentId>;
   wires: EntityState<Wire, WireId>;
   nodePositions: Record<NodeId, LayoutNodePosition>;
-  connectorCavityOccupancy: Record<ConnectorId, Record<number, string>>;
+  connectorCavityOccupancy: Record<ConnectorId, Record<number, string[]>>;
   splicePortOccupancy: Record<SpliceId, Record<number, string>>;
   networkSummaryViewState?: NetworkSummaryViewState;
 }
@@ -172,7 +172,7 @@ export interface AppState {
   segments: EntityState<Segment, SegmentId>;
   wires: EntityState<Wire, WireId>;
   nodePositions: Record<NodeId, LayoutNodePosition>;
-  connectorCavityOccupancy: Record<ConnectorId, Record<number, string>>;
+  connectorCavityOccupancy: Record<ConnectorId, Record<number, string[]>>;
   splicePortOccupancy: Record<SpliceId, Record<number, string>>;
   ui: {
     selected: SelectionState | null;

@@ -1302,6 +1302,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
         wireEndpointASpliceSideLocked: formsState.wireEndpointASpliceSideLocked,
         setWireEndpointASpliceSideLocked:
           formsState.setWireEndpointASpliceSideLocked,
+        wireEndpointAAllowSharedCavity: formsState.wireEndpointAAllowSharedCavity,
+        setWireEndpointAAllowSharedCavity:
+          formsState.setWireEndpointAAllowSharedCavity,
         wireEndpointASlotHint: modelingHandlers.wire.wireEndpointASlotHint,
         wireEndpointBConnectionReference:
           formsState.wireEndpointBConnectionReference,
@@ -1333,6 +1336,9 @@ export function useAppControllerModelingAnalysisScreenDomains({
         wireEndpointBSpliceSideLocked: formsState.wireEndpointBSpliceSideLocked,
         setWireEndpointBSpliceSideLocked:
           formsState.setWireEndpointBSpliceSideLocked,
+        wireEndpointBAllowSharedCavity: formsState.wireEndpointBAllowSharedCavity,
+        setWireEndpointBAllowSharedCavity:
+          formsState.setWireEndpointBAllowSharedCavity,
         wireEndpointBSlotHint: modelingHandlers.wire.wireEndpointBSlotHint,
         cancelWireEdit: modelingHandlers.wire.cancelWireEdit,
         wireFormError: formsState.wireFormError,

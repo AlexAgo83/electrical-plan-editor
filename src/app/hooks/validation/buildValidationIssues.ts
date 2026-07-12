@@ -12,6 +12,7 @@ import type {
   WireEndpoint
 } from "../../../core/entities";
 import { resolveConnectorPlugMaterials } from "../../../core/connectorCatalogMaterials";
+import { occupantsAt } from "../../../core/connectorOccupancy";
 import { portIndexToSpliceSide } from "../../../core/directionalSplice";
 import {
   findRearBackshellHelperNodeId,
@@ -65,7 +66,10 @@ export function buildValidationIssues({
   const issues: ValidationIssue[] = [];
   const catalogIntegrityCategory = "Catalog integrity";
 
-  const expectedConnectorOccupancy = new Map<string, string>();
+  // A connector way can legitimately hold several occupants (a shared / multi-wire
+  // crimp). Track every expected occupant plus whether any endpoint opted in via
+  // allowSharedCavity, so sharing reads as a notice rather than a conflict.
+  const expectedConnectorOccupancy = new Map<string, { refs: string[]; sharingAllowed: boolean }>();
   const expectedSpliceOccupancy = new Map<string, string>();
 
   const catalogItems: CatalogItem[] = state.catalogItems.allIds
@@ -145,19 +149,14 @@ export function buildValidationIssues({
   function registerExpectedWireOccupancy(endpoint: WireEndpoint, occupantRef: string): void {
     if (endpoint.kind === "connectorCavity") {
       const key = toConnectorOccupancyKey(endpoint.connectorId, endpoint.cavityIndex);
-      const existing = expectedConnectorOccupancy.get(key);
-      if (existing !== undefined && existing !== occupantRef) {
-        issues.push({
-          id: `occupancy-duplicate-connector-${key}`,
-          severity: "error",
-          category: "Occupancy conflict",
-          message: `Connector way ${endpoint.connectorId}/C${endpoint.cavityIndex} has multiple wire assignments.`,
-          subScreen: "connector",
-          selectionKind: "connector",
-          selectionId: endpoint.connectorId
-        });
+      const existing = expectedConnectorOccupancy.get(key) ?? { refs: [], sharingAllowed: false };
+      if (!existing.refs.includes(occupantRef)) {
+        existing.refs.push(occupantRef);
       }
-      expectedConnectorOccupancy.set(key, occupantRef);
+      if (endpoint.allowSharedCavity === true) {
+        existing.sharingAllowed = true;
+      }
+      expectedConnectorOccupancy.set(key, existing);
       return;
     }
 
@@ -715,52 +714,76 @@ export function buildValidationIssues({
     });
   }
 
+  // Report shared connector ways: a warning when opted into (multi-wire crimp), an
+  // error when several wires collide on a way with no opt-in.
+  for (const [key, entry] of expectedConnectorOccupancy) {
+    if (entry.refs.length <= 1) {
+      continue;
+    }
+    const [connectorIdRaw, cavityIndexRaw] = key.split(":");
+    const connectorId = connectorIdRaw as ConnectorId;
+    const cavityIndex = Number(cavityIndexRaw);
+    issues.push(
+      entry.sharingAllowed
+        ? {
+            id: `connector-shared-way-${connectorId}-${cavityIndex}`,
+            severity: "warning",
+            category: "Occupancy conflict",
+            message: `Connector way ${connectorId}/C${cavityIndex} is a shared way (${entry.refs.length} wires crimped together).`,
+            subScreen: "connector",
+            selectionKind: "connector",
+            selectionId: connectorId
+          }
+        : {
+            id: `occupancy-duplicate-connector-${connectorId}:${cavityIndex}`,
+            severity: "error",
+            category: "Occupancy conflict",
+            message: `Connector way ${connectorId}/C${cavityIndex} has multiple wire assignments.`,
+            subScreen: "connector",
+            selectionKind: "connector",
+            selectionId: connectorId
+          }
+    );
+  }
+
   for (const [connectorId, occupancyByCavity] of Object.entries(state.connectorCavityOccupancy)) {
     const typedConnectorId = connectorId as ConnectorId;
-    for (const [cavityIndexRaw, occupantRef] of Object.entries(occupancyByCavity)) {
-      if (occupantRef.trim().length === 0) {
+    for (const [cavityIndexRaw, rawOccupants] of Object.entries(occupancyByCavity)) {
+      const occupants = occupantsAt(rawOccupants);
+      if (occupants.length === 0) {
         continue;
       }
 
       const cavityIndex = Number(cavityIndexRaw);
       const key = toConnectorOccupancyKey(typedConnectorId, cavityIndex);
-      const expectedRef = expectedConnectorOccupancy.get(key);
-      if (expectedRef === undefined) {
-        issues.push({
-          id: `connector-manual-occupancy-${typedConnectorId}-${cavityIndex}`,
-          severity: "warning",
-          category: "Occupancy conflict",
-          message: `Connector '${typedConnectorId}' way C${cavityIndex} is occupied by '${occupantRef}' without linked wire endpoint.`,
-          subScreen: "connector",
-          selectionKind: "connector",
-          selectionId: typedConnectorId
-        });
-        continue;
-      }
+      const expected = expectedConnectorOccupancy.get(key);
 
-      if (expectedRef !== occupantRef) {
-        issues.push({
-          id: `connector-occupancy-mismatch-${typedConnectorId}-${cavityIndex}`,
-          severity: "error",
-          category: "Occupancy conflict",
-          message: `Connector '${typedConnectorId}' way C${cavityIndex} occupancy mismatch ('${occupantRef}' vs expected '${expectedRef}').`,
-          subScreen: "connector",
-          selectionKind: "connector",
-          selectionId: typedConnectorId
-        });
-      }
+      for (const occupantRef of occupants) {
+        if (expected === undefined || !expected.refs.includes(occupantRef)) {
+          issues.push({
+            id: `connector-manual-occupancy-${typedConnectorId}-${cavityIndex}-${occupantRef}`,
+            severity: "warning",
+            category: "Occupancy conflict",
+            message: `Connector '${typedConnectorId}' way C${cavityIndex} is occupied by '${occupantRef}' without linked wire endpoint.`,
+            subScreen: "connector",
+            selectionKind: "connector",
+            selectionId: typedConnectorId
+          });
+          continue;
+        }
 
-      const parsed = parseWireOccupantRef(occupantRef);
-      if (parsed !== null && state.wires.byId[parsed.wireId] === undefined) {
-        issues.push({
-          id: `connector-occupancy-missing-wire-${typedConnectorId}-${cavityIndex}`,
-          severity: "error",
-          category: "Occupancy conflict",
-          message: `Connector '${typedConnectorId}' way C${cavityIndex} references unknown wire '${parsed.wireId}'.`,
-          subScreen: "connector",
-          selectionKind: "connector",
-          selectionId: typedConnectorId
-        });
+        const parsed = parseWireOccupantRef(occupantRef);
+        if (parsed !== null && state.wires.byId[parsed.wireId] === undefined) {
+          issues.push({
+            id: `connector-occupancy-missing-wire-${typedConnectorId}-${cavityIndex}-${occupantRef}`,
+            severity: "error",
+            category: "Occupancy conflict",
+            message: `Connector '${typedConnectorId}' way C${cavityIndex} references unknown wire '${parsed.wireId}'.`,
+            subScreen: "connector",
+            selectionKind: "connector",
+            selectionId: typedConnectorId
+          });
+        }
       }
     }
   }
@@ -815,24 +838,25 @@ export function buildValidationIssues({
     }
   }
 
-  for (const [expectedKey, expectedRef] of expectedConnectorOccupancy) {
+  for (const [expectedKey, expected] of expectedConnectorOccupancy) {
     const [connectorIdRaw, cavityIndexRaw] = expectedKey.split(":");
     const connectorId = connectorIdRaw as ConnectorId;
     const cavityIndex = Number(cavityIndexRaw);
-    const actualRef = state.connectorCavityOccupancy[connectorId]?.[cavityIndex];
-    if (actualRef === expectedRef) {
-      continue;
+    const actualRefs = occupantsAt(state.connectorCavityOccupancy[connectorId]?.[cavityIndex]);
+    for (const expectedRef of expected.refs) {
+      if (actualRefs.includes(expectedRef)) {
+        continue;
+      }
+      issues.push({
+        id: `connector-expected-occupancy-missing-${connectorId}-${cavityIndex}-${expectedRef}`,
+        severity: "error",
+        category: "Occupancy conflict",
+        message: `Connector '${connectorId}' way C${cavityIndex} should be occupied by '${expectedRef}' but is not.`,
+        subScreen: "connector",
+        selectionKind: "connector",
+        selectionId: connectorId
+      });
     }
-
-    issues.push({
-      id: `connector-expected-occupancy-missing-${connectorId}-${cavityIndex}`,
-      severity: "error",
-      category: "Occupancy conflict",
-      message: `Connector '${connectorId}' way C${cavityIndex} should be occupied by '${expectedRef}' but current occupancy is '${actualRef ?? "none"}'.`,
-      subScreen: "connector",
-      selectionKind: "connector",
-      selectionId: connectorId
-    });
   }
 
   for (const [expectedKey, expectedRef] of expectedSpliceOccupancy) {

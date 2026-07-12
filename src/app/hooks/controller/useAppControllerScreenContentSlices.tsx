@@ -730,6 +730,8 @@ export function buildModelingScreenContentSlice(
       params.setWireEndpointASpliceSideOverride,
     wireEndpointASpliceSideLocked: params.wireEndpointASpliceSideLocked,
     setWireEndpointASpliceSideLocked: params.setWireEndpointASpliceSideLocked,
+    wireEndpointAAllowSharedCavity: params.wireEndpointAAllowSharedCavity,
+    setWireEndpointAAllowSharedCavity: params.setWireEndpointAAllowSharedCavity,
     wireEndpointASlotHint: params.wireEndpointASlotHint,
     wireEndpointBConnectionReference: params.wireEndpointBConnectionReference,
     setWireEndpointBConnectionReference:
@@ -755,6 +757,8 @@ export function buildModelingScreenContentSlice(
       params.setWireEndpointBSpliceSideOverride,
     wireEndpointBSpliceSideLocked: params.wireEndpointBSpliceSideLocked,
     setWireEndpointBSpliceSideLocked: params.setWireEndpointBSpliceSideLocked,
+    wireEndpointBAllowSharedCavity: params.wireEndpointBAllowSharedCavity,
+    setWireEndpointBAllowSharedCavity: params.setWireEndpointBAllowSharedCavity,
     wireEndpointBSlotHint: params.wireEndpointBSlotHint,
     cancelWireEdit: params.cancelWireEdit,
     wireFormError: params.wireFormError,

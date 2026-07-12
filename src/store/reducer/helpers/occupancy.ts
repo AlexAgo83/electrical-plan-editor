@@ -1,4 +1,5 @@
 import type { WireEndpoint, WireId } from "../../../core/entities";
+import { occupantsAt } from "../../../core/connectorOccupancy";
 import type { AppState } from "../../types";
 
 export interface EndpointOccupancyState {
@@ -10,12 +11,17 @@ export function getWireEndpointOccupantRef(wireId: WireId, side: "A" | "B"): str
   return `wire:${wireId}:${side}`;
 }
 
-export function getEndpointOccupant(state: EndpointOccupancyState, endpoint: WireEndpoint): string | undefined {
+/**
+ * All occupant refs held at an endpoint's slot. Connector ways can hold several
+ * (shared way); splice ports hold at most one.
+ */
+export function getEndpointOccupants(state: EndpointOccupancyState, endpoint: WireEndpoint): string[] {
   if (endpoint.kind === "connectorCavity") {
-    return state.connectorCavityOccupancy[endpoint.connectorId]?.[endpoint.cavityIndex];
+    return occupantsAt(state.connectorCavityOccupancy[endpoint.connectorId]?.[endpoint.cavityIndex]);
   }
 
-  return state.splicePortOccupancy[endpoint.spliceId]?.[endpoint.portIndex];
+  const occupant = state.splicePortOccupancy[endpoint.spliceId]?.[endpoint.portIndex];
+  return occupant !== undefined && occupant.length > 0 ? [occupant] : [];
 }
 
 export function setEndpointOccupant(
@@ -24,12 +30,15 @@ export function setEndpointOccupant(
   occupantRef: string
 ): EndpointOccupancyState {
   if (endpoint.kind === "connectorCavity") {
+    const current = occupantsAt(state.connectorCavityOccupancy[endpoint.connectorId]?.[endpoint.cavityIndex]);
+    // Append the occupant (a shared way keeps every occupant); avoid duplicates.
+    const next = current.includes(occupantRef) ? current : [...current, occupantRef];
     return {
       connectorCavityOccupancy: {
         ...state.connectorCavityOccupancy,
         [endpoint.connectorId]: {
           ...(state.connectorCavityOccupancy[endpoint.connectorId] ?? {}),
-          [endpoint.cavityIndex]: occupantRef
+          [endpoint.cavityIndex]: next
         }
       },
       splicePortOccupancy: state.splicePortOccupancy
@@ -55,12 +64,23 @@ export function releaseEndpointOccupant(
 ): EndpointOccupancyState {
   if (endpoint.kind === "connectorCavity") {
     const connectorOccupancy = state.connectorCavityOccupancy[endpoint.connectorId];
-    if (connectorOccupancy === undefined || connectorOccupancy[endpoint.cavityIndex] !== expectedOccupantRef) {
+    if (connectorOccupancy === undefined) {
+      return state;
+    }
+    const current = occupantsAt(connectorOccupancy[endpoint.cavityIndex]);
+    if (!current.includes(expectedOccupantRef)) {
       return state;
     }
 
+    // Remove only this occupant — other wires sharing the way stay put.
+    const remaining = current.filter((ref) => ref !== expectedOccupantRef);
+
     const nextConnectorOccupancy = { ...connectorOccupancy };
-    delete nextConnectorOccupancy[endpoint.cavityIndex];
+    if (remaining.length === 0) {
+      delete nextConnectorOccupancy[endpoint.cavityIndex];
+    } else {
+      nextConnectorOccupancy[endpoint.cavityIndex] = remaining;
+    }
 
     const nextConnectorCavityOccupancy = { ...state.connectorCavityOccupancy };
     if (Object.keys(nextConnectorOccupancy).length === 0) {

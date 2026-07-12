@@ -8,7 +8,7 @@ import { FUNCTIONAL_FILTERS } from "../../core/functionalSchematic";
 import type { AppAction } from "../actions";
 import type { AppState } from "../types";
 import {
-  getEndpointOccupant,
+  getEndpointOccupants,
   getWireEndpointOccupantRef,
   releaseEndpointOccupant,
   setEndpointOccupant,
@@ -250,28 +250,26 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         return state;
       }
 
-      const endpointAOccupant = isEndpointOccupancyExclusive(state, endpointA)
-        ? getEndpointOccupant(occupancyState, endpointA)
-        : undefined;
-      const endpointBOccupant = isEndpointOccupancyExclusive(state, endpointB)
-        ? getEndpointOccupant(occupancyState, endpointB)
-        : undefined;
       const endpointAOccupantRef = getWireEndpointOccupantRef(action.payload.id, "A");
       const endpointBOccupantRef = getWireEndpointOccupantRef(action.payload.id, "B");
+      const ownOccupantRefs = new Set([endpointAOccupantRef, endpointBOccupantRef]);
 
-      if (
-        endpointAOccupant !== undefined &&
-        endpointAOccupant !== endpointAOccupantRef &&
-        endpointAOccupant !== endpointBOccupantRef
-      ) {
+      // Occupants of the slot that belong to OTHER wires. A shared connector way is
+      // permitted only when the incoming endpoint opts in via allowSharedCavity.
+      const foreignOccupants = (endpoint: typeof endpointA): string[] => {
+        if (!isEndpointOccupancyExclusive(state, endpoint)) {
+          return [];
+        }
+        return getEndpointOccupants(occupancyState, endpoint).filter((ref) => !ownOccupantRefs.has(ref));
+      };
+      const endpointAllowsSharing = (endpoint: typeof endpointA): boolean =>
+        endpoint.kind === "connectorCavity" && endpoint.allowSharedCavity === true;
+
+      if (foreignOccupants(endpointA).length > 0 && !endpointAllowsSharing(endpointA)) {
         return withError(state, "Wire endpoint A is already occupied.");
       }
 
-      if (
-        endpointBOccupant !== undefined &&
-        endpointBOccupant !== endpointAOccupantRef &&
-        endpointBOccupant !== endpointBOccupantRef
-      ) {
+      if (foreignOccupants(endpointB).length > 0 && !endpointAllowsSharing(endpointB)) {
         return withError(state, "Wire endpoint B is already occupied.");
       }
 

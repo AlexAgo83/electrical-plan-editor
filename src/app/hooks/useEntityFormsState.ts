@@ -141,6 +141,7 @@ export function useEntityFormsState() {
   const [wireEndpointAPortIndex, setWireEndpointAPortIndex] = useState("1");
   const [wireEndpointASpliceSideOverride, setWireEndpointASpliceSideOverride] = useState<DirectionalSpliceSide | "auto">("auto");
   const [wireEndpointASpliceSideLocked, setWireEndpointASpliceSideLocked] = useState(false);
+  const [wireEndpointAAllowSharedCavity, setWireEndpointAAllowSharedCavity] = useState(false);
   const [wireEndpointBConnectionReference, setWireEndpointBConnectionReference] = useState("");
   const [wireEndpointBConnectionName, setWireEndpointBConnectionName] = useState("");
   const [wireEndpointBSealReference, setWireEndpointBSealReference] = useState("");
@@ -152,6 +153,7 @@ export function useEntityFormsState() {
   const [wireEndpointBPortIndex, setWireEndpointBPortIndex] = useState("1");
   const [wireEndpointBSpliceSideOverride, setWireEndpointBSpliceSideOverride] = useState<DirectionalSpliceSide | "auto">("auto");
   const [wireEndpointBSpliceSideLocked, setWireEndpointBSpliceSideLocked] = useState(false);
+  const [wireEndpointBAllowSharedCavity, setWireEndpointBAllowSharedCavity] = useState(false);
   const [wireForcedRouteInput, setWireForcedRouteInput] = useState("");
   const [wireFormError, setWireFormError] = useState<string | null>(null);
 
@@ -386,6 +388,8 @@ export function useEntityFormsState() {
     setWireEndpointASpliceSideOverride,
     wireEndpointASpliceSideLocked,
     setWireEndpointASpliceSideLocked,
+    wireEndpointAAllowSharedCavity,
+    setWireEndpointAAllowSharedCavity,
     wireEndpointBConnectionReference,
     setWireEndpointBConnectionReference,
     wireEndpointBConnectionName,
@@ -408,6 +412,8 @@ export function useEntityFormsState() {
     setWireEndpointBSpliceSideOverride,
     wireEndpointBSpliceSideLocked,
     setWireEndpointBSpliceSideLocked,
+    wireEndpointBAllowSharedCavity,
+    setWireEndpointBAllowSharedCavity,
     wireForcedRouteInput,
     setWireForcedRouteInput,
     wireFormError,

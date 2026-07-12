@@ -40,7 +40,7 @@ import {
 import type { AppState, LayoutNodePosition, NetworkScopedState } from "../../store";
 import { bootstrapCatalogForScopedState, normalizeCatalogItem, normalizeManufacturerReference } from "../../store/catalog";
 import { normalizeSplicePlacement, normalizeWireRouteEndpointDetail } from "../../core/splicePlacement";
-import { appendSpliceMigrationReportEntries } from "../persistence/migrations";
+import { appendSpliceMigrationReportEntries, normalizeConnectorCavityOccupancy } from "../persistence/migrations";
 import { migrateLegacySpliceNodes } from "../persistence/spliceNodeMigration";
 
 export const NETWORK_FILE_SCHEMA_VERSION = 4;
@@ -461,7 +461,7 @@ function normalizeScopedState(scoped: NetworkScopedState): NetworkScopedState {
     segments,
     wires,
     nodePositions: normalizeNodePositions(scoped.nodePositions),
-    connectorCavityOccupancy: { ...scoped.connectorCavityOccupancy },
+    connectorCavityOccupancy: normalizeConnectorCavityOccupancy(scoped.connectorCavityOccupancy),
     splicePortOccupancy: { ...scoped.splicePortOccupancy }
   });
 }

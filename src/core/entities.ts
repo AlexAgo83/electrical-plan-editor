@@ -278,6 +278,12 @@ export type WireEndpoint =
       kind: "connectorCavity";
       connectorId: ConnectorId;
       cavityIndex: number;
+      /**
+       * When true, this endpoint is allowed to join a connector way that is already
+       * occupied by other wire(s) — physically, several wires crimped into one terminal.
+       * Only the incoming endpoint needs this flag; wires already on the way are untouched.
+       */
+      allowSharedCavity?: boolean;
     }
   | {
       kind: "splicePort";

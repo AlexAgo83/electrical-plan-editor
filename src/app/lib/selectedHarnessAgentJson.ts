@@ -1,4 +1,5 @@
 import { APP_RELEASE_VERSION } from "../../core/schema";
+import { occupantsAt } from "../../core/connectorOccupancy";
 import type {
   CatalogItem,
   Connector,
@@ -87,7 +88,7 @@ export interface SelectedHarnessAgentJsonPayload {
     network: Network;
     connectors: Array<
       Connector & {
-        cavityOccupancy: Array<{ cavityIndex: number; occupantRef: string }>;
+        cavityOccupancy: Array<{ cavityIndex: number; occupantRefs: string[] }>;
         resolvedCavities: Array<{
           cavityIndex: number;
           terminal?: MaterialRef;
@@ -481,8 +482,8 @@ export function buildSelectedHarnessAgentJsonPayload(params: {
     const exportedConnectors = connectors.map((connector) => {
       const catalogItem = connector.catalogItemId === undefined ? undefined : catalogById.get(connector.catalogItemId);
       const cavityOccupancy = Object.entries(occupancy[connector.id] ?? {})
-        .map(([cavityIndex, occupantRef]) => ({ cavityIndex: Number(cavityIndex), occupantRef }))
-        .filter((entry) => Number.isInteger(entry.cavityIndex))
+        .map(([cavityIndex, occupantRefs]) => ({ cavityIndex: Number(cavityIndex), occupantRefs: occupantsAt(occupantRefs) }))
+        .filter((entry) => Number.isInteger(entry.cavityIndex) && entry.occupantRefs.length > 0)
         .sort((left, right) => left.cavityIndex - right.cavityIndex);
       const resolvedCavities = Array.from({ length: connector.cavityCount }, (_, index) => {
         const cavityIndex = index + 1;

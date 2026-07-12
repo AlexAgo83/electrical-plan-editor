@@ -38,6 +38,10 @@ interface OccupancyStatus {
 
 export interface ConnectorCavityStatus extends OccupancyStatus {
   cavityIndex: number;
+  /** All occupants of the way; length > 1 means a shared (multi-wire crimp) way. */
+  occupantRefs?: string[];
+  /** True when 2+ wires share this way. */
+  isShared?: boolean;
 }
 
 export interface SplicePortStatus extends OccupancyStatus {
@@ -87,7 +91,7 @@ export interface AnalysisWorkspaceContentProps {
   setConnectorOccupantRefInput: (value: string) => void;
   handleReserveCavity: (event: FormEvent<HTMLFormElement>) => void;
   connectorCavityStatuses: ConnectorCavityStatus[];
-  handleReleaseCavity: (cavityIndex: number) => void;
+  handleReleaseCavity: (cavityIndex: number, occupantRef?: string) => void;
   sortedConnectorSynthesisRows: ConnectorSynthesisRow[];
   connectorSynthesisSort: SortState;
   setConnectorSynthesisSort: (value: SortState | ((current: SortState) => SortState)) => void;

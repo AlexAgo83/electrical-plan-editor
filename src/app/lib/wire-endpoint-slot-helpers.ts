@@ -1,4 +1,5 @@
 import type { ConnectorId, SpliceId } from "../../core/entities";
+import { occupantsAt } from "../../core/connectorOccupancy";
 import { resolveSplicePortMode } from "../../core/splicePortMode";
 import type { AppState } from "../../store";
 
@@ -11,6 +12,11 @@ function isExcludedOccupant(occupantRef: string | undefined, excludeOccupantRefs
   return occupantRef !== undefined && excludeOccupantRefs.has(occupantRef);
 }
 
+/** A connector way is available when it is empty or every occupant is excluded (e.g. the wire being edited). */
+function isConnectorWayAvailable(occupants: string[], excludeOccupantRefs: ReadonlySet<string>): boolean {
+  return occupants.length === 0 || occupants.every((ref) => excludeOccupantRefs.has(ref));
+}
+
 export function findNextAvailableConnectorWay(
   context: OccupancyContext,
   connectorId: ConnectorId,
@@ -18,8 +24,8 @@ export function findNextAvailableConnectorWay(
   excludeOccupantRefs: ReadonlySet<string>
 ): number | null {
   for (let index = 1; index <= cavityCount; index += 1) {
-    const occupantRef = context.connectorCavityOccupancy[connectorId]?.[index];
-    if (occupantRef === undefined || isExcludedOccupant(occupantRef, excludeOccupantRefs)) {
+    const occupants = occupantsAt(context.connectorCavityOccupancy[connectorId]?.[index]);
+    if (isConnectorWayAvailable(occupants, excludeOccupantRefs)) {
       return index;
     }
   }
@@ -67,7 +73,15 @@ export function getConnectorWayOccupant(
   connectorId: ConnectorId,
   cavityIndex: number
 ): string | undefined {
-  return context.connectorCavityOccupancy[connectorId]?.[cavityIndex];
+  return occupantsAt(context.connectorCavityOccupancy[connectorId]?.[cavityIndex])[0];
+}
+
+export function getConnectorWayOccupants(
+  context: OccupancyContext,
+  connectorId: ConnectorId,
+  cavityIndex: number
+): string[] {
+  return occupantsAt(context.connectorCavityOccupancy[connectorId]?.[cavityIndex]);
 }
 
 export function getSplicePortOccupant(

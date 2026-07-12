@@ -152,9 +152,9 @@ describe("sample network fixture", () => {
     const state = createSampleNetworkState();
     const sourceOccupancy = state.connectorCavityOccupancy[asConnectorId("C-SRC")];
 
-    expect(sourceOccupancy?.[1]).toBe("wire:W-001:A");
-    expect(sourceOccupancy?.[2]).toBe("wire:W-002:A");
-    expect(sourceOccupancy?.[3]).toBe("wire:W-004:A");
+    expect(sourceOccupancy?.[1]).toEqual(["wire:W-001:A"]);
+    expect(sourceOccupancy?.[2]).toEqual(["wire:W-002:A"]);
+    expect(sourceOccupancy?.[3]).toEqual(["wire:W-004:A"]);
   });
 
   it("identifies an empty initial state correctly", () => {

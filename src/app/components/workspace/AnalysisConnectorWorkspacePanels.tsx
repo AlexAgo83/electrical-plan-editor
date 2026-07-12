@@ -235,37 +235,50 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
       <div className="cavity-grid connector-physical-way-list" aria-label="Connector way details">
         {selectedConnectorLayout.ways.map((way) => {
           const status = statusByCavity.get(way.cavityIndex);
-          const occupantRef = status?.occupantRef ?? null;
-          const occupantWireId = parseOccupantWireId(occupantRef);
-          const wire = occupantWireId === null ? null : wireById.get(occupantWireId);
+          const occupantRefs =
+            status?.occupantRefs ?? (status?.occupantRef !== null && status?.occupantRef !== undefined ? [status.occupantRef] : []);
+          const isOccupied = occupantRefs.length > 0;
+          const isShared = occupantRefs.length > 1;
           const wayLabel = getConnectorLayoutWayDisplayLabel(way);
           return (
-            <article key={way.cavityIndex} className={`cavity${status?.isOccupied === true ? " is-occupied" : ""}`}>
-              <h3>{wayLabel}</h3>
-              <p className="cavity-occupant-line">
-                {status?.isOccupied === true ? <span className="action-button-icon is-wires cavity-occupant-ref-icon" aria-hidden="true" /> : null}
-                {status?.isOccupied === true ? renderWireColorPrefixMarker(wire) : null}
-                {status?.isOccupied === true ? formatConnectorOccupantRef(occupantRef) : "Free"}
-              </p>
-              {status?.isOccupied === true ? (
-                <div className="cavity-actions">
-                  {occupantWireId === null ? null : (
-                    <button
-                      type="button"
-                      className="validation-row-go-to-button button-with-icon"
-                      onClick={() => onOpenWireFromAnalysisTable(occupantWireId)}
-                    >
-                      <span className="action-button-icon is-open" aria-hidden="true" />
-                      Go to
-                    </button>
-                  )}
-                  {occupantWireId === null ? (
-                    <button type="button" className="button-with-icon" onClick={() => handleReleaseCavity(way.cavityIndex)}>
-                      Release
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
+            <article key={way.cavityIndex} className={`cavity${isOccupied ? " is-occupied" : ""}${isShared ? " is-shared" : ""}`}>
+              <h3>
+                {wayLabel}
+                {isShared ? <span className="cavity-shared-badge" title="Shared way (several wires crimped together)"> · shared ×{occupantRefs.length}</span> : null}
+              </h3>
+              {isOccupied ? (
+                occupantRefs.map((occupantRef) => {
+                  const occupantWireId = parseOccupantWireId(occupantRef);
+                  const wire = occupantWireId === null ? null : wireById.get(occupantWireId);
+                  return (
+                    <div key={occupantRef} className="cavity-occupant-entry">
+                      <p className="cavity-occupant-line">
+                        <span className="action-button-icon is-wires cavity-occupant-ref-icon" aria-hidden="true" />
+                        {renderWireColorPrefixMarker(wire)}
+                        {formatConnectorOccupantRef(occupantRef)}
+                      </p>
+                      <div className="cavity-actions">
+                        {occupantWireId === null ? (
+                          <button type="button" className="button-with-icon" onClick={() => handleReleaseCavity(way.cavityIndex, occupantRef)}>
+                            Release
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            className="validation-row-go-to-button button-with-icon"
+                            onClick={() => onOpenWireFromAnalysisTable(occupantWireId)}
+                          >
+                            <span className="action-button-icon is-open" aria-hidden="true" />
+                            Go to
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="cavity-occupant-line">Free</p>
+              )}
             </article>
           );
         })}

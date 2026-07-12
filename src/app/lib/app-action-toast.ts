@@ -1,5 +1,6 @@
 import type { AppAction } from "../../store/actions";
 import type { AppState } from "../../store";
+import { occupantsAt } from "../../core/connectorOccupancy";
 import type { ToastNotificationVariant } from "../hooks/useToastNotifications";
 
 export interface AppActionToast {
@@ -178,30 +179,32 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
         cascade: action.type === "connector/removeCascade"
       });
     case "connector/occupyCavity": {
-      const previousOccupant = previousState.connectorCavityOccupancy[action.payload.connectorId]?.[action.payload.cavityIndex];
-      const nextOccupant = nextState.connectorCavityOccupancy[action.payload.connectorId]?.[action.payload.cavityIndex];
-      if (nextOccupant === undefined || previousOccupant === nextOccupant) {
+      const previousOccupants = occupantsAt(previousState.connectorCavityOccupancy[action.payload.connectorId]?.[action.payload.cavityIndex]);
+      const nextOccupants = occupantsAt(nextState.connectorCavityOccupancy[action.payload.connectorId]?.[action.payload.cavityIndex]);
+      const added = nextOccupants.find((ref) => !previousOccupants.includes(ref));
+      if (added === undefined) {
         return null;
       }
       return buildConnectorCavityOccupancyToast({
         actionName: "reserved",
         connectorId: action.payload.connectorId,
         cavityIndex: action.payload.cavityIndex,
-        occupantRef: nextOccupant,
+        occupantRef: added,
         state: nextState
       });
     }
     case "connector/releaseCavity": {
-      const previousOccupant = previousState.connectorCavityOccupancy[action.payload.connectorId]?.[action.payload.cavityIndex];
-      const nextOccupant = nextState.connectorCavityOccupancy[action.payload.connectorId]?.[action.payload.cavityIndex];
-      if (previousOccupant === undefined || nextOccupant !== undefined) {
+      const previousOccupants = occupantsAt(previousState.connectorCavityOccupancy[action.payload.connectorId]?.[action.payload.cavityIndex]);
+      const nextOccupants = occupantsAt(nextState.connectorCavityOccupancy[action.payload.connectorId]?.[action.payload.cavityIndex]);
+      const removed = previousOccupants.find((ref) => !nextOccupants.includes(ref));
+      if (removed === undefined) {
         return null;
       }
       return buildConnectorCavityOccupancyToast({
         actionName: "released",
         connectorId: action.payload.connectorId,
         cavityIndex: action.payload.cavityIndex,
-        occupantRef: previousOccupant,
+        occupantRef: removed,
         state: previousState
       });
     }

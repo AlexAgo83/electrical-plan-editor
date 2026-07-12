@@ -1,0 +1,320 @@
+{
+  "budgets": {
+    "max_docs": 24,
+    "max_docs_per_ref": 4
+  },
+  "changed_paths": [],
+  "command": "logics-manager sync context-pack req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox item_665_core_model_array_occupancy_allowsharedcavity_flag_migration_and_portability item_666_assignment_gate_reducer_exclusivity_bypass_and_overload_checkbox_in_wire_form item_667_visibility_shared_way_indicators_in_physical_view_analysis_panel_validation_and_statistics item_668_exports_and_functional_view_shared_way_correctness task_161_orchestrate_shared_connector_way_multi_wire_crimp --mode summary-only --profile normal --handoff",
+  "companion_docs": [
+    {
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_665_core_model_array_occupancy_allowsharedcavity_flag_migration_and_portability",
+          "item_666_assignment_gate_reducer_exclusivity_bypass_and_overload_checkbox_in_wire_form",
+          "item_667_visibility_shared_way_indicators_in_physical_view_analysis_panel_validation_and_statistics",
+          "item_668_exports_and_functional_view_shared_way_correctness"
+        ],
+        "prod": [
+          "prod_016_shared_connector_way_multi_wire_crimp"
+        ],
+        "req": [
+          "req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox"
+        ],
+        "task": [
+          "task_161_orchestrate_shared_connector_way_multi_wire_crimp"
+        ]
+      },
+      "path": "logics/product/prod_016_shared_connector_way_multi_wire_crimp.md",
+      "ref": "prod_016_shared_connector_way_multi_wire_crimp",
+      "status": "Proposed",
+      "title": "Shared connector way (multi-wire crimp)"
+    }
+  ],
+  "docs": [
+    {
+      "ai_context": {
+        "keywords": "request-chain-scaffold, shared connector way (multi-wire crimp) with opt-in overload checkbox, development-ready",
+        "skip when": "The change is unrelated to this scaffolded request chain.",
+        "summary": "Shared connector way (multi-wire crimp) with opt-in overload checkbox",
+        "use when": "You need to implement or review the scaffolded workflow for Shared connector way (multi-wire crimp) with opt-in overload checkbox."
+      },
+      "kind": "request",
+      "linked_refs": {
+        "item": [
+          "item_665_core_model_array_occupancy_allowsharedcavity_flag_migration_and_portability",
+          "item_666_assignment_gate_reducer_exclusivity_bypass_and_overload_checkbox_in_wire_form",
+          "item_667_visibility_shared_way_indicators_in_physical_view_analysis_panel_validation_and_statistics",
+          "item_668_exports_and_functional_view_shared_way_correctness"
+        ],
+        "prod": [
+          "prod_016_shared_connector_way_multi_wire_crimp"
+        ],
+        "req": [
+          "req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox"
+        ]
+      },
+      "path": "logics/request/req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox.md",
+      "ref": "req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox",
+      "schema_version": "1.0",
+      "status": "Draft",
+      "title": "Shared connector way (multi-wire crimp) with opt-in overload checkbox"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, core model: array occupancy, allowsharedcavity flag, migration and portability, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Core model: array occupancy, allowSharedCavity flag, migration and portability",
+        "use when": "Implementing the scaffolded slice for Core model: array occupancy, allowSharedCavity flag, migration and portability."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_665_core_model_array_occupancy_allowsharedcavity_flag_migration_and_portability"
+        ],
+        "prod": [
+          "prod_016_shared_connector_way_multi_wire_crimp"
+        ],
+        "req": [
+          "req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox"
+        ],
+        "task": [
+          "task_161_orchestrate_shared_connector_way_multi_wire_crimp"
+        ]
+      },
+      "path": "logics/backlog/item_665_core_model_array_occupancy_allowsharedcavity_flag_migration_and_portability.md",
+      "ref": "item_665_core_model_array_occupancy_allowsharedcavity_flag_migration_and_portability",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Core model: array occupancy, allowSharedCavity flag, migration and portability"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, assignment gate: reducer exclusivity bypass and overload checkbox in wire form, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Assignment gate: reducer exclusivity bypass and overload checkbox in wire form",
+        "use when": "Implementing the scaffolded slice for Assignment gate: reducer exclusivity bypass and overload checkbox in wire form."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_666_assignment_gate_reducer_exclusivity_bypass_and_overload_checkbox_in_wire_form"
+        ],
+        "prod": [
+          "prod_016_shared_connector_way_multi_wire_crimp"
+        ],
+        "req": [
+          "req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox"
+        ],
+        "task": [
+          "task_161_orchestrate_shared_connector_way_multi_wire_crimp"
+        ]
+      },
+      "path": "logics/backlog/item_666_assignment_gate_reducer_exclusivity_bypass_and_overload_checkbox_in_wire_form.md",
+      "ref": "item_666_assignment_gate_reducer_exclusivity_bypass_and_overload_checkbox_in_wire_form",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Assignment gate: reducer exclusivity bypass and overload checkbox in wire form"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, visibility: shared-way indicators in physical view, analysis panel, validation and statistics, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Visibility: shared-way indicators in physical view, analysis panel, validation and statistics",
+        "use when": "Implementing the scaffolded slice for Visibility: shared-way indicators in physical view, analysis panel, validation and statistics."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_667_visibility_shared_way_indicators_in_physical_view_analysis_panel_validation_and_statistics"
+        ],
+        "prod": [
+          "prod_016_shared_connector_way_multi_wire_crimp"
+        ],
+        "req": [
+          "req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox"
+        ],
+        "task": [
+          "task_161_orchestrate_shared_connector_way_multi_wire_crimp"
+        ]
+      },
+      "path": "logics/backlog/item_667_visibility_shared_way_indicators_in_physical_view_analysis_panel_validation_and_statistics.md",
+      "ref": "item_667_visibility_shared_way_indicators_in_physical_view_analysis_panel_validation_and_statistics",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Visibility: shared-way indicators in physical view, analysis panel, validation and statistics"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-task, request-chain-scaffold, orchestration",
+        "skip when": "Working on one isolated sibling slice.",
+        "summary": "Orchestrate shared connector way (multi-wire crimp)",
+        "use when": "Coordinating implementation of a scaffolded request chain."
+      },
+      "kind": "task",
+      "linked_refs": {
+        "item": [
+          "item_665_core_model_array_occupancy_allowsharedcavity_flag_migration_and_portability",
+          "item_666_assignment_gate_reducer_exclusivity_bypass_and_overload_checkbox_in_wire_form",
+          "item_667_visibility_shared_way_indicators_in_physical_view_analysis_panel_validation_and_statistics",
+          "item_668_exports_and_functional_view_shared_way_correctness"
+        ],
+        "prod": [
+          "prod_016_shared_connector_way_multi_wire_crimp"
+        ],
+        "req": [
+          "req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox"
+        ],
+        "task": [
+          "task_161_orchestrate_shared_connector_way_multi_wire_crimp"
+        ]
+      },
+      "path": "logics/tasks/task_161_orchestrate_shared_connector_way_multi_wire_crimp.md",
+      "ref": "task_161_orchestrate_shared_connector_way_multi_wire_crimp",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Orchestrate shared connector way (multi-wire crimp)"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, exports and functional view: shared-way correctness, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Exports and functional view: shared-way correctness",
+        "use when": "Implementing the scaffolded slice for Exports and functional view: shared-way correctness."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_668_exports_and_functional_view_shared_way_correctness"
+        ],
+        "prod": [
+          "prod_016_shared_connector_way_multi_wire_crimp"
+        ],
+        "req": [
+          "req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox"
+        ],
+        "task": [
+          "task_161_orchestrate_shared_connector_way_multi_wire_crimp"
+        ]
+      },
+      "path": "logics/backlog/item_668_exports_and_functional_view_shared_way_correctness.md",
+      "ref": "item_668_exports_and_functional_view_shared_way_correctness",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Exports and functional view: shared-way correctness"
+    }
+  ],
+  "estimates": {
+    "char_count": 7747,
+    "companion_doc_count": 1,
+    "doc_count": 6
+  },
+  "generated_at": "2026-07-12T18:23:22Z",
+  "handoff": {
+    "companion_doc_count": 1,
+    "enabled": true,
+    "source_refs": [
+      "req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox",
+      "item_665_core_model_array_occupancy_allowsharedcavity_flag_migration_and_portability",
+      "item_666_assignment_gate_reducer_exclusivity_bypass_and_overload_checkbox_in_wire_form",
+      "item_667_visibility_shared_way_indicators_in_physical_view_analysis_panel_validation_and_statistics",
+      "item_668_exports_and_functional_view_shared_way_correctness",
+      "task_161_orchestrate_shared_connector_way_multi_wire_crimp"
+    ],
+    "validation_summary_count": 1
+  },
+  "mode": "summary-only",
+  "profile": "normal",
+  "ref": "req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox,item_665_core_model_array_occupancy_allowsharedcavity_flag_migration_and_portability,item_666_assignment_gate_reducer_exclusivity_bypass_and_overload_checkbox_in_wire_form,item_667_visibility_shared_way_indicators_in_physical_view_analysis_panel_validation_and_statistics,item_668_exports_and_functional_view_shared_way_correctness,task_161_orchestrate_shared_connector_way_multi_wire_crimp",
+  "refs": [
+    "req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox",
+    "item_665_core_model_array_occupancy_allowsharedcavity_flag_migration_and_portability",
+    "item_666_assignment_gate_reducer_exclusivity_bypass_and_overload_checkbox_in_wire_form",
+    "item_667_visibility_shared_way_indicators_in_physical_view_analysis_panel_validation_and_statistics",
+    "item_668_exports_and_functional_view_shared_way_correctness",
+    "task_161_orchestrate_shared_connector_way_multi_wire_crimp"
+  ],
+  "release": {
+    "blocking_reasons": [
+      "version_metadata: missing required evidence",
+      "changelog: missing required evidence",
+      "local_validation: missing required evidence",
+      "git_push: missing required evidence",
+      "ci: missing required evidence",
+      "production_deployment: missing required evidence"
+    ],
+    "configured": true,
+    "contract_path": "logics/release/contract.json",
+    "guidance": [
+      "Release readiness must come from project-owned evidence, not conversational memory.",
+      "Use release status or validate before preparing or claiming release readiness.",
+      "Publication-oriented actions are explicit operator actions and are separate from safe read/validate actions."
+    ],
+    "next_action": "version_metadata: missing required evidence",
+    "publication_actions": [
+      "GitHub release publication",
+      "external publication"
+    ],
+    "required_gates": [
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "version_metadata",
+        "required": true,
+        "state": "preparing",
+        "status": "pending"
+      },
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "changelog",
+        "required": true,
+        "state": "preparing",
+        "status": "pending"
+      },
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "local_validation",
+        "required": true,
+        "state": "local_validation",
+        "status": "pending"
+      },
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "git_push",
+        "required": true,
+        "state": "pushed",
+        "status": "pending"
+      },
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "ci",
+        "required": true,
+        "state": "ci_verification",
+        "status": "pending"
+      },
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "production_deployment",
+        "required": true,
+        "state": "external_publication",
+        "status": "pending"
+      }
+    ],
+    "safe_actions": [
+      "logics-manager release status",
+      "logics-manager release plan <version>",
+      "logics-manager release validate <version>"
+    ],
+    "state": "preparing",
+    "target_version": "1.18.1"
+  },
+  "validation_summary": [
+    {
+      "items": [
+        "- Run `python3 -m logics_manager lint --require-status`.",
+        "- Run scaffold command tests."
+      ],
+      "path": "logics/tasks/task_161_orchestrate_shared_connector_way_multi_wire_crimp.md",
+      "ref": "task_161_orchestrate_shared_connector_way_multi_wire_crimp"
+    }
+  ]
+}

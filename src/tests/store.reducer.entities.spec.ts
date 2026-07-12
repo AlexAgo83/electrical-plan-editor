@@ -188,8 +188,8 @@ describe("appReducer entity lifecycle", () => {
 
     expect(firstConnectorOccupancy).toBeDefined();
     expect(secondConnectorOccupancy).toBeDefined();
-    expect(firstConnectorOccupancy?.[2]).toBe("wire-draft-1:A");
-    expect(secondConnectorOccupancy?.[2]).toBe("wire-draft-1:A");
+    expect(firstConnectorOccupancy?.[2]).toEqual(["wire-draft-1:A"]);
+    expect(secondConnectorOccupancy?.[2]).toEqual(["wire-draft-1:A"]);
     expect(second.ui.lastError?.message).toBe("Way 2 is already occupied by 'wire-draft-1:A'.");
   });
 

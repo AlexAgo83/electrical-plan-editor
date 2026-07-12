@@ -233,6 +233,8 @@ export interface ModelingFormsColumnProps {
   ) => void;
   wireEndpointASpliceSideLocked: boolean;
   setWireEndpointASpliceSideLocked: (value: boolean) => void;
+  wireEndpointAAllowSharedCavity: boolean;
+  setWireEndpointAAllowSharedCavity: (value: boolean) => void;
   wireEndpointASlotHint: WireEndpointSlotHint | null;
   wireEndpointBConnectionReference: string;
   setWireEndpointBConnectionReference: (value: string) => void;
@@ -258,6 +260,8 @@ export interface ModelingFormsColumnProps {
   ) => void;
   wireEndpointBSpliceSideLocked: boolean;
   setWireEndpointBSpliceSideLocked: (value: boolean) => void;
+  wireEndpointBAllowSharedCavity: boolean;
+  setWireEndpointBAllowSharedCavity: (value: boolean) => void;
   wireEndpointBSlotHint: WireEndpointSlotHint | null;
   cancelWireEdit: () => void;
   wireFormError: string | null;

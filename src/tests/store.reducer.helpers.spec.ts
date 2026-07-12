@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { appActions, appReducer } from "../store";
 import {
-  getEndpointOccupant,
+  getEndpointOccupants,
   getWireEndpointOccupantRef,
   releaseEndpointOccupant,
   setEndpointOccupant,
@@ -43,26 +43,26 @@ describe("store reducer helpers - occupancy", () => {
     );
 
     expect(
-      getEndpointOccupant(occupancyState, {
+      getEndpointOccupants(occupancyState, {
         kind: "connectorCavity",
         connectorId: asConnectorId("C1"),
         cavityIndex: 2
       })
-    ).toBe("wire:W1:A");
+    ).toEqual(["wire:W1:A"]);
     expect(
-      getEndpointOccupant(occupancyState, {
+      getEndpointOccupants(occupancyState, {
         kind: "splicePort",
         spliceId: asSpliceId("S1"),
         portIndex: 1
       })
-    ).toBe("wire:W1:B");
+    ).toEqual(["wire:W1:B"]);
   });
 
   it("does not release occupancy when expected reference does not match", () => {
     const initial: EndpointOccupancyState = {
       connectorCavityOccupancy: {
         [asConnectorId("C1")]: {
-          1: "wire:W1:A"
+          1: ["wire:W1:A"]
         }
       },
       splicePortOccupancy: {}

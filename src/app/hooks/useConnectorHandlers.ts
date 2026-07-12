@@ -512,12 +512,12 @@ export function useConnectorHandlers({
     dispatchAction(appActions.occupyConnectorCavity(selectedConnectorId, cavityIndex, connectorOccupantRefInput));
   }
 
-  function handleReleaseCavity(cavityIndex: number): void {
+  function handleReleaseCavity(cavityIndex: number, occupantRef?: string): void {
     if (selectedConnectorId === null) {
       return;
     }
 
-    dispatchAction(appActions.releaseConnectorCavity(selectedConnectorId, cavityIndex));
+    dispatchAction(appActions.releaseConnectorCavity(selectedConnectorId, cavityIndex, occupantRef));
   }
 
   function handleClearConnectorTerminalAndSealOverrides(): void {

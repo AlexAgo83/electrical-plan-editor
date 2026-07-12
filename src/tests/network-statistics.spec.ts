@@ -176,7 +176,7 @@ describe("calculateNetworkStatistics", () => {
         (item) => item.id
       ),
       wires: entityState([wire], (item) => item.id),
-      connectorCavityOccupancy: { [connector.id]: { 1: "wire:W1:A", 2: "manual" } },
+      connectorCavityOccupancy: { [connector.id]: { 1: ["wire:W1:A"], 2: ["manual"] } },
       splicePortOccupancy: { [splice.id]: { 1: "wire:W1:B" } }
     });
 
@@ -198,7 +198,7 @@ describe("calculateNetworkStatistics", () => {
     expect(stats.materialDistribution).toEqual([{ key: "aluminum", label: "aluminum", count: 1, totalLengthMm: 1250 }]);
     expect(stats.electricalMetadata).toEqual({ wiresWithCurrentA: 1, maxCurrentA: 8, fuseProtectedWires: 1 });
     expect(stats.pinRoles).toMatchObject({ source: 1, consumer: 1, connectorsWithDeclaredRoles: 1 });
-    expect(stats.connectorUtilization).toMatchObject({ totalWays: 4, occupiedWays: 2, occupancyPercent: 50 });
+    expect(stats.connectorUtilization).toMatchObject({ totalWays: 4, occupiedWays: 2, sharedWays: 0, occupancyPercent: 50 });
     expect(stats.spliceUtilization).toMatchObject({
       finitePortCapacity: 2,
       occupiedFinitePorts: 1,
@@ -211,6 +211,22 @@ describe("calculateNetworkStatistics", () => {
       linkedSplices: 1,
       unlinkedSplices: 0
     });
+  });
+
+  it("counts a shared connector way once as occupied and reports it as shared", () => {
+    const connector = makeConnector("C1", {});
+    const state = makeSlice(makeNetwork("net-shared", "Shared"), {
+      connectors: entityState([connector], (item) => item.id),
+      // Way 1 holds two crimped wires; way 2 holds one.
+      connectorCavityOccupancy: {
+        [connector.id]: { 1: ["wire:W1:A", "wire:W2:A"], 2: ["wire:W3:A"] }
+      }
+    });
+
+    const stats = calculateNetworkStatistics({ slices: [state] }).perNetwork[0]!;
+
+    // Two occupied ways (a shared way counts once), one of which is shared.
+    expect(stats.connectorUtilization).toMatchObject({ occupiedWays: 2, sharedWays: 1 });
   });
 
   it("falls back to route segment lengths and ignores non-physical wires", () => {

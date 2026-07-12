@@ -38,7 +38,7 @@ interface ConnectorPhysicalViewProps {
   selectedWireId: WireId | null;
   parseOccupantWireId: (occupantRef: string | null) => WireId | null;
   onGoToWire: (wireId: WireId) => void;
-  onReleaseCavity: (cavityIndex: number) => void;
+  onReleaseCavity: (cavityIndex: number, occupantRef?: string) => void;
 }
 
 type RenderableKeying = {
@@ -298,6 +298,8 @@ export function ConnectorPhysicalView({
           {layout.ways.map((way) => {
             const status = statusByCavity.get(way.cavityIndex);
             const isOccupied = status?.isOccupied === true;
+            const sharedOccupantCount = status?.occupantRefs?.length ?? 0;
+            const isShared = status?.isShared === true;
             const wireId = parseOccupantWireId(status?.occupantRef ?? null);
             const isWireHighlighted = selectedWireId !== null && wireId === selectedWireId;
             const wire = wireId === null ? null : wireById.get(wireId) ?? null;
@@ -329,6 +331,17 @@ export function ConnectorPhysicalView({
                 <text className={labelClassName} y={0}>
                   {label}
                 </text>
+                {isShared ? (
+                  <text
+                    className="connector-physical-way-shared-badge"
+                    x={0.34}
+                    y={-0.34}
+                    style={{ fontSize: 0.18 }}
+                    aria-label={`Shared way, ${sharedOccupantCount} wires`}
+                  >
+                    ×{sharedOccupantCount}
+                  </text>
+                ) : null}
                 {wireTechnicalId !== null ? (
                   <g className="connector-physical-wire-technical-id-badge" transform="translate(0 0.32)">
                     <rect
@@ -356,38 +369,54 @@ export function ConnectorPhysicalView({
         <div className="cavity-grid connector-physical-way-list" aria-label="Physical way details">
           {layout.ways.map((way) => {
             const status = statusByCavity.get(way.cavityIndex);
-            const occupantRef = status?.occupantRef ?? null;
-            const wireId = parseOccupantWireId(occupantRef);
-            const wire = wireId === null ? null : wireById.get(wireId);
-            const isWireHighlighted = selectedWireId !== null && wireId === selectedWireId;
+            const occupantRefs =
+              status?.occupantRefs ?? (status?.occupantRef !== null && status?.occupantRef !== undefined ? [status.occupantRef] : []);
+            const isOccupied = occupantRefs.length > 0;
+            const isShared = occupantRefs.length > 1;
+            const anyWireHighlighted =
+              selectedWireId !== null && occupantRefs.some((ref) => parseOccupantWireId(ref) === selectedWireId);
             return (
               <article
                 key={way.cavityIndex}
-                className={`cavity${status?.isOccupied === true ? " is-occupied" : ""}${
-                  isWireHighlighted ? " is-wire-highlighted" : ""
+                className={`cavity${isOccupied ? " is-occupied" : ""}${isShared ? " is-shared" : ""}${
+                  anyWireHighlighted ? " is-wire-highlighted" : ""
                 }`}
               >
-                <h3>C{way.cavityIndex}</h3>
-                <p className="cavity-occupant-line">
-                  {status?.isOccupied === true ? <span className="action-button-icon is-wires cavity-occupant-ref-icon" aria-hidden="true" /> : null}
-                  {status?.isOccupied === true ? renderWireColorPrefixMarker(wire) : null}
-                  {status?.isOccupied === true ? renderPhysicalOccupantRef(occupantRef, wireById) : <span>Free</span>}
-                </p>
-                {status?.isOccupied === true ? (
-                  <div className="cavity-actions">
-                    {wireId !== null ? (
-                      <button type="button" className="validation-row-go-to-button button-with-icon" onClick={() => onGoToWire(wireId)}>
-                        <span className="action-button-icon is-open" aria-hidden="true" />
-                        Go to
-                      </button>
-                    ) : null}
-                    {wireId === null ? (
-                      <button type="button" className="button-with-icon" onClick={() => onReleaseCavity(way.cavityIndex)}>
-                        Release
-                      </button>
-                    ) : null}
-                  </div>
-                ) : null}
+                <h3>
+                  C{way.cavityIndex}
+                  {isShared ? <span className="cavity-shared-badge" title="Shared way (several wires crimped together)"> · shared ×{occupantRefs.length}</span> : null}
+                </h3>
+                {isOccupied ? (
+                  occupantRefs.map((occupantRef) => {
+                    const wireId = parseOccupantWireId(occupantRef);
+                    const wire = wireId === null ? null : wireById.get(wireId);
+                    return (
+                      <div key={occupantRef} className="cavity-occupant-entry">
+                        <p className="cavity-occupant-line">
+                          <span className="action-button-icon is-wires cavity-occupant-ref-icon" aria-hidden="true" />
+                          {renderWireColorPrefixMarker(wire)}
+                          {renderPhysicalOccupantRef(occupantRef, wireById)}
+                        </p>
+                        <div className="cavity-actions">
+                          {wireId !== null ? (
+                            <button type="button" className="validation-row-go-to-button button-with-icon" onClick={() => onGoToWire(wireId)}>
+                              <span className="action-button-icon is-open" aria-hidden="true" />
+                              Go to
+                            </button>
+                          ) : (
+                            <button type="button" className="button-with-icon" onClick={() => onReleaseCavity(way.cavityIndex, occupantRef)}>
+                              Release
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="cavity-occupant-line">
+                    <span>Free</span>
+                  </p>
+                )}
               </article>
             );
           })}

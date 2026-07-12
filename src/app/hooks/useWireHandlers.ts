@@ -102,6 +102,8 @@ interface UseWireHandlersParams {
   setWireEndpointASpliceSideOverride: (value: DirectionalSpliceSide | "auto") => void;
   wireEndpointASpliceSideLocked: boolean;
   setWireEndpointASpliceSideLocked: (value: boolean) => void;
+  wireEndpointAAllowSharedCavity: boolean;
+  setWireEndpointAAllowSharedCavity: (value: boolean) => void;
   wireEndpointBConnectionReference: string;
   setWireEndpointBConnectionReference: (value: string) => void;
   wireEndpointBConnectionName: string;
@@ -124,6 +126,8 @@ interface UseWireHandlersParams {
   setWireEndpointBSpliceSideOverride: (value: DirectionalSpliceSide | "auto") => void;
   wireEndpointBSpliceSideLocked: boolean;
   setWireEndpointBSpliceSideLocked: (value: boolean) => void;
+  wireEndpointBAllowSharedCavity: boolean;
+  setWireEndpointBAllowSharedCavity: (value: boolean) => void;
   wireForcedRouteInput: string;
   setWireForcedRouteInput: (value: string) => void;
   setWireFormError: (value: string | null) => void;
@@ -190,6 +194,8 @@ export function useWireHandlers({
   setWireEndpointASpliceSideOverride,
   wireEndpointASpliceSideLocked,
   setWireEndpointASpliceSideLocked,
+  wireEndpointAAllowSharedCavity,
+  setWireEndpointAAllowSharedCavity,
   wireEndpointBConnectionReference,
   setWireEndpointBConnectionReference,
   wireEndpointBConnectionName,
@@ -212,6 +218,8 @@ export function useWireHandlers({
   setWireEndpointBSpliceSideOverride,
   wireEndpointBSpliceSideLocked,
   setWireEndpointBSpliceSideLocked,
+  wireEndpointBAllowSharedCavity,
+  setWireEndpointBAllowSharedCavity,
   wireForcedRouteInput,
   setWireForcedRouteInput,
   setWireFormError,
@@ -242,14 +250,16 @@ export function useWireHandlers({
             connectorId: wireEndpointAConnectorId,
             cavityIndex: wireEndpointACavityIndex,
             spliceId: wireEndpointASpliceId,
-            portIndex: wireEndpointAPortIndex
+            portIndex: wireEndpointAPortIndex,
+            allowSharedCavity: wireEndpointAAllowSharedCavity
           }
         : {
             kind: wireEndpointBKind,
             connectorId: wireEndpointBConnectorId,
             cavityIndex: wireEndpointBCavityIndex,
             spliceId: wireEndpointBSpliceId,
-            portIndex: wireEndpointBPortIndex
+            portIndex: wireEndpointBPortIndex,
+            allowSharedCavity: wireEndpointBAllowSharedCavity
           },
     [
       wireEndpointAKind,
@@ -257,11 +267,13 @@ export function useWireHandlers({
       wireEndpointACavityIndex,
       wireEndpointASpliceId,
       wireEndpointAPortIndex,
+      wireEndpointAAllowSharedCavity,
       wireEndpointBKind,
       wireEndpointBConnectorId,
       wireEndpointBCavityIndex,
       wireEndpointBSpliceId,
-      wireEndpointBPortIndex
+      wireEndpointBPortIndex,
+      wireEndpointBAllowSharedCavity
     ]
   );
 
@@ -406,6 +418,7 @@ export function useWireHandlers({
     setWireEndpointAPortIndex("1");
     setWireEndpointASpliceSideOverride("auto");
     setWireEndpointASpliceSideLocked(false);
+    setWireEndpointAAllowSharedCavity(false);
     setWireEndpointBConnectionReference("");
     setWireEndpointBConnectionName("");
     setWireEndpointBSealReference("");
@@ -417,6 +430,7 @@ export function useWireHandlers({
     setWireEndpointBPortIndex("1");
     setWireEndpointBSpliceSideOverride("auto");
     setWireEndpointBSpliceSideLocked(false);
+    setWireEndpointBAllowSharedCavity(false);
     setWireForcedRouteInput("");
     setWireFormError(null);
   }
@@ -451,6 +465,7 @@ export function useWireHandlers({
     setWireEndpointAPortIndex("1");
     setWireEndpointASpliceSideOverride("auto");
     setWireEndpointASpliceSideLocked(false);
+    setWireEndpointAAllowSharedCavity(false);
     setWireEndpointBConnectionReference("");
     setWireEndpointBSealReference("");
     setWireEndpointBKind("splicePort");
@@ -460,6 +475,7 @@ export function useWireHandlers({
     setWireEndpointBPortIndex("1");
     setWireEndpointBSpliceSideOverride("auto");
     setWireEndpointBSpliceSideLocked(false);
+    setWireEndpointBAllowSharedCavity(false);
     setWireForcedRouteInput("");
     setWireFormError(null);
   }
@@ -483,6 +499,7 @@ export function useWireHandlers({
     const nextEndpointAPortIndex = wireEndpointBPortIndex;
     const nextEndpointASpliceSideOverride = wireEndpointBSpliceSideOverride;
     const nextEndpointASpliceSideLocked = wireEndpointBSpliceSideLocked;
+    const nextEndpointAAllowSharedCavity = wireEndpointBAllowSharedCavity;
 
     setWireEndpointAConnectionReference(nextEndpointAConnectionReference);
     setWireEndpointAConnectionName(wireEndpointBConnectionName);
@@ -495,6 +512,7 @@ export function useWireHandlers({
     setWireEndpointAPortIndex(nextEndpointAPortIndex);
     setWireEndpointASpliceSideOverride(nextEndpointASpliceSideOverride);
     setWireEndpointASpliceSideLocked(nextEndpointASpliceSideLocked);
+    setWireEndpointAAllowSharedCavity(nextEndpointAAllowSharedCavity);
 
     setWireEndpointBConnectionReference(wireEndpointAConnectionReference);
     setWireEndpointBConnectionName(wireEndpointAConnectionName);
@@ -507,6 +525,7 @@ export function useWireHandlers({
     setWireEndpointBPortIndex(wireEndpointAPortIndex);
     setWireEndpointBSpliceSideOverride(wireEndpointASpliceSideOverride);
     setWireEndpointBSpliceSideLocked(wireEndpointASpliceSideLocked);
+    setWireEndpointBAllowSharedCavity(wireEndpointAAllowSharedCavity);
     setWireFormError(null);
   }
 
@@ -559,6 +578,7 @@ export function useWireHandlers({
     if (wire.endpointA.kind === "connectorCavity") {
       setWireEndpointAConnectorId(wire.endpointA.connectorId);
       setWireEndpointACavityIndex(String(wire.endpointA.cavityIndex));
+      setWireEndpointAAllowSharedCavity(wire.endpointA.allowSharedCavity === true);
       setWireEndpointASpliceId("");
       setWireEndpointAPortIndex("1");
       setWireEndpointASpliceSideOverride("auto");
@@ -568,6 +588,7 @@ export function useWireHandlers({
       setWireEndpointAPortIndex(String(wire.endpointA.portIndex));
       setWireEndpointASpliceSideOverride(wire.endpointA.spliceSideOverride ?? portIndexToSpliceSide(wire.endpointA.portIndex));
       setWireEndpointASpliceSideLocked(wire.endpointA.spliceSideLocked === true);
+      setWireEndpointAAllowSharedCavity(false);
       setWireEndpointAConnectorId("");
       setWireEndpointACavityIndex("1");
     }
@@ -576,6 +597,7 @@ export function useWireHandlers({
     if (wire.endpointB.kind === "connectorCavity") {
       setWireEndpointBConnectorId(wire.endpointB.connectorId);
       setWireEndpointBCavityIndex(String(wire.endpointB.cavityIndex));
+      setWireEndpointBAllowSharedCavity(wire.endpointB.allowSharedCavity === true);
       setWireEndpointBSpliceId("");
       setWireEndpointBPortIndex("1");
       setWireEndpointBSpliceSideOverride("auto");
@@ -585,6 +607,7 @@ export function useWireHandlers({
       setWireEndpointBPortIndex(String(wire.endpointB.portIndex));
       setWireEndpointBSpliceSideOverride(wire.endpointB.spliceSideOverride ?? portIndexToSpliceSide(wire.endpointB.portIndex));
       setWireEndpointBSpliceSideLocked(wire.endpointB.spliceSideLocked === true);
+      setWireEndpointBAllowSharedCavity(false);
       setWireEndpointBConnectorId("");
       setWireEndpointBCavityIndex("1");
     }

@@ -13,6 +13,7 @@ import type {
   WireId
 } from "../../core/entities";
 import { normalizeConnectorLayout } from "../../core/connectorLayout";
+import { occupantsAt } from "../../core/connectorOccupancy";
 import { computeRecommendedWireSectionMm2 } from "../../core/wireSizing";
 import {
   analyzeCatalogDeleteImpact,
@@ -1419,10 +1420,17 @@ function entityExists(
 }
 
 function endpointOccupancyConflict(state: AppState, endpoint: WireEndpoint, wireId?: WireId): boolean {
-  const occupant =
-    endpoint.kind === "connectorCavity"
-      ? state.connectorCavityOccupancy[endpoint.connectorId]?.[endpoint.cavityIndex]
-      : state.splicePortOccupancy[endpoint.spliceId]?.[endpoint.portIndex];
+  if (endpoint.kind === "connectorCavity") {
+    const occupants = occupantsAt(state.connectorCavityOccupancy[endpoint.connectorId]?.[endpoint.cavityIndex]);
+    const ownRefs = wireId === undefined ? [] : [`wire:${wireId}:A`, `wire:${wireId}:B`];
+    const foreign = occupants.filter((ref) => !ownRefs.includes(ref));
+    if (foreign.length === 0) {
+      return false;
+    }
+    // A shared way is allowed when the incoming endpoint opts into overload.
+    return endpoint.allowSharedCavity !== true;
+  }
+  const occupant = state.splicePortOccupancy[endpoint.spliceId]?.[endpoint.portIndex];
   if (occupant === undefined) {
     return false;
   }

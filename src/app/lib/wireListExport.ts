@@ -198,21 +198,43 @@ export function resolveWireExportEndpointMaterials(
   };
 }
 
+function connectorCavityKey(connectorId: string, cavityIndex: number): string {
+  return `${connectorId}:${cavityIndex}`;
+}
+
+/** Connector ways referenced by 2+ wire endpoints — shared (multi-wire crimp) ways. */
+function buildSharedConnectorWayKeys(wires: readonly Wire[]): Set<string> {
+  const counts = new Map<string, number>();
+  for (const wire of wires) {
+    for (const endpoint of [wire.endpointA, wire.endpointB]) {
+      if (endpoint.kind === "connectorCavity") {
+        const key = connectorCavityKey(endpoint.connectorId, endpoint.cavityIndex);
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
+    }
+  }
+  return new Set([...counts.entries()].filter(([, count]) => count > 1).map(([key]) => key));
+}
+
 function resolveEndpoint(
   wire: Wire,
   side: "A" | "B",
   connectorById: Map<string, Connector>,
   spliceById: Map<string, Splice>,
-  catalogItemById: Map<string, CatalogItem>
+  catalogItemById: Map<string, CatalogItem>,
+  sharedWayKeys: ReadonlySet<string>
 ): ResolvedEndpoint {
   const endpoint = side === "A" ? wire.endpointA : wire.endpointB;
   if (endpoint.kind === "connectorCavity") {
     const connector = connectorById.get(endpoint.connectorId);
     const catalogItem = connector?.catalogItemId === undefined ? undefined : catalogItemById.get(connector.catalogItemId);
+    const label = resolveConnectorCavityDisplayLabel(connector, catalogItem, endpoint.cavityIndex);
+    const isShared = sharedWayKeys.has(connectorCavityKey(endpoint.connectorId, endpoint.cavityIndex));
     return {
       type: "Connector",
       ref: connector?.technicalId ?? endpoint.connectorId,
-      position: resolveConnectorCavityDisplayLabel(connector, catalogItem, endpoint.cavityIndex)
+      // Mark shared ways so a repeated way label across rows reads as intentional.
+      position: isShared ? `${label} (shared)` : label
     };
   }
   const splice = spliceById.get(endpoint.spliceId);
@@ -349,10 +371,11 @@ export function buildWireListSheet(
     a.technicalId.localeCompare(b.technicalId, undefined, { sensitivity: "base" })
   );
   const twistGroupCounts = buildWireTwistGroupExportCounts(sortedWires);
+  const sharedWayKeys = buildSharedConnectorWayKeys(sortedWires);
 
   const wireRows = sortedWires.map((wire) => {
-    const begin = resolveEndpoint(wire, "A", connectorById, spliceById, catalogItemById);
-    const end = resolveEndpoint(wire, "B", connectorById, spliceById, catalogItemById);
+    const begin = resolveEndpoint(wire, "A", connectorById, spliceById, catalogItemById, sharedWayKeys);
+    const end = resolveEndpoint(wire, "B", connectorById, spliceById, catalogItemById, sharedWayKeys);
     const beginMaterials = resolveWireExportEndpointMaterials(wire, "A", connectorById, spliceById, catalogItemById);
     const endMaterials = resolveWireExportEndpointMaterials(wire, "B", connectorById, spliceById, catalogItemById);
     return [

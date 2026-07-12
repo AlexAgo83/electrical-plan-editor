@@ -15,6 +15,7 @@ import type {
   WireId
 } from "../core/entities";
 import { resolveSplicePortMode } from "../core/splicePortMode";
+import { occupantsAt } from "../core/connectorOccupancy";
 import { buildRoutingGraphIndex, type RoutingGraphIndex } from "../core/graph";
 import { findShortestRoute, type ShortestRouteResult } from "../core/pathfinding";
 import { normalizeManufacturerReferenceKey } from "./catalog";
@@ -257,8 +258,13 @@ export function selectWireTechnicalIdTaken(
 
 export interface ConnectorCavityStatus {
   cavityIndex: number;
+  /** Primary (first) occupant of the way, or null when free. */
   occupantRef: string | null;
+  /** All occupants of the way. A shared way (crimped wires) holds 2+. */
+  occupantRefs: string[];
   isOccupied: boolean;
+  /** True when 2+ wires share this way (multi-wire crimp). */
+  isShared: boolean;
 }
 
 export function selectConnectorCavityStatuses(
@@ -274,11 +280,13 @@ export function selectConnectorCavityStatuses(
 
   return Array.from({ length: connector.cavityCount }, (_, index) => {
     const cavityIndex = index + 1;
-    const occupantRef = occupancy[cavityIndex] ?? null;
+    const occupantRefs = occupantsAt(occupancy[cavityIndex]);
     return {
       cavityIndex,
-      occupantRef,
-      isOccupied: occupantRef !== null
+      occupantRef: occupantRefs[0] ?? null,
+      occupantRefs,
+      isOccupied: occupantRefs.length > 0,
+      isShared: occupantRefs.length > 1
     };
   });
 }

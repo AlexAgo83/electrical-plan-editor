@@ -1,5 +1,6 @@
 import type { AppAction } from "../actions";
 import { normalizeConnectorTerminalMaterial } from "../../core/connectorCatalogMaterials";
+import { occupantsAt } from "../../core/connectorOccupancy";
 import { normalizePinElectricalRolesMap } from "../../core/pinElectricalRole";
 import type { Connector, ConnectorTerminalMaterial, PinElectricalRole } from "../../core/entities";
 import { getEffectiveRearBackshellConfig } from "../../core/rearBackshell";
@@ -284,15 +285,17 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
       }
 
       const connectorOccupancy = state.connectorCavityOccupancy[action.payload.connectorId] ?? {};
-      const currentOccupant = connectorOccupancy[action.payload.cavityIndex];
-      if (currentOccupant !== undefined && currentOccupant !== occupantRef) {
+      const currentOccupants = occupantsAt(connectorOccupancy[action.payload.cavityIndex]);
+      // Manual reservation stays exclusive: reject if any other occupant already holds the way.
+      const foreignOccupants = currentOccupants.filter((ref) => ref !== occupantRef);
+      if (foreignOccupants.length > 0) {
         return withError(
           state,
-          `Way ${action.payload.cavityIndex} is already occupied by '${currentOccupant}'.`
+          `Way ${action.payload.cavityIndex} is already occupied by '${foreignOccupants[0]}'.`
         );
       }
 
-      if (currentOccupant === occupantRef && state.ui.lastError === null) {
+      if (currentOccupants.length === 1 && currentOccupants[0] === occupantRef && state.ui.lastError === null) {
         return state;
       }
 
@@ -302,7 +305,7 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
           ...state.connectorCavityOccupancy,
           [action.payload.connectorId]: {
             ...connectorOccupancy,
-            [action.payload.cavityIndex]: occupantRef
+            [action.payload.cavityIndex]: [occupantRef]
           }
         }
       });
@@ -329,7 +332,20 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
       }
 
       const nextConnectorOccupancy = { ...connectorOccupancy };
-      delete nextConnectorOccupancy[action.payload.cavityIndex];
+      // With no occupantRef, clear the whole way; otherwise release only that occupant
+      // (a shared way keeps its remaining wires).
+      if (action.payload.occupantRef !== undefined) {
+        const remaining = occupantsAt(connectorOccupancy[action.payload.cavityIndex]).filter(
+          (ref) => ref !== action.payload.occupantRef
+        );
+        if (remaining.length > 0) {
+          nextConnectorOccupancy[action.payload.cavityIndex] = remaining;
+        } else {
+          delete nextConnectorOccupancy[action.payload.cavityIndex];
+        }
+      } else {
+        delete nextConnectorOccupancy[action.payload.cavityIndex];
+      }
 
       const nextConnectorCavityOccupancy = { ...state.connectorCavityOccupancy };
       if (Object.keys(nextConnectorOccupancy).length === 0) {

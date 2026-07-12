@@ -1,9 +1,9 @@
+import type { WireEndpoint } from "../../../core/entities";
 import { resolveSplicePortMode } from "../../../core/splicePortMode";
 import type { AppState } from "../../types";
 import { isValidSlotIndex } from "../shared";
-import { getEndpointOccupant } from "./occupancy";
 
-function isDirectionalSpliceEndpoint(state: AppState, endpoint: Parameters<typeof getEndpointOccupant>[1]): boolean {
+function isDirectionalSpliceEndpoint(state: AppState, endpoint: WireEndpoint): boolean {
   if (endpoint.kind !== "splicePort") {
     return false;
   }
@@ -12,11 +12,11 @@ function isDirectionalSpliceEndpoint(state: AppState, endpoint: Parameters<typeo
   return splice !== undefined && resolveSplicePortMode(splice) === "directional";
 }
 
-export function isEndpointOccupancyExclusive(state: AppState, endpoint: Parameters<typeof getEndpointOccupant>[1]): boolean {
+export function isEndpointOccupancyExclusive(state: AppState, endpoint: WireEndpoint): boolean {
   return !isDirectionalSpliceEndpoint(state, endpoint);
 }
 
-export function canWriteEndpointOccupancy(state: AppState, endpoint: Parameters<typeof getEndpointOccupant>[1]): boolean {
+export function canWriteEndpointOccupancy(state: AppState, endpoint: WireEndpoint): boolean {
   if (endpoint.kind === "connectorCavity") {
     const connector = state.connectors.byId[endpoint.connectorId];
     if (connector === undefined) {

@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { APP_RELEASE_VERSION, APP_SCHEMA_VERSION } from "../core/schema";
 import {
   MIGRATION_BACKUP_KEY_PREFIX,
+  normalizeConnectorCavityOccupancy,
   PERSISTED_STATE_PAYLOAD_KIND,
   PERSISTED_STATE_SCHEMA_VERSION,
   clearPendingPersistenceRecovery,
@@ -296,5 +297,25 @@ describe("persistence migrations", () => {
     expect(backupSet).toBeDefined();
     expect(backupRemoved).toBeDefined();
     expect(storage.keys().some((key) => key.startsWith(MIGRATION_BACKUP_KEY_PREFIX))).toBe(false);
+  });
+
+  describe("connector cavity occupancy coercion", () => {
+    it("wraps legacy single-string occupants into one-element arrays", () => {
+      const normalized = normalizeConnectorCavityOccupancy({
+        C1: { 1: "wire:W1:A", 2: "wire:W2:B" }
+      });
+      expect(normalized).toEqual({
+        C1: { 1: ["wire:W1:A"], 2: ["wire:W2:B"] }
+      });
+    });
+
+    it("preserves array occupants (idempotent) and drops empty entries", () => {
+      const normalized = normalizeConnectorCavityOccupancy({
+        C1: { 1: ["wire:W1:A", "wire:W2:A"], 2: [], 3: "" }
+      });
+      expect(normalized).toEqual({
+        C1: { 1: ["wire:W1:A", "wire:W2:A"] }
+      });
+    });
   });
 });

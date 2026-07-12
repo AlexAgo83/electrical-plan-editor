@@ -5,7 +5,7 @@ import { toPositiveInteger } from "../lib/app-utils-shared";
 import {
   findNextAvailableConnectorWay,
   findNextAvailableSplicePort,
-  getConnectorWayOccupant,
+  getConnectorWayOccupants,
   getSplicePortOccupant
 } from "../lib/wire-endpoint-slot-helpers";
 
@@ -22,6 +22,7 @@ interface EndpointDraftInput {
   cavityIndex: string;
   spliceId: string;
   portIndex: string;
+  allowSharedCavity?: boolean;
 }
 
 export function buildWireEndpointDraft(input: EndpointDraftInput): WireEndpoint | null {
@@ -38,7 +39,8 @@ export function buildWireEndpointDraft(input: EndpointDraftInput): WireEndpoint 
     return {
       kind: "connectorCavity",
       connectorId: input.connectorId as ConnectorId,
-      cavityIndex
+      cavityIndex,
+      ...(input.allowSharedCavity === true ? { allowSharedCavity: true } : {})
     };
   }
 
@@ -75,9 +77,15 @@ export function computeWireEndpointSlotHint(
     if (cavityIndex <= 0) {
       return null;
     }
-    const occupant = getConnectorWayOccupant(snapshot, connector.id, cavityIndex);
-    if (occupant === undefined || excluded.has(occupant)) {
+    const occupants = getConnectorWayOccupants(snapshot, connector.id, cavityIndex).filter((ref) => !excluded.has(ref));
+    if (occupants.length === 0) {
       return null;
+    }
+    // The way is occupied by another wire. When the user opts into overload, the way
+    // is shared (multi-wire crimp) rather than blocked.
+    if (input.allowSharedCavity === true) {
+      const suffix = occupants.length > 1 ? ` (${occupants.length} wires)` : "";
+      return { tone: "help", message: `Way ${cavityIndex} will be shared — several wires crimped together${suffix}.` };
     }
     const nextFree = findNextAvailableConnectorWay(snapshot, connector.id, connector.cavityCount, excluded);
     if (nextFree === null) {

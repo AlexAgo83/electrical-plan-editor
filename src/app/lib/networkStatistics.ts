@@ -11,6 +11,7 @@ import type {
   Splice,
   Wire
 } from "../../core/entities";
+import { occupantsAt } from "../../core/connectorOccupancy";
 import { resolveSplicePortMode } from "../../core/splicePortMode";
 import { resolveWireMaterial } from "../../core/wireSizing";
 import type { EntityState, NetworkScopedState } from "../../store";
@@ -80,6 +81,8 @@ export interface ConnectorUtilizationStatistics {
   totalWays: number;
   occupiedWays: number;
   occupancyPercent: number | null;
+  /** Number of ways shared by 2+ wires (multi-wire crimp). */
+  sharedWays: number;
   topUnusedConnectors: Array<{
     networkId: NetworkId;
     connectorId: ConnectorId;
@@ -361,6 +364,32 @@ function countOccupiedSlots(occupancy: Record<number, string> | undefined, max: 
   }).length;
 }
 
+function countConnectorWays(
+  occupancy: Record<number, string[]> | undefined,
+  max: number
+): { occupied: number; shared: number } {
+  if (occupancy === undefined) {
+    return { occupied: 0, shared: 0 };
+  }
+  let occupied = 0;
+  let shared = 0;
+  for (const [key, rawOccupants] of Object.entries(occupancy)) {
+    const index = Number(key);
+    if (!Number.isInteger(index) || index < 1 || index > max) {
+      continue;
+    }
+    const occupants = occupantsAt(rawOccupants);
+    // A shared way (2+ wires crimped together) still occupies a single way.
+    if (occupants.length > 0) {
+      occupied += 1;
+    }
+    if (occupants.length > 1) {
+      shared += 1;
+    }
+  }
+  return { occupied, shared };
+}
+
 function buildConnectorUtilization(
   networkId: NetworkId,
   connectors: Connector[],
@@ -368,7 +397,7 @@ function buildConnectorUtilization(
 ): ConnectorUtilizationStatistics {
   const totalWays = connectors.reduce((total, connector) => total + connector.cavityCount, 0);
   const rows = connectors.map((connector) => {
-    const occupied = countOccupiedSlots(occupancy[connector.id], connector.cavityCount);
+    const { occupied, shared } = countConnectorWays(occupancy[connector.id], connector.cavityCount);
     return {
       networkId,
       connectorId: connector.id,
@@ -376,13 +405,16 @@ function buildConnectorUtilization(
       technicalId: connector.technicalId,
       unusedWays: Math.max(0, connector.cavityCount - occupied),
       totalWays: connector.cavityCount,
-      occupied
+      occupied,
+      shared
     };
   });
   const occupiedWays = rows.reduce((total, row) => total + row.occupied, 0);
+  const sharedWays = rows.reduce((total, row) => total + row.shared, 0);
   return {
     totalWays,
     occupiedWays,
+    sharedWays,
     occupancyPercent: totalWays === 0 ? null : (occupiedWays / totalWays) * 100,
     topUnusedConnectors: rows
       .filter((row) => row.unusedWays > 0)
@@ -567,9 +599,11 @@ function mergeWireLengths(rows: PerNetworkStatistics[]): WireLengthStatistics {
 function mergeConnectorUtilization(rows: PerNetworkStatistics[]): ConnectorUtilizationStatistics {
   const totalWays = rows.reduce((total, row) => total + row.connectorUtilization.totalWays, 0);
   const occupiedWays = rows.reduce((total, row) => total + row.connectorUtilization.occupiedWays, 0);
+  const sharedWays = rows.reduce((total, row) => total + row.connectorUtilization.sharedWays, 0);
   return {
     totalWays,
     occupiedWays,
+    sharedWays,
     occupancyPercent: totalWays === 0 ? null : (occupiedWays / totalWays) * 100,
     topUnusedConnectors: rows
       .flatMap((row) => row.connectorUtilization.topUnusedConnectors)

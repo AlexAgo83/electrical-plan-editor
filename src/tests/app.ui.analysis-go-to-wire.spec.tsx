@@ -303,7 +303,7 @@ describe("App integration UI - analysis go-to wire actions", () => {
         ...baseState.connectorCavityOccupancy,
         [asConnectorId("C1")]: {
           ...(baseState.connectorCavityOccupancy[asConnectorId("C1")] ?? {}),
-          1: "wire:W-GHOST:A"
+          1: ["wire:W-GHOST:A"]
         }
       }
     };

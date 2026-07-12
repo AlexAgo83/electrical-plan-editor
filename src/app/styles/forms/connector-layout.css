@@ -330,6 +330,36 @@
   gap: 0.28rem;
 }
 
+.cavity-occupant-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.cavity-occupant-entry + .cavity-occupant-entry {
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px dashed var(--border-subtle, rgba(128, 128, 128, 0.35));
+}
+
+.cavity-shared-badge {
+  font-size: 0.72em;
+  font-weight: 600;
+  color: var(--accent-strong, #b45309);
+}
+
+.cavity.is-shared {
+  outline: 1px solid var(--accent-strong, #b45309);
+  outline-offset: -1px;
+}
+
+.connector-physical-way-shared-badge {
+  fill: var(--accent-strong, #b45309);
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
 .cavity-occupant-ref-icon {
   width: 0.74rem;
   height: 0.74rem;

@@ -205,6 +205,61 @@ describe("buildFunctionalSchematicGraph", () => {
     expect(graph.nodes.some((node) => node.label.includes("SEG-CAN"))).toBe(false);
   });
 
+  it("merges wires sharing a connector way into a single functional node (multi-wire crimp)", () => {
+    const sharedConnectors: Connector[] = [
+      { id: asConnectorId("C-X"), name: "Source", technicalId: "SRC C1", cavityCount: 4 },
+      { id: asConnectorId("C-Y"), name: "Load Y", technicalId: "LDY C1", cavityCount: 4 },
+      { id: asConnectorId("C-Z"), name: "Load Z", technicalId: "LDZ C1", cavityCount: 4 }
+    ];
+    const sharedWires: Wire[] = [
+      {
+        id: asWireId("W-A"),
+        name: "X to Y",
+        technicalId: "W-A",
+        sectionMm2: 0.5,
+        primaryColorId: null,
+        secondaryColorId: null,
+        // Both wires terminate on C-X way 1 — a shared crimp.
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-X"), cavityIndex: 1 },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-Y"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 10,
+        isRouteLocked: false
+      },
+      {
+        id: asWireId("W-B"),
+        name: "X to Z",
+        technicalId: "W-B",
+        sectionMm2: 0.5,
+        primaryColorId: null,
+        secondaryColorId: null,
+        endpointA: { kind: "connectorCavity", connectorId: asConnectorId("C-X"), cavityIndex: 1, allowSharedCavity: true },
+        endpointB: { kind: "connectorCavity", connectorId: asConnectorId("C-Z"), cavityIndex: 1 },
+        routeSegmentIds: [],
+        lengthMm: 10,
+        isRouteLocked: false
+      }
+    ];
+
+    const graph = buildFunctionalSchematicGraph({
+      network: { voltageV: 12 },
+      // Seed from the shared connector so both wires terminating on it are included.
+      seed: { kind: "connector", connectorId: asConnectorId("C-X") },
+      activeFilter: "all",
+      wires: sharedWires,
+      segments: [],
+      connectorMap: new Map(sharedConnectors.map((connector) => [connector.id, connector])),
+      spliceMap: new Map(),
+      catalogItemMap: new Map()
+    });
+
+    // Both wires touch the connector; the shared way collapses to a single functional
+    // node (electrically commoned) rather than one node per wire.
+    expect(graph.includedWireIds).toEqual(expect.arrayContaining([asWireId("W-A"), asWireId("W-B")]));
+    const sharedPinNodes = graph.nodes.filter((node) => node.id === "connector:C-X:pin:1");
+    expect(sharedPinNodes).toHaveLength(1);
+  });
+
   it("keeps source IDs and filters traces by domain", () => {
     const graph = buildFunctionalSchematicGraph({
       network: null,

@@ -101,7 +101,10 @@ export type AppAction =
       type: "connector/occupyCavity";
       payload: { connectorId: ConnectorId; cavityIndex: number; occupantRef: string };
     }
-  | { type: "connector/releaseCavity"; payload: { connectorId: ConnectorId; cavityIndex: number } }
+  | {
+      type: "connector/releaseCavity";
+      payload: { connectorId: ConnectorId; cavityIndex: number; occupantRef?: string };
+    }
   | { type: "splice/upsert"; payload: Splice }
   | { type: "splice/convertToDirectional"; payload: { id: SpliceId } }
   | { type: "splice/rerouteConnectedWires"; payload: { id: SpliceId } }
@@ -276,9 +279,9 @@ export const appActions = {
     type: "connector/occupyCavity",
     payload: { connectorId, cavityIndex, occupantRef }
   }),
-  releaseConnectorCavity: (connectorId: ConnectorId, cavityIndex: number): AppAction => ({
+  releaseConnectorCavity: (connectorId: ConnectorId, cavityIndex: number, occupantRef?: string): AppAction => ({
     type: "connector/releaseCavity",
-    payload: { connectorId, cavityIndex }
+    payload: { connectorId, cavityIndex, occupantRef }
   }),
 
   upsertSplice: (payload: Splice): AppAction => ({ type: "splice/upsert", payload }),

@@ -356,6 +356,7 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
             <div className="summary-grid">
               <KpiTile label="Total ways" value={formatCount(stats.aggregate.connectorUtilization.totalWays)} />
               <KpiTile label="Occupied ways" value={formatCount(stats.aggregate.connectorUtilization.occupiedWays)} />
+              <KpiTile label="Shared ways" value={formatCount(stats.aggregate.connectorUtilization.sharedWays)} />
               <KpiTile label="Occupancy" value={formatPercent(stats.aggregate.connectorUtilization.occupancyPercent)} />
             </div>
             {stats.aggregate.connectorUtilization.topUnusedConnectors.length === 0 ? (

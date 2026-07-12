@@ -155,6 +155,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireEndpointASpliceSideOverride,
     wireEndpointASpliceSideLocked,
     setWireEndpointASpliceSideLocked,
+    wireEndpointAAllowSharedCavity,
+    setWireEndpointAAllowSharedCavity,
     wireEndpointASlotHint,
     wireEndpointBConnectionReference,
     setWireEndpointBConnectionReference,
@@ -178,6 +180,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     setWireEndpointBSpliceSideOverride,
     wireEndpointBSpliceSideLocked,
     setWireEndpointBSpliceSideLocked,
+    wireEndpointBAllowSharedCavity,
+    setWireEndpointBAllowSharedCavity,
     wireEndpointBSlotHint,
     catalogItems,
     connectors,
@@ -525,6 +529,14 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               Way index
               <input type="number" min={1} step={1} value={wireEndpointACavityIndex} onChange={(event) => setWireEndpointACavityIndex(event.target.value)} />
             </label>
+            <label className="settings-checkbox">
+              <input
+                type="checkbox"
+                checked={wireEndpointAAllowSharedCavity}
+                onChange={(event) => setWireEndpointAAllowSharedCavity(event.target.checked)}
+              />{" "}
+              Allow overload (share way — several wires crimped together)
+            </label>
             {endpointAPhysicalLabelPreview !== null ? (
               <small className="inline-help">Physical label: {endpointAPhysicalLabelPreview}</small>
             ) : null}
@@ -648,6 +660,14 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             <label>
               Way index
               <input type="number" min={1} step={1} value={wireEndpointBCavityIndex} onChange={(event) => setWireEndpointBCavityIndex(event.target.value)} />
+            </label>
+            <label className="settings-checkbox">
+              <input
+                type="checkbox"
+                checked={wireEndpointBAllowSharedCavity}
+                onChange={(event) => setWireEndpointBAllowSharedCavity(event.target.checked)}
+              />{" "}
+              Allow overload (share way — several wires crimped together)
             </label>
             {endpointBPhysicalLabelPreview !== null ? (
               <small className="inline-help">Physical label: {endpointBPhysicalLabelPreview}</small>

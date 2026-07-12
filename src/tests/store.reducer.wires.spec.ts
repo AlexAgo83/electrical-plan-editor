@@ -39,7 +39,7 @@ describe("appReducer wire lifecycle and routing", () => {
     expect(wire?.isRouteLocked).toBe(false);
     expect(wire?.routeSegmentIds).toEqual([asSegmentId("SEG1")]);
     expect(wire?.lengthMm).toBe(50);
-    expect(state.connectorCavityOccupancy[asConnectorId("C1")]?.[1]).toBe("wire:W1:A");
+    expect(state.connectorCavityOccupancy[asConnectorId("C1")]?.[1]).toEqual(["wire:W1:A"]);
     expect(state.splicePortOccupancy[asSpliceId("S1")]?.[1]).toBe("wire:W1:B");
   });
 

@@ -100,6 +100,46 @@ function normalizeNodePositions(candidate: unknown): Record<NodeId, LayoutNodePo
   return normalized;
 }
 
+/**
+ * Coerce connector-way occupancy to the array shape. Legacy files stored a single
+ * occupant ref per way (`string`); this wraps those into one-element arrays with no
+ * data loss, and is idempotent for files already in the array shape.
+ */
+export function normalizeConnectorCavityOccupancy(
+  candidate: unknown
+): NetworkScopedState["connectorCavityOccupancy"] {
+  if (!isRecord(candidate)) {
+    return {};
+  }
+
+  const normalized = {} as NetworkScopedState["connectorCavityOccupancy"];
+  for (const [connectorId, byCavity] of Object.entries(candidate)) {
+    if (!isRecord(byCavity)) {
+      continue;
+    }
+    const nextByCavity: Record<number, string[]> = {};
+    for (const [cavityKey, rawValue] of Object.entries(byCavity)) {
+      const cavityIndex = Number(cavityKey);
+      if (!Number.isInteger(cavityIndex)) {
+        continue;
+      }
+      const occupants = Array.isArray(rawValue)
+        ? rawValue.filter((ref): ref is string => typeof ref === "string" && ref.length > 0)
+        : typeof rawValue === "string" && rawValue.length > 0
+          ? [rawValue]
+          : [];
+      if (occupants.length > 0) {
+        nextByCavity[cavityIndex] = occupants;
+      }
+    }
+    if (Object.keys(nextByCavity).length > 0) {
+      normalized[connectorId as ConnectorId] = nextByCavity;
+    }
+  }
+
+  return normalized;
+}
+
 function normalizeWireEntityState(candidate: EntityState<Wire, WireId>): EntityState<Wire, WireId> {
   const byId = {} as EntityState<Wire, WireId>["byId"];
   for (const wireId of candidate.allIds) {
@@ -386,7 +426,7 @@ function normalizeNetworkScopedState(candidate: unknown): NetworkScopedState | n
     segments: candidate.segments as NetworkScopedState["segments"],
     wires: normalizeWireEntityState(candidate.wires as EntityState<Wire, WireId>),
     nodePositions: normalizeNodePositions(candidate.nodePositions),
-    connectorCavityOccupancy: candidate.connectorCavityOccupancy as NetworkScopedState["connectorCavityOccupancy"],
+    connectorCavityOccupancy: normalizeConnectorCavityOccupancy(candidate.connectorCavityOccupancy),
     splicePortOccupancy: candidate.splicePortOccupancy as NetworkScopedState["splicePortOccupancy"],
     networkSummaryViewState: normalizeNetworkSummaryViewState(candidate.networkSummaryViewState)
   });
@@ -502,6 +542,8 @@ function normalizeAndValidateCurrentAppState(candidate: unknown): AppState | nul
     nextState.nodePositions = activeScoped.nodePositions;
     nextState.connectorCavityOccupancy = activeScoped.connectorCavityOccupancy;
     nextState.splicePortOccupancy = activeScoped.splicePortOccupancy;
+  } else {
+    nextState.connectorCavityOccupancy = normalizeConnectorCavityOccupancy(candidate.connectorCavityOccupancy);
   }
   if (nextActiveNetworkId === null && candidate.catalogItems === undefined) {
     nextState.catalogItems = { byId: {}, allIds: [] };
@@ -734,7 +776,7 @@ function migrateLegacySingleNetworkStateToCurrent(
     segments: legacy.segments,
     wires: normalizeWireEntityState(legacy.wires),
     nodePositions: {},
-    connectorCavityOccupancy: legacy.connectorCavityOccupancy,
+    connectorCavityOccupancy: normalizeConnectorCavityOccupancy(legacy.connectorCavityOccupancy),
     splicePortOccupancy: legacy.splicePortOccupancy
   };
   const catalogBootstrappedScoped = bootstrapCatalogForScopedState(scoped);

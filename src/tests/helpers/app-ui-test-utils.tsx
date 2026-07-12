@@ -302,7 +302,7 @@ export function createValidationIssueState(): AppState {
       ...base.connectorCavityOccupancy,
       [connectorId]: {
         ...(base.connectorCavityOccupancy[connectorId] ?? {}),
-        2: "manual-ghost"
+        2: ["manual-ghost"]
       }
     }
   };

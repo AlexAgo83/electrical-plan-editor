@@ -8,6 +8,7 @@ import type {
   Wire
 } from "./entities";
 import { normalizePinElectricalRolesMap } from "./pinElectricalRole";
+import { occupantsAt } from "./connectorOccupancy";
 
 export type BomMaterialOrigin = "catalog default" | "instance override" | "manual";
 
@@ -29,7 +30,7 @@ export interface ConnectorMaterialWarning {
   message: string;
 }
 
-export type ConnectorCavityOccupancyMap = Record<Connector["id"], Record<number, string>>;
+export type ConnectorCavityOccupancyMap = Record<Connector["id"], Record<number, string[]>>;
 
 function normalizeReference(value: string | undefined): string | undefined {
   const normalized = value?.trim() ?? "";
@@ -208,9 +209,10 @@ export function getUsedConnectorCavities(
 
   const occupancy = connectorCavityOccupancy?.[connector.id];
   if (occupancy !== undefined) {
-    for (const key of Object.keys(occupancy)) {
+    for (const [key, occupants] of Object.entries(occupancy)) {
       const cavityIndex = Number(key);
-      if (Number.isInteger(cavityIndex)) {
+      // A shared way (2+ occupants) counts once — one terminal is crimped for all wires.
+      if (Number.isInteger(cavityIndex) && occupantsAt(occupants).length > 0) {
         used.add(cavityIndex);
       }
     }
