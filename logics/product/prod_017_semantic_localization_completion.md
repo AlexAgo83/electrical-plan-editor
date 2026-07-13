@@ -1,6 +1,6 @@
 ## prod_017_semantic_localization_completion - Semantic localization completion
 > Date: 2026-07-13
-> Status: Proposed
+> Status: Settled
 > Related request: `req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility`
 > Related backlog: `item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys`
 > Related task: `task_163_orchestrate_completion_of_semantic_localization`
