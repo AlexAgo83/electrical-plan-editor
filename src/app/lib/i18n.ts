@@ -1,6 +1,22 @@
 import type { AppLocale } from "../types/app-controller";
+import enCatalog from "../i18n/en.json";
+import frCatalog from "../i18n/fr.json";
 
 export const DEFAULT_APP_LOCALE: AppLocale = "en";
+
+const CATALOGS: Record<AppLocale, unknown> = { en: enCatalog, fr: frCatalog };
+
+function catalogValue(catalog: unknown, key: string): string | undefined {
+  const value = key.split(".").reduce<unknown>((current, segment) => {
+    if (typeof current !== "object" || current === null || !(segment in current)) return undefined;
+    return (current as Record<string, unknown>)[segment];
+  }, catalog);
+  return typeof value === "string" ? value : undefined;
+}
+
+export function translate(locale: AppLocale, key: string): string {
+  return catalogValue(CATALOGS[locale], key) ?? catalogValue(enCatalog, key) ?? key;
+}
 
 const FR_TEXT_BY_EN_TEXT: Readonly<Record<string, string>> = {
   "Home": "Accueil",

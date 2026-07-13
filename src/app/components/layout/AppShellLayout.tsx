@@ -36,6 +36,7 @@ function clampDockedNavigationProgress(value: number): number {
 }
 
 interface AppShellLayoutProps {
+  locale: WorkspaceSidebarPanelProps["locale"];
   appShellClassName: string;
   workspaceShellStyle: CSSProperties;
   appRepositoryUrl: string;
@@ -143,6 +144,7 @@ export function AppShellLayout({
   appRepositoryUrl,
   currentYear,
   appVersion,
+  locale,
   headerBlockRef,
   navigationToggleButtonRef,
   operationsButtonRef,
@@ -714,6 +716,7 @@ export function AppShellLayout({
           inert={isNavigationDrawerInteractionHidden}
         >
           <WorkspaceSidebarPanel
+            locale={locale}
             activeScreen={activeScreen}
             activeSubScreen={activeSubScreen}
             isModelingScreen={isModelingScreen}

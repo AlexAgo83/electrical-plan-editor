@@ -3,7 +3,7 @@
 > Schema version: 1.0
 > Status: Draft
 > Understanding: 100
-> Confidence: 92
+> Confidence: 99
 > Complexity: High
 > Theme: Internationalization migration
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -74,3 +74,4 @@
 
 # Backlog
 - none
+- `item_669_migrate_runtime_text_translation_to_the_shared_semantic_key_i18n_contract`

@@ -1,0 +1,32 @@
+{
+  "navigation": {
+    "screens": {
+      "home": "Home",
+      "networkScope": "Network Scope",
+      "harnessAssembly": "Harness Assembly",
+      "modeling": "Modeling",
+      "statistics": "Statistics",
+      "validation": "Validation"
+    },
+    "entities": {
+      "catalog": "Catalog",
+      "connector": "Connector",
+      "splice": "Splice",
+      "node": "Node",
+      "segment": "Segment",
+      "wire": "Wire"
+    },
+    "entityNavigation": "Entity navigation",
+    "aiAgent": "AI Agent",
+    "aiAgentWorkspace": "AI Agent modeling workspace",
+    "descriptions": {
+      "networkScope": "Network Scope workspace: active network context and lifecycle management.",
+      "harnessAssembly": "Harness Assembly workspace: cross-harness grouping and functional trace.",
+      "home": "Home workspace: start, resume, shortcuts, and quick preferences.",
+      "modeling": "Modeling workspace: entity editor, operational lists, and analysis panels.",
+      "statistics": "Statistics workspace: read-only network metrics and manual multi-network comparison.",
+      "validation": "Validation center: grouped model integrity issues with one-click navigation.",
+      "settings": "Settings workspace: workspace preferences and project-level options."
+    }
+  }
+}

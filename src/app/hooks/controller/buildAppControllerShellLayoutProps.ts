@@ -50,6 +50,7 @@ interface BuildAppControllerShellLayoutPropsParams {
   navigation: Pick<
     AppShellLayoutProps,
     | "activeScreen"
+    | "locale"
     | "activeSubScreen"
     | "isModelingScreen"
     | "isAnalysisScreen"

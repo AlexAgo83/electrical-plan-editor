@@ -1,8 +1,10 @@
 import type { ReactElement } from "react";
 import { getCountedNavigationAriaLabel, getCountedNavigationLabel } from "../lib/compactNavigationLabel";
-import type { ScreenId, SubScreenId } from "../types/app-controller";
+import { translate } from "../lib/i18n";
+import type { AppLocale, ScreenId, SubScreenId } from "../types/app-controller";
 
 interface WorkspaceNavigationProps {
+  locale: AppLocale;
   activeScreen: ScreenId;
   activeSubScreen: SubScreenId;
   isModelingScreen: boolean;
@@ -21,6 +23,7 @@ interface WorkspaceNavigationProps {
 }
 
 export function WorkspaceNavigation({
+  locale,
   activeScreen,
   activeSubScreen,
   isModelingScreen,
@@ -62,32 +65,32 @@ export function WorkspaceNavigation({
   const showEntityNavigation = isModelingScreen || isAnalysisScreen;
   const subScreenEntries = isAnalysisScreen
     ? ([
-        ["connector", "Connector"],
-        ["splice", "Splice"],
-        ["node", "Node"],
-        ["segment", "Segment"],
-        ["wire", "Wire"]
+        ["connector", "navigation.entities.connector"],
+        ["splice", "navigation.entities.splice"],
+        ["node", "navigation.entities.node"],
+        ["segment", "navigation.entities.segment"],
+        ["wire", "navigation.entities.wire"]
       ] as const)
     : ([
-        ["catalog", "Catalog"],
-        ["connector", "Connector"],
-        ["splice", "Splice"],
-        ["node", "Node"],
-        ["segment", "Segment"],
-        ["wire", "Wire"]
+        ["catalog", "navigation.entities.catalog"],
+        ["connector", "navigation.entities.connector"],
+        ["splice", "navigation.entities.splice"],
+        ["node", "navigation.entities.node"],
+        ["segment", "navigation.entities.segment"],
+        ["wire", "navigation.entities.wire"]
       ] as const);
 
   return (
     <section className="workspace-switcher">
       <div className="workspace-nav-row">
         {([
-          ["home", "Home"],
-          ["networkScope", "Network Scope"],
-          ["harnessAssembly", "Harness Assembly"],
-          ["modeling", "Modeling"],
-          ["statistics", "Statistics"],
-          ["validation", "Validation"]
-        ] as const).map(([screenId, label]) => (
+          ["home", "navigation.screens.home"],
+          ["networkScope", "navigation.screens.networkScope"],
+          ["harnessAssembly", "navigation.screens.harnessAssembly"],
+          ["modeling", "navigation.screens.modeling"],
+          ["statistics", "navigation.screens.statistics"],
+          ["validation", "navigation.screens.validation"]
+        ] as const).map(([screenId, labelKey]) => (
           <button
             key={screenId}
             type="button"
@@ -103,7 +106,7 @@ export function WorkspaceNavigation({
               {screenIconClassById[screenId] ? (
                 <span className={`action-button-icon ${screenIconClassById[screenId]}`} aria-hidden="true" />
               ) : null}
-              <span>{label}</span>
+              <span data-locale-exempt="true">{translate(locale, labelKey)}</span>
               {screenId === "validation" ? (
                 <>
                   <span
@@ -119,11 +122,12 @@ export function WorkspaceNavigation({
         ))}
       </div>
       {showEntityNavigation ? (
-        <section className="workspace-nav-subsection" aria-label="Entity navigation">
-          <p className="meta-line workspace-nav-divider">Entity navigation</p>
+        <section className="workspace-nav-subsection" aria-label={translate(locale, "navigation.entityNavigation")} data-locale-exempt="true">
+          <p className="meta-line workspace-nav-divider">{translate(locale, "navigation.entityNavigation")}</p>
           <div className="workspace-nav-row secondary">
-            {subScreenEntries.map(([subScreenId, label]) => {
+            {subScreenEntries.map(([subScreenId, labelKey]) => {
               const entityCount = entityCountBySubScreen[subScreenId];
+              const label = translate(locale, labelKey);
               const navigationLabel = getCountedNavigationLabel(label, entityCount);
               return (
                 <button
@@ -149,14 +153,15 @@ export function WorkspaceNavigation({
                 type="button"
                 className={isAiAgentOpen ? "workspace-tab is-ai-agent-tab is-active" : "workspace-tab is-ai-agent-tab"}
                 onClick={onOpenAiAgent}
-                aria-label="AI Agent"
-                aria-description={isAiAgentReady ? "AI Agent modeling workspace" : aiAgentDisabledReason}
+                aria-label={translate(locale, "navigation.aiAgent")}
+                aria-description={isAiAgentReady ? translate(locale, "navigation.aiAgentWorkspace") : aiAgentDisabledReason}
                 disabled={!isAiAgentReady || onOpenAiAgent === undefined}
-                title="AI Agent"
+                title={translate(locale, "navigation.aiAgent")}
+                data-locale-exempt="true"
               >
                 <span className="workspace-tab-content">
                   <span className="action-button-icon is-ai-agent" aria-hidden="true" />
-                  <span>AI Agent</span>
+                  <span>{translate(locale, "navigation.aiAgent")}</span>
                 </span>
               </button>
             ) : null}
@@ -164,19 +169,19 @@ export function WorkspaceNavigation({
         </section>
       ) : null}
       <p className="meta-line screen-description">
-        {activeScreen === "networkScope"
-          ? "Network Scope workspace: active network context and lifecycle management."
+        <span data-locale-exempt="true">{activeScreen === "networkScope"
+          ? translate(locale, "navigation.descriptions.networkScope")
           : activeScreen === "harnessAssembly"
-          ? "Harness Assembly workspace: cross-harness grouping and functional trace."
+          ? translate(locale, "navigation.descriptions.harnessAssembly")
           : activeScreen === "home"
-          ? "Home workspace: start, resume, shortcuts, and quick preferences."
+          ? translate(locale, "navigation.descriptions.home")
           : isModelingScreen || isAnalysisScreen
-          ? "Modeling workspace: entity editor, operational lists, and analysis panels."
+          ? translate(locale, "navigation.descriptions.modeling")
           : isStatisticsScreen
-          ? "Statistics workspace: read-only network metrics and manual multi-network comparison."
+          ? translate(locale, "navigation.descriptions.statistics")
           : isValidationScreen
-          ? "Validation center: grouped model integrity issues with one-click navigation."
-          : "Settings workspace: workspace preferences and project-level options."}
+          ? translate(locale, "navigation.descriptions.validation")
+          : translate(locale, "navigation.descriptions.settings")}</span>
       </p>
     </section>
   );

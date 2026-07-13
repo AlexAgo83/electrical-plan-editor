@@ -1,8 +1,9 @@
 import type { ReactElement } from "react";
 import { WorkspaceNavigation } from "../WorkspaceNavigation";
-import type { ScreenId, SubScreenId } from "../../types/app-controller";
+import type { AppLocale, ScreenId, SubScreenId } from "../../types/app-controller";
 
 interface WorkspaceSidebarPanelProps {
+  locale: AppLocale;
   activeScreen: ScreenId;
   activeSubScreen: SubScreenId;
   isModelingScreen: boolean;
@@ -21,6 +22,7 @@ interface WorkspaceSidebarPanelProps {
 }
 
 export function WorkspaceSidebarPanel({
+  locale,
   activeScreen,
   activeSubScreen,
   isModelingScreen,
@@ -40,6 +42,7 @@ export function WorkspaceSidebarPanel({
   return (
     <aside className="workspace-sidebar">
       <WorkspaceNavigation
+        locale={locale}
         activeScreen={activeScreen}
         activeSubScreen={activeSubScreen}
         isModelingScreen={isModelingScreen}

@@ -1,0 +1,32 @@
+{
+  "navigation": {
+    "screens": {
+      "home": "Accueil",
+      "networkScope": "Périmètre réseau",
+      "harnessAssembly": "Assemblage de faisceaux",
+      "modeling": "Modélisation",
+      "statistics": "Statistiques",
+      "validation": "Validation"
+    },
+    "entities": {
+      "catalog": "Catalogue",
+      "connector": "Connecteur",
+      "splice": "Épissure",
+      "node": "Nœud",
+      "segment": "Segment",
+      "wire": "Fil"
+    },
+    "entityNavigation": "Navigation entités",
+    "aiAgent": "Agent IA",
+    "aiAgentWorkspace": "Espace de modélisation de l’agent IA",
+    "descriptions": {
+      "networkScope": "Espace Périmètre réseau : contexte du réseau actif et gestion du cycle de vie.",
+      "harnessAssembly": "Espace Assemblage de faisceaux : regroupement entre faisceaux et parcours fonctionnel.",
+      "home": "Espace Accueil : démarrer, reprendre, raccourcis et préférences rapides.",
+      "modeling": "Espace Modélisation : éditeur d’entités, listes opérationnelles et panneaux d’analyse.",
+      "statistics": "Espace Statistiques : métriques réseau en lecture seule et comparaison manuelle de plusieurs réseaux.",
+      "validation": "Centre de validation : problèmes d’intégrité du modèle regroupés avec navigation en un clic.",
+      "settings": "Espace Paramètres : préférences de l’espace de travail et options du projet."
+    }
+  }
+}

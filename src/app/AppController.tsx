@@ -1031,6 +1031,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       onCommitBootRecovery: commitBootRecovery
     },
     navigation: {
+      locale,
       activeScreen,
       activeSubScreen,
       isModelingScreen,
