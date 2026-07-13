@@ -302,7 +302,12 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
                 <span className="fuse-rating-value-cell" role="cell">
                   <label className="fuse-rating-input-label">
                     <span className="sr-only">
-                      {t("ui.modelingconnectorformpanelRatingForFusePair")}{pair.pairIndex + 1}{t("ui.modelingconnectorformpanelPins2")}{pair.pinA} {t("ui.modelingconnectorformpanelAnd")}{pair.pinB}{t("ui.modelingconnectorformpanelInAmperes")}</span>
+                      {t("ui.modelingconnectorformpanelRatingForFusePair", {
+                        pairIndex: pair.pairIndex + 1,
+                        pinA: pair.pinA,
+                        pinB: pair.pinB
+                      })}
+                    </span>
                     <span className="fuse-rating-unit-prefix" aria-hidden="true">{t("ui.modelingconnectorformpanelAmp")}</span>
                     <input
                       type="number"

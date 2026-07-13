@@ -219,7 +219,7 @@ export function BomExportPreviewDialog({
           </button>
           <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={onConfirm}>
             <span className="table-export-icon" aria-hidden="true" />
-            <span>{t("ui.bomexportpreviewdialogDownload")}{formatLabel}</span>
+            <span>{t("ui.bomexportpreviewdialogDownload", { format: formatLabel })}</span>
           </button>
         </footer>
       </section>

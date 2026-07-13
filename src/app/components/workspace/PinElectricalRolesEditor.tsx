@@ -154,7 +154,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                 </span>
                 <span role="cell" data-label="Role">
                   <label className="sr-only" htmlFor={`pin-role-role-${cavityIndex}`}>
-                    {t("ui.pinelectricalroleseditorRoleForPin")}{pinLabel}
+                    {t("ui.pinelectricalroleseditorRoleForPin", { pinLabel })}
                   </label>
                   <select
                     id={`pin-role-role-${cavityIndex}`}
@@ -175,7 +175,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                   {hidesRoleDetails ? null : (
                     <>
                       <label className="sr-only" htmlFor={`pin-role-current-${cavityIndex}`}>
-                        {t("ui.pinelectricalroleseditorMaxCurrentForPin")}{pinLabel}
+                        {t("ui.pinelectricalroleseditorMaxCurrentForPin", { pinLabel })}
                       </label>
                       <input
                         id={`pin-role-current-${cavityIndex}`}
@@ -203,7 +203,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                   {hidesRoleDetails ? null : (
                     <>
                       <label className="sr-only" htmlFor={`pin-role-label-${cavityIndex}`}>
-                        {t("ui.pinelectricalroleseditorLabelForPin")}{pinLabel}
+                        {t("ui.pinelectricalroleseditorLabelForPin", { pinLabel })}
                       </label>
                       <input
                         id={`pin-role-label-${cavityIndex}`}

@@ -187,7 +187,7 @@ export function SvgExportPreviewDialog({
           </button>
           <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={onConfirm}>
             <span className="network-summary-export-icon" aria-hidden="true" />
-            <span>{t("ui.bomexportpreviewdialogDownload")}{previewFormatLabel}</span>
+            <span>{t("ui.bomexportpreviewdialogDownload", { format: previewFormatLabel })}</span>
           </button>
         </footer>
       </section>

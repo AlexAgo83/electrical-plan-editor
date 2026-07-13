@@ -65,8 +65,8 @@ export function MultiNetworkFunctionalAnalysisPanel({
         <span className="status-chip is-error">{t("ui.errors2")} {model.summary.errors}</span>
         <span className="status-chip is-warning">{t("ui.warnings2")} {model.summary.warnings}</span>
         <span className="status-chip">{t("ui.info")} {model.summary.info}</span>
-        <span className="status-chip">{t("ui.multinetworkfunctionalanalysispanelL1")}{model.summary.l1}</span>
-        <span className="status-chip">{t("ui.multinetworkfunctionalanalysispanelLoops")}{model.summary.loops}</span>
+        <span className="status-chip">{t("ui.multinetworkfunctionalanalysispanelL1", { count: model.summary.l1 })}</span>
+        <span className="status-chip">{t("ui.multinetworkfunctionalanalysispanelLoops", { count: model.summary.loops })}</span>
       </div>
 
       <p className="empty-copy">
@@ -92,7 +92,10 @@ export function MultiNetworkFunctionalAnalysisPanel({
 
       {model.schematic !== null ? (
         <p className="empty-copy multi-network-functional-analysis-section">
-          {t("ui.multinetworkfunctionalanalysispanelUnionGraph")}{model.schematic.nodeCount} {t("ui.multinetworkfunctionalanalysispanelNodes")}{model.schematic.edgeCount} {t("ui.multinetworkfunctionalanalysispanelEdges")}{model.schematic.warnings.length > 0 ? ` ${model.schematic.warnings.join(" ")}` : ""}
+          {t("ui.multinetworkfunctionalanalysispanelUnionGraph", {
+            nodeCount: model.schematic.nodeCount,
+            edgeCount: model.schematic.edgeCount
+          })}{model.schematic.warnings.length > 0 ? ` ${model.schematic.warnings.join(" ")}` : ""}
         </p>
       ) : null}
 

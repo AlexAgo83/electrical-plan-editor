@@ -397,7 +397,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     </label>
     {recommendedWireSectionMm2 !== null ? (
       <div className="stack-form">
-        <small className="inline-help">{t("ui.modelingwireformpanelRecommendedSection")}{recommendedWireSectionMm2} mm²</small>
+        <small className="inline-help">
+          {t("ui.modelingwireformpanelRecommendedSection", { section: recommendedWireSectionMm2 })}
+        </small>
         <div className="row-actions compact">
           <button type="button" className="button-with-icon" onClick={handleApplyRecommendedWireSection}>
             <span className="action-button-icon is-save" aria-hidden="true" />
@@ -541,7 +543,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               />{" "}
               {t("ui.modelingwireformpanelAllowOverloadShareWaySeveralWiresCrimpedTogether")}</label>
             {endpointAPhysicalLabelPreview !== null ? (
-              <small className="inline-help">{t("ui.modelingwireformpanelPhysicalLabel")}{endpointAPhysicalLabelPreview}</small>
+              <small className="inline-help">{t("ui.modelingwireformpanelPhysicalLabel", { label: endpointAPhysicalLabelPreview })}</small>
             ) : null}
             {wireEndpointASlotHint !== null ? (
               <small className={wireEndpointASlotHint.tone === "error" ? "inline-error" : "inline-help"}>{wireEndpointASlotHint.message}</small>
@@ -674,7 +676,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               />{" "}
               {t("ui.modelingwireformpanelAllowOverloadShareWaySeveralWiresCrimpedTogether")}</label>
             {endpointBPhysicalLabelPreview !== null ? (
-              <small className="inline-help">{t("ui.modelingwireformpanelPhysicalLabel")}{endpointBPhysicalLabelPreview}</small>
+              <small className="inline-help">{t("ui.modelingwireformpanelPhysicalLabel", { label: endpointBPhysicalLabelPreview })}</small>
             ) : null}
             {wireEndpointBSlotHint !== null ? (
               <small className={wireEndpointBSlotHint.tone === "error" ? "inline-error" : "inline-help"}>{wireEndpointBSlotHint.message}</small>

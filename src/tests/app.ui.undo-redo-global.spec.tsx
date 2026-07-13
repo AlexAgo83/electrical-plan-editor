@@ -112,7 +112,9 @@ describe("App integration UI - global undo/redo", () => {
 
     await waitFor(() => {
       catalogPanel = getPanelByHeading("Catalog");
-      expect(within(catalogPanel).getByText("Imported 2 catalog row(s): 1 created / 1 updated.")).toBeInTheDocument();
+      expect(
+        within(catalogPanel).getByText("Imported catalog rows: 2; created: 1; updated: 1.")
+      ).toBeInTheDocument();
     });
 
     let catalogValues = Object.values(store.getState().catalogItems.byId).map((item) => item?.manufacturerReference ?? "").sort();

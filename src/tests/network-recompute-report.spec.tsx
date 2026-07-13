@@ -41,7 +41,9 @@ describe("useAppControllerNetworkRecomputeReport", () => {
       "Wire 'W-1': splice side B L -> R.",
       "Wire 'W-2': route 5 -> 3 segment(s)."
     ]);
-    expect(dialog?.message).toMatch(/2 changes were applied/i);
+    expect(dialog?.message).toBe(
+      "Wire routes and directional splice sides were recomputed: 2 entities changed."
+    );
     expect(onConsume).toHaveBeenCalledTimes(1);
   });
 });
