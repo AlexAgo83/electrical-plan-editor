@@ -1,10 +1,10 @@
 ## item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys - Migrate settings, shared shell, actions, and forms to semantic keys
 > From version: 1.18.2
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 10%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Internationalization contract adoption
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -53,3 +53,9 @@
 # Priority
 - Priority: High
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Tasks
+- `task_163_orchestrate_completion_of_semantic_localization`
+
+# Notes
+- Task `task_163_orchestrate_completion_of_semantic_localization` was finished via `logics-manager flow finish task` on 2026-07-13.

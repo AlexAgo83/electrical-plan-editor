@@ -4,33 +4,8 @@
     "max_docs_per_ref": 8
   },
   "changed_paths": [],
-  "command": "logics-manager sync context-pack req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces item_672_migrate_onboarding_controller_notifications_and_import_export_states item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge task_163_orchestrate_completion_of_semantic_localization --mode summary-only --profile deep --handoff",
-  "companion_docs": [
-    {
-      "kind": "product",
-      "linked_refs": {
-        "item": [
-          "item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys",
-          "item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces",
-          "item_672_migrate_onboarding_controller_notifications_and_import_export_states",
-          "item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge"
-        ],
-        "prod": [
-          "prod_017_semantic_localization_completion"
-        ],
-        "req": [
-          "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility"
-        ],
-        "task": [
-          "task_163_orchestrate_completion_of_semantic_localization"
-        ]
-      },
-      "path": "logics/product/prod_017_semantic_localization_completion.md",
-      "ref": "prod_017_semantic_localization_completion",
-      "status": "Proposed",
-      "title": "Semantic localization completion"
-    }
-  ],
+  "command": "logics-manager sync context-pack req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces item_672_migrate_onboarding_controller_notifications_and_import_export_states item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge task_163_orchestrate_completion_of_semantic_localization --mode full --profile deep",
+  "companion_docs": [],
   "docs": [
     {
       "ai_context": {
@@ -57,7 +32,22 @@
       "path": "logics/request/req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility.md",
       "ref": "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility",
       "schema_version": "1.0",
-      "status": "Draft",
+      "sections": {
+        "Acceptance criteria": [
+          "- AC1: Every remaining product-owned user-visible string and accessibility label is rendered from a stable semantic key in the canonical catalogs, with locale parity and no raw-sentence keys.",
+          "- AC2: Dynamic messages use named placeholders and locale-aware formatting; no regular-expression reconstruction of English source sentences remains.",
+          "- AC3: The DOM observer, legacy reverse lookup, legacy catalog namespace, and compatibility hook are deleted after an automated zero-consumer proof.",
+          "- AC4: Configured domain data, imported content, user input, identifiers, and file/model values remain untranslated and are covered by boundary tests.",
+          "- AC5: The repository i18n lifecycle checks, unit tests, UI tests, type checks, and production build pass, and a static guard prevents new hardcoded product copy."
+        ],
+        "Needs": [
+          "- All product-owned interface copy must use stable semantic keys at render time instead of being discovered from English text after rendering.",
+          "- The temporary legacy catalog, DOM observer, and text/regular-expression translation bridge must be removed without regressing either supported locale.",
+          "- Dynamic messages must use named placeholders and explicit plural-aware formatting rather than reconstructed source sentences.",
+          "- Configured electrical data, imported model content, user input, identifiers, and domain values must remain data and must never be translated as interface copy."
+        ]
+      },
+      "status": "Done",
       "title": "Complete semantic i18n migration and retire runtime text compatibility"
     },
     {
@@ -85,7 +75,19 @@
       "path": "logics/backlog/item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys.md",
       "ref": "item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys",
       "schema_version": "1.0",
-      "status": "Ready",
+      "sections": {
+        "Acceptance criteria": [
+          "- AC1: Settings and shared UI render all product-owned copy from semantic catalog keys in both locales.",
+          "- AC2: The legacy-consumer report lists every remaining compatibility dependency by source surface.",
+          "- AC3: Boundary tests keep configured and user-provided values unchanged.",
+          "- AC4: No migrated component relies on DOM mutation for its localized result."
+        ],
+        "Problem": [
+          "- Shared controls and settings still depend on visible source text being translated after render.",
+          "- These high-reuse surfaces multiply legacy dependencies and make coverage difficult to measure."
+        ]
+      },
+      "status": "Done",
       "title": "Migrate settings, shared shell, actions, and forms to semantic keys"
     },
     {
@@ -113,7 +115,19 @@
       "path": "logics/backlog/item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces.md",
       "ref": "item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces",
       "schema_version": "1.0",
-      "status": "Ready",
+      "sections": {
+        "Acceptance criteria": [
+          "- AC1: Product-owned copy across the targeted domain surfaces uses semantic keys with complete locale parity.",
+          "- AC2: Dynamic messages use named placeholders and correct plural/number formatting.",
+          "- AC3: Domain values remain byte-for-byte unchanged when the locale changes.",
+          "- AC4: Targeted UI tests pass without the DOM compatibility translator."
+        ],
+        "Problem": [
+          "- Domain-heavy panels mix product instructions and diagnostics with configured electrical data.",
+          "- Runtime source-text matching cannot reliably preserve that boundary or format dynamic counts and values."
+        ]
+      },
+      "status": "Done",
       "title": "Migrate modeling, catalog, validation, and diagnostic surfaces"
     },
     {
@@ -141,7 +155,19 @@
       "path": "logics/backlog/item_672_migrate_onboarding_controller_notifications_and_import_export_states.md",
       "ref": "item_672_migrate_onboarding_controller_notifications_and_import_export_states",
       "schema_version": "1.0",
-      "status": "Ready",
+      "sections": {
+        "Acceptance criteria": [
+          "- AC1: All targeted surfaces use semantic keys and named placeholders.",
+          "- AC2: No source-text regular-expression handler is needed by a migrated flow.",
+          "- AC3: File and user data remain unchanged across locale switches.",
+          "- AC4: Tests cover representative success and failure paths in both locales."
+        ],
+        "Problem": [
+          "- Onboarding and controller-level feedback contain dynamic product sentences that are currently handled by source-text and regular-expression compatibility rules.",
+          "- Import and export feedback must localize its framing while preserving file names, formats, counts, and error details as data."
+        ]
+      },
+      "status": "Done",
       "title": "Migrate onboarding, controller notifications, and import-export states"
     },
     {
@@ -169,7 +195,19 @@
       "path": "logics/backlog/item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge.md",
       "ref": "item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge",
       "schema_version": "1.0",
-      "status": "Ready",
+      "sections": {
+        "Acceptance criteria": [
+          "- AC1: Automated inventory reports zero runtime consumers of legacy source-text translation.",
+          "- AC2: All compatibility implementation and the legacy namespace are removed from production code.",
+          "- AC3: A failing fixture proves the static guard rejects newly hardcoded product copy.",
+          "- AC4: Full repository validation passes in both locales and boundary tests prove domain data is untouched."
+        ],
+        "Problem": [
+          "- The compatibility layer remains global infrastructure until every consumer is migrated and its absence is verified.",
+          "- Leaving an empty bridge in place would allow future hardcoded copy to silently reintroduce source-text translation."
+        ]
+      },
+      "status": "Done",
       "title": "Prove zero legacy consumers and remove the runtime compatibility bridge"
     },
     {
@@ -200,19 +238,32 @@
       "path": "logics/tasks/task_163_orchestrate_completion_of_semantic_localization.md",
       "ref": "task_163_orchestrate_completion_of_semantic_localization",
       "schema_version": "1.0",
-      "status": "Ready",
+      "sections": {
+        "Context": [
+          "- Orchestrate the scaffolded request chain and keep sibling implementation slices linked."
+        ],
+        "Validation": [
+          "- `npm run quality:i18n` passed: 1,461 EN/FR keys with named-placeholder parity, 288 production source files scanned, and the hardcoded-copy rejection fixture accepted.",
+          "- `npm run lint`, `npm run typecheck`, and `npm run test:ci:segmentation:check` passed.",
+          "- `npm run test:ci:fast -- --coverage` passed: 88 files and 571 tests.",
+          "- `npm run test:ci:ui` passed: 69 files and 430 tests across nine chunks.",
+          "- `npm run test:e2e` passed: 3 Playwright scenarios.",
+          "- `npm run build:vite` passed."
+        ]
+      },
+      "status": "Done",
       "title": "Orchestrate completion of semantic localization"
     }
   ],
   "estimates": {
-    "char_count": 7402,
-    "companion_doc_count": 1,
+    "char_count": 11324,
+    "companion_doc_count": 0,
     "doc_count": 6
   },
-  "generated_at": "2026-07-13T10:14:19Z",
+  "generated_at": "2026-07-13T13:56:11Z",
   "handoff": {
-    "companion_doc_count": 1,
-    "enabled": true,
+    "companion_doc_count": 0,
+    "enabled": false,
     "source_refs": [
       "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility",
       "item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys",
@@ -221,9 +272,9 @@
       "item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge",
       "task_163_orchestrate_completion_of_semantic_localization"
     ],
-    "validation_summary_count": 1
+    "validation_summary_count": 0
   },
-  "mode": "summary-only",
+  "mode": "full",
   "profile": "deep",
   "ref": "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility,item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys,item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces,item_672_migrate_onboarding_controller_notifications_and_import_export_states,item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge,task_163_orchestrate_completion_of_semantic_localization",
   "refs": [
@@ -307,14 +358,5 @@
     "state": "blocked",
     "target_version": null
   },
-  "validation_summary": [
-    {
-      "items": [
-        "- Run `python3 -m logics_manager lint --require-status`.",
-        "- Run scaffold command tests."
-      ],
-      "path": "logics/tasks/task_163_orchestrate_completion_of_semantic_localization.md",
-      "ref": "task_163_orchestrate_completion_of_semantic_localization"
-    }
-  ]
+  "validation_summary": []
 }

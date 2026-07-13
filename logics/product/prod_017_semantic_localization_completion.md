@@ -2,7 +2,7 @@
 > Date: 2026-07-13
 > Status: Proposed
 > Related request: `req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility`
-> Related backlog: `item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys`, `item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces`, `item_672_migrate_onboarding_controller_notifications_and_import_export_states`, `item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge`
+> Related backlog: `item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys`
 > Related task: `task_163_orchestrate_completion_of_semantic_localization`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
@@ -48,5 +48,5 @@ flowchart LR
 - Contract checks, repository tests, type checks, and production build pass.
 
 # References
-- Product back-reference: `req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility`
+- Product back-reference: `item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys`
 - Task back-reference: `task_163_orchestrate_completion_of_semantic_localization`
