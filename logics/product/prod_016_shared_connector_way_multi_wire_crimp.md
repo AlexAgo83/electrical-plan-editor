@@ -6,9 +6,17 @@
 > Related task: `task_161_orchestrate_shared_connector_way_multi_wire_crimp`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
+> Non-semantic edit: added overview Mermaid diagram
 
 # Overview
 Opt-in overload of a connector way so 2+ wire endpoints can share one terminal, gated by a per-endpoint checkbox, with shared-way indicators across views and exports.
+
+```mermaid
+%% logics-kind: product
+flowchart LR
+    Wire[Incoming wire opts in] --> Way[Shared connector way]
+    Way --> Views[Views and exports show shared occupancy]
+```
 
 # Goals
 - Model the real-world practice of crimping several wires into one terminal.
