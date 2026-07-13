@@ -1,7 +1,7 @@
 ## req_165_migrate_runtime_text_translation_to_the_shared_semantic_key_i18n_contract - Migrate runtime text translation to the shared semantic key i18n contract
 > From version: 1.18.1
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 100
 > Confidence: 99
 > Complexity: High

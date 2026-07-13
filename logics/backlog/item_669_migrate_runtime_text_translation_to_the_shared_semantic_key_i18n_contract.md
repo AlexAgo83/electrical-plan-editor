@@ -1,10 +1,10 @@
 ## item_669_migrate_runtime_text_translation_to_the_shared_semantic_key_i18n_contract - Migrate runtime text translation to the shared semantic key i18n contract
 > From version: 1.18.1
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 30%
+> Progress: 100%
 > Complexity: High
 > Theme: Operator workflow and runtime integration
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
@@ -49,8 +49,8 @@ Retire the legacy text and DOM translation paths only after screen-level coverag
 # Links
 - Product brief(s): (none yet)
 - Architecture decision(s): (none yet)
-- Request: `logics/request/req_165_migrate_runtime_text_translation_to_the_shared_semantic_key_i18n_contract.md`
-- Primary task(s): (none yet)
+- Request: `req_165_migrate_runtime_text_translation_to_the_shared_semantic_key_i18n_contract`
+- Primary task(s): `task_162_migrate_runtime_text_translation_to_the_shared_semantic_key_i18n_contract`
 
 # AI Context
 - Summary: Migrate runtime text translation to the shared semantic key i18n contract
@@ -66,6 +66,7 @@ Retire the legacy text and DOM translation paths only after screen-level coverag
 - Hybrid rationale: Derived from request `req_165_migrate_runtime_text_translation_to_the_shared_semantic_key_i18n_contract` and kept bounded to one coherent delivery slice.
 - Source file: `logics/request/req_165_migrate_runtime_text_translation_to_the_shared_semantic_key_i18n_contract.md`.
 - Generated locally by logics-manager.
+- Task `task_162_migrate_runtime_text_translation_to_the_shared_semantic_key_i18n_contract` was finished via `logics-manager flow finish task` on 2026-07-13.
 
 # Tasks
 - `task_162_migrate_runtime_text_translation_to_the_shared_semantic_key_i18n_contract`
