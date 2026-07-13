@@ -1,6 +1,6 @@
 ## prod_016_shared_connector_way_multi_wire_crimp - Shared connector way (multi-wire crimp)
 > Date: 2026-07-12
-> Status: Proposed
+> Status: Settled
 > Related request: `req_165_shared_connector_way_multi_wire_crimp_with_opt_in_overload_checkbox`
 > Related backlog: `item_665_core_model_array_occupancy_allowsharedcavity_flag_migration_and_portability`
 > Related task: `task_161_orchestrate_shared_connector_way_multi_wire_crimp`
