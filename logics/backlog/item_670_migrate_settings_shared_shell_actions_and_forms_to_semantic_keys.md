@@ -1,10 +1,10 @@
 ## item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys - Migrate settings, shared shell, actions, and forms to semantic keys
 > From version: 1.18.2
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 10%
 > Complexity: Medium
 > Theme: Internationalization contract adoption
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.

@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useRef, type ReactElement } from "react";
 import type { ConfirmDialogIntent } from "../../types/confirm-dialog";
 import { useModalDialog } from "../../hooks/useModalDialog";
@@ -26,7 +27,7 @@ export function ConfirmDialog({
   details,
   detailsLabel = "Filename",
   confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  cancelLabel = t("ui.cancel"),
   intent = "neutral",
   closeOnBackdrop = true,
   confirmOnEnter = false,

@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useState, type ReactElement } from "react";
 import type { CatalogItemId, Connector, ConnectorId, Splice, SpliceId } from "../../../core/entities";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
@@ -33,7 +34,7 @@ function CatalogUsageTableSection({
   rows: Array<Connector | Splice>;
   technicalIdLabel: string;
   onGoTo: (id: string) => void;
-  createLabel: "Create Connector" | "Create Splice";
+  createLabel: string;
   createIconClass: "is-connectors" | "is-splices";
   onCreate: () => void;
   linkedConnectorCount: number;
@@ -51,7 +52,8 @@ function CatalogUsageTableSection({
           className={`filter-chip${activeMode === "connectors" ? " is-active" : ""}`}
           onClick={() => setActiveMode("connectors")}
         >
-          Connectors
+          
+          {t("ui.connectors")}
           <span className="filter-chip-count">{linkedConnectorCount}</span>
         </button>
         <button
@@ -61,7 +63,8 @@ function CatalogUsageTableSection({
           className={`filter-chip${activeMode === "splices" ? " is-active" : ""}`}
           onClick={() => setActiveMode("splices")}
         >
-          Splices
+          
+          {t("ui.splices")}
           <span className="filter-chip-count">{linkedSpliceCount}</span>
         </button>
       </div>
@@ -89,9 +92,9 @@ function CatalogUsageTableSection({
       <table className="data-table catalog-usage-table">
         <thead>
           <tr>
-            <th>Name</th>
+            <th>{t("ui.name")}</th>
             <th>{technicalIdLabel}</th>
-            <th className="validation-actions-cell">Actions</th>
+            <th className="validation-actions-cell">{t("ui.actions")}</th>
           </tr>
         </thead>
         <tbody>
@@ -102,12 +105,12 @@ function CatalogUsageTableSection({
               <td className="validation-actions-cell">
                 <button
                   type="button"
-                  aria-label="Go to"
+                  aria-label={t("ui.goTo")}
                   className="validation-row-go-to-button button-with-icon"
                   onClick={() => onGoTo(row.id)}
                 >
                   <span className="action-button-icon is-open" aria-hidden="true" />
-                  <span className="catalog-usage-go-to-label">Go to</span>
+                  <span className="catalog-usage-go-to-label">{t("ui.goTo")}</span>
                 </button>
               </td>
             </tr>
@@ -152,8 +155,8 @@ export function CatalogAnalysisWorkspaceContent({
           activeMode={activeUsageMode}
           setActiveMode={setActiveUsageMode}
           rows={activeUsageRows}
-          technicalIdLabel={isMobileViewport ? "ID" : "Technical ID"}
-          createLabel={activeUsageMode === "connectors" ? "Create Connector" : "Create Splice"}
+          technicalIdLabel={isMobileViewport ? t("ui.id") : t("ui.technicalID")}
+          createLabel={activeUsageMode === "connectors" ? t("ui.createConnector") : t("ui.createSplice")}
           createIconClass={activeUsageMode === "connectors" ? "is-connectors" : "is-splices"}
           onCreate={() => {
             if (activeUsageMode === "connectors") {

@@ -29,7 +29,7 @@
       "settings": "Espace Paramètres : préférences de l’espace de travail et options du projet."
     }
   },
-  "legacy": {
+  "ui": {
     "home": "Accueil",
     "networkScope": "Périmètre réseau",
     "modeling": "Modélisation",
@@ -719,6 +719,16 @@
     "routeReset": "route réinitialisée",
     "lengthsOptimized": "longueurs optimisées",
     "viewUpdated": "vue mise à jour",
-    "workspaceStateReplaced": "État d'espace de travail remplacé"
+    "workspaceStateReplaced": "État d'espace de travail remplacé",
+    "round": "Rond",
+    "square": "Carré",
+    "slot": "Oblong",
+    "line": "Ligne",
+    "dashed": "Pointillé",
+    "smallHalfSize": "Petit (0,5 x)",
+    "bigDoubleSize": "Grand (2 x 2)",
+    "arrow": "Flèche",
+    "diamond": "Losange",
+    "circle": "Cercle"
   }
 }

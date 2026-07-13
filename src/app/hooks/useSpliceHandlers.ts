@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import { type FormEvent } from "react";
 import type { CatalogItemId, Splice, SpliceId, SplicePlacement } from "../../core/entities";
 import {
@@ -73,7 +74,7 @@ export function useSpliceHandlers({
 
   function setSpliceCapacityMode(nextMode: SplicePortMode): void {
     if (nextMode === "unbounded" && spliceCatalogItemId.trim().length > 0) {
-      setSpliceFormError("Clear catalog selection before switching splice capacity to unbounded.");
+      setSpliceFormError(t("ui.clearCatalogSelectionBeforeSwitchingSpliceCapacityToUnbounded"));
       return;
     }
 
@@ -81,7 +82,7 @@ export function useSpliceHandlers({
     setSpliceFormError(null);
     setSpliceFormInfo(
       nextMode === "unbounded"
-        ? "Unbounded mode allows any positive port index (∞)."
+        ? t("ui.unboundedModeAllowsAnyPositivePortIndex")
         : null
     );
   }
@@ -102,18 +103,18 @@ export function useSpliceHandlers({
     if (catalogItem === undefined) {
       setSpliceCatalogItemId(nextCatalogItemId);
       setSpliceManufacturerReference("");
-      setSpliceFormError("Selected catalog item is invalid.");
+      setSpliceFormError(t("ui.selectedCatalogItemIsInvalid"));
       setSpliceFormInfo(null);
       return;
     }
 
     if (spliceFormMode === "edit" && editingSpliceId !== null) {
       if (hasSpliceOccupancyIndexAboveLimit(store, editingSpliceId, catalogItem.connectionCount)) {
-        setSpliceFormError("Selected catalog item is incompatible: occupied port indexes exceed the catalog connection count.");
+        setSpliceFormError(t("ui.selectedCatalogItemIsIncompatibleOccupiedPortIndexesExceedThe"));
         return;
       }
       if (hasSpliceWireEndpointIndexAboveLimit(store, editingSpliceId, catalogItem.connectionCount)) {
-        setSpliceFormError("Selected catalog item is incompatible: wire endpoint port indexes exceed the catalog connection count.");
+        setSpliceFormError(t("ui.selectedCatalogItemIsIncompatibleWireEndpointPortIndexesExceed"));
         return;
       }
     }
@@ -125,7 +126,7 @@ export function useSpliceHandlers({
     setPortCount(nextPortMode === "directional" ? "2" : String(catalogItem.connectionCount));
     setSplicePortMode(nextPortMode);
     setSpliceFormError(null);
-    setSpliceFormInfo(switchedFromUnbounded ? "Catalog selection switched capacity mode to bounded." : null);
+    setSpliceFormInfo(switchedFromUnbounded ? t("ui.catalogSelectionSwitchedCapacityModeToBounded") : null);
   }
 
   function resetSpliceForm(): void {
@@ -219,7 +220,7 @@ export function useSpliceHandlers({
     const selectedCatalogItemId = toCatalogItemId(spliceCatalogItemId);
     const selectedCatalogItem = selectedCatalogItemId === null ? undefined : store.getState().catalogItems.byId[selectedCatalogItemId];
     if (selectedCatalogItemId !== null && selectedCatalogItem === undefined) {
-      setSpliceFormError("Selected catalog item is invalid.");
+      setSpliceFormError(t("ui.selectedCatalogItemIsInvalid"));
       return;
     }
 
@@ -234,11 +235,11 @@ export function useSpliceHandlers({
         ? selectedCatalogItem.connectionCount
         : Math.max(0, Math.trunc(Number(portCount)));
     if (trimmedName.length === 0 || trimmedTechnicalId.length === 0) {
-      setSpliceFormError("Splice name and technical ID are required.");
+      setSpliceFormError(t("ui.spliceNameAndTechnicalIDAreRequired"));
       return;
     }
     if (normalizedPortMode === "bounded" && (!Number.isInteger(normalizedPortCountRaw) || normalizedPortCountRaw < 1)) {
-      setSpliceFormError("Bounded splice port count must be an integer >= 1.");
+      setSpliceFormError(t("ui.boundedSplicePortCountMustBeAnInteger1"));
       return;
     }
     const selectedPlacementSegmentId = toSegmentId(splicePlacementSegmentId);
@@ -337,10 +338,10 @@ export function useSpliceHandlers({
 
       if (impact.kind === "direct") {
         const shouldDelete = await confirmAction({
-          title: "Delete splice",
+          title: t("ui.deleteSplice"),
           message: `Delete splice '${splice.name}' (${splice.technicalId})?`,
-          confirmLabel: "Delete",
-          cancelLabel: "Cancel",
+          confirmLabel: t("ui.delete"),
+          cancelLabel: t("ui.cancel"),
           intent: "danger",
           confirmOnEnter: true
         });
@@ -360,7 +361,7 @@ export function useSpliceHandlers({
           title: "Cascade delete splice",
           message: impact.message,
           confirmLabel: "Delete all",
-          cancelLabel: "Cancel",
+          cancelLabel: t("ui.cancel"),
           intent: "danger",
           confirmOnEnter: true,
           variant: "deleteCascade",
@@ -381,8 +382,8 @@ export function useSpliceHandlers({
       await confirmAction({
         title: "Splice delete blocked",
         message: impact.message,
-        confirmLabel: "Close",
-        cancelLabel: "Cancel",
+        confirmLabel: t("ui.close"),
+        cancelLabel: t("ui.cancel"),
         intent: "warning",
         variant: "deleteBlocked",
         summaryCategories: impact.categories,
@@ -412,7 +413,7 @@ export function useSpliceHandlers({
         title: "Convert splice to directional",
         message: `Convert splice '${splice.name}' (${splice.technicalId}) from numeric ports to automatic L/R sides? Existing wire endpoints will be reassigned from routing where possible and old manual port occupancy will be cleared.`,
         confirmLabel: "Convert",
-        cancelLabel: "Cancel",
+        cancelLabel: t("ui.cancel"),
         intent: "warning",
         confirmOnEnter: true
       });

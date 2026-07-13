@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import { useRef, useState, type ChangeEvent, type RefObject } from "react";
 import type { CatalogItem, CatalogItemId } from "../../core/entities";
 import type { AppState, AppStore } from "../../store";
@@ -56,7 +57,7 @@ export function useCatalogCsvImportExport({
     if (catalogItems.length === 0) {
       setCatalogCsvImportExportStatus({
         kind: "failed",
-        message: "No catalog item available for export."
+        message: t("ui.noCatalogItemAvailableForExport")
       });
       return;
     }
@@ -90,7 +91,7 @@ export function useCatalogCsvImportExport({
       openImportFailureDialog("Catalog CSV import failed", "Unable to read the selected CSV file.", [file.name]);
       setCatalogCsvImportExportStatus({
         kind: "failed",
-        message: "Unable to read selected catalog CSV file."
+        message: t("ui.unableToReadSelectedCatalogCSVFile")
       });
       resetInput();
       return;
@@ -110,7 +111,7 @@ export function useCatalogCsvImportExport({
         kind: "failed",
           message:
             firstError === undefined
-              ? "Catalog CSV import failed due to validation errors."
+              ? t("ui.catalogCSVImportFailedDueToValidationErrors")
               : `Catalog CSV import failed at row ${firstError.rowNumber}: ${firstError.message}`
       });
       setCatalogCsvLastImportSummaryLine(
@@ -125,8 +126,8 @@ export function useCatalogCsvImportExport({
         kind: warningCount > 0 ? "partial" : "failed",
         message:
           warningCount > 0
-            ? "Catalog CSV contains no importable row after warnings."
-            : "Catalog CSV contains no data row."
+            ? t("ui.catalogCSVContainsNoImportableRowAfterWarnings")
+            : t("ui.catalogCSVContainsNoDataRow")
       });
       setCatalogCsvLastImportSummaryLine(`Catalog CSV import skipped (${file.name}): no row imported.`);
       resetInput();
@@ -139,14 +140,14 @@ export function useCatalogCsvImportExport({
     );
     if (catalogItemsBeforeConfirmation.length > 0) {
       const shouldContinue = await requestConfirmation({
-        title: "Import catalog CSV",
+        title: t("ui.importCatalogCSV"),
         message: `Import ${parsed.rows.length} catalog row(s) into the current catalog? Existing items are matched by manufacturer reference.`,
         intent: "warning"
       });
       if (!shouldContinue) {
         setCatalogCsvImportExportStatus({
           kind: "failed",
-          message: "Catalog CSV import canceled."
+          message: t("ui.catalogCSVImportCanceled")
         });
         resetInput();
         return;
@@ -173,7 +174,7 @@ export function useCatalogCsvImportExport({
           kind: "failed",
           message: `Catalog import blocked: existing catalog has duplicate manufacturer reference '${item.manufacturerReference}'.`
         });
-        setCatalogCsvLastImportSummaryLine("Catalog CSV import aborted: resolve existing catalog duplicate references first.");
+        setCatalogCsvLastImportSummaryLine(t("ui.catalogCSVImportAbortedResolveExistingCatalogDuplicateReferencesFirst"));
         resetInput();
         return;
       }
@@ -203,7 +204,7 @@ export function useCatalogCsvImportExport({
         );
         setCatalogCsvImportExportStatus({
           kind: "failed",
-          message: "Catalog import failed: invalid manufacturer reference."
+          message: t("ui.catalogImportFailedInvalidManufacturerReference")
         });
         setCatalogCsvLastImportSummaryLine(
           `Catalog CSV import aborted after ${createdCount + updatedCount} row(s); ${warningCount} warnings in file.`

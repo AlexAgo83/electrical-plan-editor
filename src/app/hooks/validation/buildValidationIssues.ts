@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type {
   CatalogItem,
   Connector,
@@ -31,7 +32,6 @@ import {
 } from "../../lib/app-utils-networking";
 import type { ValidationIssue } from "../../types/app-controller";
 import { appendElectricalDimensioningIssues } from "./appendElectricalDimensioningIssues";
-
 type AppState = ReturnType<AppStore["getState"]>;
 
 interface BuildValidationIssuesParams {
@@ -64,7 +64,7 @@ export function buildValidationIssues({
   spliceSectionImbalanceRatioPercent
 }: BuildValidationIssuesParams): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
-  const catalogIntegrityCategory = "Catalog integrity";
+  const catalogIntegrityCategory = t("ui.catalogIntegrity");
 
   // A connector way can legitimately hold several occupants (a shared / multi-wire
   // crimp). Track every expected occupant plus whether any endpoint opted in via
@@ -171,7 +171,7 @@ export function buildValidationIssues({
       issues.push({
         id: `occupancy-duplicate-splice-${key}`,
         severity: "error",
-        category: "Occupancy conflict",
+        category: t("ui.occupancyConflict"),
         message: `Splice port ${endpoint.spliceId}/P${endpoint.portIndex} has multiple wire assignments.`,
         subScreen: "splice",
         selectionKind: "splice",
@@ -188,7 +188,7 @@ export function buildValidationIssues({
       issues.push({
         id: `node-missing-connector-${node.id}`,
         severity: "error",
-        category: "Missing reference",
+        category: t("ui.missingReference"),
         message: `Node '${node.id}' references missing connector '${node.connectorId}'.`,
         subScreen: "node",
         selectionKind: "node",
@@ -200,7 +200,7 @@ export function buildValidationIssues({
       issues.push({
         id: `node-missing-splice-${node.id}`,
         severity: "error",
-        category: "Missing reference",
+        category: t("ui.missingReference"),
         message: `Node '${node.id}' references missing splice '${node.spliceId}'.`,
         subScreen: "node",
         selectionKind: "node",
@@ -212,7 +212,7 @@ export function buildValidationIssues({
       issues.push({
         id: `node-missing-backshell-connector-${node.id}`,
         severity: "error",
-        category: "Missing reference",
+        category: t("ui.missingReference"),
         message: `Backshell helper node '${node.id}' references missing connector '${node.connectorId}'.`,
         subScreen: "node",
         selectionKind: "node",
@@ -224,7 +224,7 @@ export function buildValidationIssues({
       issues.push({
         id: `node-missing-label-${node.id}`,
         severity: "error",
-        category: "Incomplete required fields",
+        category: t("ui.incompleteRequiredFields"),
         message: `Intermediate node '${node.id}' is missing its label.`,
         subScreen: "node",
         selectionKind: "node",
@@ -238,7 +238,7 @@ export function buildValidationIssues({
       issues.push({
         id: `segment-missing-node-${segment.id}`,
         severity: "error",
-        category: "Missing reference",
+        category: t("ui.missingReference"),
         message: `Segment '${segment.id}' has an endpoint that is no longer available.`,
         subScreen: "segment",
         selectionKind: "segment",
@@ -250,7 +250,7 @@ export function buildValidationIssues({
       issues.push({
         id: `segment-invalid-length-${segment.id}`,
         severity: "error",
-        category: "Incomplete required fields",
+        category: t("ui.incompleteRequiredFields"),
         message: `Segment '${segment.id}' must have a length >= 1 mm.`,
         subScreen: "segment",
         selectionKind: "segment",
@@ -264,7 +264,7 @@ export function buildValidationIssues({
       issues.push({
         id: `connector-required-fields-${connector.id}`,
         severity: "error",
-        category: "Incomplete required fields",
+        category: t("ui.incompleteRequiredFields"),
         message: `Connector '${connector.id}' is missing required fields or has invalid way count.`,
         subScreen: "connector",
         selectionKind: "connector",
@@ -386,7 +386,7 @@ export function buildValidationIssues({
       issues.push({
         id: `splice-required-fields-${splice.id}`,
         severity: "error",
-        category: "Incomplete required fields",
+        category: t("ui.incompleteRequiredFields"),
         message: `Splice '${splice.id}' is missing required fields or has invalid bounded port count.`,
         subScreen: "splice",
         selectionKind: "splice",
@@ -510,7 +510,7 @@ export function buildValidationIssues({
       issues.push({
         id: `wire-missing-connector-a-${wire.id}`,
         severity: "error",
-        category: "Missing reference",
+        category: t("ui.missingReference"),
         message: `Wire '${wire.technicalId}' endpoint A references missing connector '${wire.endpointA.connectorId}'.`,
         subScreen: "wire",
         selectionKind: "wire",
@@ -521,7 +521,7 @@ export function buildValidationIssues({
       issues.push({
         id: `wire-missing-splice-a-${wire.id}`,
         severity: "error",
-        category: "Missing reference",
+        category: t("ui.missingReference"),
         message: `Wire '${wire.technicalId}' endpoint A references missing splice '${wire.endpointA.spliceId}'.`,
         subScreen: "wire",
         selectionKind: "wire",
@@ -532,7 +532,7 @@ export function buildValidationIssues({
       issues.push({
         id: `wire-missing-connector-b-${wire.id}`,
         severity: "error",
-        category: "Missing reference",
+        category: t("ui.missingReference"),
         message: `Wire '${wire.technicalId}' endpoint B references missing connector '${wire.endpointB.connectorId}'.`,
         subScreen: "wire",
         selectionKind: "wire",
@@ -543,7 +543,7 @@ export function buildValidationIssues({
       issues.push({
         id: `wire-missing-splice-b-${wire.id}`,
         severity: "error",
-        category: "Missing reference",
+        category: t("ui.missingReference"),
         message: `Wire '${wire.technicalId}' endpoint B references missing splice '${wire.endpointB.spliceId}'.`,
         subScreen: "wire",
         selectionKind: "wire",
@@ -555,7 +555,7 @@ export function buildValidationIssues({
       issues.push({
         id: `wire-required-fields-${wire.id}`,
         severity: "error",
-        category: "Incomplete required fields",
+        category: t("ui.incompleteRequiredFields"),
         message: `Wire '${wire.id}' is missing required name or technical ID.`,
         subScreen: "wire",
         selectionKind: "wire",
@@ -572,7 +572,7 @@ export function buildValidationIssues({
         issues.push({
           id: `wire-endpoint-a-connector-out-of-range-${wire.id}`,
           severity: "error",
-          category: "Incomplete required fields",
+          category: t("ui.incompleteRequiredFields"),
           message: `Wire '${wire.technicalId}' endpoint A connector way index is out of range.`,
           subScreen: "wire",
           selectionKind: "wire",
@@ -585,7 +585,7 @@ export function buildValidationIssues({
         issues.push({
           id: `wire-endpoint-a-splice-out-of-range-${wire.id}`,
           severity: "error",
-          category: "Incomplete required fields",
+          category: t("ui.incompleteRequiredFields"),
           message: `Wire '${wire.technicalId}' endpoint A splice port index is out of range.`,
           subScreen: "wire",
           selectionKind: "wire",
@@ -599,7 +599,7 @@ export function buildValidationIssues({
         issues.push({
           id: `wire-endpoint-b-connector-out-of-range-${wire.id}`,
           severity: "error",
-          category: "Incomplete required fields",
+          category: t("ui.incompleteRequiredFields"),
           message: `Wire '${wire.technicalId}' endpoint B connector way index is out of range.`,
           subScreen: "wire",
           selectionKind: "wire",
@@ -612,7 +612,7 @@ export function buildValidationIssues({
         issues.push({
           id: `wire-endpoint-b-splice-out-of-range-${wire.id}`,
           severity: "error",
-          category: "Incomplete required fields",
+          category: t("ui.incompleteRequiredFields"),
           message: `Wire '${wire.technicalId}' endpoint B splice port index is out of range.`,
           subScreen: "wire",
           selectionKind: "wire",
@@ -625,7 +625,7 @@ export function buildValidationIssues({
       issues.push({
         id: `wire-empty-route-${wire.id}`,
         severity: wire.isRouteLocked ? "error" : "warning",
-        category: "Route lock validity",
+        category: t("ui.routeLockValidity"),
         message: wire.isRouteLocked
           ? `Wire '${wire.technicalId}' is route-locked but has no segment in its forced route.`
           : `Wire '${wire.technicalId}' currently has an empty auto-route.`,
@@ -640,7 +640,7 @@ export function buildValidationIssues({
       issues.push({
         id: `wire-missing-route-segment-${wire.id}`,
         severity: "error",
-        category: "Route lock validity",
+        category: t("ui.routeLockValidity"),
         message: `Wire '${wire.technicalId}' route references missing segments: ${missingRouteSegmentIds.join(", ")}.`,
         subScreen: "wire",
         selectionKind: "wire",
@@ -653,7 +653,7 @@ export function buildValidationIssues({
         issues.push({
           id: `wire-locked-route-missing-endpoint-node-${wire.id}`,
           severity: "error",
-          category: "Route lock validity",
+          category: t("ui.routeLockValidity"),
           message: `Wire '${wire.technicalId}' is route-locked but at least one endpoint node is missing.`,
           subScreen: "wire",
           selectionKind: "wire",
@@ -663,7 +663,7 @@ export function buildValidationIssues({
         issues.push({
           id: `wire-locked-route-invalid-chain-${wire.id}`,
           severity: "error",
-          category: "Route lock validity",
+          category: t("ui.routeLockValidity"),
           message: `Wire '${wire.technicalId}' has an invalid forced route chain between its endpoints.`,
           subScreen: "wire",
           selectionKind: "wire",
@@ -728,7 +728,7 @@ export function buildValidationIssues({
         ? {
             id: `connector-shared-way-${connectorId}-${cavityIndex}`,
             severity: "warning",
-            category: "Occupancy conflict",
+            category: t("ui.occupancyConflict"),
             message: `Connector way ${connectorId}/C${cavityIndex} is a shared way (${entry.refs.length} wires crimped together).`,
             subScreen: "connector",
             selectionKind: "connector",
@@ -737,7 +737,7 @@ export function buildValidationIssues({
         : {
             id: `occupancy-duplicate-connector-${connectorId}:${cavityIndex}`,
             severity: "error",
-            category: "Occupancy conflict",
+            category: t("ui.occupancyConflict"),
             message: `Connector way ${connectorId}/C${cavityIndex} has multiple wire assignments.`,
             subScreen: "connector",
             selectionKind: "connector",
@@ -763,7 +763,7 @@ export function buildValidationIssues({
           issues.push({
             id: `connector-manual-occupancy-${typedConnectorId}-${cavityIndex}-${occupantRef}`,
             severity: "warning",
-            category: "Occupancy conflict",
+            category: t("ui.occupancyConflict"),
             message: `Connector '${typedConnectorId}' way C${cavityIndex} is occupied by '${occupantRef}' without linked wire endpoint.`,
             subScreen: "connector",
             selectionKind: "connector",
@@ -777,7 +777,7 @@ export function buildValidationIssues({
           issues.push({
             id: `connector-occupancy-missing-wire-${typedConnectorId}-${cavityIndex}-${occupantRef}`,
             severity: "error",
-            category: "Occupancy conflict",
+            category: t("ui.occupancyConflict"),
             message: `Connector '${typedConnectorId}' way C${cavityIndex} references unknown wire '${parsed.wireId}'.`,
             subScreen: "connector",
             selectionKind: "connector",
@@ -802,7 +802,7 @@ export function buildValidationIssues({
         issues.push({
           id: `splice-manual-occupancy-${typedSpliceId}-${portIndex}`,
           severity: "warning",
-          category: "Occupancy conflict",
+          category: t("ui.occupancyConflict"),
           message: `Splice '${typedSpliceId}' port P${portIndex} is occupied by '${occupantRef}' without linked wire endpoint.`,
           subScreen: "splice",
           selectionKind: "splice",
@@ -815,7 +815,7 @@ export function buildValidationIssues({
         issues.push({
           id: `splice-occupancy-mismatch-${typedSpliceId}-${portIndex}`,
           severity: "error",
-          category: "Occupancy conflict",
+          category: t("ui.occupancyConflict"),
           message: `Splice '${typedSpliceId}' port P${portIndex} occupancy mismatch ('${occupantRef}' vs expected '${expectedRef}').`,
           subScreen: "splice",
           selectionKind: "splice",
@@ -828,7 +828,7 @@ export function buildValidationIssues({
         issues.push({
           id: `splice-occupancy-missing-wire-${typedSpliceId}-${portIndex}`,
           severity: "error",
-          category: "Occupancy conflict",
+          category: t("ui.occupancyConflict"),
           message: `Splice '${typedSpliceId}' port P${portIndex} references unknown wire '${parsed.wireId}'.`,
           subScreen: "splice",
           selectionKind: "splice",
@@ -850,7 +850,7 @@ export function buildValidationIssues({
       issues.push({
         id: `connector-expected-occupancy-missing-${connectorId}-${cavityIndex}-${expectedRef}`,
         severity: "error",
-        category: "Occupancy conflict",
+        category: t("ui.occupancyConflict"),
         message: `Connector '${connectorId}' way C${cavityIndex} should be occupied by '${expectedRef}' but is not.`,
         subScreen: "connector",
         selectionKind: "connector",
@@ -871,7 +871,7 @@ export function buildValidationIssues({
     issues.push({
       id: `splice-expected-occupancy-missing-${spliceId}-${portIndex}`,
       severity: "error",
-      category: "Occupancy conflict",
+      category: t("ui.occupancyConflict"),
       message: `Splice '${spliceId}' port P${portIndex} should be occupied by '${expectedRef}' but current occupancy is '${actualRef ?? "none"}'.`,
       subScreen: "splice",
       selectionKind: "splice",

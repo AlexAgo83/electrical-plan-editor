@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { FormEvent, ReactElement } from "react";
 import { createDefaultConnectorLayout } from "../../../core/connectorLayout";
 import type { CatalogAdditionalAccessory, ConnectorLayout } from "../../../core/entities";
@@ -132,7 +133,7 @@ export function ModelingCatalogFormPanel({
   const hasUrlValidationError = catalogUrl.trim().length > 0 && !isValidCatalogUrlInput(catalogUrl);
   const showPanel = isCatalogSubScreen && catalogFormMode !== "idle";
   const catalogSubmitDisabled = catalogManufacturerReferenceAlreadyUsed || hasUrlValidationError;
-  const catalogSubmitLabel = catalogFormMode === "create" ? "Create" : "Save";
+  const catalogSubmitLabel = catalogFormMode === "create" ? t("ui.create") : t("ui.save");
 
   if (!showPanel) {
     return null;
@@ -173,7 +174,7 @@ export function ModelingCatalogFormPanel({
         data-form-panel={FORM_PANEL_IDS.catalog}
       >
         {renderFormHeader(
-          catalogFormMode === "create" ? "Create catalog item" : "Edit catalog item",
+          catalogFormMode === "create" ? t("ui.createCatalogItem") : t("ui.editCatalogItem"),
           catalogFormMode
         )}
         {catalogFormMode === "create" && catalogCopySourceOptions.length > 0 ? (
@@ -199,20 +200,22 @@ export function ModelingCatalogFormPanel({
           </label>
         ) : null}
         <label>
-          Manufacturer reference
+          
+          {t("ui.manufacturerReference")}
           <input
             value={catalogManufacturerReference}
             onChange={(event) => setCatalogManufacturerReference(event.target.value)}
-            placeholder="e.g. TE-1-967616-1"
+            placeholder={t("ui.eGTE19676161")}
             maxLength={120}
             required
           />
         </label>
         {catalogManufacturerReferenceAlreadyUsed ? (
-          <small className="inline-error">This manufacturer reference is already used in this network catalog.</small>
+          <small className="inline-error">{t("ui.thisManufacturerReferenceIsAlreadyUsedInThisNetworkCatalog")}</small>
         ) : null}
         <label>
-          Connection count
+          
+          {t("ui.connectionCount")}
           <input
             type="number"
             min={1}
@@ -235,12 +238,13 @@ export function ModelingCatalogFormPanel({
             Auto pairs:{" "}
             {Array.from({ length: Math.floor(Number(catalogConnectionCount) / 2) || 0 }, (_, i) =>
               `(${i * 2 + 1}↔${i * 2 + 2})`
-            ).join(", ") || "(none)"}
+            ).join(", ") || t("ui.none2")}
           </small>
         ) : null}
         <label>
-          Name
-          <input value={catalogName} onChange={(event) => setCatalogName(event.target.value)} placeholder="Optional display name" />
+          
+          {t("ui.name")}
+          <input value={catalogName} onChange={(event) => setCatalogName(event.target.value)} placeholder={t("ui.optionalDisplayName")} />
         </label>
         <label>
           {`Unit price (excl. tax) [${workspaceCurrencyCode}]`}
@@ -250,7 +254,7 @@ export function ModelingCatalogFormPanel({
             step={0.01}
             value={catalogUnitPriceExclTax}
             onChange={(event) => setCatalogUnitPriceExclTax(event.target.value)}
-            placeholder="Optional"
+            placeholder={t("ui.optional")}
             inputMode="decimal"
           />
         </label>
@@ -263,7 +267,7 @@ export function ModelingCatalogFormPanel({
             placeholder="https://example.com/product"
           />
         </label>
-        {hasUrlValidationError ? <small className="inline-error">Use an absolute http/https URL.</small> : null}
+        {hasUrlValidationError ? <small className="inline-error">{t("ui.useAnAbsoluteHttpHttpsURL")}</small> : null}
         {catalogUrl.trim().length > 0 && !hasUrlValidationError ? (
           <div className="row-actions compact">
             <a
@@ -273,7 +277,8 @@ export function ModelingCatalogFormPanel({
               rel="noopener noreferrer"
             >
               <span className="action-button-icon is-open" aria-hidden="true" />
-              Open link
+              
+              {t("ui.openLink")}
             </a>
           </div>
         ) : null}
@@ -357,7 +362,7 @@ export function ModelingCatalogFormPanel({
           {renderCatalogSubmitButton()}
           <button type="button" className={catalogFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelCatalogEdit}>
             {catalogFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
-            {catalogFormMode === "edit" ? "Cancel edit" : "Cancel"}
+            {catalogFormMode === "edit" ? t("ui.cancelEdit") : t("ui.cancel")}
           </button>
         </div>
         {renderCatalogFormError()}
@@ -390,8 +395,8 @@ export function ModelingCatalogFormPanel({
             {catalogAdditionalAccessories.length > 0 ? (
               <div className="catalog-accessory-row catalog-accessory-row-header" aria-hidden="true">
                 <span />
-                <span>Reference</span>
-                <span>Name</span>
+                <span>{t("ui.reference")}</span>
+                <span>{t("ui.name")}</span>
                 <span />
               </div>
             ) : null}
@@ -414,7 +419,7 @@ export function ModelingCatalogFormPanel({
                     aria-label="Accessory reference"
                     value={accessory.accessoryReference}
                     onChange={(event) => updateAdditionalAccessory(index, { accessoryReference: event.target.value })}
-                    placeholder="Reference"
+                    placeholder={t("ui.reference")}
                     maxLength={120}
                   />
                 </label>
@@ -426,7 +431,7 @@ export function ModelingCatalogFormPanel({
                     aria-label="Accessory name"
                     value={accessory.accessoryName ?? ""}
                     onChange={(event) => updateAdditionalAccessory(index, { accessoryName: event.target.value })}
-                    placeholder="Name"
+                    placeholder={t("ui.name")}
                   />
                 </label>
                 <button

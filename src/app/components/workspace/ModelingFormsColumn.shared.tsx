@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 
 export type ModelingFormMode = "idle" | "create" | "edit";
@@ -15,7 +16,7 @@ export function renderFormHeader(title: string, mode: ModelingFormMode): ReactEl
               : "network-form-mode-chip"
         }
       >
-        {mode === "create" ? "Create mode" : mode === "edit" ? "Edit mode" : "Idle"}
+        {mode === "create" ? t("ui.createMode") : mode === "edit" ? t("ui.editMode") : t("ui.idle")}
       </span>
     </header>
   );
@@ -29,7 +30,8 @@ export function renderIdleCopy(entityLabel: string, onCreate: () => void): React
       <div className="row-actions compact idle-panel-actions">
         <button type="button" className="button-with-icon" onClick={onCreate}>
           <span className="action-button-icon is-new" aria-hidden="true" />
-          Create
+          
+          {t("ui.create")}
         </button>
       </div>
     </>

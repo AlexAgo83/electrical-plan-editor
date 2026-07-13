@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useMemo, useState, type ReactElement } from "react";
 import type { NetworkId } from "../../../core/entities";
 import type { AppState, NetworkScopedState } from "../../../store";
@@ -119,9 +120,9 @@ function ComparisonTable({ rows }: { rows: PerNetworkStatistics[] }): ReactEleme
           <thead>
             <tr>
               <th>Network</th>
-              <th>Connectors</th>
-              <th>Splices</th>
-              <th>Wires</th>
+              <th>{t("ui.connectors")}</th>
+              <th>{t("ui.splices")}</th>
+              <th>{t("ui.wires")}</th>
               <th>Total length</th>
               <th>Connector occupancy</th>
             </tr>
@@ -224,7 +225,7 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
         </div>
         {scopeMode === "manual" ? (
           <div className="statistics-manual-selection">
-            <h3>Networks</h3>
+            <h3>{t("ui.networks")}</h3>
             <div className="statistics-network-list">
               {networks.map((network) => (
                 <label
@@ -258,9 +259,9 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
           <section className="panel statistics-summary-panel">
             <h2>Summary</h2>
             <div className="summary-grid">
-              <KpiTile label="Connectors" value={formatCount(stats.aggregate.counts.connectors)} />
-              <KpiTile label="Splices" value={formatCount(stats.aggregate.counts.splices)} />
-              <KpiTile label="Wires" value={formatCount(stats.aggregate.counts.wires)} />
+              <KpiTile label={t("ui.connectors")} value={formatCount(stats.aggregate.counts.connectors)} />
+              <KpiTile label={t("ui.splices")} value={formatCount(stats.aggregate.counts.splices)} />
+              <KpiTile label={t("ui.wires")} value={formatCount(stats.aggregate.counts.wires)} />
               <KpiTile
                 label="Physical length"
                 value={
@@ -323,9 +324,9 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Wire</th>
+                    <th>{t("ui.wire")}</th>
                     <th>Network</th>
-                    <th>Length</th>
+                    <th>{t("ui.length")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -365,7 +366,7 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>Connector</th>
+                    <th>{t("ui.connector")}</th>
                     <th>Network</th>
                     <th>Unused ways</th>
                     <th>Total ways</th>

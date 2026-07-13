@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import {
   useCallback,
   useEffect,
@@ -190,7 +191,7 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
 
   const networkSvgRef = useRef<SVGSVGElement | null>(null);
   const networkCanvasShellRef = useRef<HTMLDivElement | null>(null);
-  const graphStats = [{ label: "Graph nodes", value: routingGraphNodeCount }, { label: "Graph segments", value: routingGraphSegmentCount }, { label: "Adjacency entries", value: totalEdgeEntries }];
+  const graphStats = [{ label: t("ui.graphNodes"), value: routingGraphNodeCount }, { label: t("ui.graphSegments"), value: routingGraphSegmentCount }, { label: t("ui.adjacencyEntries"), value: totalEdgeEntries }];
   const dialogThemeHostClassName = ["app-shell", ...getThemeClassNames(themeMode)].join(" ");
   const globalRenderScale = 1 + clampNumber(globalRenderScalePercent, 0, 300) / 100;
   const effectiveScale = networkScale > 0 ? networkScale : 1;
@@ -274,7 +275,7 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
     const byId = new Map<SegmentId, string>();
     for (const segment of segments) {
       const normalizedTag = segment.subNetworkTag?.trim();
-      byId.set(segment.id, normalizedTag === undefined || normalizedTag.length === 0 ? "(default)" : normalizedTag);
+      byId.set(segment.id, normalizedTag === undefined || normalizedTag.length === 0 ? t("ui.default3") : normalizedTag);
     }
     return byId;
   }, [segments]);
@@ -284,7 +285,7 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
       byNodeId.set(node.id, false);
     }
     for (const segment of segments) {
-      const tag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
+      const tag = segmentSubNetworkTagById.get(segment.id) ?? t("ui.default3");
       if (!activeSubNetworkTags.has(tag)) {
         continue;
       }

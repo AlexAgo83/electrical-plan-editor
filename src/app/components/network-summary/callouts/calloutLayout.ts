@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../../lib/i18n";
 import type { ConnectorId, ConnectorLayout, NodeId, SpliceId } from "../../../../core/entities";
 import type { CanvasCalloutTextSize, NetworkCalloutContentMode, NodePosition } from "../../../types/app-controller";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
@@ -421,14 +422,14 @@ export function buildCalloutLayoutMetrics(
     textAnchor: "start" | "end";
   }> = [
     { key: "pin", header: "Pin", textAnchor: "start" },
-    { key: "technicalId", header: "Wire ID", textAnchor: "start" },
-    { key: "color", header: "Color", textAnchor: "start" },
-    { key: "targetId", header: "End ID", textAnchor: "start" },
+    { key: "technicalId", header: t("ui.wireID"), textAnchor: "start" },
+    { key: "color", header: t("ui.color"), textAnchor: "start" },
+    { key: "targetId", header: t("ui.endID"), textAnchor: "start" },
     { key: "targetPin", header: "PIN", textAnchor: "start" },
     ...(showCalloutWireNames
-      ? ([{ key: "wireName", header: "Wire name", textAnchor: "start" }] as const)
+      ? ([{ key: "wireName", header: t("ui.wireName"), textAnchor: "start" }] as const)
       : []),
-    { key: "length", header: "Length", textAnchor: "end" },
+    { key: "length", header: t("ui.length"), textAnchor: "end" },
     { key: "section", header: "Section", textAnchor: "end" }
   ];
 

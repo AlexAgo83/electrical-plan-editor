@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useId, useState, type ReactElement } from "react";
 import type { NetworkNode, NodeId } from "../../../core/entities";
 import type { ShortestRouteResult } from "../../../core/pathfinding";
@@ -58,7 +59,7 @@ export function NetworkRoutePreviewPanel({
   return (
     <section className="panel route-preview-panel">
       <div className="route-preview-panel-header">
-        <h2>Route preview</h2>
+        <h2>{t("ui.routePreview")}</h2>
         <button
           type="button"
           className="filter-chip route-preview-panel-toggle"
@@ -76,7 +77,7 @@ export function NetworkRoutePreviewPanel({
             className={isExpanded ? "route-preview-panel-toggle-icon is-collapse" : "route-preview-panel-toggle-icon"}
             aria-hidden="true"
           />
-          {isExpanded ? "Collapse" : "Expand"}
+          {isExpanded ? t("ui.collapse") : t("ui.expand")}
         </button>
       </div>
 
@@ -84,9 +85,9 @@ export function NetworkRoutePreviewPanel({
         <div id={panelBodyId} className="route-preview-panel-body">
           <form className="row-form network-route-form route-preview-form">
             <label className="route-preview-field">
-              <span className="route-preview-label">Start node</span>
+              <span className="route-preview-label">{t("ui.startNode")}</span>
               <select value={routePreviewStartNodeId} onChange={(event) => setRoutePreviewStartNodeId(event.target.value)}>
-                <option value="">Select node</option>
+                <option value="">{t("ui.selectNode")}</option>
                 {nodes.map((node) => (
                   <option key={node.id} value={node.id}>
                     {describeNode(node)}
@@ -96,9 +97,9 @@ export function NetworkRoutePreviewPanel({
             </label>
 
             <label className="route-preview-field">
-              <span className="route-preview-label">End node</span>
+              <span className="route-preview-label">{t("ui.endNode")}</span>
               <select value={routePreviewEndNodeId} onChange={(event) => setRoutePreviewEndNodeId(event.target.value)}>
-                <option value="">Select node</option>
+                <option value="">{t("ui.selectNode")}</option>
                 {nodes.map((node) => (
                   <option key={node.id} value={node.id}>
                     {describeNode(node)}
@@ -110,57 +111,57 @@ export function NetworkRoutePreviewPanel({
 
           <div className="route-preview-selection-strip" aria-live="polite">
             <article>
-              <span>Start</span>
-              <strong>{selectedStartNode === null ? "Select node" : describeNode(selectedStartNode)}</strong>
+              <span>{t("ui.start")}</span>
+              <strong>{selectedStartNode === null ? t("ui.selectNode") : describeNode(selectedStartNode)}</strong>
             </article>
             <span className="route-preview-selection-arrow" aria-hidden="true">
               →
             </span>
             <article>
-              <span>End</span>
-              <strong>{selectedEndNode === null ? "Select node" : describeNode(selectedEndNode)}</strong>
+              <span>{t("ui.end")}</span>
+              <strong>{selectedEndNode === null ? t("ui.selectNode") : describeNode(selectedEndNode)}</strong>
             </article>
           </div>
 
           {hasRouteSelection ? (
             routePreview === null ? (
-              <p className="route-preview-empty">No route currently exists between the selected start and end nodes.</p>
+              <p className="route-preview-empty">{t("ui.noRouteCurrentlyExistsBetweenTheSelectedStartAndEnd")}</p>
             ) : (
               <div className="route-preview-results">
                 <div className="route-preview-status-line">
-                  <span className="route-preview-status-chip">Route found</span>
-                  <p>Shortest path computed from current selection.</p>
+                  <span className="route-preview-status-chip">{t("ui.routeFound")}</span>
+                  <p>{t("ui.shortestPathComputedFromCurrentSelection")}</p>
                 </div>
                 <div className="route-preview-metrics">
                   <article>
-                    <span>Length</span>
+                    <span>{t("ui.length")}</span>
                     <strong>{routePreview.totalLengthMm} mm</strong>
                   </article>
                   <article>
-                    <span>Segments</span>
+                    <span>{t("ui.segments")}</span>
                     <strong>{routePreview.segmentIds.length}</strong>
                   </article>
                   <article>
-                    <span>Nodes</span>
+                    <span>{t("ui.nodes")}</span>
                     <strong>{routePreview.nodeIds.length}</strong>
                   </article>
                 </div>
                 <div className="route-preview-path-grid">
                   <article>
-                    <h4>Segments path</h4>
+                    <h4>{t("ui.segmentsPath")}</h4>
                     <p className="route-preview-path">
-                      {routePreview.segmentIds.length === 0 ? "(none)" : routePreview.segmentIds.join(" -> ")}
+                      {routePreview.segmentIds.length === 0 ? t("ui.none2") : routePreview.segmentIds.join(" -> ")}
                     </p>
                   </article>
                   <article>
-                    <h4>Nodes path</h4>
+                    <h4>{t("ui.nodesPath")}</h4>
                     <p className="route-preview-path">{routePreview.nodeIds.join(" -> ")}</p>
                   </article>
                 </div>
               </div>
             )
           ) : (
-            <p className="route-preview-empty">Select start and end nodes to preview shortest path routing.</p>
+            <p className="route-preview-empty">{t("ui.selectStartAndEndNodesToPreviewShortestPathRouting")}</p>
           )}
         </div>
       ) : null}

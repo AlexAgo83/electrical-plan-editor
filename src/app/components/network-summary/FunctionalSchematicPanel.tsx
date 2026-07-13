@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { logPerfDuration } from "../../lib/perfDebug";
 import type { CatalogItem, Connector, ConnectorId, Network, Segment, Splice, SpliceId, Wire } from "../../../core/entities";
@@ -86,7 +87,7 @@ function getFunctionalWireColorTitleLabel(wireColorInput: WireColorPresentationI
     return null;
   }
   const label = getWireColorLabel(wireColorInput);
-  return label === "No color" || label === "Free color (unspecified)" ? null : label;
+  return label === t("ui.noColor") || label === "Free color (unspecified)" ? null : label;
 }
 
 interface FunctionalEdgeRenderModel {
@@ -993,7 +994,8 @@ function FunctionalSchematicPanelComponent({
             onClick={() => setShowGrid((current) => !current)}
           >
             <span className="network-summary-grid-icon" aria-hidden="true" />
-            Grid
+            
+            {t("ui.grid")}
           </button>
           <button
             type="button"
@@ -1027,7 +1029,8 @@ function FunctionalSchematicPanelComponent({
           {onOpenOnboardingHelp === undefined ? null : (
             <button type="button" className="workspace-tab onboarding-help-button" onClick={onOpenOnboardingHelp}>
               <span className="action-button-icon is-help" aria-hidden="true" />
-              Help
+              
+              {t("ui.help")}
             </button>
           )}
         </div>
@@ -1042,7 +1045,7 @@ function FunctionalSchematicPanelComponent({
             aria-pressed={filter === activeFilter}
             onClick={() => setActiveFilter(filter)}
           >
-            {filter === "all" ? "All" : filter}
+            {filter === "all" ? t("ui.all") : filter}
           </button>
         ))}
       </div>

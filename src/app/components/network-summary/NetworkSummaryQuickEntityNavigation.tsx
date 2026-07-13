@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 import { getCountedNavigationAriaLabel, getCountedNavigationLabel } from "../../lib/compactNavigationLabel";
 import type { SubScreenId } from "../../types/app-controller";
@@ -16,22 +17,22 @@ interface NetworkSummaryQuickEntityNavigationProps {
 
 const QUICK_ENTITY_NAV_ITEMS: Record<
   NetworkSummaryQuickEntityNavigationProps["quickEntityNavigationMode"],
-  ReadonlyArray<{ subScreen: SubScreenId; label: string }>
+  ReadonlyArray<{ subScreen: SubScreenId; labelKey: string }>
 > = {
   modeling: [
-    { subScreen: "catalog", label: "Catalog" },
-    { subScreen: "connector", label: "Connectors" },
-    { subScreen: "splice", label: "Splices" },
-    { subScreen: "node", label: "Nodes" },
-    { subScreen: "segment", label: "Segments" },
-    { subScreen: "wire", label: "Wires" }
+    { subScreen: "catalog", labelKey: "ui.catalog" },
+    { subScreen: "connector", labelKey: "ui.connectors" },
+    { subScreen: "splice", labelKey: "ui.splices" },
+    { subScreen: "node", labelKey: "ui.nodes" },
+    { subScreen: "segment", labelKey: "ui.segments" },
+    { subScreen: "wire", labelKey: "ui.wires" }
   ],
   analysis: [
-    { subScreen: "connector", label: "Connectors" },
-    { subScreen: "splice", label: "Splices" },
-    { subScreen: "node", label: "Nodes" },
-    { subScreen: "segment", label: "Segments" },
-    { subScreen: "wire", label: "Wires" }
+    { subScreen: "connector", labelKey: "ui.connectors" },
+    { subScreen: "splice", labelKey: "ui.splices" },
+    { subScreen: "node", labelKey: "ui.nodes" },
+    { subScreen: "segment", labelKey: "ui.segments" },
+    { subScreen: "wire", labelKey: "ui.wires" }
   ]
 };
 
@@ -67,13 +68,14 @@ export function NetworkSummaryQuickEntityNavigation({
   return (
     <section
       className={sectionClassName}
-      aria-label="Quick entity navigation"
+      aria-label={t("ui.quickEntityNavigation")}
       data-quick-entity-nav-source={variant === "panel" ? "true" : undefined}
     >
-      <div className={groupClassName} role="group" aria-label="Quick entity navigation strip">
+      <div className={groupClassName} role="group" aria-label={t("ui.quickEntityNavigationStrip")}>
         {QUICK_ENTITY_NAV_ITEMS[quickEntityNavigationMode].map((item) => {
           const entityCount = entityCountBySubScreen[item.subScreen];
-          const navigationLabel = getCountedNavigationLabel(item.label, entityCount, variant === "header");
+          const itemLabel = t(item.labelKey);
+          const navigationLabel = getCountedNavigationLabel(itemLabel, entityCount, variant === "header");
           return (
             <button
               key={item.subScreen}
@@ -81,8 +83,8 @@ export function NetworkSummaryQuickEntityNavigation({
               className={!isAiAgentOpen && activeSubScreen === item.subScreen ? "filter-chip is-active" : "filter-chip"}
               onClick={() => onQuickEntityNavigation(item.subScreen)}
               aria-pressed={!isAiAgentOpen && activeSubScreen === item.subScreen}
-              aria-label={navigationLabel === item.label ? undefined : getCountedNavigationAriaLabel(item.label, entityCount)}
-              title={item.label}
+              aria-label={navigationLabel === itemLabel ? undefined : getCountedNavigationAriaLabel(itemLabel, entityCount)}
+              title={itemLabel}
             >
               <span
                 className={`action-button-icon network-summary-quick-entity-nav-icon ${SUB_SCREEN_ICON_CLASS_BY_ID[item.subScreen]}`}

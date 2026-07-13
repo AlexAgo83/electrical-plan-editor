@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { appActions } from "../../../store";
 import type { SubScreenId } from "../../types/app-controller";
 import type { OnboardingStepId } from "../../lib/onboarding";
@@ -54,7 +55,7 @@ export function useAppControllerModelingAnalysisDomainAssembly({
           screen: "modeling",
           subScreen: "splice",
           panelSelector: '[data-onboarding-panel="modeling-splices"]',
-          panelLabel: "Splices"
+          panelLabel: t("ui.splices")
         }),
       openNodeStep: () => openSingleStepOnboarding("nodes"),
       openSegmentStep: () => openSingleStepOnboarding("segments"),

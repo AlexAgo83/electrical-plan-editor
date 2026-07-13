@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 import type { NetworkId } from "../../../core/entities";
 import type {
@@ -64,15 +65,16 @@ export function MultiNetworkFunctionalAnalysisPanel({
       </div>
 
       <div className="chip-group list-panel-filters multi-network-functional-analysis-summary" aria-label="Functional analysis summary">
-        <span className="status-chip is-error">Errors {model.summary.errors}</span>
-        <span className="status-chip is-warning">Warnings {model.summary.warnings}</span>
-        <span className="status-chip">Info {model.summary.info}</span>
+        <span className="status-chip is-error">{t("ui.errors2")} {model.summary.errors}</span>
+        <span className="status-chip is-warning">{t("ui.warnings2")} {model.summary.warnings}</span>
+        <span className="status-chip">{t("ui.info")} {model.summary.info}</span>
         <span className="status-chip">L1 {model.summary.l1}</span>
         <span className="status-chip">Loops {model.summary.loops}</span>
       </div>
 
       <p className="empty-copy">
-        Scope: {activeScopeLabel}
+        
+        {t("ui.scope")} {activeScopeLabel}
         {model.selectedNetworkLabels.length > 1 ? ` (${model.selectedNetworkLabels.join(", ")})` : ""}
       </p>
 
@@ -106,7 +108,7 @@ export function MultiNetworkFunctionalAnalysisPanel({
             <table className="data-table multi-network-functional-analysis-table">
               <thead>
                 <tr>
-                  <th>Severity</th>
+                  <th>{t("ui.severity")}</th>
                   <th>Family</th>
                   <th>Scope</th>
                   <th>Finding</th>
@@ -161,7 +163,8 @@ function FindingRow({
             }}
           >
             <span className="action-button-icon is-open" aria-hidden="true" />
-            Go to
+            
+            {t("ui.goTo")}
           </button>
         )}
       </td>
@@ -170,5 +173,5 @@ function FindingRow({
 }
 
 function severityLabel(severity: MultiNetworkFunctionalAnalysisFinding["severity"]): string {
-  return severity === "error" ? "Error" : severity === "warning" ? "Warning" : "Info";
+  return severity === "error" ? t("ui.error") : severity === "warning" ? "Warning" : t("ui.info");
 }

@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useMemo, useState, type FormEvent, type ReactElement } from "react";
 import type {
   Connector,
@@ -256,7 +257,7 @@ export function HarnessAssemblyManagerPanel({
           {onOpenOnboardingHelp === undefined ? null : (
             <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenOnboardingHelp}>
               <span className="action-button-icon is-help" aria-hidden="true" />
-              <span>Help</span>
+              <span>{t("ui.help")}</span>
             </button>
           )}
         </header>
@@ -266,11 +267,11 @@ export function HarnessAssemblyManagerPanel({
         ) : (
           <form className="harness-assembly-grid" onSubmit={handleSubmit}>
             <label className="stack-label">
-              <span className="network-form-label">Name</span>
+              <span className="network-form-label">{t("ui.name")}</span>
               <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Front cabin assembly" />
             </label>
             <label className="stack-label">
-              <span className="network-form-label">Technical ID</span>
+              <span className="network-form-label">{t("ui.technicalID")}</span>
               <input value={technicalId} onChange={(event) => setTechnicalId(event.target.value)} placeholder="ASM-FRONT-CABIN" />
             </label>
 
@@ -330,7 +331,8 @@ export function HarnessAssemblyManagerPanel({
               {selectedAssembly !== null ? (
                 <button type="button" className="network-delete-button button-with-icon" onClick={() => onRemoveAssembly(selectedAssembly.id)}>
                   <span className="action-button-icon is-delete" aria-hidden="true" />
-                  Delete
+                  
+                  {t("ui.delete")}
                 </button>
               ) : null}
             </div>

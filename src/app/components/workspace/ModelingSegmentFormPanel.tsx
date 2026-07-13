@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 import { useSegmentHandlersContext } from "../controller/ModelingController.context";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
@@ -55,20 +56,22 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
   return (
 <article className="panel" hidden={!isSegmentSubScreen} data-form-panel={FORM_PANEL_IDS.segment}>
   {renderFormHeader(
-    segmentFormMode === "create" ? "Create Segment" : segmentFormMode === "edit" ? "Edit Segment" : "Segment form",
+    segmentFormMode === "create" ? t("ui.createSegment") : segmentFormMode === "edit" ? t("ui.editSegment") : t("ui.segmentForm"),
     segmentFormMode
   )}
   {segmentFormMode === "idle" ? renderIdleCopy("segment", segmentHandlers.resetSegmentForm) : (
   <form className="stack-form" onSubmit={segmentHandlers.handleSegmentSubmit}>
     <label>
-      Segment ID
+      
+      {t("ui.segmentID")}
       <input value={segmentIdInput} onChange={(event) => setSegmentIdInput(event.target.value)} placeholder="SEG-001" required />
     </label>
-    {segmentFormMode === "edit" ? <small className="inline-help">Editing Segment ID performs an atomic rename.</small> : null}
+    {segmentFormMode === "edit" ? <small className="inline-help">{t("ui.editingSegmentIDPerformsAnAtomicRename")}</small> : null}
     <label>
-      Node A
+      
+      {t("ui.nodeA")}
       <select value={segmentNodeA} onChange={(event) => setSegmentNodeA(event.target.value)} required>
-        <option value="">Select node</option>
+        <option value="">{t("ui.selectNode")}</option>
         {nodeOptions.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -77,9 +80,10 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
       </select>
     </label>
     <label>
-      Node B
+      
+      {t("ui.nodeB")}
       <select value={segmentNodeB} onChange={(event) => setSegmentNodeB(event.target.value)} required>
-        <option value="">Select node</option>
+        <option value="">{t("ui.selectNode")}</option>
         {nodeBOptions.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -88,11 +92,13 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
       </select>
     </label>
     <label>
-      Length (mm)
+      
+      {t("ui.lengthMm")}
       <input type="number" min={1} step={0.1} value={segmentLengthMm} onChange={(event) => setSegmentLengthMm(event.target.value)} required />
     </label>
     <label>
-      Sub-network tag (optional)
+      
+      {t("ui.subNetworkTagOptional")}
       <input value={segmentSubNetworkTag} onChange={(event) => setSegmentSubNetworkTag(event.target.value)} placeholder="front-harness" />
     </label>
     <label>
@@ -129,18 +135,20 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
       <button type="submit" className="button-with-icon">
         {segmentFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
         {segmentFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
-        {segmentFormMode === "create" ? "Create" : "Save"}
+        {segmentFormMode === "create" ? t("ui.create") : t("ui.save")}
       </button>
       {segmentFormMode === "edit" && segmentEditAfterCreate ? (
         <button type="button" className="button-with-icon" onClick={segmentHandlers.resetSegmentForm}>
           <span className="action-button-icon is-new" aria-hidden="true" />
-          New
+          
+          {t("ui.new")}
         </button>
       ) : null}
       {segmentFormMode === "edit" ? (
         <button type="button" className="button-with-icon" onClick={segmentHandlers.handleSwapSegmentNodes}>
           <span className="action-button-icon is-swap" aria-hidden="true" />
-          Swap nodes
+          
+          {t("ui.swapNodes")}
         </button>
       ) : null}
       <button
@@ -149,7 +157,7 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
         onClick={segmentHandlers.cancelSegmentEdit}
       >
         {segmentFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
-        {segmentFormMode === "edit" ? "Cancel edit" : "Cancel"}
+        {segmentFormMode === "edit" ? t("ui.cancelEdit") : t("ui.cancel")}
       </button>
     </div>
     {segmentFormError !== null ? <small className="inline-error">{segmentFormError}</small> : null}

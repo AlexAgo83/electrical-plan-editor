@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   ConnectorId,
@@ -34,7 +35,6 @@ import type {
   ConnectorAnalysisView,
   SpliceAnalysisView,
 } from "../../components/workspace/AnalysisWorkspaceContent.types";
-
 type SegmentBatchEditableField =
   | "sheathType"
   | "insulation"
@@ -746,8 +746,8 @@ export function useAppControllerModelingAnalysisScreenDomains({
         await requestConfirmation({
           title: batchDeletePreflight.blockedTitle,
           message: batchDeletePreflight.blockedMessage,
-          confirmLabel: "Close",
-          cancelLabel: "Cancel",
+          confirmLabel: t("ui.close"),
+          cancelLabel: t("ui.cancel"),
           intent: "warning",
           variant: "deleteBlocked",
           summaryCategories: batchDeletePreflight.summaryCategories,
@@ -764,7 +764,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
         title: batchDeletePreflight.confirmationTitle,
         message: batchDeletePreflight.confirmationMessage,
         confirmLabel: batchDeletePreflight.confirmLabel,
-        cancelLabel: "Cancel",
+        cancelLabel: t("ui.cancel"),
         intent: "danger",
         confirmOnEnter: true,
         variant: batchDeletePreflight.confirmationVariant,

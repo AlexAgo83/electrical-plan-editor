@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useRef, type ReactElement } from "react";
 import type { NetworkId } from "../../../core/entities";
 import { useModalDialog } from "../../hooks/useModalDialog";
@@ -24,7 +25,7 @@ export function MultiNetworkFunctionalAnalysisDialog(props: MultiNetworkFunction
       <section ref={dialogRef} className="confirm-dialog panel workspace-tool-dialog multi-network-functional-analysis-dialog is-neutral" role="dialog" aria-modal="true" aria-labelledby="multi-network-functional-analysis-dialog-title" tabIndex={-1} onKeyDown={onKeyDown}>
         <header className="confirm-dialog-header workspace-tool-dialog-header">
           <h2 id="multi-network-functional-analysis-dialog-title">Multi-network functional analysis</h2>
-          <button ref={closeButtonRef} type="button" className="confirm-dialog-cancel" onClick={props.onClose}>Close</button>
+          <button ref={closeButtonRef} type="button" className="confirm-dialog-cancel" onClick={props.onClose}>{t("ui.close")}</button>
         </header>
         <MultiNetworkFunctionalAnalysisPanel model={props.model} scope={props.scope} setScope={props.setScope} onToggleCustomNetwork={props.onToggleCustomNetwork} onGoToFinding={props.onGoToFinding} />
       </section>

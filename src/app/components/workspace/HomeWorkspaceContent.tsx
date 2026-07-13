@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { lazy, Suspense, useEffect, useId, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import { HOME_CHANGELOG_ENTRY_SUMMARIES, loadHomeChangelogEntryContent } from "../../lib/changelogFeed";
 import type { UndoHistoryEntry } from "../../types/app-controller";
@@ -180,7 +181,7 @@ function ChangelogEntryMarkdown({ content }: { content: string }): ReactElement 
                 {section.body.length > 0 ? (
                   <ChangelogMarkdownBlock content={section.body} />
                 ) : (
-                  <p className="meta-line">No listed changes in this section.</p>
+                  <p className="meta-line">{t("ui.noListedChangesInThisSection")}</p>
                 )}
               </div>
             ) : null}
@@ -208,9 +209,9 @@ export function HomeWorkspaceContent({
   postMvpModules
 }: HomeWorkspaceContentProps): ReactElement {
   const homeExtensionEntries = [
-    ["session", "Session summary", postMvpModules?.sessionSummary],
-    ["history", "Activity history", postMvpModules?.activityHistory],
-    ["health", "Health snapshot", postMvpModules?.healthSnapshot]
+    ["session", t("ui.sessionSummary"), postMvpModules?.sessionSummary],
+    ["history", t("ui.activityHistory"), postMvpModules?.activityHistory],
+    ["health", t("ui.healthSnapshot"), postMvpModules?.healthSnapshot]
   ] as const;
 
   const hasPostMvpModules = homeExtensionEntries.some(([, , content]) => content !== undefined && content !== null);
@@ -296,13 +297,13 @@ export function HomeWorkspaceContent({
   }, [canLoadMoreChangelogs]);
 
   return (
-    <section className="home-workspace-grid" aria-label="Home workspace">
+    <section className="home-workspace-grid" aria-label={t("ui.homeWorkspace")}>
       <div className="home-left-column">
         <section className="panel home-panel home-quick-start-panel">
           <header className="home-panel-header">
-            <h2>Quick start</h2>
+            <h2>{t("ui.quickStart")}</h2>
             <div className="home-panel-header-tools">
-              <span className="settings-panel-chip">Home</span>
+              <span className="settings-panel-chip">{t("ui.home")}</span>
             </div>
           </header>
           <p className="settings-panel-intro home-start-intro">
@@ -311,29 +312,29 @@ export function HomeWorkspaceContent({
           <div className="row-actions home-primary-actions">
             <button type="button" className="button-with-icon" onClick={onOpenModeling} disabled={!hasActiveNetwork}>
               <span className="action-button-icon is-edit" aria-hidden="true" />
-              <span>Resume</span>
+              <span>{t("ui.resume")}</span>
             </button>
             <button type="button" className="button-with-icon" onClick={onOpenNetworkScope}>
               <span className="action-button-icon is-home-start" aria-hidden="true" />
-              <span>Load network</span>
+              <span>{t("ui.loadNetwork")}</span>
             </button>
             {onOpenOnboardingHelp !== undefined ? (
               <button type="button" className="button-with-icon" onClick={onOpenOnboardingHelp}>
                 <span className="action-button-icon is-help" aria-hidden="true" />
-                <span>Help</span>
+                <span>{t("ui.help")}</span>
               </button>
             ) : null}
             <button type="button" className="button-with-icon" onClick={onCreateEmptyWorkspace}>
               <span className="action-button-icon is-home-create" aria-hidden="true" />
-              <span>Create empty workspace</span>
+              <span>{t("ui.createEmptyWorkspace")}</span>
             </button>
             <button type="button" className="button-with-icon" onClick={onSaveWorkspace} disabled={networkCount === 0}>
               <span className="action-button-icon is-save" aria-hidden="true" />
-              <span>Save workspace</span>
+              <span>{t("ui.saveWorkspace")}</span>
             </button>
             <button type="button" className="button-with-icon" onClick={onOpenImportPicker}>
               <span className="action-button-icon is-home-import" aria-hidden="true" />
-              <span>Load workspace</span>
+              <span>{t("ui.loadWorkspace")}</span>
             </button>
           </div>
           <input
@@ -349,24 +350,26 @@ export function HomeWorkspaceContent({
 
         <section className="panel home-panel home-workspace-resume-panel">
           <header className="home-panel-header">
-            <h2>Workspace</h2>
+            <h2>{t("ui.workspace")}</h2>
             <span className="settings-panel-chip">
               {hasActiveNetwork && activeNetworkName !== null ? activeNetworkName : "No active network"}
             </span>
           </header>
           <p className="settings-panel-intro home-resume-intro">
-            Continue where you left off using the current workspace context and active network.
+            
+            {t("ui.continueWhereYouLeftOffUsingTheCurrentWorkspaceContext")}
           </p>
           <NetworkRecentChangesList entries={recentChangesForActiveNetwork} onOpenEntryTarget={onOpenRecentChangeTarget} />
         </section>
       </div>
       <section className="panel home-panel home-whats-new-panel">
         <header className="home-panel-header">
-          <h2>What's new</h2>
+          <h2>{t("ui.whatSNew")}</h2>
           <span className="settings-panel-chip">Changelog</span>
         </header>
         <p className="settings-panel-intro home-whats-new-intro">
-          Latest release notes from available changelog files.
+          
+          {t("ui.latestReleaseNotesFromAvailableChangelogFiles")}
         </p>
         <div
           ref={changelogScrollContainerRef}
@@ -377,7 +380,7 @@ export function HomeWorkspaceContent({
           data-locale-exempt="true"
         >
           {HOME_CHANGELOG_ENTRY_SUMMARIES.length === 0 ? (
-            <p className="empty-copy">No changelog available.</p>
+            <p className="empty-copy">{t("ui.noChangelogAvailable")}</p>
           ) : (
             visibleChangelogEntries.map((entry) => {
               const content = changelogContentBySourcePath[entry.sourcePath];
@@ -400,7 +403,7 @@ export function HomeWorkspaceContent({
       {hasPostMvpModules ? (
         <section className="panel home-panel home-extension-panel">
           <header className="home-panel-header">
-            <h2>Workspace hub</h2>
+            <h2>{t("ui.workspaceHub")}</h2>
             <span className="settings-panel-chip">Post-MVP</span>
           </header>
           <p className="settings-panel-intro">Extension-ready region for session, history, health, and release notes modules.</p>

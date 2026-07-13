@@ -1,10 +1,10 @@
 ## item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces - Migrate modeling, catalog, validation, and diagnostic surfaces
 > From version: 1.18.2
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 10%
 > Complexity: High
 > Theme: Internationalization contract adoption
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.

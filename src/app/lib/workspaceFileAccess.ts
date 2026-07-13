@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import type { WorkspaceFilePayloadV1 } from "./workspaceFile";
 
 type FileSystemPermissionMode = "read" | "readwrite";
@@ -188,7 +189,7 @@ export function buildWorkspaceFileSummary(payload: WorkspaceFilePayloadV1): stri
   const networkCount = payload.state.networks.allIds.length;
   const activeNetworkName =
     payload.state.activeNetworkId === null
-      ? "None"
+      ? t("ui.none")
       : payload.state.networks.byId[payload.state.activeNetworkId]?.name ?? payload.state.activeNetworkId;
 
   return [

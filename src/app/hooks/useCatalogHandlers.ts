@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import type { FormEvent } from "react";
 import type {
   CatalogAdditionalAccessory,
@@ -363,23 +364,23 @@ export function useCatalogHandlers({
       : [];
 
     if (manufacturerReference.length === 0) {
-      setCatalogFormError("Manufacturer reference is required.");
+      setCatalogFormError(t("ui.manufacturerReferenceIsRequired"));
       return;
     }
     if (manufacturerReference.length > 120) {
-      setCatalogFormError("Manufacturer reference must be 120 characters or fewer.");
+      setCatalogFormError(t("ui.manufacturerReferenceMustBe120CharactersOrFewer"));
       return;
     }
     if (connectionCount < 1) {
-      setCatalogFormError("Connection count must be an integer >= 1.");
+      setCatalogFormError(t("ui.connectionCountMustBeAnInteger1"));
       return;
     }
     if (Number.isNaN(unitPriceExclTax)) {
-      setCatalogFormError("Unit price (excl. tax) must be a valid number >= 0.");
+      setCatalogFormError(t("ui.unitPriceExclTaxMustBeAValidNumber0"));
       return;
     }
     if (!isValidCatalogUrlInput(url)) {
-      setCatalogFormError("URL must be empty or a valid absolute http/https URL.");
+      setCatalogFormError(t("ui.urlMustBeEmptyOrAValidAbsoluteHttpHttps"));
       return;
     }
     if (catalogShowAdditionalAccessories && additionalAccessories.some((accessory) => accessory.accessoryReference.length === 0)) {
@@ -489,10 +490,10 @@ export function useCatalogHandlers({
 
       if (impact.kind === "direct") {
         const shouldDelete = await confirmAction({
-          title: "Delete catalog item",
+          title: t("ui.deleteCatalogItem"),
           message: `Delete catalog item ${formattedIdentity}?`,
-          confirmLabel: "Delete",
-          cancelLabel: "Cancel",
+          confirmLabel: t("ui.delete"),
+          cancelLabel: t("ui.cancel"),
           intent: "danger",
           confirmOnEnter: true
         });
@@ -510,8 +511,8 @@ export function useCatalogHandlers({
       await confirmAction({
         title: "Catalog item delete blocked",
         message: impact.message,
-        confirmLabel: "Close",
-        cancelLabel: "Cancel",
+        confirmLabel: t("ui.close"),
+        cancelLabel: t("ui.cancel"),
         intent: "warning",
         variant: "deleteBlocked",
         summaryCategories: impact.categories,

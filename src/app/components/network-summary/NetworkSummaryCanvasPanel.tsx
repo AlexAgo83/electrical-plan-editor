@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import {
   useEffect,
   type CSSProperties,
@@ -181,7 +182,7 @@ export function NetworkSummaryCanvasPanel({
     <>
       <div className="network-summary-canvas-region">
         {nodes.length === 0 ? (
-          <p className="empty-copy">No nodes yet. Create nodes and segments to render the 2D network.</p>
+          <p className="empty-copy">{t("ui.noNodesYetCreateNodesAndSegmentsToRenderThe")}</p>
         ) : (
           <div ref={networkCanvasShellRef} className={`network-canvas-shell${isPanningNetwork ? " is-panning" : ""}`}>
             <NetworkCanvasFloatingInfoPanels
@@ -201,7 +202,7 @@ export function NetworkSummaryCanvasPanel({
             <svg
               ref={networkSvgRef}
               className={`network-svg${useStrokeInvariantLines ? " network-svg--stroke-invariant" : ""} network-canvas--label-stroke-${labelStrokeMode} network-canvas--label-size-${labelSizeMode} network-callout-text-size-${calloutTextSize}`}
-              aria-label="2D network diagram"
+              aria-label={t("ui.2dNetworkDiagram")}
               viewBox={`0 0 ${networkViewWidth} ${networkViewHeight}`}
               style={networkSvgStrokeVariables}
               onMouseDown={handleNetworkCanvasMouseDown}
@@ -273,7 +274,8 @@ export function NetworkSummaryCanvasPanel({
         )}
       </div>
       <p className="empty-copy network-summary-mobile-unavailable" role="status">
-        2D network summary is not available on mobile. Use a wider screen to access the canvas controls and legend.
+        
+        {t("ui.2dNetworkSummaryIsNotAvailableOnMobileUseA")}
       </p>
       <NetworkSummaryLegend />
     </>

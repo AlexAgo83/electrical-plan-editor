@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useMemo, useState, type ReactElement } from "react";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
@@ -82,33 +83,34 @@ export function ValidationWorkspaceContent({
   return (
     <section className="panel-grid validation-panel-stack">
       <section className="panel validation-summary-panel">
-        <h2>Validation summary</h2>
+        <h2>{t("ui.validationSummary")}</h2>
         <div className="summary-grid">
           <article>
-            <h3>Total issues</h3>
+            <h3>{t("ui.totalIssues2")}</h3>
             <p>{validationIssues.length}</p>
           </article>
           <article>
-            <h3>Errors</h3>
+            <h3>{t("ui.errors2")}</h3>
             <p>{validationErrorCount}</p>
           </article>
           <article>
-            <h3>Warnings</h3>
+            <h3>{t("ui.warnings2")}</h3>
             <p>{validationWarningCount}</p>
           </article>
           <article>
-            <h3>Visible</h3>
+            <h3>{t("ui.visible")}</h3>
             <p>{visibleValidationIssues.length}</p>
           </article>
         </div>
         <p className="meta-line validation-active-filter">
-          Active filters: {validationSeverityFilter === "all" ? "All severities" : validationSeverityFilter === "error" ? "Errors" : "Warnings"} / {" "}
-          {validationCategoryFilter === "all" ? "All categories" : validationCategoryFilter}
+          
+          {t("ui.activeFilters")} {validationSeverityFilter === "all" ? t("ui.allSeverities") : validationSeverityFilter === "error" ? t("ui.errors2") : t("ui.warnings2")} / {" "}
+          {validationCategoryFilter === "all" ? t("ui.allCategories") : validationCategoryFilter}
         </p>
       </section>
       <section className="panel">
         <header className="validation-center-header">
-          <h2>Validation center</h2>
+          <h2>{t("ui.validationCenter")}</h2>
           <div className="validation-center-header-actions">
             <button
               type="button"
@@ -116,7 +118,7 @@ export function ValidationWorkspaceContent({
               onClick={() =>
                 downloadCsvFile(
                   "validation-issues",
-                  ["Category", "Severity", "Issue", "Screen", "Selection kind", "Selection ID"],
+                  [t("ui.category"), t("ui.severity"), t("ui.issue"), t("ui.screen"), t("ui.selectionKind"), t("ui.selectionID")],
                   visibleValidationIssues.map((issue) => [
                     issue.category,
                     issue.severity.toUpperCase(),
@@ -135,12 +137,12 @@ export function ValidationWorkspaceContent({
           </div>
         </header>
         <div className="validation-toolbar">
-          <span>Issue filters</span>
-          <div className="chip-group" role="group" aria-label="Validation severity filter">
+          <span>{t("ui.issueFilters")}</span>
+          <div className="chip-group" role="group" aria-label={t("ui.validationSeverityFilter")}>
             {([
-              ["all", "All severities"],
-              ["error", "Errors"],
-              ["warning", "Warnings"]
+              ["all", t("ui.allSeverities")],
+              ["error", t("ui.errors2")],
+              ["warning", t("ui.warnings2")]
             ] as const).map(([severity, label]) => {
               const severityCount =
                 severity === "all" ? validationIssuesForSeverityCounts.length : validationSeverityCountByLevel[severity];
@@ -158,13 +160,13 @@ export function ValidationWorkspaceContent({
               );
             })}
           </div>
-          <div className="chip-group" role="group" aria-label="Validation category filter">
+          <div className="chip-group" role="group" aria-label={t("ui.validationCategoryFilter")}>
             <button
               type="button"
               className={validationCategoryFilter === "all" ? "filter-chip is-active" : "filter-chip"}
               onClick={() => setValidationCategoryFilter("all")}
             >
-              <span>All</span>
+              <span>{t("ui.all")}</span>
               <span className="filter-chip-count" aria-hidden="true">({validationIssuesForCategoryCounts.length})</span>
             </button>
             {validationCategories.map((category) => {
@@ -185,10 +187,10 @@ export function ValidationWorkspaceContent({
           </div>
         </div>
         {validationIssues.length === 0 ? (
-          <p className="empty-copy">No integrity issue found in the current model.</p>
+          <p className="empty-copy">{t("ui.noIntegrityIssueFoundInTheCurrentModel")}</p>
         ) : visibleValidationIssues.length === 0 ? (
           <>
-            <p className="empty-copy">No integrity issue matches the current filters.</p>
+            <p className="empty-copy">{t("ui.noIntegrityIssueMatchesTheCurrentFilters")}</p>
             <TableEntryCountFooter count={0} />
           </>
         ) : (
@@ -207,18 +209,21 @@ export function ValidationWorkspaceContent({
                       {!isMobileViewport ? (
                         <th aria-sort={getTableAriaSort(validationTableSort, "severity")}>
                           <button type="button" className="sort-header-button" onClick={() => toggleValidationTableSort("severity")}>
-                            Severity <span className="sort-indicator">{validationTableSortIndicator("severity")}</span>
+                            
+                            {t("ui.severity")} <span className="sort-indicator">{validationTableSortIndicator("severity")}</span>
                           </button>
                         </th>
                       ) : null}
                       <th aria-sort={getTableAriaSort(validationTableSort, "issue")}>
                         <button type="button" className="sort-header-button" onClick={() => toggleValidationTableSort("issue")}>
-                          Issue <span className="sort-indicator">{validationTableSortIndicator("issue")}</span>
+                          
+                          {t("ui.issue")} <span className="sort-indicator">{validationTableSortIndicator("issue")}</span>
                         </button>
                       </th>
                       <th className="validation-actions-cell" aria-sort={getTableAriaSort(validationTableSort, "actions")}>
                         <button type="button" className="sort-header-button" onClick={() => toggleValidationTableSort("actions")}>
-                          Actions <span className="sort-indicator">{validationTableSortIndicator("actions")}</span>
+                          
+                          {t("ui.actions")} <span className="sort-indicator">{validationTableSortIndicator("actions")}</span>
                         </button>
                       </th>
                     </tr>
@@ -262,7 +267,8 @@ export function ValidationWorkspaceContent({
                             }}
                           >
                             <span className="action-button-icon is-open" aria-hidden="true" />
-                            Go to
+                            
+                            {t("ui.goTo")}
                           </button>
                         </td>
                       </tr>

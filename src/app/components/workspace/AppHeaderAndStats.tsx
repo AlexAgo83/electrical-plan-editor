@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement, ReactNode, RefObject } from "react";
 import type { AppError } from "../../../store/types";
 interface AppHeaderAndStatsProps {
@@ -73,7 +74,7 @@ export function AppHeaderAndStats({
             type="button"
             className="header-nav-toggle"
             onClick={onToggleNavigationDrawer}
-            aria-label={isNavigationDrawerOpen ? "Close menu" : "Open menu"}
+            aria-label={isNavigationDrawerOpen ? t("ui.closeMenu") : t("ui.openMenu")}
             aria-expanded={isNavigationDrawerOpen}
             aria-controls="workspace-navigation-drawer"
           >
@@ -90,7 +91,7 @@ export function AppHeaderAndStats({
           {isInstallPromptAvailable && !isDockedNavigationVisible ? (
             <button type="button" className="header-install-toggle" onClick={onInstallApp}>
               <span className="header-install-icon" aria-hidden="true" />
-              <span className="header-install-label">Install app</span>
+              <span className="header-install-label">{t("ui.installApp")}</span>
             </button>
           ) : null}
           {isPwaUpdateReady ? (
@@ -102,22 +103,22 @@ export function AppHeaderAndStats({
                   : "header-update-toggle is-ready-glow"
               }
               onClick={onApplyPwaUpdate}
-              aria-label="Update ready"
-              title="Update ready"
+              aria-label={t("ui.updateReady")}
+              title={t("ui.updateReady")}
             >
               <span className="action-button-icon is-redo" aria-hidden="true" />
-              <span className="header-update-label">Update ready</span>
+              <span className="header-update-label">{t("ui.updateReady")}</span>
             </button>
           ) : null}
           <button
             type="button"
             className={isSettingsActive ? "header-settings-toggle is-active" : "header-settings-toggle"}
             aria-pressed={isSettingsActive}
-            aria-label="Settings"
+            aria-label={t("ui.settings")}
             onClick={onOpenSettings}
           >
             <span className="header-settings-icon" aria-hidden="true" />
-            <span className="header-settings-label">Settings</span>
+            <span className="header-settings-label">{t("ui.settings")}</span>
           </button>
           <button
             ref={operationsButtonRef}
@@ -126,11 +127,11 @@ export function AppHeaderAndStats({
             onClick={onToggleOperationsPanel}
             aria-expanded={isOperationsPanelOpen}
             aria-controls="workspace-operations-panel"
-            aria-label="Ops"
+            aria-label={t("ui.ops")}
             aria-description={opsStatusDescription}
           >
             <span className="header-ops-icon" aria-hidden="true" />
-            <span className="header-ops-label">Ops</span>
+            <span className="header-ops-label">{t("ui.ops")}</span>
             <span
               className={validationErrorCount > 0 ? "header-ops-badge is-error" : "header-ops-badge"}
               aria-hidden="true"
@@ -162,7 +163,8 @@ export function AppHeaderAndStats({
             <small>{lastError.code}</small>
           </p>
           <button type="button" onClick={onClearError}>
-            Clear
+            
+            {t("ui.clear")}
           </button>
         </section>
       ) : null}

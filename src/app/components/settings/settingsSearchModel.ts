@@ -1,10 +1,25 @@
+import { translateCurrent as t } from "../../lib/i18n";
 export interface SettingsSectionDefinition {
   id: string;
   title: string;
   labels: string[];
 }
 
-export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
+export const SETTINGS_SECTION_IDS = [
+  "settings-workspace-storage",
+  "settings-import-export",
+  "settings-canvas-render",
+  "settings-canvas-tools",
+  "settings-appearance",
+  "settings-global-preferences",
+  "settings-shortcuts",
+  "settings-catalog-bom",
+  "settings-sample-network",
+  "settings-ai-provider"
+] as const;
+
+export function getSettingsSections(): SettingsSectionDefinition[] {
+  return [
   {
     id: "settings-workspace-storage",
     title: "Workspace storage",
@@ -28,112 +43,113 @@ export const SETTINGS_SECTIONS: SettingsSectionDefinition[] = [
   },
   {
     id: "settings-import-export",
-    title: "Import / Export networks",
+    title: t("ui.importExportNetworks"),
     labels: [
-      "Selected networks for export",
-      "Export active",
+      t("ui.selectedNetworksForExport"),
+      t("ui.exportActive"),
       "Export selected JSON",
-      "Export all",
+      t("ui.exportAll"),
       "Export selected BOM (XLSX)",
       "Export selected wire list (XLSX)",
       "Export selected SVG",
       "Export selected PNG",
       "Export selected PDF",
-      "Import from file"
+      t("ui.importFromFile")
     ]
   },
   {
     id: "settings-canvas-render",
-    title: "Canvas render preferences",
+    title: t("ui.canvasRenderPreferences"),
     labels: [
-      "Label stroke mode",
-      "2D label size",
-      "Callout text size",
-      "Connector drawing display",
-      "Use consistent physical layout scale",
-      "Connector drawing size (%)",
-      "Summary global scale (%)",
-      "Auto segment label rotation",
-      "2D label rotation",
-      "Reset zoom target (%)",
-      "Viewport resize behavior"
+      t("ui.labelStrokeMode"),
+      t("ui.2dLabelSize"),
+      t("ui.calloutTextSize"),
+      t("ui.connectorDrawingDisplay"),
+      t("ui.useConsistentPhysicalLayoutScale"),
+      t("ui.connectorDrawingSize"),
+      t("ui.summaryGlobalScale"),
+      t("ui.autoSegmentLabelRotation"),
+      t("ui.2dLabelRotation"),
+      t("ui.resetZoomTarget"),
+      t("ui.viewportResizeBehavior")
     ]
   },
   {
     id: "settings-canvas-tools",
-    title: "Canvas tools preferences",
+    title: t("ui.canvasToolsPreferences"),
     labels: [
-      "Show grid by default",
-      "Snap node movement by default",
-      "Lock node movement by default",
-      "Show info overlays by default",
-      "Show segment names",
-      "Show segment lengths by default",
-      "Show connector/splice cable callouts by default",
-      "Show only selected connector/splice callout",
-      "Show wire names in callout table",
-      "Keep connector/splice/node shape size constant while zooming",
-      "Show colocated splice link line",
-      "Show network entity ID prefix",
-      "Node shape target size (%)",
-      "Include background in PNG export",
-      "Include frame in SVG/PNG export",
-      "Include identity cartouche in SVG/PNG export"
+      t("ui.showGridByDefault"),
+      t("ui.snapNodeMovementByDefault"),
+      t("ui.lockNodeMovementByDefault"),
+      t("ui.showInfoOverlaysByDefault"),
+      t("ui.showSegmentNames"),
+      t("ui.showSegmentLengthsByDefault"),
+      t("ui.showConnectorSpliceCableCalloutsByDefault"),
+      t("ui.showOnlySelectedConnectorSpliceCallout"),
+      t("ui.showWireNamesInCalloutTable"),
+      t("ui.keepConnectorSpliceNodeShapeSizeConstantWhileZooming"),
+      t("ui.showColocatedSpliceLinkLine"),
+      t("ui.showNetworkEntityIDPrefix"),
+      t("ui.nodeShapeTargetSize"),
+      t("ui.includeBackgroundInPNGExport"),
+      t("ui.includeFrameInSVGPNGExport"),
+      t("ui.includeIdentityCartoucheInSVGPNGExport")
     ]
   },
   {
     id: "settings-appearance",
-    title: "Appearance preferences",
-    labels: ["Theme mode", "Table density", "Table font size", "Default sort column", "Default sort direction", "Default ID sort direction"]
+    title: t("ui.appearancePreferences"),
+    labels: [t("ui.themeMode"), t("ui.tableDensity"), t("ui.tableFontSize"), t("ui.defaultSortColumn"), t("ui.defaultSortDirection"), t("ui.defaultIDSortDirection")]
   },
   {
     id: "settings-global-preferences",
-    title: "Global preferences",
+    title: t("ui.globalPreferences"),
     labels: [
-      "Show floating inspector panel on supported screens",
+      t("ui.showFloatingInspectorPanelOnSupportedScreens"),
       "Show route preview panel",
       "Hide Wire analysis auto route panel",
       "Show multi-network functional analysis panel",
-      "Workspace panels layout",
-      "Wide screen (remove app max width cap)",
+      t("ui.workspacePanelsLayout"),
+      t("ui.wideScreenRemoveAppMaxWidthCap"),
       "Enable performance debug console logs",
-      "Default wire section (mm²)",
-      "Default auto-create linked nodes for connectors",
+      t("ui.defaultWireSectionMm2"),
+      t("ui.defaultAutoCreateLinkedNodesForConnectors"),
       "Directional splice imbalance limit (%)",
-      "Language"
+      t("ui.language")
     ]
   },
   {
     id: "settings-shortcuts",
-    title: "Action bar and shortcuts",
-    labels: ["Show shortcut hints in the action bar", "Enable keyboard shortcuts (undo/redo/navigation/issues/view)", "Restore network viewport on undo/redo"]
+    title: t("ui.actionBarAndShortcuts"),
+    labels: [t("ui.showShortcutHintsInTheActionBar"), t("ui.enableKeyboardShortcutsUndoRedoNavigationIssuesView"), "Restore network viewport on undo/redo"]
   },
   {
     id: "settings-catalog-bom",
-    title: "Catalog & BOM setup",
+    title: t("ui.catalogBOMSetup"),
     labels: [
-      "Currency (Catalog/BOM)",
-      "Enable tax / VAT (TVA)",
+      t("ui.currencyCatalogBOM"),
+      t("ui.enableTaxVATTVA"),
       "Tabular export format",
-      "Wire stripping allowance (mm)",
-      "Twisted-pair length coefficient",
+      t("ui.wireStrippingAllowanceMm"),
+      t("ui.twistedPairLengthCoefficient"),
       "Compact BOM export columns",
       "Hide BOM traceability labels",
-      "Computed downstream load (A)",
-      "Tax rate (%)"
+      t("ui.computedDownstreamLoadA"),
+      t("ui.taxRate")
     ]
   },
   {
     id: "settings-sample-network",
-    title: "Sample network controls",
-    labels: ["Recreate sample network", "Reset sample network to baseline"]
+    title: t("ui.sampleNetworkControls"),
+    labels: [t("ui.recreateSampleNetwork"), t("ui.resetSampleNetworkToBaseline")]
   },
   {
     id: "settings-ai-provider",
     title: "AI provider",
     labels: ["Provider", "Model", "API key", "Endpoint", "Timeout (ms)", "Strict structured output mode", "Enable experimental direct execution", "Test connection"]
   }
-];
+  ];
+}
 
 export function normalizeSettingsSearch(value: string): string {
   return value.trim().replace(/\s+/g, " ").toLowerCase();

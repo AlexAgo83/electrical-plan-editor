@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import type { CatalogItem } from "../../core/entities";
 import { isValidCatalogUrlInput, normalizeManufacturerReferenceKey } from "../../store";
 import type { CsvCellValue } from "./csv";
@@ -282,7 +283,7 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
       issues.push({
         kind: "error",
         rowNumber,
-        message: "Manufacturer reference is required."
+        message: t("ui.manufacturerReferenceIsRequired")
       });
       continue;
     }
@@ -292,7 +293,7 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
       issues.push({
         kind: "error",
         rowNumber,
-        message: "Manufacturer reference is required."
+        message: t("ui.manufacturerReferenceIsRequired")
       });
       continue;
     }
@@ -317,7 +318,7 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
       issues.push({
         kind: "error",
         rowNumber,
-        message: "Connection count must be an integer >= 1."
+        message: t("ui.connectionCountMustBeAnInteger1")
       });
       continue;
     }
@@ -337,7 +338,7 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
       issues.push({
         kind: "error",
         rowNumber,
-        message: "URL must be empty or a valid absolute http/https URL."
+        message: t("ui.urlMustBeEmptyOrAValidAbsoluteHttpHttps")
       });
       continue;
     }

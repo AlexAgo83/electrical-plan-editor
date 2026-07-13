@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import type { FormEvent } from "react";
 import type { CatalogItemId, Connector, ConnectorId } from "../../core/entities";
 import type { AppStore } from "../../store";
@@ -134,11 +135,11 @@ export function useConnectorHandlers({
 
     if (connectorFormMode === "edit" && editingConnectorId !== null) {
       if (hasConnectorOccupancyIndexAboveLimit(store, editingConnectorId, catalogItem.connectionCount)) {
-        setConnectorFormError("Selected catalog item is incompatible: occupied way indexes exceed the catalog connection count.");
+        setConnectorFormError(t("ui.selectedCatalogItemIsIncompatibleOccupiedWayIndexesExceedThe"));
         return;
       }
       if (hasConnectorWireEndpointIndexAboveLimit(store, editingConnectorId, catalogItem.connectionCount)) {
-        setConnectorFormError("Selected catalog item is incompatible: wire endpoint way indexes exceed the catalog connection count.");
+        setConnectorFormError(t("ui.selectedCatalogItemIsIncompatibleWireEndpointWayIndexesExceed"));
         return;
       }
     }
@@ -178,7 +179,7 @@ export function useConnectorHandlers({
       setConnectorPinElectricalRoleSelection([]);
       setConnectorAutoCreateLinkedNode(defaultAutoCreateLinkedNodes);
       setCavityCount("4");
-      setConnectorFormError("Create a catalog item first to define manufacturer reference and connection count.");
+      setConnectorFormError(t("ui.createACatalogItemFirstToDefineManufacturerReferenceAnd"));
       return;
     }
 
@@ -298,14 +299,14 @@ export function useConnectorHandlers({
       selectedCatalogItemId === null ? undefined : store.getState().catalogItems.byId[selectedCatalogItemId];
 
     if (selectedCatalogItem === undefined) {
-      setConnectorFormError("Select a catalog item first.");
+      setConnectorFormError(t("ui.selectACatalogItemFirst"));
       return;
     }
 
     const normalizedCavityCount = selectedCatalogItem.connectionCount;
     const terminalOverrides = parseConnectorTerminalOverridesDraft(connectorTerminalOverridesText, normalizedCavityCount);
     if (trimmedName.length === 0 || trimmedTechnicalId.length === 0 || normalizedCavityCount < 1) {
-      setConnectorFormError("All fields are required and way count must be >= 1.");
+      setConnectorFormError(t("ui.allFieldsAreRequiredAndWayCountMustBe1"));
       return;
     }
     if (!terminalOverrides.ok) {
@@ -423,7 +424,7 @@ export function useConnectorHandlers({
           });
           if (!linkedNodeExists) {
             setConnectorFormError(
-              "Connector created, but the linked connector node could not be created automatically. Create it manually in Nodes."
+              t("ui.connectorCreatedButTheLinkedConnectorNodeCouldNotBe")
             );
           }
         }
@@ -447,10 +448,10 @@ export function useConnectorHandlers({
 
       if (impact.kind === "direct") {
         const shouldDelete = await confirmAction({
-          title: "Delete connector",
+          title: t("ui.deleteConnector"),
           message: `Delete connector '${connector.name}' (${connector.technicalId})?`,
-          confirmLabel: "Delete",
-          cancelLabel: "Cancel",
+          confirmLabel: t("ui.delete"),
+          cancelLabel: t("ui.cancel"),
           intent: "danger",
           confirmOnEnter: true
         });
@@ -470,7 +471,7 @@ export function useConnectorHandlers({
           title: "Cascade delete connector",
           message: impact.message,
           confirmLabel: "Delete all",
-          cancelLabel: "Cancel",
+          cancelLabel: t("ui.cancel"),
           intent: "danger",
           confirmOnEnter: true,
           variant: "deleteCascade",
@@ -491,8 +492,8 @@ export function useConnectorHandlers({
       await confirmAction({
         title: "Connector delete blocked",
         message: impact.message,
-        confirmLabel: "Close",
-        cancelLabel: "Cancel",
+        confirmLabel: t("ui.close"),
+        cancelLabel: t("ui.cancel"),
         intent: "warning",
         variant: "deleteBlocked",
         summaryCategories: impact.categories,

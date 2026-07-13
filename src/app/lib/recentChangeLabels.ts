@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import type {
   CatalogItemId,
   ConnectorId,
@@ -27,21 +28,21 @@ function targetKindLabel(kind: UndoHistoryTargetKind): string {
     case "network":
       return "Network";
     case "catalog":
-      return "Catalog item";
+      return t("ui.catalogItem");
     case "connector":
-      return "Connector";
+      return t("ui.connector");
     case "splice":
-      return "Splice";
+      return t("ui.splice");
     case "node":
-      return "Node";
+      return t("ui.node");
     case "segment":
-      return "Segment";
+      return t("ui.segment");
     case "wire":
-      return "Wire";
+      return t("ui.wire");
     case "layout":
       return "Layout";
     case "workspace":
-      return "Workspace";
+      return t("ui.workspace");
   }
 }
 
@@ -221,7 +222,7 @@ function actionVerb(action: AppAction, previousState: AppState): string {
     case "network/select":
       return "activated";
     case "network/setSummaryViewState":
-      return "view updated";
+      return t("ui.viewUpdated");
     case "network/rename":
       return "renamed";
     case "network/update":
@@ -231,7 +232,7 @@ function actionVerb(action: AppAction, previousState: AppState): string {
     case "network/delete":
       return "deleted";
     case "network/importMany":
-      return "imported";
+      return t("ui.imported2");
     case "harnessAssembly/upsert":
       return previousState.harnessAssemblies.byId[action.payload.id] === undefined ? "created" : "updated";
     case "harnessAssembly/remove":
@@ -246,9 +247,9 @@ function actionVerb(action: AppAction, previousState: AppState): string {
     case "connector/removeCascade":
       return "deleted";
     case "connector/occupyCavity":
-      return "cavity occupied";
+      return t("ui.cavityOccupied");
     case "connector/releaseCavity":
-      return "cavity released";
+      return t("ui.cavityReleased");
     case "splice/upsert":
       return previousState.splices.byId[action.payload.id] === undefined ? "created" : "updated";
     case "splice/convertToDirectional":
@@ -256,14 +257,14 @@ function actionVerb(action: AppAction, previousState: AppState): string {
     case "splice/rerouteConnectedWires":
       return "rerouted";
     case "splice/applyOptimizedCanvasLayout":
-      return "lengths optimized";
+      return t("ui.lengthsOptimized");
     case "splice/remove":
     case "splice/removeCascade":
       return "deleted";
     case "splice/occupyPort":
-      return "port occupied";
+      return t("ui.portOccupied");
     case "splice/releasePort":
-      return "port released";
+      return t("ui.portReleased");
     case "node/upsert":
       return previousState.nodes.byId[action.payload.id] === undefined ? "created" : "updated";
     case "node/rename":
@@ -279,9 +280,9 @@ function actionVerb(action: AppAction, previousState: AppState): string {
     case "wire/save":
       return previousState.wires.byId[action.payload.id] === undefined ? "created" : "updated";
     case "wire/lockRoute":
-      return "route locked";
+      return t("ui.routeLocked");
     case "wire/resetRoute":
-      return "route reset";
+      return t("ui.routeReset");
     case "wire/upsert":
       return previousState.wires.byId[action.payload.id] === undefined ? "created" : "updated";
     case "wire/remove":
@@ -507,8 +508,8 @@ function describeCatalogChange(action: Extract<AppAction, { type: "catalog/upser
 
   return describeChangedFields(previousItem, action.payload, [
     ["Identity", ["manufacturerReference", "name"]],
-    ["Connection count", ["connectionCount"]],
-    ["Pricing", ["unitPriceExclTax"]],
+    [t("ui.connectionCount"), ["connectionCount"]],
+    [t("ui.pricing"), ["unitPriceExclTax"]],
     ["Supplier link", ["url"]],
     ["Accessories", ["additionalAccessories"]],
     ["Terminal defaults", ["connectorDefaults"]],
@@ -569,8 +570,8 @@ function describeSpliceChange(action: Extract<AppAction, { type: "splice/upsert"
 
   return describeChangedFields(previousSplice, action.payload, [
     ["Identity", ["technicalId", "name"]],
-    ["Port count", ["portCount"]],
-    ["Port mode", ["portMode", "sideInverted"]],
+    [t("ui.portCount"), ["portCount"]],
+    [t("ui.portMode"), ["portMode", "sideInverted"]],
     ["Catalog link", ["catalogItemId", "manufacturerReference"]],
     ["Callout position", ["cableCalloutPosition"]]
   ]);
@@ -589,9 +590,9 @@ function describeWireChange(
 
   return describeChangedFields(previousWire, action.payload, [
     ["Identity", ["technicalId", "name"]],
-    ["Endpoints", ["endpointA", "endpointB"]],
+    [t("ui.endpoints"), ["endpointA", "endpointB"]],
     ["Electrical spec", ["sectionMm2", "currentA", "material"]],
-    ["Color", ["colorMode", "primaryColorId", "secondaryColorId", "freeColorLabel"]],
+    [t("ui.color"), ["colorMode", "primaryColorId", "secondaryColorId", "freeColorLabel"]],
     [
       "Terminations",
       [
@@ -618,7 +619,7 @@ function describeNodeChange(action: Extract<AppAction, { type: "node/upsert" }>,
   }
 
   return describeChangedFields(previousNode, action.payload, [
-    ["Node kind", ["kind"]],
+    [t("ui.nodeKind"), ["kind"]],
     [action.payload.kind === "intermediate" ? "Intermediate label" : "Endpoint binding", ["label", "connectorId", "spliceId"]]
   ]);
 }
@@ -632,9 +633,9 @@ function describeSegmentChange(action: Extract<AppAction, { type: "segment/upser
   }
 
   return describeChangedFields(previousSegment, action.payload, [
-    ["Endpoints", ["nodeA", "nodeB"]],
-    ["Length", ["lengthMm"]],
-    ["Sub-network", ["subNetworkTag"]]
+    [t("ui.endpoints"), ["nodeA", "nodeB"]],
+    [t("ui.length"), ["lengthMm"]],
+    [t("ui.subNetwork"), ["subNetworkTag"]]
   ]);
 }
 
@@ -805,7 +806,7 @@ export function buildReplaceStateHistoryEntry(
     targetKind: "workspace",
     targetId: displayRef,
     networkId: activeNetworkId,
-    label: "Workspace state replaced",
+    label: t("ui.workspaceStateReplaced"),
     timestampIso: nowIso
   };
 }

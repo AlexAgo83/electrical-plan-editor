@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import { type ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { consumeLastSpliceMigrationReport } from "../../adapters/persistence";
 import { type Network, type NetworkId } from "../../core/entities";
@@ -144,7 +145,7 @@ export function useNetworkImportExport({
       if (payload.networks.length === 0) {
         setImportExportStatus({
           kind: "failed",
-          message: "No network available for the selected export scope."
+          message: t("ui.noNetworkAvailableForTheSelectedExportScope")
         });
         return;
       }
@@ -165,7 +166,7 @@ export function useNetworkImportExport({
       if (exportResult === "failed") {
         setImportExportStatus({
           kind: "failed",
-          message: "Export is not available in this environment."
+          message: t("ui.exportIsNotAvailableInThisEnvironment")
         });
         return;
       }
@@ -184,7 +185,7 @@ export function useNetworkImportExport({
       if (payload.networks.length === 0) {
         setImportExportStatus({
           kind: "failed",
-          message: "No network available for the selected export scope."
+          message: t("ui.noNetworkAvailableForTheSelectedExportScope")
         });
         return;
       }
@@ -205,7 +206,7 @@ export function useNetworkImportExport({
       if (exportResult === "failed") {
         setImportExportStatus({
           kind: "failed",
-          message: "Export is not available in this environment."
+          message: t("ui.exportIsNotAvailableInThisEnvironment")
         });
         return;
       }
@@ -234,7 +235,7 @@ export function useNetworkImportExport({
       setLastImportSummary(resolved.summary);
 
       if (resolved.networks.length === 0) {
-        const message = "No network was imported. Check file errors.";
+        const message = t("ui.noNetworkWasImportedCheckFileErrors");
         setImportFailureDialog({
           title: "Network import failed",
           message: "The selected file did not produce any importable network.",
@@ -607,7 +608,7 @@ export function useNetworkImportExport({
     try {
       rawJson = await file.text();
     } catch {
-      const message = "Unable to read selected file.";
+      const message = t("ui.unableToReadSelectedFile");
       setImportFailureDialog({
         title: "Network import failed",
         message: "The selected file could not be read.",
@@ -628,7 +629,7 @@ export function useNetworkImportExport({
 
     const parsed = parseNetworkFilePayload(rawJson);
     if (parsed.payload === null) {
-      const message = parsed.error ?? "Invalid import file.";
+      const message = parsed.error ?? t("ui.invalidImportFile");
       setImportFailureDialog({
         title: "Network import failed",
         message: "The selected file is not a valid network export.",

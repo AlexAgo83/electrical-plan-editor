@@ -1,10 +1,10 @@
 ## item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge - Prove zero legacy consumers and remove the runtime compatibility bridge
 > From version: 1.18.2
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 10%
 > Complexity: Medium
 > Theme: Internationalization contract adoption
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.

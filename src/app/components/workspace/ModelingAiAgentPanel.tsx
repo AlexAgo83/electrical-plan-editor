@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useMemo, useState, type ReactElement } from "react";
 import type { AiAgentContextSummary } from "../../lib/aiAgentContext";
 import { buildAiAgentImpactPreview, type AiAgentImpactPreview } from "../../lib/aiAgentApply";
@@ -203,7 +204,7 @@ export function ModelingAiAgentPanel({
           <span>Context</span> <strong>{selectedContextSummary.scopeLabel}</strong>
         </p>
         <p className="meta-line">
-          <span>Network</span> <strong>{selectedContextSummary.networkName ?? "None"}</strong>
+          <span>Network</span> <strong>{selectedContextSummary.networkName ?? t("ui.none")}</strong>
         </p>
         <p className="meta-line ai-agent-context-entities">
           <span>Entities</span>
@@ -536,7 +537,7 @@ export function ModelingAiAgentPanel({
             <span>Unsupported</span> <strong>{proposalValidation.unsupported.length}</strong>
           </p>
           <p className="meta-line">
-            <span>Warnings</span> <strong>{proposalValidation.warnings.length}</strong>
+            <span>{t("ui.warnings2")}</span> <strong>{proposalValidation.warnings.length}</strong>
           </p>
           {proposalValidation.accepted.map((operation, index) => (
             <p className="meta-line ai-agent-operation-line" key={`${operation.type}-${index}`}>

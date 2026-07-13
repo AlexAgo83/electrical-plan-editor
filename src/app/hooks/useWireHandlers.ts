@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import { useCallback, useEffect, useRef, type FormEvent } from "react";
 import type {
   ConnectorId,
@@ -35,7 +36,6 @@ import {
   resolveWireEndpointReferenceName,
   type WireEndpointReferenceSyncPlan
 } from "./wireEndpointReferenceSync";
-
 type DispatchAction = (
   action: Parameters<AppStore["dispatch"]>[0],
   options?: {
@@ -659,13 +659,13 @@ export function useWireHandlers({
     const normalizedName = wireName.trim();
     const normalizedTechnicalId = wireTechnicalId.trim();
     if (normalizedName.length === 0 || normalizedTechnicalId.length === 0) {
-      setWireFormError("Wire name and technical ID are required.");
+      setWireFormError(t("ui.wireNameAndTechnicalIDAreRequired"));
       return;
     }
     const normalizedSectionInput = wireSectionMm2.replace(",", ".").trim();
     const parsedSectionMm2 = Number(normalizedSectionInput);
     if (!Number.isFinite(parsedSectionMm2) || parsedSectionMm2 <= 0) {
-      setWireFormError("Wire section must be a positive value in mm².");
+      setWireFormError(t("ui.wireSectionMustBeAPositiveValueInMm2"));
       return;
     }
     const normalizedCurrentInput = wireCurrentA.replace(",", ".").trim();
@@ -711,7 +711,7 @@ export function useWireHandlers({
       (endpointBConnectionReference?.length ?? 0) > 120 ||
       (endpointBSealReference?.length ?? 0) > 120
     ) {
-      setWireFormError("Wire endpoint references must be 120 characters or fewer.");
+      setWireFormError(t("ui.wireEndpointReferencesMustBe120CharactersOrFewer"));
       return;
     }
 
@@ -884,10 +884,10 @@ export function useWireHandlers({
       wire.name.trim().length === 0 ? `'${wire.technicalId}'` : `'${wire.name}' (${wire.technicalId})`;
     void (async () => {
       const shouldDelete = await confirmAction({
-        title: "Delete wire",
+        title: t("ui.deleteWire"),
         message: `Delete wire ${wireIdentity}?`,
-        confirmLabel: "Delete",
-        cancelLabel: "Cancel",
+        confirmLabel: t("ui.delete"),
+        cancelLabel: t("ui.cancel"),
         intent: "danger",
         confirmOnEnter: true
       });
@@ -913,7 +913,7 @@ export function useWireHandlers({
       .filter((token) => token.length > 0) as SegmentId[];
 
     if (forcedSegmentIds.length === 0) {
-      setWireFormError("Provide at least one segment ID to lock a forced route.");
+      setWireFormError(t("ui.provideAtLeastOneSegmentIDToLockAForced"));
       return;
     }
 

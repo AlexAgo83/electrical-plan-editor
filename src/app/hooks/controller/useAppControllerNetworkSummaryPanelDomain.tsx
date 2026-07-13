@@ -1,5 +1,5 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
 import { unstable_batchedUpdates } from "react-dom";
 import type { AppAction } from "../../../store/actions";
 import type {
@@ -35,7 +35,6 @@ import {
   buildSelectedHarnessAgentJsonPayload,
   serializeSelectedHarnessAgentJsonPayload
 } from "../../lib/selectedHarnessAgentJson";
-
 type NetworkSummaryPanelSliceParams = Parameters<typeof buildNetworkSummaryPanelControllerSlice>[0];
 
 const DISPLAYED_HARNESS_ASSEMBLY_STORAGE_KEY = "electrical-plan-editor.displayed-harness-assembly-id";
@@ -784,7 +783,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
             {harnessAssemblies.length === 0 ? <p className="empty-copy">No saved harness assembly yet.</p> : null}
             <footer className="confirm-dialog-actions">
               <button type="button" className="confirm-dialog-cancel" onClick={() => setIsHarnessAssemblyPickerOpen(false)}>
-                Cancel
+                
+                {t("ui.cancel")}
               </button>
             </footer>
           </section>

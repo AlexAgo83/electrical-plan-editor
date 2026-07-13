@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useCallback } from "react";
 import type { NetworkId } from "../../../core/entities";
 import { buildNetworkExportFilename } from "../useNetworkImportExport";
@@ -42,10 +43,10 @@ export function useAppControllerSaveExportActions({
         networkCount: 1
       });
       const shouldSave = await requestConfirmation({
-        title: "Save active network",
-        message: "Export the active network now?",
+        title: t("ui.saveActiveNetwork"),
+        message: t("ui.exportTheActiveNetworkNow"),
         details: fileName,
-        confirmLabel: "Save",
+        confirmLabel: t("ui.save"),
         intent: "neutral"
       });
       if (!shouldSave) {
@@ -87,7 +88,7 @@ export function useAppControllerSaveExportActions({
           title: "Save selected network",
           message: "Export the selected network now?",
           details: fileName,
-          confirmLabel: "Save",
+          confirmLabel: t("ui.save"),
           intent: "neutral"
         });
         if (!shouldSave) {

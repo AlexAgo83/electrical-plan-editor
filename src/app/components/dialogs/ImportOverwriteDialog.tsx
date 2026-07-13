@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { useModalDialog } from "../../hooks/useModalDialog";
 import type { OverwriteCandidate } from "../../../adapters/portability";
@@ -187,7 +188,8 @@ export function ImportOverwriteDialog({
         </ul>
         <footer className="confirm-dialog-actions">
           <button ref={cancelButtonRef} type="button" className="confirm-dialog-cancel" onClick={onCancel}>
-            Cancel
+            
+            {t("ui.cancel")}
           </button>
           <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={handleConfirm}>
             <span className="action-button-icon is-open" aria-hidden="true" />

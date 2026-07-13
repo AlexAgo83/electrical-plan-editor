@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useMemo, useState, type ReactElement } from "react";
 import { getWireColorLabel, getWireColorSortValue } from "../../../core/cableColors";
 import type { SegmentId, WireEndpoint } from "../../../core/entities";
@@ -95,7 +96,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           if (field === "endpointB") return endpointB;
           if (field === "sectionMm2") return wire.sectionMm2;
           if (field === "lengthMm") return wire.lengthMm;
-          return wire.isRouteLocked ? "Locked" : "Auto";
+          return wire.isRouteLocked ? t("ui.locked") : t("ui.auto");
         },
         (wire) => wire.id
       ),
@@ -105,21 +106,21 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     wireAnalysisTableSort.field === field ? (wireAnalysisTableSort.direction === "asc" ? "▲" : "▼") : "";
   const wireFilterPlaceholder =
     wireFilterField === "endpoints"
-      ? "Connector/Splice or ID"
+      ? t("ui.connectorSpliceOrID")
       : wireFilterField === "name"
-        ? "Wire name"
+        ? t("ui.wireName")
         : wireFilterField === "technicalId"
-          ? "Technical ID"
-        : "Name, technical ID, endpoint...";
+          ? t("ui.technicalID")
+        : t("ui.nameTechnicalIDEndpoint");
   const getWireFuseManufacturerReference = (wire: (typeof visibleWires)[number]): string | null => {
     if (wire.protection?.kind !== "fuse") {
       return null;
     }
-    return catalogItemById.get(wire.protection.catalogItemId)?.manufacturerReference ?? "(missing catalog item)";
+    return catalogItemById.get(wire.protection.catalogItemId)?.manufacturerReference ?? t("ui.missingCatalogItem");
   };
   const getWireColorSummaryLabel = (wire: (typeof visibleWires)[number]): string | null => {
     const label = getWireColorLabel(wire);
-    return label === "No color" || label === "Free color (unspecified)" ? null : label;
+    return label === t("ui.noColor") || label === "Free color (unspecified)" ? null : label;
   };
   const getRouteSegmentLabel = (segment: (typeof segments)[number]): string => {
     const nodeALabel = nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
@@ -128,7 +129,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
   };
   const renderCurrentRoutePath = (segmentIds: readonly string[]): ReactElement => {
     if (segmentIds.length === 0) {
-      return <p className="route-preview-path analysis-current-route-empty">(none)</p>;
+      return <p className="route-preview-path analysis-current-route-empty">{t("ui.none2")}</p>;
     }
 
     return (
@@ -187,7 +188,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     <>
 <section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen || !showEntityTables}>
   <header className="list-panel-header list-panel-header-mobile-inline-tools">
-    <h2>Wires</h2>
+    <h2>{t("ui.wires")}</h2>
     <div className="list-panel-header-tools">
       <div className="list-panel-header-tools-row is-title-actions">
         <button
@@ -196,45 +197,45 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           onClick={() => {
             const headers = showWireRouteModeColumn
               ? [
-                  "Name",
-                  "Technical ID",
+                  t("ui.name"),
+                  t("ui.technicalID"),
                   "Twist group",
-                  "Color",
-                  "Begin ID",
-                  "Begin pin",
+                  t("ui.color"),
+                  t("ui.beginID"),
+                  t("ui.beginPin"),
                   "Begin connection ref",
                   "Begin connection name",
                   "Begin seal ref",
                   "Begin seal name",
-                  "End ID",
-                  "End pin",
+                  t("ui.endID"),
+                  t("ui.endPin"),
                   "End connection ref",
                   "End connection name",
                   "End seal ref",
                   "End seal name",
-                  "Section (mm²)",
-                  "Length (mm)",
+                  t("ui.sectionMm2"),
+                  t("ui.lengthMm"),
                   "Untwisted length (mm)",
-                  "Route mode"
+                  t("ui.routeMode")
                 ]
               : [
-                  "Name",
-                  "Technical ID",
-                  "Color",
-                  "Begin ID",
-                  "Begin pin",
+                  t("ui.name"),
+                  t("ui.technicalID"),
+                  t("ui.color"),
+                  t("ui.beginID"),
+                  t("ui.beginPin"),
                   "Begin connection ref",
                   "Begin connection name",
                   "Begin seal ref",
                   "Begin seal name",
-                  "End ID",
-                  "End pin",
+                  t("ui.endID"),
+                  t("ui.endPin"),
                   "End connection ref",
                   "End connection name",
                   "End seal ref",
                   "End seal name",
-                  "Section (mm²)",
-                  "Length (mm)",
+                  t("ui.sectionMm2"),
+                  t("ui.lengthMm"),
                   "Untwisted length (mm)"
                 ];
             const twistGroupCounts = buildWireTwistGroupExportCounts(wires);
@@ -265,7 +266,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   wire.sectionMm2,
                   resolveWireExportLengthMm(wire, twistGroupCounts, wireExportLengthPreferences),
                   resolveWireUntwistedExportLengthMm(wire, twistGroupCounts, wireExportLengthPreferences),
-                  wire.isRouteLocked ? "Locked" : "Auto"
+                  wire.isRouteLocked ? t("ui.locked") : t("ui.auto")
                 ];
               }
               return [
@@ -322,7 +323,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
         {onOpenWireOnboardingHelp !== undefined ? (
           <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenWireOnboardingHelp}>
             <span className="action-button-icon is-help" aria-hidden="true" />
-            <span>Help</span>
+            <span>{t("ui.help")}</span>
           </button>
         ) : null}
       </div>
@@ -335,7 +336,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
             value={wireFunctionalTagFilter}
             onChange={(event) => setWireFunctionalTagFilter(event.target.value)}
           >
-            <option value="all">Any</option>
+            <option value="all">{t("ui.any")}</option>
             {wireFunctionalTagOptions.map((label) => (
               <option key={label} value={label}>
                 {label}
@@ -344,15 +345,15 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           </select>
         </label>
         <TableFilterBar
-          label="Filter"
-          fieldLabel="Wire filter field"
+          label={t("ui.filter")}
+          fieldLabel={t("ui.wireFilterField")}
           fieldValue={wireFilterField}
           onFieldChange={(value) => setWireFilterField(value as "endpoints" | "name" | "technicalId" | "any")}
           fieldOptions={[
-            { value: "endpoints", label: "Endpoints" },
-            { value: "name", label: "Wire name" },
-            { value: "technicalId", label: "Technical ID" },
-            { value: "any", label: "Any" }
+            { value: "endpoints", label: t("ui.endpoints") },
+            { value: "name", label: t("ui.wireName") },
+            { value: "technicalId", label: t("ui.technicalID") },
+            { value: "any", label: t("ui.any") }
           ]}
           queryValue={wireEndpointFilterQuery}
           onQueryChange={setWireEndpointFilterQuery}
@@ -362,10 +363,10 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     </div>
   </header>
   {wires.length === 0 ? (
-    <p className="empty-copy">No wire yet.</p>
+    <p className="empty-copy">{t("ui.noWireYet")}</p>
   ) : sortedVisibleWires.length === 0 ? (
     <>
-      <p className="empty-copy">No wire matches the current filters.</p>
+      <p className="empty-copy">{t("ui.noWireMatchesTheCurrentFilters")}</p>
       <TableEntryCountFooter count={0} />
     </>
   ) : (
@@ -384,7 +385,8 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }))
                 }
               >
-                Name <span className="sort-indicator">{wireListSortIndicator("name")}</span>
+                
+                {t("ui.name")} <span className="sort-indicator">{wireListSortIndicator("name")}</span>
               </button>
             </th>
             <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "technicalId")}>
@@ -398,7 +400,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }))
                 }
               >
-                {isMobileViewport ? "ID" : "Technical ID"} <span className="sort-indicator">{wireListSortIndicator("technicalId")}</span>
+                {isMobileViewport ? t("ui.id") : t("ui.technicalID")} <span className="sort-indicator">{wireListSortIndicator("technicalId")}</span>
               </button>
             </th>
             <th>{isMobileViewport ? "Func tag" : "Functional tag"}</th>
@@ -414,7 +416,8 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }))
                 }
               >
-                Color <span className="sort-indicator">{wireListSortIndicator("color")}</span>
+                
+                {t("ui.color")} <span className="sort-indicator">{wireListSortIndicator("color")}</span>
               </button>
             </th>
             <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "endpointA")}>
@@ -428,7 +431,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }))
                 }
               >
-                {isMobileViewport ? "End A" : "Endpoint A"} <span className="sort-indicator">{wireListSortIndicator("endpointA")}</span>
+                {isMobileViewport ? t("ui.endA") : t("ui.endpointA")} <span className="sort-indicator">{wireListSortIndicator("endpointA")}</span>
               </button>
             </th>
             <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "endpointB")}>
@@ -442,7 +445,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }))
                 }
               >
-                {isMobileViewport ? "End B" : "Endpoint B"} <span className="sort-indicator">{wireListSortIndicator("endpointB")}</span>
+                {isMobileViewport ? t("ui.endB") : t("ui.endpointB")} <span className="sort-indicator">{wireListSortIndicator("endpointB")}</span>
               </button>
             </th>
             <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "sectionMm2")}>
@@ -456,7 +459,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }))
                 }
               >
-                {isMobileViewport ? "Sec" : "Section (mm²)"} <span className="sort-indicator">{wireListSortIndicator("sectionMm2")}</span>
+                {isMobileViewport ? t("ui.sec") : t("ui.sectionMm2")} <span className="sort-indicator">{wireListSortIndicator("sectionMm2")}</span>
               </button>
             </th>
             <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "lengthMm")}>
@@ -470,7 +473,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   }))
                 }
               >
-                {isMobileViewport ? "Len" : "Length (mm)"} <span className="sort-indicator">{wireListSortIndicator("lengthMm")}</span>
+                {isMobileViewport ? t("ui.len") : t("ui.lengthMm")} <span className="sort-indicator">{wireListSortIndicator("lengthMm")}</span>
               </button>
             </th>
           </tr>
@@ -515,7 +518,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   ) : null}
                 </td>
                 <td className="technical-id">{wire.technicalId}</td>
-                <td>{wire.functionalDomainTag ?? "Auto"}</td>
+                <td>{wire.functionalDomainTag ?? t("ui.auto")}</td>
                 <td>{wire.twistGroupLabel ?? ""}</td>
                 <td>{renderWireColorCellValue(wire)}</td>
                 <td>{renderWireEndpointReference(wire.endpointA)}</td>
@@ -550,19 +553,19 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
 
 <section className="panel analysis-wire-route-panel" hidden={!isWireSubScreen || hideWireAnalysisRoutePanel}>
   <header className="analysis-wire-route-header">
-    <h2>Wire analysis</h2>
+    <h2>{t("ui.wireAnalysis")}</h2>
     {selectedWire !== null ? (
       <span className={selectedWire.isRouteLocked ? "analysis-wire-mode-chip is-locked" : "analysis-wire-mode-chip"}>
-        {selectedWire.isRouteLocked ? "Locked route" : "Auto route"}
+        {selectedWire.isRouteLocked ? t("ui.lockedRoute") : t("ui.autoRoute")}
       </span>
     ) : null}
   </header>
   {selectedWire === null ? (
-    <p className="empty-copy">Select a wire to lock a forced route or reset to auto shortest path.</p>
+    <p className="empty-copy">{t("ui.selectAWireToLockAForcedRouteOrReset")}</p>
   ) : (
     <div className="analysis-wire-route-content">
       <article className="analysis-wire-identity">
-        <span className="analysis-wire-identity-label">Selected wire</span>
+        <span className="analysis-wire-identity-label">{t("ui.selectedWire")}</span>
         <p className="analysis-wire-identity-value">
           <strong>{selectedWire.name}</strong> <span className="technical-id">({selectedWire.technicalId})</span>
         </p>
@@ -581,33 +584,34 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
 
       <div className="route-preview-selection-strip">
         <article>
-          <span>Start</span>
+          <span>{t("ui.start")}</span>
           <strong>{renderWireEndpointReference(selectedWire.endpointA)}</strong>
         </article>
         <span className="route-preview-selection-arrow" aria-hidden="true">
           &rarr;
         </span>
         <article>
-          <span>End</span>
+          <span>{t("ui.end")}</span>
           <strong>{renderWireEndpointReference(selectedWire.endpointB)}</strong>
         </article>
       </div>
 
       <article className="analysis-wire-route-current">
-        <span>Current route</span>
+        <span>{t("ui.currentRoute")}</span>
         {renderCurrentRoutePath(selectedWire.routeSegmentIds)}
       </article>
       <article className="analysis-wire-route-current">
-        <span>Endpoint references</span>
+        <span>{t("ui.endpointReferences")}</span>
         <p className="route-preview-path">
-          A: {selectedWire.endpointAConnectionReference?.trim() || "No connection ref"} / {selectedWire.endpointASealReference?.trim() || "No seal ref"}
+          A: {selectedWire.endpointAConnectionReference?.trim() || t("ui.noConnectionRef")} / {selectedWire.endpointASealReference?.trim() || t("ui.noSealRef")}
           {" • "}
-          B: {selectedWire.endpointBConnectionReference?.trim() || "No connection ref"} / {selectedWire.endpointBSealReference?.trim() || "No seal ref"}
+          B: {selectedWire.endpointBConnectionReference?.trim() || t("ui.noConnectionRef")} / {selectedWire.endpointBSealReference?.trim() || t("ui.noSealRef")}
         </p>
       </article>
 
       <label className="stack-label analysis-wire-route-input">
-        Forced route segment IDs (comma-separated)
+        
+        {t("ui.forcedRouteSegmentIDsCommaSeparated")}
         <input
           value={wireForcedRouteInput}
           onChange={(event) => setWireForcedRouteInput(event.target.value)}
@@ -618,11 +622,13 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
       <div className="row-actions analysis-wire-route-actions">
         <button type="button" className="button-with-icon" onClick={handleLockWireRoute}>
           <span className="action-button-icon is-lock-move" aria-hidden="true" />
-          Lock forced route
+          
+          {t("ui.lockForcedRoute")}
         </button>
         <button type="button" className="button-with-icon" onClick={handleResetWireRoute}>
           <span className="action-button-icon is-cancel" aria-hidden="true" />
-          Reset to auto route
+          
+          {t("ui.resetToAutoRoute")}
         </button>
       </div>
       {wireFormError !== null ? <small className="inline-error">{wireFormError}</small> : null}

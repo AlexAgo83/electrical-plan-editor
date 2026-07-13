@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import type { CSSProperties, ReactElement } from "react";
 import { CABLE_COLOR_BY_ID, getWireColorCode, getWireColorLabel, isWireFreeColorMode } from "../../core/cableColors";
 import type { Wire } from "../../core/entities";
@@ -48,7 +49,7 @@ export function renderWireColorCellValue(
     const colorLabel = getWireColorLabel(wire);
     return (
       <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }} title={colorLabel}>
-        <span aria-hidden="true" style={neutralBadgeStyle}>Free</span>
+        <span aria-hidden="true" style={neutralBadgeStyle}>{t("ui.free")}</span>
         {wire.freeColorLabel !== null ? <span>{getFreeColorCellText(wire)}</span> : null}
       </span>
     );
@@ -85,7 +86,8 @@ export function renderWireColorPrefixMarker(
     }
     return (
       <span aria-hidden="true" title={getWireColorLabel(wire)} style={neutralBadgeStyle}>
-        Free
+        
+        {t("ui.free")}
       </span>
     );
   }

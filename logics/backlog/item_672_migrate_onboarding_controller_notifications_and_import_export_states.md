@@ -1,10 +1,10 @@
 ## item_672_migrate_onboarding_controller_notifications_and_import_export_states - Migrate onboarding, controller notifications, and import-export states
 > From version: 1.18.2
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 10%
 > Complexity: Medium
 > Theme: Internationalization contract adoption
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.

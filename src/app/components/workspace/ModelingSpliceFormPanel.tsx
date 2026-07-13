@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
 import { buildModelingDynamicSelectOptions } from "../../lib/modelingSelectOptions";
@@ -72,26 +73,29 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
   return (
 <article className="panel" hidden={!isSpliceSubScreen} data-form-panel={FORM_PANEL_IDS.splice}>
   {renderFormHeader(
-    spliceFormMode === "create" ? "Create Splice" : spliceFormMode === "edit" ? "Edit Splice" : "Splice form",
+    spliceFormMode === "create" ? t("ui.createSplice") : spliceFormMode === "edit" ? t("ui.editSplice") : t("ui.spliceForm"),
     spliceFormMode
   )}
   {spliceFormMode === "idle" ? renderIdleCopy("splice", openCreateSpliceForm) : (
   <form className="stack-form" onSubmit={handleSpliceSubmit}>
     <label>
-      Functional name
-      <input value={spliceName} onChange={(event) => setSpliceName(event.target.value)} placeholder="Cabin junction" required />
+      
+      {t("ui.functionalName")}
+      <input value={spliceName} onChange={(event) => setSpliceName(event.target.value)} placeholder={t("ui.cabinJunction")} required />
     </label>
     <label>
-      Technical ID
+      
+      {t("ui.technicalID")}
       <input value={spliceTechnicalId} onChange={(event) => setSpliceTechnicalId(event.target.value)} placeholder="S-001" required />
     </label>
     <label>
-      Catalog item (manufacturer reference)
+      
+      {t("ui.catalogItemManufacturerReference")}
       <select
         value={spliceCatalogItemId}
         onChange={(event) => setSpliceCatalogItemId(event.target.value)}
       >
-        <option value="">No catalog item</option>
+        <option value="">{t("ui.noCatalogItem")}</option>
         {catalogItemOptions.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -101,10 +105,11 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     </label>
     {!hasCatalogItems ? (
       <div className="row-actions compact">
-        <small className="inline-help">No catalog item is required for splices. Create one only when you need a linked product reference.</small>
+        <small className="inline-help">{t("ui.noCatalogItemIsRequiredForSplicesCreateOneOnly")}</small>
         <button type="button" className="button-with-icon" onClick={openCatalogSubScreen}>
           <span className="action-button-icon is-catalog" aria-hidden="true" />
-          Open Catalog
+          
+          {t("ui.openCatalog")}
         </button>
       </div>
     ) : null}
@@ -117,7 +122,8 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
             title={`Open catalog item ${spliceManufacturerReference}`}
             onClick={() => onSelectCatalogItem(selectedCatalogItem.id)}
           >
-            Manufacturer reference: <span className="technical-id">{spliceManufacturerReference}</span>
+            
+            {t("ui.manufacturerReference2")} <span className="technical-id">{spliceManufacturerReference}</span>
           </EntityReferenceButton>
         )}
       </small>
@@ -125,7 +131,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     {isCatalogLinked ? (
       <small className="inline-help">Catalog-linked directional splices keep L/R sides; legacy bounded splices derive port count from catalog connection count.</small>
     ) : null}
-    {spliceTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
+    {spliceTechnicalIdAlreadyUsed ? <small className="inline-error">{t("ui.thisTechnicalIDIsAlreadyUsed")}</small> : null}
     {spliceFormMode === "create" ? (
       <label>
         Splice type
@@ -148,7 +154,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
             onChange={(event) => setSplicePortMode(event.target.value as "bounded" | "unbounded")}
             disabled={isCatalogLinked}
           >
-            <option value="bounded">Bounded</option>
+            <option value="bounded">{t("ui.bounded")}</option>
             <option value="unbounded">Unbounded (infinity)</option>
           </select>
         </label>
@@ -188,12 +194,13 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       </>
     ) : isUnbounded ? (
       <label>
-        Port count
+        
+        {t("ui.portCount")}
         <input value="infinity" readOnly aria-readonly="true" />
       </label>
     ) : (
       <label>
-        {isCatalogLinked ? "Port count (from catalog)" : "Port count"}
+        {isCatalogLinked ? t("ui.portCountFromCatalog") : t("ui.portCount")}
         <input
           type="number"
           min={1}
@@ -276,22 +283,24 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       >
         {spliceFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
         {spliceFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
-        {spliceFormMode === "create" ? "Create" : "Save"}
+        {spliceFormMode === "create" ? t("ui.create") : t("ui.save")}
       </button>
       {spliceFormMode === "edit" && spliceEditAfterCreate ? (
         <button type="button" className="button-with-icon" onClick={openCreateSpliceForm}>
           <span className="action-button-icon is-new" aria-hidden="true" />
-          New
+          
+          {t("ui.new")}
         </button>
       ) : null}
       <button type="button" className={spliceFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelSpliceEdit}>
         {spliceFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
-        {spliceFormMode === "edit" ? "Cancel edit" : "Cancel"}
+        {spliceFormMode === "edit" ? t("ui.cancelEdit") : t("ui.cancel")}
       </button>
       {spliceFormMode === "edit" && isDirectional ? (
         <button type="button" className="button-with-icon" onClick={handleSuggestOptimizedSplicePlacement}>
           <span className="action-button-icon is-analysis" aria-hidden="true" />
-          Suggest optimized lengths
+          
+          {t("ui.suggestOptimizedLengths")}
         </button>
       ) : null}
     </div>

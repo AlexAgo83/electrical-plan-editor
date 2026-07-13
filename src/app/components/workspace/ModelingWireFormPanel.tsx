@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 import { CABLE_COLOR_BY_ID, CABLE_COLOR_CATALOG } from "../../../core/cableColors";
 import { getConnectorCavityFallbackLabel, resolveConnectorCavityDisplayLabel } from "../../../core/connectorLayout";
@@ -350,15 +351,17 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
 
   return (
 <article className="panel" hidden={!isWireSubScreen} data-form-panel={FORM_PANEL_IDS.wire}>
-  {renderFormHeader(wireFormMode === "create" ? "Create Wire" : wireFormMode === "edit" ? "Edit Wire" : "Wire form", wireFormMode)}
+  {renderFormHeader(wireFormMode === "create" ? t("ui.createWire") : wireFormMode === "edit" ? t("ui.editWire") : t("ui.wireForm"), wireFormMode)}
   {wireFormMode === "idle" ? renderIdleCopy("wire", wireHandlers.resetWireForm) : (
   <form className="stack-form" onSubmit={wireHandlers.handleWireSubmit}>
     <label>
-      Functional name
-      <input value={wireName} onChange={(event) => setWireName(event.target.value)} placeholder="Feed wire" required />
+      
+      {t("ui.functionalName")}
+      <input value={wireName} onChange={(event) => setWireName(event.target.value)} placeholder={t("ui.feedWire")} required />
     </label>
     <label>
-      Technical ID
+      
+      {t("ui.technicalID")}
       <input value={wireTechnicalId} onChange={(event) => setWireTechnicalId(event.target.value)} placeholder="W-001" required />
     </label>
     <label>
@@ -373,7 +376,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     <label>
       Functional tag
       <select value={wireFunctionalDomainTag} onChange={(event) => setWireFunctionalDomainTag(event.target.value)}>
-        <option value="">Auto</option>
+        <option value="">{t("ui.auto")}</option>
         {functionalDomainTagOptions.map((tag) => (
           <option key={tag} value={tag}>
             {tag}
@@ -382,7 +385,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       </select>
     </label>
     <label>
-      Section (mm²)
+      
+      {t("ui.sectionMm2")}
       <input
         type="number"
         min={0.01}
@@ -433,14 +437,15 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     {wireFuseEnabled ? (
       <>
         <label>
-          Fuse catalog item
+          
+          {t("ui.fuseCatalogItem")}
           <select
             value={wireFuseCatalogItemId}
             onChange={(event) => setWireFuseCatalogItemId(event.target.value)}
             required={wireFuseEnabled}
             aria-required={wireFuseEnabled}
           >
-            <option value="">Select catalog item</option>
+            <option value="">{t("ui.selectCatalogItem")}</option>
             {fuseCatalogItemOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
@@ -448,17 +453,18 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
             ))}
           </select>
         </label>
-        <small className="inline-help">Fuse reference is taken from the linked catalog item's manufacturer reference.</small>
+        <small className="inline-help">{t("ui.fuseReferenceIsTakenFromTheLinkedCatalogItemS")}</small>
       </>
     ) : null}
     <label>
-      Primary color
+      
+      {t("ui.primaryColor")}
       <select
         value={primaryColorSelectValue}
         onChange={(event) => handleWirePrimaryColorSelection(event.target.value)}
       >
         <option value="">Not specified</option>
-        <option value="__free__">Free</option>
+        <option value="__free__">{t("ui.free")}</option>
         {CABLE_COLOR_CATALOG.map((color) => (
           <option key={color.id} value={color.id}>
             {color.id} - {color.label}
@@ -468,12 +474,13 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     </label>
     {wireColorMode === "catalog" && wirePrimaryColorId.length > 0 ? (
       <label>
-        Secondary color
+        
+        {t("ui.secondaryColor")}
         <select
           value={wireSecondaryColorId}
           onChange={(event) => setWireSecondaryColorId(event.target.value)}
         >
-          <option value="">None</option>
+          <option value="">{t("ui.none")}</option>
           {CABLE_COLOR_CATALOG.map((color) => (
             <option key={color.id} value={color.id}>
               {color.id} - {color.label}
@@ -501,23 +508,25 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         )}
       </small>
     ) : null}
-    {wireTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
+    {wireTechnicalIdAlreadyUsed ? <small className="inline-error">{t("ui.thisTechnicalIDIsAlreadyUsed")}</small> : null}
     <div className="form-split wire-endpoints-grid">
       <fieldset className="inline-fieldset wire-endpoint-fieldset">
-        <legend>Endpoint A</legend>
+        <legend>{t("ui.endpointA")}</legend>
         <label>
-          Type
+          
+          {t("ui.type")}
           <select value={wireEndpointAKind} onChange={(event) => setWireEndpointAKind(event.target.value as WireEndpoint["kind"])}>
-            <option value="connectorCavity">Connector way</option>
-            <option value="splicePort">Splice port</option>
+            <option value="connectorCavity">{t("ui.connectorWay")}</option>
+            <option value="splicePort">{t("ui.splicePort")}</option>
           </select>
         </label>
         {wireEndpointAKind === "connectorCavity" ? (
           <>
             <label>
-              Connector
+              
+              {t("ui.connector")}
               <select value={wireEndpointAConnectorId} onChange={(event) => setWireEndpointAConnectorId(event.target.value)}>
-                <option value="">Select connector</option>
+                <option value="">{t("ui.selectConnector")}</option>
                 {connectorOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -526,7 +535,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               </select>
             </label>
             <label>
-              Way index
+              
+              {t("ui.wayIndex")}
               <input type="number" min={1} step={1} value={wireEndpointACavityIndex} onChange={(event) => setWireEndpointACavityIndex(event.target.value)} />
             </label>
             <label className="settings-checkbox">
@@ -547,9 +557,10 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         ) : (
           <>
             <label>
-              Splice
+              
+              {t("ui.splice")}
               <select value={wireEndpointASpliceId} onChange={(event) => setWireEndpointASpliceId(event.target.value)}>
-                <option value="">Select splice</option>
+                <option value="">{t("ui.selectSplice")}</option>
                 {endpointASpliceOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -585,7 +596,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               </>
             ) : (
               <label>
-                Port index
+                
+                {t("ui.portIndex")}
                 <input type="number" min={1} step={1} value={wireEndpointAPortIndex} onChange={(event) => setWireEndpointAPortIndex(event.target.value)} />
               </label>
             )}
@@ -595,14 +607,14 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
           </>
         )}
         <div className="stack-form">
-          <small className="inline-help">Side A metadata</small>
+          <small className="inline-help">{t("ui.sideAMetadata")}</small>
           <label>
-            {buildDefaultLabel("Connection reference", endpointACatalogDefaults.connectionReference)}
+            {buildDefaultLabel(t("ui.connectionReference"), endpointACatalogDefaults.connectionReference)}
             <input
               value={wireEndpointAConnectionReference}
               onChange={(event) => setWireEndpointAConnectionReference(event.target.value)}
               maxLength={120}
-              placeholder="Optional"
+              placeholder={t("ui.optional")}
             />
           </label>
           <label>
@@ -611,16 +623,16 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               value={wireEndpointAConnectionName}
               onChange={(event) => setWireEndpointAConnectionName(event.target.value)}
               maxLength={120}
-              placeholder="Optional"
+              placeholder={t("ui.optional")}
             />
           </label>
           <label>
-            {buildDefaultLabel("Seal reference", endpointACatalogDefaults.sealReference)}
+            {buildDefaultLabel(t("ui.sealReference"), endpointACatalogDefaults.sealReference)}
             <input
               value={wireEndpointASealReference}
               onChange={(event) => setWireEndpointASealReference(event.target.value)}
               maxLength={120}
-              placeholder="Optional"
+              placeholder={t("ui.optional")}
             />
           </label>
           <label>
@@ -629,27 +641,29 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               value={wireEndpointASealName}
               onChange={(event) => setWireEndpointASealName(event.target.value)}
               maxLength={120}
-              placeholder="Optional"
+              placeholder={t("ui.optional")}
             />
           </label>
         </div>
       </fieldset>
 
       <fieldset className="inline-fieldset wire-endpoint-fieldset">
-        <legend>Endpoint B</legend>
+        <legend>{t("ui.endpointB")}</legend>
         <label>
-          Type
+          
+          {t("ui.type")}
           <select value={wireEndpointBKind} onChange={(event) => setWireEndpointBKind(event.target.value as WireEndpoint["kind"])}>
-            <option value="connectorCavity">Connector way</option>
-            <option value="splicePort">Splice port</option>
+            <option value="connectorCavity">{t("ui.connectorWay")}</option>
+            <option value="splicePort">{t("ui.splicePort")}</option>
           </select>
         </label>
         {wireEndpointBKind === "connectorCavity" ? (
           <>
             <label>
-              Connector
+              
+              {t("ui.connector")}
               <select value={wireEndpointBConnectorId} onChange={(event) => setWireEndpointBConnectorId(event.target.value)}>
-                <option value="">Select connector</option>
+                <option value="">{t("ui.selectConnector")}</option>
                 {endpointBConnectorOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -658,7 +672,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               </select>
             </label>
             <label>
-              Way index
+              
+              {t("ui.wayIndex")}
               <input type="number" min={1} step={1} value={wireEndpointBCavityIndex} onChange={(event) => setWireEndpointBCavityIndex(event.target.value)} />
             </label>
             <label className="settings-checkbox">
@@ -679,9 +694,10 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         ) : (
           <>
             <label>
-              Splice
+              
+              {t("ui.splice")}
               <select value={wireEndpointBSpliceId} onChange={(event) => setWireEndpointBSpliceId(event.target.value)}>
-                <option value="">Select splice</option>
+                <option value="">{t("ui.selectSplice")}</option>
                 {endpointBSpliceOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
@@ -717,7 +733,8 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               </>
             ) : (
               <label>
-                Port index
+                
+                {t("ui.portIndex")}
                 <input type="number" min={1} step={1} value={wireEndpointBPortIndex} onChange={(event) => setWireEndpointBPortIndex(event.target.value)} />
               </label>
             )}
@@ -727,14 +744,14 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
           </>
         )}
         <div className="stack-form">
-          <small className="inline-help">Side B metadata</small>
+          <small className="inline-help">{t("ui.sideBMetadata")}</small>
           <label>
-            {buildDefaultLabel("Connection reference", endpointBCatalogDefaults.connectionReference)}
+            {buildDefaultLabel(t("ui.connectionReference"), endpointBCatalogDefaults.connectionReference)}
             <input
               value={wireEndpointBConnectionReference}
               onChange={(event) => setWireEndpointBConnectionReference(event.target.value)}
               maxLength={120}
-              placeholder="Optional"
+              placeholder={t("ui.optional")}
             />
           </label>
           <label>
@@ -743,16 +760,16 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               value={wireEndpointBConnectionName}
               onChange={(event) => setWireEndpointBConnectionName(event.target.value)}
               maxLength={120}
-              placeholder="Optional"
+              placeholder={t("ui.optional")}
             />
           </label>
           <label>
-            {buildDefaultLabel("Seal reference", endpointBCatalogDefaults.sealReference)}
+            {buildDefaultLabel(t("ui.sealReference"), endpointBCatalogDefaults.sealReference)}
             <input
               value={wireEndpointBSealReference}
               onChange={(event) => setWireEndpointBSealReference(event.target.value)}
               maxLength={120}
-              placeholder="Optional"
+              placeholder={t("ui.optional")}
             />
           </label>
           <label>
@@ -761,7 +778,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               value={wireEndpointBSealName}
               onChange={(event) => setWireEndpointBSealName(event.target.value)}
               maxLength={120}
-              placeholder="Optional"
+              placeholder={t("ui.optional")}
             />
           </label>
         </div>
@@ -776,18 +793,20 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       >
         {wireFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
         {wireFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
-        {wireFormMode === "create" ? "Create" : "Save"}
+        {wireFormMode === "create" ? t("ui.create") : t("ui.save")}
       </button>
       {wireFormMode === "edit" && wireEditAfterCreate ? (
         <button type="button" className="button-with-icon" onClick={wireHandlers.resetWireForm}>
           <span className="action-button-icon is-new" aria-hidden="true" />
-          New
+          
+          {t("ui.new")}
         </button>
       ) : null}
       {wireFormMode === "edit" ? (
         <button type="button" className="button-with-icon" onClick={wireHandlers.handleSwapWireEndpoints}>
           <span className="action-button-icon is-swap" aria-hidden="true" />
-          Swap endpoints
+          
+          {t("ui.swapEndpoints")}
         </button>
       ) : null}
       <button
@@ -796,7 +815,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         onClick={wireHandlers.cancelWireEdit}
       >
         {wireFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
-        {wireFormMode === "edit" ? "Cancel edit" : "Cancel"}
+        {wireFormMode === "edit" ? t("ui.cancelEdit") : t("ui.cancel")}
       </button>
     </div>
     {wireFormError !== null ? <small className="inline-error">{wireFormError}</small> : null}

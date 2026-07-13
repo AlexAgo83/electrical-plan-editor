@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../../lib/i18n";
 import type {
   Connector,
   ConnectorId,
@@ -706,7 +707,7 @@ export function buildRenderedSegments({
       continue;
     }
 
-    const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? "(default)";
+    const segmentSubNetworkTag = segmentSubNetworkTagById.get(segment.id) ?? t("ui.default3");
     const isSubNetworkDeemphasized = isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentSubNetworkTag);
     const isWireHighlighted = selectedWireRouteSegmentIds.has(segment.id);
     const partialCoverage = partialCoverageBySegmentId.get(segment.id);
@@ -1137,7 +1138,7 @@ export function buildRenderedFloatingSplices({
   const result: RenderedFloatingSpliceModel[] = [];
 
   for (const entry of placedCandidates) {
-    const segmentTag = segmentSubNetworkTagById.get(entry.segmentId) ?? "(default)";
+    const segmentTag = segmentSubNetworkTagById.get(entry.segmentId) ?? t("ui.default3");
     const isSubNetworkDeemphasized =
       isSubNetworkFilteringActive && !activeSubNetworkTagSet.has(segmentTag);
     const isColocated = entry.colocationSize > 1;

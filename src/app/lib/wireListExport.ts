@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import { resolveConnectorTerminalMaterial } from "../../core/connectorCatalogMaterials";
 import { resolveConnectorCavityDisplayLabel } from "../../core/connectorLayout";
 import type { CatalogItem, Connector, NetworkNode, Splice, Wire, WireEndpoint } from "../../core/entities";
@@ -231,7 +232,7 @@ function resolveEndpoint(
     const label = resolveConnectorCavityDisplayLabel(connector, catalogItem, endpoint.cavityIndex);
     const isShared = sharedWayKeys.has(connectorCavityKey(endpoint.connectorId, endpoint.cavityIndex));
     return {
-      type: "Connector",
+      type: t("ui.connector"),
       ref: connector?.technicalId ?? endpoint.connectorId,
       // Mark shared ways so a repeated way label across rows reads as intentional.
       position: isShared ? `${label} (shared)` : label
@@ -239,7 +240,7 @@ function resolveEndpoint(
   }
   const splice = spliceById.get(endpoint.spliceId);
   return {
-    type: "Splice",
+    type: t("ui.splice"),
     ref: splice?.technicalId ?? endpoint.spliceId,
     position: endpoint.spliceSideOverride ?? endpoint.portIndex
   };
@@ -257,7 +258,7 @@ function buildReferenceTableRows(
     ...[...connectors]
       .sort((a, b) => a.technicalId.localeCompare(b.technicalId, undefined, { sensitivity: "base" }))
       .map((connector) => ({
-        type: "Connector",
+        type: t("ui.connector"),
         id: formatEntityId(connector.technicalId),
         name: connector.name,
         internalId: connector.id
@@ -265,7 +266,7 @@ function buildReferenceTableRows(
     ...[...splices]
       .sort((a, b) => a.technicalId.localeCompare(b.technicalId, undefined, { sensitivity: "base" }))
       .map((splice) => ({
-        type: "Splice",
+        type: t("ui.splice"),
         id: formatEntityId(splice.technicalId),
         name: splice.name,
         internalId: splice.id
@@ -273,7 +274,7 @@ function buildReferenceTableRows(
     ...[...nodes]
       .sort((a, b) => a.id.localeCompare(b.id, undefined, { sensitivity: "base" }))
       .map((node) => ({
-        type: "Node",
+        type: t("ui.node"),
         id: formatEntityId(node.id),
         name: resolveNodeReferenceName(node, connectorById, spliceById),
         internalId: node.id
@@ -344,26 +345,26 @@ export function buildWireListSheet(
   const catalogItemById = new Map(catalogItems.map((item) => [item.id, item]));
 
   const baseHeaders = [
-    "Technical ID",
-    "Name",
+    t("ui.technicalID"),
+    t("ui.name"),
     "Twist group",
-    "Section (mm²)",
-    "Color",
+    t("ui.sectionMm2"),
+    t("ui.color"),
     "Begin type",
     "Begin ref",
-    "Begin pin",
+    t("ui.beginPin"),
     "Begin connection ref",
     "Begin connection name",
     "Begin seal ref",
     "Begin seal name",
     "End type",
     "End ref",
-    "End pin",
+    t("ui.endPin"),
     "End connection ref",
     "End connection name",
     "End seal ref",
     "End seal name",
-    "Length (mm)",
+    t("ui.lengthMm"),
     "Untwisted length (mm)"
   ];
 

@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import type { FormEvent } from "react";
 import type { NetworkId } from "../../core/entities";
 import { formatIsoToLocalDateInput } from "../../core/networkMetadata";
@@ -12,7 +13,6 @@ import {
 } from "../lib/workspaceNetworkViewportActions";
 import type { SortState } from "../types/app-controller";
 import type { UseWorkspaceHandlersParams } from "./workspaceHandlerTypes";
-
 export function useWorkspaceHandlers({
   store,
   networks,
@@ -223,7 +223,7 @@ export function useWorkspaceHandlers({
       return;
     }
 
-    setNetworkFormError("Unable to create network. Check technical ID uniqueness.");
+    setNetworkFormError(t("ui.unableToCreateNetworkCheckTechnicalIDUniqueness"));
   }
 
   function handleSelectNetwork(nextNetworkId: NetworkId): void {
@@ -234,13 +234,13 @@ export function useWorkspaceHandlers({
     event.preventDefault();
 
     if (targetNetworkId === null) {
-      setNetworkFormError("No network selected for editing.");
+      setNetworkFormError(t("ui.noNetworkSelectedForEditing"));
       return;
     }
 
     const targetNetwork = store.getState().networks.byId[targetNetworkId];
     if (targetNetwork === undefined) {
-      setNetworkFormError("Selected network no longer exists.");
+      setNetworkFormError(t("ui.selectedNetworkNoLongerExists"));
       return;
     }
 
@@ -284,7 +284,7 @@ export function useWorkspaceHandlers({
 
     const targetNetwork = store.getState().networks.byId[targetNetworkId];
     if (targetNetwork === undefined) {
-      setNetworkFormError("Selected network no longer exists.");
+      setNetworkFormError(t("ui.selectedNetworkNoLongerExists"));
       return;
     }
 
@@ -317,16 +317,16 @@ export function useWorkspaceHandlers({
 
     const targetNetwork = store.getState().networks.byId[targetNetworkId];
     if (targetNetwork === undefined) {
-      setNetworkFormError("Selected network no longer exists.");
+      setNetworkFormError(t("ui.selectedNetworkNoLongerExists"));
       return;
     }
 
     void (async () => {
       const shouldDelete = await confirmAction({
-        title: "Delete network",
+        title: t("ui.deleteNetwork"),
         message: `Delete network '${targetNetwork.name}' (${targetNetwork.technicalId})?`,
-        confirmLabel: "Delete",
-        cancelLabel: "Cancel",
+        confirmLabel: t("ui.delete"),
+        cancelLabel: t("ui.cancel"),
         intent: "danger",
         confirmOnEnter: true
       });
@@ -352,8 +352,8 @@ export function useWorkspaceHandlers({
 
     void (async () => {
       const shouldReset = await confirmAction({
-        title: "Reset sample network",
-        message: "Reset the sample network to baseline? This removes any changes made to sample entities.",
+        title: t("ui.resetSampleNetwork"),
+        message: t("ui.resetTheSampleNetworkToBaselineThisRemovesAnyChanges"),
         intent: "warning"
       });
       if (!shouldReset) {

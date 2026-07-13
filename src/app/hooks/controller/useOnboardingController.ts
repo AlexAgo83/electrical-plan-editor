@@ -1,6 +1,7 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  ONBOARDING_STEPS,
+  getOnboardingSteps,
   getOnboardingStepById,
   readOnboardingAutoOpenEnabled,
   writeOnboardingAutoOpenEnabled,
@@ -155,8 +156,9 @@ export function useOnboardingController({
     cancelPendingOnboardingTargetFocus();
   }, [cancelPendingOnboardingTargetFocus]);
 
+  const onboardingSteps = getOnboardingSteps();
   const activeOnboardingStep =
-    onboardingModalMode === "full" ? ONBOARDING_STEPS[onboardingStepIndex] : getOnboardingStepById(onboardingSingleStepId);
+    onboardingModalMode === "full" ? onboardingSteps[onboardingStepIndex] : getOnboardingStepById(onboardingSingleStepId);
   const activeOnboardingPrimaryTarget =
     onboardingModalMode === "single" && onboardingSingleStepTargetOverride !== null
       ? onboardingSingleStepTargetOverride
@@ -202,13 +204,13 @@ export function useOnboardingController({
       screen: "modeling",
       subScreen: "connector",
       panelSelector: '[data-onboarding-panel="modeling-connectors"]',
-      panelLabel: "Connectors"
+      panelLabel: t("ui.connectors")
     };
     const splicesTarget: OnboardingStepTarget = {
       screen: "modeling",
       subScreen: "splice",
       panelSelector: '[data-onboarding-panel="modeling-splices"]',
-      panelLabel: "Splices"
+      panelLabel: t("ui.splices")
     };
     const primaryIsSplices = activeOnboardingPrimaryTarget?.subScreen === "splice";
     const primaryTarget = primaryIsSplices ? splicesTarget : connectorsTarget;
@@ -241,12 +243,12 @@ export function useOnboardingController({
       screen: "modeling",
       subScreen: "catalog",
       panelSelector: '[data-onboarding-panel="modeling-catalog"]',
-      panelLabel: "Catalog"
+      panelLabel: t("ui.catalog")
     };
     const isListInContext = activeScreen === catalogListTarget.screen && activeSubScreen === catalogListTarget.subScreen;
     return [
       {
-        label: isListInContext ? "Scroll to Catalog" : "Open Catalog",
+        label: isListInContext ? "Scroll to Catalog" : t("ui.openCatalog"),
         onClick: () => openOnboardingTarget(catalogListTarget)
       }
     ];
@@ -254,7 +256,7 @@ export function useOnboardingController({
 
   const onboardingTargetActionLabel =
     activeOnboardingPrimaryTarget === undefined
-      ? "Open target"
+      ? t("ui.openTarget")
       : isOnboardingStepAlreadyInContext
         ? `Scroll to ${activeOnboardingPrimaryTarget.panelLabel}`
         : `Open ${activeOnboardingPrimaryTarget.panelLabel}`;
@@ -286,14 +288,14 @@ export function useOnboardingController({
     }
 
     setOnboardingStepIndex((current) => {
-      if (current >= ONBOARDING_STEPS.length - 1) {
+      if (current >= onboardingSteps.length - 1) {
         cancelPendingOnboardingTargetFocus();
         setIsOnboardingOpen(false);
         return current;
       }
       return current + 1;
     });
-  }, [cancelPendingOnboardingTargetFocus, onboardingModalMode]);
+  }, [cancelPendingOnboardingTargetFocus, onboardingModalMode, onboardingSteps.length]);
 
   const closeOnboarding = useCallback(() => {
     cancelPendingOnboardingTargetFocus();
@@ -305,7 +307,7 @@ export function useOnboardingController({
       ? onboardingStepIndex
       : activeOnboardingStep === undefined
         ? 0
-        : ONBOARDING_STEPS.findIndex((step) => step.id === activeOnboardingStep.id);
+        : onboardingSteps.findIndex((step) => step.id === activeOnboardingStep.id);
 
   return {
     openFullOnboarding,
@@ -315,12 +317,12 @@ export function useOnboardingController({
     onboardingModalMode,
     onboardingStepIndex,
     onboardingStepDisplayIndex,
-    onboardingTotalSteps: ONBOARDING_STEPS.length,
+    onboardingTotalSteps: onboardingSteps.length,
     onboardingAutoOpenEnabled,
     setOnboardingAutoOpenEnabledPersisted,
     closeOnboarding,
     handleOnboardingNext,
-    canGoNext: onboardingModalMode !== "full" || onboardingStepIndex < ONBOARDING_STEPS.length - 1,
+    canGoNext: onboardingModalMode !== "full" || onboardingStepIndex < onboardingSteps.length - 1,
     onboardingTargetActions
   };
 }

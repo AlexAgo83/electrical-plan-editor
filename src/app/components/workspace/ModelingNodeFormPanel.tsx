@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 import type { NetworkNode } from "../../../core/entities";
 import { FORM_PANEL_IDS } from "../../lib/form-panel-scroll";
@@ -55,22 +56,24 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
 
   return (
 <article className="panel" hidden={!isNodeSubScreen} data-form-panel={FORM_PANEL_IDS.node}>
-  {renderFormHeader(nodeFormMode === "create" ? "Create Node" : nodeFormMode === "edit" ? "Edit Node" : "Node form", nodeFormMode)}
+  {renderFormHeader(nodeFormMode === "create" ? t("ui.createNode") : nodeFormMode === "edit" ? t("ui.editNode") : t("ui.nodeForm"), nodeFormMode)}
   {nodeFormMode === "idle" ? renderIdleCopy("node", openCreateNodeForm) : (
   <form className="stack-form" onSubmit={handleNodeSubmit}>
     <label>
-      Node ID
+      
+      {t("ui.nodeID")}
       <input value={nodeIdInput} onChange={(event) => setNodeIdInput(event.target.value)} placeholder="N-001" required />
     </label>
-    {nodeFormMode === "edit" ? <small className="inline-help">Changing Node ID renames the node and remaps connected references.</small> : null}
+    {nodeFormMode === "edit" ? <small className="inline-help">{t("ui.changingNodeIDRenamesTheNodeAndRemapsConnectedReferences")}</small> : null}
     {nodeFormMode === "create" && pendingPlacementCopy !== null ? <small className="inline-help">{pendingPlacementCopy}</small> : null}
 
     <label>
-      Node kind
+      
+      {t("ui.nodeKind")}
       <select value={nodeKind} onChange={(event) => setNodeKind(event.target.value as NetworkNode["kind"])}>
-        <option value="intermediate">Intermediate</option>
-        <option value="connector">Connector node</option>
-        <option value="splice">Splice node</option>
+        <option value="intermediate">{t("ui.intermediate")}</option>
+        <option value="connector">{t("ui.connectorNode")}</option>
+        <option value="splice">{t("ui.spliceNode")}</option>
       </select>
     </label>
 
@@ -83,9 +86,10 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
 
     {nodeKind === "connector" ? (
       <label>
-        Connector
+        
+        {t("ui.connector")}
         <select value={nodeConnectorId} onChange={(event) => setNodeConnectorId(event.target.value)} required>
-          <option value="">Select connector</option>
+          <option value="">{t("ui.selectConnector")}</option>
           {connectorOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -97,9 +101,10 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
 
     {nodeKind === "splice" ? (
       <label>
-        Splice
+        
+        {t("ui.splice")}
         <select value={nodeSpliceId} onChange={(event) => setNodeSpliceId(event.target.value)} required>
-          <option value="">Select splice</option>
+          <option value="">{t("ui.selectSplice")}</option>
           {spliceOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -113,17 +118,18 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
       <button type="submit" className="button-with-icon">
         {nodeFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
         {nodeFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
-        {nodeFormMode === "create" ? "Create" : "Save"}
+        {nodeFormMode === "create" ? t("ui.create") : t("ui.save")}
       </button>
       {nodeFormMode === "edit" && nodeEditAfterCreate ? (
         <button type="button" className="button-with-icon" onClick={openCreateNodeForm}>
           <span className="action-button-icon is-new" aria-hidden="true" />
-          New
+          
+          {t("ui.new")}
         </button>
       ) : null}
       <button type="button" className={nodeFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelNodeEdit}>
         {nodeFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
-        {nodeFormMode === "edit" ? "Cancel edit" : "Cancel"}
+        {nodeFormMode === "edit" ? t("ui.cancelEdit") : t("ui.cancel")}
       </button>
     </div>
     {nodeFormError !== null ? <small className="inline-error">{nodeFormError}</small> : null}

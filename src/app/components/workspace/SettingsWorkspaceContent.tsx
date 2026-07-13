@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import type { NetworkImportSummary } from "../../../adapters/portability";
 import { ImportOverwriteDialog } from "../dialogs/ImportOverwriteDialog";
@@ -6,13 +7,13 @@ import { SettingsSearchControl } from "../settings/SettingsSearchControl";
 import { useSettingsSearchDock } from "../settings/SettingsSearchDock";
 import type { NetworkId } from "../../../core/entities";
 import type { ThemeMode } from "../../../store";
-import { THEME_MODE_OPTIONS } from "../../lib/themeModes";
+import { getThemeModeOptions } from "../../lib/themeModes";
 import { getAiProviderLabel, type AiProviderId } from "../../lib/aiSettings";
 import { isPerfDebugEnabled, setPerfDebugEnabled } from "../../lib/perfDebug";
 import type { AiSettingsModel } from "../../hooks/useAiSettings";
 import type { WorkspaceFileStorageStatus } from "../../hooks/useWorkspaceFileStorage";
 import { SettingsLabelText } from "../settings/SettingsLabelText";
-import { SETTINGS_SECTIONS, normalizeSettingsSearch, sectionMatches } from "../settings/settingsSearchModel";
+import { getSettingsSections, normalizeSettingsSearch, sectionMatches, SETTINGS_SECTION_IDS } from "../settings/settingsSearchModel";
 import type {
   AppLocale,
   CanvasCalloutTextSize,
@@ -339,7 +340,8 @@ export function SettingsWorkspaceContent({
   const { settingsSearchQuery, setSettingsSearchQuery } = useSettingsSearchDock();
   const [perfDebugLoggingEnabled, setPerfDebugLoggingEnabled] = useState(() => isPerfDebugEnabled());
   const normalizedSettingsSearch = normalizeSettingsSearch(settingsSearchQuery);
-  const matchedSectionCounts = SETTINGS_SECTIONS.map((section) => ({
+  const settingsSections = getSettingsSections();
+  const matchedSectionCounts = settingsSections.map((section) => ({
     id: section.id,
     count: sectionMatches(section, normalizedSettingsSearch)
   }));
@@ -450,7 +452,7 @@ export function SettingsWorkspaceContent({
       return;
     }
 
-    const sectionElements = SETTINGS_SECTIONS.map((section) => contentElement.querySelector<HTMLElement>(`#${section.id}`)).filter((section): section is HTMLElement => section !== null);
+    const sectionElements = SETTINGS_SECTION_IDS.map((sectionId) => contentElement.querySelector<HTMLElement>(`#${sectionId}`)).filter((section): section is HTMLElement => section !== null);
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -488,14 +490,14 @@ export function SettingsWorkspaceContent({
         {hasSearchQuery ? (
           <div className={totalMatchCount > 0 ? "settings-search-summary" : "settings-search-summary is-empty"} role="status">
             {totalMatchCount > 0 ? `${totalMatchCount} matching setting label${totalMatchCount === 1 ? "" : "s"}` : "No setting label matches this search."}
-            <button type="button" onClick={() => setSettingsSearchQuery("")}>Clear</button>
+            <button type="button" onClick={() => setSettingsSearchQuery("")}>{t("ui.clear")}</button>
           </div>
         ) : null}
       </div>
       <div className="settings-sectioned-layout">
         <nav className="panel settings-panel settings-section-nav" aria-label="Settings sections">
           <p className="settings-section-nav-title">Sections</p>
-          {SETTINGS_SECTIONS.map((section) => {
+          {settingsSections.map((section) => {
             const matchCount = matchedSectionCounts.find((entry) => entry.id === section.id)?.count ?? 0;
             const sectionButtonClassName = [
               "settings-section-nav-button",
@@ -659,7 +661,7 @@ export function SettingsWorkspaceContent({
               <dt>{renderSettingLabel("Linked file")}</dt>
               <dd>
                 {workspaceFileStatus.fileName === null ? (
-                  "None"
+                  t("ui.none")
                 ) : (
                   <button
                     type="button"
@@ -677,7 +679,7 @@ export function SettingsWorkspaceContent({
               <dt>Resumable file</dt>
               <dd>
                 {workspaceFileStatus.resumeFileName === null ? (
-                  "None"
+                  t("ui.none")
                 ) : (
                   <button
                     type="button"
@@ -705,8 +707,8 @@ export function SettingsWorkspaceContent({
 
       <section id="settings-import-export" className="panel settings-panel settings-panel--import-export">
         <header className="settings-panel-header">
-          <h2>Import / Export networks</h2>
-          <span className="settings-panel-chip">Portability</span>
+          <h2>{t("ui.importExportNetworks")}</h2>
+          <span className="settings-panel-chip">{t("ui.portability")}</span>
         </header>
         <p className="settings-panel-intro">
           JSON above, grouped exports below.
@@ -723,17 +725,17 @@ export function SettingsWorkspaceContent({
               </div>
               <div className="row-actions settings-actions settings-export-package-actions settings-export-package-actions--standalone">
                 <button type="button" onClick={() => handleExportNetworks("active")} disabled={activeNetworkId === null}>
-                  {renderSettingLabel("Export active")}
+                  {renderSettingLabel(t("ui.exportActive"))}
                 </button>
                 <button type="button" onClick={() => handleExportNetworks("selected")} disabled={!canExportSelectedNetworks}>
                   {renderSettingLabel("Export selected JSON")}
                 </button>
                 <button type="button" onClick={() => handleExportNetworks("all")} disabled={networks.length === 0}>
-                  {renderSettingLabel("Export all")}
+                  {renderSettingLabel(t("ui.exportAll"))}
                 </button>
               </div>
               <div className="settings-export-package-footer">
-                <button type="button" onClick={handleOpenImportPicker}>{renderSettingLabel("Import from file")}</button>
+                <button type="button" onClick={handleOpenImportPicker}>{renderSettingLabel(t("ui.importFromFile"))}</button>
               </div>
               <input
                 ref={importFileInputRef}
@@ -764,14 +766,14 @@ export function SettingsWorkspaceContent({
             </section>
           </div>
           <fieldset className="inline-fieldset settings-export-fieldset settings-import-export-selection-column">
-            <legend>{renderSettingLabel("Selected networks for export")}</legend>
+            <legend>{renderSettingLabel(t("ui.selectedNetworksForExport"))}</legend>
             <p className="meta-line settings-export-selection-summary">
               {canExportSelectedNetworks
                 ? `${selectedExportCount} network${selectedExportCount === 1 ? "" : "s"} selected.`
                 : "Select one or more networks."}
             </p>
             {networks.length === 0 ? (
-              <p className="empty-copy">No network available.</p>
+              <p className="empty-copy">{t("ui.noNetworkAvailable")}</p>
             ) : (
               <div className="settings-grid settings-export-selection-grid">
                 {networks.map((network) => (
@@ -797,7 +799,7 @@ export function SettingsWorkspaceContent({
           <section className="settings-export-package-card settings-export-package-card--selected settings-export-package-card--full" aria-label="Selected networks export package">
             <div className="settings-export-package-head">
               <div>
-                <h3>Export selected</h3>
+                <h3>{t("ui.exportSelected")}</h3>
                 <p>Grouped outputs.</p>
               </div>
             </div>
@@ -879,10 +881,10 @@ export function SettingsWorkspaceContent({
         {lastImportSummary !== null ? (
           <>
             <div className="settings-import-summary">
-              <p className="meta-line"><span>Imported</span> <strong>{lastImportSummary.importedNetworkIds.length}</strong></p>
-              <p className="meta-line"><span>Skipped</span> <strong>{lastImportSummary.skippedNetworkIds.length}</strong></p>
-              <p className="meta-line"><span>Warnings</span> <strong>{lastImportSummary.warnings.length}</strong></p>
-              <p className="meta-line"><span>Errors</span> <strong>{lastImportSummary.errors.length}</strong></p>
+              <p className="meta-line"><span>{t("ui.imported")}</span> <strong>{lastImportSummary.importedNetworkIds.length}</strong></p>
+              <p className="meta-line"><span>{t("ui.skipped")}</span> <strong>{lastImportSummary.skippedNetworkIds.length}</strong></p>
+              <p className="meta-line"><span>{t("ui.warnings2")}</span> <strong>{lastImportSummary.warnings.length}</strong></p>
+              <p className="meta-line"><span>{t("ui.errors2")}</span> <strong>{lastImportSummary.errors.length}</strong></p>
             </div>
             {lastImportSummary.warnings.length > 0 ? (
               <div className="settings-import-details is-warning" role="status" aria-label="Import warning details">
@@ -909,48 +911,48 @@ export function SettingsWorkspaceContent({
       </section>
       <section id="settings-canvas-render" className="panel settings-panel">
         <header className="settings-panel-header">
-          <h2>Canvas render preferences</h2>
-          <span className="settings-panel-chip">Canvas Render</span>
+          <h2>{t("ui.canvasRenderPreferences")}</h2>
+          <span className="settings-panel-chip">{t("ui.canvasRender")}</span>
         </header>
-        <p className="settings-panel-intro">Typography and rendering defaults used for labels, callouts, and view reset behavior.</p>
+        <p className="settings-panel-intro">{t("ui.typographyAndRenderingDefaultsUsedForLabelsCalloutsAndView")}</p>
         <div className="settings-grid">
           <label className="settings-field">
-            {renderSettingLabel("Label stroke mode")}
+            {renderSettingLabel(t("ui.labelStrokeMode"))}
             <select
               value={canvasDefaultLabelStrokeMode}
               onChange={(event) => setCanvasDefaultLabelStrokeMode(event.target.value as CanvasLabelStrokeMode)}
             >
-              <option value="none">None</option>
-              <option value="light">Light</option>
-              <option value="normal">Normal</option>
+              <option value="none">{t("ui.none")}</option>
+              <option value="light">{t("ui.light")}</option>
+              <option value="normal">{t("ui.normal")}</option>
             </select>
           </label>
           <label className="settings-field">
-            {renderSettingLabel("2D label size")}
+            {renderSettingLabel(t("ui.2dLabelSize"))}
             <select
               value={canvasDefaultLabelSizeMode}
               onChange={(event) => setCanvasDefaultLabelSizeMode(event.target.value as CanvasLabelSizeMode)}
             >
-              <option value="extraSmall">Extra small</option>
-              <option value="small">Small</option>
-              <option value="normal">Normal</option>
-              <option value="large">Large</option>
-              <option value="extraLarge">Extra large</option>
+              <option value="extraSmall">{t("ui.extraSmall")}</option>
+              <option value="small">{t("ui.small")}</option>
+              <option value="normal">{t("ui.normal")}</option>
+              <option value="large">{t("ui.large")}</option>
+              <option value="extraLarge">{t("ui.extraLarge")}</option>
             </select>
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Callout text size")}
+            {renderSettingLabel(t("ui.calloutTextSize"))}
             <select
               value={canvasDefaultCalloutTextSize}
               onChange={(event) => setCanvasDefaultCalloutTextSize(event.target.value as CanvasCalloutTextSize)}
             >
-              <option value="small">Small</option>
-              <option value="normal">Normal</option>
-              <option value="large">Large</option>
+              <option value="small">{t("ui.small")}</option>
+              <option value="normal">{t("ui.normal")}</option>
+              <option value="large">{t("ui.large")}</option>
             </select>
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Connector drawing display")}
+            {renderSettingLabel(t("ui.connectorDrawingDisplay"))}
             <select
               value={canvasConnectorDrawingDisplayMode}
               onChange={(event) => {
@@ -961,9 +963,9 @@ export function SettingsWorkspaceContent({
                 setNetworkCalloutContentMode(nextCalloutMode);
               }}
             >
-              <option value="disabled">Disabled</option>
-              <option value="callouts">Callouts</option>
-              <option value="nodes">Nodes</option>
+              <option value="disabled">{t("ui.disabled")}</option>
+              <option value="callouts">{t("ui.callouts")}</option>
+              <option value="nodes">{t("ui.nodes")}</option>
             </select>
           </label>
           <label className="settings-checkbox">
@@ -973,10 +975,10 @@ export function SettingsWorkspaceContent({
               disabled={canvasConnectorDrawingDisplayMode !== "nodes"}
               onChange={(event) => setCanvasUseConsistentConnectorLayoutScale(event.target.checked)}
             />
-            {renderSettingLabel("Use consistent physical layout scale")}
+            {renderSettingLabel(t("ui.useConsistentPhysicalLayoutScale"))}
           </label>
           <label className="settings-field settings-range-field">
-            {renderSettingLabel("Connector drawing size (%)")}
+            {renderSettingLabel(t("ui.connectorDrawingSize"))}
             <div className="settings-range-control">
               <input
                 className="settings-range-input"
@@ -998,7 +1000,7 @@ export function SettingsWorkspaceContent({
             </div>
           </label>
           <label className="settings-field settings-range-field">
-            {renderSettingLabel("Summary global scale (%)")}
+            {renderSettingLabel(t("ui.summaryGlobalScale"))}
             <div className="settings-range-control">
               <input
                 className="settings-range-input"
@@ -1019,17 +1021,17 @@ export function SettingsWorkspaceContent({
             </div>
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Auto segment label rotation")}
+            {renderSettingLabel(t("ui.autoSegmentLabelRotation"))}
             <select
               value={canvasDefaultAutoSegmentLabelRotation ? "yes" : "no"}
               onChange={(event) => setCanvasDefaultAutoSegmentLabelRotation(event.target.value === "yes")}
             >
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
+              <option value="yes">{t("ui.yes")}</option>
+              <option value="no">{t("ui.no")}</option>
             </select>
           </label>
           <label className="settings-field">
-            {renderSettingLabel("2D label rotation")}
+            {renderSettingLabel(t("ui.2dLabelRotation"))}
             <select
               value={String(canvasDefaultLabelRotationDegrees)}
               disabled={canvasDefaultAutoSegmentLabelRotation}
@@ -1045,35 +1047,35 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Reset zoom target (%)")}
+            {renderSettingLabel(t("ui.resetZoomTarget"))}
             <input type="number" value={canvasResetZoomPercentInput} onChange={(event) => setCanvasResetZoomPercentInput(event.target.value)} />
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Viewport resize behavior")}
+            {renderSettingLabel(t("ui.viewportResizeBehavior"))}
             <select
               value={canvasResizeBehaviorMode}
               disabled
               onChange={(event) => setCanvasResizeBehaviorMode(event.target.value as CanvasResizeBehaviorMode)}
             >
-              <option value="visibleAreaOnly">Resize changes visible area only</option>
+              <option value="visibleAreaOnly">{t("ui.resizeChangesVisibleAreaOnly")}</option>
             </select>
           </label>
         </div>
         <div className="row-actions settings-actions settings-canvas-render-actions">
-          <button type="button" onClick={() => handleZoomAction("reset")}>Reset current view</button>
+          <button type="button" onClick={() => handleZoomAction("reset")}>{t("ui.resetCurrentView")}</button>
         </div>
       </section>
 
       <section id="settings-canvas-tools" className="panel settings-panel">
         <header className="settings-panel-header">
-          <h2>Canvas tools preferences</h2>
-          <span className="settings-panel-chip">Canvas Tools</span>
+          <h2>{t("ui.canvasToolsPreferences")}</h2>
+          <span className="settings-panel-chip">{t("ui.canvasTools")}</span>
         </header>
-        <p className="settings-panel-intro">Default tool behavior and overlay visibility for the 2D network workspace.</p>
+        <p className="settings-panel-intro">{t("ui.defaultToolBehaviorAndOverlayVisibilityForThe2DNetwork")}</p>
         <div className="settings-grid">
           <label className="settings-checkbox">
             <input type="checkbox" checked={canvasDefaultShowGrid} onChange={(event) => setCanvasDefaultShowGrid(event.target.checked)} />
-            {renderSettingLabel("Show grid by default")}
+            {renderSettingLabel(t("ui.showGridByDefault"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1081,7 +1083,7 @@ export function SettingsWorkspaceContent({
               checked={canvasDefaultSnapToGrid}
               onChange={(event) => setCanvasDefaultSnapToGrid(event.target.checked)}
             />
-            {renderSettingLabel("Snap node movement by default")}
+            {renderSettingLabel(t("ui.snapNodeMovementByDefault"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1089,7 +1091,7 @@ export function SettingsWorkspaceContent({
               checked={canvasDefaultLockEntityMovement}
               onChange={(event) => setCanvasDefaultLockEntityMovement(event.target.checked)}
             />
-            {renderSettingLabel("Lock node movement by default")}
+            {renderSettingLabel(t("ui.lockNodeMovementByDefault"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1097,7 +1099,7 @@ export function SettingsWorkspaceContent({
               checked={canvasDefaultShowInfoPanels}
               onChange={(event) => setCanvasDefaultShowInfoPanels(event.target.checked)}
             />
-            {renderSettingLabel("Show info overlays by default")}
+            {renderSettingLabel(t("ui.showInfoOverlaysByDefault"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1105,7 +1107,7 @@ export function SettingsWorkspaceContent({
               checked={showSegmentNames}
               onChange={(event) => setShowSegmentNames(event.target.checked)}
             />
-            {renderSettingLabel("Show segment names")}
+            {renderSettingLabel(t("ui.showSegmentNames"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1113,7 +1115,7 @@ export function SettingsWorkspaceContent({
               checked={canvasDefaultShowSegmentLengths}
               onChange={(event) => setCanvasDefaultShowSegmentLengths(event.target.checked)}
             />
-            {renderSettingLabel("Show segment lengths by default")}
+            {renderSettingLabel(t("ui.showSegmentLengthsByDefault"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1121,7 +1123,7 @@ export function SettingsWorkspaceContent({
               checked={canvasDefaultShowCableCallouts}
               onChange={(event) => setCanvasDefaultShowCableCallouts(event.target.checked)}
             />
-            {renderSettingLabel("Show connector/splice cable callouts by default")}
+            {renderSettingLabel(t("ui.showConnectorSpliceCableCalloutsByDefault"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1133,7 +1135,7 @@ export function SettingsWorkspaceContent({
                 setShowSelectedCalloutOnly(checked);
               }}
             />
-            {renderSettingLabel("Show only selected connector/splice callout")}
+            {renderSettingLabel(t("ui.showOnlySelectedConnectorSpliceCallout"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1141,7 +1143,7 @@ export function SettingsWorkspaceContent({
               checked={canvasShowCalloutWireNames}
               onChange={(event) => setCanvasShowCalloutWireNames(event.target.checked)}
             />
-            {renderSettingLabel("Show wire names in callout table")}
+            {renderSettingLabel(t("ui.showWireNamesInCalloutTable"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1149,7 +1151,7 @@ export function SettingsWorkspaceContent({
               checked={canvasZoomInvariantNodeShapes}
               onChange={(event) => setCanvasZoomInvariantNodeShapes(event.target.checked)}
             />
-            {renderSettingLabel("Keep connector/splice/node shape size constant while zooming")}
+            {renderSettingLabel(t("ui.keepConnectorSpliceNodeShapeSizeConstantWhileZooming"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1157,7 +1159,7 @@ export function SettingsWorkspaceContent({
               checked={canvasShowColocatedSpliceLinkLine}
               onChange={(event) => setCanvasShowColocatedSpliceLinkLine(event.target.checked)}
             />
-            {renderSettingLabel("Show colocated splice link line")}
+            {renderSettingLabel(t("ui.showColocatedSpliceLinkLine"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1165,10 +1167,10 @@ export function SettingsWorkspaceContent({
               checked={canvasShowNetworkEntityPrefix}
               onChange={(event) => setCanvasShowNetworkEntityPrefix(event.target.checked)}
             />
-            {renderSettingLabel("Show network entity ID prefix")}
+            {renderSettingLabel(t("ui.showNetworkEntityIDPrefix"))}
           </label>
           <label className="settings-field settings-range-field">
-            {renderSettingLabel("Node shape target size (%)")}
+            {renderSettingLabel(t("ui.nodeShapeTargetSize"))}
             <div className="settings-range-control">
               <input
                 className="settings-range-input"
@@ -1195,7 +1197,7 @@ export function SettingsWorkspaceContent({
               checked={canvasPngExportIncludeBackground}
               onChange={(event) => setCanvasPngExportIncludeBackground(event.target.checked)}
             />
-            {renderSettingLabel("Include background in PNG export")}
+            {renderSettingLabel(t("ui.includeBackgroundInPNGExport"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1203,7 +1205,7 @@ export function SettingsWorkspaceContent({
               checked={canvasExportIncludeFrame}
               onChange={(event) => setCanvasExportIncludeFrame(event.target.checked)}
             />
-            {renderSettingLabel("Include frame in SVG/PNG export")}
+            {renderSettingLabel(t("ui.includeFrameInSVGPNGExport"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1211,22 +1213,22 @@ export function SettingsWorkspaceContent({
               checked={canvasExportIncludeCartouche}
               onChange={(event) => setCanvasExportIncludeCartouche(event.target.checked)}
             />
-            {renderSettingLabel("Include identity cartouche in SVG/PNG export")}
+            {renderSettingLabel(t("ui.includeIdentityCartoucheInSVGPNGExport"))}
           </label>
         </div>
       </section>
 
       <section id="settings-appearance" className="panel settings-panel">
         <header className="settings-panel-header">
-          <h2>Appearance preferences</h2>
-          <span className="settings-panel-chip">Display</span>
+          <h2>{t("ui.appearancePreferences")}</h2>
+          <span className="settings-panel-chip">{t("ui.display")}</span>
         </header>
-        <p className="settings-panel-intro">Global visual defaults for theme, table typography, density, and sorting across modeling and analysis views.</p>
+        <p className="settings-panel-intro">{t("ui.globalVisualDefaultsForThemeTableTypographyDensityAndSorting")}</p>
         <div className="settings-grid">
           <label className="settings-field">
-            {renderSettingLabel("Theme mode")}
+            {renderSettingLabel(t("ui.themeMode"))}
             <select value={themeMode} onChange={(event) => setThemeMode(event.target.value as ThemeMode)}>
-              {THEME_MODE_OPTIONS.map((option) => (
+              {getThemeModeOptions().map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -1234,39 +1236,39 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Table density")}
+            {renderSettingLabel(t("ui.tableDensity"))}
             <select value={tableDensity} onChange={(event) => setTableDensity(event.target.value as TableDensity)}>
-              <option value="comfortable">Comfortable</option>
-              <option value="compact">Compact</option>
+              <option value="comfortable">{t("ui.comfortable")}</option>
+              <option value="compact">{t("ui.compact")}</option>
             </select>
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Table font size")}
+            {renderSettingLabel(t("ui.tableFontSize"))}
             <select value={tableFontSize} onChange={(event) => setTableFontSize(event.target.value as TableFontSize)}>
-              <option value="small">Small</option>
-              <option value="normal">Normal</option>
-              <option value="large">Large</option>
+              <option value="small">{t("ui.small")}</option>
+              <option value="normal">{t("ui.normal")}</option>
+              <option value="large">{t("ui.large")}</option>
             </select>
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Default sort column")}
+            {renderSettingLabel(t("ui.defaultSortColumn"))}
             <select value={defaultSortField} onChange={(event) => setDefaultSortField(event.target.value as SortField)}>
-              <option value="name">Name</option>
-              <option value="technicalId">Technical ID</option>
+              <option value="name">{t("ui.name")}</option>
+              <option value="technicalId">{t("ui.technicalID")}</option>
             </select>
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Default sort direction")}
+            {renderSettingLabel(t("ui.defaultSortDirection"))}
             <select value={defaultSortDirection} onChange={(event) => setDefaultSortDirection(event.target.value as SortDirection)}>
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
+              <option value="asc">{t("ui.ascending")}</option>
+              <option value="desc">{t("ui.descending")}</option>
             </select>
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Default ID sort direction")}
+            {renderSettingLabel(t("ui.defaultIDSortDirection"))}
             <select value={defaultIdSortDirection} onChange={(event) => setDefaultIdSortDirection(event.target.value as SortDirection)}>
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
+              <option value="asc">{t("ui.ascending")}</option>
+              <option value="desc">{t("ui.descending")}</option>
             </select>
           </label>
         </div>
@@ -1274,10 +1276,10 @@ export function SettingsWorkspaceContent({
 
       <section id="settings-global-preferences" className="panel settings-panel" data-onboarding-panel="settings-global-preferences">
         <header className="settings-panel-header">
-          <h2>Global preferences</h2>
-          <span className="settings-panel-chip">Defaults</span>
+          <h2>{t("ui.globalPreferences")}</h2>
+          <span className="settings-panel-chip">{t("ui.defaults")}</span>
         </header>
-        <p className="settings-panel-intro">Shared UI preferences applied across workspace screens (outside of screen-specific controls).</p>
+        <p className="settings-panel-intro">{t("ui.sharedUIPreferencesAppliedAcrossWorkspaceScreensOutsideOfScreen")}</p>
         <div className="settings-grid">
           <label className="settings-checkbox">
             <input
@@ -1285,7 +1287,7 @@ export function SettingsWorkspaceContent({
               checked={showFloatingInspectorPanel}
               onChange={(event) => setShowFloatingInspectorPanel(event.target.checked)}
             />
-            {renderSettingLabel("Show floating inspector panel on supported screens")}
+            {renderSettingLabel(t("ui.showFloatingInspectorPanelOnSupportedScreens"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1312,14 +1314,14 @@ export function SettingsWorkspaceContent({
             {renderSettingLabel("Show multi-network functional analysis panel")}
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Workspace panels layout")}
+            {renderSettingLabel(t("ui.workspacePanelsLayout"))}
             <select
               value={workspacePanelsLayoutMode}
               onChange={(event) => setWorkspacePanelsLayoutMode(event.target.value as WorkspacePanelsLayoutMode)}
               disabled
             >
-              <option value="multiColumn">Responsive multi-column</option>
-              <option value="singleColumn">Force single column</option>
+              <option value="multiColumn">{t("ui.responsiveMultiColumn")}</option>
+              <option value="singleColumn">{t("ui.forceSingleColumn")}</option>
             </select>
           </label>
           <label className="settings-checkbox">
@@ -1328,7 +1330,7 @@ export function SettingsWorkspaceContent({
               checked={workspaceWideScreen}
               onChange={(event) => setWorkspaceWideScreen(event.target.checked)}
             />
-            {renderSettingLabel("Wide screen (remove app max width cap)")}
+            {renderSettingLabel(t("ui.wideScreenRemoveAppMaxWidthCap"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1339,7 +1341,7 @@ export function SettingsWorkspaceContent({
             {renderSettingLabel("Enable performance debug console logs")}
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Default wire section (mm²)")}
+            {renderSettingLabel(t("ui.defaultWireSectionMm2"))}
             <input
               type="number"
               min={0.01}
@@ -1360,7 +1362,7 @@ export function SettingsWorkspaceContent({
               checked={defaultAutoCreateLinkedNodes}
               onChange={(event) => setDefaultAutoCreateLinkedNodes(event.target.checked)}
             />
-            {renderSettingLabel("Default auto-create linked nodes for connectors")}
+            {renderSettingLabel(t("ui.defaultAutoCreateLinkedNodesForConnectors"))}
           </label>
           <label className="settings-field">
             {renderSettingLabel("Directional splice imbalance limit (%)")}
@@ -1381,35 +1383,35 @@ export function SettingsWorkspaceContent({
           <label className="settings-field settings-locale-field">
             <span className="settings-locale-label">
               <span className="action-button-icon is-settings settings-locale-icon" aria-hidden="true" />
-              <span>{renderSettingLabel("Language")}</span>
+              <span>{renderSettingLabel(t("ui.language"))}</span>
             </span>
             <select
               className="settings-locale-select"
-              aria-label="Language"
+              aria-label={t("ui.language")}
               value={locale}
               onChange={(event) => setLocale(event.target.value as AppLocale)}
             >
-              <option value="en">English</option>
-              <option value="fr">Français</option>
+              <option value="en">{t("ui.english")}</option>
+              <option value="fr">{t("ui.francAis")}</option>
             </select>
-            <span className="settings-locale-hint">Apply language across all app screens (except changelog).</span>
+            <span className="settings-locale-hint">{t("ui.applyLanguageAcrossAllAppScreensExceptChangelog")}</span>
           </label>
         </div>
         <div className="row-actions settings-actions settings-global-preferences-actions">
-          <button type="button" onClick={resetWorkspacePreferencesToDefaults}>Reset all UI preferences</button>
+          <button type="button" onClick={resetWorkspacePreferencesToDefaults}>{t("ui.resetAllUIPreferences")}</button>
         </div>
       </section>
 
       <section id="settings-shortcuts" className="panel settings-panel">
         <header className="settings-panel-header">
-          <h2>Action bar and shortcuts</h2>
-          <span className="settings-panel-chip">Shortcuts</span>
+          <h2>{t("ui.actionBarAndShortcuts")}</h2>
+          <span className="settings-panel-chip">{t("ui.shortcuts")}</span>
         </header>
-        <p className="settings-panel-intro">Enable keyboard helpers and keep a quick reference of available shortcuts.</p>
+        <p className="settings-panel-intro">{t("ui.enableKeyboardHelpersAndKeepAQuickReferenceOfAvailable")}</p>
         <div className="settings-grid">
           <label className="settings-checkbox">
             <input type="checkbox" checked={showShortcutHints} onChange={(event) => setShowShortcutHints(event.target.checked)} />
-            {renderSettingLabel("Show shortcut hints in the action bar")}
+            {renderSettingLabel(t("ui.showShortcutHintsInTheActionBar"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1417,7 +1419,7 @@ export function SettingsWorkspaceContent({
               checked={keyboardShortcutsEnabled}
               onChange={(event) => setKeyboardShortcutsEnabled(event.target.checked)}
             />
-            {renderSettingLabel("Enable keyboard shortcuts (undo/redo/navigation/issues/view)")}
+            {renderSettingLabel(t("ui.enableKeyboardShortcutsUndoRedoNavigationIssuesView"))}
           </label>
           <label className="settings-checkbox">
             <input
@@ -1429,31 +1431,33 @@ export function SettingsWorkspaceContent({
           </label>
         </div>
         <ul className="settings-shortcut-list">
-          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Z</span> <span>Undo last modeling action</span></li>
-          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Shift + Z</span> <span>Redo</span></li>
-          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Y</span> <span>Redo (alternative shortcut)</span></li>
-          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + S</span> <span>Save active plan (export JSON)</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + 1..7</span> <span>Switch top-level workspace</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + Shift + 1..5</span> <span>Switch entity sub-screen</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + F</span> <span>Fit network view to current graph</span></li>
-          <li><span className="technical-id settings-shortcut-key">Alt + J / Alt + K</span> <span>Previous / next validation issue</span></li>
+          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Z</span> <span>{t("ui.undoLastModelingAction")}</span></li>
+          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Shift + Z</span> <span>{t("ui.redo")}</span></li>
+          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + Y</span> <span>{t("ui.redoAlternativeShortcut")}</span></li>
+          <li><span className="technical-id settings-shortcut-key">Ctrl/Cmd + S</span> <span>{t("ui.saveActivePlanExportJSON")}</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + 1..7</span> <span>{t("ui.switchTopLevelWorkspace")}</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + Shift + 1..5</span> <span>{t("ui.switchEntitySubScreen")}</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + F</span> <span>{t("ui.fitNetworkViewToCurrentGraph")}</span></li>
+          <li><span className="technical-id settings-shortcut-key">Alt + J / Alt + K</span> <span>{t("ui.previousNextValidationIssue")}</span></li>
         </ul>
       </section>
 
       <section id="settings-catalog-bom" className="panel settings-panel">
         <header className="settings-panel-header">
-          <h2>Catalog & BOM setup</h2>
-          <span className="settings-panel-chip">Pricing</span>
+          <h2>{t("ui.catalogBOMSetup")}</h2>
+          <span className="settings-panel-chip">{t("ui.pricing")}</span>
         </header>
         <p className="settings-panel-intro">
-          Workspace pricing context for catalog and BOM flows. Catalog prices stay stored as excl. tax values.
+          
+          {t("ui.workspacePricingContextForCatalogAndBOMFlowsCatalogPrices")}
         </p>
         <p className="meta-line">
-          Tax/VAT settings only affect BOM calculations/export context. Disabling tax keeps HT-only outputs and preserves the last tax rate.
+          
+          {t("ui.taxVATSettingsOnlyAffectBOMCalculationsExportContextDisabling")}
         </p>
         <div className="settings-grid">
           <label className="settings-field">
-            {renderSettingLabel("Currency (Catalog/BOM)")}
+            {renderSettingLabel(t("ui.currencyCatalogBOM"))}
             <select
               value={workspaceCurrencyCode}
               onChange={(event) => setWorkspaceCurrencyCode(event.target.value as WorkspaceCurrencyCode)}
@@ -1471,7 +1475,7 @@ export function SettingsWorkspaceContent({
               checked={workspaceTaxEnabled}
               onChange={(event) => setWorkspaceTaxEnabled(event.target.checked)}
             />
-            {renderSettingLabel("Enable tax / VAT (TVA)")}
+            {renderSettingLabel(t("ui.enableTaxVATTVA"))}
           </label>
           <label className="settings-field">
             {renderSettingLabel("Tabular export format")}
@@ -1481,7 +1485,7 @@ export function SettingsWorkspaceContent({
             </select>
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Wire stripping allowance (mm)")}
+            {renderSettingLabel(t("ui.wireStrippingAllowanceMm"))}
             <input
               type="number"
               min={0}
@@ -1497,7 +1501,7 @@ export function SettingsWorkspaceContent({
             />
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Twisted-pair length coefficient")}
+            {renderSettingLabel(t("ui.twistedPairLengthCoefficient"))}
             <input
               type="number"
               min={0.001}
@@ -1534,10 +1538,10 @@ export function SettingsWorkspaceContent({
               checked={bomExportComputedDownstreamLoad}
               onChange={(event) => setBomExportComputedDownstreamLoad(event.target.checked)}
             />
-            {renderSettingLabel("Computed downstream load (A)")}
+            {renderSettingLabel(t("ui.computedDownstreamLoadA"))}
           </label>
           <label className="settings-field">
-            {renderSettingLabel("Tax rate (%)")}
+            {renderSettingLabel(t("ui.taxRate"))}
             <input
               type="number"
               min={0}
@@ -1559,24 +1563,26 @@ export function SettingsWorkspaceContent({
 
       <section id="settings-sample-network" className="panel settings-panel">
         <header className="settings-panel-header">
-          <h2>Sample network controls</h2>
-          <span className="settings-panel-chip">Sample</span>
+          <h2>{t("ui.sampleNetworkControls")}</h2>
+          <span className="settings-panel-chip">{t("ui.sample")}</span>
         </header>
-        <p className="settings-panel-intro">Quickly recreate baseline and QA-oriented sample data when testing flows or resetting your sandbox.</p>
-        <div className="settings-state-row" aria-label="Sample workspace status">
+        <p className="settings-panel-intro">{t("ui.quicklyRecreateBaselineAndQAOrientedSampleDataWhenTesting")}</p>
+        <div className="settings-state-row" aria-label={t("ui.sampleWorkspaceStatus")}>
           <span className={isCurrentWorkspaceEmpty ? "settings-state-chip is-ok" : "settings-state-chip"}>
-            Workspace: {isCurrentWorkspaceEmpty ? "empty" : "loaded"}
+            
+            {t("ui.workspace2")} {isCurrentWorkspaceEmpty ? t("ui.empty") : t("ui.loaded")}
           </span>
           <span className={hasBuiltInSampleState ? "settings-state-chip is-ok" : "settings-state-chip is-warn"}>
-            Sample signature: {hasBuiltInSampleState ? "detected" : "missing"}
+            
+            {t("ui.sampleSignature")} {hasBuiltInSampleState ? t("ui.detected") : t("ui.missing")}
           </span>
         </div>
         <div className="row-actions settings-actions">
           <button type="button" onClick={handleRecreateSampleNetwork}>
-            {renderSettingLabel("Recreate sample network")}
+            {renderSettingLabel(t("ui.recreateSampleNetwork"))}
           </button>
           <button type="button" onClick={handleResetSampleNetwork} disabled={!hasBuiltInSampleState}>
-            {renderSettingLabel("Reset sample network to baseline")}
+            {renderSettingLabel(t("ui.resetSampleNetworkToBaseline"))}
           </button>
         </div>
       </section>

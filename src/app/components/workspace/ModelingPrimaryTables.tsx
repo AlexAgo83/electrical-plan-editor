@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
@@ -162,25 +163,25 @@ function ModelingPrimaryTablesComponent({
       : (visibleNodes.find((node) => node.id === selectedNodeId) ?? null);
   const showNodeKindColumn = nodeKindFilter === "all";
   const connectorColumns: ConfigurableTableColumn[] = [
-    { id: "name", label: "Name", hideable: false },
-    { id: "technicalId", label: "Technical ID" },
-    { id: "manufacturerReference", label: "Mfr Ref" },
-    { id: "cavityCount", label: "Ways" },
-    { id: "occupiedCount", label: "Occupied" },
+    { id: "name", label: t("ui.name"), hideable: false },
+    { id: "technicalId", label: t("ui.technicalID") },
+    { id: "manufacturerReference", label: t("ui.mfrRef") },
+    { id: "cavityCount", label: t("ui.ways") },
+    { id: "occupiedCount", label: t("ui.occupied") },
   ];
   const spliceColumns: ConfigurableTableColumn[] = [
-    { id: "name", label: "Name", hideable: false },
-    { id: "technicalId", label: "Technical ID" },
-    { id: "manufacturerReference", label: "Mfr Ref" },
-    { id: "hostSegment", label: "Segment" },
+    { id: "name", label: t("ui.name"), hideable: false },
+    { id: "technicalId", label: t("ui.technicalID") },
+    { id: "manufacturerReference", label: t("ui.mfrRef") },
+    { id: "hostSegment", label: t("ui.segment") },
     { id: "offsetMm", label: "Offset" },
-    { id: "connectedWireCount", label: "Connected wires" },
+    { id: "connectedWireCount", label: t("ui.connectedWires") },
   ];
   const nodeColumns: ConfigurableTableColumn[] = [
-    { id: "id", label: "ID", hideable: false },
-    ...(showNodeKindColumn ? [{ id: "kind", label: "Kind" }] : []),
-    { id: "reference", label: "Reference" },
-    { id: "linkedSegments", label: "Linked segments" },
+    { id: "id", label: t("ui.id"), hideable: false },
+    ...(showNodeKindColumn ? [{ id: "kind", label: t("ui.kind") }] : []),
+    { id: "reference", label: t("ui.reference") },
+    { id: "linkedSegments", label: t("ui.linkedSegments") },
   ];
   const catalogItemById = useMemo(
     () => new Map(catalogItems.map((item) => [item.id, item] as const)),
@@ -223,24 +224,24 @@ function ModelingPrimaryTablesComponent({
   );
   const connectorFilterPlaceholder =
     connectorFilterField === "name"
-      ? "Connector name"
+      ? t("ui.connectorName")
       : connectorFilterField === "technicalId"
-        ? "Technical ID"
-        : "Name or technical ID";
+        ? t("ui.technicalID")
+        : t("ui.nameOrTechnicalID");
   const spliceFilterPlaceholder =
     spliceFilterField === "name"
-      ? "Splice name"
+      ? t("ui.spliceName")
       : spliceFilterField === "technicalId"
-        ? "Technical ID"
-        : "Name or technical ID";
+        ? t("ui.technicalID")
+        : t("ui.nameOrTechnicalID");
   const nodeFilterPlaceholder =
     nodeFilterField === "id"
-      ? "Node ID"
+      ? t("ui.nodeID")
       : nodeFilterField === "kind"
-        ? "connector / splice / intermediate"
+        ? t("ui.connectorSpliceIntermediate")
         : nodeFilterField === "reference"
-          ? "Reference"
-          : "ID, kind, reference...";
+          ? t("ui.reference")
+          : t("ui.idKindReference");
   const [connectorTableSort, setConnectorTableSort] = useState<{
     field: ConnectorTableSortField;
     direction: SortDirection;
@@ -576,7 +577,7 @@ function ModelingPrimaryTablesComponent({
             data-onboarding-panel="modeling-connectors"
           >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
-          <h2>Connectors</h2>
+          <h2>{t("ui.connectors")}</h2>
           <div className="list-panel-header-tools">
             <div className="list-panel-header-tools-row is-title-actions">
               <button
@@ -585,7 +586,7 @@ function ModelingPrimaryTablesComponent({
                 onClick={() =>
                   downloadCsvFile(
                     "modeling-connectors",
-                    ["Name", "Technical ID", "Mfr Ref", "Ways", "Occupied"],
+                    [t("ui.name"), t("ui.technicalID"), t("ui.mfrRef"), t("ui.ways"), t("ui.occupied")],
                     sortedVisibleConnectors.map((connector) => [
                       connector.name,
                       connector.technicalId,
@@ -618,7 +619,7 @@ function ModelingPrimaryTablesComponent({
                     className="action-button-icon is-help"
                     aria-hidden="true"
                   />
-                  <span>Help</span>
+                  <span>{t("ui.help")}</span>
                 </button>
               ) : null}
             </div>
@@ -626,13 +627,13 @@ function ModelingPrimaryTablesComponent({
               <div
                 className="chip-group list-panel-filters"
                 role="group"
-                aria-label="Connector occupancy filter"
+                aria-label={t("ui.connectorOccupancyFilter")}
               >
                 {(
                   [
-                    ["all", "All"],
-                    ["occupied", "Occupied"],
-                    ["free", "Free"],
+                    ["all", t("ui.all")],
+                    ["occupied", t("ui.occupied")],
+                    ["free", t("ui.free")],
                   ] as const
                 ).map(([filterId, label]) => (
                   <button
@@ -650,8 +651,8 @@ function ModelingPrimaryTablesComponent({
                 ))}
               </div>
               <TableFilterBar
-                label="Filter"
-                fieldLabel="Connector filter field"
+                label={t("ui.filter")}
+                fieldLabel={t("ui.connectorFilterField")}
                 fieldValue={connectorFilterField}
                 onFieldChange={(value) =>
                   setConnectorFilterField(
@@ -659,9 +660,9 @@ function ModelingPrimaryTablesComponent({
                   )
                 }
                 fieldOptions={[
-                  { value: "name", label: "Name" },
-                  { value: "technicalId", label: "Technical ID" },
-                  { value: "any", label: "Any" },
+                  { value: "name", label: t("ui.name") },
+                  { value: "technicalId", label: t("ui.technicalID") },
+                  { value: "any", label: t("ui.any") },
                 ]}
                 queryValue={connectorFilterQuery}
                 onQueryChange={setConnectorFilterQuery}
@@ -671,11 +672,12 @@ function ModelingPrimaryTablesComponent({
           </div>
         </header>
         {connectors.length === 0 ? (
-          <p className="empty-copy">No connector yet.</p>
+          <p className="empty-copy">{t("ui.noConnectorYet")}</p>
         ) : sortedVisibleConnectors.length === 0 ? (
           <>
             <p className="empty-copy">
-              No connector matches the current filters.
+              
+              {t("ui.noConnectorMatchesTheCurrentFilters")}
             </p>
             <TableEntryCountFooter count={0} />
           </>
@@ -722,7 +724,8 @@ function ModelingPrimaryTablesComponent({
                         }));
                       }}
                     >
-                      Name{" "}
+                      
+                      {t("ui.name")}{" "}
                       <span className="sort-indicator">
                         {connectorSortIndicator("name")}
                       </span>
@@ -756,7 +759,7 @@ function ModelingPrimaryTablesComponent({
                         }));
                       }}
                     >
-                      {isMobileViewport ? "ID" : "Technical ID"}{" "}
+                      {isMobileViewport ? t("ui.id") : t("ui.technicalID")}{" "}
                       <span className="sort-indicator">
                         {connectorSortIndicator("technicalId")}
                       </span>
@@ -782,7 +785,8 @@ function ModelingPrimaryTablesComponent({
                         }))
                       }
                     >
-                      Mfr Ref{" "}
+                      
+                      {t("ui.mfrRef")}{" "}
                       <span className="sort-indicator">
                         {connectorSortIndicator("manufacturerReference")}
                       </span>
@@ -808,7 +812,8 @@ function ModelingPrimaryTablesComponent({
                         }))
                       }
                     >
-                      Ways{" "}
+                      
+                      {t("ui.ways")}{" "}
                       <span className="sort-indicator">
                         {connectorSortIndicator("cavityCount")}
                       </span>
@@ -834,7 +839,7 @@ function ModelingPrimaryTablesComponent({
                         }))
                       }
                     >
-                      {isMobileViewport ? "Occup." : "Occupied"}{" "}
+                      {isMobileViewport ? t("ui.occup") : t("ui.occupied")}{" "}
                       <span className="sort-indicator">
                         {connectorSortIndicator("occupiedCount")}
                       </span>
@@ -976,7 +981,8 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-new"
                   aria-hidden="true"
                 />
-                New
+                
+                {t("ui.new")}
               </button>
               <button
                 type="button"
@@ -991,7 +997,8 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-edit"
                   aria-hidden="true"
                 />
-                Edit
+                
+                {t("ui.edit")}
               </button>
               <button
                 type="button"
@@ -1032,7 +1039,8 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-delete"
                   aria-hidden="true"
                 />
-                Delete
+                
+                {t("ui.delete")}
               </button>
             </>
           )}
@@ -1057,7 +1065,7 @@ function ModelingPrimaryTablesComponent({
         data-onboarding-panel="modeling-splices"
       >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
-          <h2>Splices</h2>
+          <h2>{t("ui.splices")}</h2>
           <div className="list-panel-header-tools">
             <div className="list-panel-header-tools-row is-title-actions">
                 <button
@@ -1067,13 +1075,13 @@ function ModelingPrimaryTablesComponent({
                     downloadCsvFile(
                       "modeling-splices",
                       [
-                        "Name",
-                        "Technical ID",
-                        "Mfr Ref",
+                        t("ui.name"),
+                        t("ui.technicalID"),
+                        t("ui.mfrRef"),
                         "Host segment",
                         "Reference node",
                         "Offset (mm)",
-                        "Connected wires",
+                        t("ui.connectedWires"),
                       ],
                       sortedVisibleSplices.map((splice) => {
                         const placement =
@@ -1113,7 +1121,7 @@ function ModelingPrimaryTablesComponent({
                     className="action-button-icon is-help"
                     aria-hidden="true"
                   />
-                  <span>Help</span>
+                  <span>{t("ui.help")}</span>
                 </button>
               ) : null}
             </div>
@@ -1121,13 +1129,13 @@ function ModelingPrimaryTablesComponent({
               <div
                 className="chip-group list-panel-filters"
                 role="group"
-                aria-label="Splice occupancy filter"
+                aria-label={t("ui.spliceOccupancyFilter")}
               >
                 {(
                   [
-                    ["all", "All"],
-                    ["occupied", "Occupied"],
-                    ["free", "Free"],
+                    ["all", t("ui.all")],
+                    ["occupied", t("ui.occupied")],
+                    ["free", t("ui.free")],
                   ] as const
                 ).map(([filterId, label]) => (
                   <button
@@ -1145,16 +1153,16 @@ function ModelingPrimaryTablesComponent({
                 ))}
               </div>
               <TableFilterBar
-                label="Filter"
-                fieldLabel="Splice filter field"
+                label={t("ui.filter")}
+                fieldLabel={t("ui.spliceFilterField")}
                 fieldValue={spliceFilterField}
                 onFieldChange={(value) =>
                   setSpliceFilterField(value as "name" | "technicalId" | "any")
                 }
                 fieldOptions={[
-                  { value: "name", label: "Name" },
-                  { value: "technicalId", label: "Technical ID" },
-                  { value: "any", label: "Any" },
+                  { value: "name", label: t("ui.name") },
+                  { value: "technicalId", label: t("ui.technicalID") },
+                  { value: "any", label: t("ui.any") },
                 ]}
                 queryValue={spliceFilterQuery}
                 onQueryChange={setSpliceFilterQuery}
@@ -1164,10 +1172,10 @@ function ModelingPrimaryTablesComponent({
           </div>
         </header>
         {splices.length === 0 ? (
-          <p className="empty-copy">No splice yet.</p>
+          <p className="empty-copy">{t("ui.noSpliceYet")}</p>
         ) : sortedVisibleSplices.length === 0 ? (
           <>
-            <p className="empty-copy">No splice matches the current filters.</p>
+            <p className="empty-copy">{t("ui.noSpliceMatchesTheCurrentFilters")}</p>
             <TableEntryCountFooter count={0} />
           </>
         ) : (
@@ -1213,7 +1221,8 @@ function ModelingPrimaryTablesComponent({
                         }));
                       }}
                     >
-                      Name{" "}
+                      
+                      {t("ui.name")}{" "}
                       <span className="sort-indicator">
                         {spliceSortIndicator("name")}
                       </span>
@@ -1244,7 +1253,7 @@ function ModelingPrimaryTablesComponent({
                         }));
                       }}
                     >
-                      {isMobileViewport ? "ID" : "Technical ID"}{" "}
+                      {isMobileViewport ? t("ui.id") : t("ui.technicalID")}{" "}
                       <span className="sort-indicator">
                         {spliceSortIndicator("technicalId")}
                       </span>
@@ -1270,7 +1279,8 @@ function ModelingPrimaryTablesComponent({
                         }))
                       }
                     >
-                      Mfr Ref{" "}
+                      
+                      {t("ui.mfrRef")}{" "}
                       <span className="sort-indicator">
                         {spliceSortIndicator("manufacturerReference")}
                       </span>
@@ -1296,7 +1306,8 @@ function ModelingPrimaryTablesComponent({
                         }))
                       }
                     >
-                      Segment{" "}
+                      
+                      {t("ui.segment")}{" "}
                       <span className="sort-indicator">
                         {spliceSortIndicator("hostSegment")}
                       </span>
@@ -1345,7 +1356,8 @@ function ModelingPrimaryTablesComponent({
                         }))
                       }
                     >
-                      Connected wires{" "}
+                      
+                      {t("ui.connectedWires")}{" "}
                       <span className="sort-indicator">
                         {spliceSortIndicator("connectedWireCount")}
                       </span>
@@ -1493,7 +1505,8 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-new"
                   aria-hidden="true"
                 />
-                New
+                
+                {t("ui.new")}
               </button>
               <button
                 type="button"
@@ -1508,7 +1521,8 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-edit"
                   aria-hidden="true"
                 />
-                Edit
+                
+                {t("ui.edit")}
               </button>
               <button
                 type="button"
@@ -1534,7 +1548,8 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-delete"
                   aria-hidden="true"
                 />
-                Delete
+                
+                {t("ui.delete")}
               </button>
             </>
           )}
@@ -1548,7 +1563,7 @@ function ModelingPrimaryTablesComponent({
         data-onboarding-panel="modeling-nodes"
       >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
-          <h2>Nodes</h2>
+          <h2>{t("ui.nodes")}</h2>
           <div className="list-panel-header-tools">
             <div className="list-panel-header-tools-row is-title-actions">
               <button
@@ -1556,8 +1571,8 @@ function ModelingPrimaryTablesComponent({
                 className="filter-chip table-export-button"
                 onClick={() => {
                   const headers = showNodeKindColumn
-                    ? ["ID", "Kind", "Reference", "Linked segments"]
-                    : ["ID", "Reference", "Linked segments"];
+                    ? [t("ui.id"), t("ui.kind"), t("ui.reference"), t("ui.linkedSegments")]
+                    : [t("ui.id"), t("ui.reference"), t("ui.linkedSegments")];
                   const rows = sortedVisibleNodes.map((node) => {
                     const linkedSegments =
                       segmentsCountByNodeId.get(node.id) ?? 0;
@@ -1596,7 +1611,7 @@ function ModelingPrimaryTablesComponent({
                     className="action-button-icon is-help"
                     aria-hidden="true"
                   />
-                  <span>Help</span>
+                  <span>{t("ui.help")}</span>
                 </button>
               ) : null}
             </div>
@@ -1604,14 +1619,14 @@ function ModelingPrimaryTablesComponent({
               <div
                 className="chip-group list-panel-filters"
                 role="group"
-                aria-label="Node kind filter"
+                aria-label={t("ui.nodeKindFilter")}
               >
                 {(
                   [
-                    ["all", "All"],
-                    ["connector", "Connector"],
-                    ["splice", "Splice"],
-                    ["intermediate", "Intermediate"],
+                    ["all", t("ui.all")],
+                    ["connector", t("ui.connector")],
+                    ["splice", t("ui.splice")],
+                    ["intermediate", t("ui.intermediate")],
                   ] as const
                 ).map(([kindId, label]) => (
                   <button
@@ -1629,8 +1644,8 @@ function ModelingPrimaryTablesComponent({
                 ))}
               </div>
               <TableFilterBar
-                label="Filter"
-                fieldLabel="Node filter field"
+                label={t("ui.filter")}
+                fieldLabel={t("ui.nodeFilterField")}
                 fieldValue={nodeFilterField}
                 onFieldChange={(value) =>
                   setNodeFilterField(
@@ -1638,10 +1653,10 @@ function ModelingPrimaryTablesComponent({
                   )
                 }
                 fieldOptions={[
-                  { value: "id", label: "Node ID" },
-                  { value: "kind", label: "Kind" },
-                  { value: "reference", label: "Reference" },
-                  { value: "any", label: "Any" },
+                  { value: "id", label: t("ui.nodeID") },
+                  { value: "kind", label: t("ui.kind") },
+                  { value: "reference", label: t("ui.reference") },
+                  { value: "any", label: t("ui.any") },
                 ]}
                 queryValue={nodeFilterQuery}
                 onQueryChange={setNodeFilterQuery}
@@ -1651,10 +1666,10 @@ function ModelingPrimaryTablesComponent({
           </div>
         </header>
         {nodes.length === 0 ? (
-          <p className="empty-copy">No node yet.</p>
+          <p className="empty-copy">{t("ui.noNodeYet")}</p>
         ) : sortedVisibleNodes.length === 0 ? (
           <>
-            <p className="empty-copy">No node matches the current filters.</p>
+            <p className="empty-copy">{t("ui.noNodeMatchesTheCurrentFilters")}</p>
             <TableEntryCountFooter count={0} />
           </>
         ) : (
@@ -1692,7 +1707,8 @@ function ModelingPrimaryTablesComponent({
                         );
                       }}
                     >
-                      ID{" "}
+                      
+                      {t("ui.id")}{" "}
                       <span className="sort-indicator">
                         {nodeSortIndicator("id")}
                       </span>
@@ -1714,7 +1730,8 @@ function ModelingPrimaryTablesComponent({
                           }))
                         }
                       >
-                        Kind{" "}
+                        
+                        {t("ui.kind")}{" "}
                         <span className="sort-indicator">
                           {nodeSortIndicator("kind")}
                         </span>
@@ -1736,7 +1753,7 @@ function ModelingPrimaryTablesComponent({
                         }))
                       }
                     >
-                      {isMobileViewport ? "Ref." : "Reference"}{" "}
+                      {isMobileViewport ? t("ui.ref") : t("ui.reference")}{" "}
                       <span className="sort-indicator">
                         {nodeSortIndicator("reference")}
                       </span>
@@ -1762,7 +1779,8 @@ function ModelingPrimaryTablesComponent({
                         }))
                       }
                     >
-                      Linked segments{" "}
+                      
+                      {t("ui.linkedSegments")}{" "}
                       <span className="sort-indicator">
                         {nodeSortIndicator("linkedSegments")}
                       </span>
@@ -1882,7 +1900,8 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-new"
                   aria-hidden="true"
                 />
-                New
+                
+                {t("ui.new")}
               </button>
               <button
                 type="button"
@@ -1896,7 +1915,8 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-edit"
                   aria-hidden="true"
                 />
-                Edit
+                
+                {t("ui.edit")}
               </button>
               <button
                 type="button"
@@ -1922,7 +1942,8 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-delete"
                   aria-hidden="true"
                 />
-                Delete
+                
+                {t("ui.delete")}
               </button>
             </>
           )}

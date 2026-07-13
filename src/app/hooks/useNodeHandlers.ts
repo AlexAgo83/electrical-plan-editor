@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import type { FormEvent } from "react";
 import type { ConnectorId, NetworkNode, NodeId, SpliceId } from "../../core/entities";
 import type { AppStore } from "../../store";
@@ -121,7 +122,7 @@ export function useNodeHandlers({
     const wasCreateMode = nodeFormMode === "create";
     const normalizedNodeId = nodeIdInput.trim();
     if (normalizedNodeId.length === 0) {
-      setNodeFormError("Node ID is required.");
+      setNodeFormError(t("ui.nodeIDIsRequired"));
       return;
     }
 
@@ -144,13 +145,13 @@ export function useNodeHandlers({
     if (nodeKind === "intermediate") {
       const trimmedLabel = nodeLabel.trim();
       if (trimmedLabel.length === 0) {
-        setNodeFormError("Intermediate node label is required.");
+        setNodeFormError(t("ui.intermediateNodeLabelIsRequired"));
         return;
       }
       nextNodeDraft = { id: requestedNodeId, kind: "intermediate", label: trimmedLabel };
     } else if (nodeKind === "connector") {
       if (nodeConnectorId.length === 0) {
-        setNodeFormError("Select a connector to create a connector node.");
+        setNodeFormError(t("ui.selectAConnectorToCreateAConnectorNode"));
         return;
       }
       nextNodeDraft = {
@@ -160,7 +161,7 @@ export function useNodeHandlers({
       };
     } else {
       if (nodeSpliceId.length === 0) {
-        setNodeFormError("Select a splice to create a splice node.");
+        setNodeFormError(t("ui.selectASpliceToCreateASpliceNode"));
         return;
       }
       nextNodeDraft = {
@@ -177,7 +178,7 @@ export function useNodeHandlers({
       dispatchAction(appActions.renameNode(originalNodeId, requestedNodeId));
       const postRenameState = store.getState();
       if (postRenameState.nodes.byId[requestedNodeId] === undefined) {
-        setNodeFormError(getAppErrorMessage(postRenameState.ui.lastError) ?? "Unable to rename node.");
+        setNodeFormError(getAppErrorMessage(postRenameState.ui.lastError) ?? t("ui.unableToRenameNode"));
         return;
       }
       effectiveNodeId = requestedNodeId;
@@ -222,10 +223,10 @@ export function useNodeHandlers({
 
       if (impact.kind === "direct") {
         const shouldDelete = await confirmAction({
-          title: "Delete node",
+          title: t("ui.deleteNode"),
           message: `Delete node ${nodeIdentity}?`,
-          confirmLabel: "Delete",
-          cancelLabel: "Cancel",
+          confirmLabel: t("ui.delete"),
+          cancelLabel: t("ui.cancel"),
           intent: "danger",
           confirmOnEnter: true
         });
@@ -243,8 +244,8 @@ export function useNodeHandlers({
       await confirmAction({
         title: "Node delete blocked",
         message: impact.message,
-        confirmLabel: "Close",
-        cancelLabel: "Cancel",
+        confirmLabel: t("ui.close"),
+        cancelLabel: t("ui.cancel"),
         intent: "warning",
         variant: "deleteBlocked",
         summaryCategories: impact.categories,

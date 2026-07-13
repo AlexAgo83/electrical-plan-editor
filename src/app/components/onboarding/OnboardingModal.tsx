@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactElement } from "react";
 import type { OnboardingModalMode, OnboardingStepDefinition } from "../../lib/onboarding";
 
@@ -139,7 +140,7 @@ export function OnboardingModal({
       <button
         type="button"
         className="onboarding-modal-backdrop"
-        aria-label="Dismiss onboarding overlay"
+        aria-label={t("ui.dismissOnboardingOverlay")}
         onClick={onClose}
       />
       <section
@@ -159,18 +160,20 @@ export function OnboardingModal({
             </span>
             <div className="onboarding-modal-title-block">
               <h2 id={titleId}>{step.title}</h2>
-              {isFullFlow ? <p className="onboarding-modal-progress">{progressLabel}</p> : <p className="onboarding-modal-progress">Context help</p>}
+              {isFullFlow ? <p className="onboarding-modal-progress">{progressLabel}</p> : <p className="onboarding-modal-progress">{t("ui.contextHelp")}</p>}
             </div>
           </div>
-          <button ref={closeButtonRef} type="button" className="onboarding-modal-close" onClick={onClose} aria-label="Close onboarding">
-            Close
+          <button ref={closeButtonRef} type="button" className="onboarding-modal-close" onClick={onClose} aria-label={t("ui.closeOnboarding")}>
+            
+            {t("ui.close")}
           </button>
         </header>
 
         <div className="onboarding-modal-body">
           <div id={`${titleId}-description`}>{renderDescription(step)}</div>
           <p className="onboarding-modal-target">
-            Target panel: <strong>{step.target.panelLabel}</strong>
+            
+            {t("ui.targetPanel")} <strong>{step.target.panelLabel}</strong>
           </p>
           <label className="onboarding-modal-checkbox">
             <input
@@ -178,7 +181,7 @@ export function OnboardingModal({
               checked={!autoOpenEnabled}
               onChange={(event) => onSetAutoOpenEnabled(!event.target.checked)}
             />
-            <span>Do not open automatically on app load</span>
+            <span>{t("ui.doNotOpenAutomaticallyOnAppLoad")}</span>
           </label>
         </div>
 
@@ -194,7 +197,7 @@ export function OnboardingModal({
           {isFullFlow ? (
             <button type="button" className="button-with-icon onboarding-modal-next-button" onClick={onNext}>
               <span className="action-button-icon is-open" aria-hidden="true" />
-              <span>{canGoNext ? "Next" : "Finish"}</span>
+              <span>{canGoNext ? t("ui.next") : t("ui.finish")}</span>
             </button>
           ) : null}
         </footer>

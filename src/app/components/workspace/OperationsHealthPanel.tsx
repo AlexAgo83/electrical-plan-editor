@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ChangeEvent, ReactElement, RefObject } from "react";
 import type { WorkspaceFileStorageStatus } from "../../hooks/useWorkspaceFileStorage";
 import type { ValidationIssue } from "../../types/app-controller";
@@ -51,25 +52,28 @@ export function OperationsHealthPanel({
 }: OperationsHealthPanelProps): ReactElement {
   return (
     <section className="workspace-ops-content panel">
-      <h2>Operations and health</h2>
+      <h2>{t("ui.operationsAndHealth")}</h2>
       <div className="row-actions compact">
         <button type="button" className="button-with-icon" onClick={handleUndo} disabled={!isUndoAvailable}>
           <span className="action-button-icon is-undo" aria-hidden="true" />
-          Undo
+          
+          {t("ui.undo")}
         </button>
         <button type="button" className="button-with-icon" onClick={handleRedo} disabled={!isRedoAvailable}>
           <span className="action-button-icon is-redo" aria-hidden="true" />
-          Redo
+          
+          {t("ui.redo")}
         </button>
       </div>
       {showShortcutHints ? (
         <>
-          <p className="shortcut-hints">Shortcuts: Ctrl/Cmd+Z undo, Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y redo.</p>
-          <p className="shortcut-hints">Nav: Alt+1..7 screens, Alt+Shift+1..5 entity tabs, Alt+V/N/G/C/R modes, Alt+F fit canvas, Alt+J/K issue nav.</p>
+          <p className="shortcut-hints">{t("ui.shortcutsCtrlCmdZUndoCtrlCmdShiftZOr")}</p>
+          <p className="shortcut-hints">{t("ui.navAlt17ScreensAltShift15Entity")}</p>
         </>
       ) : null}
       <p className={`save-status is-${saveStatus}`}>
-        State: {saveStatus === "saved" ? "Saved" : saveStatus === "unsaved" ? "Unsaved" : "Error"}
+        
+        {t("ui.state")} {saveStatus === "saved" ? t("ui.saved") : saveStatus === "unsaved" ? t("ui.unsaved") : t("ui.error")}
       </p>
       <section className="workspace-health workspace-storage-ops" aria-label="Workspace storage">
         <h2>Workspace storage</h2>
@@ -83,7 +87,7 @@ export function OperationsHealthPanel({
           Autosave: {workspaceFileStatus.saveTarget === "linked-file" ? "Linked file" : workspaceFileStatus.saveTarget === "download" ? "Downloaded copy" : "Local cache"}
         </p>
         <p className="meta-line">
-          Resume: {workspaceFileStatus.resumeStatus === "available" ? "Available" : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Unavailable" : "None"}
+          Resume: {workspaceFileStatus.resumeStatus === "available" ? "Available" : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Unavailable" : t("ui.none")}
         </p>
         <p className="meta-line">
           Direct file access: {workspaceFileStatus.directFileAccessSupported ? "Supported" : "Fallback download only"}
@@ -106,7 +110,8 @@ export function OperationsHealthPanel({
             title="Resume the last workspace file remembered by this browser"
           >
             <span className="action-button-icon is-redo" aria-hidden="true" />
-            Resume
+            
+            {t("ui.resume")}
           </button>
           <button
             type="button"
@@ -116,7 +121,8 @@ export function OperationsHealthPanel({
             title="Open a workspace file and replace the current workspace"
           >
             <span className="action-button-icon is-open" aria-hidden="true" />
-            Open
+            
+            {t("ui.open")}
           </button>
           <button
             type="button"
@@ -140,21 +146,25 @@ export function OperationsHealthPanel({
           />
         </div>
       </section>
-      <section className="workspace-health" aria-label="Model health">
-        <h2>Model health</h2>
+      <section className="workspace-health" aria-label={t("ui.modelHealth")}>
+        <h2>{t("ui.modelHealth")}</h2>
         <p className="meta-line">
-          Total issues: <strong>{validationIssuesCount}</strong>
+          
+          {t("ui.totalIssues")} <strong>{validationIssuesCount}</strong>
         </p>
         <p className="meta-line">
-          Errors: <strong>{validationErrorCount}</strong> / Warnings: <strong>{validationWarningCount}</strong>
+          
+          {t("ui.errors")} <strong>{validationErrorCount}</strong> / Warnings: <strong>{validationWarningCount}</strong>
         </p>
         <p className="meta-line">
-          Issue navigator: <strong>{issueNavigatorDisplay}</strong>
+          
+          {t("ui.issueNavigator")} <strong>{issueNavigatorDisplay}</strong>
         </p>
-        <p className="meta-line">Scope: {issueNavigationScopeLabel}</p>
+        <p className="meta-line">{t("ui.scope")} {issueNavigationScopeLabel}</p>
         {currentValidationIssue !== null ? (
           <p className="meta-line">
-            Current issue: <strong>[{currentValidationIssue.severity.toUpperCase()}] {currentValidationIssue.category}</strong>
+            
+            {t("ui.currentIssue")} <strong>[{currentValidationIssue.severity.toUpperCase()}] {currentValidationIssue.category}</strong>
           </p>
         ) : null}
         <div className="row-actions compact workspace-health-actions">
@@ -165,11 +175,13 @@ export function OperationsHealthPanel({
             disabled={orderedValidationIssues.length === 0}
           >
             <span className="action-button-icon is-prevnext" aria-hidden="true" />
-            Previous
+            
+            {t("ui.previous")}
           </button>
           <button type="button" className="button-with-icon" onClick={() => handleOpenValidationScreen("all")}>
             <span className="action-button-icon is-open" aria-hidden="true" />
-            Open
+            
+            {t("ui.open")}
           </button>
           <button
             type="button"
@@ -177,7 +189,8 @@ export function OperationsHealthPanel({
             onClick={() => moveValidationIssueCursor(1)}
             disabled={orderedValidationIssues.length === 0}
           >
-            Next
+            
+            {t("ui.next")}
             <span className="action-button-icon is-prevnext is-flip-x" aria-hidden="true" />
           </button>
         </div>

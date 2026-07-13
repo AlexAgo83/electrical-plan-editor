@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 
 interface NetworkSummaryFunctionalMenuProps {
@@ -54,7 +55,8 @@ export function NetworkSummaryFunctionalMenu({
           {onOpenAnalysis === undefined ? null : (
             <button type="button" className="network-summary-view-menu-item" onClick={handleOpenAnalysis}>
               <span className="action-button-icon is-analysis" aria-hidden="true" />
-              Analysis
+              
+              {t("ui.analysis")}
             </button>
           )}
         </div>

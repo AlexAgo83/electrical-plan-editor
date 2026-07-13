@@ -14,12 +14,25 @@ function catalogValue(catalog: unknown, key: string): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
 
-export function translate(locale: AppLocale, key: string): string {
-  return catalogValue(CATALOGS[locale], key) ?? catalogValue(enCatalog, key) ?? key;
+type TranslationValues = Readonly<Record<string, string | number>>;
+
+let activeLocale: AppLocale = DEFAULT_APP_LOCALE;
+
+export function setActiveLocale(locale: AppLocale): void {
+  activeLocale = locale;
+}
+
+export function translate(locale: AppLocale, key: string, values: TranslationValues = {}): string {
+  const template = catalogValue(CATALOGS[locale], key) ?? catalogValue(enCatalog, key) ?? key;
+  return template.replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (_, name: string) => String(values[name] ?? `{${name}}`));
+}
+
+export function translateCurrent(key: string, values: TranslationValues = {}): string {
+  return translate(activeLocale, key, values);
 }
 
 const LEGACY_KEY_BY_EN_TEXT: Readonly<Record<string, string>> = Object.fromEntries(
-  Object.entries(enCatalog.legacy).map(([key, value]) => [value, key])
+  Object.entries(enCatalog.ui).map(([key, value]) => [value, key])
 );
 
 export function normalizeAppLocale(value: unknown): AppLocale {
@@ -44,7 +57,7 @@ export function translateTextValue(locale: AppLocale, input: string): string {
   }
 
   const legacyKey = LEGACY_KEY_BY_EN_TEXT[trimmed];
-  const direct = legacyKey === undefined ? undefined : catalogValue(frCatalog, `legacy.${legacyKey}`);
+  const direct = legacyKey === undefined ? undefined : catalogValue(frCatalog, `ui.${legacyKey}`);
   if (direct !== undefined) {
     return input.replace(trimmed, preserveCase(trimmed, direct));
   }

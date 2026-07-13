@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import type { SubScreenId } from "../types/app-controller";
 
 export type OnboardingStepId =
@@ -33,26 +34,27 @@ export interface OnboardingStepDefinition {
 
 export const ONBOARDING_AUTO_OPEN_STORAGE_KEY = "electrical-plan-editor.onboarding.auto-open-enabled.v1";
 
-export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
+export function getOnboardingSteps(): readonly OnboardingStepDefinition[] {
+  return [
   {
     id: "networkScope",
-    title: "Create your first network",
+    title: t("ui.createYourFirstNetwork"),
     badge: "N1",
     badgeIconClass: "is-network-scope",
     description: [
       { text: "Start in " },
-      { text: "Network Scope", strong: true },
+      { text: t("ui.networkScope"), strong: true },
       { text: " to create the harness/wiring plan container you will model, duplicate, and export." }
     ],
     target: {
       screen: "networkScope",
       panelSelector: '[data-onboarding-panel="network-scope"]',
-      panelLabel: "Network Scope"
+      panelLabel: t("ui.networkScope")
     }
   },
   {
     id: "catalog",
-    title: "Create catalog items first",
+    title: t("ui.createCatalogItemsFirst"),
     badge: "CAT",
     badgeIconClass: "is-catalog",
     description: [
@@ -64,12 +66,12 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
       screen: "modeling",
       subScreen: "catalog",
       panelSelector: '[data-onboarding-panel="modeling-catalog"]',
-      panelLabel: "Catalog"
+      panelLabel: t("ui.catalog")
     }
   },
   {
     id: "connectorSpliceLibrary",
-    title: "Build the connectors and splices library",
+    title: t("ui.buildTheConnectorsAndSplicesLibrary"),
     badge: "LIB",
     badgeIconClass: "is-connectors",
     description: [
@@ -85,7 +87,7 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
       screen: "modeling",
       subScreen: "connector",
       panelSelector: '[data-onboarding-panel="modeling-connectors"]',
-      panelLabel: "Connectors / Splices"
+      panelLabel: t("ui.connectorsSplices")
     }
   },
   {
@@ -102,12 +104,12 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
       screen: "modeling",
       subScreen: "connector",
       panelSelector: '[data-onboarding-panel="modeling-connectors"]',
-      panelLabel: "Connectors"
+      panelLabel: t("ui.connectors")
     }
   },
   {
     id: "nodes",
-    title: "Create nodes for network points",
+    title: t("ui.createNodesForNetworkPoints"),
     badge: "ND",
     badgeIconClass: "is-nodes",
     description: [
@@ -119,12 +121,12 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
       screen: "modeling",
       subScreen: "node",
       panelSelector: '[data-onboarding-panel="modeling-nodes"]',
-      panelLabel: "Nodes"
+      panelLabel: t("ui.nodes")
     }
   },
   {
     id: "segments",
-    title: "Create segments between nodes",
+    title: t("ui.createSegmentsBetweenNodes"),
     badge: "SG",
     badgeIconClass: "is-segments",
     description: [
@@ -136,17 +138,17 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
       screen: "modeling",
       subScreen: "segment",
       panelSelector: '[data-onboarding-panel="modeling-segments"]',
-      panelLabel: "Segments"
+      panelLabel: t("ui.segments")
     }
   },
   {
     id: "wires",
-    title: "Create wires and cables",
+    title: t("ui.createWiresAndCables"),
     badge: "WR",
     badgeIconClass: "is-wires",
     description: [
       { text: "Create " },
-      { text: "wires/cables", strong: true },
+      { text: t("ui.wiresCables"), strong: true },
       { text: " and route them across segments from endpoint A to endpoint B. Wire forms support section (mm²), optional colors, endpoint references, and endpoint occupancy guidance." },
       { text: " You can also enable " },
       { text: "Fuse", strong: true },
@@ -156,7 +158,7 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
       screen: "modeling",
       subScreen: "wire",
       panelSelector: '[data-onboarding-panel="modeling-wires"]',
-      panelLabel: "Wires"
+      panelLabel: t("ui.wires")
     }
   },
   {
@@ -177,34 +179,35 @@ export const ONBOARDING_STEPS: readonly OnboardingStepDefinition[] = [
   },
   {
     id: "settingsOverview",
-    title: "Configure your workspace defaults",
+    title: t("ui.configureYourWorkspaceDefaults"),
     badge: "CFG",
     badgeIconClass: "is-settings",
     description: [
       { text: "Before continuing, review key " },
-      { text: "Settings", strong: true },
+      { text: t("ui.settings"), strong: true },
       { text: ": " },
-      { text: "Language", strong: true },
+      { text: t("ui.language"), strong: true },
       { text: ", " },
-      { text: "Theme", strong: true },
+      { text: t("ui.theme"), strong: true },
       { text: ", " },
-      { text: "Keyboard shortcuts", strong: true },
+      { text: t("ui.keyboardShortcuts"), strong: true },
       { text: ", " },
-      { text: "Canvas render preferences", strong: true },
+      { text: t("ui.canvasRenderPreferences"), strong: true },
       { text: ", and " },
-      { text: "Global preferences", strong: true },
+      { text: t("ui.globalPreferences"), strong: true },
       { text: " for your default workflow ergonomics." }
     ],
     target: {
       screen: "settings",
       panelSelector: '[data-onboarding-panel="settings-global-preferences"]',
-      panelLabel: "Settings"
+      panelLabel: t("ui.settings")
     }
   }
-] as const;
+  ] as const;
+}
 
 export function getOnboardingStepById(stepId: OnboardingStepId): OnboardingStepDefinition {
-  const step = ONBOARDING_STEPS.find((candidate) => candidate.id === stepId);
+  const step = getOnboardingSteps().find((candidate) => candidate.id === stepId);
   if (step === undefined) {
     throw new Error(`Unknown onboarding step '${stepId}'.`);
   }

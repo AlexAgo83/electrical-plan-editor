@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import { useRef } from "react";
 import type { ProfilerOnRenderCallback } from "react";
 
@@ -54,7 +55,7 @@ export function usePerfChangedProps(label: string, props: Record<string, unknown
     const previous = previousRef.current;
     if (previous !== null) {
       const changed = Object.keys(props).filter((key) => !Object.is(previous[key], props[key]));
-      console.info(`[perf] changed props ${label}:`, changed.length > 0 ? changed.join(", ") : "(none)");
+      console.info(`[perf] changed props ${label}:`, changed.length > 0 ? changed.join(", ") : t("ui.none2"));
     }
   }
   previousRef.current = props;

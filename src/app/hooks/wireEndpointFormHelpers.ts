@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import type { ConnectorId, SpliceId, WireEndpoint } from "../../core/entities";
 import { resolveSplicePortMode } from "../../core/splicePortMode";
 import type { AppStore } from "../../store";
@@ -89,7 +90,7 @@ export function computeWireEndpointSlotHint(
     }
     const nextFree = findNextAvailableConnectorWay(snapshot, connector.id, connector.cavityCount, excluded);
     if (nextFree === null) {
-      return { tone: "error", message: "Way is already occupied. No available ways on selected connector." };
+      return { tone: "error", message: t("ui.wayIsAlreadyOccupiedNoAvailableWaysOnSelectedConnector") };
     }
     return nextFree === cavityIndex ? null : { tone: "error", message: `Way ${cavityIndex} is already occupied. Suggested: way ${nextFree}.` };
   }
@@ -111,7 +112,7 @@ export function computeWireEndpointSlotHint(
   }
   const nextFree = findNextAvailableSplicePort(snapshot, splice.id, splice, excluded);
   if (nextFree === null) {
-    return { tone: "error", message: "Port is already occupied. No available ports on selected splice." };
+    return { tone: "error", message: t("ui.portIsAlreadyOccupiedNoAvailablePortsOnSelectedSplice") };
   }
   return nextFree === portIndex ? null : { tone: "error", message: `Port ${portIndex} is already occupied. Suggested: port ${nextFree}.` };
 }

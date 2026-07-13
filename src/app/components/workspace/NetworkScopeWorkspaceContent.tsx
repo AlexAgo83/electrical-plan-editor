@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import {
   useEffect,
   useMemo,
@@ -203,10 +204,10 @@ export function NetworkScopeWorkspaceContent({
   }, [networkFilterField, normalizedNetworkFilterQuery, sortedNetworks]);
   const networkFilterPlaceholder =
     networkFilterField === "name"
-      ? "Network name"
+      ? t("ui.networkName")
       : networkFilterField === "technicalId"
-        ? "Technical ID"
-        : "Name or technical ID";
+        ? t("ui.technicalID")
+        : t("ui.nameOrTechnicalID");
   useEffect(() => {
     if (networks.length === 0) {
       setFocusedNetworkId(null);
@@ -269,12 +270,12 @@ export function NetworkScopeWorkspaceContent({
   }, [isCreateMode, isEditMode]);
 
   const indicators = [
-    { label: "Catalog", value: focusedNetworkCounts?.catalogCount ?? 0 },
-    { label: "Connectors", value: focusedNetworkCounts?.connectorCount ?? 0 },
-    { label: "Splices", value: focusedNetworkCounts?.spliceCount ?? 0 },
-    { label: "Nodes", value: focusedNetworkCounts?.nodeCount ?? 0 },
-    { label: "Segments", value: focusedNetworkCounts?.segmentCount ?? 0 },
-    { label: "Wires", value: focusedNetworkCounts?.wireCount ?? 0 }
+    { label: t("ui.catalog"), value: focusedNetworkCounts?.catalogCount ?? 0 },
+    { label: t("ui.connectors"), value: focusedNetworkCounts?.connectorCount ?? 0 },
+    { label: t("ui.splices"), value: focusedNetworkCounts?.spliceCount ?? 0 },
+    { label: t("ui.nodes"), value: focusedNetworkCounts?.nodeCount ?? 0 },
+    { label: t("ui.segments"), value: focusedNetworkCounts?.segmentCount ?? 0 },
+    { label: t("ui.wires"), value: focusedNetworkCounts?.wireCount ?? 0 }
   ];
 
   return (
@@ -282,7 +283,7 @@ export function NetworkScopeWorkspaceContent({
     <section className="panel-grid network-scope-grid">
       <section className="panel network-scope-panel" data-onboarding-panel="network-scope">
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
-          <h2>Network Scope</h2>
+          <h2>{t("ui.networkScope")}</h2>
           <div className="list-panel-header-tools">
             <div className="list-panel-header-tools-row is-title-actions">
               <button
@@ -291,7 +292,7 @@ export function NetworkScopeWorkspaceContent({
                 onClick={() =>
                   downloadCsvFile(
                     "network-scope",
-                    ["Name", "Technical ID", "Status"],
+                    [t("ui.name"), t("ui.technicalID"), "Status"],
                     visibleNetworks.map((network) => [
                       network.name,
                       network.technicalId,
@@ -311,20 +312,20 @@ export function NetworkScopeWorkspaceContent({
                   onClick={onOpenOnboardingHelp}
                 >
                   <span className="action-button-icon is-help" aria-hidden="true" />
-                  <span>Help</span>
+                  <span>{t("ui.help")}</span>
                 </button>
               ) : null}
             </div>
             <div className="list-panel-header-tools-row is-filter-row">
               <TableFilterBar
-                label="Filter"
-                fieldLabel="Network filter field"
+                label={t("ui.filter")}
+                fieldLabel={t("ui.networkFilterField")}
                 fieldValue={networkFilterField}
                 onFieldChange={(value) => setNetworkFilterField(value as NetworkScopeFilterField)}
                 fieldOptions={[
-                  { value: "any", label: "Any" },
-                  { value: "name", label: "Name" },
-                  { value: "technicalId", label: "Technical ID" }
+                  { value: "any", label: t("ui.any") },
+                  { value: "name", label: t("ui.name") },
+                  { value: "technicalId", label: t("ui.technicalID") }
                 ]}
                 queryValue={networkFilterQuery}
                 onQueryChange={setNetworkFilterQuery}
@@ -343,7 +344,7 @@ export function NetworkScopeWorkspaceContent({
         ) : (
           <>
             <div className="network-scope-list-shell">
-              <table className="data-table network-scope-list" aria-label="Networks list">
+              <table className="data-table network-scope-list" aria-label={t("ui.networksList")}>
                 <colgroup>
                   <col className="network-scope-col-name" />
                   <col className="network-scope-col-technical-id" />
@@ -357,7 +358,8 @@ export function NetworkScopeWorkspaceContent({
                         className="sort-header-button"
                         onClick={() => setNetworkTableSortField("name")}
                       >
-                        Name{" "}
+                        
+                        {t("ui.name")}{" "}
                         <span
                           className={
                             networkSortIndicator("name") === null
@@ -376,7 +378,7 @@ export function NetworkScopeWorkspaceContent({
                         className="sort-header-button"
                         onClick={() => setNetworkTableSortField("technicalId")}
                       >
-                        {isMobileViewport ? "ID" : "Technical ID"}{" "}
+                        {isMobileViewport ? t("ui.id") : t("ui.technicalID")}{" "}
                         <span
                           className={
                             networkSortIndicator("technicalId") === null
@@ -474,7 +476,8 @@ export function NetworkScopeWorkspaceContent({
               disabled={focusedNetwork === null || isCreateMode}
             >
               <span className="action-button-icon is-open" aria-hidden="true" />
-              Open
+              
+              {t("ui.open")}
             </button>
             <button
               type="button"
@@ -485,7 +488,8 @@ export function NetworkScopeWorkspaceContent({
               }}
             >
               <span className="action-button-icon is-new" aria-hidden="true" />
-              New
+              
+              {t("ui.new")}
             </button>
             <button
               type="button"
@@ -547,7 +551,7 @@ export function NetworkScopeWorkspaceContent({
 
       <section className="panel network-form-panel" hidden={!showNetworkFormPanel} data-form-panel={FORM_PANEL_IDS.networkScope}>
         <header className="network-form-header">
-          <h2>{isCreateMode ? "Create network" : "Edit network"}</h2>
+          <h2>{isCreateMode ? t("ui.createNetwork") : t("ui.editNetwork")}</h2>
           <span
             className={
               isCreateMode
@@ -557,10 +561,10 @@ export function NetworkScopeWorkspaceContent({
                   : "network-form-mode-chip"
             }
           >
-            {isCreateMode ? "Create mode" : "Edit mode"}
+            {isCreateMode ? t("ui.createMode") : t("ui.editMode")}
           </span>
         </header>
-        <section className="network-scope-indicators network-scope-indicators-form" aria-label="Focused network entity counters">
+        <section className="network-scope-indicators network-scope-indicators-form" aria-label={t("ui.focusedNetworkEntityCounters")}>
           {indicators.map((indicator) => (
             <article key={indicator.label} className="network-scope-indicator">
               <span className="network-scope-indicator-label">{indicator.label}</span>
@@ -571,8 +575,8 @@ export function NetworkScopeWorkspaceContent({
         {showNetworkFormPanel ? (
           <form className="settings-grid network-form-grid" onSubmit={handleSubmitNetworkForm}>
             <label className="stack-label">
-              <span className="network-form-label">Network name</span>
-              <input value={newNetworkName} onChange={(event) => setNewNetworkName(event.target.value)} placeholder="Vehicle platform A" />
+              <span className="network-form-label">{t("ui.networkName")}</span>
+              <input value={newNetworkName} onChange={(event) => setNewNetworkName(event.target.value)} placeholder={t("ui.vehiclePlatformA")} />
             </label>
             <label className="stack-label">
               <span className="network-form-label">Network technical ID</span>
@@ -587,11 +591,11 @@ export function NetworkScopeWorkspaceContent({
               <input
                 value={newNetworkDescription}
                 onChange={(event) => setNewNetworkDescription(event.target.value)}
-                placeholder="Optional description"
+                placeholder={t("ui.optionalDescription")}
               />
             </label>
             <label className="stack-label">
-              <span className="network-form-label">Creation date</span>
+              <span className="network-form-label">{t("ui.creationDate")}</span>
               <input
                 type="date"
                 value={newNetworkCreatedAtDate}
@@ -599,7 +603,7 @@ export function NetworkScopeWorkspaceContent({
               />
             </label>
             <label className="stack-label">
-              <span className="network-form-label">Author (optional)</span>
+              <span className="network-form-label">{t("ui.authorOptional")}</span>
               <input
                 value={newNetworkAuthor}
                 onChange={(event) => setNewNetworkAuthor(event.target.value)}
@@ -619,17 +623,17 @@ export function NetworkScopeWorkspaceContent({
               />
             </label>
             <label className="stack-label">
-              <span className="network-form-label">Project code (optional)</span>
+              <span className="network-form-label">{t("ui.projectCodeOptional")}</span>
               <input
                 value={newNetworkProjectCode}
                 onChange={(event) => setNewNetworkProjectCode(event.target.value)}
                 placeholder="PRJ-A1"
                 maxLength={40}
               />
-              <span className="form-hint">Allowed: letters, numbers, spaces, and _ . / -</span>
+              <span className="form-hint">{t("ui.allowedLettersNumbersSpacesAnd")}</span>
             </label>
             <label className="stack-label">
-              <span className="network-form-label">Entity ID prefix (optional)</span>
+              <span className="network-form-label">{t("ui.entityIDPrefixOptional")}</span>
               <input
                 value={newNetworkEntityPrefix}
                 onChange={(event) => setNewNetworkEntityPrefix(event.target.value)}
@@ -637,21 +641,22 @@ export function NetworkScopeWorkspaceContent({
                 maxLength={24}
               />
               <span className="form-hint">
-                Anchored into new entity IDs (e.g. LAT-C-001). Allowed: letters, numbers, underscore, and hyphen.
+                
+                {t("ui.anchoredIntoNewEntityIDsEGLATC001")}
               </span>
             </label>
             <label className="stack-label">
-              <span className="network-form-label">Logo URL (optional)</span>
+              <span className="network-form-label">{t("ui.logoURLOptional")}</span>
               <input
                 value={newNetworkLogoUrl}
                 onChange={(event) => setNewNetworkLogoUrl(event.target.value)}
                 placeholder="https://example.com/logo.png"
                 maxLength={2048}
               />
-              <span className="form-hint">Allowed schemes: http, https, data:image/*</span>
+              <span className="form-hint">{t("ui.allowedSchemesHttpHttpsDataImage")}</span>
             </label>
             <label className="stack-label">
-              <span className="network-form-label">Export notes (optional)</span>
+              <span className="network-form-label">{t("ui.exportNotesOptional")}</span>
               <textarea
                 value={newNetworkExportNotes}
                 onChange={(event) => setNewNetworkExportNotes(event.target.value)}
@@ -666,7 +671,7 @@ export function NetworkScopeWorkspaceContent({
               <button type="submit" className={isFormOpen ? "button-with-icon" : undefined}>
                 {isCreateMode ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
                 {isEditMode ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
-                {isCreateMode ? "Create network" : "Save network"}
+                {isCreateMode ? t("ui.createNetwork") : t("ui.saveNetwork")}
               </button>
               {isEditMode ? (
                 <button
@@ -695,19 +700,21 @@ export function NetworkScopeWorkspaceContent({
                   disabled={focusedNetwork === null}
                 >
                   <span className="action-button-icon is-delete" aria-hidden="true" />
-                  Delete
+                  
+                  {t("ui.delete")}
                 </button>
               ) : null}
               {isEditMode ? (
                 <button
                   type="button"
                   className="button-with-icon"
-                  title="Recompute all wire routes and splice sides for this network"
+                  title={t("ui.recomputeAllWireRoutesAndSpliceSidesForThisNetwork")}
                   onClick={handleRecomputeNetwork}
                   disabled={focusedNetwork === null || focusedNetwork.id !== activeNetworkId}
                 >
                   <span className="action-button-icon is-redo" aria-hidden="true" />
-                  Recompute routes
+                  
+                  {t("ui.recomputeRoutes")}
                 </button>
               ) : null}
               <button
@@ -720,7 +727,8 @@ export function NetworkScopeWorkspaceContent({
                 }}
               >
                 {isEditMode ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
-                Cancel
+                
+                {t("ui.cancel")}
               </button>
             </div>
           </form>

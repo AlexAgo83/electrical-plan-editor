@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useRef, type ReactElement } from "react";
 import { useModalDialog } from "../../hooks/useModalDialog";
 import type { ConfirmDialogIntent } from "../../types/confirm-dialog";
@@ -33,7 +34,7 @@ export function FileFeedbackDialog({ isOpen, themeHostClassName, title, message,
         ) : null}
         <footer className="confirm-dialog-actions">
           <button ref={closeButtonRef} type="button" className="button-with-icon confirm-dialog-confirm" onClick={onClose}>
-            <span className="action-button-icon is-open" aria-hidden="true" /><span>Close</span>
+            <span className="action-button-icon is-open" aria-hidden="true" /><span>{t("ui.close")}</span>
           </button>
         </footer>
       </section>

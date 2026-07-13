@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { useModalDialog } from "../../hooks/useModalDialog";
 import type { ActiveBomPreviewState } from "../../hooks/controller/useAppControllerBomExportHandlers";
@@ -55,10 +56,10 @@ export function BomExportPreviewDialog({
   const previewSheets = useMemo(() => buildPreviewSheets(preview), [preview]);
   const fallbackSheet = previewSheets[0] ?? { name: "Network BOM", headers: preview.headers, rows: preview.rows };
   const activeSheet = previewSheets[Math.min(activeSheetIndex, previewSheets.length - 1)] ?? fallbackSheet;
-  const typeColumnIndex = activeSheet.headers.indexOf("Type");
-  const manufacturerReferenceColumnIndex = activeSheet.headers.indexOf("Manufacturer reference");
+  const typeColumnIndex = activeSheet.headers.indexOf(t("ui.type"));
+  const manufacturerReferenceColumnIndex = activeSheet.headers.indexOf(t("ui.manufacturerReference"));
   const connectorIdColumnIndex = activeSheet.headers.indexOf("Connector ID");
-  const connectorNameColumnIndex = activeSheet.headers.indexOf("Connector name");
+  const connectorNameColumnIndex = activeSheet.headers.indexOf(t("ui.connectorName"));
   const formatLabel = preview.format.toUpperCase();
 
   useEffect(() => {
@@ -113,20 +114,20 @@ export function BomExportPreviewDialog({
             <span className="bom-preview-summary-item">
               <span className="bom-preview-summary-label">Tax</span>
               <span className="bom-preview-summary-value">
-                {preview.workspaceTaxEnabled ? `${preview.workspaceTaxRatePercent.toFixed(2)}%` : "Disabled"}
+                {preview.workspaceTaxEnabled ? `${preview.workspaceTaxRatePercent.toFixed(2)}%` : t("ui.disabled")}
               </span>
             </span>
             {preview.compactColumns ? (
               <span className="bom-preview-summary-item">
                 <span className="bom-preview-summary-label">Columns</span>
-                <span className="bom-preview-summary-value">Compact</span>
+                <span className="bom-preview-summary-value">{t("ui.compact")}</span>
               </span>
             ) : null}
           </div>
         </header>
         {preview.warnings.length > 0 ? (
           <div className="confirm-dialog-details bom-preview-warnings" role="status">
-            <span className="confirm-dialog-details-label">Warnings</span>
+            <span className="confirm-dialog-details-label">{t("ui.warnings2")}</span>
             <ul>
               {preview.warnings.map((warning) => (
                 <li key={warning}>{warning}</li>
@@ -173,7 +174,7 @@ export function BomExportPreviewDialog({
                     const cellValue = formatPreviewCell(row[columnIndex]);
                     const rowType = typeColumnIndex >= 0 ? formatPreviewCell(row[typeColumnIndex]) : "";
                     const linkedCatalogItemId =
-                      rowType === "Catalog item" && columnIndex === manufacturerReferenceColumnIndex
+                      rowType === t("ui.catalogItem") && columnIndex === manufacturerReferenceColumnIndex
                         ? preview.catalogItemReferenceLinks[cellValue]
                         : undefined;
                     const connectorTechnicalId = connectorIdColumnIndex >= 0 ? formatPreviewCell(row[connectorIdColumnIndex]) : "";
@@ -213,7 +214,8 @@ export function BomExportPreviewDialog({
         </div>
         <footer className="confirm-dialog-actions">
           <button ref={cancelButtonRef} type="button" className="confirm-dialog-cancel" onClick={onCancel}>
-            Cancel
+            
+            {t("ui.cancel")}
           </button>
           <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={onConfirm}>
             <span className="table-export-icon" aria-hidden="true" />

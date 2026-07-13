@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import {
   isNetworkLogoUrlValid,
   isNetworkProjectCodeValid,
@@ -46,27 +47,27 @@ export function buildNetworkFormDraft(input: NetworkFormDraftInput): NetworkForm
   const trimmedName = input.name.trim();
   const trimmedTechnicalId = input.technicalId.trim();
   if (trimmedName.length === 0 || trimmedTechnicalId.length === 0) {
-    return { kind: "error", message: "Network name and technical ID are required." };
+    return { kind: "error", message: t("ui.networkNameAndTechnicalIDAreRequired") };
   }
 
   const normalizedProjectCode = normalizeNetworkProjectCode(input.projectCode);
   if (normalizedProjectCode !== undefined && !isNetworkProjectCodeValid(normalizedProjectCode)) {
-    return { kind: "error", message: "Project code supports letters, numbers, spaces, and _ . / - characters only." };
+    return { kind: "error", message: t("ui.projectCodeSupportsLettersNumbersSpacesAndCharactersOnly") };
   }
 
   const normalizedLogoUrl = normalizeNetworkLogoUrl(input.logoUrl);
   if (normalizedLogoUrl !== undefined && !isNetworkLogoUrlValid(normalizedLogoUrl)) {
-    return { kind: "error", message: "Logo URL must use http, https, or data:image/*." };
+    return { kind: "error", message: t("ui.logoURLMustUseHttpHttpsOrDataImage") };
   }
 
   const trimmedEntityPrefix = input.entityPrefix.trim();
   if (trimmedEntityPrefix.length > 0 && normalizeNetworkEntityPrefix(trimmedEntityPrefix) === undefined) {
-    return { kind: "error", message: "Entity prefix supports letters, numbers, underscore, and hyphen only." };
+    return { kind: "error", message: t("ui.entityPrefixSupportsLettersNumbersUnderscoreAndHyphenOnly") };
   }
 
   const createdAtIso = parseLocalDateInputToIso(input.createdAtDate);
   if (createdAtIso === null) {
-    return { kind: "error", message: "Creation date is invalid." };
+    return { kind: "error", message: t("ui.creationDateIsInvalid") };
   }
 
   const rawVoltage = input.voltageV.trim();

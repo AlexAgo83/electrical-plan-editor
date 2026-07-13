@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type Dispatch, type ReactElement, type RefObject, type SetStateAction } from "react";
 import type { CatalogItem, CatalogItemId, Wire } from "../../../core/entities";
 import { buildWireEndpointReferenceEntries, type WireEndpointReferenceEntry } from "../../../core/wireReferences";
@@ -125,10 +126,10 @@ export function ModelingCatalogListPanel({
     selectedCatalogItemId === null ? null : (catalogItems.find((item) => item.id === selectedCatalogItemId) ?? null);
   const filterPlaceholder =
     filterField === "manufacturerReference"
-      ? "Manufacturer reference"
+      ? t("ui.manufacturerReference")
       : filterField === "name"
-        ? "Name"
-        : "Manufacturer reference or name";
+        ? t("ui.name")
+        : t("ui.manufacturerReferenceOrName");
   const sortIndicator = (field: CatalogSortField) =>
     sortState.field === field ? (sortState.direction === "asc" ? "▲" : "▼") : "";
   const toggleSort = (field: CatalogSortField) =>
@@ -139,8 +140,8 @@ export function ModelingCatalogListPanel({
   const wireReferenceEntries = useMemo(() => buildWireEndpointReferenceEntries(wires), [wires]);
   const isItemsView = activeView === "items";
   const catalogItemColumns: ConfigurableTableColumn[] = [
-    { id: "manufacturerReference", label: "Manufacturer ref" },
-    { id: "name", label: "Name" },
+    { id: "manufacturerReference", label: t("ui.manufacturerRef") },
+    { id: "name", label: t("ui.name") },
     { id: "connectionCount", label: "Connections" },
     { id: "unitPriceExclTax", label: "Unit price" }
   ];
@@ -149,7 +150,7 @@ export function ModelingCatalogListPanel({
     <>
       <article className="panel" hidden={!isCatalogSubScreen} data-onboarding-panel="modeling-catalog">
       <header className="list-panel-header list-panel-header-mobile-inline-tools">
-        <h2>Catalog</h2>
+        <h2>{t("ui.catalog")}</h2>
         <div className="list-panel-header-tools">
           <div className="list-panel-header-tools-row is-title-actions">
             <div className="chip-group" aria-label="Catalog tables">
@@ -201,21 +202,21 @@ export function ModelingCatalogListPanel({
             {onOpenCatalogOnboardingHelp !== undefined ? (
               <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenCatalogOnboardingHelp}>
                 <span className="action-button-icon is-help" aria-hidden="true" />
-                <span>Help</span>
+                <span>{t("ui.help")}</span>
               </button>
             ) : null}
           </div>
           {isItemsView ? (
             <div className="list-panel-header-tools-row is-filter-row">
               <TableFilterBar
-                label="Filter"
-                fieldLabel="Catalog filter field"
+                label={t("ui.filter")}
+                fieldLabel={t("ui.catalogFilterField")}
                 fieldValue={filterField}
                 onFieldChange={(value) => setFilterField(value as CatalogFilterField)}
                 fieldOptions={[
-                  { value: "manufacturerReference", label: "Manufacturer ref" },
-                  { value: "name", label: "Name" },
-                  { value: "any", label: "Any" }
+                  { value: "manufacturerReference", label: t("ui.manufacturerRef") },
+                  { value: "name", label: t("ui.name") },
+                  { value: "any", label: t("ui.any") }
                 ]}
                 queryValue={filterQuery}
                 onQueryChange={setFilterQuery}
@@ -261,7 +262,8 @@ export function ModelingCatalogListPanel({
               }}
             >
               <span className="action-button-icon is-new" aria-hidden="true" />
-              Create catalog item
+              
+              {t("ui.createCatalogItem")}
             </button>
           </div>
         </>
@@ -277,13 +279,14 @@ export function ModelingCatalogListPanel({
               <tr>
                 <th data-column-id="manufacturerReference" aria-sort={getTableAriaSort(sortState, "manufacturerReference")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("manufacturerReference")}>
-                    {isMobileViewport ? "Mnf ref" : "Manufacturer ref"}{" "}
+                    {isMobileViewport ? t("ui.mnfRef") : t("ui.manufacturerRef")}{" "}
                     <span className="sort-indicator">{sortIndicator("manufacturerReference")}</span>
                   </button>
                 </th>
                 <th data-column-id="name" aria-sort={getTableAriaSort(sortState, "name")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("name")}>
-                    Name <span className="sort-indicator">{sortIndicator("name")}</span>
+                    
+                    {t("ui.name")} <span className="sort-indicator">{sortIndicator("name")}</span>
                   </button>
                 </th>
                 <th data-column-id="connectionCount" aria-sort={getTableAriaSort(sortState, "connectionCount")}>
@@ -342,11 +345,12 @@ export function ModelingCatalogListPanel({
             }}
           >
             <span className="action-button-icon is-new" aria-hidden="true" />
-            New
+            
+            {t("ui.new")}
           </button>
           {onOpenCatalogCsvImportPicker !== undefined ? (
             <button type="button" onClick={onOpenCatalogCsvImportPicker}>
-              {isMobileViewport ? "Import" : "Import CSV"}
+              {isMobileViewport ? "Import" : t("ui.importCSV")}
             </button>
           ) : null}
           <button
@@ -362,7 +366,8 @@ export function ModelingCatalogListPanel({
             disabled={selectedCatalogItem === null}
           >
             <span className="action-button-icon is-edit" aria-hidden="true" />
-            Edit
+            
+            {t("ui.edit")}
           </button>
           <button
             type="button"
@@ -371,7 +376,8 @@ export function ModelingCatalogListPanel({
             disabled={selectedCatalogItem === null || catalogFormMode === "create"}
           >
             <span className="action-button-icon is-delete" aria-hidden="true" />
-            Delete
+            
+            {t("ui.delete")}
           </button>
         </div>
       ) : null}
@@ -452,7 +458,7 @@ function WireEndpointReferenceNamesTable({
   }, [draftResetPayload]);
 
   if (entries.length === 0) {
-    return <p className="empty-copy">No {kind} references yet.</p>;
+    return <p className="empty-copy">{t("ui.no")} {kind} references yet.</p>;
   }
 
   return (
@@ -463,10 +469,10 @@ function WireEndpointReferenceNamesTable({
           tableId={`catalog-${kind}-references`}
           tableRef={tableRef}
           columns={[
-            { id: "reference", label: "Reference" },
-            { id: "name", label: "Name" },
+            { id: "reference", label: t("ui.reference") },
+            { id: "name", label: t("ui.name") },
             { id: "quantity", label: "Count" },
-            { id: "actions", label: "Actions", hideable: false }
+            { id: "actions", label: t("ui.actions"), hideable: false }
           ]}
           tableColumnPreferences={tableColumnPreferences}
           setTableColumnPreferences={setTableColumnPreferences}
@@ -475,10 +481,10 @@ function WireEndpointReferenceNamesTable({
       <table className="data-table catalog-reference-table" ref={tableRef}>
         <thead>
           <tr>
-            <th data-column-id="reference">Reference</th>
-            <th data-column-id="name">Name</th>
+            <th data-column-id="reference">{t("ui.reference")}</th>
+            <th data-column-id="name">{t("ui.name")}</th>
             <th data-column-id="quantity">Count</th>
-            <th data-column-id="actions" className="validation-actions-cell">Actions</th>
+            <th data-column-id="actions" className="validation-actions-cell">{t("ui.actions")}</th>
           </tr>
         </thead>
         <tbody>
@@ -513,14 +519,14 @@ function WireEndpointReferenceNamesTable({
                         [entry.reference]: nextValue
                       }));
                     }}
-                    placeholder="Optional"
+                    placeholder={t("ui.optional")}
                   />
                 </td>
                 <td data-column-id="quantity">{entry.quantity}</td>
                 <td data-column-id="actions" className="validation-actions-cell">
                   <button
                     type="button"
-                    aria-label="Save"
+                    aria-label={t("ui.save")}
                     className="validation-row-go-to-button button-with-icon"
                     onClick={() => {
                       void (async () => {
@@ -532,7 +538,7 @@ function WireEndpointReferenceNamesTable({
                     }}
                   >
                     <span className="action-button-icon is-save" aria-hidden="true" />
-                    <span className="catalog-reference-save-label">Save</span>
+                    <span className="catalog-reference-save-label">{t("ui.save")}</span>
                   </button>
                 </td>
               </tr>

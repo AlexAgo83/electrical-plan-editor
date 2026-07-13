@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import { useState } from "react";
 import type { AppStore } from "../../store";
 import type { SpliceId } from "../../core/entities";
@@ -47,7 +48,7 @@ export function useSpliceOptimizedPlacementSuggestion({
     if (result.kind === "empty") {
       setSpliceFormError(null);
       setSpliceFormInfo(null);
-      notifyToast("No optimized lengths", { message: result.reason, variant: "info" });
+      notifyToast(t("ui.noOptimizedLengths"), { message: result.reason, variant: "info" });
       return;
     }
 
@@ -84,7 +85,7 @@ export function useSpliceOptimizedPlacementSuggestion({
     );
     const nextError = store.getState().ui.lastError?.message ?? null;
     if (nextError !== null) {
-      notifyToast("Optimized lengths failed", { message: nextError, variant: "error" });
+      notifyToast(t("ui.optimizedLengthsFailed"), { message: nextError, variant: "error" });
       return;
     }
     setOptimizedLengthSuggestion(null);

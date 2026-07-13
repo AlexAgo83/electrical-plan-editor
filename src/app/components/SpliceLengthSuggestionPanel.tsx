@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import type { ReactElement } from "react";
 
 export interface SpliceLengthSuggestionPanelModel {
@@ -21,7 +22,7 @@ export function SpliceLengthSuggestionPanel({
   return (
     <article className={suggestion.hasWarning ? "panel splice-length-suggestion-panel is-warning" : "panel splice-length-suggestion-panel"}>
       <div className="inspector-context-header">
-        <h2>Suggested splice lengths</h2>
+        <h2>{t("ui.suggestedSpliceLengths")}</h2>
       </div>
       <div className="inspector-entity-line">
         <span className="inspector-kind-chip">splice</span>
@@ -35,10 +36,11 @@ export function SpliceLengthSuggestionPanel({
       <div className="row-actions inspector-actions splice-length-suggestion-actions">
         <button type="button" className="button-with-icon" onClick={onApply}>
           <span className="action-button-icon is-open" aria-hidden="true" />
-          <span>Apply suggestion</span>
+          <span>{t("ui.applySuggestion")}</span>
         </button>
         <button type="button" onClick={onCancel}>
-          Cancel
+          
+          {t("ui.cancel")}
         </button>
       </div>
     </article>

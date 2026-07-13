@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { CSSProperties, ReactElement } from "react";
 import type {
   CatalogItem,
@@ -241,7 +242,7 @@ function renderPhysicalWireColorDots(wire: Wire | null, startX: number): ReactEl
 
 function renderPhysicalOccupantRef(occupantRef: string | null, wireById: Map<WireId, Wire>): ReactElement {
   if (occupantRef === null) {
-    return <span>Free</span>;
+    return <span>{t("ui.free")}</span>;
   }
   const parsed = parseWireOccupantRef(occupantRef);
   if (parsed === null) {
@@ -401,7 +402,8 @@ export function ConnectorPhysicalView({
                           {wireId !== null ? (
                             <button type="button" className="validation-row-go-to-button button-with-icon" onClick={() => onGoToWire(wireId)}>
                               <span className="action-button-icon is-open" aria-hidden="true" />
-                              Go to
+                              
+                              {t("ui.goTo")}
                             </button>
                           ) : (
                             <button type="button" className="button-with-icon" onClick={() => onReleaseCavity(way.cavityIndex, occupantRef)}>
@@ -414,7 +416,7 @@ export function ConnectorPhysicalView({
                   })
                 ) : (
                   <p className="cavity-occupant-line">
-                    <span>Free</span>
+                    <span>{t("ui.free")}</span>
                   </p>
                 )}
               </article>

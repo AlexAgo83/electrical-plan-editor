@@ -29,7 +29,7 @@
       "settings": "Settings workspace: workspace preferences and project-level options."
     }
   },
-  "legacy": {
+  "ui": {
     "home": "Home",
     "networkScope": "Network Scope",
     "modeling": "Modeling",
@@ -719,6 +719,16 @@
     "routeReset": "route reset",
     "lengthsOptimized": "lengths optimized",
     "viewUpdated": "view updated",
-    "workspaceStateReplaced": "Workspace state replaced"
+    "workspaceStateReplaced": "Workspace state replaced",
+    "round": "Round",
+    "square": "Square",
+    "slot": "Slot",
+    "line": "Line",
+    "dashed": "Dashed",
+    "smallHalfSize": "Small (0.5 x)",
+    "bigDoubleSize": "Big (2 x 2)",
+    "arrow": "Arrow",
+    "diamond": "Diamond",
+    "circle": "Circle"
   }
 }

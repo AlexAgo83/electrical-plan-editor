@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import {
   useEffect,
   useRef,
@@ -336,7 +337,8 @@ export function ModelingBatchContextDialog({
             className="confirm-dialog-cancel"
             onClick={onCloseDialog}
           >
-            Close
+            
+            {t("ui.close")}
           </button>
         </header>
         <ModelingBatchContextContent

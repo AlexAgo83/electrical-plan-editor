@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 import type { SubNetworkSummary } from "../../../store";
 
@@ -22,8 +23,8 @@ interface NetworkCanvasFloatingInfoPanelsProps {
 }
 
 function renderSubNetworkTagLabel(tag: string): ReactElement | string {
-  if (tag === "(default)") {
-    return <em>DEFAULT</em>;
+  if (tag === t("ui.default3")) {
+    return <em>{t("ui.default2")}</em>;
   }
 
   return tag;
@@ -46,12 +47,12 @@ export function NetworkCanvasFloatingInfoPanels({
   if (!showNetworkInfoPanels) {
     return null;
   }
-  const visibleSubNetworkSummaries = subNetworkSummaries.filter((summary) => summary.tag !== "(default)");
+  const visibleSubNetworkSummaries = subNetworkSummaries.filter((summary) => summary.tag !== t("ui.default3"));
   const hasOnlyDefaultSubNetwork = subNetworkSummaries.length > 0 && visibleSubNetworkSummaries.length === 0;
 
   return (
     <>
-      <div className="network-canvas-floating-controls" aria-label="Canvas controls">
+      <div className="network-canvas-floating-controls" aria-label={t("ui.canvasControls")}>
         <label className="network-canvas-global-scale">
           <span className="network-canvas-global-scale-label">
             <span className="action-button-icon is-zoom" aria-hidden="true" />
@@ -96,11 +97,11 @@ export function NetworkCanvasFloatingInfoPanels({
           </button>
           <button type="button" className="workspace-tab" onClick={() => handleZoomAction("reset")}>
             <span className="action-button-icon is-undo" aria-hidden="true" />
-            <span>Reset view</span>
+            <span>{t("ui.resetView")}</span>
           </button>
           <button type="button" className="workspace-tab" onClick={fitNetworkToContent}>
             <span className="action-button-icon is-fit" aria-hidden="true" />
-            <span>Fit network</span>
+            <span>{t("ui.fitNetwork")}</span>
           </button>
         </div>
         {selectedCanvasNodeCount > 1 ? (
@@ -121,9 +122,9 @@ export function NetworkCanvasFloatingInfoPanels({
       </div>
 
       <div className="network-canvas-floating-stack">
-        <section className="network-canvas-floating-subnetworks" aria-label="Sub-networks">
+        <section className="network-canvas-floating-subnetworks" aria-label={t("ui.subNetworks")}>
           {subNetworkSummaries.length === 0 || hasOnlyDefaultSubNetwork ? (
-            <p className="network-canvas-floating-copy">No sub-network tags yet.</p>
+            <p className="network-canvas-floating-copy">{t("ui.noSubNetworkTagsYet")}</p>
           ) : (
             <>
               {visibleSubNetworkSummaries.length > 0 ? (
@@ -134,7 +135,8 @@ export function NetworkCanvasFloatingInfoPanels({
                     onClick={enableAllSubNetworkTags}
                     disabled={visibleSubNetworkSummaries.every((group) => activeSubNetworkTags.has(group.tag))}
                   >
-                    Enable all
+                    
+                    {t("ui.enableAll")}
                   </button>
                 </div>
               ) : null}
@@ -152,7 +154,7 @@ export function NetworkCanvasFloatingInfoPanels({
                     {renderSubNetworkTagLabel(group.tag)}
                   </button>
                   <span>
-                    {group.segmentCount} segment(s), {group.totalLengthMm} mm total
+                    {group.segmentCount}  {t("ui.segmentS")} {group.totalLengthMm}  {t("ui.mmTotal")}
                   </span>
                 </li>
               ))}
@@ -160,7 +162,7 @@ export function NetworkCanvasFloatingInfoPanels({
             </>
           )}
         </section>
-        <section className="network-canvas-floating-stats" aria-label="Graph statistics">
+        <section className="network-canvas-floating-stats" aria-label={t("ui.graphStatistics")}>
           <ul className="network-canvas-stats-list">
             {graphStats.map((entry) => (
               <li key={entry.label}>

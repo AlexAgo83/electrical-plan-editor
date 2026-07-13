@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useState, type ReactElement } from "react";
 import { useModalDialog } from "../../hooks/useModalDialog";
 import type { CsvCellValue } from "../../lib/csv";
@@ -127,7 +128,8 @@ export function TabularExportPreviewDialog({
         </div>
         <footer className="confirm-dialog-actions">
           <button type="button" className="confirm-dialog-cancel" onClick={onCancel}>
-            Cancel
+            
+            {t("ui.cancel")}
           </button>
           <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={onConfirm}>
             <span className="action-button-icon is-open" aria-hidden="true" />

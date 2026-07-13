@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 
 interface NetworkSummaryViewMenuProps {
@@ -69,7 +70,8 @@ export function NetworkSummaryViewMenu({
             onClick={toggleShowNetworkInfoPanels}
           >
             <span className="network-summary-info-icon" aria-hidden="true" />
-            Info
+            
+            {t("ui.info")}
           </button>
           <button
             type="button"
@@ -77,7 +79,8 @@ export function NetworkSummaryViewMenu({
             onClick={toggleShowSegmentLengths}
           >
             <span className="network-summary-length-icon" aria-hidden="true" />
-            Length
+            
+            {t("ui.length")}
           </button>
           <button
             type="button"
@@ -93,7 +96,8 @@ export function NetworkSummaryViewMenu({
             onClick={toggleShowCableCallouts}
           >
             <span className="network-summary-callouts-icon" aria-hidden="true" />
-            Callouts
+            
+            {t("ui.callouts")}
           </button>
         </div>
       )}

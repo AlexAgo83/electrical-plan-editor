@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useState } from "react";
 import type { WireRecomputeReportEntry } from "../../../store";
 import type { FileFeedbackDialogModel } from "../networkImportExportTypes";
@@ -30,7 +31,7 @@ export function useAppControllerNetworkRecomputeReport(
 
     const changeCount = lastRecomputeReport.length;
     setNetworkRecomputeReportDialog({
-      title: "Recompute report",
+      title: t("ui.recomputeReport"),
       message:
         changeCount === 0
           ? NO_CHANGE_MESSAGE

@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 import { useState } from "react";
 import { useConnectorHandlersContext } from "../controller/ModelingController.context";
@@ -128,28 +129,31 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
   return (
 <article className="panel" hidden={!isConnectorSubScreen} data-form-panel={FORM_PANEL_IDS.connector}>
   {renderFormHeader(
-    connectorFormMode === "create" ? "Create Connector" : connectorFormMode === "edit" ? "Edit Connector" : "Connector form",
+    connectorFormMode === "create" ? t("ui.createConnector") : connectorFormMode === "edit" ? t("ui.editConnector") : t("ui.connectorForm"),
     connectorFormMode
   )}
   {connectorFormMode === "idle" ? renderIdleCopy("connector", connectorHandlers.resetConnectorForm) : (
   <form className="stack-form" onSubmit={connectorHandlers.handleConnectorSubmit}>
     <label>
-      Functional name
-      <input value={connectorName} onChange={(event) => setConnectorName(event.target.value)} placeholder="Rear body connector" required />
+      
+      {t("ui.functionalName")}
+      <input value={connectorName} onChange={(event) => setConnectorName(event.target.value)} placeholder={t("ui.rearBodyConnector")} required />
     </label>
     <label>
-      Technical ID
+      
+      {t("ui.technicalID")}
       <input value={connectorTechnicalId} onChange={(event) => setConnectorTechnicalId(event.target.value)} placeholder="C-001" required />
     </label>
     <label>
-      Catalog item (manufacturer reference)
+      
+      {t("ui.catalogItemManufacturerReference")}
       <select
         value={connectorCatalogItemId}
         onChange={(event) => setConnectorCatalogItemId(event.target.value)}
         required
         disabled={!hasCatalogItems}
       >
-        <option value="">Select a catalog item</option>
+        <option value="">{t("ui.selectACatalogItem")}</option>
         {catalogItemOptions.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -159,10 +163,11 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     </label>
     {!hasCatalogItems ? (
       <div className="row-actions compact">
-        <small className="inline-error">Create a catalog item first to define manufacturer reference and connection count.</small>
+        <small className="inline-error">{t("ui.createACatalogItemFirstToDefineManufacturerReferenceAnd")}</small>
         <button type="button" className="button-with-icon" onClick={openCatalogSubScreen}>
           <span className="action-button-icon is-catalog" aria-hidden="true" />
-          Open Catalog
+          
+          {t("ui.openCatalog")}
         </button>
       </div>
     ) : null}
@@ -175,14 +180,16 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
             title={`Open catalog item ${connectorManufacturerReference}`}
             onClick={() => onSelectCatalogItem(selectedCatalogItem.id)}
           >
-            Manufacturer reference: <span className="technical-id">{connectorManufacturerReference}</span>
+            
+            {t("ui.manufacturerReference2")} <span className="technical-id">{connectorManufacturerReference}</span>
           </EntityReferenceButton>
         )}
       </small>
     ) : null}
-    {connectorTechnicalIdAlreadyUsed ? <small className="inline-error">This technical ID is already used.</small> : null}
+    {connectorTechnicalIdAlreadyUsed ? <small className="inline-error">{t("ui.thisTechnicalIDIsAlreadyUsed")}</small> : null}
     <label>
-      Way count (from catalog)
+      
+      {t("ui.wayCountFromCatalog")}
       <input type="number" min={1} step={1} value={cavityCount} readOnly required />
     </label>
     <label className="settings-checkbox">
@@ -207,7 +214,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
             : `Inherit catalog (enabled, ${catalogRearBackshell.lengthMm} mm)`}
         </option>
         <option value="enabled">Enabled</option>
-        <option value="disabled">Disabled</option>
+        <option value="disabled">{t("ui.disabled")}</option>
       </select>
     </label>
     {connectorRearBackshellOverrideEnabled !== "disabled" ? (
@@ -378,7 +385,8 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         onChange={(event) => setConnectorAutoCreateLinkedNode(event.target.checked)}
         disabled={connectorFormMode !== "create"}
       />
-      Auto-create linked node on connector creation
+      
+      {t("ui.autoCreateLinkedNodeOnConnectorCreation")}
     </label>
     <div className="row-actions">
       <button
@@ -388,12 +396,13 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
       >
         {connectorFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
         {connectorFormMode === "edit" ? <span className="action-button-icon is-save" aria-hidden="true" /> : null}
-        {connectorFormMode === "create" ? "Create" : "Save"}
+        {connectorFormMode === "create" ? t("ui.create") : t("ui.save")}
       </button>
       {connectorFormMode === "edit" && connectorEditAfterCreate ? (
         <button type="button" className="button-with-icon" onClick={connectorHandlers.resetConnectorForm}>
           <span className="action-button-icon is-new" aria-hidden="true" />
-          New
+          
+          {t("ui.new")}
         </button>
       ) : null}
       <button
@@ -402,7 +411,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         onClick={connectorHandlers.cancelConnectorEdit}
       >
         {connectorFormMode === "edit" ? <span className="action-button-icon is-cancel" aria-hidden="true" /> : null}
-        {connectorFormMode === "edit" ? "Cancel edit" : "Cancel"}
+        {connectorFormMode === "edit" ? t("ui.cancelEdit") : t("ui.cancel")}
       </button>
     </div>
     {connectorFormError !== null ? <small className="inline-error">{connectorFormError}</small> : null}

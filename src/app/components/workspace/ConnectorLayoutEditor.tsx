@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactElement } from "react";
 import type {
   ConnectorLayout,
@@ -64,33 +65,33 @@ interface ConnectorLayoutEditorProps {
   showLegend?: boolean;
 }
 
-const WAY_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutWayShape; label: string }> = [
-  { value: "round", label: "Round" },
-  { value: "square", label: "Square" },
-  { value: "slot", label: "Slot" }
+const WAY_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutWayShape; labelKey: string }> = [
+  { value: "round", labelKey: "ui.round" },
+  { value: "square", labelKey: "ui.square" },
+  { value: "slot", labelKey: "ui.slot" }
 ];
 
-const WAY_STROKE_STYLE_OPTIONS: Array<{ value: ConnectorLayoutWayStrokeStyle; label: string }> = [
-  { value: "solid", label: "Line" },
-  { value: "dashed", label: "Dashed" }
+const WAY_STROKE_STYLE_OPTIONS: Array<{ value: ConnectorLayoutWayStrokeStyle; labelKey: string }> = [
+  { value: "solid", labelKey: "ui.line" },
+  { value: "dashed", labelKey: "ui.dashed" }
 ];
 
-const WAY_SIZE_OPTIONS: Array<{ value: ConnectorLayoutWaySize; label: string }> = [
-  { value: "small", label: "Small (0.5 x)" },
-  { value: "normal", label: "Normal" },
-  { value: "big", label: "Big (2 x 2)" }
+const WAY_SIZE_OPTIONS: Array<{ value: ConnectorLayoutWaySize; labelKey: string }> = [
+  { value: "small", labelKey: "ui.smallHalfSize" },
+  { value: "normal", labelKey: "ui.normal" },
+  { value: "big", labelKey: "ui.bigDoubleSize" }
 ];
 
-const KEYING_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutKeyingShape; label: string }> = [
-  { value: "arrow", label: "Arrow" },
-  { value: "square", label: "Square" },
-  { value: "round", label: "Round" },
-  { value: "diamond", label: "Diamond" }
+const KEYING_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutKeyingShape; labelKey: string }> = [
+  { value: "arrow", labelKey: "ui.arrow" },
+  { value: "square", labelKey: "ui.square" },
+  { value: "round", labelKey: "ui.round" },
+  { value: "diamond", labelKey: "ui.diamond" }
 ];
 
-const SHELL_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutShellShape; label: string }> = [
-  { value: "square", label: "Square" },
-  { value: "circle", label: "Circle" }
+const SHELL_SHAPE_OPTIONS: Array<{ value: ConnectorLayoutShellShape; labelKey: string }> = [
+  { value: "square", labelKey: "ui.square" },
+  { value: "circle", labelKey: "ui.circle" }
 ];
 
 const DEFAULT_KEYING_COLOR_PICKER_VALUE = "#7a7a7a";
@@ -714,7 +715,7 @@ export function ConnectorLayoutEditor({
                 >
                   {SHELL_SHAPE_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.labelKey)}
                     </option>
                   ))}
                 </select>
@@ -818,7 +819,7 @@ export function ConnectorLayoutEditor({
                 >
                   {WAY_SHAPE_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.labelKey)}
                     </option>
                   ))}
                 </select>
@@ -842,7 +843,7 @@ export function ConnectorLayoutEditor({
                         !canUpdateConnectorLayoutWay(layout, selectedWay.cavityIndex, { size: "big" })
                       }
                     >
-                      {option.label}
+                      {t(option.labelKey)}
                     </option>
                   ))}
                 </select>
@@ -858,7 +859,7 @@ export function ConnectorLayoutEditor({
                 >
                   {WAY_STROKE_STYLE_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.labelKey)}
                     </option>
                   ))}
                 </select>
@@ -904,7 +905,7 @@ export function ConnectorLayoutEditor({
                           onChange={(event) => updateKeyingPlacementMode(selectedKeyingControlIndex, event.target.value as ConnectorLayoutKeyingPlacement["mode"])}
                         >
                           <option value="guided">Guided</option>
-                          <option value="free">Free</option>
+                          <option value="free">{t("ui.free")}</option>
                         </select>
                       </label>
                       <label>
@@ -921,13 +922,13 @@ export function ConnectorLayoutEditor({
                         >
                           {KEYING_SHAPE_OPTIONS.map((option) => (
                             <option key={option.value} value={option.value}>
-                              {option.label}
+                              {t(option.labelKey)}
                             </option>
                           ))}
                         </select>
                       </label>
                       <div className="connector-layout-keying-color-control">
-                        <label htmlFor={`connector-layout-keying-color-${selectedKeyingControlIndex}`}>Color</label>
+                        <label htmlFor={`connector-layout-keying-color-${selectedKeyingControlIndex}`}>{t("ui.color")}</label>
                         <div>
                           <input
                             id={`connector-layout-keying-color-${selectedKeyingControlIndex}`}
@@ -1006,7 +1007,8 @@ export function ConnectorLayoutEditor({
                           checked={isKeyingSnapEnabled(selectedKeyingPlacement)}
                           onChange={(event) => updateKeyingSnap(selectedKeyingControlIndex, event.target.checked)}
                         />
-                        Snap
+                        
+                        {t("ui.snap")}
                       </label>
                     </div>
                 ) : null}

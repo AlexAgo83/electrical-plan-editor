@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 import type { UndoHistoryEntry, UndoHistoryTargetKind } from "../../types/app-controller";
 
@@ -13,21 +14,21 @@ function getTargetKindLabel(kind: UndoHistoryTargetKind): string {
     case "network":
       return "Network";
     case "catalog":
-      return "Catalog";
+      return t("ui.catalog");
     case "connector":
-      return "Connector";
+      return t("ui.connector");
     case "splice":
-      return "Splice";
+      return t("ui.splice");
     case "node":
-      return "Node";
+      return t("ui.node");
     case "segment":
-      return "Segment";
+      return t("ui.segment");
     case "wire":
-      return "Wire";
+      return t("ui.wire");
     case "layout":
       return "Layout";
     case "workspace":
-      return "Workspace";
+      return t("ui.workspace");
   }
 }
 
@@ -39,7 +40,7 @@ function getRecentChangeActionLabel(actionType: string): string {
   const action = actionType.split("/")[1] ?? actionType;
   switch (action) {
     case "create":
-      return "Create";
+      return t("ui.create");
     case "select":
       return "Activate";
     case "setSummaryViewState":
@@ -49,13 +50,13 @@ function getRecentChangeActionLabel(actionType: string): string {
     case "update":
     case "upsert":
     case "save":
-      return "Save";
+      return t("ui.save");
     case "duplicate":
       return "Duplicate";
     case "delete":
     case "remove":
     case "removeCascade":
-      return "Delete";
+      return t("ui.delete");
     case "importMany":
       return "Import";
     case "occupyCavity":
@@ -126,8 +127,8 @@ export function NetworkRecentChangesList({ entries, onOpenEntryTarget }: Network
   }
 
   return (
-    <div className="network-recent-changes-list-shell home-network-recent-changes" aria-label="Recent changes for active network">
-      <ul className="network-recent-changes-list" aria-label="Recent changes list">
+    <div className="network-recent-changes-list-shell home-network-recent-changes" aria-label={t("ui.recentChangesForActiveNetwork")}>
+      <ul className="network-recent-changes-list" aria-label={t("ui.recentChangesList")}>
         {entries.map((entry) => {
           const tone = getRecentChangeTone(entry.actionType);
           const actionLabel = getRecentChangeActionLabel(entry.actionType);

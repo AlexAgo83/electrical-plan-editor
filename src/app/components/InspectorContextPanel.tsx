@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import type { ReactElement } from "react";
 import { CABLE_COLOR_BY_ID, getWireColorLabel, isWireFreeColorMode, type WireColorMode } from "../../core/cableColors";
 import type { CatalogItem, Connector, NetworkNode, Segment, Splice, SpliceId, Wire } from "../../core/entities";
@@ -89,7 +90,8 @@ export function InspectorContextPanel({
               fontSize: "0.75rem"
             }}
           >
-            Free
+            
+            {t("ui.free")}
           </span>
           <span>{getWireColorLabel(wireColor)}</span>
         </span>
@@ -141,51 +143,51 @@ export function InspectorContextPanel({
 
   if (selectedCatalogItem !== null) {
     detailRows.push({
-      label: "Manufacturer reference",
+      label: t("ui.manufacturerReference"),
       value: <span className="technical-id">{selectedCatalogItem.manufacturerReference}</span>
     });
-    detailRows.push({ label: "Name", value: selectedCatalogItem.name ?? "" });
+    detailRows.push({ label: t("ui.name"), value: selectedCatalogItem.name ?? "" });
     detailRows.push({ label: "Connections", value: String(selectedCatalogItem.connectionCount) });
   }
 
   if (selectedConnector !== null) {
-    detailRows.push({ label: "Name", value: selectedConnector.name });
-    detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedConnector.technicalId}</span> });
+    detailRows.push({ label: t("ui.name"), value: selectedConnector.name });
+    detailRows.push({ label: t("ui.technicalID"), value: <span className="technical-id">{selectedConnector.technicalId}</span> });
     if ((selectedConnector.manufacturerReference?.trim() ?? "").length > 0) {
       detailRows.push({
-        label: "Manufacturer reference",
+        label: t("ui.manufacturerReference"),
         value: renderCatalogReference(selectedConnector.manufacturerReference as string, selectedConnector.catalogItemId)
       });
     }
-    detailRows.push({ label: "Ways", value: `${selectedConnector.cavityCount} / Occupied ${connectorOccupiedCount}` });
+    detailRows.push({ label: t("ui.ways"), value: `${selectedConnector.cavityCount} / Occupied ${connectorOccupiedCount}` });
   }
 
   if (selectedSplice !== null) {
-    detailRows.push({ label: "Name", value: selectedSplice.name });
-    detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedSplice.technicalId}</span> });
+    detailRows.push({ label: t("ui.name"), value: selectedSplice.name });
+    detailRows.push({ label: t("ui.technicalID"), value: <span className="technical-id">{selectedSplice.technicalId}</span> });
     if ((selectedSplice.manufacturerReference?.trim() ?? "").length > 0) {
       detailRows.push({
-        label: "Manufacturer reference",
+        label: t("ui.manufacturerReference"),
         value: renderCatalogReference(selectedSplice.manufacturerReference as string, selectedSplice.catalogItemId)
       });
     }
-    detailRows.push({ label: "Ports", value: `${selectedSplice.portCount} / Occupied ${spliceOccupiedCount}` });
+    detailRows.push({ label: t("ui.ports"), value: `${selectedSplice.portCount} / Occupied ${spliceOccupiedCount}` });
   }
 
   if (selectedNode !== null) {
-    detailRows.push({ label: "Node kind", value: selectedNode.kind });
-    detailRows.push({ label: "Reference", value: describeNode(selectedNode) });
+    detailRows.push({ label: t("ui.nodeKind"), value: selectedNode.kind });
+    detailRows.push({ label: t("ui.reference"), value: describeNode(selectedNode) });
   }
 
   if (selectedSegment !== null) {
-    detailRows.push({ label: "Node A", value: <span className="technical-id">{selectedSegment.nodeA}</span> });
-    detailRows.push({ label: "Node B", value: <span className="technical-id">{selectedSegment.nodeB}</span> });
-    detailRows.push({ label: "Length", value: `${selectedSegment.lengthMm} mm` });
+    detailRows.push({ label: t("ui.nodeA"), value: <span className="technical-id">{selectedSegment.nodeA}</span> });
+    detailRows.push({ label: t("ui.nodeB"), value: <span className="technical-id">{selectedSegment.nodeB}</span> });
+    detailRows.push({ label: t("ui.length"), value: `${selectedSegment.lengthMm} mm` });
   }
 
   if (selectedWire !== null) {
-    detailRows.push({ label: "Name", value: selectedWire.name });
-    detailRows.push({ label: "Technical ID", value: <span className="technical-id">{selectedWire.technicalId}</span> });
+    detailRows.push({ label: t("ui.name"), value: selectedWire.name });
+    detailRows.push({ label: t("ui.technicalID"), value: <span className="technical-id">{selectedWire.technicalId}</span> });
     if ((selectedWire.twistGroupLabel ?? "").trim().length > 0) {
       detailRows.push({ label: "Twist group", value: selectedWire.twistGroupLabel as string });
     }
@@ -198,26 +200,26 @@ export function InspectorContextPanel({
     );
     if (cableColors !== null) {
       detailRows.push({
-        label: "Cable colors",
+        label: t("ui.cableColors"),
         value: cableColors
       });
     }
     if ((selectedWire.endpointAConnectionReference?.trim() ?? "").length > 0) {
-      detailRows.push({ label: "Endpoint A connection ref", value: selectedWire.endpointAConnectionReference as string });
+      detailRows.push({ label: t("ui.endpointAConnectionRef"), value: selectedWire.endpointAConnectionReference as string });
     }
     if ((selectedWire.endpointASealReference?.trim() ?? "").length > 0) {
-      detailRows.push({ label: "Endpoint A seal ref", value: selectedWire.endpointASealReference as string });
+      detailRows.push({ label: t("ui.endpointASealRef"), value: selectedWire.endpointASealReference as string });
     }
     if ((selectedWire.endpointBConnectionReference?.trim() ?? "").length > 0) {
-      detailRows.push({ label: "Endpoint B connection ref", value: selectedWire.endpointBConnectionReference as string });
+      detailRows.push({ label: t("ui.endpointBConnectionRef"), value: selectedWire.endpointBConnectionReference as string });
     }
     if ((selectedWire.endpointBSealReference?.trim() ?? "").length > 0) {
-      detailRows.push({ label: "Endpoint B seal ref", value: selectedWire.endpointBSealReference as string });
+      detailRows.push({ label: t("ui.endpointBSealRef"), value: selectedWire.endpointBSealReference as string });
     }
     detailRows.push({
       label: "Route",
-      value: `${selectedWire.isRouteLocked ? "Locked" : "Auto"} / ${
-        selectedWire.routeSegmentIds.length === 0 ? "(none)" : selectedWire.routeSegmentIds.join(" -> ")
+      value: `${selectedWire.isRouteLocked ? t("ui.locked") : t("ui.auto")} / ${
+        selectedWire.routeSegmentIds.length === 0 ? t("ui.none2") : selectedWire.routeSegmentIds.join(" -> ")
       }`
     });
   }
@@ -233,25 +235,27 @@ export function InspectorContextPanel({
   return (
     <article className={isCollapsed ? "panel inspector-context-panel is-collapsed" : "panel inspector-context-panel"}>
       <div className="inspector-context-header">
-        <h2>Inspector context</h2>
+        <h2>{t("ui.inspectorContext")}</h2>
         <div className="inspector-context-header-actions">
           {isCollapsed && canExpandFromCollapsed ? (
             <button type="button" className="inspector-context-toggle" onClick={onExpandFromCollapsed}>
               <span className="inspector-context-toggle-icon" aria-hidden="true" />
-              Expand
+              
+              {t("ui.expand")}
             </button>
           ) : null}
           {!isCollapsed && canCollapseToCollapsed ? (
             <button type="button" className="inspector-context-toggle" onClick={onCollapseToCollapsed}>
               <span className="inspector-context-toggle-icon is-collapse" aria-hidden="true" />
-              Collapse
+              
+              {t("ui.collapse")}
             </button>
           ) : null}
           <button
             type="button"
             className="inspector-context-toggle inspector-context-close-button"
             onClick={onCloseInspector}
-            aria-label="Close inspector"
+            aria-label={t("ui.closeInspector")}
           >
             <span className="action-button-icon is-cancel" aria-hidden="true" />
           </button>
@@ -259,18 +263,19 @@ export function InspectorContextPanel({
       </div>
       {isCollapsed ? (
         selected === null ? (
-          <p className="empty-copy">No entity selected. Select a row or a canvas item to inspect details here.</p>
+          <p className="empty-copy">{t("ui.noEntitySelectedSelectARowOrACanvasItem")}</p>
         ) : (
           <p className="meta-line">
-            Focused entity: <strong>{selected.kind}</strong> <span className="technical-id">{focusedEntityDisplayId}</span>
+            
+            {t("ui.focusedEntity")} <strong>{selected.kind}</strong> <span className="technical-id">{focusedEntityDisplayId}</span>
           </p>
         )
       ) : selected === null ? (
-        <p className="empty-copy">No entity selected. Select a row or a canvas item to inspect details here.</p>
+        <p className="empty-copy">{t("ui.noEntitySelectedSelectARowOrACanvasItem")}</p>
       ) : (
         <>
           <div className="inspector-entity-line">
-            <span className="inspector-entity-label">Focused entity:</span>
+            <span className="inspector-entity-label">{t("ui.focusedEntity")}</span>
             <span className="inspector-kind-chip">{selected.kind}</span>
             <span className="technical-id inspector-entity-id">{focusedEntityDisplayId}</span>
           </div>
@@ -290,18 +295,21 @@ export function InspectorContextPanel({
                 onClick={() => onSuggestOptimizedSplicePlacement(selectedSplice.id)}
               >
                 <span className="action-button-icon is-analysis" aria-hidden="true" />
-                Suggest optimized lengths
+                
+                {t("ui.suggestOptimizedLengths")}
               </button>
             ) : null}
             {selectedSubScreen !== null ? (
               <button type="button" className="button-with-icon" onClick={onEditSelected} disabled={selectedSubScreen === null}>
                 <span className="action-button-icon is-edit" aria-hidden="true" />
-                Edit
+                
+                {t("ui.edit")}
               </button>
             ) : null}
             <button type="button" className="button-with-icon" onClick={onClearSelection}>
               <span className="action-button-icon is-unselect" aria-hidden="true" />
-              Clear
+              
+              {t("ui.clear")}
             </button>
           </div>
         </>

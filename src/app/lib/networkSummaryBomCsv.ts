@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import type { CatalogItem, Connector, Splice, Wire, WireEndpoint } from "../../core/entities";
 import { computePinElectricalLoad } from "../../core/pinElectricalLoad";
 import {
@@ -94,23 +95,23 @@ function buildBomHeaders(
 ): string[] {
   const headers = compactColumns
     ? [
-        "Type",
-        "Manufacturer reference",
-        "Name",
-        "Connection count",
+        t("ui.type"),
+        t("ui.manufacturerReference"),
+        t("ui.name"),
+        t("ui.connectionCount"),
         "Connector quantity",
-        ...(includeComputedDownstreamLoad ? ["Computed downstream load (A)"] : []),
+        ...(includeComputedDownstreamLoad ? [t("ui.computedDownstreamLoadA")] : []),
         ...(includeTraceability ? ["Origin"] : [])
       ]
     : [
-        "Type",
-        "Manufacturer reference",
-        "Name",
-        "Connection count",
+        t("ui.type"),
+        t("ui.manufacturerReference"),
+        t("ui.name"),
+        t("ui.connectionCount"),
         "Connector quantity",
         "Splice quantity",
         "Component quantity",
-        ...(includeComputedDownstreamLoad ? ["Computed downstream load (A)"] : []),
+        ...(includeComputedDownstreamLoad ? [t("ui.computedDownstreamLoadA")] : []),
         ...(includeTraceability ? ["Origin"] : []),
         `Unit price (excl. tax, ${workspaceCurrencyCode})`,
         `Line total (excl. tax, ${workspaceCurrencyCode})`,
@@ -635,7 +636,7 @@ function buildNetworkSummaryBomExportData(
     rows.push(
       padRow(
         createBomRow(compactColumns, {
-          type: "Catalog item",
+          type: t("ui.catalogItem"),
           manufacturerReference: catalogItem.manufacturerReference,
           name: catalogItem.name ?? "",
           connectionCount: catalogItem.connectionCount,
@@ -721,7 +722,7 @@ function buildNetworkSummaryBomExportData(
         createBomRow(compactColumns, {
           type: "Summary",
           manufacturerReference: "PRICING CONTEXT",
-          name: "Tax rate (%)",
+          name: t("ui.taxRate"),
           connectionCount: normalizedTaxRatePercent.toFixed(2),
           connectorQuantity: "",
           computedDownstreamLoadA: includeComputedDownstreamLoad ? "" : undefined,
@@ -806,7 +807,7 @@ function buildNetworkSummaryBomExportData(
       formatEntityId(group.connectorTechnicalId),
       group.connectorName,
       group.connectionCount,
-      "Connector",
+      t("ui.connector"),
       connectorReference,
       connectorCatalogName,
       1,
@@ -842,11 +843,11 @@ function buildNetworkSummaryBomExportData(
       name: "By connector",
       headers: [
         "Connector ID",
-        "Connector name",
-        "Connection count",
-        "Type",
-        "Reference",
-        "Name",
+        t("ui.connectorName"),
+        t("ui.connectionCount"),
+        t("ui.type"),
+        t("ui.reference"),
+        t("ui.name"),
         "Quantity",
         ...(includeTraceability ? ["Origin"] : [])
       ],

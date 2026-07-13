@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import type { AppAction } from "../../store/actions";
 import type { AppState } from "../../store";
 import { occupantsAt } from "../../core/connectorOccupancy";
@@ -148,7 +149,7 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
       });
     case "catalog/upsert":
       return buildUpsertToast({
-        entityName: "Catalog item",
+        entityName: t("ui.catalogItem"),
         id: action.payload.id,
         wasExisting: previousState.catalogItems.byId[action.payload.id] !== undefined,
         getLabel: getCatalogItemLabel,
@@ -156,14 +157,14 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
       });
     case "catalog/remove":
       return buildRemoveToast({
-        entityName: "Catalog item",
+        entityName: t("ui.catalogItem"),
         id: action.payload.id,
         getLabel: getCatalogItemLabel,
         previousState
       });
     case "connector/upsert":
       return buildUpsertToast({
-        entityName: "Connector",
+        entityName: t("ui.connector"),
         id: action.payload.id,
         wasExisting: previousState.connectors.byId[action.payload.id] !== undefined,
         getLabel: getConnectorLabel,
@@ -172,7 +173,7 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
     case "connector/remove":
     case "connector/removeCascade":
       return buildRemoveToast({
-        entityName: "Connector",
+        entityName: t("ui.connector"),
         id: action.payload.id,
         getLabel: getConnectorLabel,
         previousState,
@@ -210,7 +211,7 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
     }
     case "splice/upsert":
       return buildUpsertToast({
-        entityName: "Splice",
+        entityName: t("ui.splice"),
         id: action.payload.id,
         wasExisting: previousState.splices.byId[action.payload.id] !== undefined,
         getLabel: getSpliceLabel,
@@ -230,14 +231,14 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
       };
     case "splice/applyOptimizedCanvasLayout":
       return {
-        title: "Optimized lengths applied",
+        title: t("ui.optimizedLengthsApplied"),
         message: getSpliceLabel(nextState, action.payload.id),
         variant: "success"
       };
     case "splice/remove":
     case "splice/removeCascade":
       return buildRemoveToast({
-        entityName: "Splice",
+        entityName: t("ui.splice"),
         id: action.payload.id,
         getLabel: getSpliceLabel,
         previousState,
@@ -273,7 +274,7 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
     }
     case "node/upsert":
       return buildUpsertToast({
-        entityName: "Node",
+        entityName: t("ui.node"),
         id: action.payload.id,
         wasExisting: previousState.nodes.byId[action.payload.id] !== undefined,
         getLabel: getNodeLabel,
@@ -287,14 +288,14 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
       };
     case "node/remove":
       return buildRemoveToast({
-        entityName: "Node",
+        entityName: t("ui.node"),
         id: action.payload.id,
         getLabel: getNodeLabel,
         previousState
       });
     case "segment/upsert":
       return buildUpsertToast({
-        entityName: "Segment",
+        entityName: t("ui.segment"),
         id: action.payload.id,
         wasExisting: previousState.segments.byId[action.payload.id] !== undefined,
         getLabel: getSegmentLabel,
@@ -314,7 +315,7 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
       };
     case "segment/remove":
       return buildRemoveToast({
-        entityName: "Segment",
+        entityName: t("ui.segment"),
         id: action.payload.id,
         getLabel: getSegmentLabel,
         previousState
@@ -322,7 +323,7 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
     case "wire/save":
     case "wire/upsert":
       return buildUpsertToast({
-        entityName: "Wire",
+        entityName: t("ui.wire"),
         id: action.payload.id,
         wasExisting: previousState.wires.byId[action.payload.id] !== undefined,
         getLabel: getWireLabel,
@@ -330,7 +331,7 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
       });
     case "wire/remove":
       return buildRemoveToast({
-        entityName: "Wire",
+        entityName: t("ui.wire"),
         id: action.payload.id,
         getLabel: getWireLabel,
         previousState

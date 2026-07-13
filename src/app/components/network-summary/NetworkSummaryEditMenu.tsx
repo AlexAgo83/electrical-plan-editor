@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 
 interface NetworkSummaryEditMenuProps {
@@ -48,7 +49,8 @@ export function NetworkSummaryEditMenu({
         aria-haspopup="menu"
       >
         <span className="network-summary-edit-icon" aria-hidden="true" />
-        Edit
+        
+        {t("ui.edit")}
       </button>
       {open ? (
         <div className="panel network-summary-view-menu network-summary-view-menu--right">
@@ -58,7 +60,8 @@ export function NetworkSummaryEditMenu({
             onClick={toggleShowNetworkGrid}
           >
             <span className="network-summary-grid-icon" aria-hidden="true" />
-            Grid
+            
+            {t("ui.grid")}
           </button>
           <button
             type="button"
@@ -66,7 +69,8 @@ export function NetworkSummaryEditMenu({
             onClick={toggleSnapNodesToGrid}
           >
             <span className="network-summary-snap-icon" aria-hidden="true" />
-            Snap
+            
+            {t("ui.snap")}
           </button>
           <button
             type="button"
@@ -74,7 +78,8 @@ export function NetworkSummaryEditMenu({
             onClick={toggleLockEntityMovement}
           >
             <span className="network-summary-lock-move-icon" aria-hidden="true" />
-            Lock
+            
+            {t("ui.lock")}
           </button>
           <button
             type="button"
@@ -82,7 +87,8 @@ export function NetworkSummaryEditMenu({
             onClick={handleRegenerateLayout}
           >
             <span className="action-button-icon is-prevnext" aria-hidden="true" />
-            Generate
+            
+            {t("ui.generate")}
           </button>
         </div>
       ) : null}

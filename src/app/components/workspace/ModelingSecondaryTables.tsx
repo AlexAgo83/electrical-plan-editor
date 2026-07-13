@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { memo, useEffect, useMemo, useRef, useState, type Dispatch, type ReactElement, type SetStateAction } from "react";
 import { getWireColorSortValue } from "../../../core/cableColors";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
@@ -255,41 +256,41 @@ function ModelingSecondaryTablesComponent({
   const showWireRouteModeColumn =
     wireRouteFilter === "all" && !isMobileViewport;
   const segmentColumns: ConfigurableTableColumn[] = [
-    { id: "id", label: "ID", hideable: false },
-    { id: "nodeA", label: "Node A" },
-    { id: "nodeB", label: "Node B" },
-    { id: "lengthMm", label: "Length" },
-    ...(showSegmentSubNetworkColumn ? [{ id: "subNetwork", label: "Sub-network" }] : []),
+    { id: "id", label: t("ui.id"), hideable: false },
+    { id: "nodeA", label: t("ui.nodeA") },
+    { id: "nodeB", label: t("ui.nodeB") },
+    { id: "lengthMm", label: t("ui.length") },
+    ...(showSegmentSubNetworkColumn ? [{ id: "subNetwork", label: t("ui.subNetwork") }] : []),
   ];
   const wireColumns: ConfigurableTableColumn[] = [
-    { id: "name", label: "Name", hideable: false },
-    { id: "technicalId", label: "Technical ID" },
+    { id: "name", label: t("ui.name"), hideable: false },
+    { id: "technicalId", label: t("ui.technicalID") },
     { id: "functionalDomainTag", label: "Functional tag" },
     { id: "twistGroupLabel", label: "Twist group" },
-    { id: "color", label: "Color" },
-    { id: "endpointA", label: "Endpoint A" },
-    { id: "endpointB", label: "Endpoint B" },
+    { id: "color", label: t("ui.color") },
+    { id: "endpointA", label: t("ui.endpointA") },
+    { id: "endpointB", label: t("ui.endpointB") },
     { id: "sectionMm2", label: "Section" },
-    { id: "lengthMm", label: "Length" },
+    { id: "lengthMm", label: t("ui.length") },
   ];
   const segmentFilterPlaceholder =
     segmentFilterField === "id"
-      ? "Segment ID"
+      ? t("ui.segmentID")
       : segmentFilterField === "nodeA"
-        ? "Node A"
+        ? t("ui.nodeA")
         : segmentFilterField === "nodeB"
-          ? "Node B"
+          ? t("ui.nodeB")
           : segmentFilterField === "subNetwork"
-            ? "Sub-network"
-            : "ID, nodes, sub-network...";
+            ? t("ui.subNetwork")
+            : t("ui.idNodesSubNetwork");
   const wireFilterPlaceholder =
     wireFilterField === "endpoints"
-      ? "Connector/Splice or ID"
+      ? t("ui.connectorSpliceOrID")
       : wireFilterField === "name"
-        ? "Wire name"
+        ? t("ui.wireName")
         : wireFilterField === "technicalId"
-          ? "Technical ID"
-          : "Name, technical ID, endpoint...";
+          ? t("ui.technicalID")
+          : t("ui.nameTechnicalIDEndpoint");
   const [segmentTableSort, setSegmentTableSort] = useState<{
     field: SegmentTableSortField;
     direction: "asc" | "desc";
@@ -408,7 +409,7 @@ function ModelingSecondaryTablesComponent({
           if (field === "endpointA") return endpointA;
           if (field === "endpointB") return endpointB;
           if (field === "lengthMm") return wire.lengthMm;
-          return wire.isRouteLocked ? "Locked" : "Auto";
+          return wire.isRouteLocked ? t("ui.locked") : t("ui.auto");
         },
         (wire) => wire.id,
       );
@@ -449,7 +450,7 @@ function ModelingSecondaryTablesComponent({
     }
     return (
       catalogItemById.get(wire.protection.catalogItemId)
-        ?.manufacturerReference ?? "(missing catalog item)"
+        ?.manufacturerReference ?? t("ui.missingCatalogItem")
     );
   };
   const renderWireEndpointReference = (
@@ -567,7 +568,7 @@ function ModelingSecondaryTablesComponent({
         data-onboarding-panel="modeling-segments"
       >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
-          <h2>Segments</h2>
+          <h2>{t("ui.segments")}</h2>
           <div className="list-panel-header-tools">
             <div className="list-panel-header-tools-row is-title-actions">
               <button
@@ -575,8 +576,8 @@ function ModelingSecondaryTablesComponent({
                 className="filter-chip table-export-button"
                 onClick={() => {
                   const headers = showSegmentSubNetworkColumn
-                    ? ["ID", "Node A", "Node B", "Length (mm)", "Sub-network"]
-                    : ["ID", "Node A", "Node B", "Length (mm)"];
+                    ? [t("ui.id"), t("ui.nodeA"), t("ui.nodeB"), t("ui.lengthMm"), t("ui.subNetwork")]
+                    : [t("ui.id"), t("ui.nodeA"), t("ui.nodeB"), t("ui.lengthMm")];
                   const rows = sortedVisibleSegments.map((segment) => {
                     const nodeA =
                       nodeLabelById.get(segment.nodeA) ?? segment.nodeA;
@@ -618,7 +619,7 @@ function ModelingSecondaryTablesComponent({
                     className="action-button-icon is-help"
                     aria-hidden="true"
                   />
-                  <span>Help</span>
+                  <span>{t("ui.help")}</span>
                 </button>
               ) : null}
             </div>
@@ -626,13 +627,13 @@ function ModelingSecondaryTablesComponent({
               <div
                 className="chip-group list-panel-filters"
                 role="group"
-                aria-label="Segment sub-network filter"
+                aria-label={t("ui.segmentSubNetworkFilter")}
               >
                 {(
                   [
-                    ["all", "All"],
-                    ["default", "Default"],
-                    ["tagged", "Tagged"],
+                    ["all", t("ui.all")],
+                    ["default", t("ui.default")],
+                    ["tagged", t("ui.tagged")],
                   ] as const
                 ).map(([filterId, label]) => (
                   <button
@@ -650,8 +651,8 @@ function ModelingSecondaryTablesComponent({
                 ))}
               </div>
               <TableFilterBar
-                label="Filter"
-                fieldLabel="Segment filter field"
+                label={t("ui.filter")}
+                fieldLabel={t("ui.segmentFilterField")}
                 fieldValue={segmentFilterField}
                 onFieldChange={(value) =>
                   setSegmentFilterField(
@@ -659,11 +660,11 @@ function ModelingSecondaryTablesComponent({
                   )
                 }
                 fieldOptions={[
-                  { value: "id", label: "Segment ID" },
-                  { value: "nodeA", label: "Node A" },
-                  { value: "nodeB", label: "Node B" },
-                  { value: "subNetwork", label: "Sub-network" },
-                  { value: "any", label: "Any" },
+                  { value: "id", label: t("ui.segmentID") },
+                  { value: "nodeA", label: t("ui.nodeA") },
+                  { value: "nodeB", label: t("ui.nodeB") },
+                  { value: "subNetwork", label: t("ui.subNetwork") },
+                  { value: "any", label: t("ui.any") },
                 ]}
                 queryValue={segmentFilterQuery}
                 onQueryChange={setSegmentFilterQuery}
@@ -673,11 +674,12 @@ function ModelingSecondaryTablesComponent({
           </div>
         </header>
         {segments.length === 0 ? (
-          <p className="empty-copy">No segment yet.</p>
+          <p className="empty-copy">{t("ui.noSegmentYet")}</p>
         ) : sortedVisibleSegments.length === 0 ? (
           <>
             <p className="empty-copy">
-              No segment matches the current filters.
+              
+              {t("ui.noSegmentMatchesTheCurrentFilters")}
             </p>
             <TableEntryCountFooter count={0} />
           </>
@@ -719,7 +721,8 @@ function ModelingSecondaryTablesComponent({
                         );
                       }}
                     >
-                      ID{" "}
+                      
+                      {t("ui.id")}{" "}
                       <span className="sort-indicator">
                         {segmentSortIndicator("id")}
                       </span>
@@ -740,7 +743,8 @@ function ModelingSecondaryTablesComponent({
                         }))
                       }
                     >
-                      Node A{" "}
+                      
+                      {t("ui.nodeA")}{" "}
                       <span className="sort-indicator">
                         {segmentSortIndicator("nodeA")}
                       </span>
@@ -761,7 +765,8 @@ function ModelingSecondaryTablesComponent({
                         }))
                       }
                     >
-                      Node B{" "}
+                      
+                      {t("ui.nodeB")}{" "}
                       <span className="sort-indicator">
                         {segmentSortIndicator("nodeB")}
                       </span>
@@ -784,7 +789,7 @@ function ModelingSecondaryTablesComponent({
                         }))
                       }
                     >
-                      {isMobileViewport ? "Len" : "Length (mm)"}{" "}
+                      {isMobileViewport ? t("ui.len") : t("ui.lengthMm")}{" "}
                       <span className="sort-indicator">
                         {segmentSortIndicator("lengthMm")}
                       </span>
@@ -811,7 +816,8 @@ function ModelingSecondaryTablesComponent({
                           }))
                         }
                       >
-                        Sub-network{" "}
+                        
+                        {t("ui.subNetwork")}{" "}
                         <span className="sort-indicator">
                           {segmentSortIndicator("subNetwork")}
                         </span>
@@ -941,7 +947,8 @@ function ModelingSecondaryTablesComponent({
                   className="action-button-icon is-new"
                   aria-hidden="true"
                 />
-                New
+                
+                {t("ui.new")}
               </button>
               <button
                 type="button"
@@ -956,7 +963,8 @@ function ModelingSecondaryTablesComponent({
                   className="action-button-icon is-edit"
                   aria-hidden="true"
                 />
-                Edit
+                
+                {t("ui.edit")}
               </button>
               <button
                 type="button"
@@ -984,7 +992,8 @@ function ModelingSecondaryTablesComponent({
                   className="action-button-icon is-delete"
                   aria-hidden="true"
                 />
-                Delete
+                
+                {t("ui.delete")}
               </button>
             </>
           )}
@@ -998,7 +1007,7 @@ function ModelingSecondaryTablesComponent({
         data-onboarding-panel="modeling-wires"
       >
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
-          <h2>Wires</h2>
+          <h2>{t("ui.wires")}</h2>
           <div className="list-panel-header-tools">
             <div className="list-panel-header-tools-row is-title-actions">
               <button
@@ -1007,45 +1016,45 @@ function ModelingSecondaryTablesComponent({
                 onClick={() => {
                   const headers = showWireRouteModeColumn
                     ? [
-                        "Name",
-                        "Technical ID",
+                        t("ui.name"),
+                        t("ui.technicalID"),
                         "Twist group",
-                        "Color",
-                        "Begin ID",
-                        "Begin pin",
+                        t("ui.color"),
+                        t("ui.beginID"),
+                        t("ui.beginPin"),
                         "Begin connection ref",
                         "Begin connection name",
                         "Begin seal ref",
                         "Begin seal name",
-                        "End ID",
-                        "End pin",
+                        t("ui.endID"),
+                        t("ui.endPin"),
                         "End connection ref",
                         "End connection name",
                         "End seal ref",
                         "End seal name",
-                        "Section (mm²)",
-                        "Length (mm)",
+                        t("ui.sectionMm2"),
+                        t("ui.lengthMm"),
                         "Untwisted length (mm)",
-                        "Route mode",
+                        t("ui.routeMode"),
                       ]
                     : [
-                        "Name",
-                        "Technical ID",
-                        "Color",
-                        "Begin ID",
-                        "Begin pin",
+                        t("ui.name"),
+                        t("ui.technicalID"),
+                        t("ui.color"),
+                        t("ui.beginID"),
+                        t("ui.beginPin"),
                         "Begin connection ref",
                         "Begin connection name",
                         "Begin seal ref",
                         "Begin seal name",
-                        "End ID",
-                        "End pin",
+                        t("ui.endID"),
+                        t("ui.endPin"),
                         "End connection ref",
                         "End connection name",
                         "End seal ref",
                         "End seal name",
-                        "Section (mm²)",
-                        "Length (mm)",
+                        t("ui.sectionMm2"),
+                        t("ui.lengthMm"),
                         "Untwisted length (mm)",
                       ];
                   const twistGroupCounts = buildWireTwistGroupExportCounts(wires);
@@ -1096,7 +1105,7 @@ function ModelingSecondaryTablesComponent({
                           twistGroupCounts,
                           wireExportLengthPreferences,
                         ),
-                        wire.isRouteLocked ? "Locked" : "Auto",
+                        wire.isRouteLocked ? t("ui.locked") : t("ui.auto"),
                       ];
                     }
                     return [
@@ -1187,7 +1196,7 @@ function ModelingSecondaryTablesComponent({
                     className="action-button-icon is-help"
                     aria-hidden="true"
                   />
-                  <span>Help</span>
+                  <span>{t("ui.help")}</span>
                 </button>
               ) : null}
             </div>
@@ -1202,7 +1211,7 @@ function ModelingSecondaryTablesComponent({
                     setWireFunctionalTagFilter(event.target.value)
                   }
                 >
-                  <option value="all">Any</option>
+                  <option value="all">{t("ui.any")}</option>
                   {wireFunctionalTagOptions.map((label) => (
                     <option key={label} value={label}>
                       {label}
@@ -1211,8 +1220,8 @@ function ModelingSecondaryTablesComponent({
                 </select>
               </label>
               <TableFilterBar
-                label="Filter"
-                fieldLabel="Wire filter field"
+                label={t("ui.filter")}
+                fieldLabel={t("ui.wireFilterField")}
                 fieldValue={wireFilterField}
                 onFieldChange={(value) =>
                   setWireFilterField(
@@ -1220,10 +1229,10 @@ function ModelingSecondaryTablesComponent({
                   )
                 }
                 fieldOptions={[
-                  { value: "endpoints", label: "Endpoints" },
-                  { value: "name", label: "Wire name" },
-                  { value: "technicalId", label: "Technical ID" },
-                  { value: "any", label: "Any" },
+                  { value: "endpoints", label: t("ui.endpoints") },
+                  { value: "name", label: t("ui.wireName") },
+                  { value: "technicalId", label: t("ui.technicalID") },
+                  { value: "any", label: t("ui.any") },
                 ]}
                 queryValue={wireEndpointFilterQuery}
                 onQueryChange={setWireEndpointFilterQuery}
@@ -1233,10 +1242,10 @@ function ModelingSecondaryTablesComponent({
           </div>
         </header>
         {wires.length === 0 ? (
-          <p className="empty-copy">No wire yet.</p>
+          <p className="empty-copy">{t("ui.noWireYet")}</p>
         ) : sortedVisibleWires.length === 0 ? (
           <>
-            <p className="empty-copy">No wire matches the current filters.</p>
+            <p className="empty-copy">{t("ui.noWireMatchesTheCurrentFilters")}</p>
             <TableEntryCountFooter count={0} />
           </>
         ) : (
@@ -1279,7 +1288,8 @@ function ModelingSecondaryTablesComponent({
                         }));
                       }}
                     >
-                      Name{" "}
+                      
+                      {t("ui.name")}{" "}
                       <span className="sort-indicator">
                         {wireSortIndicator("name")}
                       </span>
@@ -1310,7 +1320,7 @@ function ModelingSecondaryTablesComponent({
                         }));
                       }}
                     >
-                      {isMobileViewport ? "ID" : "Technical ID"}{" "}
+                      {isMobileViewport ? t("ui.id") : t("ui.technicalID")}{" "}
                       <span className="sort-indicator">
                         {wireSortIndicator("technicalId")}
                       </span>
@@ -1333,7 +1343,8 @@ function ModelingSecondaryTablesComponent({
                         }))
                       }
                     >
-                      Color{" "}
+                      
+                      {t("ui.color")}{" "}
                       <span className="sort-indicator">
                         {wireSortIndicator("color")}
                       </span>
@@ -1354,7 +1365,7 @@ function ModelingSecondaryTablesComponent({
                         }))
                       }
                     >
-                      {isMobileViewport ? "End A" : "Endpoint A"}{" "}
+                      {isMobileViewport ? t("ui.endA") : t("ui.endpointA")}{" "}
                       <span className="sort-indicator">
                         {wireSortIndicator("endpointA")}
                       </span>
@@ -1375,7 +1386,7 @@ function ModelingSecondaryTablesComponent({
                         }))
                       }
                     >
-                      {isMobileViewport ? "End B" : "Endpoint B"}{" "}
+                      {isMobileViewport ? t("ui.endB") : t("ui.endpointB")}{" "}
                       <span className="sort-indicator">
                         {wireSortIndicator("endpointB")}
                       </span>
@@ -1396,7 +1407,7 @@ function ModelingSecondaryTablesComponent({
                         }))
                       }
                     >
-                      {isMobileViewport ? "Sec" : "Section (mm²)"}{" "}
+                      {isMobileViewport ? t("ui.sec") : t("ui.sectionMm2")}{" "}
                       <span className="sort-indicator">
                         {wireSortIndicator("sectionMm2")}
                       </span>
@@ -1425,7 +1436,7 @@ function ModelingSecondaryTablesComponent({
                         }));
                       }}
                     >
-                      {isMobileViewport ? "Len" : "Length (mm)"}{" "}
+                      {isMobileViewport ? t("ui.len") : t("ui.lengthMm")}{" "}
                       <span className="sort-indicator">
                         {wireSortIndicator("lengthMm")}
                       </span>
@@ -1517,7 +1528,7 @@ function ModelingSecondaryTablesComponent({
                         ) : null}
                       </td>
                       <td className="technical-id">{wire.technicalId}</td>
-                      <td>{wire.functionalDomainTag ?? "Auto"}</td>
+                      <td>{wire.functionalDomainTag ?? t("ui.auto")}</td>
                       <td>{wire.twistGroupLabel ?? ""}</td>
                       <td>{renderWireColorCellValue(wire)}</td>
                       <td>{renderWireEndpointReference(wire.endpointA)}</td>
@@ -1580,7 +1591,8 @@ function ModelingSecondaryTablesComponent({
                   className="action-button-icon is-new"
                   aria-hidden="true"
                 />
-                New
+                
+                {t("ui.new")}
               </button>
               <button
                 type="button"
@@ -1594,7 +1606,8 @@ function ModelingSecondaryTablesComponent({
                   className="action-button-icon is-edit"
                   aria-hidden="true"
                 />
-                Edit
+                
+                {t("ui.edit")}
               </button>
               <button
                 type="button"
@@ -1620,7 +1633,8 @@ function ModelingSecondaryTablesComponent({
                   className="action-button-icon is-delete"
                   aria-hidden="true"
                 />
-                Delete
+                
+                {t("ui.delete")}
               </button>
             </>
           )}

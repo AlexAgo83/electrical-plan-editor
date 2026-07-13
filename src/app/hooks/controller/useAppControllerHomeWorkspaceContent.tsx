@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useCallback, useMemo, type ChangeEvent, type ComponentType, type RefObject } from "react";
 import { appActions, createEmptyWorkspaceState, type AppState, type AppStore } from "../../../store";
 import type { InteractionMode, UndoHistoryEntry } from "../../types/app-controller";
@@ -62,8 +63,8 @@ export function useAppControllerHomeWorkspaceContent({
     void (async () => {
       if (!isCurrentWorkspaceEmpty) {
         const shouldReplace = await requestConfirmation({
-          title: "Create empty workspace",
-          message: "Replace the current workspace with an empty workspace? This removes current workspace changes.",
+          title: t("ui.createEmptyWorkspace"),
+          message: t("ui.replaceTheCurrentWorkspaceWithAnEmptyWorkspaceThisRemoves"),
           intent: "warning"
         });
         if (!shouldReplace) {

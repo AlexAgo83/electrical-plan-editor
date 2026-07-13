@@ -1,7 +1,8 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useLayoutEffect, useRef, type ReactElement } from "react";
 import { useModalDialog } from "../../hooks/useModalDialog";
 import type { ThemeMode } from "../../../store";
-import { getThemeClassNames, THEME_MODE_OPTIONS } from "../../lib/themeModes";
+import { getThemeClassNames, getThemeModeOptions } from "../../lib/themeModes";
 import type { SvgExportPreviewState, SvgPreviewOptions } from "../network-summary/export/useNetworkSummaryExportActions";
 
 interface SvgExportPreviewDialogProps {
@@ -152,9 +153,9 @@ export function SvgExportPreviewDialog({
             </label>
           ) : null}
           <label className="svg-preview-theme-field">
-            <span>Theme</span>
+            <span>{t("ui.theme")}</span>
             <select value={preview.themeMode} onChange={(event) => handleThemeChange(event.target.value as ThemeMode)}>
-              {THEME_MODE_OPTIONS.map((option) => (
+              {getThemeModeOptions().map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -181,7 +182,8 @@ export function SvgExportPreviewDialog({
         </div>
         <footer className="confirm-dialog-actions">
           <button ref={cancelButtonRef} type="button" className="confirm-dialog-cancel" onClick={onCancel}>
-            Cancel
+            
+            {t("ui.cancel")}
           </button>
           <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={onConfirm}>
             <span className="network-summary-export-icon" aria-hidden="true" />

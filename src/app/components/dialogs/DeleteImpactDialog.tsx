@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useRef, type ReactElement } from "react";
 import { useModalDialog } from "../../hooks/useModalDialog";
 import type { ConfirmDialogIntent } from "../../types/confirm-dialog";
@@ -29,7 +30,7 @@ export function DeleteImpactDialog({
   categories,
   note,
   confirmLabel,
-  cancelLabel = "Cancel",
+  cancelLabel = t("ui.cancel"),
   intent = "warning",
   closeOnBackdrop = true,
   confirmOnEnter = false,

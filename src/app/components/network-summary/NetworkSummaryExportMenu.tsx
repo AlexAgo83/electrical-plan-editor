@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 
 interface NetworkSummaryExportMenuProps {
@@ -126,7 +127,8 @@ export function NetworkSummaryExportMenu({
               disabled={!canExportBomCsv}
             >
               <span className="table-export-icon" aria-hidden="true" />
-              BOM
+              
+              {t("ui.bom")}
             </button>
           )}
         </div>

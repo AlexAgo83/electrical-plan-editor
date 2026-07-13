@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ConfirmDialogIntent, ConfirmDialogRequest } from "../../types/confirm-dialog";
 import type { DeleteDependencySummaryCategory, DeleteImpactDialogVariant } from "../../types/delete-impact-dialog";
@@ -42,7 +43,7 @@ export function useConfirmDialogController() {
         details: request.details,
         detailsLabel: request.detailsLabel,
         confirmLabel: request.confirmLabel ?? "Confirm",
-        cancelLabel: request.cancelLabel ?? "Cancel",
+        cancelLabel: request.cancelLabel ?? t("ui.cancel"),
         intent: request.intent ?? "neutral",
         closeOnBackdrop: request.closeOnBackdrop ?? true,
         confirmOnEnter: request.confirmOnEnter ?? false,

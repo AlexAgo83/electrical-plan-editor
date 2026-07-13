@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useMemo, useState, type ReactElement } from "react";
 import type { CatalogItem, Connector, ConnectorId, Network, PinElectricalRole, PinElectricalRoleKind, Splice, Wire } from "../../../core/entities";
 import { PIN_ELECTRICAL_ROLE_KINDS, resolvePinElectricalRoleDescriptor } from "../../../core/pinElectricalRole";
@@ -263,7 +264,8 @@ export function PinRoleMassEditPanel({
       <div className="pin-role-mass-edit-section">
         <div className="pin-role-mass-edit-toolbar">
           <label className="stack-label">
-            Connector
+            
+            {t("ui.connector")}
             <select value={connectorFilter} onChange={(event) => setConnectorFilter(event.target.value as ConnectorId | "all")}>
               <option value="all">All connectors</option>
               {connectors.map((connector) => (
@@ -335,7 +337,7 @@ export function PinRoleMassEditPanel({
           <thead>
             <tr>
               <th>Select</th>
-              <th>Connector</th>
+              <th>{t("ui.connector")}</th>
               <th>Pin</th>
               <th>Role</th>
               <th>Current</th>

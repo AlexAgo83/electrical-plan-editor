@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import type { FormEvent } from "react";
 import type { MountingLabel, NodeId, Segment, SegmentId } from "../../core/entities";
 import type { AppStore } from "../../store";
@@ -202,7 +203,7 @@ export function useSegmentHandlers({
       : normalizedSegmentId) as SegmentId;
 
     if (normalizedSegmentId.length === 0) {
-      setSegmentFormError("Segment ID is required.");
+      setSegmentFormError(t("ui.segmentIDIsRequired"));
       return;
     }
 
@@ -221,13 +222,13 @@ export function useSegmentHandlers({
     }
 
     if (segmentNodeA.length === 0 || segmentNodeB.length === 0) {
-      setSegmentFormError("Both segment endpoints are required.");
+      setSegmentFormError(t("ui.bothSegmentEndpointsAreRequired"));
       return;
     }
 
     const lengthMm = toPositiveNumber(segmentLengthMm);
     if (lengthMm < 1) {
-      setSegmentFormError("Segment length must be >= 1 mm.");
+      setSegmentFormError(t("ui.segmentLengthMustBe1Mm"));
       return;
     }
     const mountingLabels = parseMountingLabelsText(segmentMountingLabelsText);
@@ -287,10 +288,10 @@ export function useSegmentHandlers({
 
       if (impact.kind === "direct") {
         const shouldDelete = await confirmAction({
-          title: "Delete segment",
+          title: t("ui.deleteSegment"),
           message: `Delete segment '${segment.id}' (${segment.nodeA} -> ${segment.nodeB})?`,
-          confirmLabel: "Delete",
-          cancelLabel: "Cancel",
+          confirmLabel: t("ui.delete"),
+          cancelLabel: t("ui.cancel"),
           intent: "danger",
           confirmOnEnter: true
         });
@@ -308,8 +309,8 @@ export function useSegmentHandlers({
       await confirmAction({
         title: "Segment delete blocked",
         message: impact.message,
-        confirmLabel: "Close",
-        cancelLabel: "Cancel",
+        confirmLabel: t("ui.close"),
+        cancelLabel: t("ui.cancel"),
         intent: "warning",
         variant: "deleteBlocked",
         summaryCategories: impact.categories,

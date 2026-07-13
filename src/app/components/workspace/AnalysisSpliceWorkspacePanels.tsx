@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import {
   useCallback,
   useEffect,
@@ -112,10 +113,10 @@ export function AnalysisSpliceWorkspacePanels(
   );
   const spliceFilterPlaceholder =
     spliceFilterField === "name"
-      ? "Splice name"
+      ? t("ui.spliceName")
       : spliceFilterField === "technicalId"
-        ? "Technical ID"
-        : "Name or technical ID...";
+        ? t("ui.technicalID")
+        : t("ui.nameOrTechnicalID2");
   const resolveSplicePlacementPresentation = useCallback(
     (
       splice: Splice,
@@ -353,7 +354,7 @@ export function AnalysisSpliceWorkspacePanels(
     selectedSplice === null || portIndexInput.trim() === ""
       ? null
       : !portIndexIsInteger
-        ? "Enter a valid port index."
+        ? t("ui.enterAValidPortIndex")
         : portIndexOutOfRange
           ? `Port index must be between 1 and ${selectedSplice.portCount}.`
           : portIsOccupied
@@ -422,19 +423,19 @@ export function AnalysisSpliceWorkspacePanels(
     <>
       <section className="panel" hidden={!isSpliceSubScreen || !showEntityTables}>
         <header className="list-panel-header list-panel-header-mobile-inline-tools">
-          <h2>Splices</h2>
+          <h2>{t("ui.splices")}</h2>
           <div className="list-panel-header-tools">
             <div className="list-panel-header-tools-row is-title-actions">
               <div
                 className="chip-group list-panel-filters"
                 role="group"
-                aria-label="Splice occupancy filter"
+                aria-label={t("ui.spliceOccupancyFilter")}
               >
                 {(
                   [
-                    ["all", "All"],
-                    ["occupied", "Occupied"],
-                    ["free", "Free"],
+                    ["all", t("ui.all")],
+                    ["occupied", t("ui.occupied")],
+                    ["free", t("ui.free")],
                   ] as const
                 ).map(([filterId, label]) => (
                   <button
@@ -458,13 +459,13 @@ export function AnalysisSpliceWorkspacePanels(
                   downloadCsvFile(
                     "analysis-splices",
                     [
-                      "Name",
-                      "Technical ID",
-                      "Mfr Ref",
+                      t("ui.name"),
+                      t("ui.technicalID"),
+                      t("ui.mfrRef"),
                       "Host segment",
                       "Reference node",
                       "Offset (mm)",
-                      "Connected wires",
+                      t("ui.connectedWires"),
                     ],
                     sortedVisibleSplices.map((splice) => {
                       const placement =
@@ -496,22 +497,22 @@ export function AnalysisSpliceWorkspacePanels(
                     className="action-button-icon is-help"
                     aria-hidden="true"
                   />
-                  <span>Help</span>
+                  <span>{t("ui.help")}</span>
                 </button>
               ) : null}
             </div>
             <div className="list-panel-header-tools-row is-filter-row">
               <TableFilterBar
-                label="Filter"
-                fieldLabel="Splice filter field"
+                label={t("ui.filter")}
+                fieldLabel={t("ui.spliceFilterField")}
                 fieldValue={spliceFilterField}
                 onFieldChange={(value) =>
                   setSpliceFilterField(value as "name" | "technicalId" | "any")
                 }
                 fieldOptions={[
-                  { value: "name", label: "Name" },
-                  { value: "technicalId", label: "Technical ID" },
-                  { value: "any", label: "Any" },
+                  { value: "name", label: t("ui.name") },
+                  { value: "technicalId", label: t("ui.technicalID") },
+                  { value: "any", label: t("ui.any") },
                 ]}
                 queryValue={spliceFilterQuery}
                 onQueryChange={setSpliceFilterQuery}
@@ -521,10 +522,10 @@ export function AnalysisSpliceWorkspacePanels(
           </div>
         </header>
         {splices.length === 0 ? (
-          <p className="empty-copy">No splice yet.</p>
+          <p className="empty-copy">{t("ui.noSpliceYet")}</p>
         ) : sortedVisibleSplices.length === 0 ? (
           <>
-            <p className="empty-copy">No splice matches the current filters.</p>
+            <p className="empty-copy">{t("ui.noSpliceMatchesTheCurrentFilters")}</p>
             <TableEntryCountFooter count={0} />
           </>
         ) : (
@@ -547,7 +548,8 @@ export function AnalysisSpliceWorkspacePanels(
                         }))
                       }
                     >
-                      Name{" "}
+                      
+                      {t("ui.name")}{" "}
                       <span className="sort-indicator">
                         {spliceListSortIndicator("name")}
                       </span>
@@ -570,7 +572,7 @@ export function AnalysisSpliceWorkspacePanels(
                         }))
                       }
                     >
-                      {isMobileViewport ? "ID" : "Technical ID"}{" "}
+                      {isMobileViewport ? t("ui.id") : t("ui.technicalID")}{" "}
                       <span className="sort-indicator">
                         {spliceListSortIndicator("technicalId")}
                       </span>
@@ -596,7 +598,8 @@ export function AnalysisSpliceWorkspacePanels(
                         }))
                       }
                     >
-                      Mfr Ref{" "}
+                      
+                      {t("ui.mfrRef")}{" "}
                       <span className="sort-indicator">
                         {spliceListSortIndicator("manufacturerReference")}
                       </span>
@@ -622,7 +625,8 @@ export function AnalysisSpliceWorkspacePanels(
                         }))
                       }
                     >
-                      Segment{" "}
+                      
+                      {t("ui.segment")}{" "}
                       <span className="sort-indicator">
                         {spliceListSortIndicator("hostSegment")}
                       </span>
@@ -671,7 +675,8 @@ export function AnalysisSpliceWorkspacePanels(
                         }))
                       }
                     >
-                      Connected wires{" "}
+                      
+                      {t("ui.connectedWires")}{" "}
                       <span className="sort-indicator">
                         {spliceListSortIndicator("connectedWireCount")}
                       </span>
@@ -747,12 +752,12 @@ export function AnalysisSpliceWorkspacePanels(
 
       <section className="panel" hidden={!isSpliceSubScreen}>
         <header className="list-panel-header">
-          <h2>Splice analysis</h2>
+          <h2>{t("ui.spliceAnalysis")}</h2>
           <div className="list-panel-header-tools">
             <div
               className="chip-group list-panel-filters"
               role="group"
-              aria-label="Splice analysis view"
+              aria-label={t("ui.spliceAnalysisView")}
             >
               <button
                 type="button"
@@ -764,7 +769,8 @@ export function AnalysisSpliceWorkspacePanels(
                 aria-pressed={spliceAnalysisView === "ports"}
                 onClick={() => setSpliceAnalysisView("ports")}
               >
-                Ports
+                
+                {t("ui.ports")}
               </button>
               <button
                 type="button"
@@ -786,10 +792,10 @@ export function AnalysisSpliceWorkspacePanels(
                 if (spliceAnalysisView === "ports") {
                   downloadCsvFile(
                     `analysis-splice-ports-${selectedSplice?.technicalId ?? "selection"}`,
-                    ["Port", "Status", "Occupant reference"],
+                    ["Port", "Status", t("ui.occupantReference")],
                     displayedSplicePortStatuses.map((slot) => [
                       `P${slot.portIndex}`,
-                      slot.isOccupied ? "Occupied" : "Free",
+                      slot.isOccupied ? t("ui.occupied") : t("ui.free"),
                       formatOccupantRef(slot.occupantRef),
                     ]),
                   );
@@ -798,14 +804,14 @@ export function AnalysisSpliceWorkspacePanels(
                 downloadCsvFile(
                   `analysis-splice-synthesis-${selectedSplice?.technicalId ?? "selection"}`,
                   [
-                    "Wire",
-                    "Technical ID",
-                    "Section (mm²)",
-                    "Local port",
+                    t("ui.wire"),
+                    t("ui.technicalID"),
+                    t("ui.sectionMm2"),
+                    t("ui.localPort"),
                     "Destination",
                     "Covered from splice (mm)",
                     "Covered from remote endpoint (mm)",
-                    "Length (mm)",
+                    t("ui.lengthMm"),
                   ],
                   sortedSpliceSynthesisRowsByColumns.map((row) => [
                     row.wireName,
@@ -832,7 +838,7 @@ export function AnalysisSpliceWorkspacePanels(
           </div>
         </header>
         {selectedSplice === null ? (
-          <p className="empty-copy">Select a splice to view ports and synthesis.</p>
+          <p className="empty-copy">{t("ui.selectASpliceToViewPortsAndSynthesis")}</p>
         ) : spliceAnalysisView === "ports" ? (
           <>
             <p className="meta-line">
@@ -841,19 +847,21 @@ export function AnalysisSpliceWorkspacePanels(
             </p>
             {selectedSplicePlacement !== null ? (
               <p className="meta-line">
-                Placement: {selectedSplicePlacement.hostSegmentLabel} from{" "}
+                Placement: {selectedSplicePlacement.hostSegmentLabel}  {t("ui.from")}{" "}
                 {selectedSplicePlacement.fromNodeLabel} at{" "}
                 {selectedSplicePlacement.offsetLabel}
               </p>
             ) : null}
             <p className="meta-line">
-              Capacity:{" "}
+              
+              {t("ui.capacity")}{" "}
               {selectedSplicePortMode === "unbounded"
-                ? "∞ (unbounded)"
+                ? t("ui.unbounded2")
                 : `${selectedSplice.portCount} ports`}
             </p>
             <p className="meta-line">
-              Branch count:{" "}
+              
+              {t("ui.branchCount")}{" "}
               {splicePortStatuses.filter((slot) => slot.isOccupied).length}
             </p>
             <div className="connector-ways-view splice-ports-view">
@@ -866,7 +874,8 @@ export function AnalysisSpliceWorkspacePanels(
                   onSubmit={handleReservePortSubmit}
                 >
                   <label>
-                    Port index
+                    
+                    {t("ui.portIndex")}
                     <input
                       type="number"
                       min={1}
@@ -888,7 +897,8 @@ export function AnalysisSpliceWorkspacePanels(
                   </label>
 
                   <label>
-                    Occupant reference
+                    
+                    {t("ui.occupantReference")}
                     <input
                       value={spliceOccupantRefInput}
                       onChange={(event) =>
@@ -908,7 +918,8 @@ export function AnalysisSpliceWorkspacePanels(
                       className="action-button-icon is-lock-move"
                       aria-hidden="true"
                     />
-                    Reserve port
+                    
+                    {t("ui.reservePort")}
                   </button>
                 </form>
                 {spliceReserveValidationMessage !== null ? (
@@ -919,14 +930,16 @@ export function AnalysisSpliceWorkspacePanels(
                 {spliceReserveValidationMessage === null &&
                 nextFreePortIndex !== null ? (
                   <small className="inline-help">
-                    Suggested next free port: P{nextFreePortIndex}
+                    
+                    {t("ui.suggestedNextFreePortP")}{nextFreePortIndex}
                   </small>
                 ) : null}
                 {spliceReserveValidationMessage === null &&
                 nextFreePortIndex === null &&
                 selectedSpliceHasFinitePorts ? (
                   <small className="inline-help">
-                    No available ports on this splice.
+                    
+                    {t("ui.noAvailablePortsOnThisSplice")}
                   </small>
                 ) : null}
                 {selectedSplicePortMode === "unbounded" ? (
@@ -944,7 +957,8 @@ export function AnalysisSpliceWorkspacePanels(
                         className="action-button-icon is-add"
                         aria-hidden="true"
                       />
-                      + Add visible port(s)
+                      
+                      {t("ui.addVisiblePortS")}
                     </button>
                   </div>
                 ) : null}
@@ -952,7 +966,7 @@ export function AnalysisSpliceWorkspacePanels(
 
               <div
                 className="cavity-grid connector-ways-cavity-grid splice-ports-cavity-grid"
-                aria-label="Splice port occupancy grid"
+                aria-label={t("ui.splicePortOccupancyGrid")}
               >
                 {displayedSplicePortStatuses.map((slot) => {
                   const parsedOccupantRef =
@@ -972,7 +986,7 @@ export function AnalysisSpliceWorkspacePanels(
                       <p>
                         {slot.isOccupied
                           ? formatOccupantRef(slot.occupantRef)
-                          : "Free"}
+                          : t("ui.free")}
                       </p>
                       {slot.isOccupied ? (
                         <div className="cavity-actions">
@@ -991,7 +1005,8 @@ export function AnalysisSpliceWorkspacePanels(
                               className="action-button-icon is-open"
                               aria-hidden="true"
                             />
-                            Go to
+                            
+                            {t("ui.goTo")}
                           </button>
                           <button
                             type="button"
@@ -1013,7 +1028,7 @@ export function AnalysisSpliceWorkspacePanels(
             </div>
           </>
         ) : sortedSpliceSynthesisRowsByColumns.length === 0 ? (
-          <p className="empty-copy">No wire currently connected to this splice.</p>
+          <p className="empty-copy">{t("ui.noWireCurrentlyConnectedToThisSplice")}</p>
         ) : (
           <>
           <table className="data-table">
@@ -1033,7 +1048,8 @@ export function AnalysisSpliceWorkspacePanels(
                       }))
                     }
                   >
-                    Wire{" "}
+                    
+                    {t("ui.wire")}{" "}
                     <span className="sort-indicator">
                       {spliceSynthesisSortIndicator("name")}
                     </span>
@@ -1059,7 +1075,7 @@ export function AnalysisSpliceWorkspacePanels(
                       }))
                     }
                   >
-                    {isMobileViewport ? "ID" : "Technical ID"}{" "}
+                    {isMobileViewport ? t("ui.id") : t("ui.technicalID")}{" "}
                     <span className="sort-indicator">
                       {spliceSynthesisSortIndicator("technicalId")}
                     </span>
@@ -1085,7 +1101,7 @@ export function AnalysisSpliceWorkspacePanels(
                       }))
                     }
                   >
-                    {isMobileViewport ? "Sect." : "Section (mm²)"}{" "}
+                    {isMobileViewport ? "Sect." : t("ui.sectionMm2")}{" "}
                     <span className="sort-indicator">
                       {spliceSynthesisSortIndicator("sectionMm2")}
                     </span>
@@ -1111,7 +1127,8 @@ export function AnalysisSpliceWorkspacePanels(
                       }))
                     }
                   >
-                    Local port{" "}
+                    
+                    {t("ui.localPort")}{" "}
                     <span className="sort-indicator">
                       {spliceSynthesisSortIndicator("localPort")}
                     </span>
@@ -1219,7 +1236,7 @@ export function AnalysisSpliceWorkspacePanels(
                       }))
                     }
                   >
-                    {isMobileViewport ? "Len" : "Length (mm)"}{" "}
+                    {isMobileViewport ? t("ui.len") : t("ui.lengthMm")}{" "}
                     <span className="sort-indicator">
                       {spliceSynthesisSortIndicator("lengthMm")}
                     </span>

@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ChangeEvent, ReactElement } from "react";
 import type { Network, NetworkId } from "../../../core/entities";
 import { NetworkSummaryEditMenu } from "./NetworkSummaryEditMenu";
@@ -88,7 +89,7 @@ export function NetworkSummaryHeader({
   return (
     <header className="network-summary-header">
       <div className="network-summary-title">
-        <h2>Network summary</h2>
+        <h2>{t("ui.networkSummary")}</h2>
         {activeNetworkName.length > 0 ? (
           <>
             <span className="network-summary-title-separator" aria-hidden="true">
@@ -115,7 +116,7 @@ export function NetworkSummaryHeader({
           </>
         ) : null}
       </div>
-      <div className="network-summary-header-actions" role="group" aria-label="Network summary display options">
+      <div className="network-summary-header-actions" role="group" aria-label={t("ui.networkSummaryDisplayOptions")}>
         <NetworkSummaryEditMenu
           showNetworkGrid={showNetworkGrid}
           snapNodesToGrid={snapNodesToGrid}
