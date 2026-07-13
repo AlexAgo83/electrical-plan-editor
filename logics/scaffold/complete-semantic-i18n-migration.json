@@ -1,0 +1,180 @@
+{
+  "title": "Complete semantic i18n migration and retire runtime text compatibility",
+  "references": [
+    "src/app/lib/i18n.ts",
+    "src/app/hooks/useAppLocaleDomTranslation.ts",
+    "src/app/AppController.tsx",
+    "src/app/components/settings",
+    "src/app/components/modeling",
+    "src/app/components/onboarding",
+    "src/app/components/catalog",
+    "src/app/components/validation"
+  ],
+  "request": {
+    "complexity": "High",
+    "theme": "Internationalization contract adoption",
+    "needs": [
+      "All product-owned interface copy must use stable semantic keys at render time instead of being discovered from English text after rendering.",
+      "The temporary legacy catalog, DOM observer, and text/regular-expression translation bridge must be removed without regressing either supported locale.",
+      "Dynamic messages must use named placeholders and explicit plural-aware formatting rather than reconstructed source sentences.",
+      "Configured electrical data, imported model content, user input, identifiers, and domain values must remain data and must never be translated as interface copy."
+    ],
+    "context": [
+      "A first migration slice established the shared i18n contract, locale catalogs, semantic navigation keys, and lifecycle commands.",
+      "The English catalog still contains a large legacy namespace keyed from visible source text. src/app/lib/i18n.ts derives reverse lookup and regular-expression handlers from that namespace.",
+      "src/app/hooks/useAppLocaleDomTranslation.ts observes rendered DOM text and attributes, while src/app/AppController.tsx activates that compatibility layer for the selected locale.",
+      "Remaining product-owned copy spans settings, common actions and forms, modeling and catalog workflows, validation and diagnostics, onboarding, controller notifications, and import/export states.",
+      "The migration must preserve domain terminology and distinguish product-owned labels from configured catalog names, file content, model values, and user-authored text.",
+      "The central i18n contract is optional at repository level but is the target convention whenever this product exposes localized UI."
+    ],
+    "acceptance_criteria": [
+      "AC1: Every remaining product-owned user-visible string and accessibility label is rendered from a stable semantic key in the canonical catalogs, with locale parity and no raw-sentence keys.",
+      "AC2: Dynamic messages use named placeholders and locale-aware formatting; no regular-expression reconstruction of English source sentences remains.",
+      "AC3: The DOM observer, legacy reverse lookup, legacy catalog namespace, and compatibility hook are deleted after an automated zero-consumer proof.",
+      "AC4: Configured domain data, imported content, user input, identifiers, and file/model values remain untranslated and are covered by boundary tests.",
+      "AC5: The repository i18n lifecycle checks, unit tests, UI tests, type checks, and production build pass, and a static guard prevents new hardcoded product copy."
+    ]
+  },
+  "product": {
+    "title": "Semantic localization completion",
+    "overview": "Finish the staged move from runtime text replacement to explicit semantic localization across the application, then remove the compatibility bridge once direct-key coverage is proven.",
+    "goals": [
+      "Make every product-owned string traceable to a stable catalog key.",
+      "Preserve a strict boundary between interface copy and domain or user data.",
+      "Delete the runtime DOM and source-text translation machinery.",
+      "Keep both supported locales complete and testable through the shared contract."
+    ],
+    "non_goals": [
+      "Translating configured component names, imported files, user-entered values, identifiers, or model content.",
+      "Adding a new locale during the migration.",
+      "Redesigning workflows or changing domain behavior.",
+      "Replacing the established i18n runtime or central contract."
+    ]
+  },
+  "backlog_items": [
+    {
+      "title": "Migrate settings, shared shell, actions, and forms to semantic keys",
+      "priority": "High",
+      "complexity": "Medium",
+      "theme": "Internationalization contract adoption",
+      "request_acs": ["AC1", "AC4", "AC5"],
+      "problem": [
+        "Shared controls and settings still depend on visible source text being translated after render.",
+        "These high-reuse surfaces multiply legacy dependencies and make coverage difficult to measure."
+      ],
+      "scope_in": [
+        "Inventory product-owned copy in settings, shared shell, dialogs, buttons, menus, form labels, placeholders, titles, empty states, and accessibility attributes.",
+        "Introduce semantic namespaces for common actions and settings concepts, then render them through the existing translator API.",
+        "Add a machine-readable legacy-consumer report so each remaining legacy entry can be assigned to a source surface.",
+        "Add tests proving configured labels, model values, and user-entered form values are not passed through translation."
+      ],
+      "scope_out": [
+        "Modeling, catalog, validation, onboarding, and controller-specific copy.",
+        "Visual redesign of settings or forms."
+      ],
+      "acceptance_criteria": [
+        "AC1: Settings and shared UI render all product-owned copy from semantic catalog keys in both locales.",
+        "AC2: The legacy-consumer report lists every remaining compatibility dependency by source surface.",
+        "AC3: Boundary tests keep configured and user-provided values unchanged.",
+        "AC4: No migrated component relies on DOM mutation for its localized result."
+      ]
+    },
+    {
+      "title": "Migrate modeling, catalog, validation, and diagnostic surfaces",
+      "priority": "High",
+      "complexity": "High",
+      "theme": "Internationalization contract adoption",
+      "request_acs": ["AC1", "AC2", "AC4", "AC5"],
+      "problem": [
+        "Domain-heavy panels mix product instructions and diagnostics with configured electrical data.",
+        "Runtime source-text matching cannot reliably preserve that boundary or format dynamic counts and values."
+      ],
+      "scope_in": [
+        "Create semantic keys for modeling forms, catalog actions, validation summaries, diagnostics, warnings, errors, and accessibility labels.",
+        "Convert dynamic counts, names embedded in product sentences, and validation details to named placeholders with locale-aware number and plural formatting.",
+        "Keep configured part names, wire labels, connector identifiers, measurements, and model content as interpolation data rather than catalog keys.",
+        "Add focused UI tests for both locales and data-boundary cases."
+      ],
+      "scope_out": [
+        "Translation of catalog records or imported model content.",
+        "Changes to validation or modeling rules."
+      ],
+      "acceptance_criteria": [
+        "AC1: Product-owned copy across the targeted domain surfaces uses semantic keys with complete locale parity.",
+        "AC2: Dynamic messages use named placeholders and correct plural/number formatting.",
+        "AC3: Domain values remain byte-for-byte unchanged when the locale changes.",
+        "AC4: Targeted UI tests pass without the DOM compatibility translator."
+      ]
+    },
+    {
+      "title": "Migrate onboarding, controller notifications, and import-export states",
+      "priority": "High",
+      "complexity": "Medium",
+      "theme": "Internationalization contract adoption",
+      "request_acs": ["AC1", "AC2", "AC4", "AC5"],
+      "problem": [
+        "Onboarding and controller-level feedback contain dynamic product sentences that are currently handled by source-text and regular-expression compatibility rules.",
+        "Import and export feedback must localize its framing while preserving file names, formats, counts, and error details as data."
+      ],
+      "scope_in": [
+        "Migrate onboarding steps, help text, controller notifications, confirmation dialogs, and import/export progress and result states.",
+        "Replace every regular-expression translation rule with an explicit semantic message and named placeholders.",
+        "Preserve file names, extensions, identifiers, raw parser details, and user-provided values as interpolation data.",
+        "Cover success, warning, error, cancellation, and accessibility states in both locales."
+      ],
+      "scope_out": [
+        "Changing import/export formats or onboarding flow behavior.",
+        "Localizing third-party or operating-system error text that is not product-owned."
+      ],
+      "acceptance_criteria": [
+        "AC1: All targeted surfaces use semantic keys and named placeholders.",
+        "AC2: No source-text regular-expression handler is needed by a migrated flow.",
+        "AC3: File and user data remain unchanged across locale switches.",
+        "AC4: Tests cover representative success and failure paths in both locales."
+      ]
+    },
+    {
+      "title": "Prove zero legacy consumers and remove the runtime compatibility bridge",
+      "priority": "High",
+      "complexity": "Medium",
+      "theme": "Internationalization contract adoption",
+      "request_acs": ["AC1", "AC2", "AC3", "AC4", "AC5"],
+      "problem": [
+        "The compatibility layer remains global infrastructure until every consumer is migrated and its absence is verified.",
+        "Leaving an empty bridge in place would allow future hardcoded copy to silently reintroduce source-text translation."
+      ],
+      "scope_in": [
+        "Run the legacy-consumer report and resolve every remaining product-owned entry or explicitly classify it as non-translatable data.",
+        "Delete the legacy catalog namespace, reverse lookup, regular-expression handlers, DOM observer hook, controller activation, and obsolete tests.",
+        "Add a static hardcoded-copy guard with a narrow reviewed allowlist for test fixtures and data values.",
+        "Run lifecycle validation, locale parity, unit and UI tests, type checks, and production build; record closure evidence in the orchestration task."
+      ],
+      "scope_out": [
+        "Broad refactoring unrelated to localization.",
+        "Adding translation management services."
+      ],
+      "acceptance_criteria": [
+        "AC1: Automated inventory reports zero runtime consumers of legacy source-text translation.",
+        "AC2: All compatibility implementation and the legacy namespace are removed from production code.",
+        "AC3: A failing fixture proves the static guard rejects newly hardcoded product copy.",
+        "AC4: Full repository validation passes in both locales and boundary tests prove domain data is untouched."
+      ]
+    }
+  ],
+  "orchestration_task": {
+    "title": "Orchestrate completion of semantic localization",
+    "plan": [
+      "Capture a baseline legacy-consumer report and classify every entry by source surface before editing production behavior.",
+      "Migrate shared shell and settings first so common semantic keys can be reused by later slices.",
+      "Migrate domain-heavy modeling, catalog, validation, and diagnostic surfaces with explicit data-boundary tests.",
+      "Migrate onboarding, controller notifications, and import/export messages, eliminating regular-expression consumers.",
+      "Require a zero-consumer report before deleting the bridge; then add the hardcoded-copy guard and run the complete validation matrix.",
+      "Update the product, backlog, task journal, context pack, and request status with final coverage and closure evidence."
+    ]
+  },
+  "context_pack": {
+    "out": "logics/context-packs/complete-semantic-i18n-migration.json",
+    "mode": "summary-only",
+    "profile": "deep"
+  }
+}

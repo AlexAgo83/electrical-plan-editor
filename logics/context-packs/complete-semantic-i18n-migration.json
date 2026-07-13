@@ -1,0 +1,320 @@
+{
+  "budgets": {
+    "max_docs": 48,
+    "max_docs_per_ref": 8
+  },
+  "changed_paths": [],
+  "command": "logics-manager sync context-pack req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces item_672_migrate_onboarding_controller_notifications_and_import_export_states item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge task_163_orchestrate_completion_of_semantic_localization --mode summary-only --profile deep --handoff",
+  "companion_docs": [
+    {
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys",
+          "item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces",
+          "item_672_migrate_onboarding_controller_notifications_and_import_export_states",
+          "item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge"
+        ],
+        "prod": [
+          "prod_017_semantic_localization_completion"
+        ],
+        "req": [
+          "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility"
+        ],
+        "task": [
+          "task_163_orchestrate_completion_of_semantic_localization"
+        ]
+      },
+      "path": "logics/product/prod_017_semantic_localization_completion.md",
+      "ref": "prod_017_semantic_localization_completion",
+      "status": "Proposed",
+      "title": "Semantic localization completion"
+    }
+  ],
+  "docs": [
+    {
+      "ai_context": {
+        "keywords": "request-chain-scaffold, complete semantic i18n migration and retire runtime text compatibility, development-ready",
+        "skip when": "The change is unrelated to this scaffolded request chain.",
+        "summary": "Complete semantic i18n migration and retire runtime text compatibility",
+        "use when": "You need to implement or review the scaffolded workflow for Complete semantic i18n migration and retire runtime text compatibility."
+      },
+      "kind": "request",
+      "linked_refs": {
+        "item": [
+          "item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys",
+          "item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces",
+          "item_672_migrate_onboarding_controller_notifications_and_import_export_states",
+          "item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge"
+        ],
+        "prod": [
+          "prod_017_semantic_localization_completion"
+        ],
+        "req": [
+          "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility"
+        ]
+      },
+      "path": "logics/request/req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility.md",
+      "ref": "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility",
+      "schema_version": "1.0",
+      "status": "Draft",
+      "title": "Complete semantic i18n migration and retire runtime text compatibility"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, migrate settings, shared shell, actions, and forms to semantic keys, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Migrate settings, shared shell, actions, and forms to semantic keys",
+        "use when": "Implementing the scaffolded slice for Migrate settings, shared shell, actions, and forms to semantic keys."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys"
+        ],
+        "prod": [
+          "prod_017_semantic_localization_completion"
+        ],
+        "req": [
+          "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility"
+        ],
+        "task": [
+          "task_163_orchestrate_completion_of_semantic_localization"
+        ]
+      },
+      "path": "logics/backlog/item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys.md",
+      "ref": "item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Migrate settings, shared shell, actions, and forms to semantic keys"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, migrate modeling, catalog, validation, and diagnostic surfaces, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Migrate modeling, catalog, validation, and diagnostic surfaces",
+        "use when": "Implementing the scaffolded slice for Migrate modeling, catalog, validation, and diagnostic surfaces."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces"
+        ],
+        "prod": [
+          "prod_017_semantic_localization_completion"
+        ],
+        "req": [
+          "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility"
+        ],
+        "task": [
+          "task_163_orchestrate_completion_of_semantic_localization"
+        ]
+      },
+      "path": "logics/backlog/item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces.md",
+      "ref": "item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Migrate modeling, catalog, validation, and diagnostic surfaces"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, migrate onboarding, controller notifications, and import-export states, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Migrate onboarding, controller notifications, and import-export states",
+        "use when": "Implementing the scaffolded slice for Migrate onboarding, controller notifications, and import-export states."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_672_migrate_onboarding_controller_notifications_and_import_export_states"
+        ],
+        "prod": [
+          "prod_017_semantic_localization_completion"
+        ],
+        "req": [
+          "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility"
+        ],
+        "task": [
+          "task_163_orchestrate_completion_of_semantic_localization"
+        ]
+      },
+      "path": "logics/backlog/item_672_migrate_onboarding_controller_notifications_and_import_export_states.md",
+      "ref": "item_672_migrate_onboarding_controller_notifications_and_import_export_states",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Migrate onboarding, controller notifications, and import-export states"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-backlog, prove zero legacy consumers and remove the runtime compatibility bridge, implementation-ready",
+        "skip when": "The change belongs to another backlog slice.",
+        "summary": "Prove zero legacy consumers and remove the runtime compatibility bridge",
+        "use when": "Implementing the scaffolded slice for Prove zero legacy consumers and remove the runtime compatibility bridge."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge"
+        ],
+        "prod": [
+          "prod_017_semantic_localization_completion"
+        ],
+        "req": [
+          "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility"
+        ],
+        "task": [
+          "task_163_orchestrate_completion_of_semantic_localization"
+        ]
+      },
+      "path": "logics/backlog/item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge.md",
+      "ref": "item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Prove zero legacy consumers and remove the runtime compatibility bridge"
+    },
+    {
+      "ai_context": {
+        "keywords": "scaffolded-task, request-chain-scaffold, orchestration",
+        "skip when": "Working on one isolated sibling slice.",
+        "summary": "Orchestrate completion of semantic localization",
+        "use when": "Coordinating implementation of a scaffolded request chain."
+      },
+      "kind": "task",
+      "linked_refs": {
+        "item": [
+          "item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys",
+          "item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces",
+          "item_672_migrate_onboarding_controller_notifications_and_import_export_states",
+          "item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge"
+        ],
+        "prod": [
+          "prod_017_semantic_localization_completion"
+        ],
+        "req": [
+          "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility"
+        ],
+        "task": [
+          "task_163_orchestrate_completion_of_semantic_localization"
+        ]
+      },
+      "path": "logics/tasks/task_163_orchestrate_completion_of_semantic_localization.md",
+      "ref": "task_163_orchestrate_completion_of_semantic_localization",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Orchestrate completion of semantic localization"
+    }
+  ],
+  "estimates": {
+    "char_count": 7402,
+    "companion_doc_count": 1,
+    "doc_count": 6
+  },
+  "generated_at": "2026-07-13T10:14:19Z",
+  "handoff": {
+    "companion_doc_count": 1,
+    "enabled": true,
+    "source_refs": [
+      "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility",
+      "item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys",
+      "item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces",
+      "item_672_migrate_onboarding_controller_notifications_and_import_export_states",
+      "item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge",
+      "task_163_orchestrate_completion_of_semantic_localization"
+    ],
+    "validation_summary_count": 1
+  },
+  "mode": "summary-only",
+  "profile": "deep",
+  "ref": "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility,item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys,item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces,item_672_migrate_onboarding_controller_notifications_and_import_export_states,item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge,task_163_orchestrate_completion_of_semantic_localization",
+  "refs": [
+    "req_166_complete_semantic_i18n_migration_and_retire_runtime_text_compatibility",
+    "item_670_migrate_settings_shared_shell_actions_and_forms_to_semantic_keys",
+    "item_671_migrate_modeling_catalog_validation_and_diagnostic_surfaces",
+    "item_672_migrate_onboarding_controller_notifications_and_import_export_states",
+    "item_673_prove_zero_legacy_consumers_and_remove_the_runtime_compatibility_bridge",
+    "task_163_orchestrate_completion_of_semantic_localization"
+  ],
+  "release": {
+    "blocking_reasons": [
+      "version_metadata: version sources disagree (1.18.1, 1.18.2)",
+      "version_metadata: evidence targets a different commit",
+      "changelog: evidence targets a different commit",
+      "local_validation: evidence targets a different commit",
+      "git_push: evidence targets a different commit",
+      "ci: evidence targets a different commit"
+    ],
+    "configured": true,
+    "contract_path": "logics/release/contract.json",
+    "guidance": [
+      "Release readiness must come from project-owned evidence, not conversational memory.",
+      "Use release status or validate before preparing or claiming release readiness.",
+      "Publication-oriented actions are explicit operator actions and are separate from safe read/validate actions."
+    ],
+    "next_action": "version_metadata: version sources disagree (1.18.1, 1.18.2)",
+    "publication_actions": [
+      "GitHub release publication",
+      "external publication"
+    ],
+    "required_gates": [
+      {
+        "blocking_reason": "evidence targets a different commit",
+        "id": "version_metadata",
+        "required": true,
+        "state": "preparing",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different commit",
+        "id": "changelog",
+        "required": true,
+        "state": "preparing",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different commit",
+        "id": "local_validation",
+        "required": true,
+        "state": "local_validation",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different commit",
+        "id": "git_push",
+        "required": true,
+        "state": "pushed",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different commit",
+        "id": "ci",
+        "required": true,
+        "state": "ci_verification",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": null,
+        "id": "production_deployment",
+        "required": true,
+        "state": "external_publication",
+        "status": "passed"
+      }
+    ],
+    "safe_actions": [
+      "logics-manager release status",
+      "logics-manager release plan <version>",
+      "logics-manager release validate <version>"
+    ],
+    "state": "blocked",
+    "target_version": null
+  },
+  "validation_summary": [
+    {
+      "items": [
+        "- Run `python3 -m logics_manager lint --require-status`.",
+        "- Run scaffold command tests."
+      ],
+      "path": "logics/tasks/task_163_orchestrate_completion_of_semantic_localization.md",
+      "ref": "task_163_orchestrate_completion_of_semantic_localization"
+    }
+  ]
+}
