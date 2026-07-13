@@ -878,7 +878,7 @@ export function useAppControllerModelingAnalysisScreenDomains({
       (connectorId, input) => {
         const connector = store.getState().connectors.byId[connectorId];
         if (connector === undefined) {
-          return { ok: false, message: "Select a connector first." };
+          return { ok: false, message: t("ui.useappcontrollermodelinganalysisscreendomainsSelectAConnectorFirst") };
         }
         const terminalOverrides = parseConnectorTerminalOverridesDraft(
           input.terminalOverridesText,

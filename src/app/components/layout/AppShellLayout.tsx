@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import {
   Suspense,
   useEffect,
@@ -132,8 +133,8 @@ interface AppShellLayoutProps {
 function WorkspaceLoadingFallback(): ReactElement {
   return (
     <section className="panel" aria-live="polite" aria-busy="true">
-      <h2>Loading workspace</h2>
-      <p className="empty-copy">The requested screen is loading.</p>
+      <h2>{t("ui.appshelllayoutLoadingWorkspace")}</h2>
+      <p className="empty-copy">{t("ui.appshelllayoutTheRequestedScreenIsLoading")}</p>
     </section>
   );
 }
@@ -508,9 +509,9 @@ export function AppShellLayout({
           className="filter-chip header-docked-network-picker-button"
           aria-haspopup="menu"
           aria-expanded={isNetworkPickerOpen}
-          aria-label={`Active plan: ${activeNetwork.name}. Change active plan`}
+          aria-label={t("ui.appshelllayoutActivePlanNameChangeActivePlan", { name: activeNetwork.name })}
           onClick={toggleNetworkPicker}
-          title={`Active plan: ${activeNetwork.name}`}
+          title={t("ui.appshelllayoutActivePlanName", { name: activeNetwork.name })}
         >
           <span className="network-summary-active-network-icon" aria-hidden="true" />
         </button>
@@ -519,7 +520,7 @@ export function AppShellLayout({
             ref={networkPickerMenuRef}
             className="panel header-network-picker-menu"
             role="menu"
-            aria-label="Select active plan"
+            aria-label={t("ui.appshelllayoutSelectActivePlan")}
             style={networkPickerMenuStyle}
           >
             {networks.map((network) => {
@@ -622,10 +623,9 @@ export function AppShellLayout({
   } else if (!hasActiveNetwork) {
     activeWorkspaceContent = (
       <section className="panel">
-        <h2>No active network</h2>
+        <h2>{t("ui.appshelllayoutNoActiveNetwork")}</h2>
         <p className="empty-copy">
-          Create a network from the network scope controls to start modeling connectors, splices, nodes, segments, and wires.
-        </p>
+          {t("ui.appshelllayoutCreateANetworkFromTheNetworkScopeControlsToStart")}</p>
       </section>
     );
   } else if (isHarnessAssemblyScreen) {
@@ -702,7 +702,7 @@ export function AppShellLayout({
         <button
           type="button"
           className={isNavigationDrawerOpen ? "workspace-drawer-backdrop is-open" : "workspace-drawer-backdrop"}
-          aria-label="Close navigation menu"
+          aria-label={t("ui.appshelllayoutCloseNavigationMenu")}
           aria-hidden={!isNavigationDrawerOpen}
           disabled={!isNavigationDrawerOpen}
           tabIndex={isNavigationDrawerOpen ? 0 : -1}
@@ -748,7 +748,7 @@ export function AppShellLayout({
         <button
           type="button"
           className={isOperationsPanelOpen ? "workspace-ops-backdrop is-open" : "workspace-ops-backdrop"}
-          aria-label="Close operations panel"
+          aria-label={t("ui.appshelllayoutCloseOperationsPanel")}
           aria-hidden={!isOperationsPanelOpen}
           disabled={!isOperationsPanelOpen}
           tabIndex={isOperationsPanelOpen ? 0 : -1}
@@ -797,13 +797,13 @@ export function AppShellLayout({
       </section>
 
       <a className="app-footer-link" href={appRepositoryUrl} target="_blank" rel="noopener noreferrer">
-        © {currentYear} e-Plan Editor · v{appVersion}
+        © {currentYear} {t("ui.appshelllayoutEPlanEditorV")}{appVersion}
       </a>
 
       {!isInspectorHidden ? (
         <aside
           className={isInspectorOpen ? "workspace-inspector-panel is-open" : "workspace-inspector-panel is-collapsed"}
-          aria-label="Inspector context panel"
+          aria-label={t("ui.appshelllayoutInspectorContextPanel")}
         >
           {inspectorContextPanel}
         </aside>

@@ -509,7 +509,7 @@ export function useCatalogHandlers({
       }
 
       await confirmAction({
-        title: "Catalog item delete blocked",
+        title: t("ui.usecataloghandlersCatalogItemDeleteBlocked"),
         message: impact.message,
         confirmLabel: t("ui.close"),
         cancelLabel: t("ui.cancel"),

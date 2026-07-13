@@ -66,7 +66,7 @@ export function DeleteImpactDialog({
       <button
         type="button"
         className="confirm-dialog-backdrop"
-        aria-label="Dismiss delete impact dialog"
+        aria-label={t("ui.deleteimpactdialogDismissDeleteImpactDialog")}
         onClick={() => {
           if (!closeOnBackdrop) {
             return;

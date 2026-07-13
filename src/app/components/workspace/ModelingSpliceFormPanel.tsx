@@ -67,7 +67,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       label: `${item.manufacturerReference}${item.name?.trim() ? ` - ${item.name.trim()}` : ""} (${item.connectionCount})`
     })),
     selectedValue: spliceCatalogItemId,
-    missingOption: isCatalogLinked ? { label: `Missing catalog item (${spliceCatalogItemId})` } : null
+    missingOption: isCatalogLinked ? { label: t("ui.missingCatalogItemValue", { itemId: spliceCatalogItemId }) } : null
   });
 
   return (
@@ -116,10 +116,10 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     {spliceManufacturerReference.trim().length > 0 ? (
       <small className="meta-line">
         {selectedCatalogItem === undefined ? (
-          `Manufacturer reference: ${spliceManufacturerReference}`
+          t("ui.manufacturerReferenceValue", { reference: spliceManufacturerReference })
         ) : (
           <EntityReferenceButton
-            title={`Open catalog item ${spliceManufacturerReference}`}
+            title={t("ui.modelingspliceformpanelOpenCatalogItemSpliceManufacturerReference", { spliceManufacturerReference: spliceManufacturerReference })}
             onClick={() => onSelectCatalogItem(selectedCatalogItem.id)}
           >
             
@@ -134,46 +134,42 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     {spliceTechnicalIdAlreadyUsed ? <small className="inline-error">{t("ui.thisTechnicalIDIsAlreadyUsed")}</small> : null}
     {spliceFormMode === "create" ? (
       <label>
-        Splice type
-        <select
+        {t("ui.modelingspliceformpanelSpliceType")}<select
           value={splicePortMode}
           onChange={(event) => setSplicePortMode(event.target.value as "bounded" | "unbounded" | "directional")}
         >
-          <option value="bounded">Legacy bounded ports</option>
-          <option value="unbounded" disabled={isCatalogLinked}>Legacy unbounded ports</option>
-          <option value="directional">Automatic L/R directional</option>
+          <option value="bounded">{t("ui.modelingspliceformpanelLegacyBoundedPorts")}</option>
+          <option value="unbounded" disabled={isCatalogLinked}>{t("ui.modelingspliceformpanelLegacyUnboundedPorts")}</option>
+          <option value="directional">{t("ui.modelingspliceformpanelAutomaticLRDirectional")}</option>
         </select>
       </label>
     ) : null}
     {spliceFormMode === "edit" && !isDirectional ? (
       <>
         <label>
-          Legacy capacity mode
-          <select
+          {t("ui.modelingspliceformpanelLegacyCapacityMode")}<select
             value={splicePortMode}
             onChange={(event) => setSplicePortMode(event.target.value as "bounded" | "unbounded")}
             disabled={isCatalogLinked}
           >
             <option value="bounded">{t("ui.bounded")}</option>
-            <option value="unbounded">Unbounded (infinity)</option>
+            <option value="unbounded">{t("ui.modelingspliceformpanelUnboundedInfinity")}</option>
           </select>
         </label>
         <div className="row-actions compact">
           <button type="button" className="button-with-icon" onClick={handleConvertSpliceToDirectional}>
             <span className="action-button-icon is-swap" aria-hidden="true" />
-            Convert to automatic L/R
-          </button>
+            {t("ui.modelingspliceformpanelConvertToAutomaticLR")}</button>
         </div>
       </>
     ) : null}
     {isDirectional ? (
-      <small className="inline-help">Directional splice: wire endpoints are assigned automatically to L or R from routing.</small>
+      <small className="inline-help">{t("ui.modelingspliceformpanelDirectionalSpliceWireEndpointsAreAssignedAutomaticallyToLOr")}</small>
     ) : null}
     {isDirectional ? (
       <>
         <label>
-          Directional ports
-          <input value="L / R" readOnly aria-readonly="true" />
+          {t("ui.modelingspliceformpanelDirectionalPorts")}<input value="L / R" readOnly aria-readonly="true" />
         </label>
         <label className="settings-checkbox">
           <input
@@ -181,14 +177,12 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
             checked={spliceSideInverted}
             onChange={(event) => setSpliceSideInverted(event.target.checked)}
           />{" "}
-          Invert all L/R assignments
-        </label>
+          {t("ui.modelingspliceformpanelInvertAllLRAssignments")}</label>
         {spliceFormMode === "edit" ? (
           <div className="row-actions compact">
             <button type="button" className="button-with-icon" onClick={handleRerouteSpliceConnectedWires}>
               <span className="action-button-icon is-swap" aria-hidden="true" />
-              Reroute connected wires
-            </button>
+              {t("ui.modelingspliceformpanelRerouteConnectedWires")}</button>
           </div>
         ) : null}
       </>
@@ -213,8 +207,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
       </label>
     )}
     <label>
-      Host segment
-      <select
+      {t("ui.modelingspliceformpanelHostSegment")}<select
         value={splicePlacementSegmentId}
         onChange={(event) => {
           const nextSegmentId = event.target.value;
@@ -226,14 +219,13 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
           }
         }}
       >
-        <option value="">Unplaced draft</option>
+        <option value="">{t("ui.modelingspliceformpanelUnplacedDraft")}</option>
         {selectablePlacementSegments.map((segment) => {
           const nodeA = nodeById.get(segment.nodeA);
           const nodeB = nodeById.get(segment.nodeB);
           return (
             <option key={segment.id} value={segment.id}>
-              {segment.id} ({nodeA === undefined ? segment.nodeA : describeNode(nodeA)} ↔ {nodeB === undefined ? segment.nodeB : describeNode(nodeB)}, {segment.lengthMm} mm)
-            </option>
+              {segment.id} ({nodeA === undefined ? segment.nodeA : describeNode(nodeA)} ↔ {nodeB === undefined ? segment.nodeB : describeNode(nodeB)}, {segment.lengthMm} {t("ui.modelingspliceformpanelMm")}</option>
           );
         })}
       </select>
@@ -241,8 +233,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
     {selectedPlacementSegment !== undefined ? (
       <>
         <label>
-          Reference node
-          <select
+          {t("ui.modelingspliceformpanelReferenceNode")}<select
             value={splicePlacementFromNodeId}
             onChange={(event) => setSplicePlacementFromNodeId(event.target.value)}
           >
@@ -257,8 +248,7 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
           </select>
         </label>
         <label>
-          Offset from reference (mm)
-          <input
+          {t("ui.modelingspliceformpanelOffsetFromReferenceMm")}<input
             type="number"
             min={0}
             step={1}
@@ -267,13 +257,11 @@ export function ModelingSpliceFormPanel(props: ModelingFormsColumnProps): ReactE
           />
         </label>
         <small className="inline-help">
-          Host segment length: {selectedPlacementSegment.lengthMm} mm. `0` and the full segment length are valid placements.
-        </small>
+          {t("ui.modelingspliceformpanelHostSegmentLength")}{selectedPlacementSegment.lengthMm} {t("ui.modelingspliceformpanelMm0AndTheFullSegmentLengthAreValidPlacements")}</small>
       </>
     ) : (
       <small className="inline-help">
-        Unplaced splices stay out of Network Summary and cannot be connected to wires until a segment placement is defined.
-      </small>
+        {t("ui.modelingspliceformpanelUnplacedSplicesStayOutOfNetworkSummaryAndCannotBe")}</small>
     )}
     <div className="row-actions">
       <button

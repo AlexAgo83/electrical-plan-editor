@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useCallback } from "react";
 import type { NetworkNode, NodeId, Segment } from "../../../core/entities";
 import { appActions, appReducer, type AppState, type LayoutNodePosition } from "../../../store";
@@ -34,8 +35,8 @@ export function useAppControllerRegenerateLayoutAction({
 
       if (Object.keys(persistedNodePositions).length > 0) {
         const shouldRegenerate = await requestConfirmation({
-          title: "Regenerate 2D layout",
-          message: "Regenerate 2D layout for this network? Existing manual positions will be replaced.",
+          title: t("ui.useappcontrollerregeneratelayoutactionRegenerate2DLayout"),
+          message: t("ui.useappcontrollerregeneratelayoutactionRegenerate2DLayoutForThisNetworkExistingManualPositionsWill"),
           intent: "warning"
         });
         if (!shouldRegenerate) {

@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import { useEffect, useMemo, useState } from "react";
 import {
   DEFAULT_AI_SETTINGS,
@@ -28,7 +29,7 @@ export function useAiSettings() {
   const [hydrated, setHydrated] = useState(false);
   const [connectionTest, setConnectionTest] = useState<AiConnectionTestState>({
     status: "idle",
-    message: "Connection has not been tested."
+    message: t("ui.useaisettingsConnectionHasNotBeenTested")
   });
 
   useEffect(() => {
@@ -51,7 +52,7 @@ export function useAiSettings() {
   const updateSettings = (patch: Partial<AiSettings>) => {
     setConnectionTest({
       status: "idle",
-      message: "Connection has not been tested."
+      message: t("ui.useaisettingsConnectionHasNotBeenTested")
     });
     setSettings((current) => mergeAiSettingsPatch(current, patch));
   };
@@ -59,7 +60,7 @@ export function useAiSettings() {
   const updateProviderConfig = (provider: AiProviderId, patch: Partial<AiProviderConfig>) => {
     setConnectionTest({
       status: "idle",
-      message: "Connection has not been tested."
+      message: t("ui.useaisettingsConnectionHasNotBeenTested")
     });
     setSettings((current) => ({
       ...current,

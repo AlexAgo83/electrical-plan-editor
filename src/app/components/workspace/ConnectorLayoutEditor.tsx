@@ -489,7 +489,7 @@ export function ConnectorLayoutEditor({
         key={`${actionClassName}-${side}`}
         type="button"
         className={`connector-layout-resize-button ${actionClassName} is-${side}`}
-        aria-label={`${actionLabel} on ${sideLabel}`}
+        aria-label={t("ui.connectorlayouteditorActionlabelOnSideLabel", { actionLabel: actionLabel, sideLabel: sideLabel })}
         disabled={!canResizeLayout(side, delta)}
         onClick={() => resizeLayout(side, delta)}
       >
@@ -576,10 +576,10 @@ export function ConnectorLayoutEditor({
 
   return (
     <fieldset className={fieldsetClassName}>
-      {showLegend ? <legend>Connector physical layout</legend> : null}
+      {showLegend ? <legend>{t("ui.connectorlayouteditorConnectorPhysicalLayout")}</legend> : null}
       <div className="connector-layout-editor-grid">
-        <div className="connector-layout-preview" aria-label="Connector layout editor preview">
-          <div className="connector-layout-resize-controls" aria-label="Layout size controls">
+        <div className="connector-layout-preview" aria-label={t("ui.connectorlayouteditorConnectorLayoutEditorPreview")}>
+          <div className="connector-layout-resize-controls" aria-label={t("ui.connectorlayouteditorLayoutSizeControls")}>
             {(["left", "right", "top", "bottom"] as const).flatMap((side) => [
               renderResizeButton(side, 1),
               renderResizeButton(side, -1)
@@ -590,7 +590,7 @@ export function ConnectorLayoutEditor({
             className="connector-layout-svg"
             viewBox={getConnectorLayoutViewBox(layout, shellPadding)}
             role="img"
-            aria-label="Editable connector physical layout"
+            aria-label={t("ui.connectorlayouteditorEditableConnectorPhysicalLayout")}
             onPointerMove={handleLayoutPointerMove}
             onPointerUp={handleLayoutPointerEnd}
             onPointerCancel={handleLayoutPointerEnd}
@@ -605,7 +605,7 @@ export function ConnectorLayoutEditor({
                 }`}
                 role="button"
                 tabIndex={0}
-                aria-label={`${keying.placement?.mode === "free" ? "Select and drag" : "Select"} keying ${index + 1}`}
+                aria-label={t("ui.connectorlayouteditorSelectKeyingIndex", { Select: keying.placement?.mode === "free" ? "Select and drag" : "Select", index: index + 1 })}
                 onPointerDown={(event) => handleKeyingPointerDown(event, index)}
                 onKeyDown={(event) => handleKeyingKeyDown(event, index)}
               >
@@ -624,7 +624,7 @@ export function ConnectorLayoutEditor({
                   transform={`translate(${wayCenter.x} ${wayCenter.y})`}
                   role="button"
                   tabIndex={0}
-                  aria-label={`Select and move way ${way.cavityIndex}`}
+                  aria-label={t("ui.connectorlayouteditorSelectAndMoveWayCavityIndex", { cavityIndex: way.cavityIndex })}
                   onClick={() => selectWay(way.cavityIndex)}
                   onPointerDown={(event) => handleWayPointerDown(event, way.cavityIndex)}
                   onKeyDown={(event) => handleWayKeyDown(event, way)}
@@ -642,7 +642,7 @@ export function ConnectorLayoutEditor({
         <div className="connector-layout-fields">
           {duplicatePositionGroups.length > 0 ? (
             <small className="inline-error">
-              Overlapping ways:{" "}
+              {t("ui.connectorlayouteditorOverlappingWays")}{" "}
               {duplicatePositionGroups
                 .map((ways) => ways.map((way) => `C${way.cavityIndex}`).join("/"))
                 .join(", ")}
@@ -651,43 +651,39 @@ export function ConnectorLayoutEditor({
           ) : null}
           {layoutSizeError !== null ? <small className="inline-error">{layoutSizeError}</small> : null}
 
-          <div className="chip-group connector-layout-detail-switch" role="group" aria-label="Connector layout detail panel">
+          <div className="chip-group connector-layout-detail-switch" role="group" aria-label={t("ui.connectorlayouteditorConnectorLayoutDetailPanel")}>
             <button
               type="button"
               className={detailPanel === "global" ? "filter-chip is-active" : "filter-chip"}
               aria-pressed={detailPanel === "global"}
               onClick={() => setDetailPanel("global")}
             >
-              Global layout
-            </button>
+              {t("ui.connectorlayouteditorGlobalLayout")}</button>
             <button
               type="button"
               className={detailPanel === "selectedWay" ? "filter-chip is-active" : "filter-chip"}
               aria-pressed={detailPanel === "selectedWay"}
               onClick={() => setDetailPanel("selectedWay")}
             >
-              Selected way
-            </button>
+              {t("ui.connectorlayouteditorSelectedWay")}</button>
             <button
               type="button"
               className={detailPanel === "keying" ? "filter-chip is-active" : "filter-chip"}
               aria-pressed={detailPanel === "keying"}
               onClick={() => setDetailPanel("keying")}
             >
-              Keying features
-            </button>
+              {t("ui.connectorlayouteditorKeyingFeatures")}</button>
           </div>
 
           {detailPanel === "global" ? (
             <section className="connector-layout-control-card connector-layout-control-card-global">
               <header className="connector-layout-control-card-header">
-                <h3>Global layout</h3>
-                <span>{layout.ways.length} ways</span>
+                <h3>{t("ui.connectorlayouteditorGlobalLayout")}</h3>
+                <span>{layout.ways.length} {t("ui.connectorlayouteditorWays")}</span>
               </header>
               <div className="form-split">
                 <label>
-                  Grid width
-                  <input
+                  {t("ui.connectorlayouteditorGridWidth")}<input
                     type="number"
                     min={1}
                     step={1}
@@ -696,8 +692,7 @@ export function ConnectorLayoutEditor({
                   />
                 </label>
                 <label>
-                  Grid height
-                  <input
+                  {t("ui.connectorlayouteditorGridHeight")}<input
                     type="number"
                     min={1}
                     step={1}
@@ -708,8 +703,7 @@ export function ConnectorLayoutEditor({
               </div>
 
               <label>
-                Border shape
-                <select
+                {t("ui.connectorlayouteditorBorderShape")}<select
                   value={shellShape}
                   onChange={(event) => updateShellShape(event.target.value as ConnectorLayoutShellShape)}
                 >
@@ -722,8 +716,7 @@ export function ConnectorLayoutEditor({
               </label>
               <label className="connector-layout-slider-field">
                 <span>
-                  Shell padding
-                  <strong>{shellPadding.toFixed(2)} grid</strong>
+                  {t("ui.connectorlayouteditorShellPadding")}<strong>{shellPadding.toFixed(2)} {t("ui.connectorlayouteditorGrid")}</strong>
                 </span>
                 <input
                   type="range"
@@ -737,8 +730,7 @@ export function ConnectorLayoutEditor({
               {shellShape === "square" ? (
                 <label className="connector-layout-slider-field">
                   <span>
-                    Rounded
-                    <strong>{Math.round(shellCornerRadius * 100)}%</strong>
+                    {t("ui.connectorlayouteditorRounded")}<strong>{Math.round(shellCornerRadius * 100)}%</strong>
                   </span>
                   <input
                     type="range"
@@ -752,8 +744,7 @@ export function ConnectorLayoutEditor({
               ) : null}
               <label className="connector-layout-slider-field">
                 <span>
-                  Shape thickness
-                  <strong>{shellStrokeWidth.toFixed(2)} grid</strong>
+                  {t("ui.connectorlayouteditorShapeThickness")}<strong>{shellStrokeWidth.toFixed(2)} {t("ui.connectorlayouteditorGrid")}</strong>
                 </span>
                 <input
                   type="range"
@@ -766,8 +757,7 @@ export function ConnectorLayoutEditor({
               </label>
               <label className="connector-layout-slider-field">
                 <span>
-                  Cell padding
-                  <strong>{cellPadding.toFixed(2)} grid</strong>
+                  {t("ui.connectorlayouteditorCellPadding")}<strong>{cellPadding.toFixed(2)} {t("ui.connectorlayouteditorGrid")}</strong>
                 </span>
                 <input
                   type="range"
@@ -784,7 +774,7 @@ export function ConnectorLayoutEditor({
           {detailPanel === "selectedWay" && selectedWay !== null ? (
             <section className="connector-layout-control-card connector-layout-control-card-selected">
               <header className="connector-layout-control-card-header">
-                <h3>Selected way</h3>
+                <h3>{t("ui.connectorlayouteditorSelectedWay")}</h3>
                 <span>C{selectedWay.cavityIndex}</span>
               </header>
               <div className="form-split">
@@ -812,8 +802,7 @@ export function ConnectorLayoutEditor({
                 </label>
               </div>
               <label>
-                Shape
-                <select
+                {t("ui.connectorlayouteditorShape")}<select
                   value={selectedWay.shape}
                   onChange={(event) => updateSelectedWay({ shape: event.target.value as ConnectorLayoutWayShape })}
                 >
@@ -825,8 +814,7 @@ export function ConnectorLayoutEditor({
                 </select>
               </label>
               <label>
-                Way size
-                <select
+                {t("ui.connectorlayouteditorWaySize")}<select
                   value={selectedWay.size ?? "normal"}
                   onChange={(event) => {
                     const size = event.target.value as ConnectorLayoutWaySize;
@@ -849,8 +837,7 @@ export function ConnectorLayoutEditor({
                 </select>
               </label>
               <label>
-                Line style
-                <select
+                {t("ui.connectorlayouteditorLineStyle")}<select
                   value={selectedWay.strokeStyle ?? "solid"}
                   onChange={(event) => {
                     const strokeStyle = event.target.value as ConnectorLayoutWayStrokeStyle;
@@ -865,8 +852,7 @@ export function ConnectorLayoutEditor({
                 </select>
               </label>
               <label>
-                Label
-                <input
+                {t("ui.connectorlayouteditorLabel")}<input
                   value={selectedWay.label ?? ""}
                   maxLength={24}
                   onChange={(event) => updateSelectedWay({ label: event.target.value.trim().length === 0 ? undefined : event.target.value })}
@@ -879,38 +865,35 @@ export function ConnectorLayoutEditor({
           {detailPanel === "keying" ? (
             <section className="connector-layout-control-card connector-layout-control-card-keying">
               <header className="connector-layout-control-card-header">
-                <h3>Keying features</h3>
+                <h3>{t("ui.connectorlayouteditorKeyingFeatures")}</h3>
                 <span>
-                  {selectedKeying === null ? "No selection" : `Keying ${selectedKeyingControlIndex + 1}`} / {keyings.length}
+                  {selectedKeying === null ? t("ui.connectorlayouteditorNoSelection") : `Keying ${selectedKeyingControlIndex + 1}`} / {keyings.length}
                 </span>
               </header>
-              <div className="connector-layout-keying-list" aria-label="Keying features">
+              <div className="connector-layout-keying-list" aria-label={t("ui.connectorlayouteditorKeyingFeatures")}>
                 <div className="connector-layout-keying-list-header">
                   <p className="meta-line">
-                    {keyings.length === 0 ? "Add a keying marker to configure the connector shell." : "Select a keying marker in the preview to edit it."}
+                    {keyings.length === 0 ? t("ui.connectorlayouteditorAddAKeyingMarkerToConfigureTheConnectorShell") : t("ui.connectorlayouteditorSelectAKeyingMarkerInThePreviewToEditIt")}
                   </p>
                   <button type="button" className="button-with-icon" onClick={addKeyingWithDefaultColor}>
                     <span className="action-button-icon is-new" aria-hidden="true" />
-                    Add keying
-                  </button>
+                    {t("ui.connectorlayouteditorAddKeying")}</button>
                 </div>
-                {keyings.length === 0 ? <p className="meta-line">No keying features.</p> : null}
-                {keyings.length > 0 && selectedKeying === null ? <p className="meta-line">No keying selected.</p> : null}
+                {keyings.length === 0 ? <p className="meta-line">{t("ui.connectorlayouteditorNoKeyingFeatures")}</p> : null}
+                {keyings.length > 0 && selectedKeying === null ? <p className="meta-line">{t("ui.connectorlayouteditorNoKeyingSelected")}</p> : null}
                 {selectedKeying !== null && selectedKeyingControlIndex >= 0 ? (
                     <div key={`keying-${selectedKeyingControlIndex}`} className="connector-layout-keying-row">
                       <label>
-                        Placement
-                        <select
+                        {t("ui.connectorlayouteditorPlacement")}<select
                           value={selectedKeyingPlacement.mode}
                           onChange={(event) => updateKeyingPlacementMode(selectedKeyingControlIndex, event.target.value as ConnectorLayoutKeyingPlacement["mode"])}
                         >
-                          <option value="guided">Guided</option>
+                          <option value="guided">{t("ui.connectorlayouteditorGuided")}</option>
                           <option value="free">{t("ui.free")}</option>
                         </select>
                       </label>
                       <label>
-                        Shape
-                        <select
+                        {t("ui.connectorlayouteditorShape")}<select
                           value={selectedKeying.shape ?? "arrow"}
                           onChange={(event) =>
                             commitLayout(
@@ -945,8 +928,8 @@ export function ConnectorLayoutEditor({
                           <button
                             type="button"
                             className="connector-layout-keying-color-reset-button"
-                            aria-label="Use default keying color"
-                            title="Use default keying color"
+                            aria-label={t("ui.connectorlayouteditorUseDefaultKeyingColor")}
+                            title={t("ui.connectorlayouteditorUseDefaultKeyingColor")}
                             disabled={selectedKeying.color === undefined}
                             onClick={() =>
                               commitLayout(
@@ -963,8 +946,7 @@ export function ConnectorLayoutEditor({
                       {selectedKeyingPlacement.mode === "guided" ? (
                         <label className="connector-layout-slider-field">
                           <span>
-                            Position
-                            <strong>{Math.round(selectedKeyingPlacement.pathPosition * 100)}%</strong>
+                            {t("ui.connectorlayouteditorPosition")}<strong>{Math.round(selectedKeyingPlacement.pathPosition * 100)}%</strong>
                           </span>
                           <input
                             type="range"
@@ -978,8 +960,7 @@ export function ConnectorLayoutEditor({
                       ) : null}
                       <label className="connector-layout-slider-field">
                         <span>
-                          Scale
-                          <strong>{(selectedKeying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE).toFixed(2)}x</strong>
+                          {t("ui.connectorlayouteditorScale")}<strong>{(selectedKeying.scale ?? DEFAULT_CONNECTOR_LAYOUT_KEYING_SCALE).toFixed(2)}x</strong>
                         </span>
                         <input
                           type="range"
@@ -999,8 +980,7 @@ export function ConnectorLayoutEditor({
                         }}
                       >
                         <span className="action-button-icon is-delete" aria-hidden="true" />
-                        Remove
-                      </button>
+                        {t("ui.harnessassemblymanagerpanelRemove")}</button>
                       <label className="connector-layout-checkbox-field">
                         <input
                           type="checkbox"

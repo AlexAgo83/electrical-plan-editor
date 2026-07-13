@@ -179,9 +179,8 @@ export function ModelingCatalogFormPanel({
         )}
         {catalogFormMode === "create" && catalogCopySourceOptions.length > 0 ? (
           <label>
-            Copy from
-            <select
-              aria-label="Copy from catalog reference"
+            {t("ui.modelingcatalogformpanelCopyFrom")}<select
+              aria-label={t("ui.modelingcatalogformpanelCopyFromCatalogReference")}
               value=""
               onChange={(event) => {
                 const value = event.target.value as CatalogCopySourceValue;
@@ -190,7 +189,7 @@ export function ModelingCatalogFormPanel({
                 }
               }}
             >
-              <option value="">Select a reference...</option>
+              <option value="">{t("ui.modelingcatalogformpanelSelectAReference")}</option>
               {catalogCopySourceOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -231,11 +230,10 @@ export function ModelingCatalogFormPanel({
             checked={catalogIsFuseBox}
             onChange={(event) => setCatalogIsFuseBox(event.target.checked)}
           />
-          Fuse box
-        </label>
+          {t("ui.modelingcatalogformpanelFuseBox")}</label>
         {catalogIsFuseBox ? (
           <small className="meta-line">
-            Auto pairs:{" "}
+            {t("ui.modelingcatalogformpanelAutoPairs")}{" "}
             {Array.from({ length: Math.floor(Number(catalogConnectionCount) / 2) || 0 }, (_, i) =>
               `(${i * 2 + 1}↔${i * 2 + 2})`
             ).join(", ") || t("ui.none2")}
@@ -247,7 +245,7 @@ export function ModelingCatalogFormPanel({
           <input value={catalogName} onChange={(event) => setCatalogName(event.target.value)} placeholder={t("ui.optionalDisplayName")} />
         </label>
         <label>
-          {`Unit price (excl. tax) [${workspaceCurrencyCode}]`}
+          {t("ui.unitPriceExclTaxCurrency", { currency: workspaceCurrencyCode })}
           <input
             type="number"
             min={0}
@@ -259,8 +257,7 @@ export function ModelingCatalogFormPanel({
           />
         </label>
         <label>
-          URL
-          <input
+          {t("ui.modelingcatalogformpanelUrl")}<input
             type="url"
             value={catalogUrl}
             onChange={(event) => setCatalogUrl(event.target.value)}
@@ -297,8 +294,7 @@ export function ModelingCatalogFormPanel({
               }
             }}
           />
-          Additional accessories
-        </label>
+          {t("ui.modelingcatalogformpanelAdditionalAccessories")}</label>
         <label className="settings-checkbox">
           <input
             type="checkbox"
@@ -319,8 +315,7 @@ export function ModelingCatalogFormPanel({
               }
             }}
           />
-          Connector material defaults
-        </label>
+          {t("ui.modelingcatalogformpanelConnectorMaterialDefaults")}</label>
         <label className="settings-checkbox">
           <input
             type="checkbox"
@@ -337,8 +332,7 @@ export function ModelingCatalogFormPanel({
               }
             }}
           />
-          Pin electric roles
-        </label>
+          {t("ui.modelingcatalogformpanelPinElectricRoles")}</label>
         <label className="settings-checkbox">
           <input
             type="checkbox"
@@ -356,8 +350,7 @@ export function ModelingCatalogFormPanel({
               }
             }}
           />
-          Connector physical layout
-        </label>
+          {t("ui.connectorlayouteditorConnectorPhysicalLayout")}</label>
         <div className="row-actions catalog-item-submit-actions">
           {renderCatalogSubmitButton()}
           <button type="button" className={catalogFormMode === "edit" ? "button-with-icon" : undefined} onClick={cancelCatalogEdit}>
@@ -374,7 +367,7 @@ export function ModelingCatalogFormPanel({
           <div className="catalog-accessory-panel-toolbar">
             <span className="catalog-accessory-count">
               {catalogAdditionalAccessories.length === 0
-                ? "No accessory"
+                ? t("ui.modelingcatalogformpanelNoAccessory")
                 : `${catalogAdditionalAccessories.length} ${catalogAdditionalAccessories.length === 1 ? "accessory" : "accessories"}`}
             </span>
             <button
@@ -388,8 +381,7 @@ export function ModelingCatalogFormPanel({
               }
             >
               <span className="action-button-icon is-new" aria-hidden="true" />
-              Add additional accessory
-            </button>
+              {t("ui.modelingcatalogformpanelAddAdditionalAccessory")}</button>
           </div>
           <div className="catalog-accessory-list">
             {catalogAdditionalAccessories.length > 0 ? (
@@ -403,7 +395,7 @@ export function ModelingCatalogFormPanel({
             {catalogAdditionalAccessories.length === 0 ? (
               <div className="catalog-accessory-empty-state">
                 <span className="action-button-icon is-catalog" aria-hidden="true" />
-                <small className="meta-line">No additional accessory.</small>
+                <small className="meta-line">{t("ui.modelingcatalogformpanelNoAdditionalAccessory")}</small>
               </div>
             ) : null}
             {catalogAdditionalAccessories.map((accessory, index) => (
@@ -413,10 +405,9 @@ export function ModelingCatalogFormPanel({
                 </span>
                 <label className="catalog-accessory-field">
                   <span className="visually-hidden">
-                  Accessory reference
-                  </span>
+                  {t("ui.modelingcatalogformpanelAccessoryReference")}</span>
                   <input
-                    aria-label="Accessory reference"
+                    aria-label={t("ui.modelingcatalogformpanelAccessoryReference")}
                     value={accessory.accessoryReference}
                     onChange={(event) => updateAdditionalAccessory(index, { accessoryReference: event.target.value })}
                     placeholder={t("ui.reference")}
@@ -425,10 +416,9 @@ export function ModelingCatalogFormPanel({
                 </label>
                 <label className="catalog-accessory-field">
                   <span className="visually-hidden">
-                  Accessory name
-                  </span>
+                  {t("ui.modelingcatalogformpanelAccessoryName")}</span>
                   <input
-                    aria-label="Accessory name"
+                    aria-label={t("ui.modelingcatalogformpanelAccessoryName")}
                     value={accessory.accessoryName ?? ""}
                     onChange={(event) => updateAdditionalAccessory(index, { accessoryName: event.target.value })}
                     placeholder={t("ui.name")}
@@ -437,8 +427,8 @@ export function ModelingCatalogFormPanel({
                 <button
                   type="button"
                   className="button-with-icon catalog-accessory-action-button catalog-accessory-remove-button"
-                  aria-label={`Remove accessory ${index + 1}`}
-                  title={`Remove accessory ${index + 1}`}
+                  aria-label={t("ui.modelingcatalogformpanelRemoveAccessoryIndex", { index: index + 1 })}
+                  title={t("ui.modelingcatalogformpanelRemoveAccessoryIndex", { index: index + 1 })}
                   onClick={() =>
                     setCatalogAdditionalAccessories(
                       catalogAdditionalAccessories.filter((_accessory, accessoryIndex) => accessoryIndex !== index)
@@ -466,43 +456,37 @@ export function ModelingCatalogFormPanel({
               checked={catalogAllSameTerminals}
               onChange={(event) => setCatalogAllSameTerminals(event.target.checked)}
             />
-            All same terminals
-          </label>
+            {t("ui.modelingcatalogformpanelAllSameTerminals")}</label>
           <label>
-            Default terminal reference
-            <input
+            {t("ui.modelingcatalogformpanelDefaultTerminalReference")}<input
               value={catalogDefaultTerminalReference}
               onChange={(event) => setCatalogDefaultTerminalReference(event.target.value)}
-              placeholder="Optional terminal ref"
+              placeholder={t("ui.modelingcatalogformpanelOptionalTerminalRef")}
             />
           </label>
           <label>
-            Default terminal name
-            <input
+            {t("ui.modelingcatalogformpanelDefaultTerminalName")}<input
               value={catalogDefaultTerminalName}
               onChange={(event) => setCatalogDefaultTerminalName(event.target.value)}
-              placeholder="Optional terminal name"
+              placeholder={t("ui.modelingcatalogformpanelOptionalTerminalName")}
             />
           </label>
           <label>
-            Default seal reference
-            <input
+            {t("ui.modelingcatalogformpanelDefaultSealReference")}<input
               value={catalogDefaultSealReference}
               onChange={(event) => setCatalogDefaultSealReference(event.target.value)}
-              placeholder="Optional seal ref"
+              placeholder={t("ui.modelingcatalogformpanelOptionalSealRef")}
             />
           </label>
           <label>
-            Default seal name
-            <input
+            {t("ui.modelingcatalogformpanelDefaultSealName")}<input
               value={catalogDefaultSealName}
               onChange={(event) => setCatalogDefaultSealName(event.target.value)}
-              placeholder="Optional seal name"
+              placeholder={t("ui.modelingcatalogformpanelOptionalSealName")}
             />
           </label>
           <label>
-            Plug definitions
-            <textarea
+            {t("ui.modelingcatalogformpanelPlugDefinitions")}<textarea
               value={catalogPlugDefinitionsText}
               onChange={(event) => setCatalogPlugDefinitionsText(event.target.value)}
               placeholder={"PLUG-REF,2,Plug name\nPLUG-ALT,1"}
@@ -515,12 +499,10 @@ export function ModelingCatalogFormPanel({
               checked={catalogRearBackshellEnabled}
               onChange={(event) => setCatalogRearBackshellEnabled(event.target.checked)}
             />
-            Rear backshell helper node
-          </label>
+            {t("ui.modelingcatalogformpanelRearBackshellHelperNode")}</label>
           {catalogRearBackshellEnabled ? (
             <label>
-              Rear backshell length (mm)
-              <input
+              {t("ui.modelingcatalogformpanelRearBackshellLengthMm")}<input
                 type="number"
                 min={1}
                 step={0.1}
@@ -549,7 +531,7 @@ export function ModelingCatalogFormPanel({
             connectorLayout={catalogConnectorLayout}
             allowInheritedRoles={false}
             mode="panel"
-            title="Pin electric roles"
+            title={t("ui.modelingcatalogformpanelPinElectricRoles")}
             showPanelHeader={false}
           />
           <div className="row-actions catalog-item-submit-actions">
@@ -576,12 +558,10 @@ export function ModelingCatalogFormPanel({
               onClick={() => setCatalogConnectorLayout(createDefaultConnectorLayout(resolveCatalogLayoutConnectionCount()))}
             >
               <span className="action-button-icon is-catalog" aria-hidden="true" />
-              Auto layout
-            </button>
+              {t("ui.modelingcatalogformpanelAutoLayout")}</button>
             <button type="button" className="button-with-icon" onClick={() => setCatalogConnectorLayout(undefined)}>
               <span className="action-button-icon is-cancel" aria-hidden="true" />
-              Clear custom layout
-            </button>
+              {t("ui.modelingcatalogformpanelClearCustomLayout")}</button>
           </div>
           {renderCatalogFormError()}
         </article>

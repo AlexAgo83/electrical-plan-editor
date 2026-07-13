@@ -222,7 +222,7 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
   if (rows.length === 0) {
     return {
       rows: [],
-      issues: [{ kind: "error", rowNumber: 1, message: "CSV is empty." }],
+      issues: [{ kind: "error", rowNumber: 1, message: t("ui.catalogcsvCsvIsEmpty") }],
       schema: "current"
     };
   }
@@ -328,7 +328,7 @@ export function parseCatalogCsvImportText(text: string): CatalogCsvImportParseRe
       issues.push({
         kind: "error",
         rowNumber,
-        message: "Unit price (excl. tax) must be a valid number >= 0 when provided."
+        message: t("ui.catalogcsvUnitPriceExclTaxMustBeAValidNumber0")
       });
       continue;
     }

@@ -242,7 +242,7 @@ export function useNodeHandlers({
       }
 
       await confirmAction({
-        title: "Node delete blocked",
+        title: t("ui.usenodehandlersNodeDeleteBlocked"),
         message: impact.message,
         confirmLabel: t("ui.close"),
         cancelLabel: t("ui.cancel"),

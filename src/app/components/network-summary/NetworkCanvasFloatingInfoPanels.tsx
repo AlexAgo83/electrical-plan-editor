@@ -56,7 +56,7 @@ export function NetworkCanvasFloatingInfoPanels({
         <label className="network-canvas-global-scale">
           <span className="network-canvas-global-scale-label">
             <span className="action-button-icon is-zoom" aria-hidden="true" />
-            <span>Zoom view</span>
+            <span>{t("ui.networkcanvasfloatinginfopanelsZoomView")}</span>
           </span>
           <input
             type="range"
@@ -78,8 +78,8 @@ export function NetworkCanvasFloatingInfoPanels({
           <button
             type="button"
             className="workspace-tab network-canvas-zoom-button"
-            aria-label="Scale Down"
-            title="Scale Down"
+            aria-label={t("ui.networkcanvasfloatinginfopanelsScaleDown")}
+            title={t("ui.networkcanvasfloatinginfopanelsScaleDown")}
             onClick={() => handleZoomAction("out")}
           >
             <span className="action-button-icon is-scale-up" aria-hidden="true" />
@@ -88,8 +88,8 @@ export function NetworkCanvasFloatingInfoPanels({
           <button
             type="button"
             className="workspace-tab network-canvas-zoom-button"
-            aria-label="Scale Up"
-            title="Scale Up"
+            aria-label={t("ui.networkcanvasfloatinginfopanelsScaleUp")}
+            title={t("ui.networkcanvasfloatinginfopanelsScaleUp")}
             onClick={() => handleZoomAction("in")}
           >
             <span className="action-button-icon is-scale-up" aria-hidden="true" />
@@ -106,17 +106,15 @@ export function NetworkCanvasFloatingInfoPanels({
         </div>
         {selectedCanvasNodeCount > 1 ? (
           <div className="network-canvas-floating-guidance">
-            <p className="meta-line network-canvas-floating-copy">Drag one selected node to move the full group.</p>
+            <p className="meta-line network-canvas-floating-copy">{t("ui.networkcanvasfloatinginfopanelsDragOneSelectedNodeToMoveTheFullGroup")}</p>
           </div>
         ) : null}
         {selectedCanvasNodeCount > 0 ? (
           <div className="network-canvas-selection-summary" aria-live="polite">
             <p className="meta-line network-canvas-floating-copy">
-              {selectedCanvasNodeCount} node{selectedCanvasNodeCount > 1 ? "s" : ""} selected.
-            </p>
+              {selectedCanvasNodeCount} {t("ui.networkcanvasfloatinginfopanelsNode")}{selectedCanvasNodeCount > 1 ? "s" : ""} {t("ui.networkcanvasfloatinginfopanelsSelected")}</p>
             <button type="button" className="workspace-tab" onClick={clearSelectedCanvasNodes}>
-              Clear selection
-            </button>
+              {t("ui.networkcanvasfloatinginfopanelsClearSelection")}</button>
           </div>
         ) : null}
       </div>

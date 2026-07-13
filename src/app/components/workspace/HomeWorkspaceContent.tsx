@@ -58,7 +58,7 @@ const MarkdownBlock = lazy(async () => {
 
 function ChangelogMarkdownBlock({ content }: { content: string }): ReactElement {
   return (
-    <Suspense fallback={<p className="meta-line">Loading changelog...</p>}>
+    <Suspense fallback={<p className="meta-line">{t("ui.homeworkspacecontentLoadingChangelog")}</p>}>
       <MarkdownBlock content={content} />
     </Suspense>
   );
@@ -307,8 +307,7 @@ export function HomeWorkspaceContent({
             </div>
           </header>
           <p className="settings-panel-intro home-start-intro">
-            Start a new workspace flow, open a saved workspace file, or save a portable workspace copy.
-          </p>
+            {t("ui.homeworkspacecontentStartANewWorkspaceFlowOpenASavedWorkspaceFile")}</p>
           <div className="row-actions home-primary-actions">
             <button type="button" className="button-with-icon" onClick={onOpenModeling} disabled={!hasActiveNetwork}>
               <span className="action-button-icon is-edit" aria-hidden="true" />
@@ -352,7 +351,7 @@ export function HomeWorkspaceContent({
           <header className="home-panel-header">
             <h2>{t("ui.workspace")}</h2>
             <span className="settings-panel-chip">
-              {hasActiveNetwork && activeNetworkName !== null ? activeNetworkName : "No active network"}
+              {hasActiveNetwork && activeNetworkName !== null ? activeNetworkName : t("ui.appshelllayoutNoActiveNetwork")}
             </span>
           </header>
           <p className="settings-panel-intro home-resume-intro">
@@ -365,7 +364,7 @@ export function HomeWorkspaceContent({
       <section className="panel home-panel home-whats-new-panel">
         <header className="home-panel-header">
           <h2>{t("ui.whatSNew")}</h2>
-          <span className="settings-panel-chip">Changelog</span>
+          <span className="settings-panel-chip">{t("ui.homeworkspacecontentChangelog")}</span>
         </header>
         <p className="settings-panel-intro home-whats-new-intro">
           
@@ -374,7 +373,7 @@ export function HomeWorkspaceContent({
         <div
           ref={changelogScrollContainerRef}
           className="home-whats-new-scroll"
-          aria-label="Changelog feed"
+          aria-label={t("ui.homeworkspacecontentChangelogFeed")}
           tabIndex={0}
           data-visible-changelog-count={visibleChangelogCount}
           data-locale-exempt="true"
@@ -385,12 +384,12 @@ export function HomeWorkspaceContent({
             visibleChangelogEntries.map((entry) => {
               const content = changelogContentBySourcePath[entry.sourcePath];
               return (
-                <article key={entry.sourcePath} className="home-changelog-entry" aria-label={`Changelog v${entry.version}`}>
+                <article key={entry.sourcePath} className="home-changelog-entry" aria-label={t("ui.homeworkspacecontentChangelogVVersion", { version: entry.version })}>
                   <h3 className="home-changelog-version-heading" data-changelog-version={entry.version}>
                     v{entry.version}
                   </h3>
                   <div className="home-changelog-markdown">
-                    {content === undefined ? <p className="meta-line">Loading changelog...</p> : <ChangelogEntryMarkdown content={content} />}
+                    {content === undefined ? <p className="meta-line">{t("ui.homeworkspacecontentLoadingChangelog")}</p> : <ChangelogEntryMarkdown content={content} />}
                   </div>
                 </article>
               );

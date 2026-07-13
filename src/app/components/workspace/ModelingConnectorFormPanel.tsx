@@ -57,7 +57,7 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     missingOption:
       connectorCatalogItemId.trim().length === 0
         ? null
-        : { label: `Missing catalog item (${connectorCatalogItemId})` }
+        : { label: t("ui.missingCatalogItemValue", { itemId: connectorCatalogItemId }) }
   });
 
   const updateConnectorFusePairRating = (pairIndex: number, value: string): void => {
@@ -174,10 +174,10 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     {connectorManufacturerReference.trim().length > 0 ? (
       <small className="meta-line">
         {selectedCatalogItem === undefined ? (
-          `Manufacturer reference: ${connectorManufacturerReference}`
+          t("ui.manufacturerReferenceValue", { reference: connectorManufacturerReference })
         ) : (
           <EntityReferenceButton
-            title={`Open catalog item ${connectorManufacturerReference}`}
+            title={t("ui.modelingconnectorformpanelOpenCatalogItemConnectorManufacturerReference", { connectorManufacturerReference: connectorManufacturerReference })}
             onClick={() => onSelectCatalogItem(selectedCatalogItem.id)}
           >
             
@@ -198,11 +198,9 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
         checked={connectorIsMainHarnessConnector}
         onChange={(event) => setConnectorIsMainHarnessConnector(event.target.checked)}
       />
-      Main harness connector for functional view
-    </label>
+      {t("ui.modelingconnectorformpanelMainHarnessConnectorForFunctionalView")}</label>
     <label>
-      Rear backshell override
-      <select
+      {t("ui.modelingconnectorformpanelRearBackshellOverride")}<select
         value={connectorRearBackshellOverrideEnabled}
         onChange={(event) =>
           setConnectorRearBackshellOverrideEnabled(event.target.value as "inherit" | "enabled" | "disabled")
@@ -210,17 +208,16 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
       >
         <option value="inherit">
           {catalogRearBackshell === undefined
-            ? "Inherit catalog (disabled)"
+            ? t("ui.modelingconnectorformpanelInheritCatalogDisabled")
             : `Inherit catalog (enabled, ${catalogRearBackshell.lengthMm} mm)`}
         </option>
-        <option value="enabled">Enabled</option>
+        <option value="enabled">{t("ui.modelingconnectorformpanelEnabled")}</option>
         <option value="disabled">{t("ui.disabled")}</option>
       </select>
     </label>
     {connectorRearBackshellOverrideEnabled !== "disabled" ? (
       <label>
-        Rear backshell length override (mm, optional)
-        <input
+        {t("ui.modelingconnectorformpanelRearBackshellLengthOverrideMmOptional")}<input
           type="number"
           min={1}
           step={0.1}
@@ -233,19 +230,16 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
     {connectorCatalogFuseBoxPairs !== undefined && connectorCatalogFuseBoxPairs.length > 0 ? (
       <fieldset className="inline-fieldset fuse-rating-editor">
         <legend>
-          Fuse ratings
-          <button type="button" className="link-button fuse-rating-clear-action" onClick={clearConnectorFusePairRatings}>
-            Clear all
-          </button>
+          {t("ui.modelingconnectorformpanelFuseRatings")}<button type="button" className="link-button fuse-rating-clear-action" onClick={clearConnectorFusePairRatings}>
+            {t("ui.modelingconnectorformpanelClearAll")}</button>
           <button type="button" className="link-button fuse-rating-clear-action" onClick={resetConnectorFusePairOverridesToCatalog}>
-            Reset pairs to catalog
-          </button>
+            {t("ui.modelingconnectorformpanelResetPairsToCatalog")}</button>
         </legend>
-        <div className="fuse-rating-table" role="table" aria-label="Fuse ratings">
+        <div className="fuse-rating-table" role="table" aria-label={t("ui.modelingconnectorformpanelFuseRatings")}>
           <div className="fuse-rating-row fuse-rating-row--header" role="row">
-            <span role="columnheader">Pair</span>
-            <span role="columnheader">Pins</span>
-            <span role="columnheader">Rating</span>
+            <span role="columnheader">{t("ui.modelingconnectorformpanelPair")}</span>
+            <span role="columnheader">{t("ui.modelingconnectorformpanelPins")}</span>
+            <span role="columnheader">{t("ui.modelingconnectorformpanelRating")}</span>
           </div>
           {connectorCatalogFuseBoxPairs.map((pair) => {
             const draft = connectorFusePairRatings[pair.pairIndex] ?? "";
@@ -274,8 +268,8 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
                 </span>
                 <span className="fuse-rating-pins" role="cell">
                   <label className="fuse-rating-pin-input-label">
-                    <span className="sr-only">{`Pin A for fuse pair ${pair.pairIndex + 1}`}</span>
-                    <span className="fuse-rating-pin-prefix" aria-hidden="true">PIN</span>
+                    <span className="sr-only">{t("ui.modelingconnectorformpanelPinAForFusePairPairIndex", { pairIndex: pair.pairIndex + 1 })}</span>
+                    <span className="fuse-rating-pin-prefix" aria-hidden="true">{t("ui.modelingconnectorformpanelPin")}</span>
                     <input
                       type="number"
                       min={1}
@@ -290,8 +284,8 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
                   </label>
                   <span className="fuse-rating-pin-separator" aria-hidden="true">-</span>
                   <label className="fuse-rating-pin-input-label">
-                    <span className="sr-only">{`Pin B for fuse pair ${pair.pairIndex + 1}`}</span>
-                    <span className="fuse-rating-pin-prefix" aria-hidden="true">PIN</span>
+                    <span className="sr-only">{t("ui.modelingconnectorformpanelPinBForFusePairPairIndex", { pairIndex: pair.pairIndex + 1 })}</span>
+                    <span className="fuse-rating-pin-prefix" aria-hidden="true">{t("ui.modelingconnectorformpanelPin")}</span>
                     <input
                       type="number"
                       min={1}
@@ -308,9 +302,8 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
                 <span className="fuse-rating-value-cell" role="cell">
                   <label className="fuse-rating-input-label">
                     <span className="sr-only">
-                      Rating for fuse pair {pair.pairIndex + 1}, pins {pair.pinA} and {pair.pinB}, in amperes
-                    </span>
-                    <span className="fuse-rating-unit-prefix" aria-hidden="true">Amp</span>
+                      {t("ui.modelingconnectorformpanelRatingForFusePair")}{pair.pairIndex + 1}{t("ui.modelingconnectorformpanelPins2")}{pair.pinA} {t("ui.modelingconnectorformpanelAnd")}{pair.pinB}{t("ui.modelingconnectorformpanelInAmperes")}</span>
+                    <span className="fuse-rating-unit-prefix" aria-hidden="true">{t("ui.modelingconnectorformpanelAmp")}</span>
                     <input
                       type="number"
                       min={0}
@@ -334,11 +327,11 @@ export function ModelingConnectorFormPanel(props: ModelingFormsColumnProps): Rea
                     <button
                       type="button"
                       className="fuse-rating-preset-button"
-                      aria-label={`Choose preset rating for fuse pair ${pair.pairIndex + 1}`}
+                      aria-label={t("ui.modelingconnectorformpanelChoosePresetRatingForFusePairPairIndex", { pairIndex: pair.pairIndex + 1 })}
                       aria-haspopup="menu"
                       aria-expanded={isPresetMenuOpen}
                       aria-controls={presetMenuId}
-                      title={`Choose preset rating for fuse pair ${pair.pairIndex + 1}`}
+                      title={t("ui.modelingconnectorformpanelChoosePresetRatingForFusePairPairIndex", { pairIndex: pair.pairIndex + 1 })}
                       onClick={() =>
                         setOpenFuseRatingPresetPairIndex(isPresetMenuOpen ? null : pair.pairIndex)
                       }

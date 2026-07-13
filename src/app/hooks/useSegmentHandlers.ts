@@ -307,7 +307,7 @@ export function useSegmentHandlers({
       }
 
       await confirmAction({
-        title: "Segment delete blocked",
+        title: t("ui.usesegmenthandlersSegmentDeleteBlocked"),
         message: impact.message,
         confirmLabel: t("ui.close"),
         cancelLabel: t("ui.cancel"),

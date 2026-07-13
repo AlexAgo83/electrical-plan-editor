@@ -237,8 +237,8 @@ export function useNetworkImportExport({
       if (resolved.networks.length === 0) {
         const message = t("ui.noNetworkWasImportedCheckFileErrors");
         setImportFailureDialog({
-          title: "Network import failed",
-          message: "The selected file did not produce any importable network.",
+          title: t("ui.usenetworkimportexportNetworkImportFailed"),
+          message: t("ui.usenetworkimportexportTheSelectedFileDidNotProduceAnyImportableNetwork"),
           items: [...resolved.summary.errors, ...resolved.summary.warnings],
           onClose: () => setImportFailureDialog(null)
         });
@@ -278,7 +278,7 @@ export function useNetworkImportExport({
           (r) => `'${r.name || r.technicalId || r.networkId}': ${r.reason}`
         );
         setImportFailureDialog({
-          title: "Network import rejected",
+          title: t("ui.usenetworkimportexportNetworkImportRejected"),
           message:
             reducerRejections.length === 1
               ? "The import was rejected by the workspace."
@@ -302,7 +302,7 @@ export function useNetworkImportExport({
         resolved.summary.errors.length > 0 || resolved.summary.warnings.length > 0 ? "partial" : "success";
       setImportExportStatus({
         kind: importStatusKind,
-        message: `Imported ${resolved.networks.length} network(s).`
+        message: t("ui.networksImported", { count: resolved.networks.length })
       });
       notifyToast?.("Networks imported", {
         message: formatImportSummaryMessage(resolved.summary),
@@ -413,7 +413,7 @@ export function useNetworkImportExport({
       }
 
       if (allSheets.length === 0) {
-        setImportExportStatus({ kind: "failed", message: "No network data found for selected networks." });
+        setImportExportStatus({ kind: "failed", message: t("ui.usenetworkimportexportNoNetworkDataFoundForSelectedNetworks") });
         return;
       }
 
@@ -493,7 +493,7 @@ export function useNetworkImportExport({
       }
 
       if (allSheets.length === 0) {
-        setImportExportStatus({ kind: "failed", message: "No network data found for selected networks." });
+        setImportExportStatus({ kind: "failed", message: t("ui.usenetworkimportexportNoNetworkDataFoundForSelectedNetworks") });
         return;
       }
 
@@ -529,7 +529,7 @@ export function useNetworkImportExport({
         return network === undefined ? [] : [network];
       });
       if (validNetworks.length === 0) {
-        setImportExportStatus({ kind: "failed", message: "No network data found for selected networks." });
+        setImportExportStatus({ kind: "failed", message: t("ui.usenetworkimportexportNoNetworkDataFoundForSelectedNetworks") });
         return;
       }
       try {
@@ -561,7 +561,7 @@ export function useNetworkImportExport({
         }
         if (format === "pdf") {
           if (pdfPages.length === 0) {
-            setImportExportStatus({ kind: "failed", message: "No PDF page could be rendered for selected networks." });
+            setImportExportStatus({ kind: "failed", message: t("ui.usenetworkimportexportNoPDFPageCouldBeRenderedForSelectedNetworks") });
             return;
           }
           const blob = buildImagePdfBlob(pdfPages);
@@ -610,8 +610,8 @@ export function useNetworkImportExport({
     } catch {
       const message = t("ui.unableToReadSelectedFile");
       setImportFailureDialog({
-        title: "Network import failed",
-        message: "The selected file could not be read.",
+        title: t("ui.usenetworkimportexportNetworkImportFailed"),
+        message: t("ui.usenetworkimportexportTheSelectedFileCouldNotBeRead"),
         items: [file.name],
         onClose: () => setImportFailureDialog(null)
       });
@@ -631,8 +631,8 @@ export function useNetworkImportExport({
     if (parsed.payload === null) {
       const message = parsed.error ?? t("ui.invalidImportFile");
       setImportFailureDialog({
-        title: "Network import failed",
-        message: "The selected file is not a valid network export.",
+        title: t("ui.usenetworkimportexportNetworkImportFailed"),
+        message: t("ui.usenetworkimportexportTheSelectedFileIsNotAValidNetworkExport"),
         items: [message],
         onClose: () => setImportFailureDialog(null)
       });
@@ -695,7 +695,7 @@ export function useNetworkImportExport({
             setPendingOverwriteImport(null);
             setImportExportStatus(null);
             notifyToast?.("Import cancelled", {
-              message: "No changes were applied.",
+              message: t("ui.usenetworkimportexportNoChangesWereApplied"),
               variant: "info"
             });
           }

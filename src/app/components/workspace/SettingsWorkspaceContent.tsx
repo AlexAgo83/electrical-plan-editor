@@ -376,9 +376,9 @@ export function SettingsWorkspaceContent({
   const canExportSelectedNetworks = selectedExportCount > 0;
   const workspaceStoragePrimaryAction = workspaceFileStatus.conflict
     ? {
-        label: "Resolve conflict",
-        ariaLabel: "Resolve workspace file conflict",
-        title: "Review the linked file conflict options",
+        label: t("ui.settingsworkspacecontentResolveConflict"),
+        ariaLabel: t("ui.settingsworkspacecontentResolveWorkspaceFileConflict"),
+        title: t("ui.settingsworkspacecontentReviewTheLinkedFileConflictOptions"),
         onClick: loadLinkedFileVersion,
         disabled: false,
         iconClassName: "action-button-icon is-open"
@@ -386,34 +386,34 @@ export function SettingsWorkspaceContent({
     : workspaceFileStatus.mode === "linked"
       ? workspaceFileStatus.permission === "denied" || workspaceFileStatus.fileAvailability === "unavailable"
         ? {
-            label: "Restore file access",
+            label: t("ui.settingsworkspacecontentRestoreFileAccess"),
             ariaLabel: relinkWorkspaceAriaLabel,
-            title: "Choose the workspace file again to restore browser permission",
+            title: t("ui.settingsworkspacecontentChooseTheWorkspaceFileAgainToRestoreBrowserPermission"),
             onClick: relinkWorkspaceFile,
             disabled: false,
             iconClassName: "action-button-icon is-swap"
           }
         : {
             label: workspaceFileStatus.isSaving ? "Saving..." : "Save now",
-            ariaLabel: "Save workspace file now",
-            title: "Save the current workspace to the linked file now",
+            ariaLabel: t("ui.settingsworkspacecontentSaveWorkspaceFileNow"),
+            title: t("ui.settingsworkspacecontentSaveTheCurrentWorkspaceToTheLinkedFileNow"),
             onClick: saveWorkspaceFileNow,
             disabled: workspaceFileStatus.isSaving,
             iconClassName: "action-button-icon is-save"
           }
       : workspaceFileStatus.canResume
         ? {
-            label: "Resume last file",
-            ariaLabel: "Resume workspace file",
-            title: "Resume the last workspace file remembered by this browser",
+            label: t("ui.settingsworkspacecontentResumeLastFile"),
+            ariaLabel: t("ui.operationshealthpanelResumeWorkspaceFile"),
+            title: t("ui.operationshealthpanelResumeTheLastWorkspaceFileRememberedByThisBrowser"),
             onClick: resumeWorkspaceFile,
             disabled: false,
             iconClassName: "action-button-icon is-redo"
           }
         : {
-            label: "Save as file",
-            ariaLabel: "Save workspace file as",
-            title: "Save a new workspace file copy",
+            label: t("ui.settingsworkspacecontentSaveAsFile"),
+            ariaLabel: t("ui.operationshealthpanelSaveWorkspaceFileAs"),
+            title: t("ui.operationshealthpanelSaveANewWorkspaceFileCopy"),
             onClick: saveWorkspaceFileAs,
             disabled: false,
             iconClassName: "action-button-icon is-save"
@@ -484,19 +484,19 @@ export function SettingsWorkspaceContent({
   }, [activeSettingsSectionId]);
 
   return (
-    <section className="settings-workspace" aria-label="Settings workspace">
+    <section className="settings-workspace" aria-label={t("ui.settingsworkspacecontentSettingsWorkspace")}>
       <div className="settings-search-toolbar">
         <SettingsSearchControl />
         {hasSearchQuery ? (
           <div className={totalMatchCount > 0 ? "settings-search-summary" : "settings-search-summary is-empty"} role="status">
-            {totalMatchCount > 0 ? `${totalMatchCount} matching setting label${totalMatchCount === 1 ? "" : "s"}` : "No setting label matches this search."}
+            {totalMatchCount > 0 ? `${totalMatchCount} matching setting label${totalMatchCount === 1 ? "" : "s"}` : t("ui.settingsworkspacecontentNoSettingLabelMatchesThisSearch")}
             <button type="button" onClick={() => setSettingsSearchQuery("")}>{t("ui.clear")}</button>
           </div>
         ) : null}
       </div>
       <div className="settings-sectioned-layout">
-        <nav className="panel settings-panel settings-section-nav" aria-label="Settings sections">
-          <p className="settings-section-nav-title">Sections</p>
+        <nav className="panel settings-panel settings-section-nav" aria-label={t("ui.settingsworkspacecontentSettingsSections")}>
+          <p className="settings-section-nav-title">{t("ui.settingsworkspacecontentSections")}</p>
           {settingsSections.map((section) => {
             const matchCount = matchedSectionCounts.find((entry) => entry.id === section.id)?.count ?? 0;
             const sectionButtonClassName = [
@@ -518,18 +518,17 @@ export function SettingsWorkspaceContent({
             );
           })}
         </nav>
-        <section ref={contentRef} className="panel settings-panel panel-grid settings-panel-grid settings-section-list" aria-label="Settings sections list">
+        <section ref={contentRef} className="panel settings-panel panel-grid settings-panel-grid settings-section-list" aria-label={t("ui.settingsworkspacecontentSettingsSectionsList")}>
       <section id="settings-workspace-storage" className="panel settings-panel">
         <header className="settings-panel-header">
-          <h2>Workspace storage</h2>
-          <span className="settings-panel-chip">Storage</span>
+          <h2>{t("ui.operationshealthpanelWorkspaceStorage")}</h2>
+          <span className="settings-panel-chip">{t("ui.settingsworkspacecontentStorage")}</span>
         </header>
         <p className="settings-panel-intro">
-          Choose where this workspace lives. The browser always keeps a local fallback; file actions are for portable copies and cloud-folder sync.
-        </p>
-        <div className={`settings-storage-current ${workspaceStorageStatusTone}`} aria-label="Workspace storage status">
+          {t("ui.settingsworkspacecontentChooseWhereThisWorkspaceLivesTheBrowserAlwaysKeepsA")}</p>
+        <div className={`settings-storage-current ${workspaceStorageStatusTone}`} aria-label={t("ui.settingsworkspacecontentWorkspaceStorageStatus")}>
           <div className="settings-storage-current-copy">
-            <span className="settings-storage-current-kicker">Current save location</span>
+            <span className="settings-storage-current-kicker">{t("ui.settingsworkspacecontentCurrentSaveLocation")}</span>
             <strong>{workspaceStorageTitle}</strong>
             <p>{workspaceStorageDescription}</p>
           </div>
@@ -548,13 +547,13 @@ export function SettingsWorkspaceContent({
           </div>
         </div>
         {workspaceFileStatus.message !== null ? <p className="meta-line settings-storage-message">{workspaceFileStatus.message}</p> : null}
-        <div className="row-actions settings-actions settings-storage-secondary-actions" aria-label="More workspace file actions">
+        <div className="row-actions settings-actions settings-storage-secondary-actions" aria-label={t("ui.settingsworkspacecontentMoreWorkspaceFileActions")}>
           <button
             type="button"
             className="button-with-icon"
             onClick={openWorkspaceFile}
-            aria-label="Open workspace file"
-            title="Open a workspace file and replace the current workspace"
+            aria-label={t("ui.operationshealthpanelOpenWorkspaceFile")}
+            title={t("ui.operationshealthpanelOpenAWorkspaceFileAndReplaceTheCurrentWorkspace")}
           >
             <span className="action-button-icon is-open" aria-hidden="true" />
             {renderSettingLabel("Open workspace file")}
@@ -564,8 +563,8 @@ export function SettingsWorkspaceContent({
               type="button"
               className="button-with-icon"
               onClick={saveWorkspaceFileAs}
-              aria-label="Save workspace file as"
-              title="Save a new workspace file copy"
+              aria-label={t("ui.operationshealthpanelSaveWorkspaceFileAs")}
+              title={t("ui.operationshealthpanelSaveANewWorkspaceFileCopy")}
             >
               <span className="action-button-icon is-save" aria-hidden="true" />
               {renderSettingLabel("Save as copy")}
@@ -576,8 +575,8 @@ export function SettingsWorkspaceContent({
               type="button"
               className="button-with-icon"
               onClick={resumeWorkspaceFile}
-              aria-label="Resume workspace file"
-              title="Resume the last workspace file remembered by this browser"
+              aria-label={t("ui.operationshealthpanelResumeWorkspaceFile")}
+              title={t("ui.operationshealthpanelResumeTheLastWorkspaceFileRememberedByThisBrowser")}
             >
               <span className="action-button-icon is-redo" aria-hidden="true" />
               {renderSettingLabel("Resume last file")}
@@ -587,8 +586,8 @@ export function SettingsWorkspaceContent({
             type="button"
             className="button-with-icon"
             onClick={relinkWorkspaceFile}
-            aria-label="Use a file for autosave"
-            title={`${relinkWorkspaceLabel} a workspace file for direct file autosave when supported`}
+            aria-label={t("ui.settingsworkspacecontentUseAFileForAutosave")}
+            title={t("ui.settingsworkspacecontentRelinkworkspacelabelAWorkspaceFileForDirectFileAutosaveWhenSupported", { relinkWorkspaceLabel: relinkWorkspaceLabel })}
           >
             <span className="action-button-icon is-swap" aria-hidden="true" />
             {renderSettingLabel("Use a file for autosave")}
@@ -600,8 +599,8 @@ export function SettingsWorkspaceContent({
                 className="button-with-icon"
                 onClick={saveWorkspaceFileNow}
                 disabled={workspaceFileStatus.isSaving}
-                aria-label="Save workspace file now"
-                title="Save the current workspace to the linked file now"
+                aria-label={t("ui.settingsworkspacecontentSaveWorkspaceFileNow")}
+                title={t("ui.settingsworkspacecontentSaveTheCurrentWorkspaceToTheLinkedFileNow")}
               >
                 <span className="action-button-icon is-save" aria-hidden="true" />
                 {renderSettingLabel("Save now")}
@@ -610,8 +609,8 @@ export function SettingsWorkspaceContent({
                 type="button"
                 className="button-with-icon"
                 onClick={unlinkWorkspaceFile}
-                aria-label="Unlink workspace file"
-                title="Stop autosaving to the linked file and keep browser-local persistence"
+                aria-label={t("ui.settingsworkspacecontentUnlinkWorkspaceFile")}
+                title={t("ui.settingsworkspacecontentStopAutosavingToTheLinkedFileAndKeepBrowserLocal")}
               >
                 <span className="action-button-icon is-swap" aria-hidden="true" />
                 {renderSettingLabel("Stop autosave link")}
@@ -621,7 +620,7 @@ export function SettingsWorkspaceContent({
         </div>
         {workspaceFileStatus.conflict ? (
           <div className="settings-conflict-panel" role="alert">
-            <p>The linked file changed outside this tab. Choose which workspace version to keep before autosave resumes.</p>
+            <p>{t("ui.settingsworkspacecontentTheLinkedFileChangedOutsideThisTabChooseWhichWorkspace")}</p>
             <div className="row-actions settings-actions">
               <button type="button" onClick={loadLinkedFileVersion}>{renderSettingLabel("Load file version")}</button>
               <button type="button" onClick={keepLocalWorkspaceVersion}>{renderSettingLabel("Keep local version")}</button>
@@ -630,32 +629,32 @@ export function SettingsWorkspaceContent({
           </div>
         ) : null}
         <details className="settings-storage-technical-details">
-          <summary>Storage details</summary>
-          <div className="settings-state-row" aria-label="Workspace technical storage status">
+          <summary>{t("ui.settingsworkspacecontentStorageDetails")}</summary>
+          <div className="settings-state-row" aria-label={t("ui.settingsworkspacecontentWorkspaceTechnicalStorageStatus")}>
             <span className={workspaceFileStatus.conflict ? "settings-state-chip is-warn" : "settings-state-chip is-ok"}>
               {workspaceFileStatus.label}
             </span>
             <span className="settings-state-chip">
-              {workspaceFileStatus.mode === "linked" ? "Linked file" : "Local only"}
+              {workspaceFileStatus.mode === "linked" ? t("ui.settingssearchmodelLinkedFile") : t("ui.operationshealthpanelLocalOnly")}
             </span>
             <span className="settings-state-chip">
-              Permission: {workspaceFileStatus.permission}
+              {t("ui.settingsworkspacecontentPermission")}{workspaceFileStatus.permission}
             </span>
             <span className="settings-state-chip">
-              {workspaceFileStatus.directFileAccessSupported ? "Direct file access" : "Fallback download"}
+              {workspaceFileStatus.directFileAccessSupported ? t("ui.settingsworkspacecontentDirectFileAccess") : t("ui.settingsworkspacecontentFallbackDownload")}
             </span>
             <span className={workspaceFileStatus.fileAvailability === "unavailable" ? "settings-state-chip is-warn" : "settings-state-chip"}>
-              File: {workspaceFileStatus.fileAvailability === "available" ? "Available" : workspaceFileStatus.fileAvailability === "unavailable" ? "Unavailable" : "Unknown"}
+              {t("ui.operationshealthpanelFile")}{workspaceFileStatus.fileAvailability === "available" ? t("ui.networkscopeworkspacecontentAvailable") : workspaceFileStatus.fileAvailability === "unavailable" ? "Unavailable" : "Unknown"}
             </span>
           </div>
           <dl className="settings-storage-details">
             <div>
               <dt>{renderSettingLabel("Persistence mode")}</dt>
-              <dd>{workspaceFileStatus.mode === "linked" ? "Linked file with local cache" : "Local browser storage only"}</dd>
+              <dd>{workspaceFileStatus.mode === "linked" ? t("ui.settingsworkspacecontentLinkedFileWithLocalCache") : t("ui.settingsworkspacecontentLocalBrowserStorageOnly")}</dd>
             </div>
             <div>
-              <dt>Autosave target</dt>
-              <dd>{workspaceFileStatus.saveTarget === "linked-file" ? "Linked workspace file" : workspaceFileStatus.saveTarget === "download" ? "Downloaded workspace copy" : "Local browser cache"}</dd>
+              <dt>{t("ui.settingsworkspacecontentAutosaveTarget")}</dt>
+              <dd>{workspaceFileStatus.saveTarget === "linked-file" ? t("ui.settingsworkspacecontentLinkedWorkspaceFile") : workspaceFileStatus.saveTarget === "download" ? "Downloaded workspace copy" : "Local browser cache"}</dd>
             </div>
             <div>
               <dt>{renderSettingLabel("Linked file")}</dt>
@@ -668,7 +667,7 @@ export function SettingsWorkspaceContent({
                     className="settings-storage-file-link"
                     onClick={openLinkedWorkspaceFile}
                     disabled={workspaceFileStatus.mode !== "linked"}
-                    title="Open the linked workspace file in a new browser tab"
+                    title={t("ui.settingsworkspacecontentOpenTheLinkedWorkspaceFileInANewBrowserTab")}
                   >
                     {workspaceFileStatus.fileName}
                   </button>
@@ -676,7 +675,7 @@ export function SettingsWorkspaceContent({
               </dd>
             </div>
             <div>
-              <dt>Resumable file</dt>
+              <dt>{t("ui.settingsworkspacecontentResumableFile")}</dt>
               <dd>
                 {workspaceFileStatus.resumeFileName === null ? (
                   t("ui.none")
@@ -686,7 +685,7 @@ export function SettingsWorkspaceContent({
                     className="settings-storage-file-link"
                     onClick={openResumableWorkspaceFile}
                     disabled={!workspaceFileStatus.canResume}
-                    title="Open the resumable workspace file in a new browser tab"
+                    title={t("ui.settingsworkspacecontentOpenTheResumableWorkspaceFileInANewBrowserTab")}
                   >
                     {workspaceFileStatus.resumeFileName}
                   </button>
@@ -694,11 +693,11 @@ export function SettingsWorkspaceContent({
               </dd>
             </div>
             <div>
-              <dt>Resume status</dt>
-              <dd>{workspaceFileStatus.resumeStatus === "available" ? "Resume available" : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Resume unavailable" : "No resumable file"}</dd>
+              <dt>{t("ui.settingsworkspacecontentResumeStatus")}</dt>
+              <dd>{workspaceFileStatus.resumeStatus === "available" ? t("ui.settingsworkspacecontentResumeAvailable") : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Resume unavailable" : "No resumable file"}</dd>
             </div>
             <div>
-              <dt>Last saved</dt>
+              <dt>{t("ui.settingsworkspacecontentLastSaved")}</dt>
               <dd>{formatWorkspaceSavedAt(workspaceFileStatus.lastSavedAtIso)}</dd>
             </div>
           </dl>
@@ -711,15 +710,14 @@ export function SettingsWorkspaceContent({
           <span className="settings-panel-chip">{t("ui.portability")}</span>
         </header>
         <p className="settings-panel-intro">
-          JSON above, grouped exports below.
-        </p>
+          {t("ui.settingsworkspacecontentJsonAboveGroupedExportsBelow")}</p>
         <div className="settings-import-export-grid">
           <div className="settings-import-export-actions-column">
-            <section className="settings-export-package-card settings-export-package-card--top" aria-label="Network JSON export actions">
+            <section className="settings-export-package-card settings-export-package-card--top" aria-label={t("ui.settingsworkspacecontentNetworkJSONExportActions")}>
               <div className="settings-export-package-head">
                 <div>
-                  <h3>Network JSON</h3>
-                  <p>Active, selected, all.</p>
+                  <h3>{t("ui.settingsworkspacecontentNetworkJSON")}</h3>
+                  <p>{t("ui.settingsworkspacecontentActiveSelectedAll")}</p>
                 </div>
                 <span className="settings-state-chip">JSON</span>
               </div>
@@ -770,7 +768,7 @@ export function SettingsWorkspaceContent({
             <p className="meta-line settings-export-selection-summary">
               {canExportSelectedNetworks
                 ? `${selectedExportCount} network${selectedExportCount === 1 ? "" : "s"} selected.`
-                : "Select one or more networks."}
+                : t("ui.settingsworkspacecontentSelectOneOrMoreNetworks")}
             </p>
             {networks.length === 0 ? (
               <p className="empty-copy">{t("ui.noNetworkAvailable")}</p>
@@ -796,18 +794,18 @@ export function SettingsWorkspaceContent({
               </div>
             )}
           </fieldset>
-          <section className="settings-export-package-card settings-export-package-card--selected settings-export-package-card--full" aria-label="Selected networks export package">
+          <section className="settings-export-package-card settings-export-package-card--selected settings-export-package-card--full" aria-label={t("ui.settingsworkspacecontentSelectedNetworksExportPackage")}>
             <div className="settings-export-package-head">
               <div>
                 <h3>{t("ui.exportSelected")}</h3>
-                <p>Grouped outputs.</p>
+                <p>{t("ui.settingsworkspacecontentGroupedOutputs")}</p>
               </div>
             </div>
             <div className="settings-export-selected-grid">
               <article className="settings-export-option-group">
                 <div className="settings-export-option-copy">
-                  <h4>Wire list</h4>
-                  <p>One XLSX workbook.</p>
+                  <h4>{t("ui.settingsworkspacecontentWireList")}</h4>
+                  <p>{t("ui.settingsworkspacecontentOneXLSXWorkbook")}</p>
                 </div>
                 <div className="row-actions settings-actions settings-export-single-action">
                   <button
@@ -822,8 +820,8 @@ export function SettingsWorkspaceContent({
               </article>
               <article className="settings-export-option-group">
                 <div className="settings-export-option-copy">
-                  <h4>BOM grouped</h4>
-                  <p>One XLSX workbook.</p>
+                  <h4>{t("ui.settingsworkspacecontentBomGrouped")}</h4>
+                  <p>{t("ui.settingsworkspacecontentOneXLSXWorkbook")}</p>
                 </div>
                 <div className="row-actions settings-actions settings-export-single-action">
                   <button
@@ -838,8 +836,8 @@ export function SettingsWorkspaceContent({
               </article>
               <article className="settings-export-option-group settings-export-option-group--plan">
                 <div className="settings-export-option-copy">
-                  <h4>Network plan</h4>
-                  <p>SVG, PNG, or PDF.</p>
+                  <h4>{t("ui.settingsworkspacecontentNetworkPlan")}</h4>
+                  <p>{t("ui.settingsworkspacecontentSvgPNGOrPDF")}</p>
                 </div>
                 <div className="row-actions settings-actions settings-export-plan-actions">
                   <button
@@ -847,7 +845,7 @@ export function SettingsWorkspaceContent({
                     className="button-with-icon settings-export-action-button settings-export-plan-button"
                     onClick={() => handleExportGroupedSvg?.(selectedExportNetworkIds)}
                     disabled={!canExportSelectedNetworks || handleExportGroupedSvg === undefined}
-                    aria-label="Export selected SVG"
+                    aria-label={t("ui.settingsworkspacecontentExportSelectedSVG")}
                   >
                     <span className="network-summary-export-icon" aria-hidden="true" />
                     SVG
@@ -857,7 +855,7 @@ export function SettingsWorkspaceContent({
                     className="button-with-icon settings-export-action-button settings-export-plan-button"
                     onClick={() => handleExportGroupedPng?.(selectedExportNetworkIds)}
                     disabled={!canExportSelectedNetworks || handleExportGroupedPng === undefined}
-                    aria-label="Export selected PNG"
+                    aria-label={t("ui.settingsworkspacecontentExportSelectedPNG")}
                   >
                     <span className="network-summary-export-icon" aria-hidden="true" />
                     PNG
@@ -867,7 +865,7 @@ export function SettingsWorkspaceContent({
                     className="button-with-icon settings-export-action-button settings-export-plan-button"
                     onClick={() => handleExportGroupedPdf?.(selectedExportNetworkIds)}
                     disabled={!canExportSelectedNetworks || handleExportGroupedPdf === undefined}
-                    aria-label="Export selected PDF"
+                    aria-label={t("ui.settingsworkspacecontentExportSelectedPDF")}
                   >
                     <span className="network-summary-export-icon" aria-hidden="true" />
                     PDF
@@ -887,8 +885,8 @@ export function SettingsWorkspaceContent({
               <p className="meta-line"><span>{t("ui.errors2")}</span> <strong>{lastImportSummary.errors.length}</strong></p>
             </div>
             {lastImportSummary.warnings.length > 0 ? (
-              <div className="settings-import-details is-warning" role="status" aria-label="Import warning details">
-                <h3>Warning details</h3>
+              <div className="settings-import-details is-warning" role="status" aria-label={t("ui.settingsworkspacecontentImportWarningDetails")}>
+                <h3>{t("ui.settingsworkspacecontentWarningDetails")}</h3>
                 <ul>
                   {lastImportSummary.warnings.map((warning, index) => (
                     <li key={`${index}-${warning}`}>{warning}</li>
@@ -897,8 +895,8 @@ export function SettingsWorkspaceContent({
               </div>
             ) : null}
             {lastImportSummary.errors.length > 0 ? (
-              <div className="settings-import-details is-error" role="alert" aria-label="Import error details">
-                <h3>Error details</h3>
+              <div className="settings-import-details is-error" role="alert" aria-label={t("ui.settingsworkspacecontentImportErrorDetails")}>
+                <h3>{t("ui.settingsworkspacecontentErrorDetails")}</h3>
                 <ul>
                   {lastImportSummary.errors.map((error, index) => (
                     <li key={`${index}-${error}`}>{error}</li>
@@ -1589,25 +1587,21 @@ export function SettingsWorkspaceContent({
 
       <section id="settings-ai-provider" className="panel settings-panel" data-onboarding-panel="settings-ai-provider">
         <header className="settings-panel-header">
-          <h2>AI provider</h2>
-          <span className="settings-panel-chip">AI</span>
+          <h2>{t("ui.settingsworkspacecontentAiProvider")}</h2>
+          <span className="settings-panel-chip">{t("ui.settingsworkspacecontentAi")}</span>
         </header>
         <p className="settings-panel-intro">
-          Configure the local provider used by the Modeling AI Agent. API keys are stored locally in this browser.
-          <span className="settings-info-tooltip">
-            <button type="button" className="settings-info-tooltip-button" aria-label="AI provider API key security notice">
+          {t("ui.settingsworkspacecontentConfigureTheLocalProviderUsedByTheModelingAIAgent")}<span className="settings-info-tooltip">
+            <button type="button" className="settings-info-tooltip-button" aria-label={t("ui.settingsworkspacecontentAiProviderAPIKeySecurityNotice")}>
               i
             </button>
             <span className="settings-info-tooltip-popover" role="tooltip">
-              Warning: your API key is kept in this browser&apos;s localStorage and sent directly to the provider over HTTPS.
-              Anyone with access to this browser profile (extensions, shared device) can read it. Avoid using personal or
-              high-privilege keys, and prefer a dedicated proxy when sharing the workspace.
-            </span>
+              {t("ui.settingsworkspacecontentWarningYourAPIKeyIsKeptInThisBrowserApos")}</span>
           </span>
         </p>
-        <div className="settings-state-row" aria-label="AI provider status">
+        <div className="settings-state-row" aria-label={t("ui.settingsworkspacecontentAiProviderStatus")}>
           <span className={aiSettings.readiness.isReady ? "settings-state-chip is-ok" : "settings-state-chip is-warn"}>
-            {aiSettings.readiness.isReady ? "Ready" : "Not ready"}
+            {aiSettings.readiness.isReady ? t("ui.settingsworkspacecontentReady") : t("ui.settingsworkspacecontentNotReady")}
           </span>
           <span className="settings-state-chip">{aiSettings.readiness.message}</span>
         </div>
@@ -1637,7 +1631,7 @@ export function SettingsWorkspaceContent({
               type="password"
               value={activeAiProviderConfig.apiKey}
               onChange={(event) => aiSettings.updateProviderConfig(aiSettings.settings.provider, { apiKey: event.target.value })}
-              placeholder={`${getAiProviderLabel(aiSettings.settings.provider)} API key`}
+              placeholder={t("ui.settingsworkspacecontentProviderAPIKey", { provider: getAiProviderLabel(aiSettings.settings.provider) })}
               autoComplete="off"
             />
           </label>

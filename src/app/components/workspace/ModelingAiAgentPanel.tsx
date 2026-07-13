@@ -192,23 +192,23 @@ export function ModelingAiAgentPanel({
   }, [agentMode, instruction, permissions, selectedMode, targetScope]);
 
   return (
-    <article className="panel ai-agent-panel" data-ai-agent-panel="true" aria-label="AI Agent modeling workspace">
+    <article className="panel ai-agent-panel" data-ai-agent-panel="true" aria-label={t("ui.modelingaiagentpanelAiAgentModelingWorkspace")}>
       <header className="list-panel-header">
         <div>
-          <h2>AI Agent</h2>
-          <p className="meta-line">Prepare controlled modeling operations from a scoped instruction.</p>
+          <h2>{t("ui.modelingaiagentpanelAiAgent")}</h2>
+          <p className="meta-line">{t("ui.modelingaiagentpanelPrepareControlledModelingOperationsFromAScopedInstruction")}</p>
         </div>
       </header>
-      <div className="settings-import-summary" role="region" aria-label="AI context summary">
+      <div className="settings-import-summary" role="region" aria-label={t("ui.modelingaiagentpanelAiContextSummary")}>
         <p className="meta-line">
-          <span>Context</span> <strong>{selectedContextSummary.scopeLabel}</strong>
+          <span>{t("ui.modelingaiagentpanelContext")}</span> <strong>{selectedContextSummary.scopeLabel}</strong>
         </p>
         <p className="meta-line">
-          <span>Network</span> <strong>{selectedContextSummary.networkName ?? t("ui.none")}</strong>
+          <span>{t("ui.networksummaryexportmenuNetwork")}</span> <strong>{selectedContextSummary.networkName ?? t("ui.none")}</strong>
         </p>
         <p className="meta-line ai-agent-context-entities">
-          <span>Entities</span>
-          <strong className="ai-agent-entity-counts" aria-label="AI context entity counts">
+          <span>{t("ui.modelingaiagentpanelEntities")}</span>
+          <strong className="ai-agent-entity-counts" aria-label={t("ui.modelingaiagentpanelAiContextEntityCounts")}>
             {entityCountEntries.map(({ key, count, singular, plural }) => {
               const countLabel = `${count} ${formatCountLabel(count, singular, plural)}`;
               return (
@@ -222,20 +222,19 @@ export function ModelingAiAgentPanel({
         </p>
         {selectedContextSummary.selectionLabel !== null ? (
           <p className="meta-line ai-agent-context-selection">
-            <span>Selection</span> <strong>{selectedContextSummary.selectionLabel}</strong>
+            <span>{t("ui.modelingaiagentpanelSelection")}</span> <strong>{selectedContextSummary.selectionLabel}</strong>
           </p>
         ) : null}
         {!selectedContextSummary.isAvailable && selectedContextSummary.unavailableReason !== null ? (
           <p className="meta-line">
-            <span>Status</span> <strong>{selectedContextSummary.unavailableReason}</strong>
+            <span>{t("ui.modelingaiagentpanelStatus")}</span> <strong>{selectedContextSummary.unavailableReason}</strong>
           </p>
         ) : null}
       </div>
 
       <form className="stack-form" onSubmit={(event) => event.preventDefault()}>
         <label>
-          Instruction
-          <textarea
+          {t("ui.modelingaiagentpanelInstruction")}<textarea
             rows={5}
             value={instruction}
             onChange={(event) => {
@@ -244,14 +243,13 @@ export function ModelingAiAgentPanel({
               setDraftRawResponse(null);
               setProposalValidation(null);
             }}
-            placeholder="Add a routing node near the dashboard connector and prepare route updates for selected wires."
+            placeholder={t("ui.modelingaiagentpanelAddARoutingNodeNearTheDashboardConnectorAndPrepare")}
           />
         </label>
         <div className="form-split">
           <label>
-            Instruction history
-            <select
-              aria-label="Instruction history"
+            {t("ui.modelingaiagentpanelInstructionHistory")}<select
+              aria-label={t("ui.modelingaiagentpanelInstructionHistory")}
               value=""
               disabled={instructionHistory.length === 0}
               onChange={(event) => {
@@ -264,7 +262,7 @@ export function ModelingAiAgentPanel({
                 setProposalValidation(null);
               }}
             >
-              <option value="">Recent instructions</option>
+              <option value="">{t("ui.modelingaiagentpanelRecentInstructions")}</option>
               {instructionHistory.map((historyInstruction) => (
                 <option value={historyInstruction} key={historyInstruction}>
                   {historyInstruction}
@@ -282,8 +280,7 @@ export function ModelingAiAgentPanel({
                 setDraftStatus("AI instruction history cleared.");
               }}
             >
-              Clear history
-            </button>
+              {t("ui.modelingaiagentpanelClearHistory")}</button>
             <button
               type="button"
               onClick={() => {
@@ -300,14 +297,12 @@ export function ModelingAiAgentPanel({
                 setCanRollbackLastSession(false);
               }}
             >
-              Reset AI Agent local data
-            </button>
+              {t("ui.modelingaiagentpanelResetAIAgentLocalData")}</button>
           </div>
         </div>
         <div className="form-split">
           <label>
-            Target scope
-            <select
+            {t("ui.modelingaiagentpanelTargetScope")}<select
               value={targetScope}
               onChange={(event) => {
                 setTargetScope(event.target.value as AiAgentScope);
@@ -316,15 +311,14 @@ export function ModelingAiAgentPanel({
                 setDraftRawResponse(null);
               }}
             >
-              <option value="activeNetwork">Active network</option>
-              <option value="currentSelection">Current selection</option>
-              <option value="selectedHarness">Selected harness</option>
-              <option value="allNetworks">All networks</option>
+              <option value="activeNetwork">{t("ui.functionalschematicpanelActiveNetwork")}</option>
+              <option value="currentSelection">{t("ui.modelingaiagentpanelCurrentSelection")}</option>
+              <option value="selectedHarness">{t("ui.modelingaiagentpanelSelectedHarness")}</option>
+              <option value="allNetworks">{t("ui.modelingaiagentpanelAllNetworks")}</option>
             </select>
           </label>
           <label>
-            Agent mode
-            <select
+            {t("ui.modelingaiagentpanelAgentMode")}<select
               value={selectedMode}
               onChange={(event) => {
                 setAgentMode(event.target.value as AiAgentMode);
@@ -333,77 +327,71 @@ export function ModelingAiAgentPanel({
                 setDraftRawResponse(null);
               }}
             >
-              <option value="assisted">Assisted proposal</option>
+              <option value="assisted">{t("ui.modelingaiagentpanelAssistedProposal")}</option>
               <option value="direct" disabled={!experimentalDirectExecutionEnabled}>
-                Experimental direct execution
-              </option>
+                {t("ui.modelingaiagentpanelExperimentalDirectExecution")}</option>
             </select>
           </label>
         </div>
         {selectedMode === "direct" ? (
-          <div className="settings-import-summary" role="region" aria-label="Experimental direct execution warning">
+          <div className="settings-import-summary" role="region" aria-label={t("ui.modelingaiagentpanelExperimentalDirectExecutionWarning")}>
             <p className="meta-line">
-              <span>Experimental</span>
-              <strong>Direct execution applies locally valid operations immediately after provider validation.</strong>
+              <span>{t("ui.modelingaiagentpanelExperimental")}</span>
+              <strong>{t("ui.modelingaiagentpanelDirectExecutionAppliesLocallyValidOperationsImmediatelyAfterProviderValidation")}</strong>
             </p>
           </div>
         ) : null}
 
         <fieldset className="inline-fieldset ai-agent-permissions-fieldset">
-          <legend>Operation permissions</legend>
+          <legend>{t("ui.modelingaiagentpanelOperationPermissions")}</legend>
           <label className="settings-checkbox">
             <input
               type="checkbox"
               checked={permissions.add}
               onChange={(event) => updatePermission("add", event.target.checked)}
             />
-            Add connectors, splices, nodes, segments, or valid wires
-          </label>
+            {t("ui.modelingaiagentpanelAddConnectorsSplicesNodesSegmentsOrValidWires")}</label>
           <label className="settings-checkbox">
             <input
               type="checkbox"
               checked={permissions.move}
               onChange={(event) => updatePermission("move", event.target.checked)}
             />
-            Move supported canvas entities
-          </label>
+            {t("ui.modelingaiagentpanelMoveSupportedCanvasEntities")}</label>
           <label className="settings-checkbox">
             <input
               type="checkbox"
               checked={permissions.update}
               onChange={(event) => updatePermission("update", event.target.checked)}
             />
-            Update safe scalar fields
-          </label>
+            {t("ui.modelingaiagentpanelUpdateSafeScalarFields")}</label>
           <label className="settings-checkbox">
             <input
               type="checkbox"
               checked={permissions.route}
               onChange={(event) => updatePermission("route", event.target.checked)}
             />
-            Regenerate routes
-          </label>
+            {t("ui.modelingaiagentpanelRegenerateRoutes")}</label>
           <label className="settings-checkbox">
             <input
               type="checkbox"
               checked={permissions.delete}
               onChange={(event) => updatePermission("delete", event.target.checked)}
             />
-            Delete entities
-          </label>
+            {t("ui.modelingaiagentpanelDeleteEntities")}</label>
         </fieldset>
 
         {draftStatus !== null ? (
           <p className="meta-line ai-agent-draft-status">
             {draftStatus}
-            {isPreparingProposal ? <span className="ai-agent-status-loader" aria-label="Preparing proposal" /> : null}
+            {isPreparingProposal ? <span className="ai-agent-status-loader" aria-label={t("ui.modelingaiagentpanelPreparingProposal")} /> : null}
             {draftRawResponse !== null ? (
               <span className="ai-agent-response-hover">
-                <button type="button" className="ai-agent-response-info" aria-label="Show AI response">
+                <button type="button" className="ai-agent-response-info" aria-label={t("ui.modelingaiagentpanelShowAIResponse")}>
                   i
                 </button>
                 <span className="ai-agent-response-popover" role="tooltip">
-                  <span className="ai-agent-response-popover-title">AI response</span>
+                  <span className="ai-agent-response-popover-title">{t("ui.modelingaiagentpanelAiResponse")}</span>
                   <code>{draftRawResponse}</code>
                 </span>
               </span>
@@ -487,8 +475,7 @@ export function ModelingAiAgentPanel({
               );
             }}
           >
-            Apply
-          </button>
+            {t("ui.modelingaiagentpanelApply")}</button>
           <button
             type="button"
             disabled={selectedMode === "direct" || proposalValidation === null}
@@ -498,8 +485,7 @@ export function ModelingAiAgentPanel({
               setDraftRawResponse(null);
             }}
           >
-            Reject
-          </button>
+            {t("ui.modelingaiagentpanelReject")}</button>
           <button
             type="button"
             disabled={!canRollbackLastSession}
@@ -512,60 +498,57 @@ export function ModelingAiAgentPanel({
               setDraftStatus(didRollback ? "Rolled back the last applied AI session." : "No AI session is available to roll back.");
             }}
           >
-            Rollback
-          </button>
+            {t("ui.modelingaiagentpanelRollback")}</button>
         </div>
       </form>
       {proposalValidation !== null ? (
-        <div className="settings-import-summary ai-agent-proposal-summary" role="region" aria-label="AI proposal summary">
+        <div className="settings-import-summary ai-agent-proposal-summary" role="region" aria-label={t("ui.modelingaiagentpanelAiProposalSummary")}>
           {proposalImpactPreview !== null ? (
             <p className="meta-line">
-              <span>Impact</span>
+              <span>{t("ui.modelingaiagentpanelImpact")}</span>
               <strong>
-                {proposalImpactPreview.addCount} add / {proposalImpactPreview.updateCount} update / {proposalImpactPreview.moveCount} move /{" "}
-                {proposalImpactPreview.routeCount} route / {proposalImpactPreview.deleteCount} delete
-              </strong>
+                {proposalImpactPreview.addCount} {t("ui.modelingaiagentpanelAdd")}{proposalImpactPreview.updateCount} {t("ui.modelingaiagentpanelUpdate")}{proposalImpactPreview.moveCount} {t("ui.modelingaiagentpanelMove")}{" "}
+                {proposalImpactPreview.routeCount} {t("ui.modelingaiagentpanelRoute")}{proposalImpactPreview.deleteCount} {t("ui.modelingaiagentpanelDelete")}</strong>
             </p>
           ) : null}
           <p className="meta-line">
-            <span>Accepted</span> <strong>{proposalValidation.accepted.length}</strong>
+            <span>{t("ui.modelingaiagentpanelAccepted")}</span> <strong>{proposalValidation.accepted.length}</strong>
           </p>
           <p className="meta-line">
-            <span>Rejected</span> <strong>{proposalValidation.rejected.length}</strong>
+            <span>{t("ui.modelingaiagentpanelRejected")}</span> <strong>{proposalValidation.rejected.length}</strong>
           </p>
           <p className="meta-line">
-            <span>Unsupported</span> <strong>{proposalValidation.unsupported.length}</strong>
+            <span>{t("ui.modelingaiagentpanelUnsupported")}</span> <strong>{proposalValidation.unsupported.length}</strong>
           </p>
           <p className="meta-line">
             <span>{t("ui.warnings2")}</span> <strong>{proposalValidation.warnings.length}</strong>
           </p>
           {proposalValidation.accepted.map((operation, index) => (
             <p className="meta-line ai-agent-operation-line" key={`${operation.type}-${index}`}>
-              <span>Accepted operation</span>
+              <span>{t("ui.modelingaiagentpanelAcceptedOperation")}</span>
               <strong>{operation.type}</strong>
               <small>{formatAiAgentOperationDetails(operation)}</small>
             </p>
           ))}
           {proposalValidation.rejected.map((issue) => (
             <p className="meta-line ai-agent-operation-line" key={`rejected-${issue.operationType}-${issue.operationIndex}`}>
-              <span>Rejected operation</span> <strong>{issue.message}</strong>
+              <span>{t("ui.modelingaiagentpanelRejectedOperation")}</span> <strong>{issue.message}</strong>
             </p>
           ))}
           {proposalValidation.unsupported.map((issue) => (
             <p className="meta-line ai-agent-operation-line" key={`${issue.operationType}-${issue.operationIndex}`}>
-              <span>Unsupported operation</span> <strong>{issue.operationType}</strong>
+              <span>{t("ui.modelingaiagentpanelUnsupportedOperation")}</span> <strong>{issue.operationType}</strong>
             </p>
           ))}
         </div>
       ) : null}
       {lastAppliedImpactPreview !== null ? (
-        <div className="settings-import-summary ai-agent-proposal-summary" role="region" aria-label="Last AI session impact">
+        <div className="settings-import-summary ai-agent-proposal-summary" role="region" aria-label={t("ui.modelingaiagentpanelLastAISessionImpact")}>
           <p className="meta-line">
-            <span>Last impact</span>
+            <span>{t("ui.modelingaiagentpanelLastImpact")}</span>
             <strong>
-              {lastAppliedImpactPreview.addCount} add / {lastAppliedImpactPreview.updateCount} update / {lastAppliedImpactPreview.moveCount} move /{" "}
-              {lastAppliedImpactPreview.routeCount} route / {lastAppliedImpactPreview.deleteCount} delete
-            </strong>
+              {lastAppliedImpactPreview.addCount} {t("ui.modelingaiagentpanelAdd")}{lastAppliedImpactPreview.updateCount} {t("ui.modelingaiagentpanelUpdate")}{lastAppliedImpactPreview.moveCount} {t("ui.modelingaiagentpanelMove")}{" "}
+              {lastAppliedImpactPreview.routeCount} {t("ui.modelingaiagentpanelRoute")}{lastAppliedImpactPreview.deleteCount} {t("ui.modelingaiagentpanelDelete")}</strong>
           </p>
         </div>
       ) : null}

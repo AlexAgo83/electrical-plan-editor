@@ -223,13 +223,15 @@ export function useOnboardingController({
       (secondaryTarget.subScreen === undefined || activeSubScreen === secondaryTarget.subScreen);
     return [
       {
-        label: isPrimaryAlreadyInContext ? `Scroll to ${primaryTarget.panelLabel}` : `Open ${primaryTarget.panelLabel}`,
+        label: isPrimaryAlreadyInContext
+          ? t("ui.scrollToNamedTarget", { target: primaryTarget.panelLabel })
+          : t("ui.openNamedTarget", { target: primaryTarget.panelLabel }),
         onClick: () => openOnboardingTarget(primaryTarget)
       },
       {
         label: isSecondaryAlreadyInContext
-          ? `Scroll to ${secondaryTarget.panelLabel}`
-          : `Open ${secondaryTarget.panelLabel}`,
+          ? t("ui.scrollToNamedTarget", { target: secondaryTarget.panelLabel })
+          : t("ui.openNamedTarget", { target: secondaryTarget.panelLabel }),
         onClick: () => openOnboardingTarget(secondaryTarget)
       }
     ];
@@ -248,7 +250,7 @@ export function useOnboardingController({
     const isListInContext = activeScreen === catalogListTarget.screen && activeSubScreen === catalogListTarget.subScreen;
     return [
       {
-        label: isListInContext ? "Scroll to Catalog" : t("ui.openCatalog"),
+        label: isListInContext ? t("ui.scrollToNamedTarget", { target: catalogListTarget.panelLabel }) : t("ui.openCatalog"),
         onClick: () => openOnboardingTarget(catalogListTarget)
       }
     ];
@@ -258,8 +260,8 @@ export function useOnboardingController({
     activeOnboardingPrimaryTarget === undefined
       ? t("ui.openTarget")
       : isOnboardingStepAlreadyInContext
-        ? `Scroll to ${activeOnboardingPrimaryTarget.panelLabel}`
-        : `Open ${activeOnboardingPrimaryTarget.panelLabel}`;
+        ? t("ui.scrollToNamedTarget", { target: activeOnboardingPrimaryTarget.panelLabel })
+        : t("ui.openNamedTarget", { target: activeOnboardingPrimaryTarget.panelLabel });
 
   const onboardingTargetActions = useMemo(() => {
     if (activeOnboardingStep === undefined) {

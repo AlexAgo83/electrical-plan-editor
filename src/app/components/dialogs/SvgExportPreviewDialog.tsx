@@ -103,7 +103,7 @@ export function SvgExportPreviewDialog({
 
   return (
     <div className={layerClassName} role="presentation">
-      <button type="button" className="confirm-dialog-backdrop" aria-label={`Close ${previewFormatLabel} preview`} onClick={onCancel} />
+      <button type="button" className="confirm-dialog-backdrop" aria-label={t("ui.svgexportpreviewdialogClosePreviewFormatLabelPreview", { previewFormatLabel: previewFormatLabel })} onClick={onCancel} />
       <section
         ref={dialogRef}
         className="confirm-dialog panel bom-preview-dialog svg-preview-dialog is-neutral"
@@ -118,23 +118,23 @@ export function SvgExportPreviewDialog({
           <h2 id={titleId}>{previewTitle}</h2>
           <div className="bom-preview-dialog-summary" id={descriptionId}>
             <span className="bom-preview-summary-item">
-              <span className="bom-preview-summary-label">Format</span>
+              <span className="bom-preview-summary-label">{t("ui.bomexportpreviewdialogFormat")}</span>
               <span className="bom-preview-summary-value">{previewFormatLabel}</span>
             </span>
             <span className="bom-preview-summary-item">
-              <span className="bom-preview-summary-label">Size</span>
+              <span className="bom-preview-summary-label">{t("ui.svgexportpreviewdialogSize")}</span>
               <span className="bom-preview-summary-value">
                 {preview.exportWidth} x {preview.exportHeight}
               </span>
             </span>
           </div>
         </header>
-        <div className="svg-preview-toolbar" aria-label="SVG preview options">
+        <div className="svg-preview-toolbar" aria-label={t("ui.svgexportpreviewdialogSvgPreviewOptions")}>
           {showDecorationOptions ? (
             <>
               <label className="settings-checkbox-row">
                 <input type="checkbox" checked={preview.includeFrame} onChange={(event) => handleFrameChange(event.target.checked)} />
-                <span>Include frame</span>
+                <span>{t("ui.svgexportpreviewdialogIncludeFrame")}</span>
               </label>
               <label className="settings-checkbox-row">
                 <input
@@ -142,14 +142,14 @@ export function SvgExportPreviewDialog({
                   checked={preview.includeCartouche}
                   onChange={(event) => handleCartoucheChange(event.target.checked)}
                 />
-                <span>Include identity</span>
+                <span>{t("ui.svgexportpreviewdialogIncludeIdentity")}</span>
               </label>
             </>
           ) : null}
           {showGridOption ? (
             <label className="settings-checkbox-row">
               <input type="checkbox" checked={preview.includeGrid} onChange={(event) => handleGridChange(event.target.checked)} />
-              <span>Include grid</span>
+              <span>{t("ui.svgexportpreviewdialogIncludeGrid")}</span>
             </label>
           ) : null}
           <label className="svg-preview-theme-field">
@@ -187,7 +187,7 @@ export function SvgExportPreviewDialog({
           </button>
           <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={onConfirm}>
             <span className="network-summary-export-icon" aria-hidden="true" />
-            <span>Download {previewFormatLabel}</span>
+            <span>{t("ui.bomexportpreviewdialogDownload")}{previewFormatLabel}</span>
           </button>
         </footer>
       </section>

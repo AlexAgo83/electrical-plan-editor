@@ -160,8 +160,8 @@ export function NetworkRecentChangesList({ entries, onOpenEntryTarget }: Network
                 <button
                   type="button"
                   className="network-recent-changes-open-button"
-                  aria-label={`Open changed object: ${entry.label}`}
-                  title="Open changed object"
+                  aria-label={t("ui.networkrecentchangespanelOpenChangedObjectLabel", { label: entry.label })}
+                  title={t("ui.networkrecentchangespanelOpenChangedObject")}
                   onClick={() => onOpenEntryTarget(entry)}
                 >
                   <span className="network-recent-changes-open-icon" aria-hidden="true" />

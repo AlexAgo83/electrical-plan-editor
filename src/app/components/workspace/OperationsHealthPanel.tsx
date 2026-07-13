@@ -75,29 +75,29 @@ export function OperationsHealthPanel({
         
         {t("ui.state")} {saveStatus === "saved" ? t("ui.saved") : saveStatus === "unsaved" ? t("ui.unsaved") : t("ui.error")}
       </p>
-      <section className="workspace-health workspace-storage-ops" aria-label="Workspace storage">
-        <h2>Workspace storage</h2>
+      <section className="workspace-health workspace-storage-ops" aria-label={t("ui.operationshealthpanelWorkspaceStorage")}>
+        <h2>{t("ui.operationshealthpanelWorkspaceStorage")}</h2>
         <p className="meta-line">
-          File state: <strong>{workspaceFileStatus.label}</strong>
+          {t("ui.operationshealthpanelFileState")}<strong>{workspaceFileStatus.label}</strong>
         </p>
         <p className="meta-line">
-          Mode: {workspaceFileStatus.mode === "linked" ? "Linked file" : "Local only"}
+          {t("ui.operationshealthpanelMode")}{workspaceFileStatus.mode === "linked" ? t("ui.settingssearchmodelLinkedFile") : t("ui.operationshealthpanelLocalOnly")}
         </p>
         <p className="meta-line">
-          Autosave: {workspaceFileStatus.saveTarget === "linked-file" ? "Linked file" : workspaceFileStatus.saveTarget === "download" ? "Downloaded copy" : "Local cache"}
+          {t("ui.operationshealthpanelAutosave")}{workspaceFileStatus.saveTarget === "linked-file" ? t("ui.settingssearchmodelLinkedFile") : workspaceFileStatus.saveTarget === "download" ? "Downloaded copy" : "Local cache"}
         </p>
         <p className="meta-line">
-          Resume: {workspaceFileStatus.resumeStatus === "available" ? "Available" : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Unavailable" : t("ui.none")}
+          {t("ui.operationshealthpanelResume")}{workspaceFileStatus.resumeStatus === "available" ? t("ui.networkscopeworkspacecontentAvailable") : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Unavailable" : t("ui.none")}
         </p>
         <p className="meta-line">
-          Direct file access: {workspaceFileStatus.directFileAccessSupported ? "Supported" : "Fallback download only"}
+          {t("ui.operationshealthpanelDirectFileAccess")}{workspaceFileStatus.directFileAccessSupported ? t("ui.operationshealthpanelSupported") : t("ui.operationshealthpanelFallbackDownloadOnly")}
         </p>
         <p className="meta-line">
-          File availability: {workspaceFileStatus.fileAvailability === "available" ? "Available" : workspaceFileStatus.fileAvailability === "unavailable" ? "Unavailable" : "Unknown"}
+          {t("ui.operationshealthpanelFileAvailability")}{workspaceFileStatus.fileAvailability === "available" ? t("ui.networkscopeworkspacecontentAvailable") : workspaceFileStatus.fileAvailability === "unavailable" ? "Unavailable" : "Unknown"}
         </p>
-        {workspaceFileStatus.fileName !== null ? <p className="meta-line">File: {workspaceFileStatus.fileName}</p> : null}
+        {workspaceFileStatus.fileName !== null ? <p className="meta-line">{t("ui.operationshealthpanelFile")}{workspaceFileStatus.fileName}</p> : null}
         {workspaceFileStatus.mode !== "linked" && workspaceFileStatus.resumeFileName !== null ? (
-          <p className="meta-line">Resume: {workspaceFileStatus.resumeFileName}</p>
+          <p className="meta-line">{t("ui.operationshealthpanelResume")}{workspaceFileStatus.resumeFileName}</p>
         ) : null}
         {workspaceFileStatus.message !== null ? <p className="meta-line">{workspaceFileStatus.message}</p> : null}
         <div className="row-actions compact workspace-storage-actions">
@@ -106,8 +106,8 @@ export function OperationsHealthPanel({
             className="button-with-icon"
             onClick={onResumeWorkspaceFile}
             disabled={!workspaceFileStatus.canResume || workspaceFileStatus.mode === "linked"}
-            aria-label="Resume workspace file"
-            title="Resume the last workspace file remembered by this browser"
+            aria-label={t("ui.operationshealthpanelResumeWorkspaceFile")}
+            title={t("ui.operationshealthpanelResumeTheLastWorkspaceFileRememberedByThisBrowser")}
           >
             <span className="action-button-icon is-redo" aria-hidden="true" />
             
@@ -117,8 +117,8 @@ export function OperationsHealthPanel({
             type="button"
             className="button-with-icon"
             onClick={onOpenWorkspaceFile}
-            aria-label="Open workspace file"
-            title="Open a workspace file and replace the current workspace"
+            aria-label={t("ui.operationshealthpanelOpenWorkspaceFile")}
+            title={t("ui.operationshealthpanelOpenAWorkspaceFileAndReplaceTheCurrentWorkspace")}
           >
             <span className="action-button-icon is-open" aria-hidden="true" />
             
@@ -128,12 +128,11 @@ export function OperationsHealthPanel({
             type="button"
             className="button-with-icon"
             onClick={onSaveWorkspaceFileAs}
-            aria-label="Save workspace file as"
-            title="Save a new workspace file copy"
+            aria-label={t("ui.operationshealthpanelSaveWorkspaceFileAs")}
+            title={t("ui.operationshealthpanelSaveANewWorkspaceFileCopy")}
           >
             <span className="action-button-icon is-save" aria-hidden="true" />
-            Save as
-          </button>
+            {t("ui.operationshealthpanelSaveAs")}</button>
           <input
             ref={workspaceFileInputRef}
             className="visually-hidden"
@@ -142,7 +141,7 @@ export function OperationsHealthPanel({
             onChange={(event) => {
               void onWorkspaceFileInputChange(event);
             }}
-            aria-label="Open workspace file"
+            aria-label={t("ui.operationshealthpanelOpenWorkspaceFile")}
           />
         </div>
       </section>
@@ -154,7 +153,7 @@ export function OperationsHealthPanel({
         </p>
         <p className="meta-line">
           
-          {t("ui.errors")} <strong>{validationErrorCount}</strong> / Warnings: <strong>{validationWarningCount}</strong>
+          {t("ui.errors")} <strong>{validationErrorCount}</strong> {t("ui.operationshealthpanelWarnings")}<strong>{validationWarningCount}</strong>
         </p>
         <p className="meta-line">
           

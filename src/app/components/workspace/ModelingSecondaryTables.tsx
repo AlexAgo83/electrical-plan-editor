@@ -265,12 +265,12 @@ function ModelingSecondaryTablesComponent({
   const wireColumns: ConfigurableTableColumn[] = [
     { id: "name", label: t("ui.name"), hideable: false },
     { id: "technicalId", label: t("ui.technicalID") },
-    { id: "functionalDomainTag", label: "Functional tag" },
-    { id: "twistGroupLabel", label: "Twist group" },
+    { id: "functionalDomainTag", label: t("ui.analysisconnectorworkspacepanelsFunctionalTag") },
+    { id: "twistGroupLabel", label: t("ui.analysisconnectorworkspacepanelsTwistGroup") },
     { id: "color", label: t("ui.color") },
     { id: "endpointA", label: t("ui.endpointA") },
     { id: "endpointB", label: t("ui.endpointB") },
-    { id: "sectionMm2", label: "Section" },
+    { id: "sectionMm2", label: t("ui.analysiswireworkspacepanelsSection") },
     { id: "lengthMm", label: t("ui.length") },
   ];
   const segmentFilterPlaceholder =
@@ -464,7 +464,7 @@ function ModelingSecondaryTablesComponent({
       }
       return (
         <EntityReferenceButton
-          title={`Open connector ${connector.technicalId}`}
+          title={t("ui.modelingsecondarytablesOpenConnectorTechnicalId", { technicalId: connector.technicalId })}
           onClick={() => onSelectConnectorReference(endpoint.connectorId)}
         >
           {label}
@@ -478,7 +478,7 @@ function ModelingSecondaryTablesComponent({
     }
     return (
       <EntityReferenceButton
-        title={`Open splice ${splice.technicalId}`}
+        title={t("ui.modelingsecondarytablesOpenSpliceTechnicalId", { technicalId: splice.technicalId })}
         onClick={() => onSelectSpliceReference(endpoint.spliceId)}
       >
         {label}
@@ -692,7 +692,7 @@ function ModelingSecondaryTablesComponent({
                     <th>
                       <input
                         type="checkbox"
-                        aria-label="Select all visible segments"
+                        aria-label={t("ui.modelingsecondarytablesSelectAllVisibleSegments")}
                         checked={allVisibleSegmentsSelected}
                         onChange={() =>
                           onSetBatchSelectionForVisible(
@@ -869,7 +869,7 @@ function ModelingSecondaryTablesComponent({
                         <td>
                           <input
                             type="checkbox"
-                            aria-label={`Select segment ${segment.id}`}
+                            aria-label={t("ui.networksummarygraphlayersSelectSegmentId", { id: segment.id })}
                             checked={isBatchSelected}
                             onChange={() =>
                               onToggleBatchSelection("segment", segment.id)
@@ -908,8 +908,7 @@ function ModelingSecondaryTablesComponent({
                 onClick={onOpenBatchSelectionDialog}
                 disabled={selectedSegmentBatchCount === 0}
               >
-                Open batch
-                {selectedSegmentBatchCount > 0
+                {t("ui.modelingprimarytablesOpenBatch")}{selectedSegmentBatchCount > 0
                   ? ` (${selectedSegmentBatchCount})`
                   : ""}
               </button>
@@ -923,8 +922,7 @@ function ModelingSecondaryTablesComponent({
                   className="action-button-icon is-delete"
                   aria-hidden="true"
                 />
-                Delete selected
-                {selectedSegmentBatchCount > 0
+                {t("ui.modelingbatchcontextpanelDeleteSelected")}{selectedSegmentBatchCount > 0
                   ? ` (${selectedSegmentBatchCount})`
                   : ""}
               </button>
@@ -933,8 +931,7 @@ function ModelingSecondaryTablesComponent({
                 className="button-with-icon"
                 onClick={onExitBatchMode}
               >
-                Cancel selection
-              </button>
+                {t("ui.modelingbatchcontextpanelCancelSelection")}</button>
             </>
           ) : (
             <>
@@ -976,7 +973,7 @@ function ModelingSecondaryTablesComponent({
                   className="action-button-icon is-multi-select"
                   aria-hidden="true"
                 />
-                {isMobileViewport ? "Select" : "Select multiple"}
+                {isMobileViewport ? t("ui.pinelectricalroleseditorSelect") : t("ui.modelingprimarytablesSelectMultiple")}
               </button>
               <button
                 type="button"
@@ -1202,10 +1199,10 @@ function ModelingSecondaryTablesComponent({
             </div>
             <div className="list-panel-header-tools-row is-filter-row is-wire-filter-row">
               <label className="list-inline-number-filter wire-tag-filter">
-                <span>Tag</span>
+                <span>{t("ui.analysiswireworkspacepanelsTag")}</span>
                 <select
                   className="list-inline-table-filter-select"
-                  aria-label="Wire tag filter"
+                  aria-label={t("ui.analysiswireworkspacepanelsWireTagFilter")}
                   value={wireFunctionalTagFilter}
                   onChange={(event) =>
                     setWireFunctionalTagFilter(event.target.value)
@@ -1257,7 +1254,7 @@ function ModelingSecondaryTablesComponent({
                     <th>
                       <input
                         type="checkbox"
-                        aria-label="Select all visible wires"
+                        aria-label={t("ui.modelingsecondarytablesSelectAllVisibleWires")}
                         checked={allVisibleWiresSelected}
                         onChange={() =>
                           onSetBatchSelectionForVisible("wire", visibleWireIds)
@@ -1326,8 +1323,8 @@ function ModelingSecondaryTablesComponent({
                       </span>
                     </button>
                   </th>
-                  <th>{isMobileViewport ? "Func tag" : "Functional tag"}</th>
-                  <th>{isMobileViewport ? "Twist" : "Twist group"}</th>
+                  <th>{isMobileViewport ? t("ui.analysiswireworkspacepanelsFuncTag") : t("ui.analysisconnectorworkspacepanelsFunctionalTag")}</th>
+                  <th>{isMobileViewport ? t("ui.analysiswireworkspacepanelsTwist") : t("ui.analysisconnectorworkspacepanelsTwistGroup")}</th>
                   <th aria-sort={getTableAriaSort(wireTableSort, "color")}>
                     <button
                       type="button"
@@ -1492,7 +1489,7 @@ function ModelingSecondaryTablesComponent({
                         <td>
                           <input
                             type="checkbox"
-                            aria-label={`Select wire ${wire.technicalId}`}
+                            aria-label={t("ui.modelingsecondarytablesSelectWireTechnicalId", { technicalId: wire.technicalId })}
                             checked={isBatchSelected}
                             onChange={() =>
                               onToggleBatchSelection("wire", wire.id)
@@ -1506,13 +1503,12 @@ function ModelingSecondaryTablesComponent({
                         {fuseManufacturerReference !== null ? (
                           <div className="wire-fuse-inline">
                             <span className="status-chip wire-fuse-chip">
-                              Fuse
-                            </span>
+                              {t("ui.analysiswireworkspacepanelsFuse")}</span>
                             {fuseCatalogItemId !== undefined &&
                             fuseCatalogItem !== undefined ? (
                               <EntityReferenceButton
                                 className="technical-id"
-                                title={`Open catalog item ${fuseManufacturerReference}`}
+                                title={t("ui.modelingsecondarytablesOpenCatalogItemFuseManufacturerReference", { fuseManufacturerReference: fuseManufacturerReference })}
                                 onClick={() =>
                                   onSelectCatalogItem(fuseCatalogItemId)
                                 }
@@ -1552,8 +1548,7 @@ function ModelingSecondaryTablesComponent({
                 onClick={onOpenBatchSelectionDialog}
                 disabled={selectedWireBatchCount === 0}
               >
-                Open batch
-                {selectedWireBatchCount > 0
+                {t("ui.modelingprimarytablesOpenBatch")}{selectedWireBatchCount > 0
                   ? ` (${selectedWireBatchCount})`
                   : ""}
               </button>
@@ -1567,8 +1562,7 @@ function ModelingSecondaryTablesComponent({
                   className="action-button-icon is-delete"
                   aria-hidden="true"
                 />
-                Delete selected
-                {selectedWireBatchCount > 0
+                {t("ui.modelingbatchcontextpanelDeleteSelected")}{selectedWireBatchCount > 0
                   ? ` (${selectedWireBatchCount})`
                   : ""}
               </button>
@@ -1577,8 +1571,7 @@ function ModelingSecondaryTablesComponent({
                 className="button-with-icon"
                 onClick={onExitBatchMode}
               >
-                Cancel selection
-              </button>
+                {t("ui.modelingbatchcontextpanelCancelSelection")}</button>
             </>
           ) : (
             <>
@@ -1619,7 +1612,7 @@ function ModelingSecondaryTablesComponent({
                   className="action-button-icon is-multi-select"
                   aria-hidden="true"
                 />
-                {isMobileViewport ? "Select" : "Select multiple"}
+                {isMobileViewport ? t("ui.pinelectricalroleseditorSelect") : t("ui.modelingprimarytablesSelectMultiple")}
               </button>
               <button
                 type="button"
@@ -1644,7 +1637,7 @@ function ModelingSecondaryTablesComponent({
       {wireExportPreview !== null ? (
         <TabularExportPreviewDialog
           isOpen={wireExportPreview !== null}
-          title="Wire export preview"
+          title={t("ui.analysiswireworkspacepanelsWireExportPreview")}
           summaryLabel="Modeling wires"
           filenameLabel={`${wireExportPreview.filenameBase}.xlsx`}
           sheets={wireExportPreview.sheets}

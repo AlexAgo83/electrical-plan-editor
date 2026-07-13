@@ -241,18 +241,17 @@ export function HarnessAssemblyManagerPanel({
     return (
       <button type="button" className="button-with-icon" onClick={saveDraftAssembly}>
         <span className="action-button-icon is-save" aria-hidden="true" />
-        Save assembly
-      </button>
+        {t("ui.harnessassemblymanagerpanelSaveAssembly")}</button>
     );
   }
 
   return (
     <>
-      <section className="panel harness-assembly-manager-panel" aria-label="Harness assembly manager">
+      <section className="panel harness-assembly-manager-panel" aria-label={t("ui.harnessassemblymanagerpanelHarnessAssemblyManager")}>
         <header className="network-summary-header">
           <div>
-            <h2>Harness assembly</h2>
-            <p className="functional-schematic-subtitle">Group networks, choose trace roots, and define physical interconnector links.</p>
+            <h2>{t("ui.harnessassemblymanagerpanelHarnessAssembly")}</h2>
+            <p className="functional-schematic-subtitle">{t("ui.harnessassemblymanagerpanelGroupNetworksChooseTraceRootsAndDefinePhysicalInterconnectorLinks")}</p>
           </div>
           {onOpenOnboardingHelp === undefined ? null : (
             <button type="button" className="filter-chip onboarding-help-button" onClick={onOpenOnboardingHelp}>
@@ -263,19 +262,19 @@ export function HarnessAssemblyManagerPanel({
         </header>
 
         {hasEmptyAssemblySelection ? (
-          <p className="empty-copy">Select an existing harness assembly or choose New assembly to start editing.</p>
+          <p className="empty-copy">{t("ui.harnessassemblymanagerpanelSelectAnExistingHarnessAssemblyOrChooseNewAssemblyTo")}</p>
         ) : (
           <form className="harness-assembly-grid" onSubmit={handleSubmit}>
             <label className="stack-label">
               <span className="network-form-label">{t("ui.name")}</span>
-              <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Front cabin assembly" />
+              <input value={name} onChange={(event) => setName(event.target.value)} placeholder={t("ui.harnessassemblymanagerpanelFrontCabinAssembly")} />
             </label>
             <label className="stack-label">
               <span className="network-form-label">{t("ui.technicalID")}</span>
               <input value={technicalId} onChange={(event) => setTechnicalId(event.target.value)} placeholder="ASM-FRONT-CABIN" />
             </label>
 
-            <div className="harness-assembly-list" aria-label="Harness members">
+            <div className="harness-assembly-list" aria-label={t("ui.harnessassemblymanagerpanelHarnessMembers")}>
               {networks.map((network, index) => {
                 const checked = memberNetworkIds.has(network.id);
                 return (
@@ -301,7 +300,7 @@ export function HarnessAssemblyManagerPanel({
                       type="color"
                       value={memberColors[network.id] ?? resolveDefaultHarnessColor(index)}
                       onChange={(event) => setMemberColors((current) => ({ ...current, [network.id]: event.target.value }))}
-                      aria-label={`${network.name} harness color`}
+                      aria-label={t("ui.harnessassemblymanagerpanelNameHarnessColor", { name: network.name })}
                       disabled={!checked}
                     />
                   </label>
@@ -312,22 +311,19 @@ export function HarnessAssemblyManagerPanel({
             <div className="row-actions compact">
               <button type="button" className="button-with-icon" onClick={() => onSelectedAssemblyIdChange("new")}>
                 <span className="action-button-icon is-new" aria-hidden="true" />
-                New assembly
-              </button>
+                {t("ui.harnessassemblymanagerpanelNewAssembly")}</button>
               <button type="submit" className="button-with-icon">
                 <span className="action-button-icon is-save" aria-hidden="true" />
-                Save assembly
-              </button>
+                {t("ui.harnessassemblymanagerpanelSaveAssembly")}</button>
               <button
                 type="button"
                 className="button-with-icon"
                 onClick={onExportAgentJson}
                 disabled={!canExportAgentJson}
-                title={canExportAgentJson ? "Export selected harness agent JSON" : "Select a saved harness assembly to export agent JSON"}
+                title={canExportAgentJson ? t("ui.harnessassemblymanagerpanelExportSelectedHarnessAgentJSON") : t("ui.harnessassemblymanagerpanelSelectASavedHarnessAssemblyToExportAgentJSON")}
               >
                 <span className="action-button-icon is-open" aria-hidden="true" />
-                Agent JSON
-              </button>
+                {t("ui.harnessassemblymanagerpanelAgentJSON")}</button>
               {selectedAssembly !== null ? (
                 <button type="button" className="network-delete-button button-with-icon" onClick={() => onRemoveAssembly(selectedAssembly.id)}>
                   <span className="action-button-icon is-delete" aria-hidden="true" />
@@ -338,8 +334,7 @@ export function HarnessAssemblyManagerPanel({
             </div>
             {hasUnsavedVisualizationChanges ? (
               <p className="form-hint warning" role="status">
-                Unsaved assembly edits are not reflected in the visualization yet. Save assembly to update the graph.
-              </p>
+                {t("ui.harnessassemblymanagerpanelUnsavedAssemblyEditsAreNotReflectedInTheVisualizationYet")}</p>
             ) : null}
           </form>
         )}
@@ -347,11 +342,11 @@ export function HarnessAssemblyManagerPanel({
 
       {selectedAssembly !== null ? (
         <>
-          <section className="panel harness-assembly-manager-panel" aria-label="Master connector roots">
+          <section className="panel harness-assembly-manager-panel" aria-label={t("ui.harnessassemblymanagerpanelMasterConnectorRoots")}>
             <header className="network-summary-header">
               <div>
-                <h2>Master connectors</h2>
-                <p className="functional-schematic-subtitle">Choose the connector roots used to generate the assembly functional graph.</p>
+                <h2>{t("ui.harnessassemblymanagerpanelMasterConnectors")}</h2>
+                <p className="functional-schematic-subtitle">{t("ui.harnessassemblymanagerpanelChooseTheConnectorRootsUsedToGenerateTheAssemblyFunctional")}</p>
               </div>
             </header>
             <div className="harness-assembly-list">
@@ -389,29 +384,28 @@ export function HarnessAssemblyManagerPanel({
             </div>
             {hasUnsavedVisualizationChanges ? (
               <p className="form-hint warning" role="status">
-                Unsaved assembly edits are not reflected in the visualization yet. Save assembly to update the graph.
-              </p>
+                {t("ui.harnessassemblymanagerpanelUnsavedAssemblyEditsAreNotReflectedInTheVisualizationYet")}</p>
             ) : null}
           </section>
 
           <section className="panel harness-assembly-manager-panel" aria-label="Inter-harness connector links">
             <header className="network-summary-header">
               <div>
-                <h2>Interconnector links</h2>
-                <p className="functional-schematic-subtitle">Define physical links between connectors from different harnesses.</p>
+                <h2>{t("ui.harnessassemblymanagerpanelInterconnectorLinks")}</h2>
+                <p className="functional-schematic-subtitle">{t("ui.harnessassemblymanagerpanelDefinePhysicalLinksBetweenConnectorsFromDifferentHarnesses")}</p>
               </div>
             </header>
             <div className="harness-assembly-link-form">
-              <input value={linkName} onChange={(event) => setLinkName(event.target.value)} placeholder="Link name" />
+              <input value={linkName} onChange={(event) => setLinkName(event.target.value)} placeholder={t("ui.harnessassemblymanagerpanelLinkName")} />
               <select value={sourceNetworkId} onChange={(event) => {
                 setSourceNetworkId(event.target.value as NetworkId | "");
                 setSourceConnectorId("");
               }}>
-                <option value="">Source harness</option>
+                <option value="">{t("ui.harnessassemblymanagerpanelSourceHarness")}</option>
                 {selectedMemberNetworks.map((network) => <option key={network.id} value={network.id}>{network.technicalId}</option>)}
               </select>
               <select value={sourceConnectorId} onChange={(event) => setSourceConnectorId(event.target.value as ConnectorId | "")}>
-                <option value="">Source connector</option>
+                <option value="">{t("ui.harnessassemblymanagerpanelSourceConnector")}</option>
                 {sourceConnectors.map((connector) => (
                   <option key={connector.id} value={connector.id}>{formatConnectorOptionLabel(connector)}</option>
                 ))}
@@ -420,22 +414,21 @@ export function HarnessAssemblyManagerPanel({
                 setTargetNetworkId(event.target.value as NetworkId | "");
                 setTargetConnectorId("");
               }}>
-                <option value="">Target harness</option>
+                <option value="">{t("ui.harnessassemblymanagerpanelTargetHarness")}</option>
                 {selectedMemberNetworks.map((network) => <option key={network.id} value={network.id}>{network.technicalId}</option>)}
               </select>
               <select value={targetConnectorId} onChange={(event) => setTargetConnectorId(event.target.value as ConnectorId | "")}>
-                <option value="">Target connector</option>
+                <option value="">{t("ui.harnessassemblymanagerpanelTargetConnector")}</option>
                 {targetConnectors.map((connector) => (
                   <option key={connector.id} value={connector.id}>{formatConnectorOptionLabel(connector)}</option>
                 ))}
               </select>
               <button type="button" className="network-scope-create-button button-with-icon" onClick={handleAddLink} disabled={!canAddLink}>
                 <span className="action-button-icon is-new" aria-hidden="true" />
-                Add link
-              </button>
+                {t("ui.harnessassemblymanagerpanelAddLink")}</button>
             </div>
             {connectorLinks.length === 0 ? (
-              <p className="empty-copy">No interconnector link defined for this assembly.</p>
+              <p className="empty-copy">{t("ui.harnessassemblymanagerpanelNoInterconnectorLinkDefinedForThisAssembly")}</p>
             ) : (
               <ul className="harness-assembly-links">
                 {connectorLinks.map((link) => (
@@ -448,16 +441,15 @@ export function HarnessAssemblyManagerPanel({
                           event.currentTarget.blur();
                         }
                       }}
-                      placeholder="Interconnector"
-                      aria-label="Interconnector link name"
+                      placeholder={t("ui.harnessassemblymanagerpanelInterconnector")}
+                      aria-label={t("ui.harnessassemblymanagerpanelInterconnectorLinkName")}
                     />
                     <span className="technical-id">
                       {describeConnector(link.sourceNetworkId, link.sourceConnectorId)} {"->"} {describeConnector(link.targetNetworkId, link.targetConnectorId)}
                     </span>
                     <button type="button" className="network-delete-button button-with-icon" onClick={() => handleRemoveLink(link.id)}>
                       <span className="action-button-icon is-delete" aria-hidden="true" />
-                      Remove
-                    </button>
+                      {t("ui.harnessassemblymanagerpanelRemove")}</button>
                   </li>
                 ))}
               </ul>
@@ -467,8 +459,7 @@ export function HarnessAssemblyManagerPanel({
             </div>
             {hasUnsavedVisualizationChanges ? (
               <p className="form-hint warning" role="status">
-                Unsaved assembly edits are not reflected in the visualization yet. Save assembly to update the graph.
-              </p>
+                {t("ui.harnessassemblymanagerpanelUnsavedAssemblyEditsAreNotReflectedInTheVisualizationYet")}</p>
             ) : null}
           </section>
         </>

@@ -32,7 +32,10 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
   const pendingPlacementCopy =
     pendingNewNodePosition === null
       ? null
-      : `Canvas placement captured at x=${Math.round(pendingNewNodePosition.x)}, y=${Math.round(pendingNewNodePosition.y)}.`;
+      : t("ui.canvasPlacementCaptured", {
+          x: Math.round(pendingNewNodePosition.x),
+          y: Math.round(pendingNewNodePosition.y)
+        });
   const connectorOptions = buildModelingDynamicSelectOptions({
     options: connectors.map((connector) => ({
       value: connector.id,
@@ -79,8 +82,7 @@ export function ModelingNodeFormPanel(props: ModelingFormsColumnProps): ReactEle
 
     {nodeKind === "intermediate" ? (
       <label>
-        Label
-        <input value={nodeLabel} onChange={(event) => setNodeLabel(event.target.value)} placeholder="N-branch-01" required />
+        {t("ui.connectorlayouteditorLabel")}<input value={nodeLabel} onChange={(event) => setNodeLabel(event.target.value)} placeholder={t("ui.modelingnodeformpanelNBranch01")} required />
       </label>
     ) : null}
 

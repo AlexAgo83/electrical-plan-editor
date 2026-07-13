@@ -74,7 +74,7 @@ export function buildNetworkFormDraft(input: NetworkFormDraftInput): NetworkForm
   const parsedVoltage = rawVoltage.length === 0 ? undefined : Number(rawVoltage);
   const normalizedVoltageV = rawVoltage.length === 0 ? undefined : normalizeNetworkVoltageV(parsedVoltage);
   if (rawVoltage.length > 0 && normalizedVoltageV === undefined) {
-    return { kind: "error", message: "Network voltage must be a positive value in V." };
+    return { kind: "error", message: t("ui.networkformdraftNetworkVoltageMustBeAPositiveValueInV") };
   }
 
   return {

@@ -90,16 +90,15 @@ function ModelingBatchContextContent({
       data-testid="modeling-batch-context-panel"
     >
       <div className="network-form-header">
-        <h3>Batch selection</h3>
+        <h3>{t("ui.modelingbatchcontextpanelBatchSelection")}</h3>
         <span className="network-form-mode-chip is-edit">
           Multi-select mode
         </span>
       </div>
       <p className="empty-copy">
-        {selectedCount} {label} selected.
-        {showSegmentBatchEdit
-          ? " You can update sheath parameters for the whole selection."
-          : " Editing is unavailable while multi-selection is active."}
+        {selectedCount} {label} {t("ui.networkcanvasfloatinginfopanelsSelected")}{showSegmentBatchEdit
+          ? t("ui.modelingbatchcontextpanelYouCanUpdateSheathParametersForTheWholeSelection")
+          : t("ui.modelingbatchcontextpanelEditingIsUnavailableWhileMultiSelectionIsActive")}
       </p>
       {showSegmentBatchEdit ? (
         <form
@@ -110,41 +109,37 @@ function ModelingBatchContextContent({
           }}
         >
           <label>
-            Layer (optional)
-            <input
+            {t("ui.modelingbatchcontextpanelLayerOptional")}<input
               value={segmentBatchEdit.sheathType}
               onChange={(event) =>
                 segmentBatchEdit.setSheathType(event.target.value)
               }
-              placeholder="CT5"
+              placeholder={t("ui.modelingbatchcontextpanelCt5")}
             />
           </label>
           <small className="inline-help">{fieldHelp("sheathType")}</small>
           <label>
-            Insulation (optional)
-            <input
+            {t("ui.modelingbatchcontextpanelInsulationOptional")}<input
               value={segmentBatchEdit.insulation}
               onChange={(event) =>
                 segmentBatchEdit.setInsulation(event.target.value)
               }
-              placeholder="PVC"
+              placeholder={t("ui.modelingbatchcontextpanelPvc")}
             />
           </label>
           <small className="inline-help">{fieldHelp("insulation")}</small>
           <label>
-            Line style (optional)
-            <input
+            {t("ui.modelingbatchcontextpanelLineStyleOptional")}<input
               value={segmentBatchEdit.lineStyle}
               onChange={(event) =>
                 segmentBatchEdit.setLineStyle(event.target.value)
               }
-              placeholder="braided sleeve"
+              placeholder={t("ui.modelingbatchcontextpanelBraidedSleeve")}
             />
           </label>
           <small className="inline-help">{fieldHelp("lineStyle")}</small>
           <label>
-            Internal part reference (optional)
-            <input
+            {t("ui.modelingbatchcontextpanelInternalPartReferenceOptional")}<input
               value={segmentBatchEdit.internalPartReference}
               onChange={(event) =>
                 segmentBatchEdit.setInternalPartReference(event.target.value)
@@ -164,29 +159,29 @@ function ModelingBatchContextContent({
               className="button-with-icon"
               disabled={selectedCount === 0}
             >
-              Apply to selected{selectedCount > 0 ? ` (${selectedCount})` : ""}
+              {t("ui.modelingbatchcontextpanelApplyToSelected")}{selectedCount > 0 ? ` (${selectedCount})` : ""}
             </button>
           </div>
         </form>
       ) : null}
       <dl className="compact-definition-list">
         <div>
-          <dt>Direct delete</dt>
+          <dt>{t("ui.modelingbatchcontextpanelDirectDelete")}</dt>
           <dd>{directCount}</dd>
         </div>
         <div>
-          <dt>Cascade delete</dt>
+          <dt>{t("ui.modelingbatchcontextpanelCascadeDelete")}</dt>
           <dd>{cascadeCount}</dd>
         </div>
         <div>
-          <dt>Blocked</dt>
+          <dt>{t("ui.modelingbatchcontextpanelBlocked")}</dt>
           <dd>{blockedCount}</dd>
         </div>
       </dl>
       {summaryCategories.length > 0 ? (
         <div
           className="delete-impact-summary"
-          aria-label="Batch delete summary"
+          aria-label={t("ui.modelingbatchcontextpanelBatchDeleteSummary")}
         >
           {summaryCategories.map((category) => (
             <section key={category.key} className="delete-impact-category">
@@ -213,15 +208,14 @@ function ModelingBatchContextContent({
           onClick={onDeleteSelected}
           disabled={selectedCount === 0}
         >
-          Delete selected{selectedCount > 0 ? ` (${selectedCount})` : ""}
+          {t("ui.modelingbatchcontextpanelDeleteSelected")}{selectedCount > 0 ? ` (${selectedCount})` : ""}
         </button>
         <button
           type="button"
           className="button-with-icon"
           onClick={onCancelBatchMode}
         >
-          Cancel selection
-        </button>
+          {t("ui.modelingbatchcontextpanelCancelSelection")}</button>
       </div>
     </div>
   );
@@ -317,7 +311,7 @@ export function ModelingBatchContextDialog({
       <button
         type="button"
         className="confirm-dialog-backdrop"
-        aria-label="Close batch selection"
+        aria-label={t("ui.modelingbatchcontextpanelCloseBatchSelection")}
         onClick={onCloseDialog}
       />
       <section
@@ -330,7 +324,7 @@ export function ModelingBatchContextDialog({
         onKeyDown={handleDialogKeyDown}
       >
         <header className="confirm-dialog-header workspace-tool-dialog-header">
-          <h2 id="modeling-batch-context-dialog-title">Batch selection</h2>
+          <h2 id="modeling-batch-context-dialog-title">{t("ui.modelingbatchcontextpanelBatchSelection")}</h2>
           <button
             ref={closeButtonRef}
             type="button"

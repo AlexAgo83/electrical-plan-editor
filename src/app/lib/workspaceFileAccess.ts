@@ -55,7 +55,7 @@ export interface WorkspaceFileStorageStatus {
 
 export const WORKSPACE_FILE_TYPES = [
   {
-    description: "Electrical Plan Editor workspace",
+    description: t("ui.workspacefileaccessElectricalPlanEditorWorkspace"),
     accept: { "application/json": [".epe.json", ".json"] }
   }
 ];

@@ -21,7 +21,7 @@ export function MultiNetworkFunctionalAnalysisDialog(props: MultiNetworkFunction
   if (!props.isOpen) return null;
   return (
     <div className="confirm-dialog-layer app-shell" role="presentation">
-      <button type="button" className="confirm-dialog-backdrop" aria-label="Close multi-network functional analysis" onClick={props.onClose} />
+      <button type="button" className="confirm-dialog-backdrop" aria-label={t("ui.multinetworkfunctionalanalysisdialogCloseMultiNetworkFunctionalAnalysis")} onClick={props.onClose} />
       <section ref={dialogRef} className="confirm-dialog panel workspace-tool-dialog multi-network-functional-analysis-dialog is-neutral" role="dialog" aria-modal="true" aria-labelledby="multi-network-functional-analysis-dialog-title" tabIndex={-1} onKeyDown={onKeyDown}>
         <header className="confirm-dialog-header workspace-tool-dialog-header">
           <h2 id="multi-network-functional-analysis-dialog-title">Multi-network functional analysis</h2>

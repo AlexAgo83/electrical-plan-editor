@@ -22,23 +22,23 @@ export function getSettingsSections(): SettingsSectionDefinition[] {
   return [
   {
     id: "settings-workspace-storage",
-    title: "Workspace storage",
+    title: t("ui.operationshealthpanelWorkspaceStorage"),
     labels: [
-      "Persistence mode",
-      "Linked file",
-      "Permission",
-      "Open workspace file",
-      "Save as file",
-      "Save as copy",
-      "Use a file for autosave",
-      "Resume last file",
-      "Save now",
-      "Stop autosave link",
-      "Resolve conflict",
-      "Restore file access",
-      "Load file version",
-      "Keep local version",
-      "Save local copy"
+      t("ui.settingssearchmodelPersistenceMode"),
+      t("ui.settingssearchmodelLinkedFile"),
+      t("ui.settingssearchmodelPermission"),
+      t("ui.operationshealthpanelOpenWorkspaceFile"),
+      t("ui.settingsworkspacecontentSaveAsFile"),
+      t("ui.settingssearchmodelSaveAsCopy"),
+      t("ui.settingsworkspacecontentUseAFileForAutosave"),
+      t("ui.settingsworkspacecontentResumeLastFile"),
+      t("ui.settingssearchmodelSaveNow"),
+      t("ui.settingssearchmodelStopAutosaveLink"),
+      t("ui.settingsworkspacecontentResolveConflict"),
+      t("ui.settingsworkspacecontentRestoreFileAccess"),
+      t("ui.settingssearchmodelLoadFileVersion"),
+      t("ui.settingssearchmodelKeepLocalVersion"),
+      t("ui.settingssearchmodelSaveLocalCopy")
     ]
   },
   {
@@ -47,13 +47,13 @@ export function getSettingsSections(): SettingsSectionDefinition[] {
     labels: [
       t("ui.selectedNetworksForExport"),
       t("ui.exportActive"),
-      "Export selected JSON",
+      t("ui.settingssearchmodelExportSelectedJSON"),
       t("ui.exportAll"),
-      "Export selected BOM (XLSX)",
-      "Export selected wire list (XLSX)",
-      "Export selected SVG",
-      "Export selected PNG",
-      "Export selected PDF",
+      t("ui.settingssearchmodelExportSelectedBOMXLSX"),
+      t("ui.settingssearchmodelExportSelectedWireListXLSX"),
+      t("ui.settingsworkspacecontentExportSelectedSVG"),
+      t("ui.settingsworkspacecontentExportSelectedPNG"),
+      t("ui.settingsworkspacecontentExportSelectedPDF"),
       t("ui.importFromFile")
     ]
   },
@@ -106,22 +106,22 @@ export function getSettingsSections(): SettingsSectionDefinition[] {
     title: t("ui.globalPreferences"),
     labels: [
       t("ui.showFloatingInspectorPanelOnSupportedScreens"),
-      "Show route preview panel",
-      "Hide Wire analysis auto route panel",
-      "Show multi-network functional analysis panel",
+      t("ui.settingssearchmodelShowRoutePreviewPanel"),
+      t("ui.settingssearchmodelHideWireAnalysisAutoRoutePanel"),
+      t("ui.settingssearchmodelShowMultiNetworkFunctionalAnalysisPanel"),
       t("ui.workspacePanelsLayout"),
       t("ui.wideScreenRemoveAppMaxWidthCap"),
-      "Enable performance debug console logs",
+      t("ui.settingssearchmodelEnablePerformanceDebugConsoleLogs"),
       t("ui.defaultWireSectionMm2"),
       t("ui.defaultAutoCreateLinkedNodesForConnectors"),
-      "Directional splice imbalance limit (%)",
+      t("ui.settingssearchmodelDirectionalSpliceImbalanceLimit"),
       t("ui.language")
     ]
   },
   {
     id: "settings-shortcuts",
     title: t("ui.actionBarAndShortcuts"),
-    labels: [t("ui.showShortcutHintsInTheActionBar"), t("ui.enableKeyboardShortcutsUndoRedoNavigationIssuesView"), "Restore network viewport on undo/redo"]
+    labels: [t("ui.showShortcutHintsInTheActionBar"), t("ui.enableKeyboardShortcutsUndoRedoNavigationIssuesView"), t("ui.settingssearchmodelRestoreNetworkViewportOnUndoRedo")]
   },
   {
     id: "settings-catalog-bom",
@@ -129,11 +129,11 @@ export function getSettingsSections(): SettingsSectionDefinition[] {
     labels: [
       t("ui.currencyCatalogBOM"),
       t("ui.enableTaxVATTVA"),
-      "Tabular export format",
+      t("ui.settingssearchmodelTabularExportFormat"),
       t("ui.wireStrippingAllowanceMm"),
       t("ui.twistedPairLengthCoefficient"),
-      "Compact BOM export columns",
-      "Hide BOM traceability labels",
+      t("ui.settingssearchmodelCompactBOMExportColumns"),
+      t("ui.settingssearchmodelHideBOMTraceabilityLabels"),
       t("ui.computedDownstreamLoadA"),
       t("ui.taxRate")
     ]
@@ -145,8 +145,8 @@ export function getSettingsSections(): SettingsSectionDefinition[] {
   },
   {
     id: "settings-ai-provider",
-    title: "AI provider",
-    labels: ["Provider", "Model", "API key", "Endpoint", "Timeout (ms)", "Strict structured output mode", "Enable experimental direct execution", "Test connection"]
+    title: t("ui.settingsworkspacecontentAiProvider"),
+    labels: [t("ui.settingssearchmodelProvider"), t("ui.settingssearchmodelModel"), t("ui.settingssearchmodelApiKey"), t("ui.settingssearchmodelEndpoint"), t("ui.settingssearchmodelTimeoutMs"), t("ui.settingssearchmodelStrictStructuredOutputMode"), t("ui.settingssearchmodelEnableExperimentalDirectExecution"), t("ui.settingssearchmodelTestConnection")]
   }
   ];
 }

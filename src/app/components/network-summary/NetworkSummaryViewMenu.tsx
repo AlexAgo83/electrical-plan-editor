@@ -50,8 +50,7 @@ export function NetworkSummaryViewMenu({
         aria-haspopup="menu"
       >
         <span className="network-summary-view-icon" aria-hidden="true" />
-        View
-      </button>
+        {t("ui.networksummaryviewmenuView")}</button>
       {open && (
         <div className="panel network-summary-view-menu network-summary-view-menu--right">
           <button
@@ -62,8 +61,7 @@ export function NetworkSummaryViewMenu({
             aria-label={showFloatingInspectorPanel ? "Hide inspector" : "Show inspector"}
           >
             <span className="network-summary-inspector-icon" aria-hidden="true" />
-            Inspect
-          </button>
+            {t("ui.networksummaryviewmenuInspect")}</button>
           <button
             type="button"
             className={showNetworkInfoPanels ? "network-summary-view-menu-item is-active" : "network-summary-view-menu-item"}
@@ -88,8 +86,7 @@ export function NetworkSummaryViewMenu({
             onClick={toggleShowSegmentDressings}
           >
             <span className="network-summary-dressings-icon" aria-hidden="true" />
-            Dressings
-          </button>
+            {t("ui.networksummaryviewmenuDressings")}</button>
           <button
             type="button"
             className={showCableCallouts ? "network-summary-view-menu-item is-active" : "network-summary-view-menu-item"}

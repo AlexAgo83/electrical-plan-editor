@@ -44,14 +44,12 @@ export function NetworkSummaryFunctionalMenu({
         aria-haspopup="menu"
       >
         <span className="action-button-icon is-harness-assembly" aria-hidden="true" />
-        Functional
-      </button>
+        {t("ui.networksummaryfunctionalmenuFunctional")}</button>
       {open ? (
         <div className="panel network-summary-view-menu network-summary-view-menu--right">
           <button type="button" className="network-summary-view-menu-item" onClick={handleOpenHarnessAssembly}>
             <span className="action-button-icon is-harness-assembly" aria-hidden="true" />
-            Harness assembly
-          </button>
+            {t("ui.harnessassemblymanagerpanelHarnessAssembly")}</button>
           {onOpenAnalysis === undefined ? null : (
             <button type="button" className="network-summary-view-menu-item" onClick={handleOpenAnalysis}>
               <span className="action-button-icon is-analysis" aria-hidden="true" />

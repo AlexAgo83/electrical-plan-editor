@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 import { ConfirmDialog } from "../dialogs/ConfirmDialog";
 import { ChoiceDialog } from "../dialogs/ChoiceDialog";
@@ -136,7 +137,7 @@ export function AppControllerOverlays({
       <PreviewLoadingDialog
         isOpen={isBomPreviewLoading && activeBomPreview === null}
         themeHostClassName={appShellClassName}
-        title="Preparing BOM preview"
+        title={t("ui.appcontrolleroverlaysPreparingBOMPreview")}
         message="Building the export table."
       />
       {spliceMigrationReportDialog !== null ? (

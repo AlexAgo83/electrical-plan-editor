@@ -468,7 +468,7 @@ export function useConnectorHandlers({
 
       if (impact.kind === "cascade") {
         const shouldCascadeDelete = await confirmAction({
-          title: "Cascade delete connector",
+          title: t("ui.useconnectorhandlersCascadeDeleteConnector"),
           message: impact.message,
           confirmLabel: "Delete all",
           cancelLabel: t("ui.cancel"),
@@ -490,7 +490,7 @@ export function useConnectorHandlers({
       }
 
       await confirmAction({
-        title: "Connector delete blocked",
+        title: t("ui.useconnectorhandlersConnectorDeleteBlocked"),
         message: impact.message,
         confirmLabel: t("ui.close"),
         cancelLabel: t("ui.cancel"),

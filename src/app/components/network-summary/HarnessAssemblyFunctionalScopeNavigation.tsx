@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 import type { HarnessAssembly } from "../../../core/entities";
 
@@ -28,20 +29,20 @@ export function HarnessAssemblyFunctionalScopeNavigation({
   return (
     <section
       className={sectionClassName}
-      aria-label="Functional graph scope"
-      data-quick-entity-nav-source={variant === "panel" ? "true" : undefined}
+      aria-label={t("ui.harnessassemblyfunctionalscopenavigationFunctionalGraphScope")}
+      data-quick-entity-nav-source={variant === "panel" ? t("ui.harnessassemblyfunctionalscopenavigationTrue") : undefined}
     >
-      <div className={groupClassName} role="tablist" aria-label="Functional graph scope tabs">
+      <div className={groupClassName} role="tablist" aria-label={t("ui.harnessassemblyfunctionalscopenavigationFunctionalGraphScopeTabs")}>
         <button
           type="button"
           role="tab"
           className="filter-chip network-summary-export-button"
           aria-selected={activeScope === "assembly"}
           onClick={onOpenAssemblyPicker}
-          title={displayedHarnessAssembly === null ? "Select a harness assembly" : `Selected: ${displayedHarnessAssembly.name}`}
+          title={displayedHarnessAssembly === null ? t("ui.harnessassemblyfunctionalscopenavigationSelectAHarnessAssembly") : `Selected: ${displayedHarnessAssembly.name}`}
         >
           <span className="action-button-icon network-summary-quick-entity-nav-icon is-harness-assembly" aria-hidden="true" />
-          <span className="network-summary-quick-entity-nav-label">Select harness assembly</span>
+          <span className="network-summary-quick-entity-nav-label">{t("ui.harnessassemblyfunctionalscopenavigationSelectHarnessAssembly")}</span>
         </button>
         <button
           type="button"
@@ -51,7 +52,7 @@ export function HarnessAssemblyFunctionalScopeNavigation({
           onClick={onShowCurrentNetwork}
         >
           <span className="action-button-icon network-summary-quick-entity-nav-icon is-network-scope" aria-hidden="true" />
-          <span className="network-summary-quick-entity-nav-label">Current network functional</span>
+          <span className="network-summary-quick-entity-nav-label">{t("ui.harnessassemblyfunctionalscopenavigationCurrentNetworkFunctional")}</span>
         </button>
       </div>
     </section>

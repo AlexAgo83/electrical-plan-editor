@@ -102,35 +102,30 @@ export function ModelingSegmentFormPanel(props: ModelingFormsColumnProps): React
       <input value={segmentSubNetworkTag} onChange={(event) => setSegmentSubNetworkTag(event.target.value)} placeholder="front-harness" />
     </label>
     <label>
-      Sheath type (optional)
-      <input value={segmentSheathType} onChange={(event) => setSegmentSheathType(event.target.value)} placeholder="CT5" />
+      {t("ui.modelingsegmentformpanelSheathTypeOptional")}<input value={segmentSheathType} onChange={(event) => setSegmentSheathType(event.target.value)} placeholder={t("ui.modelingbatchcontextpanelCt5")} />
     </label>
     <label>
-      Insulation (optional)
-      <input value={segmentInsulation} onChange={(event) => setSegmentInsulation(event.target.value)} placeholder="PVC" />
+      {t("ui.modelingbatchcontextpanelInsulationOptional")}<input value={segmentInsulation} onChange={(event) => setSegmentInsulation(event.target.value)} placeholder={t("ui.modelingbatchcontextpanelPvc")} />
     </label>
     <label>
-      Line style (optional)
-      <input value={segmentLineStyle} onChange={(event) => setSegmentLineStyle(event.target.value)} placeholder="braided sleeve" />
+      {t("ui.modelingbatchcontextpanelLineStyleOptional")}<input value={segmentLineStyle} onChange={(event) => setSegmentLineStyle(event.target.value)} placeholder={t("ui.modelingbatchcontextpanelBraidedSleeve")} />
     </label>
     <label>
-      Internal part reference (optional)
-      <input
+      {t("ui.modelingbatchcontextpanelInternalPartReferenceOptional")}<input
         value={segmentInternalPartReference}
         onChange={(event) => setSegmentInternalPartReference(event.target.value)}
         placeholder="INT-PART-001"
       />
     </label>
     <label>
-      Mounting labels (optional)
-      <textarea
+      {t("ui.modelingsegmentformpanelMountingLabelsOptional")}<textarea
         value={segmentMountingLabelsText}
         onChange={(event) => setSegmentMountingLabelsText(event.target.value)}
         placeholder={"LBL-001,Assembly label,0.5,0,-18\nLBL-002,Rear harness,0.2,0,14"}
         rows={3}
       />
     </label>
-    <small className="inline-help">One line per label: id,text,positionRatio,offsetX,offsetY</small>
+    <small className="inline-help">{t("ui.modelingsegmentformpanelOneLinePerLabelIdTextPositionRatioOffsetXOffsetY")}</small>
     <div className="row-actions">
       <button type="submit" className="button-with-icon">
         {segmentFormMode === "create" ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}

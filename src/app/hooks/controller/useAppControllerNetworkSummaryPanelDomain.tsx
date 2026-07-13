@@ -642,12 +642,12 @@ export function useAppControllerNetworkSummaryPanelDomain({
       <section className="panel functional-schematic-panel" aria-labelledby="harness-assembly-empty-title">
         <header className="network-summary-header">
           <div>
-            <h2 id="harness-assembly-empty-title">Harness assembly functional schematic</h2>
-            <p className="functional-schematic-subtitle">Select a saved harness assembly to display its functional graph.</p>
+            <h2 id="harness-assembly-empty-title">{t("ui.useappcontrollernetworksummarypaneldomainHarnessAssemblyFunctionalSchematic")}</h2>
+            <p className="functional-schematic-subtitle">{t("ui.useappcontrollernetworksummarypaneldomainSelectASavedHarnessAssemblyToDisplayItsFunctionalGraph")}</p>
           </div>
         </header>
         <div className="functional-schematic-canvas-shell">
-          <p className="empty-copy">No harness assembly selected.</p>
+          <p className="empty-copy">{t("ui.useappcontrollernetworksummarypaneldomainNoHarnessAssemblySelected")}</p>
         </div>
       </section>
     ) : (
@@ -660,7 +660,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
         spliceMap={new Map()}
         rootConnectorIds={[]}
         assemblyGraphFactory={assemblyGraphFactory ?? undefined}
-        title="Harness assembly functional schematic"
+        title={t("ui.useappcontrollernetworksummarypaneldomainHarnessAssemblyFunctionalSchematic")}
         titleSuffix={displayedHarnessAssembly.name}
         subtitle={`Filtered trace across ${displayedHarnessAssembly.name} from configured master connectors.`}
         selectedWireId={null}
@@ -686,7 +686,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
       connectorMap={connectorMap}
       spliceMap={spliceMap}
       rootConnectorIds={mainHarnessConnectorIds}
-      title="Current network functional"
+      title={t("ui.harnessassemblyfunctionalscopenavigationCurrentNetworkFunctional")}
       titleSuffix={activeNetwork?.name ?? "No active network"}
       selectedWireId={selection.selectedWireId}
       selectedConnectorId={selection.selectedConnectorId ?? mainHarnessConnectorIds[0] ?? null}
@@ -703,12 +703,12 @@ export function useAppControllerNetworkSummaryPanelDomain({
     <section className="panel functional-schematic-panel" aria-labelledby="current-network-functional-empty-title">
       <header className="network-summary-header">
         <div>
-          <h2 id="current-network-functional-empty-title">Current network functional</h2>
-          <p className="functional-schematic-subtitle">Set an active network to display its functional graph.</p>
+          <h2 id="current-network-functional-empty-title">{t("ui.harnessassemblyfunctionalscopenavigationCurrentNetworkFunctional")}</h2>
+          <p className="functional-schematic-subtitle">{t("ui.useappcontrollernetworksummarypaneldomainSetAnActiveNetworkToDisplayItsFunctionalGraph")}</p>
         </div>
       </header>
       <div className="functional-schematic-canvas-shell">
-        <p className="empty-copy">No active network selected.</p>
+        <p className="empty-copy">{t("ui.useappcontrollernetworksummarypaneldomainNoActiveNetworkSelected")}</p>
       </div>
     </section>
   );
@@ -743,7 +743,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
           <button
             type="button"
             className="confirm-dialog-backdrop"
-            aria-label="Close harness assembly selector"
+            aria-label={t("ui.useappcontrollernetworksummarypaneldomainCloseHarnessAssemblySelector")}
             onClick={() => setIsHarnessAssemblyPickerOpen(false)}
           />
           <section
@@ -753,7 +753,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
             aria-labelledby="harness-assembly-picker-title"
           >
             <header className="confirm-dialog-header">
-              <h2 id="harness-assembly-picker-title">Select harness assembly</h2>
+              <h2 id="harness-assembly-picker-title">{t("ui.harnessassemblyfunctionalscopenavigationSelectHarnessAssembly")}</h2>
             </header>
             <div className="harness-assembly-picker-list" role="list">
               <button
@@ -765,8 +765,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
                 }
                 onClick={() => handlePickDisplayedAssembly("new")}
               >
-                <span>New assembly</span>
-                <span className="technical-id">Create draft</span>
+                <span>{t("ui.harnessassemblymanagerpanelNewAssembly")}</span>
+                <span className="technical-id">{t("ui.useappcontrollernetworksummarypaneldomainCreateDraft")}</span>
               </button>
               {harnessAssemblies.map((assembly) => (
                 <button
@@ -780,7 +780,7 @@ export function useAppControllerNetworkSummaryPanelDomain({
                 </button>
               ))}
             </div>
-            {harnessAssemblies.length === 0 ? <p className="empty-copy">No saved harness assembly yet.</p> : null}
+            {harnessAssemblies.length === 0 ? <p className="empty-copy">{t("ui.useappcontrollernetworksummarypaneldomainNoSavedHarnessAssemblyYet")}</p> : null}
             <footer className="confirm-dialog-actions">
               <button type="button" className="confirm-dialog-cancel" onClick={() => setIsHarnessAssemblyPickerOpen(false)}>
                 

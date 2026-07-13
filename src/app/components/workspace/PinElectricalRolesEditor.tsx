@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement, ReactNode } from "react";
 import { useState } from "react";
 import type { CatalogItem, ConnectorLayout, PinElectricalRoleKind } from "../../../core/entities";
@@ -102,16 +103,16 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
         <div
           className="pin-electrical-roles-table"
           role="table"
-          aria-label="Pin electrical roles"
+          aria-label={t("ui.pinelectricalroleseditorPinElectricalRoles")}
         >
           <div className="pin-electrical-roles-row pin-electrical-roles-row--header" role="row">
             <span role="columnheader">
-              <span className="sr-only">Select</span>
+              <span className="sr-only">{t("ui.pinelectricalroleseditorSelect")}</span>
             </span>
-            <span role="columnheader">Pin</span>
-            <span role="columnheader">Role</span>
-            <span role="columnheader">Max current (A)</span>
-            <span role="columnheader">Label</span>
+            <span role="columnheader">{t("ui.pinelectricalroleseditorPin")}</span>
+            <span role="columnheader">{t("ui.pinelectricalroleseditorRole")}</span>
+            <span role="columnheader">{t("ui.pinelectricalroleseditorMaxCurrentA")}</span>
+            <span role="columnheader">{t("ui.connectorlayouteditorLabel")}</span>
           </div>
           {Array.from({ length: safeCavityCount }, (_, index) => {
             const cavityIndex = index + 1;
@@ -138,14 +139,14 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
               >
                 <span role="cell" data-label="Select">
                   <label className="sr-only" htmlFor={`pin-role-select-${cavityIndex}`}>
-                    Select pin {pinLabel}
+                    {t("ui.pinelectricalroleseditorSelectPin")}{pinLabel}
                   </label>
                   <input
                     id={`pin-role-select-${cavityIndex}`}
                     type="checkbox"
                     checked={isSelected}
                     onChange={() => toggleSelection(cavityIndex)}
-                    aria-label={`Select pin ${pinLabel}`}
+                    aria-label={t("ui.pinelectricalroleseditorSelectPinPinLabel", { pinLabel: pinLabel })}
                   />
                 </span>
                 <span role="cell" className="pin-electrical-roles-index" data-label="Pin">
@@ -153,7 +154,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                 </span>
                 <span role="cell" data-label="Role">
                   <label className="sr-only" htmlFor={`pin-role-role-${cavityIndex}`}>
-                    Role for pin {pinLabel}
+                    {t("ui.pinelectricalroleseditorRoleForPin")}{pinLabel}
                   </label>
                   <select
                     id={`pin-role-role-${cavityIndex}`}
@@ -174,7 +175,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                   {hidesRoleDetails ? null : (
                     <>
                       <label className="sr-only" htmlFor={`pin-role-current-${cavityIndex}`}>
-                        Max current for pin {pinLabel}
+                        {t("ui.pinelectricalroleseditorMaxCurrentForPin")}{pinLabel}
                       </label>
                       <input
                         id={`pin-role-current-${cavityIndex}`}
@@ -202,7 +203,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                   {hidesRoleDetails ? null : (
                     <>
                       <label className="sr-only" htmlFor={`pin-role-label-${cavityIndex}`}>
-                        Label for pin {pinLabel}
+                        {t("ui.pinelectricalroleseditorLabelForPin")}{pinLabel}
                       </label>
                       <input
                         id={`pin-role-label-${cavityIndex}`}
@@ -211,7 +212,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
                         autoComplete="off"
                         maxLength={80}
                         value={draft.label}
-                        placeholder="BAT+, KL15, LS_OUT..."
+                        placeholder={t("ui.pinelectricalroleseditorBatKL15LSOUT")}
                         onChange={(event) =>
                           updateDraftField(cavityIndex, "label", event.target.value)
                         }
@@ -226,10 +227,9 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
             );
           })}
         </div>
-        <div className="pin-electrical-roles-bulk row-actions compact" aria-label="Bulk pin role actions">
+        <div className="pin-electrical-roles-bulk row-actions compact" aria-label={t("ui.pinelectricalroleseditorBulkPinRoleActions")}>
           <label className="pin-electrical-roles-bulk-role stack-label">
-            Bulk role
-            <select
+            {t("ui.pinelectricalroleseditorBulkRole")}<select
               value={bulkRole}
               disabled={selection.length === 0}
               onChange={(event) => setBulkRole(event.target.value as PinElectricalRoleKind)}
@@ -247,8 +247,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
             disabled={selection.length === 0}
             onClick={applyBulkRole}
           >
-            Apply role
-          </button>
+            {t("ui.pinelectricalroleseditorApplyRole")}</button>
           {allowInheritedRoles ? (
             <button
               type="button"
@@ -256,8 +255,7 @@ export function PinElectricalRolesEditor(props: PinElectricalRolesEditorProps): 
               disabled={selection.length === 0}
               onClick={resetSelectionToCatalog}
             >
-              Use catalog default
-            </button>
+              {t("ui.pinelectricalroleseditorUseCatalogDefault")}</button>
           ) : null}
         </div>
       </div>

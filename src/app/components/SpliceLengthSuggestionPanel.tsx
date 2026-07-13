@@ -25,12 +25,12 @@ export function SpliceLengthSuggestionPanel({
         <h2>{t("ui.suggestedSpliceLengths")}</h2>
       </div>
       <div className="inspector-entity-line">
-        <span className="inspector-kind-chip">splice</span>
+        <span className="inspector-kind-chip">{t("ui.splicelengthsuggestionpanelSplice")}</span>
         <span className="technical-id inspector-entity-id">{suggestion.spliceSummary}</span>
       </div>
       <p className="splice-length-suggestion-message">{suggestion.message}</p>
-      <div className="splice-length-suggestion-details" aria-label="Comparison">
-        <span className="confirm-dialog-details-label">Comparison</span>
+      <div className="splice-length-suggestion-details" aria-label={t("ui.splicelengthsuggestionpanelComparison")}>
+        <span className="confirm-dialog-details-label">{t("ui.splicelengthsuggestionpanelComparison")}</span>
         <code className="confirm-dialog-details-code">{suggestion.comparisonDetails}</code>
       </div>
       <div className="row-actions inspector-actions splice-length-suggestion-actions">

@@ -21,10 +21,10 @@ export function PinRoleMassEditDialog(props: PinRoleMassEditDialogProps): ReactE
   if (!props.isOpen) return null;
   return (
     <div className="confirm-dialog-layer app-shell" role="presentation">
-      <button type="button" className="confirm-dialog-backdrop" aria-label="Close pin role mass edit" onClick={props.onClose} />
+      <button type="button" className="confirm-dialog-backdrop" aria-label={t("ui.pinrolemasseditdialogClosePinRoleMassEdit")} onClick={props.onClose} />
       <section ref={dialogRef} className="confirm-dialog panel workspace-tool-dialog pin-role-mass-edit-dialog is-neutral" role="dialog" aria-modal="true" aria-labelledby="pin-role-mass-edit-dialog-title" tabIndex={-1} onKeyDown={onKeyDown}>
         <header className="confirm-dialog-header workspace-tool-dialog-header">
-          <h2 id="pin-role-mass-edit-dialog-title">Pin role mass edit</h2>
+          <h2 id="pin-role-mass-edit-dialog-title">{t("ui.pinrolemasseditdialogPinRoleMassEdit")}</h2>
           <button ref={closeButtonRef} type="button" className="confirm-dialog-cancel" onClick={props.onClose}>{t("ui.close")}</button>
         </header>
         <PinRoleMassEditPanel activeNetwork={props.activeNetwork} connectors={props.connectors} splices={props.splices} wires={props.wires} catalogItems={props.catalogItems} onApplyPinRoleMassEdit={props.onApplyPinRoleMassEdit} />

@@ -84,14 +84,14 @@ function DistributionTable({ title, rows }: { title: string; rows: DistributionR
     <section className="panel">
       <h2>{title}</h2>
       {rows.length === 0 ? (
-        <p className="empty-copy">No data available.</p>
+        <p className="empty-copy">{t("ui.statisticsworkspacecontentNoDataAvailable")}</p>
       ) : (
         <table className="data-table">
           <thead>
             <tr>
-              <th>Bucket</th>
-              <th>Count</th>
-              <th>Total length</th>
+              <th>{t("ui.statisticsworkspacecontentBucket")}</th>
+              <th>{t("ui.modelingcataloglistpanelCount")}</th>
+              <th>{t("ui.statisticsworkspacecontentTotalLength")}</th>
             </tr>
           </thead>
           <tbody>
@@ -114,17 +114,17 @@ function ComparisonTable({ rows }: { rows: PerNetworkStatistics[] }): ReactEleme
     <section className="panel">
       <h2>Per-network comparison</h2>
       {rows.length <= 1 ? (
-        <p className="empty-copy">Select several networks to compare them side by side.</p>
+        <p className="empty-copy">{t("ui.statisticsworkspacecontentSelectSeveralNetworksToCompareThemSideBySide")}</p>
       ) : (
         <table className="data-table">
           <thead>
             <tr>
-              <th>Network</th>
+              <th>{t("ui.networksummaryexportmenuNetwork")}</th>
               <th>{t("ui.connectors")}</th>
               <th>{t("ui.splices")}</th>
               <th>{t("ui.wires")}</th>
-              <th>Total length</th>
-              <th>Connector occupancy</th>
+              <th>{t("ui.statisticsworkspacecontentTotalLength")}</th>
+              <th>{t("ui.statisticsworkspacecontentConnectorOccupancy")}</th>
             </tr>
           </thead>
           <tbody>
@@ -188,12 +188,11 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
   if (appState.activeNetworkId === null && scopeMode === "active") {
     return (
       <section className="panel">
-        <h2>Statistics</h2>
-        <p className="empty-copy">Create or select a network to view statistics.</p>
+        <h2>{t("ui.statisticsworkspacecontentStatistics")}</h2>
+        <p className="empty-copy">{t("ui.statisticsworkspacecontentCreateOrSelectANetworkToViewStatistics")}</p>
         {networks.length === 0 ? null : (
           <button type="button" className="button-with-icon" onClick={() => setScopeMode("manual")}>
-            Select networks manually
-          </button>
+            {t("ui.statisticsworkspacecontentSelectNetworksManually")}</button>
         )}
       </section>
     );
@@ -202,25 +201,23 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
   return (
     <section className="panel-grid statistics-workspace">
       <section className="panel">
-        <h2>Statistics</h2>
+        <h2>{t("ui.statisticsworkspacecontentStatistics")}</h2>
         <div className="validation-toolbar">
-          <span>Scope</span>
-          <div className="chip-group" role="group" aria-label="Statistics scope">
+          <span>{t("ui.multinetworkfunctionalanalysispanelScope")}</span>
+          <div className="chip-group" role="group" aria-label={t("ui.statisticsworkspacecontentStatisticsScope")}>
             <button
               type="button"
               className={scopeMode === "active" ? "filter-chip is-active" : "filter-chip"}
               onClick={() => setScopeMode("active")}
               disabled={appState.activeNetworkId === null}
             >
-              Active network
-            </button>
+              {t("ui.functionalschematicpanelActiveNetwork")}</button>
             <button
               type="button"
               className={scopeMode === "manual" ? "filter-chip is-active" : "filter-chip"}
               onClick={() => setScopeMode("manual")}
             >
-              Manual selection
-            </button>
+              {t("ui.statisticsworkspacecontentManualSelection")}</button>
           </div>
         </div>
         {scopeMode === "manual" ? (
@@ -251,13 +248,13 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
 
       {stats === null ? (
         <section className="panel">
-          <h2>No statistics to show</h2>
-          <p className="empty-copy">Select at least one network to compute statistics.</p>
+          <h2>{t("ui.statisticsworkspacecontentNoStatisticsToShow")}</h2>
+          <p className="empty-copy">{t("ui.statisticsworkspacecontentSelectAtLeastOneNetworkToComputeStatistics")}</p>
         </section>
       ) : (
         <>
           <section className="panel statistics-summary-panel">
-            <h2>Summary</h2>
+            <h2>{t("ui.statisticsworkspacecontentSummary")}</h2>
             <div className="summary-grid">
               <KpiTile label={t("ui.connectors")} value={formatCount(stats.aggregate.counts.connectors)} />
               <KpiTile label={t("ui.splices")} value={formatCount(stats.aggregate.counts.splices)} />
@@ -276,39 +273,37 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
             </div>
             {stats.aggregate.wireLengths.ignoredWireCount > 0 ? (
               <p className="meta-line">
-                {formatCount(stats.aggregate.wireLengths.ignoredWireCount)} wire
-                {stats.aggregate.wireLengths.ignoredWireCount === 1 ? " is" : "s are"} ignored by length metrics because no physical route or explicit length exists.
-              </p>
+                {formatCount(stats.aggregate.wireLengths.ignoredWireCount)} {t("ui.functionalschematicpanelWire")}{stats.aggregate.wireLengths.ignoredWireCount === 1 ? t("ui.statisticsworkspacecontentIs") : t("ui.statisticsworkspacecontentSAre")} {t("ui.statisticsworkspacecontentIgnoredByLengthMetricsBecauseNoPhysicalRouteOrExplicit")}</p>
             ) : null}
           </section>
 
           <ComparisonTable rows={stats.perNetwork} />
 
           <section className="panel">
-            <h2>Wire length metrics</h2>
+            <h2>{t("ui.statisticsworkspacecontentWireLengthMetrics")}</h2>
             {stats.aggregate.wireLengths.includedWireCount === 0 ? (
-              <p className="empty-copy">No routed physical wire length available.</p>
+              <p className="empty-copy">{t("ui.statisticsworkspacecontentNoRoutedPhysicalWireLengthAvailable")}</p>
             ) : (
               <table className="data-table">
                 <tbody>
                   <tr>
-                    <th>Total</th>
+                    <th>{t("ui.statisticsworkspacecontentTotal")}</th>
                     <td>{formatMeters(stats.aggregate.wireLengths.totalMm)}</td>
                   </tr>
                   <tr>
-                    <th>Average</th>
+                    <th>{t("ui.statisticsworkspacecontentAverage")}</th>
                     <td>{formatMeters(stats.aggregate.wireLengths.averageMm)}</td>
                   </tr>
                   <tr>
-                    <th>Median</th>
+                    <th>{t("ui.statisticsworkspacecontentMedian")}</th>
                     <td>{formatMeters(stats.aggregate.wireLengths.medianMm)}</td>
                   </tr>
                   <tr>
-                    <th>Minimum</th>
+                    <th>{t("ui.statisticsworkspacecontentMinimum")}</th>
                     <td>{formatMeters(stats.aggregate.wireLengths.minMm)}</td>
                   </tr>
                   <tr>
-                    <th>Maximum</th>
+                    <th>{t("ui.statisticsworkspacecontentMaximum")}</th>
                     <td>{formatMeters(stats.aggregate.wireLengths.maxMm)}</td>
                   </tr>
                 </tbody>
@@ -317,15 +312,15 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
           </section>
 
           <section className="panel">
-            <h2>Longest wires</h2>
+            <h2>{t("ui.statisticsworkspacecontentLongestWires")}</h2>
             {stats.aggregate.wireLengths.longestWires.length === 0 ? (
-              <p className="empty-copy">No routed physical wire length available.</p>
+              <p className="empty-copy">{t("ui.statisticsworkspacecontentNoRoutedPhysicalWireLengthAvailable")}</p>
             ) : (
               <table className="data-table">
                 <thead>
                   <tr>
                     <th>{t("ui.wire")}</th>
-                    <th>Network</th>
+                    <th>{t("ui.networksummaryexportmenuNetwork")}</th>
                     <th>{t("ui.length")}</th>
                   </tr>
                 </thead>
@@ -349,11 +344,11 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
             )}
           </section>
 
-          <DistributionTable title="Wire sections" rows={stats.aggregate.sectionDistribution} />
-          <DistributionTable title="Wire colors" rows={stats.aggregate.colorDistribution} />
+          <DistributionTable title={t("ui.statisticsworkspacecontentWireSections")} rows={stats.aggregate.sectionDistribution} />
+          <DistributionTable title={t("ui.statisticsworkspacecontentWireColors")} rows={stats.aggregate.colorDistribution} />
 
           <section className="panel">
-            <h2>Connector utilization</h2>
+            <h2>{t("ui.statisticsworkspacecontentConnectorUtilization")}</h2>
             <div className="summary-grid">
               <KpiTile label="Total ways" value={formatCount(stats.aggregate.connectorUtilization.totalWays)} />
               <KpiTile label="Occupied ways" value={formatCount(stats.aggregate.connectorUtilization.occupiedWays)} />
@@ -361,15 +356,15 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
               <KpiTile label="Occupancy" value={formatPercent(stats.aggregate.connectorUtilization.occupancyPercent)} />
             </div>
             {stats.aggregate.connectorUtilization.topUnusedConnectors.length === 0 ? (
-              <p className="empty-copy">No unused connector ways.</p>
+              <p className="empty-copy">{t("ui.statisticsworkspacecontentNoUnusedConnectorWays")}</p>
             ) : (
               <table className="data-table">
                 <thead>
                   <tr>
                     <th>{t("ui.connector")}</th>
-                    <th>Network</th>
-                    <th>Unused ways</th>
-                    <th>Total ways</th>
+                    <th>{t("ui.networksummaryexportmenuNetwork")}</th>
+                    <th>{t("ui.statisticsworkspacecontentUnusedWays")}</th>
+                    <th>{t("ui.statisticsworkspacecontentTotalWays")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -394,7 +389,7 @@ export function StatisticsWorkspaceContent({ appState }: StatisticsWorkspaceCont
           </section>
 
           <section className="panel">
-            <h2>Splice utilization</h2>
+            <h2>{t("ui.statisticsworkspacecontentSpliceUtilization")}</h2>
             <div className="summary-grid">
               <KpiTile label="Finite ports" value={formatCount(stats.aggregate.spliceUtilization.finitePortCapacity)} />
               <KpiTile label="Occupied ports" value={formatCount(stats.aggregate.spliceUtilization.occupiedFinitePorts)} />

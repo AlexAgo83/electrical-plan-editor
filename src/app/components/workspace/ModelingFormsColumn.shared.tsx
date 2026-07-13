@@ -23,7 +23,7 @@ export function renderFormHeader(title: string, mode: ModelingFormMode): ReactEl
 }
 
 export function renderIdleCopy(entityLabel: string, onCreate: () => void): ReactElement {
-  const idleCopy = `Select a ${entityLabel} row to view or edit it, or create a new one.`;
+  const idleCopy = t("ui.selectEntityRow", { entity: entityLabel.toLowerCase() });
   return (
     <>
       <p className="empty-copy">{idleCopy}</p>

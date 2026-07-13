@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch, type ReactElement, type RefObject, type SetStateAction } from "react";
 import type { TableColumnPreferences } from "../../hooks/uiPreferencesStorage";
 
@@ -130,8 +131,7 @@ export function ConfigurableTableColumnsControl({
   return (
     <div ref={wrapperRef} className="network-summary-view-menu-wrapper">
       <button type="button" className="filter-chip" aria-expanded={isOpen} onClick={() => setIsOpen((current) => !current)}>
-        Columns ▾
-      </button>
+        {t("ui.configurabletablecolumnsColumns")}</button>
       {isOpen ? (
         <div className="panel network-summary-view-menu network-summary-view-menu--right" role="menu">
           {hideableColumns.map((column) => (

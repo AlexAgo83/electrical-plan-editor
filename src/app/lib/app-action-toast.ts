@@ -106,20 +106,20 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
   switch (action.type) {
     case "network/create":
       return {
-        title: "Network created",
+        title: t("ui.appActionToastNetworkCreated"),
         message: `${action.payload.network.name} (${action.payload.network.technicalId})`,
         variant: "success"
       };
     case "network/update":
     case "network/rename":
       return {
-        title: "Network updated",
+        title: t("ui.appActionToastNetworkUpdated"),
         message: getNetworkLabel(nextState, action.payload.id),
         variant: "success"
       };
     case "network/duplicate":
       return {
-        title: "Network duplicated",
+        title: t("ui.appActionToastNetworkDuplicated"),
         message: `${action.payload.network.name} (${action.payload.network.technicalId})`,
         variant: "success"
       };
@@ -219,13 +219,13 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
       });
     case "splice/convertToDirectional":
       return {
-        title: "Splice converted",
+        title: t("ui.appActionToastSpliceConverted"),
         message: getSpliceLabel(nextState, action.payload.id),
         variant: "success"
       };
     case "splice/rerouteConnectedWires":
       return {
-        title: "Connected wires rerouted",
+        title: t("ui.appActionToastConnectedWiresRerouted"),
         message: getSpliceLabel(nextState, action.payload.id),
         variant: "success"
       };
@@ -282,7 +282,7 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
       });
     case "node/rename":
       return {
-        title: "Node updated",
+        title: t("ui.appActionToastNodeUpdated"),
         message: getNodeLabel(nextState, action.payload.toId),
         variant: "success"
       };
@@ -303,13 +303,13 @@ export function buildAppActionToast(action: AppAction, previousState: AppState, 
       });
     case "segment/updateBatch":
       return {
-        title: "Segments updated",
+        title: t("ui.appActionToastSegmentsUpdated"),
         message: `${action.payload.ids.length} segment${action.payload.ids.length === 1 ? "" : "s"}`,
         variant: "success"
       };
     case "segment/rename":
       return {
-        title: "Segment updated",
+        title: t("ui.appActionToastSegmentUpdated"),
         message: getSegmentLabel(nextState, action.payload.toId),
         variant: "success"
       };

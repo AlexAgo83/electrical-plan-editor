@@ -133,7 +133,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
     }
 
     return (
-      <ol className="analysis-current-route-path" aria-label="Current route segment order">
+      <ol className="analysis-current-route-path" aria-label={t("ui.analysiswireworkspacepanelsCurrentRouteSegmentOrder")}>
         {segmentIds.map((segmentId, index) => {
           const segment = segmentById.get(segmentId as SegmentId);
           const segmentLabel = segment === undefined ? segmentId : getRouteSegmentLabel(segment);
@@ -168,7 +168,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
         return <>{label}</>;
       }
       return (
-        <EntityReferenceButton title={`Open connector ${connector.technicalId}`} onClick={() => onSelectConnector(endpoint.connectorId)}>
+        <EntityReferenceButton title={t("ui.openNamedTarget", { target: `${t("ui.connector").toLowerCase()} ${connector.technicalId}` })} onClick={() => onSelectConnector(endpoint.connectorId)}>
           {label}
         </EntityReferenceButton>
       );
@@ -179,7 +179,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
       return <>{label}</>;
     }
     return (
-      <EntityReferenceButton title={`Open splice ${splice.technicalId}`} onClick={() => onSelectSplice(endpoint.spliceId)}>
+      <EntityReferenceButton title={t("ui.openNamedTarget", { target: `${t("ui.splice").toLowerCase()} ${splice.technicalId}` })} onClick={() => onSelectSplice(endpoint.spliceId)}>
         {label}
       </EntityReferenceButton>
     );
@@ -329,10 +329,10 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
       </div>
       <div className="list-panel-header-tools-row is-filter-row is-wire-filter-row">
         <label className="list-inline-number-filter wire-tag-filter">
-          <span>Tag</span>
+          <span>{t("ui.analysiswireworkspacepanelsTag")}</span>
           <select
             className="list-inline-table-filter-select"
-            aria-label="Wire tag filter"
+            aria-label={t("ui.analysiswireworkspacepanelsWireTagFilter")}
             value={wireFunctionalTagFilter}
             onChange={(event) => setWireFunctionalTagFilter(event.target.value)}
           >
@@ -403,8 +403,8 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                 {isMobileViewport ? t("ui.id") : t("ui.technicalID")} <span className="sort-indicator">{wireListSortIndicator("technicalId")}</span>
               </button>
             </th>
-            <th>{isMobileViewport ? "Func tag" : "Functional tag"}</th>
-            <th>{isMobileViewport ? "Twist" : "Twist group"}</th>
+            <th>{isMobileViewport ? t("ui.analysiswireworkspacepanelsFuncTag") : t("ui.analysisconnectorworkspacepanelsFunctionalTag")}</th>
+            <th>{isMobileViewport ? t("ui.analysiswireworkspacepanelsTwist") : t("ui.analysisconnectorworkspacepanelsTwistGroup")}</th>
             <th aria-sort={getTableAriaSort(wireAnalysisTableSort, "color")}>
               <button
                 type="button"
@@ -502,11 +502,11 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
                   <div>{wire.name}</div>
                   {fuseManufacturerReference !== null ? (
                     <div className="wire-fuse-inline">
-                      <span className="status-chip wire-fuse-chip">Fuse</span>
+                      <span className="status-chip wire-fuse-chip">{t("ui.analysiswireworkspacepanelsFuse")}</span>
                       {fuseCatalogItemId !== undefined && fuseCatalogItem !== undefined ? (
                         <EntityReferenceButton
                           className="technical-id"
-                          title={`Open catalog item ${fuseManufacturerReference}`}
+                          title={t("ui.openNamedTarget", { target: `${t("ui.catalogItem").toLowerCase()} ${fuseManufacturerReference}` })}
                           onClick={() => onSelectCatalogItem(fuseCatalogItemId)}
                         >
                           {fuseManufacturerReference}
@@ -536,7 +536,7 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
   {wireExportPreview !== null ? (
     <TabularExportPreviewDialog
       isOpen={wireExportPreview !== null}
-      title="Wire export preview"
+      title={t("ui.analysiswireworkspacepanelsWireExportPreview")}
       summaryLabel="Analysis wires"
       filenameLabel={`${wireExportPreview.filenameBase}.xlsx`}
       sheets={wireExportPreview.sheets}
@@ -570,14 +570,14 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
           <strong>{selectedWire.name}</strong> <span className="technical-id">({selectedWire.technicalId})</span>
         </p>
         <p className="meta-line" style={{ margin: 0 }}>
-          Section {selectedWire.sectionMm2} mm²{getWireColorSummaryLabel(selectedWire) !== null ? ` • ${getWireColorSummaryLabel(selectedWire)}` : ""}
+          {t("ui.analysiswireworkspacepanelsSection")}{selectedWire.sectionMm2} mm²{getWireColorSummaryLabel(selectedWire) !== null ? ` • ${getWireColorSummaryLabel(selectedWire)}` : ""}
         </p>
       </article>
       {getWireFuseManufacturerReference(selectedWire) !== null ? (
           <article className="analysis-wire-route-current">
-            <span>Protection</span>
+            <span>{t("ui.analysiswireworkspacepanelsProtection")}</span>
             <p className="route-preview-path">
-              <span className="status-chip wire-fuse-chip">Fuse</span> {getWireFuseManufacturerReference(selectedWire)}
+              <span className="status-chip wire-fuse-chip">{t("ui.analysiswireworkspacepanelsFuse")}</span> {getWireFuseManufacturerReference(selectedWire)}
             </p>
           </article>
       ) : null}
@@ -603,9 +603,9 @@ export function AnalysisWireWorkspacePanels(props: AnalysisWorkspaceContentProps
       <article className="analysis-wire-route-current">
         <span>{t("ui.endpointReferences")}</span>
         <p className="route-preview-path">
-          A: {selectedWire.endpointAConnectionReference?.trim() || t("ui.noConnectionRef")} / {selectedWire.endpointASealReference?.trim() || t("ui.noSealRef")}
+          {t("ui.analysiswireworkspacepanelsA")}{selectedWire.endpointAConnectionReference?.trim() || t("ui.noConnectionRef")} / {selectedWire.endpointASealReference?.trim() || t("ui.noSealRef")}
           {" • "}
-          B: {selectedWire.endpointBConnectionReference?.trim() || t("ui.noConnectionRef")} / {selectedWire.endpointBSealReference?.trim() || t("ui.noSealRef")}
+          {t("ui.analysiswireworkspacepanelsB")}{selectedWire.endpointBConnectionReference?.trim() || t("ui.noConnectionRef")} / {selectedWire.endpointBSealReference?.trim() || t("ui.noSealRef")}
         </p>
       </article>
 

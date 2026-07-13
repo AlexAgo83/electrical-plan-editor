@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import type { ReactElement } from "react";
 import type { ToastNotification } from "../hooks/useToastNotifications";
 
@@ -12,7 +13,7 @@ export function ToastViewport({ toasts, onDismissToast }: ToastViewportProps): R
   }
 
   return (
-    <section className="toast-viewport" aria-label="Notifications" aria-live="polite" aria-relevant="additions text">
+    <section className="toast-viewport" aria-label={t("ui.toastviewportNotifications")} aria-live="polite" aria-relevant="additions text">
       {toasts.map((toast) => (
         <article key={toast.id} className={`toast-notification is-${toast.variant}`} role="status">
           <div className="toast-notification-content">
@@ -23,7 +24,7 @@ export function ToastViewport({ toasts, onDismissToast }: ToastViewportProps): R
             type="button"
             className="toast-notification-dismiss"
             onClick={() => onDismissToast(toast.id)}
-            aria-label={`Dismiss notification: ${toast.title}`}
+            aria-label={t("ui.toastviewportDismissNotificationTitle", { title: toast.title })}
           >
             <span aria-hidden="true">x</span>
           </button>

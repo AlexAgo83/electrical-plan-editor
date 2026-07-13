@@ -3,9 +3,6 @@ import { useEffect, useState } from "react";
 import type { WireRecomputeReportEntry } from "../../../store";
 import type { FileFeedbackDialogModel } from "../networkImportExportTypes";
 
-const NO_CHANGE_MESSAGE =
-  "All wire routes and directional splice sides were recomputed. No changes were needed.";
-
 export interface AppControllerNetworkRecomputeReport {
   networkRecomputeReportDialog: FileFeedbackDialogModel | null;
 }
@@ -34,10 +31,10 @@ export function useAppControllerNetworkRecomputeReport(
       title: t("ui.recomputeReport"),
       message:
         changeCount === 0
-          ? NO_CHANGE_MESSAGE
+          ? t("ui.networkRecomputeNoChanges")
           : changeCount === 1
-            ? "Recomputed all wire routes and directional splice sides. 1 change was applied."
-            : `Recomputed all wire routes and directional splice sides. ${String(changeCount)} changes were applied.`,
+            ? t("ui.networkRecomputeOneChange")
+            : t("ui.networkRecomputeManyChanges", { count: changeCount }),
       items: lastRecomputeReport.map((entry) => entry.message),
       onClose: () => setNetworkRecomputeReportDialog(null)
     });

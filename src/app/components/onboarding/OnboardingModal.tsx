@@ -89,7 +89,7 @@ export function OnboardingModal({
 
   const isFullFlow = mode === "full";
   const titleId = `onboarding-modal-title-${step.id}`;
-  const progressLabel = `Step ${stepIndex + 1} of ${totalSteps}`;
+  const progressLabel = t("ui.stepProgress", { step: stepIndex + 1, total: totalSteps });
   const handleDialogKeyDown = (event: ReactKeyboardEvent<HTMLElement>): void => {
     if (event.key === "Escape") {
       event.preventDefault();

@@ -250,7 +250,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       label: `${item.manufacturerReference}${item.name?.trim() ? ` - ${item.name.trim()}` : ""}`
     })),
     selectedValue: wireFuseCatalogItemId,
-    missingOption: selectedFuseCatalogItemMissing ? { label: `Missing catalog item (${wireFuseCatalogItemId})` } : null
+    missingOption: selectedFuseCatalogItemMissing ? { label: t("ui.missingCatalogItemValue", { itemId: wireFuseCatalogItemId }) } : null
   });
   const connectorOptions = buildModelingDynamicSelectOptions({
     options: connectors.map((connector) => ({
@@ -365,17 +365,15 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       <input value={wireTechnicalId} onChange={(event) => setWireTechnicalId(event.target.value)} placeholder="W-001" required />
     </label>
     <label>
-      Twist group
-      <input
+      {t("ui.analysisconnectorworkspacepanelsTwistGroup")}<input
         value={wireTwistGroupLabel}
         onChange={(event) => setWireTwistGroupLabel(event.target.value)}
         maxLength={80}
-        placeholder="Optional (e.g. CAN 1)"
+        placeholder={t("ui.modelingwireformpanelOptionalEGCAN1")}
       />
     </label>
     <label>
-      Functional tag
-      <select value={wireFunctionalDomainTag} onChange={(event) => setWireFunctionalDomainTag(event.target.value)}>
+      {t("ui.analysisconnectorworkspacepanelsFunctionalTag")}<select value={wireFunctionalDomainTag} onChange={(event) => setWireFunctionalDomainTag(event.target.value)}>
         <option value="">{t("ui.auto")}</option>
         {functionalDomainTagOptions.map((tag) => (
           <option key={tag} value={tag}>
@@ -399,18 +397,16 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     </label>
     {recommendedWireSectionMm2 !== null ? (
       <div className="stack-form">
-        <small className="inline-help">Recommended section: {recommendedWireSectionMm2} mm²</small>
+        <small className="inline-help">{t("ui.modelingwireformpanelRecommendedSection")}{recommendedWireSectionMm2} mm²</small>
         <div className="row-actions compact">
           <button type="button" className="button-with-icon" onClick={handleApplyRecommendedWireSection}>
             <span className="action-button-icon is-save" aria-hidden="true" />
-            Apply
-          </button>
+            {t("ui.modelingaiagentpanelApply")}</button>
         </div>
       </div>
     ) : null}
     <label>
-      Current (A)
-      <input
+      {t("ui.modelingwireformpanelCurrentA")}<input
         type="number"
         min={0.01}
         step={0.01}
@@ -420,10 +416,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
       />
     </label>
     <label>
-      Material
-      <select value={wireMaterial} onChange={(event) => setWireMaterial(event.target.value as typeof wireMaterial)}>
-        <option value="copper">Copper</option>
-        <option value="aluminum">Aluminum</option>
+      {t("ui.modelingwireformpanelMaterial")}<select value={wireMaterial} onChange={(event) => setWireMaterial(event.target.value as typeof wireMaterial)}>
+        <option value="copper">{t("ui.modelingwireformpanelCopper")}</option>
+        <option value="aluminum">{t("ui.modelingwireformpanelAluminum")}</option>
       </select>
     </label>
     <label className="settings-checkbox">
@@ -432,8 +427,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         checked={wireFuseEnabled}
         onChange={(event) => setWireFuseEnabled(event.target.checked)}
       />{" "}
-      Fuse
-    </label>
+      {t("ui.analysiswireworkspacepanelsFuse")}</label>
     {wireFuseEnabled ? (
       <>
         <label>
@@ -463,7 +457,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
         value={primaryColorSelectValue}
         onChange={(event) => handleWirePrimaryColorSelection(event.target.value)}
       >
-        <option value="">Not specified</option>
+        <option value="">{t("ui.modelingwireformpanelNotSpecified")}</option>
         <option value="__free__">{t("ui.free")}</option>
         {CABLE_COLOR_CATALOG.map((color) => (
           <option key={color.id} value={color.id}>
@@ -492,7 +486,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
     {wireColorMode === "catalog" ? (
       <small className="inline-help">
         {primaryColor === undefined ? (
-          <>Not specified</>
+          <>{t("ui.modelingwireformpanelNotSpecified")}</>
         ) : (
           <>
             {swatch(primaryColor.hex, primaryColor.label)}
@@ -545,10 +539,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
                 checked={wireEndpointAAllowSharedCavity}
                 onChange={(event) => setWireEndpointAAllowSharedCavity(event.target.checked)}
               />{" "}
-              Allow overload (share way — several wires crimped together)
-            </label>
+              {t("ui.modelingwireformpanelAllowOverloadShareWaySeveralWiresCrimpedTogether")}</label>
             {endpointAPhysicalLabelPreview !== null ? (
-              <small className="inline-help">Physical label: {endpointAPhysicalLabelPreview}</small>
+              <small className="inline-help">{t("ui.modelingwireformpanelPhysicalLabel")}{endpointAPhysicalLabelPreview}</small>
             ) : null}
             {wireEndpointASlotHint !== null ? (
               <small className={wireEndpointASlotHint.tone === "error" ? "inline-error" : "inline-help"}>{wireEndpointASlotHint.message}</small>
@@ -569,19 +562,17 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               </select>
             </label>
             <small className={selectedEndpointASpliceIsUnplaced ? "inline-error" : "inline-help"}>
-              Only placed splices can be connected to wire endpoints.
-            </small>
+              {t("ui.modelingwireformpanelOnlyPlacedSplicesCanBeConnectedToWireEndpoints")}</small>
             {endpointAIsDirectionalSplice ? (
               <>
                 <label>
-                  Side
-                  <select
+                  {t("ui.modelingwireformpanelSide")}<select
                     value={wireEndpointASpliceSideOverride}
                     onChange={(event) => setWireEndpointASpliceSideOverride(event.target.value as typeof wireEndpointASpliceSideOverride)}
                   >
-                    <option value="auto">Auto by routing</option>
-                    <option value="L">Force L</option>
-                    <option value="R">Force R</option>
+                    <option value="auto">{t("ui.modelingwireformpanelAutoByRouting")}</option>
+                    <option value="L">{t("ui.modelingwireformpanelForceL")}</option>
+                    <option value="R">{t("ui.modelingwireformpanelForceR")}</option>
                   </select>
                 </label>
                 <label className="settings-checkbox">
@@ -591,8 +582,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
                     onChange={(event) => setWireEndpointASpliceSideLocked(event.target.checked)}
                     disabled={wireEndpointASpliceSideOverride === "auto"}
                   />{" "}
-                  Lock forced side
-                </label>
+                  {t("ui.modelingwireformpanelLockForcedSide")}</label>
               </>
             ) : (
               <label>
@@ -682,10 +672,9 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
                 checked={wireEndpointBAllowSharedCavity}
                 onChange={(event) => setWireEndpointBAllowSharedCavity(event.target.checked)}
               />{" "}
-              Allow overload (share way — several wires crimped together)
-            </label>
+              {t("ui.modelingwireformpanelAllowOverloadShareWaySeveralWiresCrimpedTogether")}</label>
             {endpointBPhysicalLabelPreview !== null ? (
-              <small className="inline-help">Physical label: {endpointBPhysicalLabelPreview}</small>
+              <small className="inline-help">{t("ui.modelingwireformpanelPhysicalLabel")}{endpointBPhysicalLabelPreview}</small>
             ) : null}
             {wireEndpointBSlotHint !== null ? (
               <small className={wireEndpointBSlotHint.tone === "error" ? "inline-error" : "inline-help"}>{wireEndpointBSlotHint.message}</small>
@@ -706,19 +695,17 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
               </select>
             </label>
             <small className={selectedEndpointBSpliceIsUnplaced ? "inline-error" : "inline-help"}>
-              Only placed splices can be connected to wire endpoints.
-            </small>
+              {t("ui.modelingwireformpanelOnlyPlacedSplicesCanBeConnectedToWireEndpoints")}</small>
             {endpointBIsDirectionalSplice ? (
               <>
                 <label>
-                  Side
-                  <select
+                  {t("ui.modelingwireformpanelSide")}<select
                     value={wireEndpointBSpliceSideOverride}
                     onChange={(event) => setWireEndpointBSpliceSideOverride(event.target.value as typeof wireEndpointBSpliceSideOverride)}
                   >
-                    <option value="auto">Auto by routing</option>
-                    <option value="L">Force L</option>
-                    <option value="R">Force R</option>
+                    <option value="auto">{t("ui.modelingwireformpanelAutoByRouting")}</option>
+                    <option value="L">{t("ui.modelingwireformpanelForceL")}</option>
+                    <option value="R">{t("ui.modelingwireformpanelForceR")}</option>
                   </select>
                 </label>
                 <label className="settings-checkbox">
@@ -728,8 +715,7 @@ export function ModelingWireFormPanel(props: ModelingFormsColumnProps): ReactEle
                     onChange={(event) => setWireEndpointBSpliceSideLocked(event.target.checked)}
                     disabled={wireEndpointBSpliceSideOverride === "auto"}
                   />{" "}
-                  Lock forced side
-                </label>
+                  {t("ui.modelingwireformpanelLockForcedSide")}</label>
               </>
             ) : (
               <label>

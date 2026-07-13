@@ -250,7 +250,7 @@ export function AnalysisSpliceWorkspacePanels(
       const connectorId = row.remoteEndpoint.connectorId;
       return (
         <EntityReferenceButton
-          title={`Open connector ${row.remoteEndpointLabel}`}
+          title={t("ui.openNamedTarget", { target: `${t("ui.connector").toLowerCase()} ${row.remoteEndpointLabel}` })}
           onClick={() => onOpenConnectorFromAnalysisTable(connectorId)}
         >
           {row.remoteEndpointLabel}
@@ -261,7 +261,7 @@ export function AnalysisSpliceWorkspacePanels(
     const spliceId = row.remoteEndpoint.spliceId;
     return (
       <EntityReferenceButton
-        title={`Open splice ${row.remoteEndpointLabel}`}
+        title={t("ui.openNamedTarget", { target: `${t("ui.splice").toLowerCase()} ${row.remoteEndpointLabel}` })}
         onClick={() => onOpenSpliceFromAnalysisTable(spliceId)}
       >
         {row.remoteEndpointLabel}
@@ -356,12 +356,12 @@ export function AnalysisSpliceWorkspacePanels(
       : !portIndexIsInteger
         ? t("ui.enterAValidPortIndex")
         : portIndexOutOfRange
-          ? `Port index must be between 1 and ${selectedSplice.portCount}.`
+          ? t("ui.portIndexRange", { max: selectedSplice.portCount })
           : portIsOccupied
-            ? `Port P${parsedPortIndex} is already used (${formatOccupantRef(selectedPortSlot.occupantRef)}).${
+            ? `${t("ui.portAlreadyUsed", { index: parsedPortIndex, occupant: formatOccupantRef(selectedPortSlot.occupantRef) })} ${
                 nextFreePortIndex === null
-                  ? " No available ports."
-                  : ` Suggested: P${nextFreePortIndex}.`
+                  ? t("ui.noAvailablePorts")
+                  : t("ui.suggestedPort", { index: nextFreePortIndex })
               }`
             : null;
   const canReservePort =
@@ -649,7 +649,7 @@ export function AnalysisSpliceWorkspacePanels(
                         }))
                       }
                     >
-                      Offset{" "}
+                      {t("ui.analysisspliceworkspacepanelsOffset")}{" "}
                       <span className="sort-indicator">
                         {spliceListSortIndicator("offsetMm")}
                       </span>
@@ -721,7 +721,7 @@ export function AnalysisSpliceWorkspacePanels(
                         linkedCatalogItem !== undefined ? (
                           <EntityReferenceButton
                             className="technical-id"
-                            title={`Open catalog item ${splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
+                            title={t("ui.openNamedTarget", { target: `${t("ui.catalogItem").toLowerCase()} ${splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}` })}
                             onClick={() =>
                               onSelectCatalogItem(linkedCatalogItemId)
                             }
@@ -782,8 +782,7 @@ export function AnalysisSpliceWorkspacePanels(
                 aria-pressed={spliceAnalysisView === "synthesis"}
                 onClick={() => setSpliceAnalysisView("synthesis")}
               >
-                Synthesis
-              </button>
+                {t("ui.analysisconnectorworkspacepanelsSynthesis")}</button>
             </div>
             <button
               type="button"
@@ -842,13 +841,13 @@ export function AnalysisSpliceWorkspacePanels(
         ) : spliceAnalysisView === "ports" ? (
           <>
             <p className="meta-line">
-              <span className="splice-badge">Junction</span>{" "}
+              <span className="splice-badge">{t("ui.analysisspliceworkspacepanelsJunction")}</span>{" "}
               <strong>{selectedSplice.name}</strong> ({selectedSplice.technicalId})
             </p>
             {selectedSplicePlacement !== null ? (
               <p className="meta-line">
-                Placement: {selectedSplicePlacement.hostSegmentLabel}  {t("ui.from")}{" "}
-                {selectedSplicePlacement.fromNodeLabel} at{" "}
+                {t("ui.analysisspliceworkspacepanelsPlacement")}{selectedSplicePlacement.hostSegmentLabel}  {t("ui.from")}{" "}
+                {selectedSplicePlacement.fromNodeLabel} {t("ui.analysisspliceworkspacepanelsAt")}{" "}
                 {selectedSplicePlacement.offsetLabel}
               </p>
             ) : null}
@@ -867,7 +866,7 @@ export function AnalysisSpliceWorkspacePanels(
             <div className="connector-ways-view splice-ports-view">
               <section
                 className="connector-ways-assignment-panel splice-ports-assignment-panel"
-                aria-label="Manual port assignment"
+                aria-label={t("ui.analysisspliceworkspacepanelsManualPortAssignment")}
               >
                 <form
                   className="row-form connector-ways-assignment-form splice-ports-assignment-form"
@@ -1017,8 +1016,7 @@ export function AnalysisSpliceWorkspacePanels(
                               className="action-button-icon is-cancel"
                               aria-hidden="true"
                             />
-                            Release
-                          </button>
+                            {t("ui.analysisconnectorworkspacepanelsRelease")}</button>
                         </div>
                       ) : null}
                     </article>
@@ -1101,7 +1099,7 @@ export function AnalysisSpliceWorkspacePanels(
                       }))
                     }
                   >
-                    {isMobileViewport ? "Sect." : t("ui.sectionMm2")}{" "}
+                    {isMobileViewport ? t("ui.analysisspliceworkspacepanelsSect") : t("ui.sectionMm2")}{" "}
                     <span className="sort-indicator">
                       {spliceSynthesisSortIndicator("sectionMm2")}
                     </span>
@@ -1154,7 +1152,7 @@ export function AnalysisSpliceWorkspacePanels(
                       }))
                     }
                   >
-                    Destination{" "}
+                    {t("ui.analysisconnectorworkspacepanelsDestination")}{" "}
                     <span className="sort-indicator">
                       {spliceSynthesisSortIndicator("destination")}
                     </span>
@@ -1181,8 +1179,8 @@ export function AnalysisSpliceWorkspacePanels(
                     }
                   >
                     {isMobileViewport
-                      ? "Local mm"
-                      : "Covered from splice (mm)"}{" "}
+                      ? t("ui.analysisspliceworkspacepanelsLocalMm")
+                      : t("ui.analysisspliceworkspacepanelsCoveredFromSpliceMm")}{" "}
                     <span className="sort-indicator">
                       {spliceSynthesisSortIndicator("localCoveredLengthMm")}
                     </span>
@@ -1209,8 +1207,8 @@ export function AnalysisSpliceWorkspacePanels(
                     }
                   >
                     {isMobileViewport
-                      ? "Remote mm"
-                      : "Covered from remote (mm)"}{" "}
+                      ? t("ui.analysisspliceworkspacepanelsRemoteMm")
+                      : t("ui.analysisspliceworkspacepanelsCoveredFromRemoteMm")}{" "}
                     <span className="sort-indicator">
                       {spliceSynthesisSortIndicator("remoteCoveredLengthMm")}
                     </span>
@@ -1260,7 +1258,7 @@ export function AnalysisSpliceWorkspacePanels(
                       >
                         {renderWireColorPrefixMarker(wire)}
                         <EntityReferenceButton
-                          title={`Open wire ${row.wireTechnicalId}`}
+                          title={t("ui.openNamedTarget", { target: `${t("ui.wire").toLowerCase()} ${row.wireTechnicalId}` })}
                           onClick={() => onOpenWireFromAnalysisTable(row.wireId)}
                         >
                           {row.wireName}

@@ -75,7 +75,7 @@ export function BomExportPreviewDialog({
 
   return (
     <div className={themeHostClassName ? `confirm-dialog-layer ${themeHostClassName}` : "confirm-dialog-layer"} role="presentation">
-      <button type="button" className="confirm-dialog-backdrop" aria-label="Close BOM preview" onClick={onCancel} />
+      <button type="button" className="confirm-dialog-backdrop" aria-label={t("ui.bomexportpreviewdialogCloseBOMPreview")} onClick={onCancel} />
       <section
         ref={dialogRef}
         className="confirm-dialog panel bom-preview-dialog is-neutral"
@@ -87,39 +87,39 @@ export function BomExportPreviewDialog({
         onKeyDown={onKeyDown}
       >
         <header className="confirm-dialog-header bom-preview-dialog-header">
-          <h2 id={titleId}>BOM preview</h2>
+          <h2 id={titleId}>{t("ui.bomexportpreviewdialogBomPreview")}</h2>
           <div className="bom-preview-dialog-summary" id={descriptionId}>
             <span className="bom-preview-summary-item">
-              <span className="bom-preview-summary-label">Items</span>
+              <span className="bom-preview-summary-label">{t("ui.bomexportpreviewdialogItems")}</span>
               <span className="bom-preview-summary-value">{preview.itemRowCount}</span>
             </span>
             <span className="bom-preview-summary-item">
-              <span className="bom-preview-summary-label">Rows</span>
+              <span className="bom-preview-summary-label">{t("ui.bomexportpreviewdialogRows")}</span>
               <span className="bom-preview-summary-value">{preview.rows.length}</span>
             </span>
             <span className="bom-preview-summary-item">
-              <span className="bom-preview-summary-label">Format</span>
+              <span className="bom-preview-summary-label">{t("ui.bomexportpreviewdialogFormat")}</span>
               <span className="bom-preview-summary-value">{formatLabel}</span>
             </span>
             {previewSheets.length > 1 ? (
               <span className="bom-preview-summary-item">
-                <span className="bom-preview-summary-label">Sheets</span>
+                <span className="bom-preview-summary-label">{t("ui.bomexportpreviewdialogSheets")}</span>
                 <span className="bom-preview-summary-value">{previewSheets.length}</span>
               </span>
             ) : null}
             <span className="bom-preview-summary-item">
-              <span className="bom-preview-summary-label">Currency</span>
+              <span className="bom-preview-summary-label">{t("ui.bomexportpreviewdialogCurrency")}</span>
               <span className="bom-preview-summary-value">{preview.workspaceCurrencyCode}</span>
             </span>
             <span className="bom-preview-summary-item">
-              <span className="bom-preview-summary-label">Tax</span>
+              <span className="bom-preview-summary-label">{t("ui.bomexportpreviewdialogTax")}</span>
               <span className="bom-preview-summary-value">
                 {preview.workspaceTaxEnabled ? `${preview.workspaceTaxRatePercent.toFixed(2)}%` : t("ui.disabled")}
               </span>
             </span>
             {preview.compactColumns ? (
               <span className="bom-preview-summary-item">
-                <span className="bom-preview-summary-label">Columns</span>
+                <span className="bom-preview-summary-label">{t("ui.bomexportpreviewdialogColumns")}</span>
                 <span className="bom-preview-summary-value">{t("ui.compact")}</span>
               </span>
             ) : null}
@@ -136,7 +136,7 @@ export function BomExportPreviewDialog({
           </div>
         ) : null}
         {previewSheets.length > 1 ? (
-          <div className="bom-preview-sheet-tabs" role="tablist" aria-label="BOM preview sheets">
+          <div className="bom-preview-sheet-tabs" role="tablist" aria-label={t("ui.bomexportpreviewdialogBomPreviewSheets")}>
             {previewSheets.map((sheet, sheetIndex) => {
               const selected = sheetIndex === activeSheetIndex;
               return (
@@ -156,7 +156,7 @@ export function BomExportPreviewDialog({
             })}
           </div>
         ) : null}
-        <div id="bom-preview-sheet-panel" role="tabpanel" className="bom-preview-table-shell" tabIndex={0} aria-label={`${activeSheet.name} table preview`}>
+        <div id="bom-preview-sheet-panel" role="tabpanel" className="bom-preview-table-shell" tabIndex={0} aria-label={t("ui.bomexportpreviewdialogNameTablePreview", { name: activeSheet.name })}>
           <table className="bom-preview-table">
             <thead>
               <tr>
@@ -188,7 +188,7 @@ export function BomExportPreviewDialog({
                         {linkedCatalogItemId !== undefined ? (
                           <EntityReferenceButton
                             className="technical-id"
-                            title={`Open catalog item ${cellValue}`}
+                            title={t("ui.bomexportpreviewdialogOpenCatalogItemCellValue", { cellValue: cellValue })}
                             onClick={() => onOpenCatalogItem(linkedCatalogItemId)}
                           >
                             {cellValue}
@@ -196,7 +196,7 @@ export function BomExportPreviewDialog({
                         ) : linkedConnectorId !== undefined ? (
                           <EntityReferenceButton
                             className={columnIndex === connectorIdColumnIndex ? "technical-id" : ""}
-                            title={`Open connector ${connectorTechnicalId}`}
+                            title={t("ui.bomexportpreviewdialogOpenConnectorConnectorTechnicalId", { connectorTechnicalId: connectorTechnicalId })}
                             onClick={() => onOpenConnector(linkedConnectorId)}
                           >
                             {cellValue}
@@ -219,7 +219,7 @@ export function BomExportPreviewDialog({
           </button>
           <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={onConfirm}>
             <span className="table-export-icon" aria-hidden="true" />
-            <span>Download {formatLabel}</span>
+            <span>{t("ui.bomexportpreviewdialogDownload")}{formatLabel}</span>
           </button>
         </footer>
       </section>

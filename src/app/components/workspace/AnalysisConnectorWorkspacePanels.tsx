@@ -144,7 +144,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
       const connectorId = row.remoteEndpoint.connectorId;
       return (
         <EntityReferenceButton
-          title={`Open connector ${row.remoteEndpointLabel}`}
+          title={t("ui.analysisconnectorworkspacepanelsOpenConnectorRemoteEndpointLabel", { remoteEndpointLabel: row.remoteEndpointLabel })}
           onClick={() => onOpenConnectorFromAnalysisTable(connectorId)}
         >
           {row.remoteEndpointLabel}
@@ -155,7 +155,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     const spliceId = row.remoteEndpoint.spliceId;
     return (
       <EntityReferenceButton
-        title={`Open splice ${row.remoteEndpointLabel}`}
+        title={t("ui.analysisconnectorworkspacepanelsOpenSpliceRemoteEndpointLabel", { remoteEndpointLabel: row.remoteEndpointLabel })}
         onClick={() => onOpenSpliceFromAnalysisTable(spliceId)}
       >
         {row.remoteEndpointLabel}
@@ -179,10 +179,10 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
       : !cavityIndexIsInteger
         ? t("ui.enterAValidWayIndex")
         : cavityIndexOutOfRange
-          ? `Way index must be between 1 and ${selectedConnector.cavityCount}.`
+          ? t("ui.wayIndexRange", { max: selectedConnector.cavityCount })
           : cavityIsOccupied
-            ? `Way C${parsedCavityIndex} is already used (${formatOccupantRef(selectedCavitySlot.occupantRef)}).${
-                nextFreeCavityIndex === null ? " No available ways." : ` Suggested: C${nextFreeCavityIndex}.`
+            ? `${t("ui.wayAlreadyUsed", { index: parsedCavityIndex, occupant: formatOccupantRef(selectedCavitySlot.occupantRef) })} ${
+                nextFreeCavityIndex === null ? t("ui.noAvailableWays") : t("ui.suggestedWay", { index: nextFreeCavityIndex })
               }`
             : null;
   const canReserveCavity =
@@ -233,7 +233,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
     }
     const statusByCavity = new Map(connectorCavityStatuses.map((status) => [status.cavityIndex, status] as const));
     return (
-      <div className="cavity-grid connector-physical-way-list" aria-label="Connector way details">
+      <div className="cavity-grid connector-physical-way-list" aria-label={t("ui.analysisconnectorworkspacepanelsConnectorWayDetails")}>
         {selectedConnectorLayout.ways.map((way) => {
           const status = statusByCavity.get(way.cavityIndex);
           const occupantRefs =
@@ -245,7 +245,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
             <article key={way.cavityIndex} className={`cavity${isOccupied ? " is-occupied" : ""}${isShared ? " is-shared" : ""}`}>
               <h3>
                 {wayLabel}
-                {isShared ? <span className="cavity-shared-badge" title="Shared way (several wires crimped together)"> · shared ×{occupantRefs.length}</span> : null}
+                {isShared ? <span className="cavity-shared-badge" title={t("ui.analysisconnectorworkspacepanelsSharedWaySeveralWiresCrimpedTogether")}> {t("ui.analysisconnectorworkspacepanelsShared")}{occupantRefs.length}</span> : null}
               </h3>
               {isOccupied ? (
                 occupantRefs.map((occupantRef) => {
@@ -261,8 +261,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
                       <div className="cavity-actions">
                         {occupantWireId === null ? (
                           <button type="button" className="button-with-icon" onClick={() => handleReleaseCavity(way.cavityIndex, occupantRef)}>
-                            Release
-                          </button>
+                            {t("ui.analysisconnectorworkspacepanelsRelease")}</button>
                         ) : (
                           <button
                             type="button"
@@ -491,7 +490,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
                   {linkedCatalogItemId !== undefined && linkedCatalogItem !== undefined ? (
                     <EntityReferenceButton
                       className="technical-id"
-                      title={`Open catalog item ${connector.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
+                      title={t("ui.analysisconnectorworkspacepanelsOpenCatalogItemManufacturerReference", { manufacturerReference: connector.manufacturerReference ?? linkedCatalogItem.manufacturerReference })}
                       onClick={() => onSelectCatalogItem(linkedCatalogItemId)}
                     >
                       {connector.manufacturerReference ?? linkedCatalogItem.manufacturerReference}
@@ -523,8 +522,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           aria-pressed={connectorAnalysisView === "physical"}
           onClick={() => setConnectorAnalysisView("physical")}
         >
-          Physical
-        </button>
+          {t("ui.analysisconnectorworkspacepanelsPhysical")}</button>
         <button
           type="button"
           className={connectorAnalysisView === "ways" ? "filter-chip is-active" : "filter-chip"}
@@ -540,24 +538,21 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           aria-pressed={connectorAnalysisView === "roles"}
           onClick={() => setConnectorAnalysisView("roles")}
         >
-          Roles
-        </button>
+          {t("ui.analysisconnectorworkspacepanelsRoles")}</button>
         <button
           type="button"
           className={connectorAnalysisView === "catalogMaterial" ? "filter-chip is-active" : "filter-chip"}
           aria-pressed={connectorAnalysisView === "catalogMaterial"}
           onClick={() => setConnectorAnalysisView("catalogMaterial")}
         >
-          Catalog material
-        </button>
+          {t("ui.analysisconnectorworkspacepanelsCatalogMaterial")}</button>
         <button
           type="button"
           className={connectorAnalysisView === "synthesis" ? "filter-chip is-active" : "filter-chip"}
           aria-pressed={connectorAnalysisView === "synthesis"}
           onClick={() => setConnectorAnalysisView("synthesis")}
         >
-          Synthesis
-        </button>
+          {t("ui.analysisconnectorworkspacepanelsSynthesis")}</button>
       </div>
       <button
         type="button"
@@ -621,7 +616,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
         <strong>{selectedConnector.name}</strong> ({selectedConnector.technicalId})
       </p>
       <div className="connector-ways-view">
-        <section className="connector-ways-assignment-panel" aria-label="Manual way assignment">
+        <section className="connector-ways-assignment-panel" aria-label={t("ui.analysisconnectorworkspacepanelsManualWayAssignment")}>
           <form className="row-form connector-ways-assignment-form" onSubmit={handleReserveCavitySubmit}>
             <label>
               
@@ -674,7 +669,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
       <div className="connector-roles-view">
         <PinElectricalRolesEditor
           mode="panel"
-          title="Electrical roles"
+          title={t("ui.functionalschematicpanelElectricalRoles")}
           showPanelHeader={false}
           cavityCount={selectedConnector.cavityCount}
           drafts={pinRoleDrafts}
@@ -696,8 +691,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
                 onClick={handleSavePinElectricalRoles}
               >
                 <span className="action-button-icon is-save" aria-hidden="true" />
-                Save roles
-              </button>
+                {t("ui.analysisconnectorworkspacepanelsSaveRoles")}</button>
               {pinRoleSaveMessage === null ? null : (
                 <small className={pinRoleDraftsAreInvalid ? "inline-error" : "inline-help"}>{pinRoleSaveMessage}</small>
               )}
@@ -734,8 +728,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
               setCatalogMaterialSaveMessage(null);
             }}
           />
-          Apply catalog seals
-        </label>
+          {t("ui.analysisconnectorworkspacepanelsApplyCatalogSeals")}</label>
         <label className="settings-checkbox">
           <input
             type="checkbox"
@@ -745,11 +738,9 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
               setCatalogMaterialSaveMessage(null);
             }}
           />
-          Apply catalog plugs
-        </label>
+          {t("ui.analysisconnectorworkspacepanelsApplyCatalogPlugs")}</label>
         <label>
-          Terminal and seal overrides
-          <textarea
+          {t("ui.analysisconnectorworkspacepanelsTerminalAndSealOverrides")}<textarea
             value={connectorTerminalOverridesText}
             onChange={(event) => {
               setConnectorTerminalOverridesText(event.target.value);
@@ -763,8 +754,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
       <div className="row-actions compact">
         <button type="button" className="button-with-icon" onClick={handleSaveCatalogMaterialApplication}>
           <span className="action-button-icon is-save" aria-hidden="true" />
-          Save material application
-        </button>
+          {t("ui.analysisconnectorworkspacepanelsSaveMaterialApplication")}</button>
         <button
           type="button"
           className="button-with-icon"
@@ -774,8 +764,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           }}
         >
           <span className="action-button-icon is-cancel" aria-hidden="true" />
-          Clear terminal and seal overrides
-        </button>
+          {t("ui.analysisconnectorworkspacepanelsClearTerminalAndSealOverrides")}</button>
         {catalogMaterialSaveMessage === null ? null : (
           <small className={catalogMaterialSaveIsError ? "inline-error" : "inline-help"}>{catalogMaterialSaveMessage}</small>
         )}
@@ -808,10 +797,10 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
           </th>
           <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "sectionMm2")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "sectionMm2", direction: current.field === "sectionMm2" && current.direction === "asc" ? "desc" : "asc" }))}>{t("ui.sectionMm2")} <span className="sort-indicator">{connectorSynthesisSortIndicator("sectionMm2")}</span></button></th>
           <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "color")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "color", direction: current.field === "color" && current.direction === "asc" ? "desc" : "asc" }))}>{t("ui.color")} <span className="sort-indicator">{connectorSynthesisSortIndicator("color")}</span></button></th>
-          <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "twistGroup")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "twistGroup", direction: current.field === "twistGroup" && current.direction === "asc" ? "desc" : "asc" }))}>Twist group <span className="sort-indicator">{connectorSynthesisSortIndicator("twistGroup")}</span></button></th>
-          <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "functionalTag")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "functionalTag", direction: current.field === "functionalTag" && current.direction === "asc" ? "desc" : "asc" }))}>Functional tag <span className="sort-indicator">{connectorSynthesisSortIndicator("functionalTag")}</span></button></th>
+          <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "twistGroup")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "twistGroup", direction: current.field === "twistGroup" && current.direction === "asc" ? "desc" : "asc" }))}>{t("ui.analysisconnectorworkspacepanelsTwistGroup")}<span className="sort-indicator">{connectorSynthesisSortIndicator("twistGroup")}</span></button></th>
+          <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "functionalTag")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "functionalTag", direction: current.field === "functionalTag" && current.direction === "asc" ? "desc" : "asc" }))}>{t("ui.analysisconnectorworkspacepanelsFunctionalTag")}<span className="sort-indicator">{connectorSynthesisSortIndicator("functionalTag")}</span></button></th>
           <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "localWay")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "localWay", direction: current.field === "localWay" && current.direction === "asc" ? "desc" : "asc" }))}>{t("ui.localWay")} <span className="sort-indicator">{connectorSynthesisSortIndicator("localWay")}</span></button></th>
-          <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "destination")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "destination", direction: current.field === "destination" && current.direction === "asc" ? "desc" : "asc" }))}>Destination <span className="sort-indicator">{connectorSynthesisSortIndicator("destination")}</span></button></th>
+          <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "destination")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "destination", direction: current.field === "destination" && current.direction === "asc" ? "desc" : "asc" }))}>{t("ui.analysisconnectorworkspacepanelsDestination")}<span className="sort-indicator">{connectorSynthesisSortIndicator("destination")}</span></button></th>
           <th aria-sort={getTableAriaSort(connectorSynthesisTableSort, "lengthMm")}><button type="button" className="sort-header-button" onClick={() => setConnectorSynthesisTableSort((current) => ({ field: "lengthMm", direction: current.field === "lengthMm" && current.direction === "asc" ? "desc" : "asc" }))}>{isMobileViewport ? t("ui.len") : t("ui.lengthMm")} <span className="sort-indicator">{connectorSynthesisSortIndicator("lengthMm")}</span></button></th>
         </tr>
       </thead>
@@ -824,7 +813,7 @@ export function AnalysisConnectorWorkspacePanels(props: AnalysisWorkspaceContent
               <span style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", flexWrap: "wrap" }}>
                 {renderWireColorPrefixMarker(wire)}
                 <EntityReferenceButton
-                  title={`Open wire ${row.wireTechnicalId}`}
+                  title={t("ui.analysisconnectorworkspacepanelsOpenWireWireTechnicalId", { wireTechnicalId: row.wireTechnicalId })}
                   onClick={() => onOpenWireFromAnalysisTable(row.wireId)}
                 >
                   {row.wireName}

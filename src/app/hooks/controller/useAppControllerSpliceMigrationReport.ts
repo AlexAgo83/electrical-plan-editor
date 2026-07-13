@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useCallback, useEffect, useState } from "react";
 import { consumeLastSpliceMigrationReport } from "../../../adapters/persistence";
 import type { FileFeedbackDialogModel } from "../networkImportExportTypes";
@@ -21,7 +22,7 @@ export function useAppControllerSpliceMigrationReport(): AppControllerSpliceMigr
     }
 
     setSpliceMigrationReportDialog({
-      title: "Splice migration report",
+      title: t("ui.useappcontrollersplicemigrationreportSpliceMigrationReport"),
       message:
         entries.length === 1
           ? "A legacy splice-node migration ran while loading this workspace."

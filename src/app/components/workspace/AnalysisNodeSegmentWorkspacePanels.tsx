@@ -215,20 +215,24 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
     const label = describeWireEndpoint(endpoint);
     if (endpoint.kind === "connectorCavity") {
       return (
-        <EntityReferenceButton title={`Open connector ${endpoint.connectorId}`} onClick={() => onSelectConnector(endpoint.connectorId)}>
+        <EntityReferenceButton title={t("ui.analysisnodesegmentworkspacepanelsOpenConnectorConnectorId", { connectorId: endpoint.connectorId })} onClick={() => onSelectConnector(endpoint.connectorId)}>
           {label}
         </EntityReferenceButton>
       );
     }
 
     return (
-      <EntityReferenceButton title={`Open splice ${endpoint.spliceId}`} onClick={() => onSelectSplice(endpoint.spliceId)}>
+      <EntityReferenceButton title={t("ui.analysisnodesegmentworkspacepanelsOpenSpliceSpliceId", { spliceId: endpoint.spliceId })} onClick={() => onSelectSplice(endpoint.spliceId)}>
         {label}
       </EntityReferenceButton>
     );
   };
   const renderSegmentEndpointReference = (nodeId: NetworkNode["id"], endpointLabel: string): ReactElement => (
-    <EntityReferenceButton className="analysis-segment-endpoint-button" title={`Open ${endpointLabel.toLowerCase()} ${nodeLabelById.get(nodeId) ?? nodeId}`} onClick={() => onSelectNode(nodeId)}>
+    <EntityReferenceButton
+      className="analysis-segment-endpoint-button"
+      title={t("ui.openNamedTarget", { target: `${endpointLabel.toLowerCase()} ${nodeLabelById.get(nodeId) ?? nodeId}` })}
+      onClick={() => onSelectNode(nodeId)}
+    >
       {nodeLabelById.get(nodeId) ?? nodeId}
     </EntityReferenceButton>
   );
@@ -533,7 +537,7 @@ export function AnalysisNodeSegmentWorkspacePanels(props: AnalysisWorkspaceConte
                 <span className="analysis-wire-identity-label">{t("ui.selectedSegment")}</span>
                 <strong className="analysis-segment-identity-id technical-id">{selectedSegment.id}</strong>
               </div>
-              <div className="analysis-segment-endpoint-path" aria-label={`Selected segment ${selectedSegment.id} path`}>
+              <div className="analysis-segment-endpoint-path" aria-label={t("ui.analysisnodesegmentworkspacepanelsSelectedSegmentIdPath", { id: selectedSegment.id })}>
                 <span className="analysis-segment-endpoint">
                   <span className="analysis-segment-endpoint-label">A</span>
                   {renderSegmentEndpointReference(selectedSegment.nodeA, t("ui.nodeA"))}

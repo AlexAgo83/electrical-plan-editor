@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import type { NetworkExportScope } from "../../adapters/portability";
 import { buildTimestampedFileName, normalizeFileNamePart } from "./exportFileName";
 
@@ -111,7 +112,7 @@ export async function saveJsonFileWithPicker(
       suggestedName: fileName,
       types: [
         {
-          description: "JSON file",
+          description: t("ui.jsonfileexportJsonFile"),
           accept: { "application/json": [".json"] }
         }
       ]

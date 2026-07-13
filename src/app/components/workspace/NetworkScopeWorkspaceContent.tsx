@@ -335,10 +335,10 @@ export function NetworkScopeWorkspaceContent({
           </div>
         </header>
         {networks.length === 0 ? (
-          <p className="empty-copy">No network available. Create one to enable modeling and analysis.</p>
+          <p className="empty-copy">{t("ui.networkscopeworkspacecontentNoNetworkAvailableCreateOneToEnableModelingAndAnalysis")}</p>
         ) : visibleNetworks.length === 0 ? (
           <>
-            <p className="empty-copy">No network matches the current filters.</p>
+            <p className="empty-copy">{t("ui.networkscopeworkspacecontentNoNetworkMatchesTheCurrentFilters")}</p>
             <TableEntryCountFooter count={0} />
           </>
         ) : (
@@ -397,7 +397,7 @@ export function NetworkScopeWorkspaceContent({
                         className="sort-header-button"
                         onClick={() => setNetworkTableSortField("status")}
                       >
-                        Status{" "}
+                        {t("ui.modelingaiagentpanelStatus")}{" "}
                         <span
                           className={
                             networkSortIndicator("status") === null
@@ -451,7 +451,7 @@ export function NetworkScopeWorkspaceContent({
                         <td><span className="technical-id">{network.technicalId}</span></td>
                         <td>
                           <span className={isActive ? "network-scope-status-chip is-active" : "network-scope-status-chip is-available"}>
-                            {isActive ? "Active" : "Available"}
+                            {isActive ? t("ui.networkscopeworkspacecontentActive") : t("ui.networkscopeworkspacecontentAvailable")}
                           </span>
                         </td>
                       </tr>
@@ -502,7 +502,7 @@ export function NetworkScopeWorkspaceContent({
               disabled={focusedNetwork === null || isCreateMode}
             >
               <span className="action-button-icon is-duplicate" aria-hidden="true" />
-              {isMobileViewport ? "Dup." : "Duplicate"}
+              {isMobileViewport ? t("ui.networkscopeworkspacecontentDup") : t("ui.networkscopeworkspacecontentDuplicate")}
             </button>
             <button
               type="button"
@@ -515,7 +515,7 @@ export function NetworkScopeWorkspaceContent({
               disabled={focusedNetwork === null || isCreateMode}
             >
               <span className="action-button-icon is-home-import" aria-hidden="true" />
-              {isMobileViewport ? "Exp." : "Export"}
+              {isMobileViewport ? t("ui.networkscopeworkspacecontentExp") : t("ui.tabularexportpreviewdialogExport")}
             </button>
             <button
               type="button"
@@ -524,7 +524,7 @@ export function NetworkScopeWorkspaceContent({
               disabled={isCreateMode}
             >
               <span className="action-button-icon is-home-import" aria-hidden="true" />
-              {isMobileViewport ? "Imp." : "Import"}
+              {isMobileViewport ? t("ui.networkscopeworkspacecontentImp") : t("ui.modelingcataloglistpanelImport")}
             </button>
             <input
               ref={importFileInputRef}
@@ -579,7 +579,7 @@ export function NetworkScopeWorkspaceContent({
               <input value={newNetworkName} onChange={(event) => setNewNetworkName(event.target.value)} placeholder={t("ui.vehiclePlatformA")} />
             </label>
             <label className="stack-label">
-              <span className="network-form-label">Network technical ID</span>
+              <span className="network-form-label">{t("ui.networkscopeworkspacecontentNetworkTechnicalID")}</span>
               <input
                 value={newNetworkTechnicalId}
                 onChange={(event) => setNewNetworkTechnicalId(event.target.value)}
@@ -587,7 +587,7 @@ export function NetworkScopeWorkspaceContent({
               />
             </label>
             <label className="stack-label">
-              <span className="network-form-label">Description (optional)</span>
+              <span className="network-form-label">{t("ui.networkscopeworkspacecontentDescriptionOptional")}</span>
               <input
                 value={newNetworkDescription}
                 onChange={(event) => setNewNetworkDescription(event.target.value)}
@@ -607,12 +607,12 @@ export function NetworkScopeWorkspaceContent({
               <input
                 value={newNetworkAuthor}
                 onChange={(event) => setNewNetworkAuthor(event.target.value)}
-                placeholder="Jane Doe"
+                placeholder={t("ui.networkscopeworkspacecontentJaneDoe")}
                 maxLength={80}
               />
             </label>
             <label className="stack-label">
-              <span className="network-form-label">Voltage (V, optional)</span>
+              <span className="network-form-label">{t("ui.networkscopeworkspacecontentVoltageVOptional")}</span>
               <input
                 type="number"
                 min={0.01}
@@ -660,13 +660,13 @@ export function NetworkScopeWorkspaceContent({
               <textarea
                 value={newNetworkExportNotes}
                 onChange={(event) => setNewNetworkExportNotes(event.target.value)}
-                placeholder="Free multiline notes shown in export cartouche."
+                placeholder={t("ui.networkscopeworkspacecontentFreeMultilineNotesShownInExportCartouche")}
                 rows={4}
                 maxLength={2000}
               />
             </label>
             {networkFormError !== null ? <p className="form-error">{networkFormError}</p> : null}
-            {networkTechnicalIdAlreadyUsed ? <p className="form-hint danger">Technical ID already used by another network.</p> : null}
+            {networkTechnicalIdAlreadyUsed ? <p className="form-hint danger">{t("ui.networkscopeworkspacecontentTechnicalIDAlreadyUsedByAnotherNetwork")}</p> : null}
             <div className="row-actions compact network-form-submit-actions">
               <button type="submit" className={isFormOpen ? "button-with-icon" : undefined}>
                 {isCreateMode ? <span className="action-button-icon is-new" aria-hidden="true" /> : null}
@@ -685,8 +685,7 @@ export function NetworkScopeWorkspaceContent({
                   disabled={focusedNetwork === null || focusedNetwork.id === activeNetworkId}
                 >
                   <span className="action-button-icon is-active" aria-hidden="true" />
-                  Set active
-                </button>
+                  {t("ui.networkscopeworkspacecontentSetActive")}</button>
               ) : null}
               {isEditMode ? (
                 <button

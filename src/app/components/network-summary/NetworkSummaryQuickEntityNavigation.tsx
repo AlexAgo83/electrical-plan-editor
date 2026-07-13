@@ -52,10 +52,11 @@ export function NetworkSummaryQuickEntityNavigation({
   onQuickEntityNavigation,
   isAiAgentOpen = false,
   isAiAgentReady = false,
-  aiAgentDisabledReason = "Configure a valid AI provider in Settings.",
+  aiAgentDisabledReason,
   onOpenAiAgent,
   variant = "panel"
 }: NetworkSummaryQuickEntityNavigationProps): ReactElement {
+  const resolvedAiAgentDisabledReason = aiAgentDisabledReason ?? t("ui.configureAValidAIProviderInSettings");
   const sectionClassName =
     variant === "header"
       ? "header-quick-entity-nav-panel"
@@ -100,14 +101,14 @@ export function NetworkSummaryQuickEntityNavigation({
             type="button"
             className={isAiAgentOpen ? "filter-chip is-ai-agent-tab is-active" : "filter-chip is-ai-agent-tab"}
             onClick={onOpenAiAgent}
-            aria-label="AI Agent"
-            aria-description={isAiAgentReady ? "AI Agent modeling workspace" : aiAgentDisabledReason}
+            aria-label={t("navigation.aiAgent")}
+            aria-description={isAiAgentReady ? t("navigation.aiAgentWorkspace") : resolvedAiAgentDisabledReason}
             aria-pressed={isAiAgentOpen}
             disabled={!isAiAgentReady || onOpenAiAgent === undefined}
-            title="AI Agent"
+            title={t("navigation.aiAgent")}
           >
             <span className="action-button-icon network-summary-quick-entity-nav-icon is-ai-agent" aria-hidden="true" />
-            {variant === "header" ? null : <span className="network-summary-quick-entity-nav-label">AI Agent</span>}
+            {variant === "header" ? null : <span className="network-summary-quick-entity-nav-label">{t("navigation.aiAgent")}</span>}
           </button>
         ) : null}
       </div>

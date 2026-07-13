@@ -54,7 +54,7 @@ export function TabularExportPreviewDialog({
 
   return (
     <div className={themeHostClassName ? `confirm-dialog-layer ${themeHostClassName}` : "confirm-dialog-layer"} role="presentation">
-      <button type="button" className="confirm-dialog-backdrop" aria-label={`Close ${title}`} onClick={onCancel} />
+      <button type="button" className="confirm-dialog-backdrop" aria-label={t("ui.tabularexportpreviewdialogCloseTitle", { title: title })} onClick={onCancel} />
       <section
         ref={dialogRef}
         className="confirm-dialog panel bom-preview-dialog is-neutral"
@@ -69,25 +69,25 @@ export function TabularExportPreviewDialog({
           <h2 id={titleId}>{title}</h2>
           <div className="bom-preview-dialog-summary" id={descriptionId}>
             <span className="bom-preview-summary-item">
-              <span className="bom-preview-summary-label">Rows</span>
+              <span className="bom-preview-summary-label">{t("ui.bomexportpreviewdialogRows")}</span>
               <span className="bom-preview-summary-value">{activeSheet.rows.length}</span>
             </span>
             <span className="bom-preview-summary-item">
-              <span className="bom-preview-summary-label">Sheets</span>
+              <span className="bom-preview-summary-label">{t("ui.bomexportpreviewdialogSheets")}</span>
               <span className="bom-preview-summary-value">{sheets.length}</span>
             </span>
             <span className="bom-preview-summary-item">
-              <span className="bom-preview-summary-label">Target</span>
+              <span className="bom-preview-summary-label">{t("ui.tabularexportpreviewdialogTarget")}</span>
               <span className="bom-preview-summary-value">{summaryLabel}</span>
             </span>
           </div>
         </header>
         <p className="confirm-dialog-details">
-          <span className="confirm-dialog-details-label">Suggested filename</span>
+          <span className="confirm-dialog-details-label">{t("ui.tabularexportpreviewdialogSuggestedFilename")}</span>
           <code className="confirm-dialog-details-code">{filenameLabel}</code>
         </p>
         {sheets.length > 1 ? (
-          <div className="bom-preview-sheet-tabs" role="tablist" aria-label={`${title} sheets`}>
+          <div className="bom-preview-sheet-tabs" role="tablist" aria-label={t("ui.tabularexportpreviewdialogTitleSheets", { title: title })}>
             {sheets.map((sheet, index) => {
               const selected = index === activeSheetIndex;
               return (
@@ -106,7 +106,7 @@ export function TabularExportPreviewDialog({
             })}
           </div>
         ) : null}
-        <div className="bom-preview-table-shell" tabIndex={0} aria-label={`${activeSheet.name} table preview`}>
+        <div className="bom-preview-table-shell" tabIndex={0} aria-label={t("ui.bomexportpreviewdialogNameTablePreview", { name: activeSheet.name })}>
           <table className="bom-preview-table">
             <thead>
               <tr>
@@ -133,7 +133,7 @@ export function TabularExportPreviewDialog({
           </button>
           <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={onConfirm}>
             <span className="action-button-icon is-open" aria-hidden="true" />
-            <span>Export</span>
+            <span>{t("ui.tabularexportpreviewdialogExport")}</span>
           </button>
         </footer>
       </section>

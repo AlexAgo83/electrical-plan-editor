@@ -58,7 +58,7 @@ export function InspectorContextPanel({
     }
 
     return (
-      <EntityReferenceButton title={`Open catalog item ${reference}`} onClick={() => onSelectCatalogItem(catalogItemId)}>
+      <EntityReferenceButton title={t("ui.inspectorcontextpanelOpenCatalogItemReference", { reference: reference })} onClick={() => onSelectCatalogItem(catalogItemId)}>
         <span className="technical-id">{reference}</span>
       </EntityReferenceButton>
     );
@@ -147,7 +147,7 @@ export function InspectorContextPanel({
       value: <span className="technical-id">{selectedCatalogItem.manufacturerReference}</span>
     });
     detailRows.push({ label: t("ui.name"), value: selectedCatalogItem.name ?? "" });
-    detailRows.push({ label: "Connections", value: String(selectedCatalogItem.connectionCount) });
+    detailRows.push({ label: t("ui.inspectorcontextpanelConnections"), value: String(selectedCatalogItem.connectionCount) });
   }
 
   if (selectedConnector !== null) {
@@ -159,7 +159,7 @@ export function InspectorContextPanel({
         value: renderCatalogReference(selectedConnector.manufacturerReference as string, selectedConnector.catalogItemId)
       });
     }
-    detailRows.push({ label: t("ui.ways"), value: `${selectedConnector.cavityCount} / Occupied ${connectorOccupiedCount}` });
+    detailRows.push({ label: t("ui.ways"), value: t("ui.occupiedCount", { total: selectedConnector.cavityCount, occupied: connectorOccupiedCount }) });
   }
 
   if (selectedSplice !== null) {
@@ -171,7 +171,7 @@ export function InspectorContextPanel({
         value: renderCatalogReference(selectedSplice.manufacturerReference as string, selectedSplice.catalogItemId)
       });
     }
-    detailRows.push({ label: t("ui.ports"), value: `${selectedSplice.portCount} / Occupied ${spliceOccupiedCount}` });
+    detailRows.push({ label: t("ui.ports"), value: t("ui.occupiedCount", { total: selectedSplice.portCount, occupied: spliceOccupiedCount }) });
   }
 
   if (selectedNode !== null) {
@@ -189,9 +189,9 @@ export function InspectorContextPanel({
     detailRows.push({ label: t("ui.name"), value: selectedWire.name });
     detailRows.push({ label: t("ui.technicalID"), value: <span className="technical-id">{selectedWire.technicalId}</span> });
     if ((selectedWire.twistGroupLabel ?? "").trim().length > 0) {
-      detailRows.push({ label: "Twist group", value: selectedWire.twistGroupLabel as string });
+      detailRows.push({ label: t("ui.analysisconnectorworkspacepanelsTwistGroup"), value: selectedWire.twistGroupLabel as string });
     }
-    detailRows.push({ label: "Section", value: `${selectedWire.sectionMm2} mm²` });
+    detailRows.push({ label: t("ui.analysiswireworkspacepanelsSection"), value: `${selectedWire.sectionMm2} mm²` });
     const cableColors = renderCableColorSwatches(
       selectedWire.colorMode,
       selectedWire.primaryColorId,
@@ -217,7 +217,7 @@ export function InspectorContextPanel({
       detailRows.push({ label: t("ui.endpointBSealRef"), value: selectedWire.endpointBSealReference as string });
     }
     detailRows.push({
-      label: "Route",
+      label: t("ui.inspectorcontextpanelRoute"),
       value: `${selectedWire.isRouteLocked ? t("ui.locked") : t("ui.auto")} / ${
         selectedWire.routeSegmentIds.length === 0 ? t("ui.none2") : selectedWire.routeSegmentIds.join(" -> ")
       }`

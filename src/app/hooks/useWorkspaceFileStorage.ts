@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { consumeLastSpliceMigrationReport } from "../../adapters/persistence";
 import { downloadJsonFile } from "./useNetworkImportExport";
@@ -61,8 +62,8 @@ export function useWorkspaceFileStorage({
       }
 
       const shouldReplace = await requestConfirmation({
-        title: "Open workspace file",
-        message: "Replace the current workspace with the selected file?",
+        title: t("ui.operationshealthpanelOpenWorkspaceFile"),
+        message: t("ui.useworkspacefilestorageReplaceTheCurrentWorkspaceWithTheSelectedFile"),
         details: `${sourceLabel}\n\n${buildWorkspaceFileSummary(parsed.payload)}`,
         confirmLabel: "Open file",
         intent: "neutral"
@@ -123,10 +124,10 @@ export function useWorkspaceFileStorage({
           resumeFileName: null,
           resumeStatus: "unavailable",
           fileAvailability: "unavailable",
-          message: "No previous workspace file handle is available in this browser."
+          message: t("ui.useworkspacefilestorageNoPreviousWorkspaceFileHandleIsAvailableInThisBrowser")
         }));
         notifyToast("Workspace file cannot be resumed", {
-          message: "Open the workspace file once to create a resumable link.",
+          message: t("ui.useworkspacefilestorageOpenTheWorkspaceFileOnceToCreateAResumableLink"),
           variant: "warning"
         });
         return;
@@ -140,10 +141,10 @@ export function useWorkspaceFileStorage({
           canResume: true,
           resumeFileName: handle.name,
           fileAvailability: "unavailable",
-          message: "The previous workspace file could not be resumed. Try opening it again."
+          message: t("ui.useworkspacefilestorageThePreviousWorkspaceFileCouldNotBeResumedTryOpening")
         }));
         notifyToast("Workspace file cannot be resumed", {
-          message: "The browser could not read the previous file handle.",
+          message: t("ui.useworkspacefilestorageTheBrowserCouldNotReadThePreviousFileHandle"),
           variant: "error"
         });
       }
@@ -167,7 +168,7 @@ export function useWorkspaceFileStorage({
         } catch (error) {
           if (!(error instanceof DOMException && error.name === "AbortError")) {
             notifyToast("Workspace file not opened", {
-              message: "The file picker could not read the selected workspace.",
+              message: t("ui.useworkspacefilestorageTheFilePickerCouldNotReadTheSelectedWorkspace"),
               variant: "error"
             });
           }
@@ -207,7 +208,7 @@ export function useWorkspaceFileStorage({
               ...current,
               conflict: true,
               isSaving: false,
-              message: "The linked workspace file could not be read as a valid workspace. Choose which version to keep before overwriting it."
+              message: t("ui.useworkspacefilestorageTheLinkedWorkspaceFileCouldNotBeReadAsA")
             }));
             return "conflict";
           }
@@ -218,7 +219,7 @@ export function useWorkspaceFileStorage({
               ...current,
               conflict: true,
               isSaving: false,
-              message: "The linked workspace file changed outside this tab. Choose which version to keep."
+              message: t("ui.useworkspacefilestorageTheLinkedWorkspaceFileChangedOutsideThisTabChooseWhich")
             }));
             return "conflict";
           }
@@ -235,7 +236,7 @@ export function useWorkspaceFileStorage({
           permission: current.permission === "unavailable" ? "unknown" : current.permission,
           conflict: false,
           isSaving: false,
-          message: "Workspace file saved."
+          message: t("ui.useworkspacefilestorageWorkspaceFileSaved")
         }));
         return "saved";
       } catch {
@@ -243,7 +244,7 @@ export function useWorkspaceFileStorage({
           ...current,
           fileAvailability: "unavailable",
           isSaving: false,
-          message: "The linked workspace file could not be written. It may be unavailable; local browser persistence remains active."
+          message: t("ui.useworkspacefilestorageTheLinkedWorkspaceFileCouldNotBeWrittenItMay")
         }));
         return "failed";
       }
@@ -286,7 +287,7 @@ export function useWorkspaceFileStorage({
       const downloaded = downloadJsonFile(fileName, serialized);
       if (!downloaded) {
         notifyToast("Workspace file not saved", {
-          message: "File download is not available in this environment.",
+          message: t("ui.useworkspacefilestorageFileDownloadIsNotAvailableInThisEnvironment"),
           variant: "error"
         });
         return;
@@ -306,7 +307,7 @@ export function useWorkspaceFileStorage({
     const handle = linkedHandleRef.current;
     if (handle !== null) {
       void (async () => {
-        setStatusBase((current) => ({ ...current, isSaving: true, message: "Saving linked workspace file now." }));
+        setStatusBase((current) => ({ ...current, isSaving: true, message: t("ui.useworkspacefilestorageSavingLinkedWorkspaceFileNow") }));
         const result = await writeCurrentStateToHandle(handle, { ignoreConflict: false });
         if (result === "saved") {
           notifyToast("Workspace file saved", {
@@ -315,12 +316,12 @@ export function useWorkspaceFileStorage({
           });
         } else if (result === "conflict") {
           notifyToast("Workspace file conflict", {
-            message: "The linked file changed outside this tab.",
+            message: t("ui.useworkspacefilestorageTheLinkedFileChangedOutsideThisTab"),
             variant: "warning"
           });
         } else {
           notifyToast("Workspace file not saved", {
-            message: "The linked file could not be written.",
+            message: t("ui.useworkspacefilestorageTheLinkedFileCouldNotBeWritten"),
             variant: "error"
           });
         }
@@ -336,7 +337,7 @@ export function useWorkspaceFileStorage({
     void clearStoredWorkspaceFileHandle();
     setStatusBase(createLocalWorkspaceFileStatus());
     notifyToast("Workspace file unlinked", {
-      message: "Local browser persistence remains active.",
+      message: t("ui.useworkspacefilestorageLocalBrowserPersistenceRemainsActive"),
       variant: "info"
     });
   }, [notifyToast]);
@@ -345,7 +346,7 @@ export function useWorkspaceFileStorage({
     const handle = linkedHandleRef.current;
     if (handle === null) {
       notifyToast("Workspace file cannot be opened", {
-        message: "The browser does not currently have a linked file handle.",
+        message: t("ui.useworkspacefilestorageTheBrowserDoesNotCurrentlyHaveALinkedFileHandle"),
         variant: "warning"
       });
       return;
@@ -360,7 +361,7 @@ export function useWorkspaceFileStorage({
         setStatusBase((current) => ({
           ...current,
           fileAvailability: "unavailable",
-          message: "The linked file could not be read. It may have been moved or deleted; relink it from Workspace storage."
+          message: t("ui.useworkspacefilestorageTheLinkedFileCouldNotBeReadItMayHave")
         }));
       }
     });
@@ -371,7 +372,7 @@ export function useWorkspaceFileStorage({
       const handle = linkedHandleRef.current ?? await readStoredWorkspaceFileHandle();
       if (handle === null) {
         notifyToast("Workspace file cannot be opened", {
-          message: "No resumable workspace file handle is available in this browser.",
+          message: t("ui.useworkspacefilestorageNoResumableWorkspaceFileHandleIsAvailableInThisBrowser"),
           variant: "warning"
         });
         return;
@@ -387,7 +388,7 @@ export function useWorkspaceFileStorage({
             ...current,
             fileAvailability: "unavailable",
             resumeStatus: "unavailable",
-            message: "The resumable file could not be read. It may have been moved or deleted; relink it from Workspace storage."
+            message: t("ui.useworkspacefilestorageTheResumableFileCouldNotBeReadItMayHave")
           }));
         }
       });
@@ -412,11 +413,11 @@ export function useWorkspaceFileStorage({
     }
 
     void (async () => {
-      setStatusBase((current) => ({ ...current, isSaving: true, message: "Overwriting linked file with local workspace." }));
+      setStatusBase((current) => ({ ...current, isSaving: true, message: t("ui.useworkspacefilestorageOverwritingLinkedFileWithLocalWorkspace") }));
       const result = await writeCurrentStateToHandle(handle, { ignoreConflict: true });
       if (result === "failed") {
         notifyToast("Workspace file not saved", {
-          message: "The linked file could not be overwritten.",
+          message: t("ui.useworkspacefilestorageTheLinkedFileCouldNotBeOverwritten"),
           variant: "error"
         });
         return;
@@ -462,14 +463,14 @@ export function useWorkspaceFileStorage({
               setStatusBase((current) => ({
                 ...current,
                 isSaving: false,
-                message: "Autosave to the linked workspace file failed. Local browser persistence remains active."
+                message: t("ui.useworkspacefilestorageAutosaveToTheLinkedWorkspaceFileFailedLocalBrowserPersistence")
               }));
             }
           } catch {
             setStatusBase((current) => ({
               ...current,
               isSaving: false,
-              message: "Autosave to the linked workspace file failed. Local browser persistence remains active."
+              message: t("ui.useworkspacefilestorageAutosaveToTheLinkedWorkspaceFileFailedLocalBrowserPersistence")
             }));
           } finally {
             isWritingRef.current = false;

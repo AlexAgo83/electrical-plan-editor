@@ -66,7 +66,7 @@ export function useCatalogCsvImportExport({
     downloadCsvFile("catalog", headers, rows);
     setCatalogCsvImportExportStatus({
       kind: "success",
-      message: `Exported ${rows.length} catalog item(s).`
+      message: t(rows.length === 1 ? "ui.catalogItemExported" : "ui.catalogItemsExported", { count: rows.length })
     });
   }
 
@@ -88,7 +88,7 @@ export function useCatalogCsvImportExport({
     try {
       text = await file.text();
     } catch {
-      openImportFailureDialog("Catalog CSV import failed", "Unable to read the selected CSV file.", [file.name]);
+      openImportFailureDialog(t("ui.catalogCSVImportFailedTitle"), t("ui.unableToReadSelectedCSVFile"), [file.name]);
       setCatalogCsvImportExportStatus({
         kind: "failed",
         message: t("ui.unableToReadSelectedCatalogCSVFile")
@@ -103,19 +103,24 @@ export function useCatalogCsvImportExport({
     if (errorIssues.length > 0) {
       const firstError = errorIssues[0];
       openImportFailureDialog(
-        "Catalog CSV import failed",
-        "The selected CSV file contains blocking validation errors.",
-        errorIssues.map((issue) => `Row ${issue.rowNumber}: ${issue.message}`)
+        t("ui.catalogCSVImportFailedTitle"),
+        t("ui.catalogCSVBlockingValidationErrors"),
+        errorIssues.map((issue) => t("ui.catalogCSVRowIssue", { row: issue.rowNumber, reason: issue.message }))
       );
       setCatalogCsvImportExportStatus({
         kind: "failed",
           message:
             firstError === undefined
               ? t("ui.catalogCSVImportFailedDueToValidationErrors")
-              : `Catalog CSV import failed at row ${firstError.rowNumber}: ${firstError.message}`
+              : t("ui.catalogImportFailedAtRow", { row: firstError.rowNumber, reason: firstError.message })
       });
       setCatalogCsvLastImportSummaryLine(
-        `Catalog CSV import aborted (${file.name}): ${parsed.rows.length} rows parsed, ${warningCount} warnings, ${errorIssues.length} errors.`
+        t("ui.catalogImportAbortedSummary", {
+          file: file.name,
+          rows: parsed.rows.length,
+          warnings: warningCount,
+          errors: errorIssues.length
+        })
       );
       resetInput();
       return;
@@ -129,7 +134,7 @@ export function useCatalogCsvImportExport({
             ? t("ui.catalogCSVContainsNoImportableRowAfterWarnings")
             : t("ui.catalogCSVContainsNoDataRow")
       });
-      setCatalogCsvLastImportSummaryLine(`Catalog CSV import skipped (${file.name}): no row imported.`);
+      setCatalogCsvLastImportSummaryLine(t("ui.catalogImportSkipped", { file: file.name }));
       resetInput();
       return;
     }
@@ -141,7 +146,7 @@ export function useCatalogCsvImportExport({
     if (catalogItemsBeforeConfirmation.length > 0) {
       const shouldContinue = await requestConfirmation({
         title: t("ui.importCatalogCSV"),
-        message: `Import ${parsed.rows.length} catalog row(s) into the current catalog? Existing items are matched by manufacturer reference.`,
+        message: t("ui.catalogRowsImportConfirmation", { rows: parsed.rows.length }),
         intent: "warning"
       });
       if (!shouldContinue) {
@@ -166,13 +171,13 @@ export function useCatalogCsvImportExport({
       const existing = existingByManufacturerReference.get(normalizedReferenceKey);
       if (existing !== undefined && existing.id !== item.id) {
         openImportFailureDialog(
-          "Catalog CSV import blocked",
-          "The current catalog contains duplicate manufacturer references.",
-          [`Resolve duplicate reference '${item.manufacturerReference}' before importing.`]
+          t("ui.catalogCSVImportBlockedTitle"),
+          t("ui.catalogDuplicateManufacturerReferences"),
+          [t("ui.resolveDuplicateReference", { reference: item.manufacturerReference })]
         );
         setCatalogCsvImportExportStatus({
           kind: "failed",
-          message: `Catalog import blocked: existing catalog has duplicate manufacturer reference '${item.manufacturerReference}'.`
+          message: t("ui.catalogImportDuplicateReference", { reference: item.manufacturerReference })
         });
         setCatalogCsvLastImportSummaryLine(t("ui.catalogCSVImportAbortedResolveExistingCatalogDuplicateReferencesFirst"));
         resetInput();
@@ -198,16 +203,16 @@ export function useCatalogCsvImportExport({
       const normalizedReferenceKey = normalizeManufacturerReferenceKey(row.manufacturerReference);
       if (normalizedReferenceKey === undefined) {
         openImportFailureDialog(
-          "Catalog CSV import failed",
-          "A row contains an invalid manufacturer reference.",
-          [`Processed rows before failure: ${createdCount + updatedCount}`]
+          t("ui.catalogCSVImportFailedTitle"),
+          t("ui.catalogInvalidManufacturerReference"),
+          [t("ui.processedRowsBeforeFailure", { rows: createdCount + updatedCount })]
         );
         setCatalogCsvImportExportStatus({
           kind: "failed",
           message: t("ui.catalogImportFailedInvalidManufacturerReference")
         });
         setCatalogCsvLastImportSummaryLine(
-          `Catalog CSV import aborted after ${createdCount + updatedCount} row(s); ${warningCount} warnings in file.`
+          t("ui.catalogImportAbortedAfterRows", { rows: createdCount + updatedCount, warnings: warningCount })
         );
         resetInput();
         return;
@@ -236,16 +241,19 @@ export function useCatalogCsvImportExport({
 
       if (candidateState.ui.lastError !== null) {
         openImportFailureDialog(
-          "Catalog CSV import failed",
-          `The row '${row.manufacturerReference}' could not be imported.`,
-          [getAppErrorMessage(candidateState.ui.lastError) ?? "Unknown catalog import error."]
+          t("ui.catalogCSVImportFailedTitle"),
+          t("ui.catalogRowCouldNotBeImported", { reference: row.manufacturerReference }),
+          [getAppErrorMessage(candidateState.ui.lastError) ?? t("ui.unknownCatalogImportError")]
         );
         setCatalogCsvImportExportStatus({
           kind: "failed",
-          message: `Catalog import failed on '${row.manufacturerReference}': ${getAppErrorMessage(candidateState.ui.lastError)}`
+          message: t("ui.catalogImportFailedOnReference", {
+            reference: row.manufacturerReference,
+            reason: getAppErrorMessage(candidateState.ui.lastError) ?? t("ui.unknownCatalogImportError")
+          })
         });
         setCatalogCsvLastImportSummaryLine(
-          `Catalog CSV import aborted after ${createdCount + updatedCount} row(s); ${warningCount} warnings in file.`
+          t("ui.catalogImportAbortedAfterRows", { rows: createdCount + updatedCount, warnings: warningCount })
         );
         resetInput();
         return;
@@ -268,10 +276,15 @@ export function useCatalogCsvImportExport({
     setActiveSubScreen("catalog");
     setCatalogCsvImportExportStatus({
       kind: warningCount > 0 ? "partial" : "success",
-      message: `Imported ${parsed.rows.length} catalog row(s): ${createdCount} created / ${updatedCount} updated.`
+      message: t("ui.catalogRowsImported", { rows: parsed.rows.length, created: createdCount, updated: updatedCount })
     });
     setCatalogCsvLastImportSummaryLine(
-      `Last catalog CSV import (${file.name}): ${parsed.rows.length} rows, ${warningCount} warnings, ${errorIssues.length} errors.`
+      t("ui.lastCatalogImportSummary", {
+        file: file.name,
+        rows: parsed.rows.length,
+        warnings: warningCount,
+        errors: errorIssues.length
+      })
     );
     resetInput();
   }

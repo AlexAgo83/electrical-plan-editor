@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import { useRef, type ReactElement } from "react";
 import { useModalDialog } from "../../hooks/useModalDialog";
 import type { ChoiceDialogOption, ConfirmDialogIntent } from "../../types/confirm-dialog";
@@ -31,7 +32,7 @@ export function ChoiceDialog({
   const detailsId = `${titleId}-details`;
   return (
     <div className={themeHostClassName ? `confirm-dialog-layer ${themeHostClassName}` : "confirm-dialog-layer"} role="presentation">
-      <button type="button" className="confirm-dialog-backdrop" aria-label="Dismiss choice dialog" onClick={closeOnBackdrop ? close : undefined} />
+      <button type="button" className="confirm-dialog-backdrop" aria-label={t("ui.choicedialogDismissChoiceDialog")} onClick={closeOnBackdrop ? close : undefined} />
       <section ref={dialogRef} className={`confirm-dialog panel ${getIntentClassName(options[0]?.intent)}`} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={details ? `${descriptionId} ${detailsId}` : descriptionId} tabIndex={-1} onKeyDown={onKeyDown}>
         <header className="confirm-dialog-header"><h2 id={titleId}>{title}</h2></header>
         <p id={descriptionId} className="confirm-dialog-message">{message}</p>

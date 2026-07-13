@@ -85,8 +85,8 @@ export function useAppControllerSaveExportActions({
           networkCount: 1
         });
         const shouldSave = await requestConfirmation({
-          title: "Save selected network",
-          message: "Export the selected network now?",
+          title: t("ui.useappcontrollersaveexportactionsSaveSelectedNetwork"),
+          message: t("ui.useappcontrollersaveexportactionsExportTheSelectedNetworkNow"),
           details: fileName,
           confirmLabel: t("ui.save"),
           intent: "neutral"

@@ -43,11 +43,11 @@ function CatalogUsageTableSection({
   const activeLabel = activeMode === "connectors" ? "connectors" : "splices";
   const renderHeader = () => (
     <header className="analysis-wire-route-header catalog-usage-header">
-      <h2>Used by</h2>
-      <div className="chip-group" aria-label="Catalog usage type">
+      <h2>{t("ui.cataloganalysisworkspacecontentUsedBy")}</h2>
+      <div className="chip-group" aria-label={t("ui.cataloganalysisworkspacecontentCatalogUsageType")}>
         <button
           type="button"
-          aria-label={`Connectors ${linkedConnectorCount}`}
+          aria-label={t("ui.cataloganalysisworkspacecontentConnectorsLinkedConnectorCount", { linkedConnectorCount: linkedConnectorCount })}
           aria-pressed={activeMode === "connectors"}
           className={`filter-chip${activeMode === "connectors" ? " is-active" : ""}`}
           onClick={() => setActiveMode("connectors")}
@@ -58,7 +58,7 @@ function CatalogUsageTableSection({
         </button>
         <button
           type="button"
-          aria-label={`Splices ${linkedSpliceCount}`}
+          aria-label={t("ui.cataloganalysisworkspacecontentSplicesLinkedSpliceCount", { linkedSpliceCount: linkedSpliceCount })}
           aria-pressed={activeMode === "splices"}
           className={`filter-chip${activeMode === "splices" ? " is-active" : ""}`}
           onClick={() => setActiveMode("splices")}
@@ -75,7 +75,7 @@ function CatalogUsageTableSection({
     return (
       <article className="panel">
         {renderHeader()}
-        <p className="empty-copy">No linked {activeLabel} for the selected catalog item.</p>
+        <p className="empty-copy">{t("ui.cataloganalysisworkspacecontentNoLinked")}{activeLabel} {t("ui.cataloganalysisworkspacecontentForTheSelectedCatalogItem")}</p>
         <div className="row-actions compact catalog-usage-empty-actions">
           <button type="button" className="button-with-icon" onClick={onCreate}>
             <span className={`action-button-icon ${createIconClass}`} aria-hidden="true" />

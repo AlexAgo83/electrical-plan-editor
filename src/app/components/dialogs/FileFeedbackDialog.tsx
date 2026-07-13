@@ -22,13 +22,13 @@ export function FileFeedbackDialog({ isOpen, themeHostClassName, title, message,
   const descriptionId = `${titleId}-description`;
   return (
     <div className={themeHostClassName ? `confirm-dialog-layer ${themeHostClassName}` : "confirm-dialog-layer"} role="presentation">
-      <button type="button" className="confirm-dialog-backdrop" aria-label="Close import feedback" onClick={onClose} />
+      <button type="button" className="confirm-dialog-backdrop" aria-label={t("ui.filefeedbackdialogCloseImportFeedback")} onClick={onClose} />
       <section ref={dialogRef} className={`confirm-dialog panel ${intentClassName}`} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={descriptionId} tabIndex={-1} onKeyDown={onKeyDown}>
         <header className="confirm-dialog-header"><h2 id={titleId}>{title}</h2></header>
         <p id={descriptionId} className="confirm-dialog-message">{message}</p>
         {items.length > 0 ? (
           <div className="confirm-dialog-details">
-            <span className="confirm-dialog-details-label">Details</span>
+            <span className="confirm-dialog-details-label">{t("ui.filefeedbackdialogDetails")}</span>
             <ul className="confirm-dialog-feedback-list">{items.map((item, index) => <li key={`${index}-${item}`}>{item}</li>)}</ul>
           </div>
         ) : null}

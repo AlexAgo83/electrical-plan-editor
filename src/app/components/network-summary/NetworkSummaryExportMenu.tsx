@@ -75,8 +75,7 @@ export function NetworkSummaryExportMenu({
         aria-haspopup="menu"
       >
         <span className="network-summary-export-icon" aria-hidden="true" />
-        Export
-      </button>
+        {t("ui.tabularexportpreviewdialogExport")}</button>
       {open && (
         <div className="panel network-summary-view-menu network-summary-view-menu--right">
           <button
@@ -116,8 +115,7 @@ export function NetworkSummaryExportMenu({
               disabled={!canExportNetwork}
             >
               <span className="action-button-icon is-home-import" aria-hidden="true" />
-              Network
-            </button>
+              {t("ui.networksummaryexportmenuNetwork")}</button>
           )}
           {onExportBomCsv === undefined ? null : (
             <button

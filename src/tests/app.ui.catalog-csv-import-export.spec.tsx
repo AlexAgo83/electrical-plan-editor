@@ -81,7 +81,7 @@ describe("App integration UI - catalog CSV import/export", () => {
     });
     vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
     fireEvent.click(exportButton);
-    expect(within(catalogPanel).getByText("Exported 1 catalog item(s).")).toBeInTheDocument();
+    expect(within(catalogPanel).getByText("Exported 1 catalog item.")).toBeInTheDocument();
 
     const fileInput = catalogPanel.querySelector('input[type="file"][accept="text/csv,.csv"]');
     expect(fileInput).not.toBeNull();
@@ -104,7 +104,7 @@ describe("App integration UI - catalog CSV import/export", () => {
 
     await waitFor(() => {
       catalogPanel = getPanelByHeading("Catalog");
-      expect(within(catalogPanel).getByText("Imported 2 catalog row(s): 1 created / 1 updated.")).toBeInTheDocument();
+      expect(within(catalogPanel).getByText("Imported catalog rows: 2; created: 1; updated: 1.")).toBeInTheDocument();
     });
 
     expect(catalogPanel).not.toHaveAttribute("hidden");
@@ -186,7 +186,7 @@ describe("App integration UI - catalog CSV import/export", () => {
     fireEvent.click(within(confirmDialog).getByRole("button", { name: "Confirm" }));
 
     await waitFor(() => {
-      expect(within(getPanelByHeading("Catalog")).getByText("Imported 2 catalog row(s): 1 created / 1 updated.")).toBeInTheDocument();
+      expect(within(getPanelByHeading("Catalog")).getByText("Imported catalog rows: 2; created: 1; updated: 1.")).toBeInTheDocument();
     });
 
     const catalogByRef = Object.values(store.getState().catalogItems.byId).reduce<
@@ -242,7 +242,7 @@ describe("App integration UI - catalog CSV import/export", () => {
       fireEvent.click(openMenuButton);
     }
     fireEvent.click(screen.getByRole("button", { name: /^Modeling$|^Modélisation$/ }));
-    const closeMenuButton = screen.queryByRole("button", { name: /Close menu|Fermer le menu/ });
+    const closeMenuButton = document.querySelector<HTMLButtonElement>(".header-nav-toggle[aria-expanded='true']");
     if (closeMenuButton !== null) {
       fireEvent.click(closeMenuButton);
     }
@@ -251,8 +251,8 @@ describe("App integration UI - catalog CSV import/export", () => {
     expect(secondaryNavRow).not.toBeNull();
     fireEvent.click(within(secondaryNavRow as HTMLElement).getByRole("button", { name: /^Catalog$|^Catalogue$/, hidden: true }));
 
-    const catalogPanel = getPanelByHeading("Catalog");
-    const exportButton = within(catalogPanel).getByRole("button", { name: /Export CSV|Exporter CSV/ });
+    const catalogPanel = getPanelByHeading("Catalogue");
+    const exportButton = within(catalogPanel).getByRole("button", { name: /Export CSV|Exporter au format CSV/ });
 
     Object.defineProperty(URL, "createObjectURL", {
       configurable: true,

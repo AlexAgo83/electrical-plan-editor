@@ -92,7 +92,7 @@ export function getOnboardingSteps(): readonly OnboardingStepDefinition[] {
   },
   {
     id: "pinRoles",
-    title: "Declare pin roles",
+    title: t("ui.onboardingDeclarePinRoles"),
     badge: "PIN",
     badgeIconClass: "is-connectors",
     description: [
@@ -163,7 +163,7 @@ export function getOnboardingSteps(): readonly OnboardingStepDefinition[] {
   },
   {
     id: "harnessAssembly",
-    title: "Build harness assemblies",
+    title: t("ui.onboardingBuildHarnessAssemblies"),
     badge: "HAR",
     badgeIconClass: "is-harness-assembly",
     description: [

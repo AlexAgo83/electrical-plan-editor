@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import type { Connector } from "../../core/entities";
 
 export interface ParsedConnectorTerminalOverride {
@@ -50,7 +51,7 @@ export function parseConnectorTerminalOverridesDraft(
   ) {
     return {
       ok: false,
-      message: "Terminal overrides must use one line per override: cavity,terminal,seal,terminal name,seal name."
+      message: t("ui.connectorterminaloverridesdraftTerminalOverridesMustUseOneLinePerOverrideCavityTerminal")
     };
   }
 

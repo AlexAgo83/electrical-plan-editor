@@ -174,7 +174,7 @@ function ModelingPrimaryTablesComponent({
     { id: "technicalId", label: t("ui.technicalID") },
     { id: "manufacturerReference", label: t("ui.mfrRef") },
     { id: "hostSegment", label: t("ui.segment") },
-    { id: "offsetMm", label: "Offset" },
+    { id: "offsetMm", label: t("ui.analysisspliceworkspacepanelsOffset") },
     { id: "connectedWireCount", label: t("ui.connectedWires") },
   ];
   const nodeColumns: ConfigurableTableColumn[] = [
@@ -690,7 +690,7 @@ function ModelingPrimaryTablesComponent({
                     <th>
                       <input
                         type="checkbox"
-                        aria-label="Select all visible connectors"
+                        aria-label={t("ui.modelingprimarytablesSelectAllVisibleConnectors")}
                         checked={allVisibleConnectorsSelected}
                         onChange={() =>
                           onSetBatchSelectionForVisible(
@@ -895,7 +895,7 @@ function ModelingPrimaryTablesComponent({
                         <td>
                           <input
                             type="checkbox"
-                            aria-label={`Select connector ${connector.technicalId}`}
+                            aria-label={t("ui.modelingprimarytablesSelectConnectorTechnicalId", { technicalId: connector.technicalId })}
                             checked={isBatchSelected}
                             onChange={() =>
                               onToggleBatchSelection("connector", connector.id)
@@ -911,7 +911,7 @@ function ModelingPrimaryTablesComponent({
                         linkedCatalogItem !== undefined ? (
                           <EntityReferenceButton
                             className="technical-id"
-                            title={`Open catalog item ${connector.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
+                            title={t("ui.analysisconnectorworkspacepanelsOpenCatalogItemManufacturerReference", { manufacturerReference: connector.manufacturerReference ?? linkedCatalogItem.manufacturerReference })}
                             onClick={() =>
                               onSelectCatalogItem(linkedCatalogItemId)
                             }
@@ -942,8 +942,7 @@ function ModelingPrimaryTablesComponent({
                 onClick={onOpenBatchSelectionDialog}
                 disabled={selectedConnectorBatchCount === 0}
               >
-                Open batch
-                {selectedConnectorBatchCount > 0
+                {t("ui.modelingprimarytablesOpenBatch")}{selectedConnectorBatchCount > 0
                   ? ` (${selectedConnectorBatchCount})`
                   : ""}
               </button>
@@ -957,8 +956,7 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-delete"
                   aria-hidden="true"
                 />
-                Delete selected
-                {selectedConnectorBatchCount > 0
+                {t("ui.modelingbatchcontextpanelDeleteSelected")}{selectedConnectorBatchCount > 0
                   ? ` (${selectedConnectorBatchCount})`
                   : ""}
               </button>
@@ -967,8 +965,7 @@ function ModelingPrimaryTablesComponent({
                 className="button-with-icon"
                 onClick={onExitBatchMode}
               >
-                Cancel selection
-              </button>
+                {t("ui.modelingbatchcontextpanelCancelSelection")}</button>
             </>
           ) : (
             <>
@@ -1010,7 +1007,7 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-multi-select"
                   aria-hidden="true"
                 />
-                {isMobileViewport ? "Select" : "Select multiple"}
+                {isMobileViewport ? t("ui.pinelectricalroleseditorSelect") : t("ui.modelingprimarytablesSelectMultiple")}
               </button>
               <button
                 type="button"
@@ -1022,8 +1019,7 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-edit"
                   aria-hidden="true"
                 />
-                Mass edit
-              </button>
+                {t("ui.modelingprimarytablesMassEdit")}</button>
               <button
                 type="button"
                 className="modeling-list-action-delete button-with-icon"
@@ -1187,7 +1183,7 @@ function ModelingPrimaryTablesComponent({
                     <th>
                       <input
                         type="checkbox"
-                        aria-label="Select all visible splices"
+                        aria-label={t("ui.modelingprimarytablesSelectAllVisibleSplices")}
                         checked={allVisibleSplicesSelected}
                         onChange={() =>
                           onSetBatchSelectionForVisible(
@@ -1330,7 +1326,7 @@ function ModelingPrimaryTablesComponent({
                         }))
                       }
                     >
-                      Offset{" "}
+                      {t("ui.analysisspliceworkspacepanelsOffset")}{" "}
                       <span className="sort-indicator">
                         {spliceSortIndicator("offsetMm")}
                       </span>
@@ -1414,7 +1410,7 @@ function ModelingPrimaryTablesComponent({
                         <td>
                           <input
                             type="checkbox"
-                            aria-label={`Select splice ${splice.technicalId}`}
+                            aria-label={t("ui.networksummarygraphlayersSelectSpliceTechnicalId", { technicalId: splice.technicalId })}
                             checked={isBatchSelected}
                             onChange={() =>
                               onToggleBatchSelection("splice", splice.id)
@@ -1430,7 +1426,7 @@ function ModelingPrimaryTablesComponent({
                         linkedCatalogItem !== undefined ? (
                           <EntityReferenceButton
                             className="technical-id"
-                            title={`Open catalog item ${splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference}`}
+                            title={t("ui.analysisconnectorworkspacepanelsOpenCatalogItemManufacturerReference", { manufacturerReference: splice.manufacturerReference ?? linkedCatalogItem.manufacturerReference })}
                             onClick={() =>
                               onSelectCatalogItem(linkedCatalogItemId)
                             }
@@ -1466,8 +1462,7 @@ function ModelingPrimaryTablesComponent({
                 onClick={onOpenBatchSelectionDialog}
                 disabled={selectedSpliceBatchCount === 0}
               >
-                Open batch
-                {selectedSpliceBatchCount > 0
+                {t("ui.modelingprimarytablesOpenBatch")}{selectedSpliceBatchCount > 0
                   ? ` (${selectedSpliceBatchCount})`
                   : ""}
               </button>
@@ -1481,8 +1476,7 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-delete"
                   aria-hidden="true"
                 />
-                Delete selected
-                {selectedSpliceBatchCount > 0
+                {t("ui.modelingbatchcontextpanelDeleteSelected")}{selectedSpliceBatchCount > 0
                   ? ` (${selectedSpliceBatchCount})`
                   : ""}
               </button>
@@ -1491,8 +1485,7 @@ function ModelingPrimaryTablesComponent({
                 className="button-with-icon"
                 onClick={onExitBatchMode}
               >
-                Cancel selection
-              </button>
+                {t("ui.modelingbatchcontextpanelCancelSelection")}</button>
             </>
           ) : (
             <>
@@ -1534,7 +1527,7 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-multi-select"
                   aria-hidden="true"
                 />
-                {isMobileViewport ? "Select" : "Select multiple"}
+                {isMobileViewport ? t("ui.pinelectricalroleseditorSelect") : t("ui.modelingprimarytablesSelectMultiple")}
               </button>
               <button
                 type="button"
@@ -1681,7 +1674,7 @@ function ModelingPrimaryTablesComponent({
                     <th>
                       <input
                         type="checkbox"
-                        aria-label="Select all visible nodes"
+                        aria-label={t("ui.modelingprimarytablesSelectAllVisibleNodes")}
                         checked={allVisibleNodesSelected}
                         onChange={() =>
                           onSetBatchSelectionForVisible("node", visibleNodeIds)
@@ -1831,7 +1824,7 @@ function ModelingPrimaryTablesComponent({
                         <td>
                           <input
                             type="checkbox"
-                            aria-label={`Select node ${node.id}`}
+                            aria-label={t("ui.modelingprimarytablesSelectNodeId", { id: node.id })}
                             checked={isBatchSelected}
                             onChange={() =>
                               onToggleBatchSelection("node", node.id)
@@ -1861,8 +1854,7 @@ function ModelingPrimaryTablesComponent({
                 onClick={onOpenBatchSelectionDialog}
                 disabled={selectedNodeBatchCount === 0}
               >
-                Open batch
-                {selectedNodeBatchCount > 0
+                {t("ui.modelingprimarytablesOpenBatch")}{selectedNodeBatchCount > 0
                   ? ` (${selectedNodeBatchCount})`
                   : ""}
               </button>
@@ -1876,8 +1868,7 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-delete"
                   aria-hidden="true"
                 />
-                Delete selected
-                {selectedNodeBatchCount > 0
+                {t("ui.modelingbatchcontextpanelDeleteSelected")}{selectedNodeBatchCount > 0
                   ? ` (${selectedNodeBatchCount})`
                   : ""}
               </button>
@@ -1886,8 +1877,7 @@ function ModelingPrimaryTablesComponent({
                 className="button-with-icon"
                 onClick={onExitBatchMode}
               >
-                Cancel selection
-              </button>
+                {t("ui.modelingbatchcontextpanelCancelSelection")}</button>
             </>
           ) : (
             <>
@@ -1928,7 +1918,7 @@ function ModelingPrimaryTablesComponent({
                   className="action-button-icon is-multi-select"
                   aria-hidden="true"
                 />
-                {isMobileViewport ? "Select" : "Select multiple"}
+                {isMobileViewport ? t("ui.pinelectricalroleseditorSelect") : t("ui.modelingprimarytablesSelectMultiple")}
               </button>
               <button
                 type="button"

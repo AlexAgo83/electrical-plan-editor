@@ -55,7 +55,6 @@ import { useValidationModel } from "./hooks/useValidationModel";
 import { useWireEndpointDescriptions } from "./hooks/useWireEndpointDescriptions";
 import { useWorkspaceShellChrome } from "./hooks/useWorkspaceShellChrome";
 import { useWorkspaceNavigation } from "./hooks/useWorkspaceNavigation";
-import { useAppLocaleDomTranslation } from "./hooks/useAppLocaleDomTranslation";
 import { setActiveLocale } from "./lib/i18n";
 import { useHoverDescriptionTitles } from "./hooks/useHoverDescriptionTitles";
 import { useAiSettings } from "./hooks/useAiSettings";
@@ -367,7 +366,9 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     setNetworkOffset
   });
 
-  useAppLocaleDomTranslation(locale);
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
   useHoverDescriptionTitles(locale);
 
   useAppControllerThemeSyncEffect({ store, themeMode });

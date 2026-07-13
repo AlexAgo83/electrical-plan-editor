@@ -35,16 +35,18 @@ export function WorkspaceNavigation({
   entityCountBySubScreen,
   isAiAgentOpen = false,
   isAiAgentReady = false,
-  aiAgentDisabledReason = "Configure a valid AI provider in Settings.",
+  aiAgentDisabledReason,
   onScreenChange,
   onSubScreenChange,
   onOpenAiAgent
 }: WorkspaceNavigationProps): ReactElement {
-  const validationCounterDescription = `${validationIssuesCount} issue${validationIssuesCount === 1 ? "" : "s"}${
-    validationErrorCount > 0
-      ? `, ${validationErrorCount} error${validationErrorCount === 1 ? "" : "s"}`
-      : ", no errors"
-  }`;
+  const validationCounterDescription = translate(
+    locale,
+    validationErrorCount > 0 ? "ui.issuesWithErrors" : "ui.issuesWithoutErrors",
+    { issues: validationIssuesCount, errors: validationErrorCount }
+  );
+  const resolvedAiAgentDisabledReason =
+    aiAgentDisabledReason ?? translate(locale, "ui.configureAValidAIProviderInSettings");
   const screenIconClassById: Partial<Record<ScreenId, string>> = {
     home: "is-home",
     networkScope: "is-network-scope",
@@ -154,7 +156,7 @@ export function WorkspaceNavigation({
                 className={isAiAgentOpen ? "workspace-tab is-ai-agent-tab is-active" : "workspace-tab is-ai-agent-tab"}
                 onClick={onOpenAiAgent}
                 aria-label={translate(locale, "navigation.aiAgent")}
-                aria-description={isAiAgentReady ? translate(locale, "navigation.aiAgentWorkspace") : aiAgentDisabledReason}
+            aria-description={isAiAgentReady ? translate(locale, "navigation.aiAgentWorkspace") : resolvedAiAgentDisabledReason}
                 disabled={!isAiAgentReady || onOpenAiAgent === undefined}
                 title={translate(locale, "navigation.aiAgent")}
                 data-locale-exempt="true"

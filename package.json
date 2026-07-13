@@ -15,6 +15,7 @@
     "lint": "eslint .",
     "quality:dependency-audit": "node scripts/quality/check-npm-audit-allowlist.mjs",
     "quality:pwa": "node scripts/quality/check-pwa-build-artifacts.mjs",
+    "quality:i18n": "node scripts/quality/check-i18n-copy.mjs && node scripts/quality/check-i18n-copy-fixture.mjs",
     "coverage:ui:report": "node scripts/quality/report-ui-coverage.mjs",
     "bundle:metrics:report": "node scripts/quality/report-bundle-metrics.mjs",
     "build:bundle:report": "npm run -s build && npm run -s bundle:metrics:report",
@@ -27,7 +28,7 @@
     "test:ci:slow-top": "node scripts/quality/report-slowest-tests.mjs --top=10",
     "test:ci:ui:slow-top": "node scripts/quality/run-vitest-segmented.mjs ui-slow-top --top=10",
     "test:e2e": "node scripts/quality/run-playwright-e2e.mjs",
-    "ci:blocking": "logics-manager lint --require-status && logics-manager sync close-eligible-requests && git diff --exit-code -- logics/request && logics-manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability && npm run -s lint && npm run -s typecheck && npm run -s quality:dependency-audit && npm run -s test:ci:segmentation:check && npm run -s test:ci:fast -- --coverage && npm run -s test:ci:ui && npm run -s test:e2e && npm run -s build:vite && npm run -s quality:pwa",
+    "ci:blocking": "logics-manager lint --require-status && logics-manager sync close-eligible-requests && git diff --exit-code -- logics/request && logics-manager audit --legacy-cutoff-version 1.1.0 --group-by-doc --skip-ac-traceability && npm run -s lint && npm run -s typecheck && npm run -s quality:i18n && npm run -s quality:dependency-audit && npm run -s test:ci:segmentation:check && npm run -s test:ci:fast -- --coverage && npm run -s test:ci:ui && npm run -s test:e2e && npm run -s build:vite && npm run -s quality:pwa",
     "ci:local": "npm run -s ci:blocking"
   },
   "dependencies": {

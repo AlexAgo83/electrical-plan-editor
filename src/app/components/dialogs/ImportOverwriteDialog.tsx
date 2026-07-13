@@ -110,7 +110,7 @@ export function ImportOverwriteDialog({
       <button
         type="button"
         className="confirm-dialog-backdrop"
-        aria-label="Dismiss dialog"
+        aria-label={t("ui.importoverwritedialogDismissDialog")}
         onClick={onCancel}
       />
       <section
@@ -124,21 +124,20 @@ export function ImportOverwriteDialog({
         onKeyDown={onKeyDown}
       >
         <header className="confirm-dialog-header">
-          <h2 id={titleId}>Similar networks detected</h2>
+          <h2 id={titleId}>{t("ui.importoverwritedialogSimilarNetworksDetected")}</h2>
         </header>
         <p id={descriptionId} className="confirm-dialog-message">
           {candidates.length === 1
-            ? "1 imported network matches an existing one."
+            ? t("ui.importoverwritedialog1ImportedNetworkMatchesAnExistingOne")
             : `${candidates.length} imported networks match existing ones.`}{" "}
-          Choose how to handle each conflict.
-        </p>
+          {t("ui.importoverwritedialogChooseHowToHandleEachConflict")}</p>
         {candidates.length > 1 ? (
           <div
             className="import-overwrite-bulk-row"
             role="group"
-            aria-label="Apply to all remaining candidates"
+            aria-label={t("ui.importoverwritedialogApplyToAllRemainingCandidates")}
           >
-            <span className="import-overwrite-bulk-label">Apply to all remaining:</span>
+            <span className="import-overwrite-bulk-label">{t("ui.importoverwritedialogApplyToAllRemaining")}</span>
             {DECISION_ORDER.map((decision) => (
               <button
                 key={decision}
@@ -157,18 +156,18 @@ export function ImportOverwriteDialog({
             return (
               <li key={candidate.importedNetworkId} className="import-overwrite-candidate">
                 <div className="import-overwrite-candidate-info">
-                  <span className="import-overwrite-existing-label">Existing</span>
+                  <span className="import-overwrite-existing-label">{t("ui.importoverwritedialogExisting")}</span>
                   <span className="import-overwrite-name">{candidate.existingName}</span>
                   <code className="import-overwrite-tech-id">{candidate.existingTechnicalId}</code>
                 </div>
                 <div className="import-overwrite-candidate-info import-overwrite-imported-info">
                   <span className="import-overwrite-imported-label">
-                    Imported · {MATCH_REASON_LABELS[candidate.matchReason]}
+                    {t("ui.importoverwritedialogImported")}{MATCH_REASON_LABELS[candidate.matchReason]}
                   </span>
                   <span className="import-overwrite-name">{candidate.importedName}</span>
                   <code className="import-overwrite-tech-id">{candidate.importedTechnicalId}</code>
                 </div>
-                <div className="import-overwrite-choices" role="group" aria-label={`Decision for ${candidate.existingName}`}>
+                <div className="import-overwrite-choices" role="group" aria-label={t("ui.importoverwritedialogDecisionForExistingName", { existingName: candidate.existingName })}>
                   {DECISION_ORDER.map((option) => (
                     <label key={option} className="import-overwrite-choice">
                       <input
@@ -193,7 +192,7 @@ export function ImportOverwriteDialog({
           </button>
           <button type="button" className="button-with-icon confirm-dialog-confirm" onClick={handleConfirm}>
             <span className="action-button-icon is-open" aria-hidden="true" />
-            <span>Confirm</span>
+            <span>{t("ui.importoverwritedialogConfirm")}</span>
           </button>
         </footer>
       </section>

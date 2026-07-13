@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement } from "react";
 
 export interface TableFilterBarOption {
@@ -63,7 +64,7 @@ export function TableFilterBar({
         <button
           type="button"
           className="list-inline-table-filter-clear"
-          aria-label={`Clear ${label.toLowerCase()} query`}
+          aria-label={t("ui.tablefilterbarClearToLowerCaseQuery", { toLowerCase: label.toLowerCase() })}
           onClick={() => onQueryChange("")}
           disabled={queryValue.length === 0}
         >

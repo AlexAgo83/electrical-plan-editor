@@ -57,11 +57,10 @@ export function AppHeaderAndStats({
   ]
     .filter((token) => token.length > 0)
     .join(" ");
-  const opsStatusDescription = `${validationIssuesCount} validation issue${validationIssuesCount === 1 ? "" : "s"}${
-    validationErrorCount > 0
-      ? `, ${validationErrorCount} error${validationErrorCount === 1 ? "" : "s"}`
-      : ", no errors"
-  }`;
+  const opsStatusDescription = t(
+    validationErrorCount > 0 ? "ui.validationIssuesWithErrors" : "ui.validationIssuesWithoutErrors",
+    { issues: validationIssuesCount, errors: validationErrorCount }
+  );
   return (
     <>
       <section
@@ -82,7 +81,7 @@ export function AppHeaderAndStats({
           </button>
           <h1 className="header-title">
             <button type="button" className="header-title-button" onClick={onOpenHome}>
-              <span className="header-title-accent">e</span>-Plan<span className="header-title-full"> Editor</span>
+              <span className="header-title-accent">e</span>{t("ui.appheaderandstatsPlan")}<span className="header-title-full"> {t("ui.appheaderandstatsEditor")}</span>
             </button>
           </h1>
         </div>
@@ -147,11 +146,9 @@ export function AppHeaderAndStats({
           <p>{bootRecoveryMessage}</p>
           <div className="inline-actions">
             <button type="button" onClick={onCommitBootRecovery}>
-              Reset stored workspace
-            </button>
+              {t("ui.appheaderandstatsResetStoredWorkspace")}</button>
             <button type="button" onClick={onClearError}>
-              Dismiss
-            </button>
+              {t("ui.appheaderandstatsDismiss")}</button>
           </div>
         </section>
       ) : null}

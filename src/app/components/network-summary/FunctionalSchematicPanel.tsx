@@ -982,11 +982,9 @@ function FunctionalSchematicPanelComponent({
             ) : null}
           </div>
           <p className="functional-schematic-subtitle">
-            {subtitle ?? `Read-only trace from ${getSeedLabel(seed, rootConnectors)}.`} {graph.includedWireIds.length} wire
-            {graph.includedWireIds.length === 1 ? "" : "s"} included.
-          </p>
+            {subtitle ?? `Read-only trace from ${getSeedLabel(seed, rootConnectors)}.`} {graph.includedWireIds.length} {t("ui.functionalschematicpanelWire")}{graph.includedWireIds.length === 1 ? "" : "s"} {t("ui.functionalschematicpanelIncluded")}</p>
         </div>
-        <div className="network-summary-header-actions" role="group" aria-label="Functional schematic actions">
+        <div className="network-summary-header-actions" role="group" aria-label={t("ui.functionalschematicpanelFunctionalSchematicActions")}>
           <button
             type="button"
             className={showGrid ? "workspace-tab is-active" : "workspace-tab"}
@@ -1004,8 +1002,7 @@ function FunctionalSchematicPanelComponent({
             onClick={handleToggleElectricalRoles}
           >
             <span className="action-button-icon is-analysis" aria-hidden="true" />
-            Electrical roles
-          </button>
+            {t("ui.functionalschematicpanelElectricalRoles")}</button>
           {onOpenActiveNetworkInModeling === undefined ? null : (
             <button
               type="button"
@@ -1013,8 +1010,7 @@ function FunctionalSchematicPanelComponent({
               onClick={onOpenActiveNetworkInModeling}
             >
               <span className="action-button-icon is-network-scope" aria-hidden="true" />
-              Active network
-            </button>
+              {t("ui.functionalschematicpanelActiveNetwork")}</button>
           )}
           <NetworkSummaryExportMenu
             canExportSvg={canExport}
@@ -1036,7 +1032,7 @@ function FunctionalSchematicPanelComponent({
         </div>
       </header>
 
-      <div className="functional-schematic-filters" aria-label="Functional schematic filters">
+      <div className="functional-schematic-filters" aria-label={t("ui.functionalschematicpanelFunctionalSchematicFilters")}>
         {graph.availableFilters.map((filter) => (
           <button
             key={filter}
@@ -1054,8 +1050,8 @@ function FunctionalSchematicPanelComponent({
         {graph.nodes.length === 0 ? (
           <p className="empty-copy">
             {rootConnectors.length > 0
-              ? "No functional trace is connected to the configured main harness connector selection."
-              : "Select a wire, connector, or splice to generate a functional trace."}
+              ? t("ui.functionalschematicpanelNoFunctionalTraceIsConnectedToTheConfiguredMainHarness")
+              : t("ui.functionalschematicpanelSelectAWireConnectorOrSpliceToGenerateAFunctional")}
           </p>
         ) : (
           <svg
@@ -1170,11 +1166,11 @@ function FunctionalSchematicPanelComponent({
       </div>
 
       {graph.warnings.length > 0 ? (
-        <div className="functional-schematic-warnings" role="status" aria-label="Functional schematic warnings">
+        <div className="functional-schematic-warnings" role="status" aria-label={t("ui.functionalschematicpanelFunctionalSchematicWarnings")}>
           {graph.warnings.slice(0, 6).map((warning, index) => (
             <p key={`${warning.kind}-${warning.sourceId ?? "global"}-${index}`}>{warning.message}</p>
           ))}
-          {graph.warnings.length > 6 ? <p>{graph.warnings.length - 6} additional warnings hidden.</p> : null}
+          {graph.warnings.length > 6 ? <p>{graph.warnings.length - 6} {t("ui.functionalschematicpanelAdditionalWarningsHidden")}</p> : null}
         </div>
       ) : null}
       <SvgExportPreviewDialog
@@ -1189,7 +1185,7 @@ function FunctionalSchematicPanelComponent({
       <PreviewLoadingDialog
         isOpen={isSvgPreviewLoading && activeSvgPreview === null}
         themeHostClassName={dialogThemeHostClassName}
-        title={`Preparing ${svgPreviewLoadingFormat.toUpperCase()} preview`}
+        title={t("ui.networksummarypanelPreparingToUpperCasePreview", { toUpperCase: svgPreviewLoadingFormat.toUpperCase() })}
         message="Rendering the functional schematic export."
       />
     </section>

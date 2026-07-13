@@ -142,8 +142,8 @@ export function ModelingCatalogListPanel({
   const catalogItemColumns: ConfigurableTableColumn[] = [
     { id: "manufacturerReference", label: t("ui.manufacturerRef") },
     { id: "name", label: t("ui.name") },
-    { id: "connectionCount", label: "Connections" },
-    { id: "unitPriceExclTax", label: "Unit price" }
+    { id: "connectionCount", label: t("ui.inspectorcontextpanelConnections") },
+    { id: "unitPriceExclTax", label: t("ui.modelingcataloglistpanelUnitPrice") }
   ];
 
   return (
@@ -153,31 +153,28 @@ export function ModelingCatalogListPanel({
         <h2>{t("ui.catalog")}</h2>
         <div className="list-panel-header-tools">
           <div className="list-panel-header-tools-row is-title-actions">
-            <div className="chip-group" aria-label="Catalog tables">
+            <div className="chip-group" aria-label={t("ui.modelingcataloglistpanelCatalogTables")}>
               <button
                 type="button"
                 aria-pressed={activeView === "items"}
                 className={`filter-chip${activeView === "items" ? " is-active" : ""}`}
                 onClick={() => setActiveView("items")}
               >
-                Items
-              </button>
+                {t("ui.bomexportpreviewdialogItems")}</button>
               <button
                 type="button"
                 aria-pressed={activeView === "endpointRefs"}
                 className={`filter-chip${activeView === "endpointRefs" ? " is-active" : ""}`}
                 onClick={() => setActiveView("endpointRefs")}
               >
-                Endpoint refs
-              </button>
+                {t("ui.modelingcataloglistpanelEndpointRefs")}</button>
               <button
                 type="button"
                 aria-pressed={activeView === "sealRefs"}
                 className={`filter-chip${activeView === "sealRefs" ? " is-active" : ""}`}
                 onClick={() => setActiveView("sealRefs")}
               >
-                Seal refs
-              </button>
+                {t("ui.modelingcataloglistpanelSealRefs")}</button>
             </div>
             {isItemsView && onExportCatalogCsv !== undefined ? (
               <button
@@ -187,7 +184,7 @@ export function ModelingCatalogListPanel({
                 disabled={catalogItems.length === 0}
               >
                 <span className="table-export-icon" aria-hidden="true" />
-                <span>Export CSV</span>
+                <span>{t("ui.modelingcataloglistpanelExportCSV")}</span>
               </button>
             ) : null}
             {isItemsView ? (
@@ -251,7 +248,7 @@ export function ModelingCatalogListPanel({
         />
       ) : catalogItems.length === 0 ? (
         <>
-          <p className="empty-copy">No catalog item yet.</p>
+          <p className="empty-copy">{t("ui.modelingcataloglistpanelNoCatalogItemYet")}</p>
           <div className="row-actions compact">
             <button
               type="button"
@@ -269,7 +266,7 @@ export function ModelingCatalogListPanel({
         </>
       ) : sortedCatalogItems.length === 0 ? (
         <>
-          <p className="empty-copy">No catalog item matches the current filters.</p>
+          <p className="empty-copy">{t("ui.modelingcataloglistpanelNoCatalogItemMatchesTheCurrentFilters")}</p>
           <TableEntryCountFooter count={0} />
         </>
       ) : (
@@ -291,12 +288,12 @@ export function ModelingCatalogListPanel({
                 </th>
                 <th data-column-id="connectionCount" aria-sort={getTableAriaSort(sortState, "connectionCount")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("connectionCount")}>
-                    {isMobileViewport ? "Con." : "Connections"} <span className="sort-indicator">{sortIndicator("connectionCount")}</span>
+                    {isMobileViewport ? t("ui.modelingcataloglistpanelCon") : t("ui.inspectorcontextpanelConnections")} <span className="sort-indicator">{sortIndicator("connectionCount")}</span>
                   </button>
                 </th>
                 <th data-column-id="unitPriceExclTax" aria-sort={getTableAriaSort(sortState, "unitPriceExclTax")}>
                   <button type="button" className="sort-header-button" onClick={() => toggleSort("unitPriceExclTax")}>
-                    {isMobileViewport ? "Price" : `Unit price HT (${workspaceCurrencyCode})`}{" "}
+                    {isMobileViewport ? t("ui.modelingcataloglistpanelPrice") : `Unit price HT (${workspaceCurrencyCode})`}{" "}
                     <span className="sort-indicator">{sortIndicator("unitPriceExclTax")}</span>
                   </button>
                 </th>
@@ -350,7 +347,7 @@ export function ModelingCatalogListPanel({
           </button>
           {onOpenCatalogCsvImportPicker !== undefined ? (
             <button type="button" onClick={onOpenCatalogCsvImportPicker}>
-              {isMobileViewport ? "Import" : t("ui.importCSV")}
+              {isMobileViewport ? t("ui.modelingcataloglistpanelImport") : t("ui.importCSV")}
             </button>
           ) : null}
           <button
@@ -458,7 +455,7 @@ function WireEndpointReferenceNamesTable({
   }, [draftResetPayload]);
 
   if (entries.length === 0) {
-    return <p className="empty-copy">{t("ui.no")} {kind} references yet.</p>;
+    return <p className="empty-copy">{t("ui.no")} {kind} {t("ui.modelingcataloglistpanelReferencesYet")}</p>;
   }
 
   return (
@@ -471,7 +468,7 @@ function WireEndpointReferenceNamesTable({
           columns={[
             { id: "reference", label: t("ui.reference") },
             { id: "name", label: t("ui.name") },
-            { id: "quantity", label: "Count" },
+            { id: "quantity", label: t("ui.modelingcataloglistpanelCount") },
             { id: "actions", label: t("ui.actions"), hideable: false }
           ]}
           tableColumnPreferences={tableColumnPreferences}
@@ -483,7 +480,7 @@ function WireEndpointReferenceNamesTable({
           <tr>
             <th data-column-id="reference">{t("ui.reference")}</th>
             <th data-column-id="name">{t("ui.name")}</th>
-            <th data-column-id="quantity">Count</th>
+            <th data-column-id="quantity">{t("ui.modelingcataloglistpanelCount")}</th>
             <th data-column-id="actions" className="validation-actions-cell">{t("ui.actions")}</th>
           </tr>
         </thead>
@@ -497,7 +494,7 @@ function WireEndpointReferenceNamesTable({
                   {linkedWire !== undefined ? (
                     <EntityReferenceButton
                       className="technical-id"
-                      title={`Open wire ${linkedWire.technicalId}`}
+                      title={t("ui.modelingcataloglistpanelOpenWireTechnicalId", { technicalId: linkedWire.technicalId })}
                       onClick={() => onOpenWireReference(linkedWire)}
                     >
                       {entry.reference}
@@ -509,7 +506,7 @@ function WireEndpointReferenceNamesTable({
                 <td data-column-id="name">
                   <input
                     className="data-table-text-input"
-                    aria-label={`${heading} name for ${entry.reference}`}
+                    aria-label={t("ui.modelingcataloglistpanelHeadingNameForReference", { heading: heading, reference: entry.reference })}
                     value={draftValue}
                     maxLength={120}
                     onChange={(event: ChangeEvent<HTMLInputElement>) => {

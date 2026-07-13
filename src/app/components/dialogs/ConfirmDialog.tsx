@@ -55,7 +55,7 @@ export function ConfirmDialog({
       <button
         type="button"
         className="confirm-dialog-backdrop"
-        aria-label="Dismiss confirmation dialog"
+        aria-label={t("ui.confirmdialogDismissConfirmationDialog")}
         onClick={closeOnBackdrop ? onCancel : undefined}
       />
       <section

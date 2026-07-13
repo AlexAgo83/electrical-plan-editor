@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../../../lib/i18n";
 import {
   memo,
   type CSSProperties,
@@ -214,7 +215,7 @@ const GraphNodeItem = memo(function GraphNodeItem({
       role="button"
       tabIndex={0}
       focusable="true"
-      aria-label={`Select ${describeNode(node)}`}
+      aria-label={t("ui.networksummarygraphlayersSelectNode", { node: describeNode(node) })}
       onMouseDown={(event) => onNodeMouseDown(event, node.id)}
       onKeyDown={(event) => handleNetworkNodeKeyDown(event, node.id, onNodeActivate)}
       onClick={(event) => {
@@ -376,7 +377,7 @@ const GraphSegmentItem = memo(function GraphSegmentItem({
         role="button"
         tabIndex={0}
         focusable="true"
-        aria-label={`Select segment ${segment.id}`}
+        aria-label={t("ui.networksummarygraphlayersSelectSegmentId", { id: segment.id })}
         onClick={(event) => {
           event.stopPropagation();
           onSelectSegment(segment.id);
@@ -616,7 +617,7 @@ const GraphFloatingSpliceItem = memo(function GraphFloatingSpliceItem({
       role="button"
       tabIndex={0}
       focusable="true"
-      aria-label={`Select splice ${splice.technicalId}`}
+      aria-label={t("ui.networksummarygraphlayersSelectSpliceTechnicalId", { technicalId: splice.technicalId })}
       onClick={(event) => {
         event.stopPropagation();
         // Match connector behavior: a single click selects and opens the splice

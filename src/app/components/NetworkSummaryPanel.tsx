@@ -1009,7 +1009,7 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
       <PreviewLoadingDialog
         isOpen={isSvgPreviewLoading && activeSvgPreview === null}
         themeHostClassName={dialogThemeHostClassName}
-        title={`Preparing ${svgPreviewLoadingFormat.toUpperCase()} preview`}
+        title={t("ui.networksummarypanelPreparingToUpperCasePreview", { toUpperCase: svgPreviewLoadingFormat.toUpperCase() })}
         message="Rendering the current network export."
       />
     </section>

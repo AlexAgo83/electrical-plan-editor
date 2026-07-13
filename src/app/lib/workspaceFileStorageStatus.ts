@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "./i18n";
 import type { WorkspaceFilePayloadV1 } from "./workspaceFile";
 import {
   isDirectFileAccessSupported,
@@ -21,7 +22,7 @@ export function createLocalWorkspaceFileStatus(): WorkspaceFileStatusBase {
     saveTarget: "local-cache",
     lastSavedAtIso: null,
     permission: "unavailable",
-    message: "Workspace changes are saved in this browser only.",
+    message: t("ui.workspacefilestoragestatusWorkspaceChangesAreSavedInThisBrowserOnly"),
     conflict: false,
     isSaving: false
   };
@@ -71,7 +72,7 @@ export function createLinkedWorkspaceFileStatus(
     permission,
     conflict: false,
     isSaving: false,
-    message: "Workspace file linked. Future changes autosave to this file while permission remains available."
+    message: t("ui.workspacefilestoragestatusWorkspaceFileLinkedFutureChangesAutosaveToThisFileWhile")
   };
 }
 
@@ -94,6 +95,6 @@ export function createDownloadedWorkspaceFileStatus(
     permission: "unavailable",
     conflict: false,
     isSaving: false,
-    message: "Workspace file downloaded. This browser did not grant direct file autosave access."
+    message: t("ui.workspacefilestoragestatusWorkspaceFileDownloadedThisBrowserDidNotGrantDirectFile")
   };
 }

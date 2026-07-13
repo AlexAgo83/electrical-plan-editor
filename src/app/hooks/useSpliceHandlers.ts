@@ -358,7 +358,7 @@ export function useSpliceHandlers({
 
       if (impact.kind === "cascade") {
         const shouldCascadeDelete = await confirmAction({
-          title: "Cascade delete splice",
+          title: t("ui.usesplicehandlersCascadeDeleteSplice"),
           message: impact.message,
           confirmLabel: "Delete all",
           cancelLabel: t("ui.cancel"),
@@ -380,7 +380,7 @@ export function useSpliceHandlers({
       }
 
       await confirmAction({
-        title: "Splice delete blocked",
+        title: t("ui.usesplicehandlersSpliceDeleteBlocked"),
         message: impact.message,
         confirmLabel: t("ui.close"),
         cancelLabel: t("ui.cancel"),
@@ -410,7 +410,7 @@ export function useSpliceHandlers({
 
     void (async () => {
       const shouldConvert = await confirmAction({
-        title: "Convert splice to directional",
+        title: t("ui.usesplicehandlersConvertSpliceToDirectional"),
         message: `Convert splice '${splice.name}' (${splice.technicalId}) from numeric ports to automatic L/R sides? Existing wire endpoints will be reassigned from routing where possible and old manual port occupancy will be cleared.`,
         confirmLabel: "Convert",
         cancelLabel: t("ui.cancel"),

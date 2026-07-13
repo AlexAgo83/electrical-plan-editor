@@ -274,7 +274,7 @@ export function buildCalloutHeaderDisplay(
   if (displayName.length > 0) {
     return { title: displayName, subtitle: "" };
   }
-  return { title: "(unnamed)", subtitle: "" };
+  return { title: t("ui.calloutlayoutUnnamed"), subtitle: "" };
 }
 
 function buildCalloutRows(groups: CalloutGroup[]): CalloutTableRow[] {

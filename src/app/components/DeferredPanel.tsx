@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../lib/i18n";
 import { useDeferredValue, useEffect, useState, type ReactElement, type ReactNode } from "react";
 
 // ponytail: tests render synchronously so existing specs keep querying panels without waitFor
@@ -37,7 +38,7 @@ export function DeferredPanel({ placeholder, children }: DeferredPanelProps): Re
       {isMounted ? (
         deferredChildren
       ) : (
-        (placeholder ?? <section className="panel" aria-busy="true" aria-label="Loading panel" />)
+        (placeholder ?? <section className="panel" aria-busy="true" aria-label={t("ui.deferredpanelLoadingPanel")} />)
       )}
     </>
   );

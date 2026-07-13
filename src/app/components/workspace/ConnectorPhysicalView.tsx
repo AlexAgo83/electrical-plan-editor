@@ -250,7 +250,7 @@ function renderPhysicalOccupantRef(occupantRef: string | null, wireById: Map<Wir
   }
   const technicalId = wireById.get(parsed.wireId)?.technicalId ?? parsed.wireId;
   return (
-    <span className="cavity-occupant-ref" aria-label={`Wire ${technicalId} / ${parsed.side}`}>
+    <span className="cavity-occupant-ref" aria-label={t("ui.connectorphysicalviewWireTechnicalIdSide", { technicalId: technicalId, side: parsed.side })}>
       <span>{technicalId} / {parsed.side}</span>
     </span>
   );
@@ -283,12 +283,12 @@ export function ConnectorPhysicalView({
 
   return (
     <div className="connector-physical-view">
-      <div className="connector-physical-canvas" aria-label="Connector physical view">
+      <div className="connector-physical-canvas" aria-label={t("ui.connectorphysicalviewConnectorPhysicalView")}>
         <svg
           className="connector-physical-svg"
           viewBox={getPhysicalViewBox(layout, shellPadding)}
           role="img"
-          aria-label={`${connector.technicalId} physical connector layout`}
+          aria-label={t("ui.connectorphysicalviewTechnicalidPhysicalConnectorLayout", { technicalId: connector.technicalId })}
         >
           {renderPhysicalShell(layout, shellShape, shellPadding)}
           {keyings.map((keying, index) => (
@@ -338,7 +338,7 @@ export function ConnectorPhysicalView({
                     x={0.34}
                     y={-0.34}
                     style={{ fontSize: 0.18 }}
-                    aria-label={`Shared way, ${sharedOccupantCount} wires`}
+                    aria-label={t("ui.connectorphysicalviewSharedWaySharedOccupantCountWires", { sharedOccupantCount: sharedOccupantCount })}
                   >
                     ×{sharedOccupantCount}
                   </text>
@@ -367,7 +367,7 @@ export function ConnectorPhysicalView({
       </div>
 
       <div className="connector-physical-details">
-        <div className="cavity-grid connector-physical-way-list" aria-label="Physical way details">
+        <div className="cavity-grid connector-physical-way-list" aria-label={t("ui.connectorphysicalviewPhysicalWayDetails")}>
           {layout.ways.map((way) => {
             const status = statusByCavity.get(way.cavityIndex);
             const occupantRefs =
@@ -385,7 +385,7 @@ export function ConnectorPhysicalView({
               >
                 <h3>
                   C{way.cavityIndex}
-                  {isShared ? <span className="cavity-shared-badge" title="Shared way (several wires crimped together)"> · shared ×{occupantRefs.length}</span> : null}
+                  {isShared ? <span className="cavity-shared-badge" title={t("ui.analysisconnectorworkspacepanelsSharedWaySeveralWiresCrimpedTogether")}> {t("ui.analysisconnectorworkspacepanelsShared")}{occupantRefs.length}</span> : null}
                 </h3>
                 {isOccupied ? (
                   occupantRefs.map((occupantRef) => {
@@ -407,8 +407,7 @@ export function ConnectorPhysicalView({
                             </button>
                           ) : (
                             <button type="button" className="button-with-icon" onClick={() => onReleaseCavity(way.cavityIndex, occupantRef)}>
-                              Release
-                            </button>
+                              {t("ui.analysisconnectorworkspacepanelsRelease")}</button>
                           )}
                         </div>
                       </div>
