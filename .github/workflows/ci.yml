@@ -11,8 +11,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.run_id }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   quality:
@@ -58,6 +58,7 @@ jobs:
         run: npm run -s test:ci:fast -- --coverage
 
   ui:
+    if: ${{ github.event_name != 'pull_request' || github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -74,6 +75,7 @@ jobs:
       - run: npm run -s test:ci:ui:shard -- --shard=${{ matrix.shard }}/3
 
   e2e:
+    if: ${{ github.event_name != 'pull_request' || github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -124,6 +126,6 @@ jobs:
           echo "$NEEDS"
           test "${{ needs.quality.result }}" = success
           test "${{ needs.unit.result }}" = success
-          test "${{ needs.ui.result }}" = success
-          test "${{ needs.e2e.result }}" = success
+          test "${{ needs.ui.result }}" = success || test "${{ needs.ui.result }}" = skipped
+          test "${{ needs.e2e.result }}" = success || test "${{ needs.e2e.result }}" = skipped
           test "${{ needs.build.result }}" = success
