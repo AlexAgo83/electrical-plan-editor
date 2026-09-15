@@ -139,8 +139,8 @@ describe("App integration UI - onboarding", () => {
   });
 
   it("cancels pending onboarding target-focus retries when modal closes", () => {
-    const originalRequestAnimationFrame = window.requestAnimationFrame;
-    const originalCancelAnimationFrame = window.cancelAnimationFrame;
+    const originalRequestAnimationFrame = window.requestAnimationFrame.bind(window);
+    const originalCancelAnimationFrame = window.cancelAnimationFrame.bind(window);
     const rafCallbacks = new Map<number, FrameRequestCallback>();
     let nextRafId = 1;
 
