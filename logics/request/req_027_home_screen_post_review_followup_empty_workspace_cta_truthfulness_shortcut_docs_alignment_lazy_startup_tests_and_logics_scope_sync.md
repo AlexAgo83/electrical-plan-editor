@@ -105,12 +105,12 @@ flowchart TD
 ```
 
 # Backlog
-- To be created from this request (proposed):
-  - Home CTA new-empty-workspace behavior correction (no reset semantics)
-  - Settings shortcut documentation cleanup and keyboard-map sync
-  - Home-first startup regression-test expectation alignment
-  - Logics scope/AC synchronization for `req_026` artifacts
-  - Closure validation + AC traceability
+- Implemented / tracked via:
+  - `item_156_home_create_empty_workspace_cta_new_workspace_behavior_and_preference_preservation.md`
+  - `item_157_settings_shortcut_documentation_alignment_with_current_keyboard_bindings.md`
+  - `item_158_home_first_startup_lazy_loading_regression_test_expectation_alignment.md`
+  - `item_159_req_026_home_mvp_scope_docs_sync_after_quick_panels_removal.md`
+  - `item_160_req_027_followup_closure_ci_e2e_build_pwa_and_ac_traceability.md`
 
 # References
 - `src/app/AppController.tsx`
