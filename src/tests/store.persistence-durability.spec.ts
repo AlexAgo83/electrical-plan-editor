@@ -3,6 +3,7 @@ import { saveStateSync } from "../adapters/persistence";
 import { appActions, createAppStore, createInitialState, type AppState } from "../store";
 import { attachPersistenceSync } from "../app/store";
 import { asConnectorId } from "./helpers/store-reducer-test-utils";
+import { resetWorkspaceSessionGateForTests, setProjectMutationBlocked } from "../app/lib/workspaceSessionGate";
 
 function dispatchConnector(store: ReturnType<typeof createAppStore>, id: string): void {
   store.dispatch(
@@ -13,6 +14,31 @@ function dispatchConnector(store: ReturnType<typeof createAppStore>, id: string)
 describe("attachPersistenceSync durability", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  it("never persists a historical snapshot displayed read-only", async () => {
+    vi.useFakeTimers();
+    const store = createAppStore(createInitialState());
+    const save = vi.fn().mockResolvedValue({ ok: true as const });
+    const saveSync = vi.fn().mockReturnValue({ ok: true as const });
+    const detach = attachPersistenceSync(store, { save, saveSync });
+    try {
+      setProjectMutationBlocked("read-only");
+      dispatchConnector(store, "HISTORICAL");
+      await vi.advanceTimersByTimeAsync(1_000);
+      window.dispatchEvent(new Event("pagehide"));
+      expect(save).not.toHaveBeenCalled();
+      expect(saveSync).not.toHaveBeenCalled();
+
+      setProjectMutationBlocked(null);
+      dispatchConnector(store, "WORKING");
+      await vi.advanceTimersByTimeAsync(1_000);
+      expect(save).toHaveBeenCalledTimes(1);
+    } finally {
+      resetWorkspaceSessionGateForTests();
+      detach();
+      vi.useRealTimers();
+    }
   });
 
   it("flushes a pending debounced save synchronously on pagehide (AC1, AC2)", () => {

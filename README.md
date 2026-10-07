@@ -250,6 +250,12 @@ The app uses explicit versioned payload contracts for both local storage and net
   - legacy file payloads are normalized on import
   - unsupported future file versions are rejected safely (no workspace mutation)
 
+- Named workspace lineages (working copy, numbered immutable versions, supplier handoff archives,
+  folder/ZIP portability, legacy adoption): see [`docs/workspace-lineages.md`](docs/workspace-lineages.md)
+  for the user workflow, the portable format contract and failure semantics.
+  - workspace file (`*.epe.json`): schema `2` (schema `1` still readable)
+  - lineage manifest / supplier handoff record: schema `1`
+
 Migration authoring workflow (future schema evolution):
 
 1. Add/adjust payload shape support in `src/adapters/persistence/migrations.ts` (local storage) and/or `src/adapters/portability/networkFile.ts` (file import/export).
