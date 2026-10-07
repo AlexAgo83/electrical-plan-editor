@@ -1,0 +1,319 @@
+{
+  "title": "Named portable workspace lineages with immutable version history and supplier handoffs",
+  "references": [
+    "src/app/lib/workspaceFile.ts",
+    "src/app/lib/workspaceFileAccess.ts",
+    "src/app/lib/workspaceFileOpenActions.ts",
+    "src/app/lib/workspaceFileStorageStatus.ts",
+    "src/app/hooks/useWorkspaceFileStorage.ts",
+    "src/app/hooks/workspaceFileStorageTypes.ts",
+    "src/app/hooks/useStoreHistory.ts",
+    "src/app/hooks/useKeyboardShortcuts.ts",
+    "src/app/components/workspace/HomeWorkspaceContent.tsx",
+    "src/app/components/workspace/SettingsWorkspaceContent.tsx",
+    "src/app/hooks/controller/useAppControllerHistoryDispatch.ts",
+    "src/store/types.ts",
+    "src/adapters/persistence/migrations.ts",
+    "src/tests/workspace-file.spec.ts",
+    "src/tests/workspace-file-storage.hook.spec.tsx",
+    "logics/product/prod_005_cloud_file_workspace_sync.md"
+  ],
+  "request": {
+    "complexity": "High",
+    "theme": "Portable workspace version history",
+    "needs": [
+      "Maintain separate named Series and Prototype workspace lineages with convenient resume/save/transfer.",
+      "Replace timestamp-only piles with deliberate readable numbered snapshots and a browsable immutable history.",
+      "Recover exactly the design and delivered artifacts used for a supplier handoff.",
+      "Preserve file ownership, offline use and manual copying across computers without a hosted backend."
+    ],
+    "context": [
+      "User workflow: a folder contains successive full snapshots of one project, is copied manually between computers, and mostly serves latest-state editing; occasionally an old supplier delivery must be reconstructed. The accepted proposal introduces two initially desired independent lineages (Series and Prototypes), a stable working file, deliberate numbered milestones and read-only history. No application code is authorized in this scoping task.",
+      "Current implementation: src/app/lib/workspaceFile.ts defines schema v1 with workspaceId, revisionId, timestamps and full AppState; buildWorkspaceFileName generates electrical-workspace-<timestamp>.epe.json. revisionId is regenerated on saves for conflict detection, not a user-visible business version. Preserve that distinction in the new format.",
+      "Current useWorkspaceFileStorage has one linkedHandleRef, one lastLoadedPayloadRef and a debounced autosave. workspaceFileAccess.ts stores one last-linked-handle in IndexedDB and only models file pickers, not directory access. Extend through a storage/repository abstraction rather than adding all history/archive logic to this hook. Directory support requires explicit capability detection.",
+      "The archived prod_005_cloud_file_workspace_sync is background context, not an active delivery parent. This feature combines named lineages, deliberate milestones and supplier archives and receives a fresh product brief. Reuse current parse/migration, file conflict and permission handling where appropriate; do not treat the archived brief as an implemented contract.",
+      "Decision: portable root per lineage contains workspace-manifest.json, <slug>-travail.epe.json, Versions/<slug>-vNNN-<label>-<shortVersionId>.epe.json, Handoffs/<handoffId>/ metadata and attachments, and Recovery/ only for explicit pre-restore or interrupted-save recovery. IDs are authoritative; slugs and filenames are presentation. Freeze the slug at creation so renaming the display name does not trigger unsafe bulk file moves. Examples use serie and protos; UI labels are localized.",
+      "Data contract: manifest has schemaVersion, workspaceId, displayName, stable slug, manifestRevisionId, working head revision/baseVersionId and an index of immutable versions and handoffs. Each version embeds workspace identity/name, versionId, displayNumber, technical revisionId, parentVersionId, restoredFromVersionId when relevant, createdAt, title/comment and a full persisted project snapshot. Actual divergent ancestry is retained; imported unrelated legacy snapshots use chronological ordering metadata without fabricated historical parentage.",
+      "Numbering: v001, v002 etc. are allocated when an explicit version commits, not on ordinary saves. Next number is max known committed displayNumber + 1 within the lineage, never count + 1. Unique IDs prevent filename collisions offline. On reunion, existing numbers stay unchanged; show v006 with short ID/device provenance if two distinct v006 exist. Explicitly choose a working head, retain both variants, then allocate v007. No auto-merge or timestamp winner.",
+      "Snapshot boundary: preserve all current portable AppState project content, including networks, harness assemblies, catalog and layouts. Do not add machine file handles, browser permissions or provider secrets to portable metadata. Existing local UI preferences remain local. Undo/redo and pending mutations are scoped/reset at workspace boundaries, distinct from durable history.",
+      "Persistence contract: implement lineage-scoped IndexedDB recovery/registry while maintaining compatibility with legacy browser persistence; a browser cache is not proof of a disk save. Validate before activation, serialize writes per lineage, capture workspace identity in asynchronous operations, stage immutable files before manifest publication, and recover interrupted working-file replacement from a verified prior copy. Directory APIs provide no universal multi-file transaction or distributed lock; explicitly detect and recover incomplete operations instead of promising atomic cloud sync.",
+      "Read-only consultation must gate every project mutation path, autosave, keyboard undo/redo, imports and agent-driven mutations, while allowing navigation and exports. A suspended working session is retained separately. Restore first durably preserves displaced work in Recovery (or a complete downloadable recovery package); failure/cancellation aborts restore. Source snapshot bytes are never rewritten by in-memory schema migration.",
+      "Supplier handoff is a recorded event referencing an existing frozen version or creating one from current work. Capture exact files chosen by the user; do not regenerate historical PDFs and call them originals. Handoff record and files become immutable on publication; later corrections are a new explicitly superseding record. Regenerated exports are separately identified. No mail, cloud account or supplier integration is included.",
+      "Fallback: without directory access, retain the library in browser storage and offer explicit ZIP import/export with a pending-export indicator; Ctrl/Cmd+S initiates a portable package download when no writable target exists, and says download initiated rather than file verified. Users can always download an individual snapshot. ZIP contains a single lineage root using the same folder layout; users transfer both lineages by copying their common parent folder or exporting two ZIPs.",
+      "Archive validation: reject absolute paths, traversal, duplicate normalized entries and unsupported schema before activation; verify declared hashes and ownership references. Initial documented limits are 10000 entries, 500 MiB total uncompressed content, 100 MiB per attachment, and 100:1 per-entry compression ratio, enforced on actual decoded bytes as well as metadata. Oversize imports fail without partial activation; limits live in one tested configuration. No attachment is executed or rendered as active content.",
+      "Legacy adoption: current deterministic fallback workspace IDs can differ per old snapshot; never infer Series/Prototypes from these IDs. Preview valid embedded dates first, valid filename timestamp second, otherwise require user placement; ties require review. Record original filename, source IDs, original bytes digest and chosen ordering. Identical source content is reported for explicit skip/keep; assigned version numbers follow confirmed order. A fresh bulk import uses v001 onward; appending uses next available numbers. Newest valid date is only a suggested working-state choice.",
+      "Performance scope: lazy-load snapshot contents and attachment blobs; open/history-list must not parse every snapshot eagerly. Verify a fixture with 100 versions and 150 wires per snapshot, and document observed package size and timing without an arbitrary hardware-specific pass threshold. Full snapshots are intentional in V1; deltas and compression beyond ZIP are deferred."
+    ],
+    "acceptance_criteria": [
+      "AC1: Users can create, name, rename and switch between independent workspaces, including Series harnesses and Prototype harnesses, from a persistent selector and Home resume cards; identity survives renaming, copying and reopening on another computer. No fixed two-workspace limit is introduced.",
+      "AC2: Save and Ctrl/Cmd+S update the active working copy without creating a numbered version. Dirty local state, locally recovered state, verified disk save, pending portable export and failures are distinguishable. Switching preserves each workspace and prevents delayed writes, undo history or selections from crossing workspace boundaries.",
+      "AC3: Create version freezes a complete standalone workspace snapshot with a stable immutable version ID, monotonically increasing display number, creation date, optional title/comment and ancestry. Repeated clicks and failed writes cannot publish duplicates or claim a successful version before its durable commit.",
+      "AC4: History lists versions by lineage with date, number, label, supplier handoff and provenance, supports text filtering and opens snapshots read-only. Resume from an older snapshot preserves the current working copy first and records the source version; resuming v002 after v005 produces a subsequent v006 without altering v003-v005.",
+      "AC5: A supplier handoff binds one frozen version to an anonymized-example recipient, declared handoff date and note, and optionally preserves exact user-supplied delivered PDF/BOM/other files with original filename, byte size and content digest. The app does not send anything or claim delivery verification; attachments round-trip byte-for-byte.",
+      "AC6: Copying a complete lineage folder to another computer and opening it recovers its working state, named history and handoff attachments without the original browser cache. Export/import of a ZIP provides equivalent portability, including a manual fallback where folder access is unavailable; individual version files remain independently openable.",
+      "AC7: Divergent copies of the same workspace are detected by stable IDs and ancestry, not timestamps or display numbers. Import/open against a known divergent lineage preserves both heads and requires an explicit continuation choice; same-number distinct versions never overwrite each other and receive visible disambiguation.",
+      "AC8: Existing timestamped workspace files remain readable. A previewable bulk import lets users explicitly assign files to a lineage, review chronological ordering, label versions and select the working state. Original files remain untouched; duplicate content is reported; invalid or ambiguous entries are not silently assigned or discarded.",
+      "AC9: Interrupted writes, revoked permissions, malformed/future schemas, incomplete copies, stale manifest entries, missing attachments and archive import limits produce recoverable actionable states. No failure silently discards the previous valid working copy or a published version. Durable history is never automatically pruned.",
+      "AC10: English/French accessible UI, targeted model/storage/UI regressions and end-to-end two-lineage portability, historical consultation, supplier handoff and divergence scenarios demonstrate the complete workflow; existing standalone workspace and network import/export behavior remains supported."
+    ]
+  },
+  "product": {
+    "title": "Portable named workspace lineages and supplier history",
+    "overview": "Provide independent named project workspaces with a stable editable working copy, explicit immutable numbered milestones, read-only historical consultation and exact supplier handoff archives. A lineage folder or equivalent ZIP carries the entire project history between computers independently of browser cache.",
+    "goals": [
+      "Resume Series or Prototypes immediately from a named workspace selector.",
+      "Keep ordinary saving simple while making milestone versions meaningful and searchable.",
+      "Retain original supplier artifacts and provenance with the corresponding frozen design.",
+      "Support complete offline folder/ZIP portability and conservative conflict recovery.",
+      "Adopt existing timestamped snapshots without destroying or guessing their history."
+    ],
+    "non_goals": [
+      "Hosted accounts, cloud-provider SDKs, real-time collaboration, automatic model merging or Git integration.",
+      "Major/minor/patch semantic versioning, arbitrary branching/rebasing or cross-lineage cherry-picking.",
+      "Automatic supplier communication, delivery verification or automatic email attachment discovery.",
+      "Visual design diffs, delta snapshot storage, automatic deletion/pruning of history and machine-independent distributed locking.",
+      "General application redesign or changing network-level import/export semantics."
+    ]
+  },
+  "backlog_items": [
+    {
+      "title": "Named lineage and immutable workspace version contracts",
+      "priority": "High",
+      "complexity": "High",
+      "theme": "Portable workspace version history",
+      "request_acs": [
+        "AC1",
+        "AC3",
+        "AC7",
+        "AC9"
+      ],
+      "problem": [
+        "Technical save revisions do not encode a named lineage, milestone number or ancestry, and timestamp filenames cannot identify business history."
+      ],
+      "scope_in": [
+        "Define typed versioned manifest, working snapshot, immutable version, recovery and handoff reference contracts matching request decisions; publish the format contract alongside the implementation.",
+        "Extend existing parse/serialize/migration paths for the new schema without dropping current full AppState content or v1 readability.",
+        "Implement stable identities, safe stable slugs, version number allocation, ancestry validation, short-ID filename disambiguation and explicit unsupported-schema errors."
+      ],
+      "scope_out": [
+        "Changes outside this item are delivered by the other linked backlog items."
+      ],
+      "acceptance_criteria": [
+        "AC1: Round-trips preserve two independent named workspace identities and complete project state, including empty workspaces; renaming changes no identity or established path.",
+        "AC2: Repeated ordinary saves change technical revisions but never create or consume a business version number.",
+        "AC3: Version creation allocates max committed number + 1; two offline v006 snapshots with distinct IDs remain valid distinct entries after reconciliation.",
+        "AC4: Old schema parses and future/invalid schema fails without changing the active state; version documents are standalone and contain sufficient identity and provenance."
+      ]
+    },
+    {
+      "title": "Lineage repository with durable folder storage and isolated local recovery",
+      "priority": "High",
+      "complexity": "High",
+      "theme": "Portable workspace version history",
+      "request_acs": [
+        "AC2",
+        "AC3",
+        "AC6",
+        "AC9"
+      ],
+      "problem": [
+        "The storage hook and IndexedDB handle registry currently track one file; adding folders and history without isolating async work risks writing one project into another."
+      ],
+      "scope_in": [
+        "Add repository interfaces for folder and browser-backed modes, per-lineage registry/handles and lazy metadata reads; integrate with current file access helpers.",
+        "Implement serialized working saves, staged immutable version publication, manifest revision checks, recovery of partially published operations, and prior-working-copy recovery around replacement.",
+        "Make create-version idempotent per submitted operation; require successful close/readback/validation before disk success, and distinguish browser durable commit from portable disk persistence.",
+        "Guard queued autosave and delayed callbacks using captured lineage/session identity. Preserve a valid legacy browser snapshot on first registry migration. Provide actionable unavailable/quota/permission statuses.",
+        "Preserve published history without automatic retention deletion; expose recoverable orphan versions or pending operations when index publication fails."
+      ],
+      "scope_out": [
+        "Changes outside this item are delivered by the other linked backlog items."
+      ],
+      "acceptance_criteria": [
+        "AC1: Save/switch with a delayed write cannot put Series state into Prototypes or attach the wrong handle; reload recovers both local sessions.",
+        "AC2: Injected failure at each snapshot/working/manifest stage leaves the previous committed state usable, reports pending recovery and permits a retry without duplicate publication.",
+        "AC3: Denied/revoked permissions and cache quota errors never produce a saved-to-disk indicator; switch is blocked if unsaved work cannot be preserved.",
+        "AC4: Directory reload without original browser data reconstructs all committed metadata and working state; missing/corrupt files are isolated and visible."
+      ]
+    },
+    {
+      "title": "Workspace selector Home resume and safe history consultation",
+      "priority": "High",
+      "complexity": "High",
+      "theme": "Portable workspace version history",
+      "request_acs": [
+        "AC1",
+        "AC2",
+        "AC4",
+        "AC10"
+      ],
+      "problem": [
+        "Users need to know which lineage they edit and inspect old snapshots without replacing or autosaving over their working session."
+      ],
+      "scope_in": [
+        "Add create/name/rename/select workflows, Home cards and persistent active-workspace/version/save status in the existing shell, compatible with standard and canvas-first layouts.",
+        "Expose Save, Create version and History; bind Ctrl/Cmd+S through the existing keyboard hook. Version dialog accepts optional title/comment and disables duplicate submissions.",
+        "History shows number, date, label, handoff markers, provenance and conflict disambiguation with text filtering; lazily load selected versions.",
+        "Implement read-only historical session with return-to-work action and central mutation guard covering dispatch, undo/redo, imports, agents and autosave.",
+        "Resume from history first writes displaced working state to verified recovery, records restoredFromVersionId, retains all published versions and clears incompatible transient editing history.",
+        "Use existing localization and accessible dialog/focus patterns; keyboard and screen-reader status distinguish historical and working sessions."
+      ],
+      "scope_out": [
+        "Changes outside this item are delivered by the other linked backlog items."
+      ],
+      "acceptance_criteria": [
+        "AC1: Create Series and Prototypes, edit each, switch/reload and resume each independently through selector and Home.",
+        "AC2: Inspect v002 after v005: all mutation routes are blocked and return restores the original working content and status.",
+        "AC3: Resume v002 preserves displaced work and published v003-v005; next explicit milestone is v006 with restoration provenance.",
+        "AC4: Cancelling or failing recovery aborts restore; asynchronous work from a consulted historical session never saves into a live working file.",
+        "AC5: Localized controls support keyboard navigation, focus return and an explicit read-only banner in both existing shell layouts."
+      ]
+    },
+    {
+      "title": "Supplier handoff records and exact delivered artifact archives",
+      "priority": "High",
+      "complexity": "High",
+      "theme": "Portable workspace version history",
+      "request_acs": [
+        "AC5",
+        "AC6",
+        "AC9",
+        "AC10"
+      ],
+      "problem": [
+        "A historical design cannot alone prove which exported files were supplied; regenerated exports may differ after application updates."
+      ],
+      "scope_in": [
+        "Add handoff creation from a frozen version or freeze-current flow with recipient, declared handoff date, note and optional file attachments.",
+        "Store immutable handoff metadata with snapshot reference and original attachment name, safe storage path, MIME hint, byte length and SHA-256 digest; use anonymized fixtures such as Supplier A.",
+        "Preserve exact selected bytes in Handoffs/<handoffId>/, list/download them from history and prevent active rendering of imported attachment content.",
+        "Allow multiple events per version; a correction creates a superseding record. Record declared handoff separately from any generated export and never trigger messaging.",
+        "Publish handoff only after files validate; mark missing or corrupt files visibly, retaining usable versions and good attachments."
+      ],
+      "scope_out": [
+        "Changes outside this item are delivered by the other linked backlog items."
+      ],
+      "acceptance_criteria": [
+        "AC1: A handoff can be located by version, recipient and date and retrieves byte-identical original PDF and BOM fixtures after export/import.",
+        "AC2: Failure while saving attachments does not publish an apparently complete handoff or damage its source snapshot; retry is recoverable.",
+        "AC3: No attachment is required to record a handoff, but UI clearly distinguishes a record without archived files from a complete artifact archive.",
+        "AC4: Existing handoff bytes/metadata are not overwritten by correction or export regeneration; the superseding relationship is visible."
+      ]
+    },
+    {
+      "title": "Portable ZIP transfer and divergence reconciliation",
+      "priority": "High",
+      "complexity": "High",
+      "theme": "Portable workspace version history",
+      "request_acs": [
+        "AC6",
+        "AC7",
+        "AC9"
+      ],
+      "problem": [
+        "Manual copies across computers need complete history portability and explicit handling of divergent offline edits. Some browsers cannot persist directory access."
+      ],
+      "scope_in": [
+        "Implement ZIP import/export with exactly the lineage folder layout, including manifest, working snapshot, versions, handoffs and explicit recovery records, excluding handles and machine-local secrets.",
+        "Implement browser-mode library and pending-portable-export state; Ctrl/Cmd+S without a writable target initiates a package download, individual snapshot download remains available.",
+        "Validate archive paths, schemas, resource limits and content hashes before registry activation; choose a ZIP dependency or adapter with a documented bundle-size assessment.",
+        "Reconcile same workspace by immutable IDs/content/ancestry: deduplicate identical objects, quarantine same-ID different-content corruption, fast-forward only proven ancestry, retain divergent working heads for explicit selection.",
+        "Preserve original version numbers and disambiguate collisions with IDs; do not merge model entities or silently choose by time. A later publication allocates beyond all known committed numbers.",
+        "Document manual directory copying, ZIP transfer, stale copies and limits of concurrent cloud-folder writers; no distributed lock guarantee."
+      ],
+      "scope_out": [
+        "Changes outside this item are delivered by the other linked backlog items."
+      ],
+      "acceptance_criteria": [
+        "AC1: A folder copy and a ZIP round-trip into a clean browser recover equivalent working content, history and attachment bytes.",
+        "AC2: Simulate two computers editing the same parent and publishing distinct v006: import retains both, requires a head choice and next version is v007.",
+        "AC3: Import of an identical package is idempotent; ancestor copies cannot silently replace newer known state; same-ID different-content is reported.",
+        "AC4: Traversal, duplicate paths, corrupt hashes, missing required working payload, future schema and decoded-size limit violations fail safely before activation.",
+        "AC5: Unsupported directory access provides honest local/pending-download statuses, import/export and history consultation without pretending to overwrite disk files."
+      ]
+    },
+    {
+      "title": "Previewable adoption of legacy timestamped workspace collections",
+      "priority": "High",
+      "complexity": "High",
+      "theme": "Portable workspace version history",
+      "request_acs": [
+        "AC8",
+        "AC9"
+      ],
+      "problem": [
+        "Existing folders have valuable snapshots with timestamp names and potentially unrelated inferred IDs; automatic grouping would invent project identity."
+      ],
+      "scope_in": [
+        "Add multi-file import preview using existing workspace parser and migration code, including persisted-state payload compatibility.",
+        "Require explicit target/new lineage and confirm order plus working-state selection; suggest dates using embedded timestamp then filename fallback, never filesystem copy date.",
+        "Show invalid files, ties, duplicates and source metadata; require explicit choices where ordering or retention is ambiguous.",
+        "Assign numbered versions using reviewed order, preserve provenance and original files, stage conversion and publish only valid confirmed entries.",
+        "Import into existing lineages appends using next available numbers; retain source IDs as provenance rather than rewriting originals or inferring ancestry."
+      ],
+      "scope_out": [
+        "Changes outside this item are delivered by the other linked backlog items."
+      ],
+      "acceptance_criteria": [
+        "AC1: A mixed legacy fixture can be assigned explicitly to Series and Prototypes in separate batches with reviewed order and selected working state.",
+        "AC2: Undated/tied/duplicate/corrupt files remain visible in preview and cannot silently disappear or become a wrong lineage.",
+        "AC3: After adoption every accepted version opens independently, records its original filename/digest and preserves project content; original inputs are unchanged.",
+        "AC4: Cancelling preview or a failing publication keeps the previous registered lineage intact and supports retry without duplicate snapshots."
+      ]
+    },
+    {
+      "title": "Workspace lineage release validation and user workflow documentation",
+      "priority": "High",
+      "complexity": "High",
+      "theme": "Portable workspace version history",
+      "request_acs": [
+        "AC1",
+        "AC2",
+        "AC3",
+        "AC4",
+        "AC5",
+        "AC6",
+        "AC7",
+        "AC8",
+        "AC9",
+        "AC10"
+      ],
+      "problem": [
+        "The feature crosses persistence, UI history and external files; happy-path tests alone would miss data loss or misleading save state."
+      ],
+      "scope_in": [
+        "Build targeted model/repository tests for migration, numbering, ancestry, idempotency, divergence, partial writes and stale asynchronous operations.",
+        "Extend workspace-file.spec.ts and workspace-file-storage.hook.spec.ts plus focused UI tests; add end-to-end scenarios using temporary files and capability stubs where necessary.",
+        "Run manual supported-browser folder access/relink tests and a no-directory fallback test, recording tested environments and limitations without claiming browser parity.",
+        "Exercise 100 full snapshots of at least 150 wires, validate lazy loading and record measured package size/open/history timing.",
+        "Document Save versus Create version, workspace selection, historical consultation/restore, supplier archive, legacy adoption and computer-to-computer transfer; capture AC evidence in task closeout."
+      ],
+      "scope_out": [
+        "Changes outside this item are delivered by the other linked backlog items."
+      ],
+      "acceptance_criteria": [
+        "AC1: End-to-end evidence covers independent Series/Prototypes editing, restore v002 after v005, supplier artifact recovery, legacy import and divergent offline v006 reconciliation.",
+        "AC2: Existing workspace parse/save/open and network import/export tests pass alongside new targeted regression tests.",
+        "AC3: Typecheck, lint, i18n validation, applicable Vitest/Playwright suites and production build pass; Logics validation and closeout traceability reference actual evidence.",
+        "AC4: Fault-injection evidence confirms no silent loss, cross-lineage write or historical snapshot mutation; documented fallback statuses match observed behavior."
+      ]
+    }
+  ],
+  "orchestration_task": {
+    "title": "Deliver named workspace lineages version history and supplier archives",
+    "plan": [
+      "Wave 1: implement and document format/identity/ancestry contracts and backward migration; settle executable fixtures before storage work.",
+      "Wave 2: build lineage repositories and recovery/commit protocol, including stale callback protection, permission errors and partial-write fault injection. This gates all UI mutation flows.",
+      "Wave 3: wire named-workspace selection, ordinary saving, version creation and centrally guarded history consultation/restoration on the repository.",
+      "Wave 4: implement immutable supplier handoffs and exact attachments, then ZIP/manual portability and conflict reconciliation using shared contracts.",
+      "Wave 5: implement previewable legacy adoption, preserving source provenance and explicit grouping.",
+      "Wave 6: run the cross-feature release matrix, document tested folder/fallback behavior and measured large-history results, record acceptance evidence and execute Logics closeout only after implementation.",
+      "Dependencies: contracts -> repository -> UI; contracts/repository -> supplier archives -> full ZIP handoff coverage; repository/format -> legacy import; all items -> integrated release validation. Do not mark this scaffold implemented or close the task while delivery evidence is absent."
+    ]
+  },
+  "context_pack": {
+    "out": "logics/context-packs/named-workspace-lineages-and-version-history.json",
+    "mode": "summary-only",
+    "profile": "deep"
+  }
+}
