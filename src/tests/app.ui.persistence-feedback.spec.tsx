@@ -65,9 +65,13 @@ describe("App integration UI - persistence feedback", () => {
         );
       });
 
-      await waitFor(() => {
-        expect(screen.getByRole("alert")).toHaveTextContent(PERSISTENCE_STORAGE_WARNING_MESSAGE);
-      });
+      // The async save resolves after the 200 ms debounce plus a full App render; 1 s is too tight on loaded runners.
+      await waitFor(
+        () => {
+          expect(screen.getByRole("alert")).toHaveTextContent(PERSISTENCE_STORAGE_WARNING_MESSAGE);
+        },
+        { timeout: 5_000 }
+      );
     } finally {
       detach();
     }
