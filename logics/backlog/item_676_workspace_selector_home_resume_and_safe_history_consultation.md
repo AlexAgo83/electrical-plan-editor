@@ -1,14 +1,14 @@
 ## item_676_workspace_selector_home_resume_and_safe_history_consultation - Workspace selector Home resume and safe history consultation
 > From version: 1.18.2
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 10%
 > Complexity: High
 > Theme: Portable workspace version history
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-07 15:19:22
+> Indicators reviewed: 2026-10-07 15:22:15
 
 # AI Context
 - Summary: Users need to know which lineage they edit and inspect old snapshots without replacing or autosaving over their working session.

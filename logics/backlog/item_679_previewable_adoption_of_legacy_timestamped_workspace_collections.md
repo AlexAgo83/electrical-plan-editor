@@ -1,14 +1,14 @@
 ## item_679_previewable_adoption_of_legacy_timestamped_workspace_collections - Previewable adoption of legacy timestamped workspace collections
 > From version: 1.18.2
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 10%
 > Complexity: High
 > Theme: Portable workspace version history
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-07 15:19:23
+> Indicators reviewed: 2026-10-07 15:22:15
 
 # AI Context
 - Summary: Existing folders have valuable snapshots with timestamp names and potentially unrelated inferred IDs; automatic grouping would invent project identity.

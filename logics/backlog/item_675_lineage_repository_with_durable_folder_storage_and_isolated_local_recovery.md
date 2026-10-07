@@ -1,14 +1,14 @@
 ## item_675_lineage_repository_with_durable_folder_storage_and_isolated_local_recovery - Lineage repository with durable folder storage and isolated local recovery
 > From version: 1.18.2
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 10%
 > Complexity: High
 > Theme: Portable workspace version history
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-07 15:19:22
+> Indicators reviewed: 2026-10-07 15:22:15
 
 # AI Context
 - Summary: The storage hook and IndexedDB handle registry currently track one file; adding folders and history without isolating async work risks writing one project into another.

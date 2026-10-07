@@ -1,14 +1,15 @@
 ## task_164_deliver_named_workspace_lineages_version_history_and_supplier_archives - Deliver named workspace lineages version history and supplier archives
 > From version: 1.18.2
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
 > Progress: 0%
 > Complexity: High
 > Theme: Portable workspace version history
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
-> Indicators reviewed: 2026-10-07 15:19:22
+> Indicators reviewed: 2026-10-07 15:22:14
+> Owner: Claude
 
 # AI Context
 - Summary: Deliver seven dependent slices: contracts, repository, history UI, supplier archives, transfer/conflicts, legacy adoption and release validation. No implementation has started.
