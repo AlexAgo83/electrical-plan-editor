@@ -3,6 +3,7 @@ import { loadRecentChangesMetadata, saveRecentChangesMetadata } from "../../adap
 import { buildReplaceStateHistoryEntry, buildUndoHistoryEntry } from "../lib/recentChangeLabels";
 import type { AppStore } from "../../store";
 import type { UndoHistoryEntry } from "../types/app-controller";
+import { isProjectMutationBlocked, reportBlockedMutationAttempt } from "../lib/workspaceSessionGate";
 
 type StoreState = ReturnType<AppStore["getState"]>;
 
@@ -23,6 +24,8 @@ interface UseStoreHistoryResult {
   handleUndo: () => void;
   handleRedo: () => void;
   replaceStateWithHistory: (nextState: StoreState) => void;
+  /** Clears undo/redo stacks at a workspace boundary (switch, historical consultation, restore). */
+  resetHistory: () => void;
 }
 
 function getHighestHistorySequence(entries: UndoHistoryEntry[]): number {
@@ -83,6 +86,10 @@ export function useStoreHistory({
       }
     ): void => {
       const shouldTrackHistory = options?.trackHistory ?? !action.type.startsWith("ui/");
+      if (!action.type.startsWith("ui/") && isProjectMutationBlocked()) {
+        reportBlockedMutationAttempt();
+        return;
+      }
       const previousState = store.getState();
 
       try {
@@ -126,6 +133,10 @@ export function useStoreHistory({
   );
 
   const handleUndo = useCallback((): void => {
+    if (isProjectMutationBlocked()) {
+      reportBlockedMutationAttempt();
+      return;
+    }
     if (undoStack.length === 0) {
       return;
     }
@@ -165,6 +176,10 @@ export function useStoreHistory({
   }, [historyLimit, onUndoRedoApplied, queueSavedStatus, store, transformUndoRedoTargetState, undoHistoryEntries, undoStack]);
 
   const handleRedo = useCallback((): void => {
+    if (isProjectMutationBlocked()) {
+      reportBlockedMutationAttempt();
+      return;
+    }
     if (redoStack.length === 0) {
       return;
     }
@@ -205,6 +220,10 @@ export function useStoreHistory({
 
   const replaceStateWithHistory = useCallback(
     (nextState: StoreState): void => {
+      if (isProjectMutationBlocked()) {
+        reportBlockedMutationAttempt();
+        return;
+      }
       const currentState = store.getState();
       if (nextState === currentState) {
         return;
@@ -238,6 +257,13 @@ export function useStoreHistory({
     [historyLimit, onReplaceStateApplied, queueSavedStatus, store]
   );
 
+  const resetHistory = useCallback((): void => {
+    setUndoStack([]);
+    setRedoStack([]);
+    setUndoHistoryEntries([]);
+    setRedoHistoryEntries([]);
+  }, []);
+
   const isUndoAvailable = useMemo(() => undoStack.length > 0, [undoStack.length]);
   const isRedoAvailable = useMemo(() => redoStack.length > 0, [redoStack.length]);
 
@@ -249,6 +275,7 @@ export function useStoreHistory({
     dispatchAction,
     handleUndo,
     handleRedo,
-    replaceStateWithHistory
+    replaceStateWithHistory,
+    resetHistory
   };
 }

@@ -1,5 +1,5 @@
 import { translateCurrent as t } from "../../lib/i18n";
-import { useCallback, useMemo, type ChangeEvent, type ComponentType, type RefObject } from "react";
+import { useCallback, useMemo, type ChangeEvent, type ComponentType, type ReactNode, type RefObject } from "react";
 import { appActions, createEmptyWorkspaceState, type AppState, type AppStore } from "../../../store";
 import type { InteractionMode, UndoHistoryEntry } from "../../types/app-controller";
 import type { CatalogItemId, ConnectorId, HarnessAssemblyId, NetworkId, NodeId, SegmentId, SpliceId, WireId } from "../../../core/entities";
@@ -34,6 +34,7 @@ interface UseAppControllerHomeWorkspaceContentParams {
   setActiveSubScreen: (subScreen: SubScreenId) => void;
   setInteractionMode: (mode: InteractionMode) => void;
   handleWorkspaceScreenChange: (screen: ScreenId) => void;
+  workspaceLineagesPanel?: ReactNode;
 }
 
 export function useAppControllerHomeWorkspaceContent({
@@ -57,7 +58,8 @@ export function useAppControllerHomeWorkspaceContent({
   setActiveScreen,
   setActiveSubScreen,
   setInteractionMode,
-  handleWorkspaceScreenChange
+  handleWorkspaceScreenChange,
+  workspaceLineagesPanel
 }: UseAppControllerHomeWorkspaceContentParams) {
   const handleCreateEmptyWorkspace = useCallback(() => {
     void (async () => {
@@ -169,6 +171,7 @@ export function useAppControllerHomeWorkspaceContent({
       }}
       onOpenRecentChangeTarget={handleOpenRecentChangeTarget}
       onOpenOnboardingHelp={onOpenOnboardingHelp}
+      workspaceLineagesPanel={workspaceLineagesPanel}
     />
   );
 

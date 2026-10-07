@@ -29,6 +29,7 @@ interface HomeWorkspaceContentProps {
   onOpenRecentChangeTarget?: (entry: UndoHistoryEntry) => void;
   onOpenOnboardingHelp?: () => void;
   postMvpModules?: HomeWorkspacePostMvpModules;
+  workspaceLineagesPanel?: ReactNode;
 }
 
 interface ChangelogCollapsibleSection {
@@ -206,7 +207,8 @@ export function HomeWorkspaceContent({
   onOpenModeling,
   onOpenRecentChangeTarget,
   onOpenOnboardingHelp,
-  postMvpModules
+  postMvpModules,
+  workspaceLineagesPanel
 }: HomeWorkspaceContentProps): ReactElement {
   const homeExtensionEntries = [
     ["session", t("ui.sessionSummary"), postMvpModules?.sessionSummary],
@@ -299,6 +301,7 @@ export function HomeWorkspaceContent({
   return (
     <section className="home-workspace-grid" aria-label={t("ui.homeWorkspace")}>
       <div className="home-left-column">
+        {workspaceLineagesPanel ?? null}
         <section className="panel home-panel home-quick-start-panel">
           <header className="home-panel-header">
             <h2>{t("ui.quickStart")}</h2>

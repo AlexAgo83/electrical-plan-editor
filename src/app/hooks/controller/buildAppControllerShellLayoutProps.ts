@@ -98,6 +98,7 @@ interface BuildAppControllerShellLayoutPropsParams {
     | "isNetworkScopeScreen"
     | "isHarnessAssemblyScreen"
     | "homeWorkspaceContent"
+    | "workspaceLineageBar"
     | "hasActiveNetwork"
     | "networkScopeWorkspaceContent"
     | "harnessAssemblyWorkspaceContent"

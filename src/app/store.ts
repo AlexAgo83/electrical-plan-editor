@@ -1,5 +1,6 @@
 import { loadState, saveState, saveStateSync, type SaveStateResult } from "../adapters/persistence";
 import { appActions, createAppStore, getAppErrorMessage, type AppStore } from "../store";
+import { isWorkspacePersistenceSuspended } from "./lib/workspaceSessionGate";
 
 export const PERSISTENCE_WRITE_FAILURE_MESSAGE =
   "Local persistence is currently unavailable. Changes remain in this tab only until storage works again.";
@@ -104,6 +105,10 @@ export function attachPersistenceSync(store: AppStore, options?: AttachPersisten
 
   function runPendingSave(): void {
     pendingIdleId = null;
+    if (isWorkspacePersistenceSuspended()) {
+      // A historical snapshot is displayed read-only; it must never overwrite browser persistence.
+      return;
+    }
     const currentState = store.getState();
     const currentSequence = saveSequence + 1;
     saveSequence = currentSequence;
@@ -151,6 +156,17 @@ export function attachPersistenceSync(store: AppStore, options?: AttachPersisten
   // microtask runs.
   function flushPendingSaveSync(): void {
     if (pendingTimerId === null && pendingIdleId === null) {
+      return;
+    }
+    if (isWorkspacePersistenceSuspended()) {
+      if (pendingTimerId !== null) {
+        clearTimeout(pendingTimerId);
+        pendingTimerId = null;
+      }
+      if (pendingIdleId !== null) {
+        cancelPersistenceIdleCallback(pendingIdleId);
+        pendingIdleId = null;
+      }
       return;
     }
 

@@ -5,6 +5,7 @@ import { appActions } from "../store";
 import { appStore } from "./store";
 import { appUiModules, preloadNetworkSummaryWorkspaceUiModules } from "./components/appUiModules";
 import { AppShellLayout } from "./components/layout/AppShellLayout";
+import { buildWorkspaceLineageElements } from "./hooks/controller/buildWorkspaceLineageElements";
 import { AppControllerOverlays } from "./components/layout/AppControllerOverlays";
 import { ToastViewport } from "./components/ToastViewport";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
@@ -390,7 +391,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       preloadNetworkSummaryWorkspaceUiModules();
     }
   }, [hasActiveNetwork, isAnalysisScreen, isModelingScreen]);
-  const { isCurrentWorkspaceEmpty, hasBuiltInSampleState, toasts, notifyToast, dismissToast, saveStatus, isUndoAvailable, isRedoAvailable, undoHistoryEntries, dispatchAction, handleUndo, handleRedo, replaceStateWithHistory, lastError, bootRecoveryMessage, clearPersistenceHealth, commitBootRecovery, workspaceFileStorage } = useAppControllerWorkspaceRuntime({
+  const { isCurrentWorkspaceEmpty, hasBuiltInSampleState, toasts, notifyToast, dismissToast, saveStatus, isUndoAvailable, isRedoAvailable, undoHistoryEntries, dispatchAction, handleUndo, handleRedo, replaceStateWithHistory, lastError, bootRecoveryMessage, clearPersistenceHealth, commitBootRecovery, workspaceFileStorage, workspaceLineages } = useAppControllerWorkspaceRuntime({
     store,
     state,
     restoreViewportOnUndo,
@@ -402,6 +403,10 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     showSpliceMigrationReport
   });
 
+  const lineageElements = buildWorkspaceLineageElements(workspaceLineages, () => {
+    setActiveScreen("modeling");
+    setActiveSubScreen("connector");
+  });
   const { networkRecomputeReportDialog } = useAppControllerNetworkRecomputeReport(
     state.ui.lastRecomputeReport ?? null,
     useCallback(
@@ -646,7 +651,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     nextValidationIssueRef,
     handleUndo,
     handleRedo,
-    handleSaveActiveNetworkWithConfirmation: workspaceNetworkDomain.handleSaveActiveNetworkWithConfirmation,
+    handleSaveActiveNetworkWithConfirmation: lineageElements.resolveSaveShortcut(workspaceNetworkDomain.handleSaveActiveNetworkWithConfirmation),
     fitNetworkToContent: workspaceNetworkDomain.fitNetworkToContent,
     activeScreenRef,
     moveVisibleValidationIssueCursor: selectionHandlersDomain.moveVisibleValidationIssueCursor,
@@ -958,7 +963,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       networkScopeFormState,
       catalogHandlers,
       aiSettings,
-      workspaceFileStorage
+      workspaceFileStorage,
+      workspaceLineagesPanel: lineageElements.workspaceLineagesPanel
     },
     domains: {
       workspaceNetworkDomain,
@@ -1072,6 +1078,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isNetworkScopeScreen,
       isHarnessAssemblyScreen,
       homeWorkspaceContent,
+      workspaceLineageBar: lineageElements.workspaceLineageBar,
       hasActiveNetwork,
       networkScopeWorkspaceContent,
       harnessAssemblyWorkspaceContent,

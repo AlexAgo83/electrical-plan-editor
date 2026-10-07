@@ -1,0 +1,167 @@
+/* Named workspace lineages: selector bar, status, banners, Home cards and dialogs. */
+.workspace-lineage-bar {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  background: color-mix(in srgb, var(--theme-primary, currentColor) 4%, transparent);
+}
+
+.workspace-lineage-bar[data-read-only="true"] {
+  background: color-mix(in srgb, #b5751f 12%, transparent);
+}
+
+.workspace-lineage-bar-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.workspace-lineage-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.workspace-lineage-select select {
+  min-width: 12rem;
+}
+
+.workspace-lineage-status {
+  font-size: 0.85rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+}
+
+.workspace-lineage-status.is-success {
+  border-color: color-mix(in srgb, #2f8a4c 60%, transparent);
+}
+
+.workspace-lineage-status.is-warning {
+  border-color: color-mix(in srgb, #b5751f 70%, transparent);
+}
+
+.workspace-lineage-status.is-danger {
+  border-color: color-mix(in srgb, #b04343 70%, transparent);
+  font-weight: 600;
+}
+
+.workspace-lineage-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-inline-start: auto;
+}
+
+.workspace-lineage-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.7rem;
+  margin: 0;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.workspace-lineage-banner.is-read-only,
+.workspace-lineage-banner.is-warning {
+  border-color: color-mix(in srgb, #b5751f 62%, transparent);
+  background: color-mix(in srgb, #b5751f 10%, transparent);
+}
+
+.workspace-lineage-banner.is-danger {
+  border-color: color-mix(in srgb, #b04343 62%, transparent);
+  background: color-mix(in srgb, #b04343 10%, transparent);
+}
+
+.workspace-lineage-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+}
+
+.workspace-lineage-card {
+  display: grid;
+  gap: 0.3rem;
+  align-content: start;
+  padding: 0.6rem;
+  border-radius: 0.6rem;
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.workspace-lineage-card.is-active {
+  border-color: color-mix(in srgb, var(--theme-primary, currentColor) 70%, transparent);
+}
+
+.workspace-lineage-card h3 {
+  margin: 0;
+}
+
+.lineage-dialog {
+  max-height: min(90vh, 52rem);
+  overflow: auto;
+}
+
+.lineage-dialog.is-wide {
+  width: min(100%, 56rem);
+}
+
+.lineage-dialog-body {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.lineage-dialog-body fieldset {
+  display: grid;
+  gap: 0.3rem;
+  border: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+  border-radius: 0.5rem;
+}
+
+.lineage-history-list,
+.lineage-legacy-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.lineage-history-entry,
+.lineage-legacy-entry {
+  padding: 0.5rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+  display: grid;
+  gap: 0.3rem;
+}
+
+.lineage-history-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: baseline;
+}
+
+.lineage-handoff-list {
+  margin: 0;
+  padding-inline-start: 1rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.lineage-attachment-ok {
+  color: #2f8a4c;
+}
+
+.lineage-attachment-bad {
+  color: #b04343;
+  font-weight: 600;
+}

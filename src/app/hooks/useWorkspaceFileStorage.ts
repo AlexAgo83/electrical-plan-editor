@@ -18,7 +18,9 @@ import {
   type WorkspaceFileStorageStatus
 } from "../lib/workspaceFileAccess";
 import { openWorkspaceHandleWithFeedback } from "../lib/workspaceFileOpenActions";
-import { AUTOSAVE_DELAY_MS, createDownloadedWorkspaceFileStatus, createLinkedWorkspaceFileStatus, createLocalWorkspaceFileStatus, createOpenedWorkspaceFileStatus, type WorkspaceFileStatusBase } from "../lib/workspaceFileStorageStatus";
+import { getWorkspaceSessionToken } from "../lib/workspaceSessionGate";
+import { useLinkedWorkspaceFileAutosave } from "./useLinkedWorkspaceFileAutosave";
+import { createDownloadedWorkspaceFileStatus, createLinkedWorkspaceFileStatus, createLocalWorkspaceFileStatus, createOpenedWorkspaceFileStatus, type WorkspaceFileStatusBase } from "../lib/workspaceFileStorageStatus";
 import type { UseWorkspaceFileStorageParams, UseWorkspaceFileStorageResult } from "./workspaceFileStorageTypes";
 
 export type { WorkspaceFileStorageStatus } from "../lib/workspaceFileAccess";
@@ -33,6 +35,8 @@ export function useWorkspaceFileStorage({
 }: UseWorkspaceFileStorageParams): UseWorkspaceFileStorageResult {
   const workspaceFileInputRef = useRef<HTMLInputElement | null>(null);
   const linkedHandleRef = useRef<WorkspaceFileHandle | null>(null);
+  // Workspace session that owns the linked handle; a named-workspace switch invalidates the link.
+  const linkedSessionTokenRef = useRef(getWorkspaceSessionToken());
   const lastLoadedPayloadRef = useRef<WorkspaceFilePayloadV1 | null>(null);
   const autosaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isWritingRef = useRef(false);
@@ -76,6 +80,7 @@ export function useWorkspaceFileStorage({
       replaceStateWithHistory(parsed.state);
       lastLoadedPayloadRef.current = parsed.payload;
       linkedHandleRef.current = handle;
+      linkedSessionTokenRef.current = getWorkspaceSessionToken();
       const spliceMigrationReport = consumeLastSpliceMigrationReport().map((entry) => entry.message);
       const nextPermission = handle === null ? "unavailable" : await resolveWritePermission(handle);
       if (handle !== null) {
@@ -268,6 +273,7 @@ export function useWorkspaceFileStorage({
           });
           await writeHandleText(handle, serialized);
           linkedHandleRef.current = handle;
+          linkedSessionTokenRef.current = getWorkspaceSessionToken();
           lastLoadedPayloadRef.current = payload;
           void writeStoredWorkspaceFileHandle(handle);
           const permission = await resolveWritePermission(handle);
@@ -437,48 +443,15 @@ export function useWorkspaceFileStorage({
     };
   }, []);
 
-  useEffect(() => {
-    return store.subscribe(() => {
-      const handle = linkedHandleRef.current;
-      if (handle === null || isWritingRef.current) {
-        return;
-      }
-
-      if (autosaveTimerRef.current !== null) {
-        clearTimeout(autosaveTimerRef.current);
-      }
-
-      autosaveTimerRef.current = setTimeout(() => {
-        const currentHandle = linkedHandleRef.current;
-        if (currentHandle === null) {
-          return;
-        }
-
-        void (async () => {
-          isWritingRef.current = true;
-          setStatusBase((current) => ({ ...current, isSaving: true, message: current.message }));
-          try {
-            const result = await writeCurrentStateToHandle(currentHandle);
-            if (result === "failed") {
-              setStatusBase((current) => ({
-                ...current,
-                isSaving: false,
-                message: t("ui.useworkspacefilestorageAutosaveToTheLinkedWorkspaceFileFailedLocalBrowserPersistence")
-              }));
-            }
-          } catch {
-            setStatusBase((current) => ({
-              ...current,
-              isSaving: false,
-              message: t("ui.useworkspacefilestorageAutosaveToTheLinkedWorkspaceFileFailedLocalBrowserPersistence")
-            }));
-          } finally {
-            isWritingRef.current = false;
-          }
-        })();
-      }, AUTOSAVE_DELAY_MS);
-    });
-  }, [store, writeCurrentStateToHandle]);
+  useLinkedWorkspaceFileAutosave({
+    store,
+    linkedHandleRef,
+    linkedSessionTokenRef,
+    autosaveTimerRef,
+    isWritingRef,
+    setStatusBase,
+    writeCurrentStateToHandle
+  });
 
   return {
     workspaceFileInputRef,

@@ -4,6 +4,7 @@ import type { ConfirmDialogRequest } from "../../types/confirm-dialog";
 import type { InteractionMode, ScreenId, SubScreenId } from "../../types/app-controller";
 import { useToastNotifications } from "../useToastNotifications";
 import { useWorkspaceFileStorage } from "../useWorkspaceFileStorage";
+import { useWorkspaceLineages } from "../useWorkspaceLineages";
 import { useAppControllerHistoryDispatch } from "./useAppControllerHistoryDispatch";
 import { useAppControllerPersistenceHealth } from "./useAppControllerPersistenceHealth";
 
@@ -54,6 +55,13 @@ export function useAppControllerWorkspaceRuntime({
     showSpliceMigrationReport
   });
 
+  const workspaceLineages = useWorkspaceLineages({
+    store,
+    resetHistory: historyDispatch.resetHistory,
+    notifyToast,
+    requestConfirmation
+  });
+
   return {
     isCurrentWorkspaceEmpty,
     hasBuiltInSampleState,
@@ -61,6 +69,7 @@ export function useAppControllerWorkspaceRuntime({
     notifyToast,
     dismissToast,
     workspaceFileStorage,
+    workspaceLineages,
     ...historyDispatch,
     ...persistenceHealth
   };

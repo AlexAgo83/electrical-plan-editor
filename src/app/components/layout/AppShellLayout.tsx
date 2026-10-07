@@ -113,6 +113,8 @@ interface AppShellLayoutProps {
   isNetworkScopeScreen: boolean;
   isHarnessAssemblyScreen: boolean;
   homeWorkspaceContent: ReactNode;
+  /** Named-workspace selector, status, read-only banner and lineage dialogs (all layouts). */
+  workspaceLineageBar?: ReactNode;
   hasActiveNetwork: boolean;
   networkScopeWorkspaceContent: ReactNode;
   harnessAssemblyWorkspaceContent: ReactNode;
@@ -216,6 +218,7 @@ export function AppShellLayout({
   isNetworkScopeScreen,
   isHarnessAssemblyScreen,
   homeWorkspaceContent,
+  workspaceLineageBar,
   hasActiveNetwork,
   networkScopeWorkspaceContent,
   harnessAssemblyWorkspaceContent,
@@ -697,6 +700,7 @@ export function AppShellLayout({
         onCommitBootRecovery={onCommitBootRecovery}
         centerContent={headerCenterContent}
       />
+      {workspaceLineageBar ?? null}
 
       <section className="workspace-shell" style={workspaceShellStyle}>
         <button

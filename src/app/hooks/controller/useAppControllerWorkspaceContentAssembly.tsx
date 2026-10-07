@@ -19,7 +19,7 @@ import type { AppControllerWorkspaceNetworkDomainAssemblyModel } from "./useAppC
 import type { AppControllerCatalogAnalysisActionsModel } from "./useAppControllerCatalogAnalysisActions";
 import type { AppControllerSelectionHandlersDomainAssemblyModel } from "./useAppControllerSelectionHandlersDomainAssembly";
 import type { AppControllerCanvasInteractionDomainAssemblyModel } from "./useAppControllerCanvasInteractionDomainAssembly";
-import { useCallback, useState, type ComponentType } from "react";
+import { useCallback, useState, type ComponentType, type ReactNode } from "react";
 import { useAppControllerHomeWorkspaceContent } from "./useAppControllerHomeWorkspaceContent";
 import { useAppControllerNetworkSummaryPanelDomain } from "./useAppControllerNetworkSummaryPanelDomain";
 import { useAppControllerModelingAnalysisDomainAssembly } from "./useAppControllerModelingAnalysisDomainAssembly";
@@ -128,6 +128,7 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     catalogHandlers: CatalogHandlersModel;
     aiSettings: AiSettingsModel;
     workspaceFileStorage: UseWorkspaceFileStorageModel;
+    workspaceLineagesPanel?: ReactNode;
   };
   domains: {
     workspaceNetworkDomain: AppControllerWorkspaceNetworkDomainAssemblyModel;
@@ -206,7 +207,8 @@ export function useAppControllerWorkspaceContentAssembly({
     setActiveScreen: handlers.setActiveScreen,
     setActiveSubScreen: handlers.setActiveSubScreen,
     setInteractionMode: handlers.setInteractionMode,
-    handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange
+    handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange,
+    workspaceLineagesPanel: models.workspaceLineagesPanel
   });
 
   const {
