@@ -1,14 +1,14 @@
 ## item_676_workspace_selector_home_resume_and_safe_history_consultation - Workspace selector Home resume and safe history consultation
 > From version: 1.18.2
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 10%
+> Progress: 100%
 > Complexity: High
 > Theme: Portable workspace version history
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-07 15:22:15
+> Indicators reviewed: 2026-10-07 16:16:37
 
 # AI Context
 - Summary: Users need to know which lineage they edit and inspect old snapshots without replacing or autosaving over their working session.
@@ -56,3 +56,9 @@
 # Priority
 - Priority: High
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Tasks
+- `task_164_deliver_named_workspace_lineages_version_history_and_supplier_archives`
+
+# Notes
+- Task `task_164_deliver_named_workspace_lineages_version_history_and_supplier_archives` was finished via `logics-manager flow finish task` on 2026-10-07.

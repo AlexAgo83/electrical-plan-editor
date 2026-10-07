@@ -1,12 +1,12 @@
 ## prod_018_portable_named_workspace_lineages_and_supplier_history - Portable named workspace lineages and supplier history
 > Date: 2026-10-07
-> Status: Proposed
+> Status: Settled
 > Related request: `req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs`
-> Related backlog: `item_674_named_lineage_and_immutable_workspace_version_contracts`, `item_675_lineage_repository_with_durable_folder_storage_and_isolated_local_recovery`, `item_676_workspace_selector_home_resume_and_safe_history_consultation`, `item_677_supplier_handoff_records_and_exact_delivered_artifact_archives`, `item_678_portable_zip_transfer_and_divergence_reconciliation`, `item_679_previewable_adoption_of_legacy_timestamped_workspace_collections`, `item_680_workspace_lineage_release_validation_and_user_workflow_documentation`
+> Related backlog: `item_674_named_lineage_and_immutable_workspace_version_contracts`
 > Related task: `task_164_deliver_named_workspace_lineages_version_history_and_supplier_archives`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
-> Indicators reviewed: 2026-10-07 15:20:01
+> Indicators reviewed: 2026-10-07 16:16:37
 
 # Overview
 Provide independent named project workspaces with a stable editable working copy, explicit immutable numbered milestones, read-only historical consultation and exact supplier handoff archives. A lineage folder or equivalent ZIP carries the entire project history between computers independently of browser cache.
@@ -63,5 +63,5 @@ flowchart LR
 - Save and failure statuses accurately distinguish local recovery, disk persistence and initiated downloads.
 
 # References
-- Product back-reference: `req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs`
+- Product back-reference: `item_674_named_lineage_and_immutable_workspace_version_contracts`
 - Task back-reference: `task_164_deliver_named_workspace_lineages_version_history_and_supplier_archives`
