@@ -152,7 +152,7 @@
     {
       "id": "github_release",
       "state": "github_release",
-      "required": false,
+      "required": true,
       "evidence_kinds": [
         "github_release"
       ]
@@ -249,10 +249,11 @@
     "require_pushed_commit": true
   },
   "github_release": {
-    "required": false,
+    "required": true,
     "mode": "manual",
     "draft_allowed": false,
-    "asset_paths": []
+    "asset_paths": [],
+    "note": "Required because production_deployment is wired to the GitHub release:published event (render-release-deploy.yml). A pushed tag alone does not deploy; the release must be published."
   },
   "assistant_readiness": {
     "must_inspect_status_before_claiming_ready": true,
