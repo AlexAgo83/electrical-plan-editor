@@ -1,14 +1,14 @@
 ## item_686_make_workspace_status_alerts_and_read_only_signals_truthful_and_localized - Make workspace status, alerts and read-only signals truthful and localized
 > From version: 1.19.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Status: In progress
+> Understanding: 95%
+> Confidence: 90%
+> Progress: 10%
 > Complexity: Medium
 > Theme: Workspace UX
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-08 15:35:55
+> Indicators reviewed: 2026-10-08 17:37:36
 
 # AI Context
 - preserveLegacyStateIfNeeded in lineageSessionController preserves any non-empty state, including the sample (use hasSampleNetworkSignature).
@@ -21,7 +21,7 @@
 # Scope
 - In:
   - Skip preserving empty or built-in sample state; move the preserved notice to Transfer and recovery with explanatory neutral copy.
-  - Split saved status from the export reminder: success tone for the saved state, neutral export hint with adjacent Export package action, warning only past a documented threshold; apply consistently to Settings, Home rows and the Ops panel.
+  - Split saved status from the export reminder: success tone for the saved state, neutral export hint with adjacent Export package action, warning only once the last package export (or workspace creation when never exported) is older than 7 days (decision 2026-10-08); apply consistently to Settings, Home rows and the Ops panel.
   - Format lineage times and dates with the app locale.
   - Keep a single themed read-only banner; replace Settings duplicates with disabled actions plus explanation; find and silence the automatic write that reports a blocked mutation when navigating while read-only, without weakening the gate.
 - Out:

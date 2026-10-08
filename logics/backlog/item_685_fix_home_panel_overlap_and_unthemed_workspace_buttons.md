@@ -1,14 +1,14 @@
 ## item_685_fix_home_panel_overlap_and_unthemed_workspace_buttons - Fix Home panel overlap and unthemed workspace buttons
 > From version: 1.19.1
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 10%
 > Complexity: Medium
 > Theme: Workspace UX
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-08 15:36:38
+> Indicators reviewed: 2026-10-08 17:37:36
 
 # AI Context
 - Summary: home.css >=980px gives .home-left-column a fixed viewport height, overflow hidden and two grid rows for three panels; themed buttons only match .row-actions button, so notice, read-only banner and Home card buttons render with browser defaults.

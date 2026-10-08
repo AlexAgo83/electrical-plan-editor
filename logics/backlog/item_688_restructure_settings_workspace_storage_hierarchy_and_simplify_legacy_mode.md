@@ -1,14 +1,14 @@
 ## item_688_restructure_settings_workspace_storage_hierarchy_and_simplify_legacy_mode - Restructure Settings workspace storage hierarchy and simplify legacy mode
 > From version: 1.19.1
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 10%
 > Complexity: High
 > Theme: Workspace UX
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-08 15:35:56
+> Indicators reviewed: 2026-10-08 17:37:36
 
 # AI Context
 - Restructure SettingsWorkspaceStorageSection only; keep the settings-workspace-storage id, notice action ids, focus requests and mode-aware search labels.

@@ -1,14 +1,14 @@
 ## item_689_give_the_history_dialog_a_clear_action_hierarchy_and_readable_metadata - Give the History dialog a clear action hierarchy and readable metadata
 > From version: 1.19.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Status: In progress
+> Understanding: 95%
+> Confidence: 90%
+> Progress: 10%
 > Complexity: Medium
 > Theme: Workspace UX
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-08 15:35:56
+> Indicators reviewed: 2026-10-08 17:37:36
 
 # AI Context
 - HistoryDialog in WorkspaceLineagePanels.tsx; resume keeps the existing confirmation and recovery-before-restore.
@@ -20,8 +20,8 @@
 
 # Scope
 - In:
-  - Per row: primary Open read-only, secondary menu for Download file, Record supplier handoff and Resume from this version marked as risky with the existing confirmation.
-  - Toolbar keeps one Record supplier handoff and Export package; remove the storage line; human-readable or hidden device labels without changing stored version metadata; normal rest state for the filter; toasts visible above the dialog or grouped.
+  - Per row: primary Open read-only, secondary dropdown menu (themed, keyboard accessible) for Download file, Record supplier handoff and Resume from this version; Resume sits last after a separator, uses the theme danger color and a warning sub-label, and keeps the existing confirmation (decision 2026-10-08).
+  - Toolbar keeps one Record supplier handoff and Export package; remove the storage line; device labels hidden from the History rows without changing stored version metadata; normal rest state for the filter; success toasts rendered above the dialog (decisions 2026-10-08).
 - Out:
   - Changes to version, handoff or restore semantics and to stored device labels in existing files.
 

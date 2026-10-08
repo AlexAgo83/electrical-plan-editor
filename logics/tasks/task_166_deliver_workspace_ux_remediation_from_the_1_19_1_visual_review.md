@@ -1,14 +1,15 @@
 ## task_166_deliver_workspace_ux_remediation_from_the_1_19_1_visual_review - Deliver workspace UX remediation from the 1.19.1 visual review
 > From version: 1.19.1
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 90%
-> Confidence: 85%
+> Status: In progress
+> Understanding: 95%
+> Confidence: 90%
 > Progress: 0%
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
-> Indicators reviewed: 2026-10-08 15:36:38
+> Indicators reviewed: 2026-10-08 17:37:36
+> Owner: Claude (paul.mondou)
 
 # AI Context
 - Summary: Orchestrates items 685-690 in five waves; item 688 reuses the status components of item 686. UI and copy only, with per-AC evidence and screenshots before closeout.
@@ -18,6 +19,7 @@
 
 # Context
 - Orchestrate the scaffolded request chain and keep sibling implementation slices linked.
+- Decisions (2026-10-08, operator): export reminder escalates to warning when the last export is older than 7 days; the active workspace is excluded from the Home compact rows; History device labels are hidden; success toasts render above the History dialog; History row secondary actions live in a dropdown menu with Resume from this version styled as danger after a separator.
 
 # Plan
 - [ ] 1. Wave 1: fix the Home layout overlap and unthemed buttons (item 1); quick, low-risk, unblocks visual checks.

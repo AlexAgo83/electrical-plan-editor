@@ -1,14 +1,14 @@
 ## item_690_validate_the_workspace_ux_remediation_and_update_the_workflow_guide - Validate the workspace UX remediation and update the workflow guide
 > From version: 1.19.1
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 10%
 > Complexity: Medium
 > Theme: Workspace UX
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-08 15:35:56
+> Indicators reviewed: 2026-10-08 17:37:36
 
 # AI Context
 - Cover AC1-AC7 of req_169 with UI, theme, locale and e2e tests at 360px and desktop, EN/FR, keyboard.
