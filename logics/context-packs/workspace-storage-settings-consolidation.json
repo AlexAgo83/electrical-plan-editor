@@ -1,0 +1,383 @@
+{
+  "budgets": {
+    "max_docs": 56,
+    "max_docs_per_ref": 8
+  },
+  "changed_paths": [],
+  "command": "logics-manager sync context-pack req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui prod_019_workspace_storage_settings_information_architecture_and_theme_consistency task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment item_681_consolidate_named_workspace_management_in_settings_storage item_682_retire_obsolete_storage_controls_with_explicit_legacy_compatibility item_683_align_storage_settings_and_lineage_dialogs_with_global_themes_and_localization item_684_validate_workspace_storage_consolidation_and_document_the_updated_workflow --mode summary-only --profile deep",
+  "companion_docs": [],
+  "docs": [
+    {
+      "ai_context": {},
+      "kind": "request",
+      "linked_refs": {
+        "item": [
+          "item_681_consolidate_named_workspace_management_in_settings_storage",
+          "item_682_retire_obsolete_storage_controls_with_explicit_legacy_compatibility",
+          "item_683_align_storage_settings_and_lineage_dialogs_with_global_themes_and_localization",
+          "item_684_validate_workspace_storage_consolidation_and_document_the_updated_workflow"
+        ],
+        "prod": [
+          "prod_018_portable_named_workspace_lineages_and_supplier_history",
+          "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency"
+        ],
+        "req": [
+          "req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs",
+          "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui"
+        ]
+      },
+      "path": "logics/request/req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui.md",
+      "ref": "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui",
+      "schema_version": "1.0",
+      "status": "Draft",
+      "title": "Consolidate release 1.19 workspace controls in Settings storage and align global UI"
+    },
+    {
+      "ai_context": {
+        "keywords": "named, portable, workspace, lineages, immutable, version, history, supplier, handoffs",
+        "skip when": "Changing individual harness exports or adding hosted collaboration.",
+        "summary": "Two independent named workspaces replace timestamp-only backups with stable working files and deliberately frozen milestones. Folder/ZIP copies preserve history and exact supplier artifacts.",
+        "use when": "Scoping or implementing the complete lineage persistence and historical consultation workflow."
+      },
+      "kind": "request",
+      "linked_refs": {
+        "item": [
+          "item_674_named_lineage_and_immutable_workspace_version_contracts",
+          "item_675_lineage_repository_with_durable_folder_storage_and_isolated_local_recovery",
+          "item_676_workspace_selector_home_resume_and_safe_history_consultation",
+          "item_677_supplier_handoff_records_and_exact_delivered_artifact_archives",
+          "item_678_portable_zip_transfer_and_divergence_reconciliation",
+          "item_679_previewable_adoption_of_legacy_timestamped_workspace_collections",
+          "item_680_workspace_lineage_release_validation_and_user_workflow_documentation"
+        ],
+        "prod": [
+          "prod_005_cloud_file_workspace_sync",
+          "prod_018_portable_named_workspace_lineages_and_supplier_history"
+        ],
+        "req": [
+          "req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs"
+        ]
+      },
+      "path": "logics/request/req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs.md",
+      "ref": "req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs",
+      "schema_version": "1.0",
+      "status": "Done",
+      "title": "Named portable workspace lineages with immutable version history and supplier handoffs"
+    },
+    {
+      "ai_context": {},
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_681_consolidate_named_workspace_management_in_settings_storage"
+        ],
+        "prod": [
+          "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency"
+        ],
+        "req": [
+          "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui"
+        ],
+        "task": [
+          "task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment"
+        ]
+      },
+      "path": "logics/backlog/item_681_consolidate_named_workspace_management_in_settings_storage.md",
+      "ref": "item_681_consolidate_named_workspace_management_in_settings_storage",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Consolidate named workspace management in Settings storage"
+    },
+    {
+      "ai_context": {},
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_682_retire_obsolete_storage_controls_with_explicit_legacy_compatibility"
+        ],
+        "prod": [
+          "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency"
+        ],
+        "req": [
+          "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui"
+        ],
+        "task": [
+          "task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment"
+        ]
+      },
+      "path": "logics/backlog/item_682_retire_obsolete_storage_controls_with_explicit_legacy_compatibility.md",
+      "ref": "item_682_retire_obsolete_storage_controls_with_explicit_legacy_compatibility",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Retire obsolete storage controls with explicit legacy compatibility"
+    },
+    {
+      "ai_context": {},
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_683_align_storage_settings_and_lineage_dialogs_with_global_themes_and_localization"
+        ],
+        "prod": [
+          "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency"
+        ],
+        "req": [
+          "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui"
+        ],
+        "task": [
+          "task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment"
+        ]
+      },
+      "path": "logics/backlog/item_683_align_storage_settings_and_lineage_dialogs_with_global_themes_and_localization.md",
+      "ref": "item_683_align_storage_settings_and_lineage_dialogs_with_global_themes_and_localization",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Align storage settings and lineage dialogs with global themes and localization"
+    },
+    {
+      "ai_context": {},
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_684_validate_workspace_storage_consolidation_and_document_the_updated_workflow"
+        ],
+        "prod": [
+          "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency"
+        ],
+        "req": [
+          "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui"
+        ],
+        "task": [
+          "task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment"
+        ]
+      },
+      "path": "logics/backlog/item_684_validate_workspace_storage_consolidation_and_document_the_updated_workflow.md",
+      "ref": "item_684_validate_workspace_storage_consolidation_and_document_the_updated_workflow",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Validate workspace storage consolidation and document the updated workflow"
+    },
+    {
+      "ai_context": {},
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_674_named_lineage_and_immutable_workspace_version_contracts"
+        ],
+        "prod": [
+          "prod_018_portable_named_workspace_lineages_and_supplier_history"
+        ],
+        "req": [
+          "req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs"
+        ],
+        "task": [
+          "task_164_deliver_named_workspace_lineages_version_history_and_supplier_archives"
+        ]
+      },
+      "path": "logics/product/prod_018_portable_named_workspace_lineages_and_supplier_history.md",
+      "ref": "prod_018_portable_named_workspace_lineages_and_supplier_history",
+      "schema_version": "1.0",
+      "status": "Settled",
+      "title": "Portable named workspace lineages and supplier history"
+    },
+    {
+      "ai_context": {},
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_681_consolidate_named_workspace_management_in_settings_storage",
+          "item_682_retire_obsolete_storage_controls_with_explicit_legacy_compatibility",
+          "item_683_align_storage_settings_and_lineage_dialogs_with_global_themes_and_localization",
+          "item_684_validate_workspace_storage_consolidation_and_document_the_updated_workflow"
+        ],
+        "prod": [
+          "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency"
+        ],
+        "req": [
+          "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui"
+        ],
+        "task": [
+          "task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment"
+        ]
+      },
+      "path": "logics/product/prod_019_workspace_storage_settings_information_architecture_and_theme_consistency.md",
+      "ref": "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency",
+      "schema_version": "1.0",
+      "status": "Proposed",
+      "title": "Workspace storage settings information architecture and theme consistency"
+    },
+    {
+      "ai_context": {
+        "deliver the four slices in order": "Settings integration, legacy compatibility, themes/search, then validation."
+      },
+      "kind": "task",
+      "linked_refs": {
+        "item": [
+          "item_681_consolidate_named_workspace_management_in_settings_storage",
+          "item_682_retire_obsolete_storage_controls_with_explicit_legacy_compatibility",
+          "item_683_align_storage_settings_and_lineage_dialogs_with_global_themes_and_localization",
+          "item_684_validate_workspace_storage_consolidation_and_document_the_updated_workflow"
+        ],
+        "prod": [
+          "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency"
+        ],
+        "req": [
+          "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui"
+        ],
+        "task": [
+          "task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment"
+        ]
+      },
+      "path": "logics/tasks/task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment.md",
+      "ref": "task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Deliver workspace storage settings consolidation and UI alignment"
+    }
+  ],
+  "estimates": {
+    "char_count": 8641,
+    "companion_doc_count": 0,
+    "doc_count": 9
+  },
+  "generated_at": "2026-10-08T07:38:18Z",
+  "handoff": {
+    "companion_doc_count": 0,
+    "enabled": false,
+    "source_refs": [
+      "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui",
+      "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency",
+      "task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment",
+      "item_681_consolidate_named_workspace_management_in_settings_storage",
+      "item_682_retire_obsolete_storage_controls_with_explicit_legacy_compatibility",
+      "item_683_align_storage_settings_and_lineage_dialogs_with_global_themes_and_localization",
+      "item_684_validate_workspace_storage_consolidation_and_document_the_updated_workflow"
+    ],
+    "validation_summary_count": 0
+  },
+  "i18n": {
+    "actions": [
+      "Keep catalogs valid with logics-manager i18n validate in the project quality gate."
+    ],
+    "applicable": true,
+    "catalogs": {
+      "en": 1642,
+      "fr": 1642
+    },
+    "configured": true,
+    "contract": {
+      "applicability": "applicable",
+      "catalog": {
+        "path": "src/app/i18n/{locale}.json"
+      },
+      "default_locale": "en",
+      "fallback_locale": "en",
+      "locales": [
+        "en",
+        "fr"
+      ],
+      "schema_version": "1.0",
+      "source_locale": "en"
+    },
+    "contract_path": "logics/i18n/contract.json",
+    "findings": [],
+    "next_action": "The i18n contract is valid.",
+    "ok": true,
+    "state": "valid"
+  },
+  "mode": "summary-only",
+  "profile": "deep",
+  "ref": "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui,prod_019_workspace_storage_settings_information_architecture_and_theme_consistency,task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment,item_681_consolidate_named_workspace_management_in_settings_storage,item_682_retire_obsolete_storage_controls_with_explicit_legacy_compatibility,item_683_align_storage_settings_and_lineage_dialogs_with_global_themes_and_localization,item_684_validate_workspace_storage_consolidation_and_document_the_updated_workflow",
+  "refs": [
+    "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui",
+    "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency",
+    "task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment",
+    "item_681_consolidate_named_workspace_management_in_settings_storage",
+    "item_682_retire_obsolete_storage_controls_with_explicit_legacy_compatibility",
+    "item_683_align_storage_settings_and_lineage_dialogs_with_global_themes_and_localization",
+    "item_684_validate_workspace_storage_consolidation_and_document_the_updated_workflow"
+  ],
+  "release": {
+    "blocking_reasons": [
+      "version_metadata: missing required evidence",
+      "changelog: missing required evidence",
+      "local_validation: missing required evidence",
+      "git_push: missing required evidence",
+      "ci: missing required evidence",
+      "github_release: missing required evidence",
+      "production_deployment: missing required evidence"
+    ],
+    "configured": true,
+    "contract_path": "logics/release/contract.json",
+    "guidance": [
+      "Release readiness must come from project-owned evidence, not conversational memory.",
+      "Use release status or validate before preparing or claiming release readiness.",
+      "Publication-oriented actions are explicit operator actions and are separate from safe read/validate actions."
+    ],
+    "next_action": "version_metadata: missing required evidence",
+    "publication_actions": [
+      "GitHub release publication",
+      "external publication"
+    ],
+    "required_gates": [
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "version_metadata",
+        "required": true,
+        "state": "preparing",
+        "status": "pending"
+      },
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "changelog",
+        "required": true,
+        "state": "preparing",
+        "status": "pending"
+      },
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "local_validation",
+        "required": true,
+        "state": "local_validation",
+        "status": "pending"
+      },
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "git_push",
+        "required": true,
+        "state": "pushed",
+        "status": "pending"
+      },
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "ci",
+        "required": true,
+        "state": "ci_verification",
+        "status": "pending"
+      },
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "github_release",
+        "required": true,
+        "state": "github_release",
+        "status": "pending"
+      },
+      {
+        "blocking_reason": "missing required evidence",
+        "id": "production_deployment",
+        "required": true,
+        "state": "external_publication",
+        "status": "pending"
+      }
+    ],
+    "safe_actions": [
+      "logics-manager release status",
+      "logics-manager release plan <version>",
+      "logics-manager release validate <version>"
+    ],
+    "state": "preparing",
+    "target_id": null,
+    "target_version": "1.19.0",
+    "targets": []
+  },
+  "validation_summary": []
+}
