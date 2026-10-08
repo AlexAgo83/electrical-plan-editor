@@ -1,13 +1,14 @@
 ## item_681_consolidate_named_workspace_management_in_settings_storage - Consolidate named workspace management in Settings storage
 > From version: 1.19.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 95%
 > Confidence: 90%
-> Progress: 0%
+> Progress: 100%
 > Complexity: High
 > Theme: Workspace storage settings
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
+> Indicators reviewed: 2026-10-08 10:16:12
 
 # AI Context
 - Release 1.19.0 management is scattered between the shell, Home and History instead of the existing storage settings.
@@ -47,3 +48,9 @@
 # Priority
 - Priority: High
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Tasks
+- `task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment`
+
+# Notes
+- Task `task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment` was finished via `logics-manager flow finish task` on 2026-10-08.

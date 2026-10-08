@@ -1,12 +1,13 @@
 ## req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui - Consolidate release 1.19 workspace controls in Settings storage and align global UI
 > From version: 1.19.0
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 95%
 > Confidence: 90%
 > Complexity: High
 > Theme: Workspace storage settings
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
+> Indicators reviewed: 2026-10-08 10:16:11
 
 # AI Context
 - Release 1.19.0 distributes lineage actions across the global toolbar, Home and History while Settings still describes single-file storage.
