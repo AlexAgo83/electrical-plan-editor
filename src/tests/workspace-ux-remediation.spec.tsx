@@ -1,4 +1,4 @@
-import { act, fireEvent, render, renderHook, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, renderHook, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HomeWorkspaceLineagesPanel } from "../app/components/workspace/WorkspaceLineagePanels";
 import type { WorkspaceLineageModel } from "../app/hooks/useWorkspaceLineages";
@@ -199,11 +199,9 @@ describe("Home named workspaces panel (req_169 AC5)", () => {
     const rows = within(screen.getByRole("list", { name: "Other workspaces" })).getAllByRole("button");
     expect(rows.map((row) => row.getAttribute("aria-label"))).toEqual(["Resume Bravo", "Resume Alpha"]);
     expect(rows[0]).toHaveTextContent("0 versions");
-    await act(async () => {
-      fireEvent.click(rows[0]!);
-    });
+    fireEvent.click(rows[0]!);
     expect(model.switchTo).toHaveBeenCalledWith("b");
-    expect(onResume).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(onResume).toHaveBeenCalledTimes(1));
     // Every button uses the themed row-actions convention.
     expect([...container.querySelectorAll("button")].filter((button) => button.closest(".row-actions") === null)).toEqual([]);
   });
