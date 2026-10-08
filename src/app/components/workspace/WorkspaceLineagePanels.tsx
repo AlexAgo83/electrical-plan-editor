@@ -1,8 +1,8 @@
 import { translateCurrent as t } from "../../lib/i18n";
-import { useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
+import { createContext, useContext, useEffect, useId, useMemo, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import { useModalDialog } from "../../hooks/useModalDialog";
 import type { WorkspaceLineageModel } from "../../hooks/useWorkspaceLineages";
-import { formatVersionNumber, sortVersionsForHistory, type LineageHandoffEntry, type LineageVersionEntry } from "../../lib/lineage/lineageFormat";
+import { formatLineageDateTime, formatVersionNumber, sortVersionsForHistory, type LineageHandoffEntry, type LineageVersionEntry } from "../../lib/lineage/lineageFormat";
 import {
   buildDefaultLegacyAdoptionPlan,
   validateLegacyAdoptionPlan,
@@ -11,14 +11,9 @@ import {
 } from "../../lib/lineage/lineageLegacyImport";
 import type { HandoffVerification } from "../../lib/lineage/lineageRepository";
 import { describeLineageSaveStatus } from "../../lib/lineage/lineageStatus";
+import { describeLineageNotices } from "../../lib/lineage/lineageNotices";
 
-function formatDateTime(iso: string | null): string {
-  if (iso === null || iso.length === 0) {
-    return "—";
-  }
-  const date = new Date(iso);
-  return Number.isNaN(date.getTime()) ? iso : date.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
-}
+const formatDateTime = formatLineageDateTime;
 
 function formatBytes(byteLength: number): string {
   if (byteLength < 1024) {
@@ -37,6 +32,8 @@ function todayIsoDate(): string {
 
 // --------------------------------------------------------------------------- dialog shell
 
+const LineageDialogThemeContext = createContext<string | null>(null);
+
 function LineageDialog({
   title,
   onClose,
@@ -51,9 +48,10 @@ function LineageDialog({
   wide?: boolean;
 }): ReactElement {
   const titleId = useId();
+  const themeHostClassName = useContext(LineageDialogThemeContext);
   const { dialogRef, onKeyDown } = useModalDialog<HTMLElement>({ isOpen: true, onClose, identity: title });
   return (
-    <div className="confirm-dialog-layer" role="presentation">
+    <div className={themeHostClassName === null ? "confirm-dialog-layer" : `confirm-dialog-layer ${themeHostClassName}`} role="presentation">
       <button type="button" className="confirm-dialog-backdrop" aria-label={t("ui.workspaceLineageCloseDialog")} onClick={onClose} />
       <section
         ref={dialogRef}
@@ -74,60 +72,38 @@ function LineageDialog({
   );
 }
 
-// --------------------------------------------------------------------------- bar
+// --------------------------------------------------------------------------- compact context
 
-export function WorkspaceLineageBar({ model }: { model: WorkspaceLineageModel }): ReactElement {
+/**
+ * The only lineage surface outside Settings: active name, truthful save status, a shortcut to
+ * Settings > Workspace storage, the always-visible historical read-only warning and links to
+ * the matching Settings recovery actions.
+ */
+export function WorkspaceLineageContextBar({
+  model,
+  onManage
+}: {
+  model: WorkspaceLineageModel;
+  onManage: (settingsTargetId?: string) => void;
+}): ReactElement | null {
   const { snapshot } = model;
-  const selectId = useId();
-  const status = describeLineageSaveStatus(snapshot);
   const active = snapshot.active;
-  const issues = active?.issues ?? [];
-  const orphanCount = issues.filter((issue) => issue.kind === "orphan-version" || issue.kind === "orphan-handoff").length;
-  const missingCount = issues.filter((issue) => issue.kind === "version-missing" || issue.kind === "handoff-record-missing").length;
-  const hasDivergence = (active?.manifest?.divergentHeads.length ?? 0) > 0;
-  const needsFolder = active?.storage === "folder" && active.manifest === null;
+  if (active === null) {
+    return null;
+  }
+  const status = describeLineageSaveStatus(snapshot);
+  const notices = describeLineageNotices(snapshot);
   const isReadOnly = snapshot.historical !== null;
-
   return (
     <section className="workspace-lineage-bar" aria-label={t("ui.workspaceLineageBarLabel")} data-read-only={isReadOnly ? "true" : "false"}>
       <div className="workspace-lineage-bar-main">
-        <label className="workspace-lineage-select" htmlFor={selectId}>
-          <span>{t("ui.workspaceLineageSelectLabel")}</span>
-          <select
-            id={selectId}
-            value={active?.workspaceId ?? ""}
-            disabled={snapshot.busy || !snapshot.ready}
-            onChange={(event) => {
-              if (event.target.value.length > 0) {
-                void model.switchTo(event.target.value);
-              }
-            }}
-          >
-            {active === null ? <option value="">{t("ui.workspaceLineageNoneOption")}</option> : null}
-            {snapshot.records.map((record) => (
-              <option key={record.workspaceId} value={record.workspaceId}>
-                {record.displayName}
-              </option>
-            ))}
-          </select>
-        </label>
+        <strong className="workspace-lineage-name">{active.displayName}</strong>
         <span className={`workspace-lineage-status is-${status.tone}`} aria-live="polite" aria-atomic="true">
           {status.label}
         </span>
-        <div className="workspace-lineage-actions">
-          <button type="button" onClick={() => void model.saveNow()} disabled={active === null || isReadOnly || snapshot.busy} title="Ctrl/Cmd + S">
-            {t("ui.workspaceLineageSave")}
-          </button>
-          <button type="button" onClick={() => model.openDialog("version")} disabled={active?.manifest == null || isReadOnly || snapshot.busy}>
-            {t("ui.workspaceLineageCreateVersion")}
-          </button>
-          <button type="button" onClick={() => model.openDialog("history")} disabled={active?.manifest == null}>
-            {t("ui.workspaceLineageHistory")}
-          </button>
-          <button type="button" onClick={() => model.openDialog("create")} disabled={snapshot.busy || !snapshot.ready}>
-            {t("ui.workspaceLineageNew")}
-          </button>
-        </div>
+        <button type="button" className="workspace-lineage-manage" onClick={() => onManage()}>
+          {t("ui.workspaceStorageManage")}
+        </button>
       </div>
       {isReadOnly && snapshot.historical !== null ? (
         <div className="workspace-lineage-banner is-read-only" role="alert">
@@ -139,55 +115,33 @@ export function WorkspaceLineageBar({ model }: { model: WorkspaceLineageModel })
           <button type="button" onClick={() => model.returnToWorking()}>
             {t("ui.workspaceLineageReturnToWorking")}
           </button>
-          <button type="button" onClick={() => void model.restoreFromVersion(snapshot.historical?.versionId ?? "")} disabled={snapshot.busy}>
-            {t("ui.workspaceLineageResumeFromVersion")}
+        </div>
+      ) : null}
+      {notices.map((notice) => (
+        <div key={notice.kind} className={`workspace-lineage-banner is-${notice.tone}`} role="status">
+          <span>{notice.message}</span>
+          <button type="button" onClick={() => onManage(notice.settingsTargetId)}>
+            {t("ui.workspaceStorageResolveInSettings")}
           </button>
         </div>
-      ) : null}
-      {hasDivergence ? (
-        <div className="workspace-lineage-banner is-warning" role="status">
-          <span>{t("ui.workspaceLineageDivergenceBanner")}</span>
-          <button type="button" onClick={() => model.openDialog("divergence")}>
-            {t("ui.workspaceLineageChooseHead")}
-          </button>
-        </div>
-      ) : null}
-      {needsFolder ? (
-        <div className="workspace-lineage-banner is-warning" role="status">
-          <span>{t("ui.workspaceLineageFolderPermissionRequired")}</span>
-          <button type="button" onClick={() => void model.relinkFolder()}>
-            {t("ui.workspaceLineageReconnectFolder")}
-          </button>
-        </div>
-      ) : null}
-      {orphanCount > 0 ? (
-        <div className="workspace-lineage-banner is-warning" role="status">
-          <span>{t("ui.workspaceLineageOrphansBanner", { count: orphanCount })}</span>
-          <button type="button" onClick={() => void model.adoptOrphanVersions()}>
-            {t("ui.workspaceLineageRecoverOrphans")}
-          </button>
-        </div>
-      ) : null}
-      {missingCount > 0 ? (
-        <div className="workspace-lineage-banner is-danger" role="status">
-          <span>{t("ui.workspaceLineageMissingFilesBanner", { count: missingCount })}</span>
-        </div>
-      ) : null}
-      {issues.some((issue) => issue.kind === "working-recovered-from-previous" || issue.kind === "working-recovered-from-version" || issue.kind === "manifest-reconstructed") ? (
-        <div className="workspace-lineage-banner is-warning" role="status">
-          <span>{t("ui.workspaceLineageRecoveredBanner")}</span>
-        </div>
-      ) : null}
-      <WorkspaceLineageDialogs model={model} />
+      ))}
     </section>
   );
 }
 
 // --------------------------------------------------------------------------- home cards
 
-export function HomeWorkspaceLineagesPanel({ model, onResume }: { model: WorkspaceLineageModel; onResume: () => void }): ReactElement {
+/** Home keeps resume navigation only; management lives in Settings > Workspace storage. */
+export function HomeWorkspaceLineagesPanel({
+  model,
+  onResume,
+  onManage
+}: {
+  model: WorkspaceLineageModel;
+  onResume: () => void;
+  onManage: () => void;
+}): ReactElement {
   const { snapshot } = model;
-  const packageInputRef = useRef<HTMLInputElement | null>(null);
   return (
     <section className="panel home-panel home-workspace-lineages-panel" aria-label={t("ui.workspaceLineageHomeTitle")}>
       <header className="home-panel-header">
@@ -195,75 +149,56 @@ export function HomeWorkspaceLineagesPanel({ model, onResume }: { model: Workspa
         <span className="settings-panel-chip">{snapshot.records.length}</span>
       </header>
       <p className="settings-panel-intro">{t("ui.workspaceLineageHomeIntro")}</p>
-      {!snapshot.libraryDurable ? <p className="workspace-lineage-banner is-danger">{t("ui.workspaceLineageLibraryNotDurable")}</p> : null}
-      {snapshot.preservedLegacySnapshot ? (
-        <div className="workspace-lineage-banner is-warning" role="status">
-          <span>{t("ui.workspaceLineagePreservedLegacy")}</span>
-          <button type="button" onClick={() => void model.downloadPreservedLegacySnapshot()}>
-            {t("ui.workspaceLineageDownload")}
-          </button>
-          <button type="button" onClick={() => void model.discardPreservedLegacySnapshot()}>
-            {t("ui.workspaceLineageDismiss")}
-          </button>
-        </div>
-      ) : null}
       {snapshot.records.length === 0 ? <p className="empty-copy">{t("ui.workspaceLineageHomeEmpty")}</p> : null}
-      <ul className="workspace-lineage-cards">
-        {snapshot.records.map((record) => {
-          const isActive = snapshot.active?.workspaceId === record.workspaceId;
-          return (
-            <li key={record.workspaceId} className={isActive ? "workspace-lineage-card is-active" : "workspace-lineage-card"}>
-              <h3>{record.displayName}</h3>
-              <p className="meta-line">
-                {record.storage === "folder" ? t("ui.workspaceLineageStorageFolder", { folder: record.folderName ?? "" }) : t("ui.workspaceLineageStorageBrowser")}
-              </p>
-              <p className="meta-line">
-                {record.latestVersionLabel === null
-                  ? t("ui.workspaceLineageNoVersionYet")
-                  : t("ui.workspaceLineageVersionSummary", { count: record.versionCount, latest: record.latestVersionLabel })}
-              </p>
-              <p className="meta-line">{t("ui.workspaceLineageLastSaved", { date: formatDateTime(record.lastDurableSaveIso) })}</p>
-              {record.storage === "browser" && record.pendingPortableExport ? <span className="settings-panel-chip">{t("ui.workspaceLineagePendingExport")}</span> : null}
-              {isActive ? <span className="settings-panel-chip">{t("ui.workspaceLineageActive")}</span> : null}
-              <button
-                type="button"
-                onClick={() => {
-                  void model.switchTo(record.workspaceId).then((ok) => {
-                    if (ok) {
-                      onResume();
-                    }
-                  });
-                }}
-                disabled={snapshot.busy}
-              >
-                {t("ui.workspaceLineageResumeCard", { name: record.displayName })}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      {snapshot.records.length > 0 ? (
+        <ul className="workspace-lineage-cards">
+          {snapshot.records.map((record) => {
+            const isActive = snapshot.active?.workspaceId === record.workspaceId;
+            return (
+              <li key={record.workspaceId} className={isActive ? "workspace-lineage-card is-active" : "workspace-lineage-card"}>
+                <h3>{record.displayName}</h3>
+                <p className="meta-line">
+                  {record.storage === "folder" ? t("ui.workspaceLineageStorageFolder", { folder: record.folderName ?? "" }) : t("ui.workspaceLineageStorageBrowser")}
+                </p>
+                <p className="meta-line">
+                  {record.latestVersionLabel === null
+                    ? t("ui.workspaceLineageNoVersionYet")
+                    : t("ui.workspaceLineageVersionSummary", { count: record.versionCount, latest: record.latestVersionLabel })}
+                </p>
+                <p className="meta-line">{t("ui.workspaceLineageLastSaved", { date: formatDateTime(record.lastDurableSaveIso) })}</p>
+                <div className="settings-state-row">
+                  {record.storage === "browser" && record.pendingPortableExport ? <span className="settings-state-chip is-warn">{t("ui.workspaceLineagePendingExport")}</span> : null}
+                  {isActive ? <span className="settings-state-chip is-ok">{t("ui.workspaceLineageActive")}</span> : null}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void model.switchTo(record.workspaceId).then((ok) => {
+                      if (ok) {
+                        onResume();
+                      }
+                    });
+                  }}
+                  disabled={snapshot.busy}
+                >
+                  {t("ui.workspaceLineageResumeCard", { name: record.displayName })}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
       <div className="row-actions">
-        <button type="button" onClick={() => model.openDialog("create")} disabled={!snapshot.ready || snapshot.busy}>
-          {t("ui.workspaceLineageNew")}
-        </button>
-        {snapshot.directoryAccessSupported ? (
-          <button type="button" onClick={() => void model.openFolder()} disabled={snapshot.busy}>
-            {t("ui.workspaceLineageOpenFolder")}
-          </button>
-        ) : null}
-        <button type="button" onClick={() => packageInputRef.current?.click()} disabled={snapshot.busy}>
-          {t("ui.workspaceLineageImportPackage")}
-        </button>
-        <button type="button" onClick={() => model.openDialog("legacy")} disabled={snapshot.busy}>
-          {t("ui.workspaceLineageImportLegacy")}
+        <button type="button" className="button-with-icon" onClick={onManage}>
+          <span className="action-button-icon is-open" aria-hidden="true" />
+          {t("ui.workspaceStorageManage")}
         </button>
       </div>
-      <PackageFileInput inputRef={packageInputRef} model={model} />
     </section>
   );
 }
 
-function PackageFileInput({ inputRef, model }: { inputRef: RefObject<HTMLInputElement | null>; model: WorkspaceLineageModel }): ReactElement {
+export function LineagePackageFileInput({ inputRef, model }: { inputRef: RefObject<HTMLInputElement | null>; model: WorkspaceLineageModel }): ReactElement {
   return (
     <input
       ref={inputRef}
@@ -284,7 +219,16 @@ function PackageFileInput({ inputRef, model }: { inputRef: RefObject<HTMLInputEl
 
 // --------------------------------------------------------------------------- dialogs
 
-function WorkspaceLineageDialogs({ model }: { model: WorkspaceLineageModel }): ReactElement | null {
+/** The single lineage dialog host, mounted once at app level independently of any trigger surface. */
+export function WorkspaceLineageDialogs({ model, themeHostClassName }: { model: WorkspaceLineageModel; themeHostClassName?: string }): ReactElement | null {
+  return (
+    <LineageDialogThemeContext.Provider value={themeHostClassName ?? null}>
+      <WorkspaceLineageDialogSwitch model={model} />
+    </LineageDialogThemeContext.Provider>
+  );
+}
+
+function WorkspaceLineageDialogSwitch({ model }: { model: WorkspaceLineageModel }): ReactElement | null {
   switch (model.dialog.kind) {
     case "create":
       return <CreateLineageDialog model={model} />;
@@ -527,7 +471,6 @@ function HandoffDetails({ model, handoff, labels }: { model: WorkspaceLineageMod
 function HistoryDialog({ model }: { model: WorkspaceLineageModel }): ReactElement {
   const [filter, setFilter] = useState("");
   const filterId = useId();
-  const packageInputRef = useRef<HTMLInputElement | null>(null);
   const active = model.snapshot.active;
   const manifest = active?.manifest ?? null;
   const labels = active?.versionLabels ?? new Map<string, string>();
@@ -552,28 +495,13 @@ function HistoryDialog({ model }: { model: WorkspaceLineageModel }): ReactElemen
       }
     >
       <div className="row-actions lineage-history-toolbar">
-        <button type="button" onClick={() => model.openDialog("rename")} disabled={isReadOnly}>
-          {t("ui.workspaceLineageRename")}
-        </button>
         <button type="button" onClick={() => model.openDialog("handoff")} disabled={isReadOnly}>
           {t("ui.workspaceLineageRecordHandoff")}
         </button>
         <button type="button" onClick={() => void model.exportPackage()}>
           {t("ui.workspaceLineageExportPackage")}
         </button>
-        <button type="button" onClick={() => packageInputRef.current?.click()} disabled={isReadOnly}>
-          {t("ui.workspaceLineageImportPackage")}
-        </button>
-        {model.snapshot.directoryAccessSupported ? (
-          <button type="button" onClick={() => void model.openFolder()}>
-            {t("ui.workspaceLineageOpenFolder")}
-          </button>
-        ) : null}
-        <button type="button" onClick={() => model.openDialog("legacy")} disabled={isReadOnly}>
-          {t("ui.workspaceLineageImportLegacy")}
-        </button>
       </div>
-      <PackageFileInput inputRef={packageInputRef} model={model} />
       <p className="meta-line">
         {active?.storage === "folder" ? t("ui.workspaceLineageStorageFolder", { folder: active.folderName ?? "" }) : t("ui.workspaceLineageStorageBrowser")}
       </p>

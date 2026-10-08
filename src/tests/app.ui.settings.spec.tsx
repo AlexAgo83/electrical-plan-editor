@@ -236,11 +236,17 @@ describe("App integration UI - settings", () => {
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Save workspace file as" })).toBeEnabled();
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Open workspace file" })).toBeEnabled();
     expect(within(workspaceStoragePanel).getByRole("button", { name: "Use a file for autosave" })).toBeEnabled();
-    expect(within(workspaceStoragePanel).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
+    // Without an active named workspace, the single-file tools live in a labelled compatibility subsection.
+    const legacySubsection = within(workspaceStoragePanel).getByRole("region", { name: "Single-file compatibility" });
+    expect(within(legacySubsection).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
+      "Create named workspace from current content",
       "Save as file",
       "Open workspace file",
       "Use a file for autosave"
     ]);
+    expect(within(workspaceStoragePanel).getByRole("region", { name: "Current workspace" })).toBeInTheDocument();
+    expect(within(workspaceStoragePanel).getByRole("region", { name: "Transfer and recovery" })).toBeInTheDocument();
+    expect(within(workspaceStoragePanel).queryByRole("region", { name: "Versions and handoffs" })).toBeNull();
     expect(within(workspaceStoragePanel).getByText("Storage details")).toBeInTheDocument();
   });
 

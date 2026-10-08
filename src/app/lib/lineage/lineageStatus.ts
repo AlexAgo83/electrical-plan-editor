@@ -9,6 +9,11 @@ function formatTime(iso: string | null): string {
   return Number.isNaN(date.getTime()) ? iso : date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
+/** Named workspace mode hides the single-file tools; a session without an active named workspace keeps them. */
+export function isNamedWorkspaceStorageMode(snapshot: LineageSessionSnapshot | undefined): boolean {
+  return snapshot?.active != null;
+}
+
 export interface LineageStatusDescription {
   label: string;
   tone: "neutral" | "success" | "warning" | "danger";

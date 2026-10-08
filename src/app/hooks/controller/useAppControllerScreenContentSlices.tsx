@@ -1190,8 +1190,8 @@ export function buildSettingsScreenContentSlice(
     unlinkWorkspaceFile: params.unlinkWorkspaceFile,
     openLinkedWorkspaceFile: params.openLinkedWorkspaceFile,
     openResumableWorkspaceFile: params.openResumableWorkspaceFile,
-    loadLinkedFileVersion: params.loadLinkedFileVersion,
-    keepLocalWorkspaceVersion: params.keepLocalWorkspaceVersion,
+    loadLinkedFileVersion: params.loadLinkedFileVersion, keepLocalWorkspaceVersion: params.keepLocalWorkspaceVersion,
+    workspaceLineages: params.workspaceLineages,
   } satisfies SettingsWorkspaceContentProps;
 
   return {

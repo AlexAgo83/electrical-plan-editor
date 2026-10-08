@@ -12,6 +12,9 @@ import { getAiProviderLabel, type AiProviderId } from "../../lib/aiSettings";
 import { isPerfDebugEnabled, setPerfDebugEnabled } from "../../lib/perfDebug";
 import type { AiSettingsModel } from "../../hooks/useAiSettings";
 import type { WorkspaceFileStorageStatus } from "../../hooks/useWorkspaceFileStorage";
+import type { WorkspaceLineageModel } from "../../hooks/useWorkspaceLineages";
+import { SettingsWorkspaceStorageSection } from "./SettingsWorkspaceStorageSection";
+import { isNamedWorkspaceStorageMode } from "../../lib/lineage/lineageStatus";
 import { SettingsLabelText } from "../settings/SettingsLabelText";
 import { getSettingsSections, normalizeSettingsSearch, sectionMatches, SETTINGS_SECTION_IDS } from "../settings/settingsSearchModel";
 import type {
@@ -184,6 +187,7 @@ interface SettingsWorkspaceContentProps {
   openResumableWorkspaceFile: () => void;
   loadLinkedFileVersion: () => void;
   keepLocalWorkspaceVersion: () => void;
+  workspaceLineages?: WorkspaceLineageModel;
 }
 
 export function SettingsWorkspaceContent({
@@ -334,13 +338,14 @@ export function SettingsWorkspaceContent({
   openLinkedWorkspaceFile,
   openResumableWorkspaceFile,
   loadLinkedFileVersion,
-  keepLocalWorkspaceVersion
+  keepLocalWorkspaceVersion,
+  workspaceLineages
 }: SettingsWorkspaceContentProps): ReactElement {
   const activeAiProviderConfig = aiSettings.settings.providers[aiSettings.settings.provider];
   const { settingsSearchQuery, setSettingsSearchQuery } = useSettingsSearchDock();
   const [perfDebugLoggingEnabled, setPerfDebugLoggingEnabled] = useState(() => isPerfDebugEnabled());
   const normalizedSettingsSearch = normalizeSettingsSearch(settingsSearchQuery);
-  const settingsSections = getSettingsSections();
+  const settingsSections = getSettingsSections(isNamedWorkspaceStorageMode(workspaceLineages?.snapshot) ? "named" : "legacy");
   const matchedSectionCounts = settingsSections.map((section) => ({
     id: section.id,
     count: sectionMatches(section, normalizedSettingsSearch)
@@ -350,95 +355,14 @@ export function SettingsWorkspaceContent({
   const contentRef = useRef<HTMLElement | null>(null);
   const sectionVisibilityRatiosRef = useRef<Map<string, number>>(new Map());
   const [activeSettingsSectionId, setActiveSettingsSectionId] = useState("settings-workspace-storage");
-  const relinkWorkspaceLabel = workspaceFileStatus.mode === "linked" || workspaceFileStatus.resumeFileName !== null ? "Relink" : "Link";
-  const relinkWorkspaceAriaLabel =
-    relinkWorkspaceLabel === "Relink" ? "Relink workspace file" : "Link workspace file";
-  const workspaceStorageStatusTone = workspaceFileStatus.conflict
-    ? "is-warn"
-    : workspaceFileStatus.mode === "linked" && workspaceFileStatus.fileAvailability !== "unavailable"
-      ? "is-ok"
-      : "";
-  const workspaceStorageTitle = workspaceFileStatus.conflict
-    ? "Action needed: linked file changed"
-    : workspaceFileStatus.mode === "linked"
-      ? `Linked to ${workspaceFileStatus.fileName ?? "a workspace file"}`
-      : workspaceFileStatus.resumeFileName !== null
-        ? "Saved locally, with a resumable file"
-        : "Saved in this browser only";
-  const workspaceStorageDescription = workspaceFileStatus.conflict
-    ? "The linked file was edited outside this tab. Pick the version to keep before autosave continues."
-    : workspaceFileStatus.mode === "linked"
-      ? "Changes autosave to the linked file while the browser keeps file permission. Local browser storage remains a fallback."
-      : workspaceFileStatus.resumeFileName !== null
-        ? "Your work is safe in this browser. You can resume the last file link or save a fresh portable copy."
-        : "Your work is safe in this browser. Save a workspace file when you want a portable copy or cloud-folder sync.";
   const selectedExportCount = selectedExportNetworkIds.length;
   const canExportSelectedNetworks = selectedExportCount > 0;
-  const workspaceStoragePrimaryAction = workspaceFileStatus.conflict
-    ? {
-        label: t("ui.settingsworkspacecontentResolveConflict"),
-        ariaLabel: t("ui.settingsworkspacecontentResolveWorkspaceFileConflict"),
-        title: t("ui.settingsworkspacecontentReviewTheLinkedFileConflictOptions"),
-        onClick: loadLinkedFileVersion,
-        disabled: false,
-        iconClassName: "action-button-icon is-open"
-      }
-    : workspaceFileStatus.mode === "linked"
-      ? workspaceFileStatus.permission === "denied" || workspaceFileStatus.fileAvailability === "unavailable"
-        ? {
-            label: t("ui.settingsworkspacecontentRestoreFileAccess"),
-            ariaLabel: relinkWorkspaceAriaLabel,
-            title: t("ui.settingsworkspacecontentChooseTheWorkspaceFileAgainToRestoreBrowserPermission"),
-            onClick: relinkWorkspaceFile,
-            disabled: false,
-            iconClassName: "action-button-icon is-swap"
-          }
-        : {
-            label: workspaceFileStatus.isSaving ? "Saving..." : "Save now",
-            ariaLabel: t("ui.settingsworkspacecontentSaveWorkspaceFileNow"),
-            title: t("ui.settingsworkspacecontentSaveTheCurrentWorkspaceToTheLinkedFileNow"),
-            onClick: saveWorkspaceFileNow,
-            disabled: workspaceFileStatus.isSaving,
-            iconClassName: "action-button-icon is-save"
-          }
-      : workspaceFileStatus.canResume
-        ? {
-            label: t("ui.settingsworkspacecontentResumeLastFile"),
-            ariaLabel: t("ui.operationshealthpanelResumeWorkspaceFile"),
-            title: t("ui.operationshealthpanelResumeTheLastWorkspaceFileRememberedByThisBrowser"),
-            onClick: resumeWorkspaceFile,
-            disabled: false,
-            iconClassName: "action-button-icon is-redo"
-          }
-        : {
-            label: t("ui.settingsworkspacecontentSaveAsFile"),
-            ariaLabel: t("ui.operationshealthpanelSaveWorkspaceFileAs"),
-            title: t("ui.operationshealthpanelSaveANewWorkspaceFileCopy"),
-            onClick: saveWorkspaceFileAs,
-            disabled: false,
-            iconClassName: "action-button-icon is-save"
-          };
   const renderSettingLabel = (text: string): ReactNode => (
     <SettingsLabelText text={text} normalizedQuery={normalizedSettingsSearch} />
   );
   const handlePerfDebugLoggingChange = (enabled: boolean): void => {
     setPerfDebugLoggingEnabled(enabled);
     setPerfDebugEnabled(enabled);
-  };
-  const formatWorkspaceSavedAt = (iso: string | null): string => {
-    if (iso === null) {
-      return "Not saved to a workspace file yet";
-    }
-
-    const date = new Date(iso);
-    if (Number.isNaN(date.getTime())) {
-      return iso;
-    }
-
-    return new Intl.DateTimeFormat(undefined, {
-      dateStyle: "medium",
-      timeStyle: "short"
-    }).format(date);
   };
   const scrollToSettingsSection = (sectionId: string): void => {
     setActiveSettingsSectionId(sectionId);
@@ -489,7 +413,7 @@ export function SettingsWorkspaceContent({
         <SettingsSearchControl />
         {hasSearchQuery ? (
           <div className={totalMatchCount > 0 ? "settings-search-summary" : "settings-search-summary is-empty"} role="status">
-            {totalMatchCount > 0 ? `${totalMatchCount} matching setting label${totalMatchCount === 1 ? "" : "s"}` : t("ui.settingsworkspacecontentNoSettingLabelMatchesThisSearch")}
+            {totalMatchCount > 0 ? t(totalMatchCount === 1 ? "ui.settingsSearchMatchCountOne" : "ui.settingsSearchMatchCountOther", { count: totalMatchCount }) : t("ui.settingsworkspacecontentNoSettingLabelMatchesThisSearch")}
             <button type="button" onClick={() => setSettingsSearchQuery("")}>{t("ui.clear")}</button>
           </div>
         ) : null}
@@ -519,190 +443,23 @@ export function SettingsWorkspaceContent({
           })}
         </nav>
         <section ref={contentRef} className="panel settings-panel panel-grid settings-panel-grid settings-section-list" aria-label={t("ui.settingsworkspacecontentSettingsSectionsList")}>
-      <section id="settings-workspace-storage" className="panel settings-panel">
-        <header className="settings-panel-header">
-          <h2>{t("ui.operationshealthpanelWorkspaceStorage")}</h2>
-          <span className="settings-panel-chip">{t("ui.settingsworkspacecontentStorage")}</span>
-        </header>
-        <p className="settings-panel-intro">
-          {t("ui.settingsworkspacecontentChooseWhereThisWorkspaceLivesTheBrowserAlwaysKeepsA")}</p>
-        <div className={`settings-storage-current ${workspaceStorageStatusTone}`} aria-label={t("ui.settingsworkspacecontentWorkspaceStorageStatus")}>
-          <div className="settings-storage-current-copy">
-            <span className="settings-storage-current-kicker">{t("ui.settingsworkspacecontentCurrentSaveLocation")}</span>
-            <strong>{workspaceStorageTitle}</strong>
-            <p>{workspaceStorageDescription}</p>
-          </div>
-          <div className="row-actions settings-storage-primary-action-row">
-            <button
-              type="button"
-              className="button-with-icon settings-storage-primary-action"
-              onClick={workspaceStoragePrimaryAction.onClick}
-              disabled={workspaceStoragePrimaryAction.disabled}
-              aria-label={workspaceStoragePrimaryAction.ariaLabel}
-              title={workspaceStoragePrimaryAction.title}
-            >
-              <span className={workspaceStoragePrimaryAction.iconClassName} aria-hidden="true" />
-              {renderSettingLabel(workspaceStoragePrimaryAction.label)}
-            </button>
-          </div>
-        </div>
-        {workspaceFileStatus.message !== null ? <p className="meta-line settings-storage-message">{workspaceFileStatus.message}</p> : null}
-        <div className="row-actions settings-actions settings-storage-secondary-actions" aria-label={t("ui.settingsworkspacecontentMoreWorkspaceFileActions")}>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={openWorkspaceFile}
-            aria-label={t("ui.operationshealthpanelOpenWorkspaceFile")}
-            title={t("ui.operationshealthpanelOpenAWorkspaceFileAndReplaceTheCurrentWorkspace")}
-          >
-            <span className="action-button-icon is-open" aria-hidden="true" />
-            {renderSettingLabel("Open workspace file")}
-          </button>
-          {workspaceStoragePrimaryAction.ariaLabel !== "Save workspace file as" ? (
-            <button
-              type="button"
-              className="button-with-icon"
-              onClick={saveWorkspaceFileAs}
-              aria-label={t("ui.operationshealthpanelSaveWorkspaceFileAs")}
-              title={t("ui.operationshealthpanelSaveANewWorkspaceFileCopy")}
-            >
-              <span className="action-button-icon is-save" aria-hidden="true" />
-              {renderSettingLabel("Save as copy")}
-            </button>
-          ) : null}
-          {workspaceFileStatus.canResume && workspaceFileStatus.mode !== "linked" && workspaceStoragePrimaryAction.ariaLabel !== "Resume workspace file" ? (
-            <button
-              type="button"
-              className="button-with-icon"
-              onClick={resumeWorkspaceFile}
-              aria-label={t("ui.operationshealthpanelResumeWorkspaceFile")}
-              title={t("ui.operationshealthpanelResumeTheLastWorkspaceFileRememberedByThisBrowser")}
-            >
-              <span className="action-button-icon is-redo" aria-hidden="true" />
-              {renderSettingLabel("Resume last file")}
-            </button>
-          ) : null}
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={relinkWorkspaceFile}
-            aria-label={t("ui.settingsworkspacecontentUseAFileForAutosave")}
-            title={t("ui.settingsworkspacecontentRelinkworkspacelabelAWorkspaceFileForDirectFileAutosaveWhenSupported", { relinkWorkspaceLabel: relinkWorkspaceLabel })}
-          >
-            <span className="action-button-icon is-swap" aria-hidden="true" />
-            {renderSettingLabel("Use a file for autosave")}
-          </button>
-          {workspaceFileStatus.mode === "linked" ? (
-            <>
-              <button
-                type="button"
-                className="button-with-icon"
-                onClick={saveWorkspaceFileNow}
-                disabled={workspaceFileStatus.isSaving}
-                aria-label={t("ui.settingsworkspacecontentSaveWorkspaceFileNow")}
-                title={t("ui.settingsworkspacecontentSaveTheCurrentWorkspaceToTheLinkedFileNow")}
-              >
-                <span className="action-button-icon is-save" aria-hidden="true" />
-                {renderSettingLabel("Save now")}
-              </button>
-              <button
-                type="button"
-                className="button-with-icon"
-                onClick={unlinkWorkspaceFile}
-                aria-label={t("ui.settingsworkspacecontentUnlinkWorkspaceFile")}
-                title={t("ui.settingsworkspacecontentStopAutosavingToTheLinkedFileAndKeepBrowserLocal")}
-              >
-                <span className="action-button-icon is-swap" aria-hidden="true" />
-                {renderSettingLabel("Stop autosave link")}
-              </button>
-            </>
-          ) : null}
-        </div>
-        {workspaceFileStatus.conflict ? (
-          <div className="settings-conflict-panel" role="alert">
-            <p>{t("ui.settingsworkspacecontentTheLinkedFileChangedOutsideThisTabChooseWhichWorkspace")}</p>
-            <div className="row-actions settings-actions">
-              <button type="button" onClick={loadLinkedFileVersion}>{renderSettingLabel("Load file version")}</button>
-              <button type="button" onClick={keepLocalWorkspaceVersion}>{renderSettingLabel("Keep local version")}</button>
-              <button type="button" onClick={saveWorkspaceFileAs}>{renderSettingLabel("Save local copy")}</button>
-            </div>
-          </div>
-        ) : null}
-        <details className="settings-storage-technical-details">
-          <summary>{t("ui.settingsworkspacecontentStorageDetails")}</summary>
-          <div className="settings-state-row" aria-label={t("ui.settingsworkspacecontentWorkspaceTechnicalStorageStatus")}>
-            <span className={workspaceFileStatus.conflict ? "settings-state-chip is-warn" : "settings-state-chip is-ok"}>
-              {workspaceFileStatus.label}
-            </span>
-            <span className="settings-state-chip">
-              {workspaceFileStatus.mode === "linked" ? t("ui.settingssearchmodelLinkedFile") : t("ui.operationshealthpanelLocalOnly")}
-            </span>
-            <span className="settings-state-chip">
-              {t("ui.settingsworkspacecontentPermission")}{workspaceFileStatus.permission}
-            </span>
-            <span className="settings-state-chip">
-              {workspaceFileStatus.directFileAccessSupported ? t("ui.settingsworkspacecontentDirectFileAccess") : t("ui.settingsworkspacecontentFallbackDownload")}
-            </span>
-            <span className={workspaceFileStatus.fileAvailability === "unavailable" ? "settings-state-chip is-warn" : "settings-state-chip"}>
-              {t("ui.operationshealthpanelFile")}{workspaceFileStatus.fileAvailability === "available" ? t("ui.networkscopeworkspacecontentAvailable") : workspaceFileStatus.fileAvailability === "unavailable" ? "Unavailable" : "Unknown"}
-            </span>
-          </div>
-          <dl className="settings-storage-details">
-            <div>
-              <dt>{renderSettingLabel("Persistence mode")}</dt>
-              <dd>{workspaceFileStatus.mode === "linked" ? t("ui.settingsworkspacecontentLinkedFileWithLocalCache") : t("ui.settingsworkspacecontentLocalBrowserStorageOnly")}</dd>
-            </div>
-            <div>
-              <dt>{t("ui.settingsworkspacecontentAutosaveTarget")}</dt>
-              <dd>{workspaceFileStatus.saveTarget === "linked-file" ? t("ui.settingsworkspacecontentLinkedWorkspaceFile") : workspaceFileStatus.saveTarget === "download" ? "Downloaded workspace copy" : "Local browser cache"}</dd>
-            </div>
-            <div>
-              <dt>{renderSettingLabel("Linked file")}</dt>
-              <dd>
-                {workspaceFileStatus.fileName === null ? (
-                  t("ui.none")
-                ) : (
-                  <button
-                    type="button"
-                    className="settings-storage-file-link"
-                    onClick={openLinkedWorkspaceFile}
-                    disabled={workspaceFileStatus.mode !== "linked"}
-                    title={t("ui.settingsworkspacecontentOpenTheLinkedWorkspaceFileInANewBrowserTab")}
-                  >
-                    {workspaceFileStatus.fileName}
-                  </button>
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>{t("ui.settingsworkspacecontentResumableFile")}</dt>
-              <dd>
-                {workspaceFileStatus.resumeFileName === null ? (
-                  t("ui.none")
-                ) : (
-                  <button
-                    type="button"
-                    className="settings-storage-file-link"
-                    onClick={openResumableWorkspaceFile}
-                    disabled={!workspaceFileStatus.canResume}
-                    title={t("ui.settingsworkspacecontentOpenTheResumableWorkspaceFileInANewBrowserTab")}
-                  >
-                    {workspaceFileStatus.resumeFileName}
-                  </button>
-                )}
-              </dd>
-            </div>
-            <div>
-              <dt>{t("ui.settingsworkspacecontentResumeStatus")}</dt>
-              <dd>{workspaceFileStatus.resumeStatus === "available" ? t("ui.settingsworkspacecontentResumeAvailable") : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Resume unavailable" : "No resumable file"}</dd>
-            </div>
-            <div>
-              <dt>{t("ui.settingsworkspacecontentLastSaved")}</dt>
-              <dd>{formatWorkspaceSavedAt(workspaceFileStatus.lastSavedAtIso)}</dd>
-            </div>
-          </dl>
-        </details>
-      </section>
+      <SettingsWorkspaceStorageSection
+        model={workspaceLineages}
+        normalizedQuery={normalizedSettingsSearch}
+        legacy={{
+          workspaceFileStatus,
+          openWorkspaceFile,
+          relinkWorkspaceFile,
+          resumeWorkspaceFile,
+          saveWorkspaceFileNow,
+          saveWorkspaceFileAs,
+          unlinkWorkspaceFile,
+          openLinkedWorkspaceFile,
+          openResumableWorkspaceFile,
+          loadLinkedFileVersion,
+          keepLocalWorkspaceVersion
+        }}
+      />
 
       <section id="settings-import-export" className="panel settings-panel settings-panel--import-export">
         <header className="settings-panel-header">

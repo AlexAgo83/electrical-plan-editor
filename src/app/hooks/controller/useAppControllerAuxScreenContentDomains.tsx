@@ -5,6 +5,7 @@ import type { NetworkScopeFormStateModel } from "../useNetworkScopeFormState";
 import type { ValidationModel } from "../useValidationModel";
 import type { AiSettingsModel } from "../useAiSettings";
 import type { UseWorkspaceFileStorageModel } from "../useWorkspaceFileStorage";
+import type { WorkspaceLineageModel } from "../useWorkspaceLineages";
 import {
   buildNetworkScopeScreenContentSlice,
   buildSettingsScreenContentSlice,
@@ -68,6 +69,7 @@ interface UseAppControllerAuxScreenContentDomainsParams {
     resetWorkspacePreferencesToDefaults: SettingsSliceParams["resetWorkspacePreferencesToDefaults"];
     aiSettings: AiSettingsModel;
     workspaceFileStorage: UseWorkspaceFileStorageModel;
+    workspaceLineages?: WorkspaceLineageModel;
   };
   includeNetworkScopeContent: boolean;
   includeValidationContent: boolean;
@@ -311,7 +313,8 @@ export function useAppControllerAuxScreenContentDomains({
     openLinkedWorkspaceFile: settings.workspaceFileStorage.openLinkedWorkspaceFile,
     openResumableWorkspaceFile: settings.workspaceFileStorage.openResumableWorkspaceFile,
     loadLinkedFileVersion: settings.workspaceFileStorage.loadLinkedFileVersion,
-    keepLocalWorkspaceVersion: settings.workspaceFileStorage.keepLocalWorkspaceVersion
+    keepLocalWorkspaceVersion: settings.workspaceFileStorage.keepLocalWorkspaceVersion,
+    workspaceLineages: settings.workspaceLineages
       })
     : null;
 

@@ -30,6 +30,8 @@ interface HomeWorkspaceContentProps {
   onOpenOnboardingHelp?: () => void;
   postMvpModules?: HomeWorkspacePostMvpModules;
   workspaceLineagesPanel?: ReactNode;
+  /** A named workspace owns saving; single-file save/load shortcuts are then legacy-only and hidden. */
+  isNamedWorkspaceActive?: boolean;
 }
 
 interface ChangelogCollapsibleSection {
@@ -208,7 +210,8 @@ export function HomeWorkspaceContent({
   onOpenRecentChangeTarget,
   onOpenOnboardingHelp,
   postMvpModules,
-  workspaceLineagesPanel
+  workspaceLineagesPanel,
+  isNamedWorkspaceActive = false
 }: HomeWorkspaceContentProps): ReactElement {
   const homeExtensionEntries = [
     ["session", t("ui.sessionSummary"), postMvpModules?.sessionSummary],
@@ -330,14 +333,18 @@ export function HomeWorkspaceContent({
               <span className="action-button-icon is-home-create" aria-hidden="true" />
               <span>{t("ui.createEmptyWorkspace")}</span>
             </button>
-            <button type="button" className="button-with-icon" onClick={onSaveWorkspace} disabled={networkCount === 0}>
-              <span className="action-button-icon is-save" aria-hidden="true" />
-              <span>{t("ui.saveWorkspace")}</span>
-            </button>
-            <button type="button" className="button-with-icon" onClick={onOpenImportPicker}>
-              <span className="action-button-icon is-home-import" aria-hidden="true" />
-              <span>{t("ui.loadWorkspace")}</span>
-            </button>
+            {!isNamedWorkspaceActive ? (
+              <>
+                <button type="button" className="button-with-icon" onClick={onSaveWorkspace} disabled={networkCount === 0}>
+                  <span className="action-button-icon is-save" aria-hidden="true" />
+                  <span>{t("ui.saveWorkspace")}</span>
+                </button>
+                <button type="button" className="button-with-icon" onClick={onOpenImportPicker}>
+                  <span className="action-button-icon is-home-import" aria-hidden="true" />
+                  <span>{t("ui.loadWorkspace")}</span>
+                </button>
+              </>
+            ) : null}
           </div>
           <input
             ref={importFileInputRef}

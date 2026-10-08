@@ -2,6 +2,8 @@ import { translateCurrent as t } from "../../lib/i18n";
 import type { ChangeEvent, ReactElement, RefObject } from "react";
 import type { WorkspaceFileStorageStatus } from "../../hooks/useWorkspaceFileStorage";
 import type { ValidationIssue } from "../../types/app-controller";
+import type { LineageSessionSnapshot } from "../../lib/lineage/lineageSessionController";
+import { describeLineageSaveStatus } from "../../lib/lineage/lineageStatus";
 
 interface OperationsHealthPanelProps {
   handleUndo: () => void;
@@ -11,6 +13,9 @@ interface OperationsHealthPanelProps {
   showShortcutHints: boolean;
   saveStatus: "saved" | "unsaved" | "error";
   workspaceFileStatus: WorkspaceFileStorageStatus;
+  /** When a named workspace is active, storage status comes from it and file actions are managed in Settings. */
+  workspaceLineageSnapshot?: LineageSessionSnapshot;
+  onManageWorkspaces?: () => void;
   onOpenWorkspaceFile: () => void;
   onResumeWorkspaceFile: () => void;
   onSaveWorkspaceFileAs: () => void;
@@ -35,6 +40,8 @@ export function OperationsHealthPanel({
   showShortcutHints,
   saveStatus,
   workspaceFileStatus,
+  workspaceLineageSnapshot,
+  onManageWorkspaces,
   onOpenWorkspaceFile,
   onResumeWorkspaceFile,
   onSaveWorkspaceFileAs,
@@ -50,6 +57,26 @@ export function OperationsHealthPanel({
   handleOpenValidationScreen,
   moveValidationIssueCursor
 }: OperationsHealthPanelProps): ReactElement {
+  const activeLineage = workspaceLineageSnapshot?.active ?? null;
+  const workspaceFileInput = (
+    <input
+      ref={workspaceFileInputRef}
+      className="visually-hidden"
+      type="file"
+      accept=".epe.json,.json,application/json"
+      onChange={(event) => {
+        void onWorkspaceFileInputChange(event);
+      }}
+      aria-label={t("ui.operationshealthpanelOpenWorkspaceFile")}
+    />
+  );
+  const manageButton =
+    onManageWorkspaces !== undefined ? (
+      <button type="button" className="button-with-icon" onClick={onManageWorkspaces}>
+        <span className="action-button-icon is-open" aria-hidden="true" />
+        {t("ui.workspaceStorageManage")}
+      </button>
+    ) : null;
   return (
     <section className="workspace-ops-content panel">
       <h2>{t("ui.operationsAndHealth")}</h2>
@@ -75,76 +102,82 @@ export function OperationsHealthPanel({
         
         {t("ui.state")} {saveStatus === "saved" ? t("ui.saved") : saveStatus === "unsaved" ? t("ui.unsaved") : t("ui.error")}
       </p>
-      <section className="workspace-health workspace-storage-ops" aria-label={t("ui.operationshealthpanelWorkspaceStorage")}>
-        <h2>{t("ui.operationshealthpanelWorkspaceStorage")}</h2>
-        <p className="meta-line">
-          {t("ui.operationshealthpanelFileState")}<strong>{workspaceFileStatus.label}</strong>
-        </p>
-        <p className="meta-line">
-          {t("ui.operationshealthpanelMode")}{workspaceFileStatus.mode === "linked" ? t("ui.settingssearchmodelLinkedFile") : t("ui.operationshealthpanelLocalOnly")}
-        </p>
-        <p className="meta-line">
-          {t("ui.operationshealthpanelAutosave")}{workspaceFileStatus.saveTarget === "linked-file" ? t("ui.settingssearchmodelLinkedFile") : workspaceFileStatus.saveTarget === "download" ? "Downloaded copy" : "Local cache"}
-        </p>
-        <p className="meta-line">
-          {t("ui.operationshealthpanelResume")}{workspaceFileStatus.resumeStatus === "available" ? t("ui.networkscopeworkspacecontentAvailable") : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Unavailable" : t("ui.none")}
-        </p>
-        <p className="meta-line">
-          {t("ui.operationshealthpanelDirectFileAccess")}{workspaceFileStatus.directFileAccessSupported ? t("ui.operationshealthpanelSupported") : t("ui.operationshealthpanelFallbackDownloadOnly")}
-        </p>
-        <p className="meta-line">
-          {t("ui.operationshealthpanelFileAvailability")}{workspaceFileStatus.fileAvailability === "available" ? t("ui.networkscopeworkspacecontentAvailable") : workspaceFileStatus.fileAvailability === "unavailable" ? "Unavailable" : "Unknown"}
-        </p>
-        {workspaceFileStatus.fileName !== null ? <p className="meta-line">{t("ui.operationshealthpanelFile")}{workspaceFileStatus.fileName}</p> : null}
-        {workspaceFileStatus.mode !== "linked" && workspaceFileStatus.resumeFileName !== null ? (
-          <p className="meta-line">{t("ui.operationshealthpanelResume")}{workspaceFileStatus.resumeFileName}</p>
-        ) : null}
-        {workspaceFileStatus.message !== null ? <p className="meta-line">{workspaceFileStatus.message}</p> : null}
-        <div className="row-actions compact workspace-storage-actions">
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={onResumeWorkspaceFile}
-            disabled={!workspaceFileStatus.canResume || workspaceFileStatus.mode === "linked"}
-            aria-label={t("ui.operationshealthpanelResumeWorkspaceFile")}
-            title={t("ui.operationshealthpanelResumeTheLastWorkspaceFileRememberedByThisBrowser")}
-          >
-            <span className="action-button-icon is-redo" aria-hidden="true" />
-            
-            {t("ui.resume")}
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={onOpenWorkspaceFile}
-            aria-label={t("ui.operationshealthpanelOpenWorkspaceFile")}
-            title={t("ui.operationshealthpanelOpenAWorkspaceFileAndReplaceTheCurrentWorkspace")}
-          >
-            <span className="action-button-icon is-open" aria-hidden="true" />
-            
-            {t("ui.open")}
-          </button>
-          <button
-            type="button"
-            className="button-with-icon"
-            onClick={onSaveWorkspaceFileAs}
-            aria-label={t("ui.operationshealthpanelSaveWorkspaceFileAs")}
-            title={t("ui.operationshealthpanelSaveANewWorkspaceFileCopy")}
-          >
-            <span className="action-button-icon is-save" aria-hidden="true" />
-            {t("ui.operationshealthpanelSaveAs")}</button>
-          <input
-            ref={workspaceFileInputRef}
-            className="visually-hidden"
-            type="file"
-            accept=".epe.json,.json,application/json"
-            onChange={(event) => {
-              void onWorkspaceFileInputChange(event);
-            }}
-            aria-label={t("ui.operationshealthpanelOpenWorkspaceFile")}
-          />
-        </div>
-      </section>
+      {workspaceLineageSnapshot !== undefined && activeLineage !== null ? (
+        <section className="workspace-health workspace-storage-ops" aria-label={t("ui.operationshealthpanelWorkspaceStorage")}>
+          <h2>{t("ui.operationshealthpanelWorkspaceStorage")}</h2>
+          <p className="meta-line">
+            {t("ui.workspaceStorageOpsActiveWorkspace")} <strong>{activeLineage.displayName}</strong>
+          </p>
+          <p className="meta-line">{describeLineageSaveStatus(workspaceLineageSnapshot).label}</p>
+          <div className="row-actions compact workspace-storage-actions">
+            {manageButton}
+            {workspaceFileInput}
+          </div>
+        </section>
+      ) : (
+        <section className="workspace-health workspace-storage-ops" aria-label={t("ui.operationshealthpanelWorkspaceStorage")}>
+          <h2>{t("ui.operationshealthpanelWorkspaceStorage")}</h2>
+          <p className="meta-line">
+            {t("ui.operationshealthpanelFileState")}<strong>{workspaceFileStatus.label}</strong>
+          </p>
+          <p className="meta-line">
+            {t("ui.operationshealthpanelMode")}{workspaceFileStatus.mode === "linked" ? t("ui.settingssearchmodelLinkedFile") : t("ui.operationshealthpanelLocalOnly")}
+          </p>
+          <p className="meta-line">
+            {t("ui.operationshealthpanelAutosave")}{workspaceFileStatus.saveTarget === "linked-file" ? t("ui.settingssearchmodelLinkedFile") : workspaceFileStatus.saveTarget === "download" ? "Downloaded copy" : "Local cache"}
+          </p>
+          <p className="meta-line">
+            {t("ui.operationshealthpanelResume")}{workspaceFileStatus.resumeStatus === "available" ? t("ui.networkscopeworkspacecontentAvailable") : workspaceFileStatus.resumeStatus === "permission-required" ? "Permission required" : workspaceFileStatus.resumeStatus === "unavailable" ? "Unavailable" : t("ui.none")}
+          </p>
+          <p className="meta-line">
+            {t("ui.operationshealthpanelDirectFileAccess")}{workspaceFileStatus.directFileAccessSupported ? t("ui.operationshealthpanelSupported") : t("ui.operationshealthpanelFallbackDownloadOnly")}
+          </p>
+          <p className="meta-line">
+            {t("ui.operationshealthpanelFileAvailability")}{workspaceFileStatus.fileAvailability === "available" ? t("ui.networkscopeworkspacecontentAvailable") : workspaceFileStatus.fileAvailability === "unavailable" ? "Unavailable" : "Unknown"}
+          </p>
+          {workspaceFileStatus.fileName !== null ? <p className="meta-line">{t("ui.operationshealthpanelFile")}{workspaceFileStatus.fileName}</p> : null}
+          {workspaceFileStatus.mode !== "linked" && workspaceFileStatus.resumeFileName !== null ? (
+            <p className="meta-line">{t("ui.operationshealthpanelResume")}{workspaceFileStatus.resumeFileName}</p>
+          ) : null}
+          {workspaceFileStatus.message !== null ? <p className="meta-line">{workspaceFileStatus.message}</p> : null}
+          <div className="row-actions compact workspace-storage-actions">
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={onResumeWorkspaceFile}
+              disabled={!workspaceFileStatus.canResume || workspaceFileStatus.mode === "linked"}
+              aria-label={t("ui.operationshealthpanelResumeWorkspaceFile")}
+              title={t("ui.operationshealthpanelResumeTheLastWorkspaceFileRememberedByThisBrowser")}
+            >
+              <span className="action-button-icon is-redo" aria-hidden="true" />
+              
+              {t("ui.resume")}
+            </button>
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={onOpenWorkspaceFile}
+              aria-label={t("ui.operationshealthpanelOpenWorkspaceFile")}
+              title={t("ui.operationshealthpanelOpenAWorkspaceFileAndReplaceTheCurrentWorkspace")}
+            >
+              <span className="action-button-icon is-open" aria-hidden="true" />
+              
+              {t("ui.open")}
+            </button>
+            <button
+              type="button"
+              className="button-with-icon"
+              onClick={onSaveWorkspaceFileAs}
+              aria-label={t("ui.operationshealthpanelSaveWorkspaceFileAs")}
+              title={t("ui.operationshealthpanelSaveANewWorkspaceFileCopy")}
+            >
+              <span className="action-button-icon is-save" aria-hidden="true" />
+              {t("ui.operationshealthpanelSaveAs")}</button>
+            {manageButton}
+            {workspaceFileInput}
+          </div>
+        </section>
+      )}
       <section className="workspace-health" aria-label={t("ui.modelHealth")}>
         <h2>{t("ui.modelHealth")}</h2>
         <p className="meta-line">

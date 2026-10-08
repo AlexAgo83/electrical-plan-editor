@@ -12,6 +12,7 @@ import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSel
 import type { ValidationModel } from "../useValidationModel";
 import type { AiSettingsModel } from "../useAiSettings";
 import type { UseWorkspaceFileStorageModel } from "../useWorkspaceFileStorage";
+import type { WorkspaceLineageModel } from "../useWorkspaceLineages";
 import type { AiProviderReadiness } from "../../lib/aiSettings";
 import { buildWorkspaceLayoutContent } from "../../lib/appControllerWorkspaceLayoutContent";
 import type { AppControllerModelingHandlersAssemblyModel } from "./useAppControllerModelingHandlersAssembly";
@@ -128,6 +129,7 @@ export interface AppControllerWorkspaceContentAssemblyParams {
     catalogHandlers: CatalogHandlersModel;
     aiSettings: AiSettingsModel;
     workspaceFileStorage: UseWorkspaceFileStorageModel;
+    workspaceLineages?: WorkspaceLineageModel;
     workspaceLineagesPanel?: ReactNode;
   };
   domains: {
@@ -208,7 +210,8 @@ export function useAppControllerWorkspaceContentAssembly({
     setActiveSubScreen: handlers.setActiveSubScreen,
     setInteractionMode: handlers.setInteractionMode,
     handleWorkspaceScreenChange: handlers.handleWorkspaceScreenChange,
-    workspaceLineagesPanel: models.workspaceLineagesPanel
+    workspaceLineagesPanel: models.workspaceLineagesPanel,
+    isNamedWorkspaceActive: models.workspaceLineages?.snapshot.active != null
   });
 
   const {
@@ -505,7 +508,8 @@ export function useAppControllerWorkspaceContentAssembly({
         handleZoomAction: domains.canvasInteractionDomain.handleZoomAction,
         resetWorkspacePreferencesToDefaults: domains.workspaceNetworkDomain.resetWorkspacePreferencesToDefaults,
         aiSettings: models.aiSettings,
-        workspaceFileStorage: models.workspaceFileStorage
+        workspaceFileStorage: models.workspaceFileStorage,
+        workspaceLineages: models.workspaceLineages
       },
       includeNetworkScopeContent: state.isNetworkScopeScreen,
       includeValidationContent: state.hasActiveNetwork && state.isValidationScreen,

@@ -24,6 +24,11 @@ button {
 
 .app-shell {
   --theme-primary: #17374e;
+  /* Semantic status hues shared by every theme; consumers mix them with the theme foreground
+     (currentColor) so contrast follows light and dark surfaces. */
+  --theme-status-success: #2f8a4c;
+  --theme-status-warning: #b5751f;
+  --theme-status-danger: #b04343;
   min-height: 100vh;
   width: 100%;
   max-width: 1200px;

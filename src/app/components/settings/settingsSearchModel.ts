@@ -18,28 +18,55 @@ export const SETTINGS_SECTION_IDS = [
   "settings-ai-provider"
 ] as const;
 
-export function getSettingsSections(): SettingsSectionDefinition[] {
+export type WorkspaceStorageSearchMode = "named" | "legacy";
+
+/** Labels reachable from Settings > Workspace storage in the current storage mode. */
+function workspaceStorageLabels(mode: WorkspaceStorageSearchMode): string[] {
+  const shared = [
+    t("ui.workspaceLineageSelectLabel"),
+    t("ui.workspaceLineageNew"),
+    t("ui.workspaceLineageImportPackage"),
+    t("ui.workspaceLineageOpenFolder"),
+    t("ui.workspaceLineageImportLegacy")
+  ];
+  if (mode === "named") {
+    return [
+      ...shared,
+      t("ui.workspaceLineageSave"),
+      t("ui.workspaceLineageRename"),
+      t("ui.workspaceLineageCreateVersion"),
+      t("ui.workspaceLineageHistory"),
+      t("ui.workspaceLineageRecordHandoff"),
+      t("ui.workspaceLineageExportPackage"),
+      t("ui.workspaceLineageReconnectFolder")
+    ];
+  }
+  return [
+    ...shared,
+    t("ui.workspaceStorageAdoptCurrent"),
+    t("ui.settingssearchmodelPersistenceMode"),
+    t("ui.settingssearchmodelLinkedFile"),
+    t("ui.operationshealthpanelOpenWorkspaceFile"),
+    t("ui.settingsworkspacecontentSaveAsFile"),
+    t("ui.settingssearchmodelSaveAsCopy"),
+    t("ui.settingsworkspacecontentUseAFileForAutosave"),
+    t("ui.settingsworkspacecontentResumeLastFile"),
+    t("ui.settingssearchmodelSaveNow"),
+    t("ui.settingssearchmodelStopAutosaveLink"),
+    t("ui.settingsworkspacecontentResolveConflict"),
+    t("ui.settingsworkspacecontentRestoreFileAccess"),
+    t("ui.settingssearchmodelLoadFileVersion"),
+    t("ui.settingssearchmodelKeepLocalVersion"),
+    t("ui.settingssearchmodelSaveLocalCopy")
+  ];
+}
+
+export function getSettingsSections(storageMode: WorkspaceStorageSearchMode = "legacy"): SettingsSectionDefinition[] {
   return [
   {
     id: "settings-workspace-storage",
     title: t("ui.operationshealthpanelWorkspaceStorage"),
-    labels: [
-      t("ui.settingssearchmodelPersistenceMode"),
-      t("ui.settingssearchmodelLinkedFile"),
-      t("ui.settingssearchmodelPermission"),
-      t("ui.operationshealthpanelOpenWorkspaceFile"),
-      t("ui.settingsworkspacecontentSaveAsFile"),
-      t("ui.settingssearchmodelSaveAsCopy"),
-      t("ui.settingsworkspacecontentUseAFileForAutosave"),
-      t("ui.settingsworkspacecontentResumeLastFile"),
-      t("ui.settingssearchmodelSaveNow"),
-      t("ui.settingssearchmodelStopAutosaveLink"),
-      t("ui.settingsworkspacecontentResolveConflict"),
-      t("ui.settingsworkspacecontentRestoreFileAccess"),
-      t("ui.settingssearchmodelLoadFileVersion"),
-      t("ui.settingssearchmodelKeepLocalVersion"),
-      t("ui.settingssearchmodelSaveLocalCopy")
-    ]
+    labels: workspaceStorageLabels(storageMode)
   },
   {
     id: "settings-import-export",

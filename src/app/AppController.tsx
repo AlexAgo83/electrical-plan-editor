@@ -5,7 +5,7 @@ import { appActions } from "../store";
 import { appStore } from "./store";
 import { appUiModules, preloadNetworkSummaryWorkspaceUiModules } from "./components/appUiModules";
 import { AppShellLayout } from "./components/layout/AppShellLayout";
-import { buildWorkspaceLineageElements } from "./hooks/controller/buildWorkspaceLineageElements";
+import { useWorkspaceLineageElements } from "./hooks/controller/useWorkspaceLineageElements";
 import { AppControllerOverlays } from "./components/layout/AppControllerOverlays";
 import { ToastViewport } from "./components/ToastViewport";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
@@ -403,10 +403,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     showSpliceMigrationReport
   });
 
-  const lineageElements = buildWorkspaceLineageElements(workspaceLineages, () => {
-    setActiveScreen("modeling");
-    setActiveSubScreen("connector");
-  });
+  const lineageElements = useWorkspaceLineageElements(workspaceLineages, { setActiveScreen, setActiveSubScreen, closeNavigationDrawer, closeOperationsPanel, themeHostClassName: appShellClassName });
   const { networkRecomputeReportDialog } = useAppControllerNetworkRecomputeReport(
     state.ui.lastRecomputeReport ?? null,
     useCallback(
@@ -964,6 +961,7 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       catalogHandlers,
       aiSettings,
       workspaceFileStorage,
+      workspaceLineages,
       workspaceLineagesPanel: lineageElements.workspaceLineagesPanel
     },
     domains: {
@@ -1024,6 +1022,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
       isPwaUpdateReady,
       onApplyPwaUpdate: handleApplyPwaUpdate,
       workspaceFileStatus: workspaceFileStorage.workspaceFileStatus,
+      workspaceLineageSnapshot: workspaceLineages.snapshot,
+      onManageWorkspaces: lineageElements.openWorkspaceStorageSettings,
       onOpenWorkspaceFile: workspaceFileStorage.openWorkspaceFile,
       onResumeWorkspaceFile: workspaceFileStorage.resumeWorkspaceFile,
       onSaveWorkspaceFileAs: workspaceFileStorage.saveWorkspaceFileAs,
@@ -1094,5 +1094,5 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     },
     inspector: { isInspectorHidden, isInspectorOpen, inspectorContextPanel }
   });
-  return <><AppShellLayout {...appShellLayoutProps} /><ToastViewport toasts={toasts} onDismissToast={dismissToast} /><AppControllerOverlays appShellClassName={appShellClassName} activeConfirmDialog={activeConfirmDialog} closeActiveConfirmDialog={closeActiveConfirmDialog} activeChoiceDialog={activeChoiceDialog} closeActiveChoiceDialog={closeActiveChoiceDialog} activeBomPreview={activeBomPreview} isBomPreviewLoading={isBomPreviewLoading} spliceMigrationReportDialog={spliceMigrationReportDialog} networkRecomputeReportDialog={networkRecomputeReportDialog} closeActiveBomPreview={closeActiveBomPreview} confirmActiveBomPreviewDownload={confirmActiveBomPreviewDownload} openBomPreviewCatalogItem={openBomPreviewCatalogItem} openBomPreviewConnector={openBomPreviewConnector} onboarding={{ activeOnboardingStep, isOnboardingOpen, onboardingModalMode, onboardingStepDisplayIndex, onboardingTotalSteps, onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabledPersisted, closeOnboarding, handleOnboardingNext, canGoNext: canOnboardingGoNext, onboardingTargetActions }} /></>;
+  return <><AppShellLayout {...appShellLayoutProps} /><ToastViewport toasts={toasts} onDismissToast={dismissToast} />{lineageElements.workspaceLineageDialogs}<AppControllerOverlays appShellClassName={appShellClassName} activeConfirmDialog={activeConfirmDialog} closeActiveConfirmDialog={closeActiveConfirmDialog} activeChoiceDialog={activeChoiceDialog} closeActiveChoiceDialog={closeActiveChoiceDialog} activeBomPreview={activeBomPreview} isBomPreviewLoading={isBomPreviewLoading} spliceMigrationReportDialog={spliceMigrationReportDialog} networkRecomputeReportDialog={networkRecomputeReportDialog} closeActiveBomPreview={closeActiveBomPreview} confirmActiveBomPreviewDownload={confirmActiveBomPreviewDownload} openBomPreviewCatalogItem={openBomPreviewCatalogItem} openBomPreviewConnector={openBomPreviewConnector} onboarding={{ activeOnboardingStep, isOnboardingOpen, onboardingModalMode, onboardingStepDisplayIndex, onboardingTotalSteps, onboardingAutoOpenEnabled, setOnboardingAutoOpenEnabledPersisted, closeOnboarding, handleOnboardingNext, canGoNext: canOnboardingGoNext, onboardingTargetActions }} /></>;
 }

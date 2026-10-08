@@ -105,4 +105,22 @@ describe("App integration UI - settings locale", () => {
     fireEvent.click(within(confirmDialog).getByRole("button", { name: "Annuler" }));
   });
 
+
+  it("localizes the workspace storage groups, compatibility subsection and search counts in French", async () => {
+    renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    fireEvent.change(within(getPanelByHeading("Global preferences")).getByLabelText("Language"), { target: { value: "fr" } });
+
+    const storagePanel = await waitFor(() => getPanelByHeading("Stockage de l'espace de travail"));
+    expect(within(storagePanel).getByRole("region", { name: "Espace actuel" })).toBeInTheDocument();
+    expect(within(storagePanel).getByRole("region", { name: "Transfert et récupération" })).toBeInTheDocument();
+    const legacy = within(storagePanel).getByRole("region", { name: "Compatibilité fichier unique" });
+    expect(within(legacy).getByText("Enregistré uniquement dans ce navigateur")).toBeInTheDocument();
+    expect(within(legacy).getByRole("button", { name: "Créer un espace nommé à partir du contenu actuel" })).toBeInTheDocument();
+    expect(storagePanel.textContent).not.toMatch(/ui\.[A-Za-z]/);
+
+    fireEvent.change(screen.getByRole("searchbox", { name: /paramètres/i }), { target: { value: "espace" } });
+    expect(screen.getByRole("status")).toHaveTextContent(/libellés? de paramètres? correspondants?/);
+    expect(within(storagePanel).getAllByText(/espace/i, { selector: "mark.settings-search-highlight" }).length).toBeGreaterThan(0);
+  });
 });

@@ -35,6 +35,7 @@ interface UseAppControllerHomeWorkspaceContentParams {
   setInteractionMode: (mode: InteractionMode) => void;
   handleWorkspaceScreenChange: (screen: ScreenId) => void;
   workspaceLineagesPanel?: ReactNode;
+  isNamedWorkspaceActive?: boolean;
 }
 
 export function useAppControllerHomeWorkspaceContent({
@@ -59,7 +60,8 @@ export function useAppControllerHomeWorkspaceContent({
   setActiveSubScreen,
   setInteractionMode,
   handleWorkspaceScreenChange,
-  workspaceLineagesPanel
+  workspaceLineagesPanel,
+  isNamedWorkspaceActive = false
 }: UseAppControllerHomeWorkspaceContentParams) {
   const handleCreateEmptyWorkspace = useCallback(() => {
     void (async () => {
@@ -172,6 +174,7 @@ export function useAppControllerHomeWorkspaceContent({
       onOpenRecentChangeTarget={handleOpenRecentChangeTarget}
       onOpenOnboardingHelp={onOpenOnboardingHelp}
       workspaceLineagesPanel={workspaceLineagesPanel}
+      isNamedWorkspaceActive={isNamedWorkspaceActive}
     />
   );
 

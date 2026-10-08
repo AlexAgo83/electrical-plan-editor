@@ -524,3 +524,12 @@ function buildStorageNameFromBase(index: number, originalFileName: string): stri
   const safeStem = toAsciiSlug(stem, 48) || "attachment";
   return `${String(index + 1).padStart(2, "0")}-${safeStem}${extension.length > 0 ? `.${extension}` : ""}`;
 }
+
+/** Medium date and short time in the viewer locale; "—" when unknown. */
+export function formatLineageDateTime(iso: string | null): string {
+  if (iso === null || iso.length === 0) {
+    return "—";
+  }
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime()) ? iso : date.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+}

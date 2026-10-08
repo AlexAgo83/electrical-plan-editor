@@ -5,6 +5,7 @@ import type { AppControllerPreferencesStateModel } from "../useAppControllerPref
 import type { AppControllerCanvasDisplayStateModel } from "../useAppControllerCanvasDisplayState";
 import type { AiSettingsModel } from "../useAiSettings";
 import type { UseWorkspaceFileStorageModel } from "../useWorkspaceFileStorage";
+import type { WorkspaceLineageModel } from "../useWorkspaceLineages";
 import { useAppControllerAuxScreenContentDomains } from "./useAppControllerAuxScreenContentDomains";
 
 type AuxDomainsParams = Parameters<typeof useAppControllerAuxScreenContentDomains>[0];
@@ -61,6 +62,7 @@ interface UseAppControllerAuxDomainAssemblyParams {
     resetWorkspacePreferencesToDefaults: () => void;
     aiSettings: AiSettingsModel;
     workspaceFileStorage: UseWorkspaceFileStorageModel;
+    workspaceLineages?: WorkspaceLineageModel;
   };
   includeNetworkScopeContent: boolean;
   includeValidationContent: boolean;
@@ -128,7 +130,8 @@ export function useAppControllerAuxDomainAssembly({
       handleZoomAction: settings.handleZoomAction,
       resetWorkspacePreferencesToDefaults: settings.resetWorkspacePreferencesToDefaults,
       aiSettings: settings.aiSettings,
-      workspaceFileStorage: settings.workspaceFileStorage
+      workspaceFileStorage: settings.workspaceFileStorage,
+      workspaceLineages: settings.workspaceLineages
     },
     includeNetworkScopeContent,
     includeValidationContent,

@@ -31,6 +31,8 @@ interface BuildAppControllerShellLayoutPropsParams {
     | "isPwaUpdateReady"
     | "onApplyPwaUpdate"
     | "workspaceFileStatus"
+    | "workspaceLineageSnapshot"
+    | "onManageWorkspaces"
     | "onOpenWorkspaceFile"
     | "onResumeWorkspaceFile"
     | "onSaveWorkspaceFileAs"
