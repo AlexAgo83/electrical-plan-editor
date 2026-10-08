@@ -8,7 +8,7 @@
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
-> Indicators reviewed: 2026-10-08 18:17:32
+> Indicators reviewed: 2026-10-08 18:20:21
 > Owner: Claude (paul.mondou)
 
 # AI Context
@@ -69,8 +69,8 @@
 - Wave 4 (item_689, 8942262e): History rows with one primary Open read-only and a keyboard-accessible More menu (Download file, Record supplier handoff, separator, danger-styled Resume with hint and existing confirmation); storage line and device ids removed; filter normal at rest; toasts verified on top of the dialog.
 - Wave 5 (item_690, d0dd7042, 0d5421b6, e6e551fd, 10165d8f): unit specs (src/tests/workspace-ux-remediation.spec.tsx) and e2e specs (tests/e2e/workspace-ux-remediation.spec.ts, updated workspace-lineages.spec.ts) cover AC1-AC7 at 360/980/1366/1920 px, six themes, EN/FR and keyboard; docs/workspace-lineages.md updated.
 - Validation: npm run -s ci:local passed on 2026-10-08 (Logics lint/audit, eslint, typecheck, quality:i18n, dependency audit, vitest fast and ui segments, Playwright e2e 8 passed, vite build, PWA check). One pre-existing eslint warning in src/app/hooks/useWorkspaceFileStorage.ts (untouched).
-- Screenshots: before (1.19.1, c1ac550a) and after captures were taken locally with Playwright (Home 0/8 workspaces, Home read-only in dark/cyberpunk/sage paper, Settings storage named/read-only/FR, History dialog and menu, toast over dialog, 360px); the after set is reproducible with WORKSPACE_UX_SCREENSHOT_DIR=<dir> npm run test:e2e -- tests/e2e/workspace-ux-remediation.spec.ts. They are not committed (no repository convention for images).
-- Note for review: the 7-day threshold needs the last export date, stored as an optional lastPortableExportIso field on the browser library registry record (IndexedDB); portable workspace, manifest and package formats are unchanged.
+- Screenshots: before/after captures were reviewed during delivery, then discarded at the operator's request (2026-10-08); visual evidence rests on the e2e assertions (layout, theming, locale, menu, toast stacking).
+- Persistence: the 7-day threshold stores the last export date as an optional lastPortableExportIso field on the browser library registry record (IndexedDB); the operator lifted the no-persistence-change guardrail for this field (2026-10-08). Portable workspace, manifest and package formats are unchanged.
 - Finished on 2026-10-08.
 - Linked backlog item(s): `item_685_fix_home_panel_overlap_and_unthemed_workspace_buttons`, `item_686_make_workspace_status_alerts_and_read_only_signals_truthful_and_localized`, `item_687_clarify_home_workspace_vocabulary_first_workspace_creation_and_compact_workspace_rows`, `item_688_restructure_settings_workspace_storage_hierarchy_and_simplify_legacy_mode`, `item_689_give_the_history_dialog_a_clear_action_hierarchy_and_readable_metadata`, `item_690_validate_the_workspace_ux_remediation_and_update_the_workflow_guide`
 - Related request(s): `req_169_remediate_workspace_ui_and_ux_findings_from_the_1_19_1_visual_review_on_home_and_settings`

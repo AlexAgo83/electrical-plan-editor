@@ -3,18 +3,10 @@ import { expect, test } from "@playwright/test";
 
 // req_169: layout, theming, truthful status, single read-only signal, Home rows and History hierarchy.
 
-const SCREENSHOT_DIR = process.env.WORKSPACE_UX_SCREENSHOT_DIR ?? null;
-
 async function preparePage(page: Page): Promise<void> {
   await page.addInitScript(() => {
     window.localStorage.setItem("electrical-plan-editor.onboarding.auto-open-enabled.v1", "false");
   });
-}
-
-async function capture(page: Page, name: string): Promise<void> {
-  if (SCREENSHOT_DIR !== null) {
-    await page.screenshot({ path: `${SCREENSHOT_DIR}/${name}.png` });
-  }
 }
 
 function homeLineagesPanel(page: Page): Locator {
@@ -140,7 +132,6 @@ test("Home panels never overlap from 980px to 1920px with 0, 1, 2 and 8 named wo
   await page.goto("/");
   await openScreen(page, "Home");
   await expectHomePanelsDoNotOverlap(page);
-  await capture(page, "home-0-workspaces-1366");
 
   // Empty library: one-step creation of the first workspace from Home.
   await homeLineagesPanel(page).getByRole("button", { name: "Create your first workspace" }).click();
@@ -170,7 +161,6 @@ test("Home panels never overlap from 980px to 1920px with 0, 1, 2 and 8 named wo
     await expectHomePanelsDoNotOverlap(page);
   }
   await page.setViewportSize({ width: 1366, height: 800 });
-  await capture(page, "home-8-workspaces-1366");
 
   // Whole-row resume opens the other workspace and goes to Modeling.
   await rows.first().click();
@@ -181,7 +171,6 @@ test("Home panels never overlap from 980px to 1920px with 0, 1, 2 and 8 named wo
   await page.setViewportSize({ width: 360, height: 800 });
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
-  await capture(page, "home-8-workspaces-360");
 });
 
 test("lineage buttons use the themed style in every reviewed theme", async ({ page }) => {
@@ -201,9 +190,6 @@ test("lineage buttons use the themed style in every reviewed theme", async ({ pa
     await expectThemedLineageButtons(page, ".workspace-lineage-read-only-banner button, .settings-workspace-storage button:not(.settings-storage-file-link)");
     await openScreen(page, "Home");
     await expectThemedLineageButtons(page, ".home-workspace-lineages-panel button");
-    if (theme === "dark" || theme === "sagePaper" || theme === "cyberpunk") {
-      await capture(page, `home-read-only-${theme}`);
-    }
   }
 });
 
@@ -223,14 +209,12 @@ test("read-only consultation shows one banner and no spurious toast; status and 
   await expect(current.locator(".lineage-export-hint").getByRole("button", { name: "Export now" })).toBeVisible();
   await expect(storageGroup(page, "Versions and handoffs")).toContainText("Latest: v001");
   await expect(storageGroup(page, "Versions and handoffs")).toContainText("1 version · 0 supplier handoffs");
-  await capture(page, "settings-storage-named-1366");
 
   await storageGroup(page, "Versions and handoffs").getByRole("button", { name: "History" }).click();
   await page.getByRole("dialog", { name: "History of Série" }).getByRole("button", { name: "Open read-only" }).click();
   await expect(page.locator(".workspace-lineage-banner.is-read-only")).toHaveCount(1);
   await expect(storagePanel(page).getByText(/Viewing v001 read-only/)).toBeVisible();
   await expect(storagePanel(page).getByRole("button", { name: "Return to working copy" })).toHaveCount(0);
-  await capture(page, "settings-storage-read-only-1366");
 
   for (const screen of ["Modeling", "Statistics", "Validation", "Network Scope", "Home", "Settings", "Modeling"]) {
     await openScreen(page, screen);
@@ -249,7 +233,6 @@ test("read-only consultation shows one banner and no spurious toast; status and 
   await expect(storagePanel(page).locator(".lineage-status-row .settings-state-chip").first()).toHaveText(/^Stocké dans ce navigateur \d{2}:\d{2}$/, { timeout: 10_000 });
   await expect(storagePanel(page).locator(".settings-storage-latest")).toContainText(/\d{1,2} [a-zéû]+\.? \d{4}/);
   await expect(storagePanel(page)).toContainText("1 version · 0 remise fournisseur");
-  await capture(page, "settings-storage-named-fr");
 });
 
 test("History rows expose one primary action and a keyboard menu; toasts stay above the dialog", async ({ page }) => {
@@ -274,7 +257,6 @@ test("History rows expose one primary action and a keyboard menu; toasts stay ab
   await expect(history.getByRole("button", { name: "Record supplier handoff" })).toHaveCount(1);
 
   await expect(firstRow.locator(".lineage-history-actions > button")).toHaveText(["Open read-only"]);
-  await capture(page, "history-dialog-1366");
   const more = firstRow.getByRole("button", { name: "More actions for v002" });
   await more.focus();
   await page.keyboard.press("Enter");
@@ -286,7 +268,6 @@ test("History rows expose one primary action and a keyboard menu; toasts stay ab
   const resume = menu.getByRole("menuitem", { name: /Resume from this version/ });
   await expect(resume).toBeFocused();
   await expect(resume).toHaveClass(/is-danger-action/);
-  await capture(page, "history-menu-open-1366");
   await page.keyboard.press("Escape");
   await expect(menu).toHaveCount(0);
   await expect(history).toBeVisible();
@@ -312,10 +293,8 @@ test("History rows expose one primary action and a keyboard menu; toasts stay ab
     return hit !== null && element.contains(hit);
   });
   expect(toastOnTop).toBe(true);
-  await capture(page, "history-toast-above-dialog");
 
   await page.setViewportSize({ width: 360, height: 800 });
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
-  await capture(page, "history-dialog-360");
 });

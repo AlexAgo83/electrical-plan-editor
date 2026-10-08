@@ -2,8 +2,8 @@
 > From version: 1.19.1
 > Schema version: 1.0
 > Status: Done
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 95%
+> Confidence: 90%
 > Complexity: High
 > Theme: Workspace UX
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
@@ -32,7 +32,7 @@
 - P8-P11 Settings > Workspace storage: three equal-height columns of full-width equal-weight buttons, no primary action; '2 version(s), 0 supplier handoff(s)' without latest version; in legacy mode a disabled selector 'Unnamed browser workspace' plus a 'No named workspace' chip, a duplicate 'Create named workspace from current content' next to New workspace, and a sentence repeating the save-location card.
 - P12-P13 Home: an empty library only offers Manage workspaces (two steps to create the first workspace); cards duplicate the selector, use a very large title, show 'Resume <full name>' buttons that wrap on long names, are sorted alphabetically and do not put the active workspace first. Decision: keep the Home selector requested for 1.19.1; cards become compact rows for the other workspaces.
 - P14-P15 History dialog: four equal buttons per version with the risky Resume from this version as prominent as Download file; duplicated Record supplier handoff (toolbar and per row); meaningless 'Stored in this browser' line; cryptic 'created on device-xxxx' labels (generated in useWorkspaceLineages.resolveDeviceLabel); the filter input looks focused at rest; success toasts stack under the dialog.
-- Guardrails: no change to persistence formats, immutable versions, recovery-before-restore, read-only gates, session isolation or the single app-level dialog host from req_168. Every action reachable today stays reachable (possibly behind a menu or disclosure). No data is deleted. All copy is semantic EN/FR in the i18n catalogs.
+- Guardrails (operator 2026-10-08: the persistence-format guardrail is not mandatory; an optional lastPortableExportIso registry field was added for the export threshold): no change to persistence formats, immutable versions, recovery-before-restore, read-only gates, session isolation or the single app-level dialog host from req_168. Every action reachable today stays reachable (possibly behind a menu or disclosure). No data is deleted. All copy is semantic EN/FR in the i18n catalogs.
 
 # Acceptance criteria
 - AC1 (P1): At 980px to 1920px widths and 0, 1, 2 and 8 named workspaces with long names, Home panels never overlap or clip each other and no large empty gap appears; each panel scrolls internally if needed and Quick start buttons stay fully visible and clickable.

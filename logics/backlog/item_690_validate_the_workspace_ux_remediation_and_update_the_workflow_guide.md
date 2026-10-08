@@ -2,8 +2,8 @@
 > From version: 1.19.1
 > Schema version: 1.0
 > Status: Done
-> Understanding: 90%
-> Confidence: 85%
+> Understanding: 95%
+> Confidence: 90%
 > Progress: 100%
 > Complexity: Medium
 > Theme: Workspace UX
@@ -12,7 +12,7 @@
 
 # AI Context
 - Cover AC1-AC7 of req_169 with UI, theme, locale and e2e tests at 360px and desktop, EN/FR, keyboard.
-- Attach before/after screenshots (light, dark, custom theme) to the task report.
+- Attach before/after screenshots (light, dark, custom theme) to the task report. Operator decision 2026-10-08: screenshots reviewed then discarded; not kept as evidence.
 - Record repository gate results per request AC before closeout.
 
 # Problem
