@@ -1,13 +1,13 @@
 ## req_169_remediate_workspace_ui_and_ux_findings_from_the_1_19_1_visual_review_on_home_and_settings - Remediate workspace UI and UX findings from the 1.19.1 visual review on Home and Settings
 > From version: 1.19.1
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
 > Complexity: High
 > Theme: Workspace UX
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
-> Indicators reviewed: 2026-10-08 15:36:38
+> Indicators reviewed: 2026-10-08 18:17:31
 
 # AI Context
 - Summary: Scope is the 15 proposals (P1-P15) of the 2026-10-08 Playwright review of production 1.19.1; each AC cites the proposals it covers. Root causes already located: fixed-height Home left column, themed buttons limited to .row-actions, sample state preserved as legacy snapshot, browser-locale dates, blocked-mutation report on read-only navigation.

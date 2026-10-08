@@ -1,14 +1,14 @@
 ## item_690_validate_the_workspace_ux_remediation_and_update_the_workflow_guide - Validate the workspace UX remediation and update the workflow guide
 > From version: 1.19.1
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 10%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Workspace UX
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-08 17:37:36
+> Indicators reviewed: 2026-10-08 18:17:32
 
 # AI Context
 - Cover AC1-AC7 of req_169 with UI, theme, locale and e2e tests at 360px and desktop, EN/FR, keyboard.
@@ -46,3 +46,9 @@
 # Priority
 - Priority: Medium
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Tasks
+- `task_166_deliver_workspace_ux_remediation_from_the_1_19_1_visual_review`
+
+# Notes
+- Task `task_166_deliver_workspace_ux_remediation_from_the_1_19_1_visual_review` was finished via `logics-manager flow finish task` on 2026-10-08.

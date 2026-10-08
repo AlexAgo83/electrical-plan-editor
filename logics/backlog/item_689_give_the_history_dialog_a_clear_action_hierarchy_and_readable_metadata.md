@@ -1,14 +1,14 @@
 ## item_689_give_the_history_dialog_a_clear_action_hierarchy_and_readable_metadata - Give the History dialog a clear action hierarchy and readable metadata
 > From version: 1.19.1
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 95%
 > Confidence: 90%
-> Progress: 10%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Workspace UX
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-08 17:37:36
+> Indicators reviewed: 2026-10-08 18:17:32
 
 # AI Context
 - HistoryDialog in WorkspaceLineagePanels.tsx; resume keeps the existing confirmation and recovery-before-restore.
@@ -31,6 +31,7 @@
 
 # AC Traceability
 - request-AC7 -> This backlog slice. Proof: AC1: Each row exposes one primary action and a keyboard-accessible secondary menu; resume remains confirmed.
+- request-AC8 -> This backlog slice. Proof: Implemented in abd7668f, dc98be17, 8942262e, d0dd7042, 0d5421b6, e6e551fd, 10165d8f; validated with npm run -s ci:local (lint, typecheck, quality:i18n, Logics lint/audit, vitest fast+ui segments, Playwright e2e incl. tests/e2e/workspace-ux-remediation.spec.ts, build, PWA) passing on 2026-10-08. Source: `10165d8f`
 
 # Decision framing
 - Product framing: Not needed
@@ -45,3 +46,9 @@
 # Priority
 - Priority: Medium
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Tasks
+- `task_166_deliver_workspace_ux_remediation_from_the_1_19_1_visual_review`
+
+# Notes
+- Task `task_166_deliver_workspace_ux_remediation_from_the_1_19_1_visual_review` was finished via `logics-manager flow finish task` on 2026-10-08.
