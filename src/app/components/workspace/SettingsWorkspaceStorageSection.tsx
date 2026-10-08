@@ -180,11 +180,7 @@ function NamedWorkspaceGroups({ model, label }: { model: WorkspaceLineageModel; 
             <span className={statusChipClassName} aria-live="polite" aria-atomic="true">
               {status.label}
             </span>
-            {active !== null ? (
-              <span className="settings-state-chip">
-                {active.storage === "folder" ? t("ui.workspaceLineageStorageFolder", { folder: active.folderName ?? "" }) : t("ui.workspaceLineageStorageBrowser")}
-              </span>
-            ) : null}
+            {active?.storage === "folder" ? <span className="settings-state-chip">{t("ui.workspaceLineageStorageFolder", { folder: active.folderName ?? "" })}</span> : null}
           </div>
           {isReadOnly && snapshot.historical !== null ? (
             <div className="workspace-lineage-banner is-read-only" role="status">

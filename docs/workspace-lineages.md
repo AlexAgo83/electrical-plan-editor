@@ -5,22 +5,62 @@ workspace lineages (delivered by `req_167` / `task_164`).
 
 ## 1. User workflow
 
+### Where to manage workspaces
+
+**Settings > Workspace storage** is the single management surface (since the `req_168`
+consolidation). It is organised in three groups:
+
+| Group | Actions |
+| --- | --- |
+| **Current workspace** | Workspace selector (switch), save status, **Save** (Ctrl/Cmd+S), **Rename**, **New workspace**; while a version is open read-only: **Return to working copy** and **Resume from this version**. |
+| **Versions and handoffs** | **Create version**, **History** (read-only consultation, resume, version download, handoff files), **Record supplier handoff**. |
+| **Transfer and recovery** | **Export package (ZIP)**, **Import package (ZIP)**, **Open workspace folder** (when the browser supports folders), **Reconnect folder** (folder workspaces), **Import old workspace files**. |
+
+Recovery messages (choose the working state after a divergence, reconnect a folder, recover
+interrupted publications, missing files, preserved previous browser workspace with
+**Download preserved snapshot** / **Dismiss**) appear at the top of the section with their action.
+
+Outside Settings only compact context remains:
+
+- **Home** keeps the **Resume** cards (navigation) and one **Manage workspaces** shortcut.
+- With an active named workspace, a compact bar under the header shows its name, the truthful save
+  status and **Manage workspaces**. While a version is open read-only, the bar always shows the
+  read-only warning with **Return to working copy**. Other recovery warnings carry a
+  **Resolve in Settings** link that opens Settings and focuses the matching action.
+- The operations panel shows the active workspace and its save status with **Manage workspaces**.
+- **Ctrl/Cmd+S** saves the active working copy from any screen.
+
+### Single-file compatibility (sessions without a named workspace)
+
+When no named workspace is active, the section shows a **Single-file compatibility** subsection
+with the previous tools: current save location, **Open workspace file**, **Save as file / Save as
+copy**, **Resume last file**, **Use a file for autosave**, linked-file **Save now** /
+**Stop autosave link**, the linked-file conflict choices (**Load file version**, **Keep local
+version**, **Save local copy**) and storage details. **Create named workspace from current content**
+adopts the session into a named workspace. The Home quick-start **Save workspace** / **Load
+workspace** shortcuts are shown only in this mode.
+
+When a named workspace is active, these single-file controls (and their Settings search entries)
+are hidden: saving, status and portability come from the named workspace (ZIP package, version
+download). Nothing is deleted when controls are hidden: old schema files still open, stored file
+handles, preserved snapshots and recovery data are kept.
+
 ### Named workspaces
 
 A *named workspace* (lineage) is an independent project line, for example **Series harnesses** and
 **Prototype harnesses**. There is no fixed limit on how many you create.
 
-- **New workspace** (selector bar or Home): enter a name, start from the current content or empty,
+- **New workspace** (Settings > Workspace storage): enter a name, start from the current content or empty,
   and choose where it lives:
   - **A folder on disk** (recommended, Chromium-based browsers): pick a parent folder; the app
     creates one sub-folder per workspace (`serie/`, `protos/`). Copying the parent folder copies
     every workspace with its history.
   - **This browser only**: the workspace stays in the browser library (IndexedDB). Export a ZIP
     package to copy it to another computer.
-- **Switch** with the persistent selector under the header or the **Resume** cards on Home.
+- **Switch** with the selector in Settings > Workspace storage or the **Resume** cards on Home.
   Unsaved work of the workspace you leave is preserved first; if that is impossible (storage full,
   folder permission revoked) the switch is refused. Undo/redo history never crosses workspaces.
-- **Rename** (History → Rename) changes only the display name; identity, folder and file names stay.
+- **Rename** (Current workspace group) changes only the display name; identity, folder and file names stay.
 
 ### Save versus Create version
 
@@ -63,7 +103,8 @@ Corrections create a new record that *supersedes* the earlier one; nothing is ov
 - **Folder mode**: copy the workspace folder (or the parent holding several workspaces) and use
   **Open workspace folder** on the other computer. The full working state, history and handoff files
   are reconstructed without the original browser data.
-- **ZIP mode**: **Export package (ZIP)** and **Import package (ZIP)** (History or Home). One package
+- **ZIP mode**: **Export package (ZIP)** and **Import package (ZIP)** (Settings > Workspace storage >
+  Transfer and recovery; export is also available in History). One package
   contains one workspace; export two packages to move two workspaces.
 - **Divergence**: if both copies continued separately, importing/opening detects it by IDs and
   recorded ancestry (never timestamps). Both working states are kept and you must **Choose working
@@ -85,7 +126,7 @@ existing versions), with original file name, digest and source IDs recorded. The
 read.
 
 When named workspaces are first introduced, the previous browser workspace is preserved and can be
-downloaded from Home.
+downloaded from Settings > Workspace storage (**Download preserved snapshot**).
 
 ## 2. Portable format contract
 
