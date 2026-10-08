@@ -84,7 +84,8 @@ describe("home workspace screen", () => {
     expect(within(workspaceStoragePanel).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
       "Resume",
       "Open",
-      "Save as"
+      "Save as",
+      "Manage workspaces"
     ]);
   });
 
