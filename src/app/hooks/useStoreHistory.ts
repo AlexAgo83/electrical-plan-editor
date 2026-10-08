@@ -20,7 +20,7 @@ interface UseStoreHistoryResult {
   isUndoAvailable: boolean;
   isRedoAvailable: boolean;
   undoHistoryEntries: UndoHistoryEntry[];
-  dispatchAction: (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean }) => void;
+  dispatchAction: (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean; background?: boolean }) => void;
   handleUndo: () => void;
   handleRedo: () => void;
   replaceStateWithHistory: (nextState: StoreState) => void;
