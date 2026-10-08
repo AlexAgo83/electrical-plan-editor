@@ -55,7 +55,7 @@ describe("home workspace screen", () => {
     switchScreenDrawerAware("home");
 
     expect(getPanelByHeading("Quick start")).toBeInTheDocument();
-    expect(getPanelByHeading("Workspace")).toBeInTheDocument();
+    expect(getPanelByHeading("Active network")).toBeInTheDocument();
     expect(getPanelByHeading("What's new")).toBeInTheDocument();
     const quickStartPanel = getPanelByHeading("Quick start");
     const quickStartActions = within(quickStartPanel)
@@ -65,9 +65,9 @@ describe("home workspace screen", () => {
       "Resume",
       "Load network",
       "Help",
-      "Create empty workspace",
-      "Save workspace",
-      "Load workspace"
+      "Start from empty content",
+      "Save workspace file",
+      "Open workspace file"
     ]);
     expect(screen.queryByRole("button", { name: "Validation" })).not.toBeInTheDocument();
   });
@@ -142,12 +142,12 @@ describe("home workspace screen", () => {
     switchScreenDrawerAware("home");
     const quickStartPanel = getPanelByHeading("Quick start");
 
-    fireEvent.click(within(quickStartPanel).getByRole("button", { name: "Save workspace" }));
+    fireEvent.click(within(quickStartPanel).getByRole("button", { name: "Save workspace file" }));
     await waitFor(() => expect(savedWrites).toHaveLength(1));
     const savedPayload = JSON.parse(savedWrites[0] ?? "{}") as { payloadKind?: unknown };
     expect(savedPayload.payloadKind).toBe(WORKSPACE_FILE_PAYLOAD_KIND);
 
-    fireEvent.click(within(quickStartPanel).getByRole("button", { name: "Load workspace" }));
+    fireEvent.click(within(quickStartPanel).getByRole("button", { name: "Open workspace file" }));
     await waitFor(() => expect(showOpenFilePicker).toHaveBeenCalled());
     const openPickerOptions = showOpenFilePicker.mock.calls[0]?.[0];
     expect(openPickerOptions?.multiple).toBe(false);
@@ -292,7 +292,7 @@ describe("home workspace screen", () => {
 
     switchScreenDrawerAware("home");
 
-    const resumePanel = getPanelByHeading("Workspace");
+    const resumePanel = getPanelByHeading("Active network");
     expect(within(resumePanel).getByText("Main network (Sample)", { selector: ".settings-panel-chip" })).toBeInTheDocument();
     expect(within(resumePanel).queryByText(/Active network:/i)).not.toBeInTheDocument();
     expect(within(resumePanel).queryByLabelText("Workspace summary")).not.toBeInTheDocument();
@@ -324,7 +324,7 @@ describe("home workspace screen", () => {
     switchScreenDrawerAware("home");
 
     expect(appShell).toHaveClass(expectedThemeClass);
-    const workspacePanel = getPanelByHeading("Workspace");
+    const workspacePanel = getPanelByHeading("Active network");
     await waitFor(() => {
       expect(within(workspacePanel).getByLabelText("Recent changes for active network")).toBeInTheDocument();
     });
@@ -360,8 +360,8 @@ describe("home workspace screen", () => {
     }
 
     switchScreenDrawerAware("home");
-    fireEvent.click(screen.getByRole("button", { name: "Create empty workspace" }));
-    const confirmDialog = screen.getByRole("dialog", { name: "Create empty workspace" });
+    fireEvent.click(screen.getByRole("button", { name: "Start from empty content" }));
+    const confirmDialog = screen.getByRole("dialog", { name: "Start from empty content" });
     fireEvent.click(within(confirmDialog).getByRole("button", { name: "Confirm" }));
 
     await waitFor(() => {

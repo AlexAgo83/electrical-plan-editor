@@ -19,6 +19,8 @@ export interface LineageRegistryRecord {
   lastOpenedAtIso: string;
   /** Browser-mode changes not yet exported as a portable package. */
   pendingPortableExport: boolean;
+  /** Last package export from this browser; absent on records written before 1.19.2. */
+  lastPortableExportIso?: string | null;
   lastDurableSaveIso: string | null;
   versionCount: number;
   latestVersionLabel: string | null;

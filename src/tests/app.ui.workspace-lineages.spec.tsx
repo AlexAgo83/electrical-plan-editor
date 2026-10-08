@@ -51,11 +51,11 @@ describe("named workspace lineages UI", () => {
     resetWorkspaceSessionGateForTests();
   });
 
-  it("keeps Home to resume cards plus one shortcut that opens and focuses Settings > Workspace storage", async () => {
+  it("offers the first workspace from Home and one shortcut that opens and focuses Settings > Workspace storage", async () => {
     renderAppWithState(createUiIntegrationState());
     switchScreenDrawerAware("home");
     const homePanel = screen.getByRole("region", { name: "Named workspaces" });
-    expect(within(homePanel).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual(["Manage workspaces"]);
+    expect(within(homePanel).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual(["Create your first workspace", "Manage workspaces"]);
     // Empty library: no selector yet.
     expect(within(homePanel).queryByRole("combobox", { name: "Workspace" })).toBeNull();
     // Without an active named workspace there is no compact context outside Settings.
@@ -66,7 +66,7 @@ describe("named workspace lineages UI", () => {
     // Legacy session: the compatibility subsection keeps the single-file tools and offers adoption.
     const legacy = within(storagePanel()).getByRole("region", { name: "Single-file compatibility" });
     expect(within(legacy).getByRole("button", { name: "Use a file for autosave" })).toBeEnabled();
-    expect(within(legacy).getByRole("button", { name: "Create named workspace from current content" })).toBeInTheDocument();
+    expect(within(legacy).queryByRole("button", { name: /named workspace/i })).toBeNull();
   });
 
   it("manages Series and Prototypes from Settings, saves after navigation and consults history read-only", async () => {

@@ -1,4 +1,4 @@
-import { translateCurrent as t } from "../../lib/i18n";
+import { translateCurrent as t, translateCurrentPlural } from "../../lib/i18n";
 import { createContext, useContext, useEffect, useId, useMemo, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
 import { useModalDialog } from "../../hooks/useModalDialog";
 import type { WorkspaceLineageModel } from "../../hooks/useWorkspaceLineages";
@@ -9,7 +9,9 @@ import {
   type LegacyAdoptionPlan,
   type LegacyAdoptionPreview
 } from "../../lib/lineage/lineageLegacyImport";
+import type { LineageRegistryRecord } from "../../lib/lineage/lineageLibrary";
 import type { HandoffVerification } from "../../lib/lineage/lineageRepository";
+import { activeExportReminderRecord, describeLineageExportReminder, describeLineageSaveStatus, type LineageStatusDescription } from "../../lib/lineage/lineageStatus";
 
 const formatDateTime = formatLineageDateTime;
 
@@ -101,6 +103,39 @@ export function WorkspaceLineageSelect({ model, label }: { model: WorkspaceLinea
   );
 }
 
+function lineageStatusChipClassName(tone: LineageStatusDescription["tone"]): string {
+  return tone === "success" ? "settings-state-chip is-ok" : tone === "neutral" ? "settings-state-chip" : "settings-state-chip is-warn";
+}
+
+/**
+ * Save status of the active workspace plus, for browser-only workspaces, the separate export hint
+ * with its adjacent action. Shared by Settings > Workspace storage and the operations panel.
+ */
+export function LineageSaveStatusRow({ model, showExportAction = true }: { model: WorkspaceLineageModel; showExportAction?: boolean }): ReactElement {
+  const { snapshot } = model;
+  const status = describeLineageSaveStatus(snapshot);
+  const reminder = describeLineageExportReminder(activeExportReminderRecord(snapshot));
+  return (
+    <div className="settings-state-row lineage-status-row">
+      <span className={lineageStatusChipClassName(status.tone)} aria-live="polite" aria-atomic="true">
+        {status.label}
+      </span>
+      {reminder !== null ? (
+        <span className={`lineage-export-hint is-${reminder.tone}`}>
+          <span>{reminder.label}</span>
+          {showExportAction ? (
+            <span className="row-actions compact">
+              <button type="button" onClick={() => void model.exportPackage()} disabled={snapshot.busy || snapshot.active?.manifest == null}>
+                {t("ui.workspaceLineageExportNow")}
+              </button>
+            </span>
+          ) : null}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 /**
  * The single read-only signal, shown on every screen (Settings included) while a frozen version is
  * open, so both exits stay reachable everywhere. There is no permanent workspace bar.
@@ -131,9 +166,17 @@ export function WorkspaceLineageReadOnlyBanner({ model }: { model: WorkspaceLine
   );
 }
 
-// --------------------------------------------------------------------------- home cards
+// --------------------------------------------------------------------------- home rows
 
-/** Home keeps resume navigation only; management lives in Settings > Workspace storage. */
+function sortByRecentActivity(records: LineageRegistryRecord[]): LineageRegistryRecord[] {
+  const activity = (record: LineageRegistryRecord): string => [record.lastDurableSaveIso ?? "", record.lastOpenedAtIso].sort().pop() ?? "";
+  return [...records].sort((left, right) => activity(right).localeCompare(activity(left)));
+}
+
+/**
+ * Home keeps resume navigation only; management lives in Settings > Workspace storage. The selector
+ * shows the active workspace, the other workspaces are compact whole-row resume buttons.
+ */
 export function HomeWorkspaceLineagesPanel({
   model,
   onResume,
@@ -144,37 +187,35 @@ export function HomeWorkspaceLineagesPanel({
   onManage: () => void;
 }): ReactElement {
   const { snapshot } = model;
+  const activeId = snapshot.active?.workspaceId ?? null;
+  const others = sortByRecentActivity(snapshot.records.filter((record) => record.workspaceId !== activeId));
+  const isEmpty = snapshot.records.length === 0;
   return (
     <section className="panel home-panel home-workspace-lineages-panel" aria-label={t("ui.workspaceLineageHomeTitle")}>
       <header className="home-panel-header">
         <h2>{t("ui.workspaceLineageHomeTitle")}</h2>
         <span className="settings-panel-chip">{snapshot.records.length}</span>
       </header>
-      <p className="settings-panel-intro">{t("ui.workspaceLineageHomeIntro")}</p>
-      {snapshot.records.length > 0 ? <WorkspaceLineageSelect model={model} /> : null}
-      {snapshot.records.length === 0 ? <p className="empty-copy">{t("ui.workspaceLineageHomeEmpty")}</p> : null}
-      {snapshot.records.length > 0 ? (
-        <ul className="workspace-lineage-cards">
-          {snapshot.records.map((record) => {
-            const isActive = snapshot.active?.workspaceId === record.workspaceId;
+      {isEmpty ? (
+        <p className="settings-panel-intro">{t("ui.workspaceLineageHomeEmpty")}</p>
+      ) : (
+        <>
+          <p className="settings-panel-intro">{t("ui.workspaceLineageHomeIntro")}</p>
+          <WorkspaceLineageSelect model={model} />
+        </>
+      )}
+      {others.length > 0 ? (
+        <ul className="row-actions workspace-lineage-rows" aria-label={t("ui.workspaceLineageHomeOthersLabel")}>
+          {others.map((record) => {
+            const reminder = describeLineageExportReminder(record);
             return (
-              <li key={record.workspaceId} className={isActive ? "workspace-lineage-card is-active" : "workspace-lineage-card"}>
-                <h3>{record.displayName}</h3>
-                <p className="meta-line">
-                  {record.storage === "folder" ? t("ui.workspaceLineageStorageFolder", { folder: record.folderName ?? "" }) : t("ui.workspaceLineageStorageBrowser")}
-                </p>
-                <p className="meta-line">
-                  {record.latestVersionLabel === null
-                    ? t("ui.workspaceLineageNoVersionYet")
-                    : t("ui.workspaceLineageVersionSummary", { count: record.versionCount, latest: record.latestVersionLabel })}
-                </p>
-                <p className="meta-line">{t("ui.workspaceLineageLastSaved", { date: formatDateTime(record.lastDurableSaveIso) })}</p>
-                <div className="settings-state-row">
-                  {record.storage === "browser" && record.pendingPortableExport ? <span className="settings-state-chip is-warn">{t("ui.workspaceLineagePendingExport")}</span> : null}
-                  {isActive ? <span className="settings-state-chip is-ok">{t("ui.workspaceLineageActive")}</span> : null}
-                </div>
+              <li key={record.workspaceId}>
                 <button
                   type="button"
+                  className="workspace-lineage-row"
+                  aria-label={t("ui.workspaceLineageResumeCard", { name: record.displayName })}
+                  title={record.displayName}
+                  disabled={snapshot.busy}
                   onClick={() => {
                     void model.switchTo(record.workspaceId).then((ok) => {
                       if (ok) {
@@ -182,9 +223,12 @@ export function HomeWorkspaceLineagesPanel({
                       }
                     });
                   }}
-                  disabled={snapshot.busy}
                 >
-                  {t("ui.workspaceLineageResumeCard", { name: record.displayName })}
+                  <span className="workspace-lineage-row-name">{record.displayName}</span>
+                  <span className="workspace-lineage-row-meta">
+                    {translateCurrentPlural("ui.workspaceStorageVersionsCount", record.versionCount)} · {formatDateTime(record.lastDurableSaveIso)}
+                  </span>
+                  {reminder?.tone === "warning" ? <span className="settings-state-chip is-warn">{t("ui.workspaceLineageExportOverdueChip")}</span> : null}
                 </button>
               </li>
             );
@@ -192,6 +236,12 @@ export function HomeWorkspaceLineagesPanel({
         </ul>
       ) : null}
       <div className="row-actions">
+        {isEmpty ? (
+          <button type="button" className="button-with-icon lineage-primary-action" onClick={() => model.openDialog("create")} disabled={snapshot.busy || !snapshot.ready}>
+            <span className="action-button-icon is-home-create" aria-hidden="true" />
+            {t("ui.workspaceLineageHomeCreateFirst")}
+          </button>
+        ) : null}
         <button type="button" className="button-with-icon" onClick={onManage}>
           <span className="action-button-icon is-open" aria-hidden="true" />
           {t("ui.workspaceStorageManage")}

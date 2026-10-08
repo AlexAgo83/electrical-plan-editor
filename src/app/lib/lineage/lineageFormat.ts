@@ -13,6 +13,7 @@
  * IDs are authoritative. Slugs and file names are presentation only; the slug is frozen at
  * creation so a later rename never moves files. See docs/workspace-lineages.md.
  */
+import { getActiveLocale } from "../i18n";
 import { createPortableId } from "../workspaceFile";
 
 export const LINEAGE_MANIFEST_FILE_NAME = "workspace-manifest.json";
@@ -531,5 +532,5 @@ export function formatLineageDateTime(iso: string | null): string {
     return "—";
   }
   const date = new Date(iso);
-  return Number.isNaN(date.getTime()) ? iso : date.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+  return Number.isNaN(date.getTime()) ? iso : date.toLocaleString(getActiveLocale(), { dateStyle: "medium", timeStyle: "short" });
 }

@@ -120,6 +120,33 @@ export function hasSampleNetworkSignature(state: AppState): boolean {
   });
 }
 
+function serializeSampleComparableContent(state: AppState): string {
+  return JSON.stringify({
+    networks: state.networks,
+    harnessAssemblies: state.harnessAssemblies,
+    networkStates: state.networks.allIds.map((networkId) => {
+      const scoped = state.networkStates[networkId];
+      return scoped === undefined
+        ? null
+        : [scoped.catalogItems, scoped.connectors, scoped.splices, scoped.nodes, scoped.segments, scoped.wires];
+    })
+  });
+}
+
+let pristineSampleContent: string | null = null;
+
+/**
+ * True only when the project content is exactly the built-in sample (view state and node
+ * positions ignored): nothing the user authored would be lost by discarding it.
+ */
+export function isUnmodifiedBuiltInSample(state: AppState): boolean {
+  if (!hasSampleNetworkSignature(state)) {
+    return false;
+  }
+  pristineSampleContent ??= serializeSampleComparableContent(createSampleNetworkState());
+  return serializeSampleComparableContent(state) === pristineSampleContent;
+}
+
 export function createSampleNetworkState(): AppState {
   const actions: AppAction[] = [
     ...buildMainSampleCatalogActions(),

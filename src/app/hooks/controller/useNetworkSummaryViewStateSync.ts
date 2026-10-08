@@ -99,7 +99,7 @@ export interface UseNetworkSummaryViewStateSyncOptions {
   setShowNetworkGrid: (value: boolean) => void;
   setSnapNodesToGrid: (value: boolean) => void;
   setLockEntityMovement: (value: boolean) => void;
-  dispatchAction: (action: SetNetworkSummaryViewStateAction, options?: { trackHistory?: boolean }) => void;
+  dispatchAction: (action: SetNetworkSummaryViewStateAction, options?: { trackHistory?: boolean; background?: boolean }) => void;
 }
 
 export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewStateSyncOptions): void {
@@ -436,7 +436,8 @@ export function useNetworkSummaryViewStateSync(options: UseNetworkSummaryViewSta
     }
 
     dispatchAction(appActions.setNetworkSummaryViewState(activeNetworkId, nextViewState), {
-      trackHistory: false
+      trackHistory: false,
+      background: true
     });
   }, [
     activeNetworkId,

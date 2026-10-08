@@ -138,7 +138,7 @@ describe("Settings > Workspace storage section", () => {
     expect(screen.queryByText(/old\.epe\.json/)).toBeNull();
   });
 
-  it("keeps a legacy linked session able to save, relink, unlink and resolve its conflict, and offers adoption", () => {
+  it("keeps a legacy linked session able to save, relink, unlink and resolve its conflict, with a single create action", () => {
     const legacy = legacyControls(legacyStatus({ mode: "linked", fileName: "plan.epe.json", conflict: true, saveTarget: "linked-file", permission: "granted" }));
     const model = fakeModel(snapshot());
     render(<SettingsWorkspaceStorageSection model={model} legacy={legacy} normalizedQuery="" />);
@@ -154,7 +154,11 @@ describe("Settings > Workspace storage section", () => {
     expect(legacy.unlinkWorkspaceFile).toHaveBeenCalledTimes(1);
     expect(legacy.keepLocalWorkspaceVersion).toHaveBeenCalledTimes(1);
     expect(legacy.loadLinkedFileVersion).toHaveBeenCalledTimes(1);
-    fireEvent.click(within(subsection).getByRole("button", { name: "Create named workspace from current content" }));
+    // Legacy mode: one create action in Current workspace, no disabled selector, no redundant chip.
+    expect(within(subsection).queryByRole("button", { name: /named workspace/i })).toBeNull();
+    expect(screen.queryByRole("combobox", { name: "Workspace" })).toBeNull();
+    expect(screen.queryByText("No named workspace")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "New workspace" }));
     expect(model.openDialog).toHaveBeenCalledWith("create");
   });
 
@@ -165,7 +169,11 @@ describe("Settings > Workspace storage section", () => {
       expect(screen.getByRole("button", { name })).toBeDisabled();
     }
     expect(screen.getByRole("button", { name: "History" })).toBeEnabled();
-    expect(screen.getByRole("button", { name: "Return to working copy" })).toBeEnabled();
+    // The global banner is the only read-only signal; Settings explains why actions are disabled.
+    expect(screen.queryByRole("button", { name: "Return to working copy" })).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.queryByText("Read-only v001")).toBeNull();
+    expect(screen.getByText(/Viewing v001 read-only: actions that change this workspace are disabled/)).toBeInTheDocument();
     unmount();
 
     render(<SettingsWorkspaceStorageSection model={fakeModel(folderSnapshot({ busy: true }))} legacy={legacyControls(legacyStatus())} normalizedQuery="" />);
@@ -184,6 +192,8 @@ describe("Settings > Workspace storage section", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Read-only: viewing v001");
     fireEvent.click(screen.getByRole("button", { name: "Return to working copy" }));
     expect(model.returnToWorking).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("button", { name: "Resume from this version" }));
+    expect(model.restoreFromVersion).toHaveBeenCalledWith("v1");
   });
 
   it("offers the themed workspace selector on Home and switches from it", () => {

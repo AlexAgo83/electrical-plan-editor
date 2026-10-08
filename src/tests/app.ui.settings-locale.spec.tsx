@@ -95,8 +95,8 @@ describe("App integration UI - settings locale", () => {
     renderAppWithState(createUiIntegrationState());
     fireEvent.click(screen.getByRole("button", { name: "Fermer l'onboarding" }));
 
-    fireEvent.click(screen.getByRole("button", { name: "Créer un espace vide" }));
-    const confirmDialog = await screen.findByRole("dialog", { name: "Créer un espace vide" });
+    fireEvent.click(screen.getByRole("button", { name: "Repartir d'un contenu vide" }));
+    const confirmDialog = await screen.findByRole("dialog", { name: "Repartir d'un contenu vide" });
     expect(
       within(confirmDialog).getByText(
         "Remplacer l'espace de travail courant par un espace vide ? Cela supprime les changements actuels de l'espace."
@@ -116,7 +116,10 @@ describe("App integration UI - settings locale", () => {
     expect(within(storagePanel).getByRole("region", { name: "Transfert et récupération" })).toBeInTheDocument();
     const legacy = within(storagePanel).getByRole("region", { name: "Compatibilité fichier unique" });
     expect(within(legacy).getByText("Enregistré uniquement dans ce navigateur")).toBeInTheDocument();
-    expect(within(legacy).getByRole("button", { name: "Créer un espace nommé à partir du contenu actuel" })).toBeInTheDocument();
+    // One create action only, in the current workspace group; the single-file tools stay collapsed.
+    expect(within(legacy).queryByRole("button", { name: /Créer/ })).toBeNull();
+    expect(within(storagePanel).getAllByRole("button", { name: "Nouvel espace" })).toHaveLength(1);
+    expect(within(legacy).getByText(/Outils fichier unique/, { selector: "summary" })).toBeInTheDocument();
     expect(storagePanel.textContent).not.toMatch(/ui\.[A-Za-z]/);
 
     fireEvent.change(screen.getByRole("searchbox", { name: /paramètres/i }), { target: { value: "espace" } });

@@ -5,7 +5,7 @@ export type LineageNoticeKind = "divergence" | "folder-permission" | "orphans" |
 
 export interface LineageNotice {
   kind: LineageNoticeKind;
-  tone: "warning" | "danger";
+  tone: "neutral" | "warning" | "danger";
   message: string;
   /** DOM id of the matching action (or message) in Settings > Workspace storage. */
   settingsTargetId: string;
@@ -15,7 +15,7 @@ export function lineageNoticeTargetId(kind: LineageNoticeKind): string {
   return `workspace-storage-notice-${kind}`;
 }
 
-/** Recovery states that need attention; shared by Settings (with actions) and the compact context (with links). */
+/** Recovery states shown in Settings > Workspace storage, each with its action or focus target. */
 export function describeLineageNotices(snapshot: LineageSessionSnapshot): LineageNotice[] {
   const notices: LineageNotice[] = [];
   const push = (kind: LineageNoticeKind, tone: LineageNotice["tone"], message: string): void => {
@@ -44,7 +44,8 @@ export function describeLineageNotices(snapshot: LineageSessionSnapshot): Lineag
     push("recovered", "warning", t("ui.workspaceLineageRecoveredBanner"));
   }
   if (snapshot.preservedLegacySnapshot) {
-    push("preserved-legacy", "warning", t("ui.workspaceLineagePreservedLegacy"));
+    // A recovery copy kept for the user, not a fault: neutral, shown in Transfer and recovery.
+    push("preserved-legacy", "neutral", t("ui.workspaceLineagePreservedLegacy"));
   }
   return notices;
 }

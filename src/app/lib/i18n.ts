@@ -22,6 +22,11 @@ export function setActiveLocale(locale: AppLocale): void {
   activeLocale = locale;
 }
 
+/** The app locale (not the browser one); dates and plurals follow it. */
+export function getActiveLocale(): AppLocale {
+  return activeLocale;
+}
+
 export function translate(locale: AppLocale, key: string, values: TranslationValues = {}): string {
   const template = catalogValue(CATALOGS[locale], key) ?? catalogValue(enCatalog, key) ?? key;
   return template.replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (_, name: string) => String(values[name] ?? `{${name}}`));
@@ -29,6 +34,12 @@ export function translate(locale: AppLocale, key: string, values: TranslationVal
 
 export function translateCurrent(key: string, values: TranslationValues = {}): string {
   return translate(activeLocale, key, values);
+}
+
+/** Picks `${baseKey}One` or `${baseKey}Other` with the app locale plural rules (French: 0 and 1 are singular). */
+export function translateCurrentPlural(baseKey: string, count: number, values: TranslationValues = {}): string {
+  const category = new Intl.PluralRules(activeLocale).select(count);
+  return translate(activeLocale, `${baseKey}${category === "one" ? "One" : "Other"}`, { count, ...values });
 }
 
 

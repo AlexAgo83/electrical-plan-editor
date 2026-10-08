@@ -83,11 +83,18 @@ export function useStoreHistory({
       action: Parameters<AppStore["dispatch"]>[0],
       options?: {
         trackHistory?: boolean;
+        /**
+         * Automatic write not caused by a user gesture (view-state sync on screen mount). While the
+         * project is read-only it is dropped like any other write, but without a blocked-edit toast.
+         */
+        background?: boolean;
       }
     ): void => {
       const shouldTrackHistory = options?.trackHistory ?? !action.type.startsWith("ui/");
       if (!action.type.startsWith("ui/") && isProjectMutationBlocked()) {
-        reportBlockedMutationAttempt();
+        if (options?.background !== true) {
+          reportBlockedMutationAttempt();
+        }
         return;
       }
       const previousState = store.getState();

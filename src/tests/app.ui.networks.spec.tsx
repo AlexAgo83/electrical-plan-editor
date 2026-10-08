@@ -108,13 +108,13 @@ describe("App integration UI - networks", () => {
     });
 
     const recentChangesList = screen.getByLabelText("Recent changes list");
-    const workspaceHeading = screen.getByRole("heading", { name: "Workspace" });
+    const workspaceHeading = screen.getByRole("heading", { name: "Active network" });
     const whatsNewHeading = screen.getByRole("heading", { name: "What's new" });
     expect(screen.queryByText(/Active network:/i)).not.toBeInTheDocument();
     expect(workspaceHeading.compareDocumentPosition(recentChangesList) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
     expect(recentChangesList.compareDocumentPosition(whatsNewHeading) & Node.DOCUMENT_POSITION_FOLLOWING).not.toBe(0);
 
-    const workspacePanel = getPanelByHeading("Workspace");
+    const workspacePanel = getPanelByHeading("Active network");
     expect(within(workspacePanel).getByText("Network 'NET-MAIN-SAMPLE' metadata / export cartouche / logo updated")).toBeInTheDocument();
     const firstTime = recentChangesList.querySelector("time")?.textContent ?? "";
     expect(firstTime).toMatch(/^\d{2}:\d{2}:\d{2}$/);

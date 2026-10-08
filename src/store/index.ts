@@ -4,6 +4,7 @@ export { appReducer } from "./reducer";
 export {
   createSampleNetworkState,
   hasSampleNetworkSignature,
+  isUnmodifiedBuiltInSample,
   isWorkspaceEmpty
 } from "./sampleNetwork";
 export * from "./selectors";

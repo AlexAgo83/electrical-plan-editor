@@ -43,7 +43,6 @@ function workspaceStorageLabels(mode: WorkspaceStorageSearchMode): string[] {
   }
   return [
     ...shared,
-    t("ui.workspaceStorageAdoptCurrent"),
     t("ui.settingssearchmodelPersistenceMode"),
     t("ui.settingssearchmodelLinkedFile"),
     t("ui.operationshealthpanelOpenWorkspaceFile"),

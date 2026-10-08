@@ -67,8 +67,8 @@ export function useAppControllerHomeWorkspaceContent({
     void (async () => {
       if (!isCurrentWorkspaceEmpty) {
         const shouldReplace = await requestConfirmation({
-          title: t("ui.createEmptyWorkspace"),
-          message: t("ui.replaceTheCurrentWorkspaceWithAnEmptyWorkspaceThisRemoves"),
+          title: isNamedWorkspaceActive ? t("ui.homeQuickStartClearContent") : t("ui.homeQuickStartEmptyContent"),
+          message: isNamedWorkspaceActive ? t("ui.homeQuickStartClearContentMessage") : t("ui.replaceTheCurrentWorkspaceWithAnEmptyWorkspaceThisRemoves"),
           intent: "warning"
         });
         if (!shouldReplace) {
@@ -83,6 +83,7 @@ export function useAppControllerHomeWorkspaceContent({
     })();
   }, [
     isCurrentWorkspaceEmpty,
+    isNamedWorkspaceActive,
     replaceStateWithHistory,
     requestConfirmation,
     setActiveScreen,

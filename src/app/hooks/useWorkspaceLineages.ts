@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { AppState, AppStore } from "../../store";
-import { createEmptyWorkspaceState, isWorkspaceEmpty } from "../../store";
+import { createEmptyWorkspaceState, isUnmodifiedBuiltInSample, isWorkspaceEmpty } from "../../store";
 import { translateCurrent as t } from "../lib/i18n";
 import { downloadBinaryFile } from "../lib/binaryDownload";
 import { buildWorkspaceFilePayload, serializeWorkspaceFilePayload } from "../lib/workspaceFile";
@@ -109,6 +109,7 @@ export function useWorkspaceLineages({ store, resetHistory, notifyToast, request
           replaceState: (state: AppState) => store.replaceState(state),
           resetHistory: () => resetHistory(),
           isWorkspaceEmpty: (state: AppState) => isWorkspaceEmpty(state),
+          isUnmodifiedBuiltInSample: (state: AppState) => isUnmodifiedBuiltInSample(state),
           downloadBytes: (fileName, bytes, mimeType) => downloadBinaryFile(fileName, bytes, mimeType)
         },
         { deviceLabel: typeof window === "undefined" ? "device" : resolveDeviceLabel() }

@@ -313,7 +313,8 @@ export function HomeWorkspaceContent({
             </div>
           </header>
           <p className="settings-panel-intro home-start-intro">
-            {t("ui.homeworkspacecontentStartANewWorkspaceFlowOpenASavedWorkspaceFile")}</p>
+            {isNamedWorkspaceActive ? t("ui.homeQuickStartIntroNamed") : t("ui.homeQuickStartIntroLegacy")}
+          </p>
           <div className="row-actions home-primary-actions">
             <button type="button" className="button-with-icon" onClick={onOpenModeling} disabled={!hasActiveNetwork}>
               <span className="action-button-icon is-edit" aria-hidden="true" />
@@ -331,17 +332,17 @@ export function HomeWorkspaceContent({
             ) : null}
             <button type="button" className="button-with-icon" onClick={onCreateEmptyWorkspace}>
               <span className="action-button-icon is-home-create" aria-hidden="true" />
-              <span>{t("ui.createEmptyWorkspace")}</span>
+              <span>{isNamedWorkspaceActive ? t("ui.homeQuickStartClearContent") : t("ui.homeQuickStartEmptyContent")}</span>
             </button>
             {!isNamedWorkspaceActive ? (
               <>
                 <button type="button" className="button-with-icon" onClick={onSaveWorkspace} disabled={networkCount === 0}>
                   <span className="action-button-icon is-save" aria-hidden="true" />
-                  <span>{t("ui.saveWorkspace")}</span>
+                  <span>{t("ui.homeQuickStartSaveFile")}</span>
                 </button>
                 <button type="button" className="button-with-icon" onClick={onOpenImportPicker}>
                   <span className="action-button-icon is-home-import" aria-hidden="true" />
-                  <span>{t("ui.loadWorkspace")}</span>
+                  <span>{t("ui.homeQuickStartOpenFile")}</span>
                 </button>
               </>
             ) : null}
@@ -359,15 +360,12 @@ export function HomeWorkspaceContent({
 
         <section className="panel home-panel home-workspace-resume-panel">
           <header className="home-panel-header">
-            <h2>{t("ui.workspace")}</h2>
+            <h2>{t("ui.homeActiveNetworkTitle")}</h2>
             <span className="settings-panel-chip">
               {hasActiveNetwork && activeNetworkName !== null ? activeNetworkName : t("ui.appshelllayoutNoActiveNetwork")}
             </span>
           </header>
-          <p className="settings-panel-intro home-resume-intro">
-            
-            {t("ui.continueWhereYouLeftOffUsingTheCurrentWorkspaceContext")}
-          </p>
+          <p className="settings-panel-intro home-resume-intro">{t("ui.homeActiveNetworkIntro")}</p>
           <NetworkRecentChangesList entries={recentChangesForActiveNetwork} onOpenEntryTarget={onOpenRecentChangeTarget} />
         </section>
       </div>

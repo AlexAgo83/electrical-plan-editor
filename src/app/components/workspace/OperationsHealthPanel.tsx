@@ -3,7 +3,7 @@ import type { ChangeEvent, ReactElement, RefObject } from "react";
 import type { WorkspaceFileStorageStatus } from "../../hooks/useWorkspaceFileStorage";
 import type { ValidationIssue } from "../../types/app-controller";
 import type { LineageSessionSnapshot } from "../../lib/lineage/lineageSessionController";
-import { describeLineageSaveStatus } from "../../lib/lineage/lineageStatus";
+import { activeExportReminderRecord, describeLineageExportReminder, describeLineageSaveStatus } from "../../lib/lineage/lineageStatus";
 
 interface OperationsHealthPanelProps {
   handleUndo: () => void;
@@ -58,6 +58,7 @@ export function OperationsHealthPanel({
   moveValidationIssueCursor
 }: OperationsHealthPanelProps): ReactElement {
   const activeLineage = workspaceLineageSnapshot?.active ?? null;
+  const lineageExportReminder = workspaceLineageSnapshot === undefined ? null : describeLineageExportReminder(activeExportReminderRecord(workspaceLineageSnapshot));
   const workspaceFileInput = (
     <input
       ref={workspaceFileInputRef}
@@ -109,6 +110,7 @@ export function OperationsHealthPanel({
             {t("ui.workspaceStorageOpsActiveWorkspace")} <strong>{activeLineage.displayName}</strong>
           </p>
           <p className="meta-line">{describeLineageSaveStatus(workspaceLineageSnapshot).label}</p>
+          {lineageExportReminder !== null ? <p className={`meta-line lineage-export-hint is-${lineageExportReminder.tone}`}>{lineageExportReminder.label}</p> : null}
           <div className="row-actions compact workspace-storage-actions">
             {manageButton}
             {workspaceFileInput}

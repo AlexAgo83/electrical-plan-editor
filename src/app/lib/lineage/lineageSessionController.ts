@@ -39,7 +39,8 @@ import {
   pickLineageFolder,
   type FolderDirectoryHandle,
   type LineageLibraryStore,
-  type LineageRegistryRecord
+  type LineageRegistryRecord,
+  type PreservedLegacySnapshot
 } from "./lineageLibrary";
 import { exportLineagePackage, readLineagePackage, validateLineageFiles, type ValidatedLineagePackage } from "./lineagePackage";
 import { reconcileLineagePackage, type LineageReconcileReport } from "./lineageReconcile";
@@ -109,6 +110,8 @@ export interface LineageSessionHost {
   replaceState(state: AppState): void;
   resetHistory(): void;
   isWorkspaceEmpty(state: AppState): boolean;
+  /** The untouched built-in sample is not user work and needs no preserved copy. */
+  isUnmodifiedBuiltInSample?(state: AppState): boolean;
   downloadBytes(fileName: string, bytes: Uint8Array, mimeType: string): boolean;
   now?(): string;
 }
@@ -314,7 +317,7 @@ export class LineageSessionController {
   async initialize(): Promise<void> {
     try {
       await this.refreshRecords();
-      this.update({ preservedLegacySnapshot: (await this.library.readPreservedLegacySnapshot()) !== null });
+      this.update({ preservedLegacySnapshot: this.isPreservedSnapshotWorthShowing(await this.library.readPreservedLegacySnapshot()) });
       const activeId = await this.library.getActiveWorkspaceId();
       const record = this.snapshot.records.find((entry) => entry.workspaceId === activeId) ?? null;
       if (record !== null) {
@@ -580,12 +583,33 @@ export class LineageSessionController {
    * First-registry migration: a valid legacy browser workspace is preserved before any lineage
    * activation replaces the editor state.
    */
+  /**
+   * Snapshots preserved by earlier releases may hold only the built-in sample or nothing; they stay
+   * stored (never deleted) but are not announced as user work.
+   */
+  private isPreservedSnapshotWorthShowing(preserved: PreservedLegacySnapshot | null): boolean {
+    if (preserved === null) {
+      return false;
+    }
+    let state: AppState;
+    try {
+      state = JSON.parse(preserved.stateJson) as AppState;
+    } catch {
+      return true;
+    }
+    try {
+      return !this.host.isWorkspaceEmpty(state) && this.host.isUnmodifiedBuiltInSample?.(state) !== true;
+    } catch {
+      return true;
+    }
+  }
+
   private async preserveLegacyStateIfNeeded(): Promise<void> {
     if (this.active !== null || this.snapshot.records.length > 0) {
       return;
     }
     const state = this.host.getState();
-    if (this.host.isWorkspaceEmpty(state)) {
+    if (this.host.isWorkspaceEmpty(state) || this.host.isUnmodifiedBuiltInSample?.(state) === true) {
       return;
     }
     await this.library.writePreservedLegacySnapshot({ stateJson: JSON.stringify(state), preservedAtIso: this.now() });
@@ -938,7 +962,7 @@ export class LineageSessionController {
           return { ok: false, error: t("ui.workspaceLineageErrorDownloadUnavailable") };
         }
         this.updateSave({ pendingPortableExport: false, downloadInitiatedIso: nowIso });
-        await this.persistRecord({ pendingPortableExport: false });
+        await this.persistRecord({ pendingPortableExport: false, lastPortableExportIso: nowIso });
         return { ok: true, value: undefined };
       } catch (error) {
         return { ok: false, error: errorMessage(error) };
