@@ -342,7 +342,7 @@
   min-width: min(20rem, 80vw);
   margin: 0;
   padding: 0.35rem;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 10px 24px color-mix(in srgb, currentColor 22%, transparent);
 }
 
 .lineage-action-menu-entry.has-separator {

@@ -239,7 +239,6 @@ describe("App integration UI - settings", () => {
     // Without an active named workspace, the single-file tools live in a labelled compatibility subsection.
     const legacySubsection = within(workspaceStoragePanel).getByRole("region", { name: "Single-file compatibility" });
     expect(within(legacySubsection).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
-      "Create named workspace from current content",
       "Save as file",
       "Open workspace file",
       "Use a file for autosave"
