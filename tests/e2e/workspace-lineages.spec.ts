@@ -98,7 +98,8 @@ test("two named lineages, supplier archive and portable transfer into a clean br
   await storageGroup(page, "Versions and handoffs").getByRole("button", { name: "History" }).click();
   const history = page.getByRole("dialog", { name: "History of Série" });
   await expect(history.locator(".lineage-history-entry")).toHaveCount(2);
-  await historyEntry(history, "v001").getByRole("button", { name: "Record supplier handoff" }).click();
+  await historyEntry(history, "v001").getByRole("button", { name: "More actions for v001" }).click();
+  await page.getByRole("menu", { name: "More actions for v001" }).getByRole("menuitem", { name: "Record supplier handoff" }).click();
   const handoff = page.getByRole("dialog", { name: "Record supplier handoff" });
   await handoff.getByLabel("Recipient").fill("Supplier A");
   await handoff.getByLabel("Declared handoff date").fill("2026-10-05");

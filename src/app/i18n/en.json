@@ -1583,7 +1583,6 @@
     "workspaceLineagePackageImported": "Package imported",
     "workspaceLineageParent": "after {version}",
     "workspaceLineagePreservedLegacy": "Recovery copy: what this browser held before named workspaces existed was kept aside. Download it to keep it as a workspace file, or dismiss it if you no longer need it.",
-    "workspaceLineageProvenanceCreated": "created on {device}",
     "workspaceLineageProvenanceLegacy": "imported from {file}",
     "workspaceLineageReadOnlyBanner": "Read-only: viewing {version}",
     "workspaceLineageReadOnlyBlocked": "A historical version is open read-only. Return to the working copy or resume from this version to edit.",
@@ -1626,7 +1625,6 @@
     "workspaceLineageStatusReadOnly": "Read-only {version}",
     "workspaceLineageStatusRecovered": "Recovered unsaved changes",
     "workspaceLineageStatusSaving": "Saving…",
-    "workspaceLineageStorageBrowser": "Stored in this browser",
     "workspaceLineageStorageBrowserOption": "This browser only (export ZIP packages to copy)",
     "workspaceLineageStorageFolder": "Folder: {folder}",
     "workspaceLineageStorageFolderOption": "A folder on disk (recommended)",
@@ -1700,6 +1698,9 @@
     "homeActiveNetworkIntro": "Recent changes on the active network; select one to jump back to it.",
     "workspaceLineageHomeCreateFirst": "Create your first workspace",
     "workspaceLineageHomeOthersLabel": "Other workspaces",
-    "workspaceLineageExportOverdueChip": "Export overdue"
+    "workspaceLineageExportOverdueChip": "Export overdue",
+    "workspaceLineageMoreActions": "More actions for {version}",
+    "workspaceLineageResumeFromVersionHint": "Replaces the working copy with this version (a recovery copy is kept first)",
+    "workspaceLineageMoreActionsShort": "More"
   }
 }

@@ -1,5 +1,18 @@
 import { translateCurrent as t, translateCurrentPlural } from "../../lib/i18n";
-import { createContext, useContext, useEffect, useId, useMemo, useState, type ChangeEvent, type ReactElement, type ReactNode, type RefObject } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type ReactElement,
+  type ReactNode,
+  type RefObject
+} from "react";
 import { useModalDialog } from "../../hooks/useModalDialog";
 import type { WorkspaceLineageModel } from "../../hooks/useWorkspaceLineages";
 import { formatLineageDateTime, formatVersionNumber, sortVersionsForHistory, type LineageHandoffEntry, type LineageVersionEntry } from "../../lib/lineage/lineageFormat";
@@ -460,7 +473,7 @@ function versionMatchesFilter(version: LineageVersionEntry, label: string, hando
   if (needle.length === 0) {
     return true;
   }
-  return [label, version.title, version.comment, version.createdAtIso, version.originalFileName ?? "", version.deviceLabel ?? "", ...handoffs.flatMap((handoff) => [handoff.recipient, handoff.handoffDate])]
+  return [label, version.title, version.comment, version.createdAtIso, version.originalFileName ?? "", ...handoffs.flatMap((handoff) => [handoff.recipient, handoff.handoffDate])]
     .join(" ")
     .toLocaleLowerCase()
     .includes(needle);
@@ -523,6 +536,138 @@ function HandoffDetails({ model, handoff, labels }: { model: WorkspaceLineageMod
   );
 }
 
+interface VersionMenuItem {
+  key: string;
+  label: string;
+  hint?: string;
+  danger?: boolean;
+  disabled?: boolean;
+  separatorBefore?: boolean;
+  onSelect: () => void;
+}
+
+/**
+ * Themed, keyboard-accessible dropdown (menu button pattern): arrows move between items, Escape
+ * closes the menu without closing the dialog and returns focus to the trigger.
+ */
+function VersionActionsMenu({ triggerLabel, items }: { triggerLabel: string; items: VersionMenuItem[] }): ReactElement {
+  const [open, setOpen] = useState(false);
+  const menuId = useId();
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const enabledIndexes = items.flatMap((item, index) => (item.disabled === true ? [] : [index]));
+  const firstEnabledIndex = enabledIndexes[0] ?? -1;
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    itemRefs.current[firstEnabledIndex]?.focus();
+    const closeOnOutsidePointer = (event: PointerEvent): void => {
+      if (containerRef.current !== null && !containerRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () => document.removeEventListener("pointerdown", closeOnOutsidePointer);
+  }, [firstEnabledIndex, open]);
+
+  const close = (restoreFocus: boolean): void => {
+    setOpen(false);
+    if (restoreFocus) {
+      triggerRef.current?.focus();
+    }
+  };
+
+  const onMenuKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>): void => {
+    const current = itemRefs.current.findIndex((element) => element === document.activeElement);
+    const position = enabledIndexes.indexOf(current);
+    const focusAt = (nextPosition: number): void => {
+      const count = enabledIndexes.length;
+      if (count > 0) {
+        itemRefs.current[enabledIndexes[(nextPosition + count) % count]!]?.focus();
+      }
+    };
+    switch (event.key) {
+      case "ArrowDown":
+        event.preventDefault();
+        focusAt(position + 1);
+        return;
+      case "ArrowUp":
+        event.preventDefault();
+        focusAt(position - 1);
+        return;
+      case "Home":
+        event.preventDefault();
+        focusAt(0);
+        return;
+      case "End":
+        event.preventDefault();
+        focusAt(enabledIndexes.length - 1);
+        return;
+      case "Escape":
+        event.preventDefault();
+        event.stopPropagation();
+        close(true);
+        return;
+      case "Tab":
+        close(false);
+        return;
+      default:
+    }
+  };
+
+  return (
+    <div className="lineage-action-menu" ref={containerRef}>
+      <button
+        ref={triggerRef}
+        type="button"
+        className="lineage-action-menu-trigger"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-controls={open ? menuId : undefined}
+        aria-label={triggerLabel}
+        onClick={() => setOpen((value) => !value)}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown" && !open) {
+            event.preventDefault();
+            setOpen(true);
+          }
+        }}
+      >
+        {t("ui.workspaceLineageMoreActionsShort")}
+        <span className="lineage-action-menu-caret" aria-hidden="true" />
+      </button>
+      {open ? (
+        <div id={menuId} role="menu" aria-label={triggerLabel} className="panel row-actions lineage-action-menu-list" onKeyDown={onMenuKeyDown}>
+          {items.map((item, index) => (
+            <div key={item.key} role="none" className={item.separatorBefore === true ? "lineage-action-menu-entry has-separator" : "lineage-action-menu-entry"}>
+              <button
+                ref={(element) => {
+                  itemRefs.current[index] = element;
+                }}
+                type="button"
+                role="menuitem"
+                tabIndex={-1}
+                className={item.danger === true ? "lineage-action-menu-item is-danger-action" : "lineage-action-menu-item"}
+                disabled={item.disabled}
+                onClick={() => {
+                  close(false);
+                  item.onSelect();
+                }}
+              >
+                <span>{item.label}</span>
+                {item.hint !== undefined ? <span className="lineage-action-menu-hint">{item.hint}</span> : null}
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function HistoryDialog({ model }: { model: WorkspaceLineageModel }): ReactElement {
   const [filter, setFilter] = useState("");
   const filterId = useId();
@@ -557,69 +702,85 @@ function HistoryDialog({ model }: { model: WorkspaceLineageModel }): ReactElemen
           {t("ui.workspaceLineageExportPackage")}
         </button>
       </div>
-      <p className="meta-line">
-        {active?.storage === "folder" ? t("ui.workspaceLineageStorageFolder", { folder: active.folderName ?? "" }) : t("ui.workspaceLineageStorageBrowser")}
-      </p>
       <label htmlFor={filterId}>{t("ui.workspaceLineageFilterLabel")}</label>
-      <input id={filterId} type="search" value={filter} placeholder={t("ui.workspaceLineageFilterPlaceholder")} onChange={(event) => setFilter(event.target.value)} />
+      <input
+        id={filterId}
+        type="search"
+        className="lineage-history-filter"
+        value={filter}
+        placeholder={t("ui.workspaceLineageFilterPlaceholder")}
+        onChange={(event) => setFilter(event.target.value)}
+      />
       {versions.length === 0 ? <p className="empty-copy">{t("ui.workspaceLineageNoVersions")}</p> : null}
       <ol className="lineage-history-list" aria-label={t("ui.workspaceLineageHistoryListLabel")}>
         {visible.map((version) => {
           const label = labels.get(version.versionId) ?? formatVersionNumber(version.displayNumber);
           const handoffs = handoffsByVersion.get(version.versionId) ?? [];
           const isCurrentBase = active?.baseVersionId === version.versionId;
+          const isMissing = missing.has(version.versionId);
+          // Device labels are technical identifiers: provenance shows only meaningful facts.
+          const provenance = [
+            version.provenanceKind === "legacy-import" ? t("ui.workspaceLineageProvenanceLegacy", { file: version.originalFileName ?? "" }) : null,
+            version.parentVersionId !== null ? t("ui.workspaceLineageParent", { version: labels.get(version.parentVersionId) ?? "?" }) : null,
+            version.restoredFromVersionId !== null ? t("ui.workspaceLineageRestoredFrom", { version: labels.get(version.restoredFromVersionId) ?? "?" }) : null
+          ].filter((entry): entry is string => entry !== null);
           return (
             <li key={version.versionId} className="lineage-history-entry" data-version-id={version.versionId}>
-              <div className="lineage-history-heading">
-                <strong>{label}</strong>
-                {version.title.length > 0 ? <span> · {version.title}</span> : null}
-                <span className="meta-line"> · {formatDateTime(version.createdAtIso)}</span>
-                {isCurrentBase ? <span className="settings-panel-chip">{t("ui.workspaceLineageWorkingBase")}</span> : null}
-                {model.snapshot.historical?.versionId === version.versionId ? <span className="settings-panel-chip">{t("ui.workspaceLineageViewing")}</span> : null}
+              <div className="lineage-history-row">
+                <div className="lineage-history-heading">
+                  <strong>{label}</strong>
+                  {version.title.length > 0 ? <span> · {version.title}</span> : null}
+                  <span className="meta-line"> · {formatDateTime(version.createdAtIso)}</span>
+                  {isCurrentBase ? <span className="settings-panel-chip">{t("ui.workspaceLineageWorkingBase")}</span> : null}
+                  {model.snapshot.historical?.versionId === version.versionId ? <span className="settings-panel-chip">{t("ui.workspaceLineageViewing")}</span> : null}
+                </div>
+                <div className="row-actions compact lineage-history-actions">
+                  <button
+                    type="button"
+                    className="lineage-primary-action"
+                    disabled={isMissing}
+                    onClick={() => {
+                      void model.openHistorical(version.versionId).then((ok) => {
+                        if (ok) {
+                          model.closeDialog();
+                        }
+                      });
+                    }}
+                  >
+                    {t("ui.workspaceLineageOpenReadOnly")}
+                  </button>
+                  <VersionActionsMenu
+                    triggerLabel={t("ui.workspaceLineageMoreActions", { version: label })}
+                    items={[
+                      { key: "download", label: t("ui.workspaceLineageDownloadVersion"), disabled: isMissing, onSelect: () => void model.downloadVersion(version.versionId) },
+                      {
+                        key: "handoff",
+                        label: t("ui.workspaceLineageRecordHandoff"),
+                        disabled: isReadOnly,
+                        onSelect: () => model.openDialog("handoff", { versionId: version.versionId })
+                      },
+                      {
+                        key: "resume",
+                        label: t("ui.workspaceLineageResumeFromVersion"),
+                        hint: t("ui.workspaceLineageResumeFromVersionHint"),
+                        danger: true,
+                        separatorBefore: true,
+                        disabled: isMissing || model.snapshot.busy,
+                        onSelect: () => {
+                          void model.restoreFromVersion(version.versionId).then((ok) => {
+                            if (ok) {
+                              model.closeDialog();
+                            }
+                          });
+                        }
+                      }
+                    ]}
+                  />
+                </div>
               </div>
               {version.comment.length > 0 ? <p className="meta-line">{version.comment}</p> : null}
-              <p className="meta-line">
-                {version.provenanceKind === "legacy-import"
-                  ? t("ui.workspaceLineageProvenanceLegacy", { file: version.originalFileName ?? "" })
-                  : t("ui.workspaceLineageProvenanceCreated", { device: version.deviceLabel ?? "—" })}
-                {version.parentVersionId !== null ? ` · ${t("ui.workspaceLineageParent", { version: labels.get(version.parentVersionId) ?? "?" })}` : ""}
-                {version.restoredFromVersionId !== null ? ` · ${t("ui.workspaceLineageRestoredFrom", { version: labels.get(version.restoredFromVersionId) ?? "?" })}` : ""}
-              </p>
-              {missing.has(version.versionId) ? <p className="workspace-lineage-banner is-danger">{t("ui.workspaceLineageVersionFileMissing")}</p> : null}
-              <div className="row-actions">
-                <button
-                  type="button"
-                  disabled={missing.has(version.versionId)}
-                  onClick={() => {
-                    void model.openHistorical(version.versionId).then((ok) => {
-                      if (ok) {
-                        model.closeDialog();
-                      }
-                    });
-                  }}
-                >
-                  {t("ui.workspaceLineageOpenReadOnly")}
-                </button>
-                <button
-                  type="button"
-                  disabled={missing.has(version.versionId) || model.snapshot.busy}
-                  onClick={() => {
-                    void model.restoreFromVersion(version.versionId).then((ok) => {
-                      if (ok) {
-                        model.closeDialog();
-                      }
-                    });
-                  }}
-                >
-                  {t("ui.workspaceLineageResumeFromVersion")}
-                </button>
-                <button type="button" disabled={missing.has(version.versionId)} onClick={() => void model.downloadVersion(version.versionId)}>
-                  {t("ui.workspaceLineageDownloadVersion")}
-                </button>
-                <button type="button" disabled={isReadOnly} onClick={() => model.openDialog("handoff", { versionId: version.versionId })}>
-                  {t("ui.workspaceLineageRecordHandoff")}
-                </button>
-              </div>
+              {provenance.length > 0 ? <p className="meta-line">{provenance.join(" · ")}</p> : null}
+              {isMissing ? <p className="workspace-lineage-banner is-danger">{t("ui.workspaceLineageVersionFileMissing")}</p> : null}
               {handoffs.length > 0 ? (
                 <ul className="lineage-handoff-list">
                   {handoffs.map((handoff) => (

@@ -284,3 +284,83 @@
   color: color-mix(in srgb, var(--theme-status-danger) 82%, currentColor);
   border-color: color-mix(in srgb, var(--theme-status-danger) 70%, transparent);
 }
+
+/* History rows: identity on the left, one primary action and the More menu on the right. */
+.lineage-history-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem 0.75rem;
+  min-width: 0;
+}
+
+.lineage-history-row .lineage-history-heading {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.lineage-history-actions {
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+/* The filter keeps the ordinary field look at rest; only real focus is highlighted. */
+.lineage-dialog .lineage-history-filter {
+  font: inherit;
+  color: inherit;
+  background: color-mix(in srgb, currentColor 4%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 0.45rem;
+  padding: 0.35rem 0.55rem;
+  outline: none;
+  box-shadow: none;
+}
+
+.lineage-dialog .lineage-history-filter:focus-visible {
+  border-color: var(--theme-primary, currentColor);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme-primary, currentColor) 35%, transparent);
+}
+
+.lineage-action-menu {
+  position: relative;
+}
+
+.lineage-action-menu-caret::before {
+  content: "▾";
+  margin-inline-start: 0.35rem;
+}
+
+.app-shell .lineage-action-menu > .row-actions.lineage-action-menu-list,
+.lineage-action-menu > .lineage-action-menu-list {
+  position: absolute;
+  inset-inline-end: 0;
+  top: calc(100% + 0.25rem);
+  z-index: 3;
+  display: grid;
+  gap: 0.2rem;
+  min-width: min(20rem, 80vw);
+  margin: 0;
+  padding: 0.35rem;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.lineage-action-menu-entry.has-separator {
+  margin-top: 0.2rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.app-shell .row-actions button.lineage-action-menu-item[type="button"] {
+  display: grid;
+  gap: 0.1rem;
+  width: 100%;
+  text-align: start;
+}
+
+.lineage-action-menu-hint {
+  font-size: 0.78rem;
+  font-weight: 400;
+  opacity: 0.85;
+  white-space: normal;
+}

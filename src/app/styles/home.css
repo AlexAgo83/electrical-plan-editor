@@ -280,6 +280,7 @@
 
   .home-left-column > .home-panel {
     flex: 0 0 auto;
+    align-self: stretch;
   }
 
   .home-left-column > .home-workspace-resume-panel {
