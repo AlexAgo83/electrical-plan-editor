@@ -1684,7 +1684,6 @@
     "workspaceStorageManage": "Gérer les espaces",
     "workspaceStorageNoticesLabel": "Alertes de l'espace",
     "workspaceStorageOpsActiveWorkspace": "Espace actif :",
-    "workspaceStorageResolveInSettings": "Résoudre dans les paramètres",
     "workspaceStorageVersionsSummary": "{versions} version(s), {handoffs} remise(s) fournisseur",
     "settingsSearchMatchCountOne": "{count} libellé de paramètre correspondant",
     "settingsSearchMatchCountOther": "{count} libellés de paramètres correspondants"

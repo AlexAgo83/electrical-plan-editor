@@ -1,53 +1,17 @@
-/* Named workspaces: compact context bar, Settings storage groups, Home cards and dialogs.
+/* Named workspaces: read-only banner, selector, Settings storage groups, Home cards and dialogs.
    Status colors come from the shared --theme-status-* tokens mixed with the theme foreground. */
-.workspace-lineage-bar {
-  display: grid;
-  gap: 0.4rem;
+.workspace-lineage-read-only-banner {
   padding: 0.45rem 0.75rem;
-  border-bottom: 1px solid color-mix(in srgb, currentColor 14%, transparent);
-  background: color-mix(in srgb, var(--theme-primary, currentColor) 4%, transparent);
 }
 
-.workspace-lineage-bar[data-read-only="true"] {
-  background: color-mix(in srgb, var(--theme-status-warning) 12%, transparent);
-}
-
-.workspace-lineage-bar-main {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem 0.75rem;
+.workspace-lineage-select {
   min-width: 0;
-}
-
-.workspace-lineage-name {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.workspace-lineage-manage {
-  margin-inline-start: auto;
-}
-
-.workspace-lineage-status {
-  font-size: 0.85rem;
-  padding: 0.15rem 0.55rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
-  overflow-wrap: anywhere;
-}
-
-.workspace-lineage-status.is-success {
-  border-color: color-mix(in srgb, var(--theme-status-success) 60%, currentColor 10%);
-}
-
-.workspace-lineage-status.is-warning {
-  border-color: color-mix(in srgb, var(--theme-status-warning) 70%, currentColor 10%);
-}
-
-.workspace-lineage-status.is-danger {
-  border-color: color-mix(in srgb, var(--theme-status-danger) 70%, currentColor 10%);
+  max-width: 28rem;
   font-weight: 600;
+}
+
+.workspace-lineage-select select {
+  font-weight: 400;
 }
 
 .workspace-lineage-banner {
@@ -106,17 +70,6 @@
 
 .settings-storage-legacy {
   margin-top: 0.75rem;
-}
-
-.settings-storage-field {
-  display: grid;
-  gap: 0.25rem;
-  font-weight: 600;
-  min-width: 0;
-}
-
-.settings-storage-field select {
-  max-width: 100%;
 }
 
 .settings-workspace-storage h2:focus-visible,

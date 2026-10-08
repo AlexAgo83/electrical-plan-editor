@@ -20,13 +20,12 @@ Recovery messages (choose the working state after a divergence, reconnect a fold
 interrupted publications, missing files, preserved previous browser workspace with
 **Download preserved snapshot** / **Dismiss**) appear at the top of the section with their action.
 
-Outside Settings only compact context remains:
+Outside Settings there is no permanent workspace bar:
 
-- **Home** keeps the **Resume** cards (navigation) and one **Manage workspaces** shortcut.
-- With an active named workspace, a compact bar under the header shows its name, the truthful save
-  status and **Manage workspaces**. While a version is open read-only, the bar always shows the
-  read-only warning with **Return to working copy**. Other recovery warnings carry a
-  **Resolve in Settings** link that opens Settings and focuses the matching action.
+- **Home** shows the workspace selector (same themed field as in Settings), the **Resume** cards
+  and one **Manage workspaces** shortcut that opens and focuses Settings > Workspace storage.
+- Only while a version is open read-only does a warning appear under the header, on every screen,
+  with **Return to working copy**; it disappears when you return.
 - The operations panel shows the active workspace and its save status with **Manage workspaces**.
 - **Ctrl/Cmd+S** saves the active working copy from any screen.
 
@@ -57,7 +56,8 @@ A *named workspace* (lineage) is an independent project line, for example **Seri
     every workspace with its history.
   - **This browser only**: the workspace stays in the browser library (IndexedDB). Export a ZIP
     package to copy it to another computer.
-- **Switch** with the selector in Settings > Workspace storage or the **Resume** cards on Home.
+- **Switch** with the selector on Home or in Settings > Workspace storage, or with the **Resume**
+  cards on Home.
   Unsaved work of the workspace you leave is preserved first; if that is impossible (storage full,
   folder permission revoked) the switch is refused. Undo/redo history never crosses workspaces.
 - **Rename** (Current workspace group) changes only the display name; identity, folder and file names stay.

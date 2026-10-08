@@ -1684,7 +1684,6 @@
     "workspaceStorageManage": "Manage workspaces",
     "workspaceStorageNoticesLabel": "Workspace notices",
     "workspaceStorageOpsActiveWorkspace": "Active workspace:",
-    "workspaceStorageResolveInSettings": "Resolve in Settings",
     "workspaceStorageVersionsSummary": "{versions} version(s), {handoffs} supplier handoff(s)",
     "settingsSearchMatchCountOne": "{count} matching setting label",
     "settingsSearchMatchCountOther": "{count} matching setting labels"

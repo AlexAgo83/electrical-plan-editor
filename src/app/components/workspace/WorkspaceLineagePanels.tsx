@@ -10,8 +10,6 @@ import {
   type LegacyAdoptionPreview
 } from "../../lib/lineage/lineageLegacyImport";
 import type { HandoffVerification } from "../../lib/lineage/lineageRepository";
-import { describeLineageSaveStatus } from "../../lib/lineage/lineageStatus";
-import { describeLineageNotices } from "../../lib/lineage/lineageNotices";
 
 const formatDateTime = formatLineageDateTime;
 
@@ -72,59 +70,58 @@ function LineageDialog({
   );
 }
 
-// --------------------------------------------------------------------------- compact context
+// --------------------------------------------------------------------------- selector and read-only banner
+
+/** Workspace switcher shared by Home and Settings; uses the themed form field styles. */
+export function WorkspaceLineageSelect({ model, label }: { model: WorkspaceLineageModel; label?: ReactNode }): ReactElement {
+  const { snapshot } = model;
+  const selectId = useId();
+  const active = snapshot.active;
+  return (
+    <label className="stack-label workspace-lineage-select" htmlFor={selectId}>
+      <span>{label ?? t("ui.workspaceLineageSelectLabel")}</span>
+      <select
+        id={selectId}
+        value={active?.workspaceId ?? ""}
+        disabled={snapshot.busy || !snapshot.ready || snapshot.records.length === 0}
+        onChange={(event) => {
+          if (event.target.value.length > 0) {
+            void model.switchTo(event.target.value);
+          }
+        }}
+      >
+        {active === null ? <option value="">{t("ui.workspaceLineageNoneOption")}</option> : null}
+        {snapshot.records.map((record) => (
+          <option key={record.workspaceId} value={record.workspaceId}>
+            {record.displayName}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
 
 /**
- * The only lineage surface outside Settings: active name, truthful save status, a shortcut to
- * Settings > Workspace storage, the always-visible historical read-only warning and links to
- * the matching Settings recovery actions.
+ * Shown outside Settings only while a frozen version is open read-only, so the exit stays
+ * reachable from every screen. There is no permanent workspace bar.
  */
-export function WorkspaceLineageContextBar({
-  model,
-  onManage
-}: {
-  model: WorkspaceLineageModel;
-  onManage: (settingsTargetId?: string) => void;
-}): ReactElement | null {
-  const { snapshot } = model;
-  const active = snapshot.active;
-  if (active === null) {
+export function WorkspaceLineageReadOnlyBanner({ model }: { model: WorkspaceLineageModel }): ReactElement | null {
+  const historical = model.snapshot.historical;
+  if (historical === null) {
     return null;
   }
-  const status = describeLineageSaveStatus(snapshot);
-  const notices = describeLineageNotices(snapshot);
-  const isReadOnly = snapshot.historical !== null;
   return (
-    <section className="workspace-lineage-bar" aria-label={t("ui.workspaceLineageBarLabel")} data-read-only={isReadOnly ? "true" : "false"}>
-      <div className="workspace-lineage-bar-main">
-        <strong className="workspace-lineage-name">{active.displayName}</strong>
-        <span className={`workspace-lineage-status is-${status.tone}`} aria-live="polite" aria-atomic="true">
-          {status.label}
+    <section className="workspace-lineage-read-only-banner" aria-label={t("ui.workspaceLineageBarLabel")}>
+      <div className="workspace-lineage-banner is-read-only" role="alert">
+        <strong>{t("ui.workspaceLineageReadOnlyBanner", { version: historical.label })}</strong>
+        <span>
+          {model.snapshot.active?.displayName ?? ""} · {historical.title.length > 0 ? `${historical.title} · ` : ""}
+          {formatDateTime(historical.createdAtIso)}
         </span>
-        <button type="button" className="workspace-lineage-manage" onClick={() => onManage()}>
-          {t("ui.workspaceStorageManage")}
+        <button type="button" onClick={() => model.returnToWorking()}>
+          {t("ui.workspaceLineageReturnToWorking")}
         </button>
       </div>
-      {isReadOnly && snapshot.historical !== null ? (
-        <div className="workspace-lineage-banner is-read-only" role="alert">
-          <strong>{t("ui.workspaceLineageReadOnlyBanner", { version: snapshot.historical.label })}</strong>
-          <span>
-            {snapshot.historical.title.length > 0 ? `${snapshot.historical.title} · ` : ""}
-            {formatDateTime(snapshot.historical.createdAtIso)}
-          </span>
-          <button type="button" onClick={() => model.returnToWorking()}>
-            {t("ui.workspaceLineageReturnToWorking")}
-          </button>
-        </div>
-      ) : null}
-      {notices.map((notice) => (
-        <div key={notice.kind} className={`workspace-lineage-banner is-${notice.tone}`} role="status">
-          <span>{notice.message}</span>
-          <button type="button" onClick={() => onManage(notice.settingsTargetId)}>
-            {t("ui.workspaceStorageResolveInSettings")}
-          </button>
-        </div>
-      ))}
     </section>
   );
 }
@@ -149,6 +146,7 @@ export function HomeWorkspaceLineagesPanel({
         <span className="settings-panel-chip">{snapshot.records.length}</span>
       </header>
       <p className="settings-panel-intro">{t("ui.workspaceLineageHomeIntro")}</p>
+      {snapshot.records.length > 0 ? <WorkspaceLineageSelect model={model} /> : null}
       {snapshot.records.length === 0 ? <p className="empty-copy">{t("ui.workspaceLineageHomeEmpty")}</p> : null}
       {snapshot.records.length > 0 ? (
         <ul className="workspace-lineage-cards">

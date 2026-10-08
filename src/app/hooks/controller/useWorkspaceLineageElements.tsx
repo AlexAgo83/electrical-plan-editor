@@ -1,11 +1,11 @@
 import { useCallback, type ReactNode } from "react";
-import { HomeWorkspaceLineagesPanel, WorkspaceLineageContextBar, WorkspaceLineageDialogs } from "../../components/workspace/WorkspaceLineagePanels";
+import { HomeWorkspaceLineagesPanel, WorkspaceLineageReadOnlyBanner, WorkspaceLineageDialogs } from "../../components/workspace/WorkspaceLineagePanels";
 import { requestWorkspaceStorageFocus } from "../../lib/workspaceStorageFocus";
 import type { ScreenId, SubScreenId } from "../../types/app-controller";
 import type { WorkspaceLineageModel } from "../useWorkspaceLineages";
 
 export interface WorkspaceLineageElements {
-  /** Compact active-workspace context shown outside Settings (renders nothing without an active named workspace). */
+  /** Read-only warning with Return to working copy; renders only while a version is consulted. */
   workspaceLineageBar: ReactNode;
   workspaceLineagesPanel: ReactNode;
   /** The single lineage dialog host, mounted once at app level. */
@@ -42,7 +42,7 @@ export function useWorkspaceLineageElements(
     setActiveSubScreen("connector");
   };
   return {
-    workspaceLineageBar: <WorkspaceLineageContextBar model={model} onManage={openWorkspaceStorageSettings} />,
+    workspaceLineageBar: <WorkspaceLineageReadOnlyBanner model={model} />,
     workspaceLineagesPanel: <HomeWorkspaceLineagesPanel model={model} onResume={onResume} onManage={() => openWorkspaceStorageSettings()} />,
     workspaceLineageDialogs: <WorkspaceLineageDialogs model={model} themeHostClassName={themeHostClassName} />,
     openWorkspaceStorageSettings,

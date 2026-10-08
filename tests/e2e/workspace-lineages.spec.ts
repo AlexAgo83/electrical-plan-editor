@@ -10,8 +10,12 @@ async function preparePage(page: Page): Promise<void> {
   });
 }
 
-function contextBar(page: Page): Locator {
+function readOnlyBanner(page: Page): Locator {
   return page.getByRole("region", { name: "Named workspace", exact: true });
+}
+
+function homePanel(page: Page): Locator {
+  return page.locator(".home-workspace-lineages-panel");
 }
 
 function storagePanel(page: Page): Locator {
@@ -27,9 +31,7 @@ function workspaceSelect(page: Page): Locator {
 }
 
 async function openStorageSettings(page: Page): Promise<void> {
-  const manage = (await contextBar(page).count()) > 0
-    ? contextBar(page).getByRole("button", { name: "Manage workspaces" })
-    : page.locator(".home-workspace-lineages-panel").getByRole("button", { name: "Manage workspaces" });
+  const manage = homePanel(page).getByRole("button", { name: "Manage workspaces" });
   await manage.focus();
   await page.keyboard.press("Enter");
   await expect(storagePanel(page).getByRole("heading", { level: 2, name: "Workspace storage" })).toBeFocused();
@@ -80,9 +82,9 @@ test("two named lineages, supplier archive and portable transfer into a clean br
   await preparePage(page);
   await page.goto("/");
   await openStorageSettings(page);
-  // Legacy session: compatibility subsection with the single-file tools, no compact context yet.
+  // Legacy session: compatibility subsection with the single-file tools; never a permanent bar.
   await expect(storagePanel(page).getByRole("region", { name: "Single-file compatibility" })).toBeVisible();
-  await expect(contextBar(page)).toHaveCount(0);
+  await expect(readOnlyBanner(page)).toHaveCount(0);
   await expect(storageGroup(page, "Current workspace").getByRole("button", { name: "New workspace" })).toBeEnabled();
 
   await createWorkspace(page, "Série", "current");
@@ -119,9 +121,17 @@ test("two named lineages, supplier archive and portable transfer into a clean br
   await expectNoHorizontalOverflow(page);
   await page.setViewportSize({ width: 1280, height: 800 });
 
-  // Reload: both lineages and the active one survive; the compact context names it outside Settings.
+  // Reload: both lineages and the active one survive; Home offers the themed selector, no permanent bar.
   await page.reload();
-  await expect(contextBar(page).getByText("Série", { exact: true })).toBeVisible();
+  const homeSelect = homePanel(page).getByRole("combobox", { name: "Workspace", exact: true });
+  await expect(homeSelect.locator("option:checked")).toHaveText("Série");
+  await expect(readOnlyBanner(page)).toHaveCount(0);
+  const selectStyle = await homeSelect.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { radius: parseFloat(style.borderTopLeftRadius), font: style.fontFamily, bodyFont: getComputedStyle(document.querySelector("main.app-shell") as Element).fontFamily };
+  });
+  expect(selectStyle.radius).toBeGreaterThan(0);
+  expect(selectStyle.font).toBe(selectStyle.bodyFont);
   await openStorageSettings(page);
   await expect(workspaceSelect(page).locator("option:checked")).toHaveText("Série");
   await expect(workspaceSelect(page).locator("option")).toHaveText(["Protos", "Série"]);
@@ -129,10 +139,11 @@ test("two named lineages, supplier archive and portable transfer into a clean br
   // Read-only consultation from history: the warning and its exit stay in the compact context.
   await storageGroup(page, "Versions and handoffs").getByRole("button", { name: "History" }).click();
   await historyEntry(page.getByRole("dialog", { name: "History of Série" }), "v001").getByRole("button", { name: "Open read-only" }).click();
-  await expect(contextBar(page).getByText("Read-only: viewing v001")).toBeVisible();
+  await expect(readOnlyBanner(page).getByText("Read-only: viewing v001")).toBeVisible();
   await expect(storageGroup(page, "Current workspace").getByRole("button", { name: "Save" })).toBeDisabled();
-  await contextBar(page).getByRole("button", { name: "Return to working copy" }).click();
+  await readOnlyBanner(page).getByRole("button", { name: "Return to working copy" }).click();
   await expect(page.getByText("Read-only: viewing v001")).toHaveCount(0);
+  await expect(readOnlyBanner(page)).toHaveCount(0);
   await expect(storageGroup(page, "Current workspace").getByRole("button", { name: "Save" })).toBeEnabled();
 
   // Another computer: clean browser context, import the ZIP package from Settings.

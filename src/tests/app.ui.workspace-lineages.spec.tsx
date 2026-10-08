@@ -14,8 +14,12 @@ function storageGroup(name: "Current workspace" | "Versions and handoffs" | "Tra
   return within(storagePanel()).getByRole("region", { name });
 }
 
-function contextBar(): HTMLElement {
+function readOnlyBanner(): HTMLElement {
   return screen.getByRole("region", { name: "Named workspace" });
+}
+
+function homePanel(): HTMLElement {
+  return screen.getByRole("region", { name: "Named workspaces" });
 }
 
 function workspaceSelect(): HTMLSelectElement {
@@ -52,6 +56,8 @@ describe("named workspace lineages UI", () => {
     switchScreenDrawerAware("home");
     const homePanel = screen.getByRole("region", { name: "Named workspaces" });
     expect(within(homePanel).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual(["Manage workspaces"]);
+    // Empty library: no selector yet.
+    expect(within(homePanel).queryByRole("combobox", { name: "Workspace" })).toBeNull();
     // Without an active named workspace there is no compact context outside Settings.
     expect(screen.queryByRole("region", { name: "Named workspace" })).toBeNull();
 
@@ -87,13 +93,19 @@ describe("named workspace lineages UI", () => {
     fireEvent.change(workspaceSelect(), { target: { value: serieOption.value } });
     await waitFor(() => expect(store.getState().networks.allIds).toHaveLength(initialNetworkCount), ASYNC_UI);
 
-    // Navigate away: the compact context and Ctrl/Cmd+S still use the same active model.
+    // Navigate away: no permanent bar; Home offers the selector and Ctrl/Cmd+S uses the same active model.
     switchScreenDrawerAware("home");
-    expect(within(contextBar()).getByText("Série")).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Named workspace" })).toBeNull();
+    const homeSelect = within(homePanel()).getByRole<HTMLSelectElement>("combobox", { name: "Workspace" });
+    expect(homeSelect.selectedOptions[0]?.textContent).toBe("Série");
+    fireEvent.change(homeSelect, { target: { value: within(homeSelect).getByRole<HTMLOptionElement>("option", { name: "Protos" }).value } });
+    await waitFor(() => expect(store.getState().networks.allIds).toHaveLength(0), ASYNC_UI);
+    fireEvent.change(homeSelect, { target: { value: serieOption.value } });
+    await waitFor(() => expect(store.getState().networks.allIds).toHaveLength(initialNetworkCount), ASYNC_UI);
     fireEvent.keyDown(window, { key: "s", ctrlKey: true });
     await screen.findByText("Working copy saved", {}, ASYNC_UI);
 
-    fireEvent.click(within(contextBar()).getByRole("button", { name: "Manage workspaces" }));
+    fireEvent.click(within(homePanel()).getByRole("button", { name: "Manage workspaces" }));
     fireEvent.click(within(await waitFor(() => storageGroup("Versions and handoffs"), ASYNC_UI)).getByRole("button", { name: "Create version" }));
     const versionDialog = await screen.findByRole("dialog", { name: "Create version v001" }, ASYNC_UI);
     // One stable host: the dialog opened from Settings is mounted exactly once.
@@ -109,7 +121,7 @@ describe("named workspace lineages UI", () => {
     const entries = within(history).getAllByRole("listitem").filter((item) => item.classList.contains("lineage-history-entry"));
     expect(entries).toHaveLength(1);
     fireEvent.click(within(entries[0]!).getByRole("button", { name: "Open read-only" }));
-    await waitFor(() => expect(within(contextBar()).getByText("Read-only: viewing v001")).toBeInTheDocument(), ASYNC_UI);
+    await waitFor(() => expect(within(readOnlyBanner()).getByText("Read-only: viewing v001")).toBeInTheDocument(), ASYNC_UI);
     expect(within(storageGroup("Current workspace")).getByRole("button", { name: "Save" })).toBeDisabled();
     expect(within(storageGroup("Versions and handoffs")).getByRole("button", { name: "Create version" })).toBeDisabled();
 
@@ -120,10 +132,11 @@ describe("named workspace lineages UI", () => {
     expect(store.getState().networks).toBe(before.networks);
     expect((await screen.findAllByText("Read-only version", {}, ASYNC_UI)).length).toBeGreaterThan(0);
 
-    // The historical warning and its exit stay visible outside Settings.
+    // While a version is consulted, the warning and its exit stay visible outside Settings.
     switchScreenDrawerAware("home");
-    fireEvent.click(within(contextBar()).getByRole("button", { name: "Return to working copy" }));
+    fireEvent.click(within(readOnlyBanner()).getByRole("button", { name: "Return to working copy" }));
     await waitFor(() => expect(screen.queryByText("Read-only: viewing v001")).toBeNull(), ASYNC_UI);
+    expect(screen.queryByRole("region", { name: "Named workspace" })).toBeNull();
     switchScreenDrawerAware("settings");
     expect(within(storageGroup("Current workspace")).getByRole("button", { name: "Save" })).not.toBeDisabled();
   });

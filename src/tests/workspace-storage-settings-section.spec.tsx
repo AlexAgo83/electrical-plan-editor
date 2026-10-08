@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SettingsWorkspaceStorageSection, type LegacyWorkspaceFileControls } from "../app/components/workspace/SettingsWorkspaceStorageSection";
-import { WorkspaceLineageContextBar } from "../app/components/workspace/WorkspaceLineagePanels";
+import { HomeWorkspaceLineagesPanel, WorkspaceLineageReadOnlyBanner } from "../app/components/workspace/WorkspaceLineagePanels";
 import type { WorkspaceLineageModel } from "../app/hooks/useWorkspaceLineages";
 import type { LineageSessionSnapshot } from "../app/lib/lineage/lineageSessionController";
 import { lineageNoticeTargetId } from "../app/lib/lineage/lineageNotices";
@@ -174,16 +174,35 @@ describe("Settings > Workspace storage section", () => {
     }
   });
 
-  it("routes context recovery links to the matching Settings action and focuses it", async () => {
-    const state = folderSnapshot({ preservedLegacySnapshot: true }, { versions: [], handoffs: [], divergentHeads: [{ headId: "h1", sourceLabel: "laptop", updatedAtIso: "2026-10-01T10:00:00Z", baseVersionId: null }] });
-    const onManage = vi.fn();
-    const { unmount } = render(<WorkspaceLineageContextBar model={fakeModel(state)} onManage={onManage} />);
-    const bar = screen.getByRole("region", { name: "Named workspace" });
-    expect(within(bar).getAllByRole("button", { name: "Resolve in Settings" })).toHaveLength(2);
-    fireEvent.click(within(bar).getAllByRole("button", { name: "Resolve in Settings" })[0]!);
-    expect(onManage).toHaveBeenCalledWith(lineageNoticeTargetId("divergence"));
+  it("shows no permanent bar outside Settings, only the read-only warning while a version is consulted", () => {
+    const { container, unmount } = render(<WorkspaceLineageReadOnlyBanner model={fakeModel(folderSnapshot())} />);
+    expect(container).toBeEmptyDOMElement();
     unmount();
 
+    const model = fakeModel(folderSnapshot({ historical: { versionId: "v1", label: "v001", title: "", createdAtIso: "2026-10-01T10:00:00Z" } }));
+    render(<WorkspaceLineageReadOnlyBanner model={model} />);
+    expect(screen.getByRole("alert")).toHaveTextContent("Read-only: viewing v001");
+    fireEvent.click(screen.getByRole("button", { name: "Return to working copy" }));
+    expect(model.returnToWorking).toHaveBeenCalledTimes(1);
+  });
+
+  it("offers the themed workspace selector on Home and switches from it", () => {
+    const state = folderSnapshot({
+      records: [
+        { workspaceId: "workspace_a", displayName: "Série", storage: "folder", folderName: "serie", latestVersionLabel: null, versionCount: 0, lastDurableSaveIso: null, pendingPortableExport: false },
+        { workspaceId: "workspace_b", displayName: "Protos", storage: "browser", folderName: null, latestVersionLabel: null, versionCount: 0, lastDurableSaveIso: null, pendingPortableExport: false }
+      ] as unknown as LineageSessionSnapshot["records"]
+    });
+    const model = fakeModel(state);
+    render(<HomeWorkspaceLineagesPanel model={model} onResume={vi.fn()} onManage={vi.fn()} />);
+    const select = screen.getByRole("combobox", { name: "Workspace" });
+    expect(select.closest("label")).toHaveClass("stack-label");
+    fireEvent.change(select, { target: { value: "workspace_b" } });
+    expect(model.switchTo).toHaveBeenCalledWith("workspace_b");
+  });
+
+  it("focuses the matching Settings recovery action when a focus target is requested", async () => {
+    const state = folderSnapshot({ preservedLegacySnapshot: true }, { versions: [], handoffs: [], divergentHeads: [{ headId: "h1", sourceLabel: "laptop", updatedAtIso: "2026-10-01T10:00:00Z", baseVersionId: null }] });
     requestWorkspaceStorageFocus(lineageNoticeTargetId("divergence"));
     const model = fakeModel(state);
     render(<SettingsWorkspaceStorageSection model={model} legacy={legacyControls(legacyStatus())} normalizedQuery="" />);

@@ -11,7 +11,7 @@ import {
 } from "../../lib/workspaceStorageFocus";
 import { SettingsLabelText } from "../settings/SettingsLabelText";
 import { formatLineageDateTime } from "../../lib/lineage/lineageFormat";
-import { LineagePackageFileInput } from "./WorkspaceLineagePanels";
+import { LineagePackageFileInput, WorkspaceLineageSelect } from "./WorkspaceLineagePanels";
 
 export interface LegacyWorkspaceFileControls {
   workspaceFileStatus: WorkspaceFileStorageStatus;
@@ -126,7 +126,6 @@ function hasNoticeAction(notice: LineageNotice): boolean {
 
 function NamedWorkspaceGroups({ model, label }: { model: WorkspaceLineageModel; label: (text: string) => ReactNode }): ReactElement {
   const { snapshot } = model;
-  const selectId = useId();
   const packageInputRef = useRef<HTMLInputElement | null>(null);
   const active = snapshot.active;
   const isReadOnly = snapshot.historical !== null;
@@ -156,26 +155,7 @@ function NamedWorkspaceGroups({ model, label }: { model: WorkspaceLineageModel; 
       ) : null}
       <div className="settings-storage-groups">
         <StorageGroup title={t("ui.workspaceStorageGroupCurrent")}>
-          <label className="settings-storage-field" htmlFor={selectId}>
-            <span>{label(t("ui.workspaceLineageSelectLabel"))}</span>
-            <select
-              id={selectId}
-              value={active?.workspaceId ?? ""}
-              disabled={snapshot.busy || !snapshot.ready || snapshot.records.length === 0}
-              onChange={(event) => {
-                if (event.target.value.length > 0) {
-                  void model.switchTo(event.target.value);
-                }
-              }}
-            >
-              {active === null ? <option value="">{t("ui.workspaceLineageNoneOption")}</option> : null}
-              {snapshot.records.map((record) => (
-                <option key={record.workspaceId} value={record.workspaceId}>
-                  {record.displayName}
-                </option>
-              ))}
-            </select>
-          </label>
+          <WorkspaceLineageSelect model={model} label={label(t("ui.workspaceLineageSelectLabel"))} />
           <div className="settings-state-row">
             <span className={statusChipClassName} aria-live="polite" aria-atomic="true">
               {status.label}
