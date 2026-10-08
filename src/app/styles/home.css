@@ -268,26 +268,32 @@
     align-items: stretch;
   }
 
+  /* The left column holds up to three panels (named workspaces, quick start, active network):
+     each keeps its natural height so none overlaps another, and the active network panel absorbs
+     the remaining height so no gap opens below it. */
   .home-left-column {
+    display: flex;
+    flex-direction: column;
     align-self: stretch;
-    grid-template-rows: auto minmax(0, 1fr);
-    align-content: stretch;
-    height: var(--home-workspace-stack-height);
-    max-height: var(--home-workspace-stack-height);
-    overflow: hidden;
+    min-height: var(--home-workspace-stack-height);
   }
 
-  .home-workspace-resume-panel {
-    align-self: stretch;
-    overflow: hidden;
+  .home-left-column > .home-panel {
+    flex: 0 0 auto;
   }
 
+  .home-left-column > .home-workspace-resume-panel {
+    flex: 1 1 auto;
+    min-height: 12rem;
+  }
+
+  /* What's new never sizes the row: it follows the left column and scrolls internally. */
   .home-whats-new-panel {
     align-self: stretch;
     grid-column: 2;
     grid-row: 1;
-    height: var(--home-workspace-stack-height);
-    max-height: var(--home-workspace-stack-height);
+    contain: size;
+    min-height: var(--home-workspace-stack-height);
   }
 }
 

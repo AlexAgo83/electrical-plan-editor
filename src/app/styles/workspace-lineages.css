@@ -171,3 +171,11 @@
   color: color-mix(in srgb, var(--theme-status-danger) 70%, currentColor);
   font-weight: 600;
 }
+
+/* Risky lineage actions (Resume from this version): keep the theme button surface, mark the
+   intent with the shared danger token. The :is() list lifts specificity above theme hover rules. */
+.app-shell .row-actions button.is-danger-action[type="button"]:is(*, :hover, :focus-visible),
+.app-shell .lineage-action-menu-item.is-danger-action:is(*, :hover, :focus-visible) {
+  color: color-mix(in srgb, var(--theme-status-danger) 82%, currentColor);
+  border-color: color-mix(in srgb, var(--theme-status-danger) 70%, transparent);
+}

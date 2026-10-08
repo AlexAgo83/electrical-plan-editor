@@ -148,7 +148,11 @@ function NamedWorkspaceGroups({ model, label }: { model: WorkspaceLineageModel; 
               tabIndex={hasNoticeAction(notice) ? undefined : -1}
             >
               <span>{notice.message}</span>
-              <NoticeActions notice={notice} model={model} label={label} />
+              {hasNoticeAction(notice) ? (
+                <span className="row-actions compact">
+                  <NoticeActions notice={notice} model={model} label={label} />
+                </span>
+              ) : null}
             </li>
           ))}
         </ul>

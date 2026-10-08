@@ -102,8 +102,8 @@ export function WorkspaceLineageSelect({ model, label }: { model: WorkspaceLinea
 }
 
 /**
- * Shown outside Settings only while a frozen version is open read-only, so the exit stays
- * reachable from every screen. There is no permanent workspace bar.
+ * The single read-only signal, shown on every screen (Settings included) while a frozen version is
+ * open, so both exits stay reachable everywhere. There is no permanent workspace bar.
  */
 export function WorkspaceLineageReadOnlyBanner({ model }: { model: WorkspaceLineageModel }): ReactElement | null {
   const historical = model.snapshot.historical;
@@ -118,9 +118,14 @@ export function WorkspaceLineageReadOnlyBanner({ model }: { model: WorkspaceLine
           {model.snapshot.active?.displayName ?? ""} · {historical.title.length > 0 ? `${historical.title} · ` : ""}
           {formatDateTime(historical.createdAtIso)}
         </span>
-        <button type="button" onClick={() => model.returnToWorking()}>
-          {t("ui.workspaceLineageReturnToWorking")}
-        </button>
+        <span className="row-actions compact">
+          <button type="button" onClick={() => model.returnToWorking()}>
+            {t("ui.workspaceLineageReturnToWorking")}
+          </button>
+          <button type="button" className="is-danger-action" onClick={() => void model.restoreFromVersion(historical.versionId)} disabled={model.snapshot.busy}>
+            {t("ui.workspaceLineageResumeFromVersion")}
+          </button>
+        </span>
       </div>
     </section>
   );
@@ -452,10 +457,12 @@ function HandoffDetails({ model, handoff, labels }: { model: WorkspaceLineageMod
                   {attachment.originalFileName} · {formatBytes(attachment.byteLength)} · <code title={attachment.sha256}>{attachment.sha256.slice(0, 12)}</code> ·{" "}
                   <span className={status === "ok" ? "lineage-attachment-ok" : "lineage-attachment-bad"}>
                     {status === "ok" ? t("ui.workspaceLineageAttachmentOk") : status === "missing" ? t("ui.workspaceLineageAttachmentMissing") : t("ui.workspaceLineageAttachmentCorrupt")}
-                  </span>{" "}
-                  <button type="button" disabled={status !== "ok"} onClick={() => void model.downloadAttachment(handoff.handoffId, attachment.attachmentId)}>
-                    {t("ui.workspaceLineageDownload")}
-                  </button>
+                  </span>
+                  <span className="row-actions compact">
+                    <button type="button" disabled={status !== "ok"} onClick={() => void model.downloadAttachment(handoff.handoffId, attachment.attachmentId)}>
+                      {t("ui.workspaceLineageDownload")}
+                    </button>
+                  </span>
                 </li>
               ))}
             </ul>
@@ -837,23 +844,25 @@ function LegacyImportDialog({ model }: { model: WorkspaceLineageModel }): ReactE
                   <li key={entry.entryId}>
                     {entry.fileName} · {entry.suggestedDateIso === null ? t("ui.workspaceLineageLegacyUndated") : formatDateTime(entry.suggestedDateIso)}
                     {plan.skippedEntryIds.includes(entry.entryId) ? ` · ${t("ui.workspaceLineageLegacySkipped")}` : ""}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setPlan({
-                          ...plan,
-                          orderedEntryIds: [...plan.orderedEntryIds, entry.entryId],
-                          skippedEntryIds: plan.skippedEntryIds.filter((id) => id !== entry.entryId)
-                        })
-                      }
-                    >
-                      {t("ui.workspaceLineageLegacyPlace")}
-                    </button>
-                    {!plan.skippedEntryIds.includes(entry.entryId) ? (
-                      <button type="button" onClick={() => setPlan({ ...plan, skippedEntryIds: [...plan.skippedEntryIds, entry.entryId] })}>
-                        {t("ui.workspaceLineageLegacySkip")}
+                    <span className="row-actions compact">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setPlan({
+                            ...plan,
+                            orderedEntryIds: [...plan.orderedEntryIds, entry.entryId],
+                            skippedEntryIds: plan.skippedEntryIds.filter((id) => id !== entry.entryId)
+                          })
+                        }
+                      >
+                        {t("ui.workspaceLineageLegacyPlace")}
                       </button>
-                    ) : null}
+                      {!plan.skippedEntryIds.includes(entry.entryId) ? (
+                        <button type="button" onClick={() => setPlan({ ...plan, skippedEntryIds: [...plan.skippedEntryIds, entry.entryId] })}>
+                          {t("ui.workspaceLineageLegacySkip")}
+                        </button>
+                      ) : null}
+                    </span>
                   </li>
                 ))}
               </ul>
