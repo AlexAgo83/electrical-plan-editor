@@ -1,0 +1,233 @@
+{
+  "title": "Remediate workspace UI and UX findings from the 1.19.1 visual review on Home and Settings",
+  "references": [
+    "changelogs/CHANGELOGS_1_19_1.md",
+    "logics/request/req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui.md",
+    "logics/product/prod_018_portable_named_workspace_lineages_and_supplier_history.md",
+    "logics/product/prod_019_workspace_storage_settings_information_architecture_and_theme_consistency.md",
+    "src/app/styles/home.css",
+    "src/app/styles/workspace-lineages.css",
+    "src/app/styles/workspace/workspace-panels-and-responsive/workspace-panels-and-actions.css",
+    "src/app/components/workspace/HomeWorkspaceContent.tsx",
+    "src/app/components/workspace/WorkspaceLineagePanels.tsx",
+    "src/app/components/workspace/SettingsWorkspaceStorageSection.tsx",
+    "src/app/components/workspace/OperationsHealthPanel.tsx",
+    "src/app/components/settings/settingsSearchModel.ts",
+    "src/app/hooks/useWorkspaceLineages.ts",
+    "src/app/hooks/useStoreHistory.ts",
+    "src/app/lib/workspaceSessionGate.ts",
+    "src/app/lib/lineage/lineageSessionController.ts",
+    "src/app/lib/lineage/lineageStatus.ts",
+    "src/app/lib/lineage/lineageFormat.ts",
+    "src/app/lib/lineage/lineageNotices.ts",
+    "src/app/lib/i18n.ts",
+    "src/app/i18n/en.json",
+    "src/app/i18n/fr.json",
+    "src/tests/app.ui.home.spec.tsx",
+    "src/tests/app.ui.theme.spec.tsx",
+    "src/tests/app.ui.settings-locale.spec.tsx",
+    "src/tests/app.ui.workspace-lineages.spec.tsx",
+    "src/tests/workspace-storage-settings-section.spec.tsx",
+    "tests/e2e/workspace-lineages.spec.ts",
+    "docs/workspace-lineages.md"
+  ],
+  "request": {
+    "complexity": "High",
+    "theme": "Workspace UX",
+    "needs": [
+      "Fix the visual defects found on Home and Settings > Workspace storage in release 1.19.1 (overlapping panels, unthemed buttons).",
+      "Make workspace status, alerts and read-only signals truthful and non-alarming.",
+      "Simplify the Home and Settings workspace flows and the History dialog so the main actions are obvious."
+    ],
+    "context": [
+      "Source: visual review of production 1.19.1 (Playwright, 1366px and 360px, themes warm brown, normal, dark, cyberpunk, circle mobility dark, sage paper, EN/FR) performed on 2026-10-08. Findings and proposals 1 to 15 below are the scope; each AC names the proposal numbers it covers.",
+      "P1 Home overlap: at >=980px home.css gives .home-left-column a fixed viewport height, overflow hidden and grid-template-rows 'auto minmax(0, 1fr)' designed for two panels. The Named workspaces panel added in 1.19.0 is a third child, so Quick start is squeezed and the Workspace (active network) panel is drawn over it (Help button hidden); with an empty library a large gap appears instead.",
+      "P2 Unthemed buttons: themed button styles target '.row-actions button'. Buttons outside that container render with browser defaults (grey, square): preserved snapshot Download/Dismiss and other notice actions, read-only Return to working copy / Resume from this version (global banner and Settings), and the Resume button of each Home card. Visible in every theme.",
+      "P3 Misleading preserved snapshot: LineageSessionController.preserveLegacyStateIfNeeded preserves any non-empty state, including the built-in sample network (hasSampleNetworkSignature exists in the store). A fresh browser therefore shows 'Your previous browser workspace was preserved' in warning tone at the top of Settings without explaining what it is.",
+      "P4 Locale: lineageStatus.formatTime and formatLineageDateTime use the browser locale ([]) instead of the app locale, so FR shows '02:41 PM' and 'Oct 8, 2026'.",
+      "P5 Status: browser-only workspaces always show 'Stored in this browser HH:MM · package export pending' in warning tone (Settings chip, every Home card, Ops panel), although it is the normal state of that mode; the export action is in another column.",
+      "P6 Read-only: Settings shows the same read-only information three times (global banner, chip, boxed banner in Current workspace with two unthemed buttons). Navigating to Modeling while read-only immediately shows a 'Read-only version' blocked-mutation toast without user action; the automatic write that triggers reportBlockedMutationAttempt must be identified (useStoreHistory) and must not notify.",
+      "P7 Vocabulary: Home uses 'workspace' for three things: Named workspaces, Quick start Create empty workspace / Save workspace / Load workspace, and the 'Workspace' panel that actually shows the active network. The Quick start intro still mentions saved workspace files in named mode.",
+      "P8-P11 Settings > Workspace storage: three equal-height columns of full-width equal-weight buttons, no primary action; '2 version(s), 0 supplier handoff(s)' without latest version; in legacy mode a disabled selector 'Unnamed browser workspace' plus a 'No named workspace' chip, a duplicate 'Create named workspace from current content' next to New workspace, and a sentence repeating the save-location card.",
+      "P12-P13 Home: an empty library only offers Manage workspaces (two steps to create the first workspace); cards duplicate the selector, use a very large title, show 'Resume <full name>' buttons that wrap on long names, are sorted alphabetically and do not put the active workspace first. Decision: keep the Home selector requested for 1.19.1; cards become compact rows for the other workspaces.",
+      "P14-P15 History dialog: four equal buttons per version with the risky Resume from this version as prominent as Download file; duplicated Record supplier handoff (toolbar and per row); meaningless 'Stored in this browser' line; cryptic 'created on device-xxxx' labels (generated in useWorkspaceLineages.resolveDeviceLabel); the filter input looks focused at rest; success toasts stack under the dialog.",
+      "Guardrails: no change to persistence formats, immutable versions, recovery-before-restore, read-only gates, session isolation or the single app-level dialog host from req_168. Every action reachable today stays reachable (possibly behind a menu or disclosure). No data is deleted. All copy is semantic EN/FR in the i18n catalogs."
+    ],
+    "acceptance_criteria": [
+      "AC1 (P1): At 980px to 1920px widths and 0, 1, 2 and 8 named workspaces with long names, Home panels never overlap or clip each other and no large empty gap appears; each panel scrolls internally if needed and Quick start buttons stay fully visible and clickable.",
+      "AC2 (P2): Every button in lineage notices, the read-only banner, the Settings storage section and Home workspace rows uses the global themed button style (radius, font, colors, hover, focus-visible, disabled) in all supported theme modes; a test asserts no lineage button falls back to browser default styling.",
+      "AC3 (P3, P4, P5): The preserved-snapshot notice appears only when the preserved state is not empty and not the built-in sample; it is shown in Transfer and recovery with explanatory copy, neutral tone, Download and Dismiss. Times and dates in lineage status, cards, history and dialogs follow the app locale (EN/FR). A browser-only workspace in its normal state shows a success-toned saved status; the export reminder is a separate neutral hint with an adjacent Export package action, escalating to warning only after a documented threshold.",
+      "AC4 (P6): While a version is open read-only there is exactly one read-only banner (global, themed, Return to working copy and Resume from this version); Settings shows disabled actions with an explanation instead of duplicate banners. Navigating between screens in read-only mode raises no blocked-mutation toast unless the user attempts an edit, and read-only gates still block every edit route.",
+      "AC5 (P7, P12, P13): Home vocabulary distinguishes named workspaces from the active network panel and from legacy file shortcuts; Quick start copy matches the current mode. An empty library offers a primary Create your first workspace action opening the create dialog directly. Home keeps the themed selector; other workspaces appear as compact rows (name, version count, last save) with the active workspace excluded or first, whole-row resume, and no wrapping multi-line buttons for long names.",
+      "AC6 (P8, P9, P10, P11): Settings > Workspace storage shows a current-workspace header (name, selector, status, primary Save, secondary Rename/New), a versions summary with the latest version label/title/date and correct pluralization, primary Create version and secondary History, compact Transfer and recovery actions with legacy import under an Advanced disclosure once a workspace exists, and a simplified legacy mode (no disabled selector or redundant chip, a single create action, single-file tools collapsed unless a link or conflict is active). All req_168 actions, gates, search labels and focus targets still work.",
+      "AC7 (P14, P15): Each History row has one primary action (Open read-only) and a secondary menu for Download file, Record supplier handoff and Resume from this version, the latter visually marked as risky with explicit copy and the existing confirmation; the toolbar keeps a single Record supplier handoff and Export package; the storage line is removed; device labels are human-readable or hidden; the filter field has a normal rest state; success toasts remain visible above or are grouped with the dialog.",
+      "AC8: EN/FR catalogs, Settings search and quality:i18n stay valid; UI, theme, locale and e2e tests cover AC1 to AC7 including 360px and desktop layouts and keyboard flows; docs/workspace-lineages.md describes the updated Home, Settings and History flows; repository delivery gates pass with recorded results."
+    ]
+  },
+  "product": {
+    "title": "Workspace experience polish after the 1.19.1 visual review",
+    "overview": "Fix the visual defects and clarify the workspace flows found in the 1.19.1 review: no overlapping or unthemed UI, truthful and calm status signals, an obvious first-workspace and main-action path on Home and Settings, and a History dialog with a clear action hierarchy. Persistence semantics remain governed by prod_018 and the Settings information architecture by prod_019.",
+    "goals": [
+      "No visual breakage or unthemed controls on Home and Settings workspace surfaces.",
+      "Status, alerts and read-only signals that are truthful, localized and proportionate.",
+      "A clear primary path: create the first workspace, save, create a version, consult history."
+    ],
+    "non_goals": [
+      "Changes to persistence formats, versions, handoffs or recovery semantics.",
+      "A redesign of Settings outside Workspace storage or of network Import/Export.",
+      "New cloud, sync or collaboration features."
+    ]
+  },
+  "backlog_items": [
+    {
+      "title": "Fix Home panel overlap and unthemed workspace buttons",
+      "priority": "High",
+      "complexity": "Medium",
+      "theme": "Workspace UX",
+      "request_acs": ["AC1", "AC2"],
+      "problem": [
+        "On desktop the Home left column clips and overlaps its panels, and several workspace buttons render with browser default styling in every theme."
+      ],
+      "scope_in": [
+        "Rework the >=980px .home-left-column layout so three panels fit (auto rows with internal scrolling, or move Named workspaces next to What's new or merge it with the active network panel); verify 0/1/2/8 workspaces and long names.",
+        "Apply the global themed button style to notice actions, read-only banner buttons, Settings storage buttons and Home workspace row buttons through the existing row-actions convention or one shared class; check hover, focus-visible and disabled in all theme modes."
+      ],
+      "scope_out": [
+        "Home redesign beyond the workspace panels; persistence changes."
+      ],
+      "acceptance_criteria": [
+        "AC1: No overlap, clipping or large gap between Home panels from 980px to 1920px for the listed workspace counts; Quick start remains fully clickable.",
+        "AC2: No lineage button falls back to browser default styling in any theme; covered by a theme test."
+      ]
+    },
+    {
+      "title": "Make workspace status, alerts and read-only signals truthful and localized",
+      "priority": "High",
+      "complexity": "Medium",
+      "theme": "Workspace UX",
+      "request_acs": ["AC3", "AC4"],
+      "problem": [
+        "A fresh browser shows a misleading preserved-snapshot alert, the normal browser-only state is permanently orange, dates ignore the app locale, read-only is shown three times and navigation triggers a spurious blocked-mutation toast."
+      ],
+      "scope_in": [
+        "Skip preserving empty or built-in sample state; move the preserved notice to Transfer and recovery with explanatory neutral copy.",
+        "Split saved status from the export reminder: success tone for the saved state, neutral export hint with adjacent Export package action, warning only past a documented threshold; apply consistently to Settings, Home rows and the Ops panel.",
+        "Format lineage times and dates with the app locale.",
+        "Keep a single themed read-only banner; replace Settings duplicates with disabled actions plus explanation; find and silence the automatic write that reports a blocked mutation when navigating while read-only, without weakening the gate."
+      ],
+      "scope_out": [
+        "Changes to recovery, preservation storage or read-only enforcement semantics."
+      ],
+      "acceptance_criteria": [
+        "AC1: Fresh browser with only the sample shows no preserved notice; a real preserved state shows the neutral notice with Download and Dismiss in Transfer and recovery.",
+        "AC2: Browser-only normal state is success-toned with a separate neutral export hint; FR shows French time and date formats.",
+        "AC3: One read-only banner; no toast on navigation in read-only mode; edits remain blocked and still notify when attempted."
+      ]
+    },
+    {
+      "title": "Clarify Home workspace vocabulary, first workspace creation and compact workspace rows",
+      "priority": "Medium",
+      "complexity": "Medium",
+      "theme": "Workspace UX",
+      "request_acs": ["AC5"],
+      "problem": [
+        "Home mixes three meanings of workspace, makes the first workspace a two-step detour and duplicates the selector with heavy cards."
+      ],
+      "scope_in": [
+        "Rename the active network panel and adjust Quick start labels/intro per mode in EN/FR; keep legacy file shortcuts only in legacy mode.",
+        "Empty library: primary Create your first workspace action opening the create dialog directly.",
+        "Keep the themed selector; render other workspaces as compact rows (name, versions, last save, status hint) with whole-row resume, active first or excluded, ellipsis for long names."
+      ],
+      "scope_out": [
+        "Changes to Quick start network actions or the What's new panel."
+      ],
+      "acceptance_criteria": [
+        "AC1: Home copy distinguishes named workspaces, active network and legacy files in EN/FR.",
+        "AC2: First workspace can be created from Home in one step; rows resume on click and never wrap into multi-line buttons."
+      ]
+    },
+    {
+      "title": "Restructure Settings workspace storage hierarchy and simplify legacy mode",
+      "priority": "Medium",
+      "complexity": "High",
+      "theme": "Workspace UX",
+      "request_acs": ["AC6"],
+      "problem": [
+        "Settings > Workspace storage presents equal-weight button stacks without a primary action or useful version summary, and legacy mode shows redundant controls."
+      ],
+      "scope_in": [
+        "Current workspace header with name, selector, status, primary Save and secondary Rename/New.",
+        "Versions summary with latest version label/title/date, correct plurals, primary Create version, secondary History and Record supplier handoff.",
+        "Compact Transfer and recovery row; Import old workspace files under an Advanced disclosure once a workspace exists.",
+        "Legacy mode: remove the disabled selector and redundant chip, single create action, single-file tools collapsed unless a link or conflict is active.",
+        "Keep settings-workspace-storage id, focus targets, notice action ids and mode-aware search labels working."
+      ],
+      "scope_out": [
+        "Other Settings sections and network Import/Export."
+      ],
+      "acceptance_criteria": [
+        "AC1: Header, summary and action hierarchy render as specified in named and legacy modes at 360px and desktop.",
+        "AC2: Every req_168 action, gate, search label and focus target still works; tests updated accordingly."
+      ]
+    },
+    {
+      "title": "Give the History dialog a clear action hierarchy and readable metadata",
+      "priority": "Medium",
+      "complexity": "Medium",
+      "theme": "Workspace UX",
+      "request_acs": ["AC7"],
+      "problem": [
+        "History rows show four equal buttons including the risky resume, duplicate handoff entry points, cryptic device labels and noisy chrome."
+      ],
+      "scope_in": [
+        "Per row: primary Open read-only, secondary menu for Download file, Record supplier handoff and Resume from this version marked as risky with the existing confirmation.",
+        "Toolbar keeps one Record supplier handoff and Export package; remove the storage line; human-readable or hidden device labels without changing stored version metadata; normal rest state for the filter; toasts visible above the dialog or grouped."
+      ],
+      "scope_out": [
+        "Changes to version, handoff or restore semantics and to stored device labels in existing files."
+      ],
+      "acceptance_criteria": [
+        "AC1: Each row exposes one primary action and a keyboard-accessible secondary menu; resume remains confirmed.",
+        "AC2: No storage line, no cryptic device id, filter not highlighted at rest, toasts not hidden under the dialog."
+      ]
+    },
+    {
+      "title": "Validate the workspace UX remediation and update the workflow guide",
+      "priority": "Medium",
+      "complexity": "Medium",
+      "theme": "Workspace UX",
+      "request_acs": ["AC8"],
+      "problem": [
+        "Layout, theming, locale and flow changes across Home, Settings and History can regress persistence safety, accessibility and documented paths."
+      ],
+      "scope_in": [
+        "Extend app.ui.home, theme, settings-locale, workspace-lineages and storage section specs plus the e2e lineage spec for AC1 to AC7, including 360px/desktop, keyboard and EN/FR.",
+        "Capture before/after screenshots for representative light, dark and custom themes and attach them to the task report.",
+        "Update docs/workspace-lineages.md; run repository delivery gates and record results per request AC."
+      ],
+      "scope_out": [
+        "Release publication."
+      ],
+      "acceptance_criteria": [
+        "AC1: Tests cover every request AC and pass with the repository gates.",
+        "AC2: Workflow guide and screenshots reflect the delivered Home, Settings and History flows."
+      ]
+    }
+  ],
+  "orchestration_task": {
+    "title": "Deliver workspace UX remediation from the 1.19.1 visual review",
+    "plan": [
+      "Wave 1: fix the Home layout overlap and unthemed buttons (item 1); quick, low-risk, unblocks visual checks.",
+      "Wave 2: truthful and localized status, preserved-snapshot filtering, single read-only banner and spurious toast root cause (item 2).",
+      "Wave 3: Home vocabulary, first-workspace action and compact rows (item 3) and Settings storage hierarchy and legacy simplification (item 4); item 4 reuses the status components from item 2.",
+      "Wave 4: History dialog hierarchy and metadata (item 5).",
+      "Wave 5: validation matrix, screenshots, docs and delivery gates with per-AC evidence (item 6).",
+      "Keep the chain ready for development; start/progress/close it only through Logics lifecycle commands when implementation actually happens."
+    ]
+  },
+  "context_pack": {
+    "out": "logics/context-packs/workspace-ux-review-remediation.json",
+    "mode": "summary-only",
+    "profile": "deep"
+  }
+}
