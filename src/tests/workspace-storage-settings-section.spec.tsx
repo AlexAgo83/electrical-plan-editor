@@ -68,7 +68,7 @@ function snapshot(overrides: Partial<LineageSessionSnapshot> = {}): LineageSessi
     preservedLegacySnapshot: false,
     lastReconcileReport: null,
     ...overrides
-  } as LineageSessionSnapshot;
+  };
 }
 
 function folderSnapshot(overrides: Partial<LineageSessionSnapshot> = {}, manifest: unknown = { versions: [], handoffs: [], divergentHeads: [] }): LineageSessionSnapshot {
@@ -91,7 +91,7 @@ function folderSnapshot(overrides: Partial<LineageSessionSnapshot> = {}, manifes
 }
 
 function fakeModel(state: LineageSessionSnapshot): WorkspaceLineageModel {
-  const ok = vi.fn(async () => true);
+  const ok = vi.fn(() => Promise.resolve(true));
   return {
     snapshot: state,
     dialog: { kind: "none" },
@@ -106,7 +106,7 @@ function fakeModel(state: LineageSessionSnapshot): WorkspaceLineageModel {
     returnToWorking: vi.fn(),
     restoreFromVersion: ok,
     createHandoff: ok,
-    verifyHandoff: vi.fn(async () => null),
+    verifyHandoff: vi.fn(() => Promise.resolve(null)),
     downloadAttachment: ok,
     downloadVersion: ok,
     exportPackage: ok,
@@ -118,7 +118,7 @@ function fakeModel(state: LineageSessionSnapshot): WorkspaceLineageModel {
     previewLegacyFiles: vi.fn(),
     applyLegacyImport: ok,
     downloadPreservedLegacySnapshot: ok,
-    discardPreservedLegacySnapshot: vi.fn(async () => undefined)
+    discardPreservedLegacySnapshot: vi.fn(() => Promise.resolve())
   } as unknown as WorkspaceLineageModel;
 }
 
