@@ -8,25 +8,34 @@ workspace lineages (delivered by `req_167` / `task_164`).
 ### Where to manage workspaces
 
 **Settings > Workspace storage** is the single management surface (since the `req_168`
-consolidation). It is organised in three groups:
+consolidation, reorganised by `req_169`). It is organised in three stacked groups, each with one
+main action (stronger outline) and secondary actions:
 
 | Group | Actions |
 | --- | --- |
-| **Current workspace** | Workspace selector (switch), save status, **Save** (Ctrl/Cmd+S), **Rename**, **New workspace**; while a version is open read-only: **Return to working copy** and **Resume from this version**. |
-| **Versions and handoffs** | **Create version**, **History** (read-only consultation, resume, version download, handoff files), **Record supplier handoff**. |
-| **Transfer and recovery** | **Export package (ZIP)**, **Import package (ZIP)**, **Open workspace folder** (when the browser supports folders), **Reconnect folder** (folder workspaces), **Import old workspace files**. |
+| **Current workspace** | Workspace selector (switch), save status and export hint, main action **Save** (Ctrl/Cmd+S), then **Rename** and **New workspace**. |
+| **Versions and handoffs** | Summary of the latest version (label, title, date) with the version and handoff counts, main action **Create version**, then **History** (read-only consultation, resume, version download, handoff files) and **Record supplier handoff**. |
+| **Transfer and recovery** | **Export package (ZIP)**, **Import package (ZIP)**, **Open workspace folder** (when the browser supports folders), **Reconnect folder** (folder workspaces); **Import old workspace files** sits under **Advanced** once a workspace exists. The preserved previous browser content, when there is one, is shown here as a neutral recovery copy with **Download preserved snapshot** / **Dismiss**. |
 
-Recovery messages (choose the working state after a divergence, reconnect a folder, recover
-interrupted publications, missing files, preserved previous browser workspace with
-**Download preserved snapshot** / **Dismiss**) appear at the top of the section with their action.
+Recovery messages that need attention (choose the working state after a divergence, reconnect a
+folder, recover interrupted publications, missing files) appear at the top of the section with
+their action.
 
 Outside Settings there is no permanent workspace bar:
 
-- **Home** shows the workspace selector (same themed field as in Settings), the **Resume** cards
-  and one **Manage workspaces** shortcut that opens and focuses Settings > Workspace storage.
-- Only while a version is open read-only does a warning appear under the header, on every screen,
-  with **Return to working copy**; it disappears when you return.
-- The operations panel shows the active workspace and its save status with **Manage workspaces**.
+- **Home** has a **Named workspaces** panel: with an empty library it offers **Create your first
+  workspace** (opens the creation dialog directly); otherwise it shows the workspace selector (the
+  active workspace, same themed field as in Settings) and the *other* workspaces as compact rows
+  (name, version count, last save; most recent first). Clicking a row resumes that workspace and
+  opens Modeling. **Manage workspaces** opens and focuses Settings > Workspace storage. The **Active
+  network** panel lists the recent changes of the active network, and **Quick start** holds the
+  network actions.
+- While a version is open read-only, a single banner appears under the header on every screen,
+  Settings included, with **Return to working copy** and **Resume from this version**; Settings
+  explains why its editing actions are disabled instead of repeating the banner. Visiting screens
+  never raises a "Read-only version" message; only an actual edit attempt does.
+- The operations panel shows the active workspace, its save status and export hint with
+  **Manage workspaces**.
 - **Ctrl/Cmd+S** saves the active working copy from any screen.
 
 ### Single-file compatibility (sessions without a named workspace)
@@ -35,9 +44,14 @@ When no named workspace is active, the section shows a **Single-file compatibili
 with the previous tools: current save location, **Open workspace file**, **Save as file / Save as
 copy**, **Resume last file**, **Use a file for autosave**, linked-file **Save now** /
 **Stop autosave link**, the linked-file conflict choices (**Load file version**, **Keep local
-version**, **Save local copy**) and storage details. **Create named workspace from current content**
-adopts the session into a named workspace. The Home quick-start **Save workspace** / **Load
-workspace** shortcuts are shown only in this mode.
+version**, **Save local copy**) and storage details. These tools are collapsed under a summary
+showing the current save location, and open automatically while a file is linked, a conflict is
+pending or a Settings search is active. The only create action is **New workspace** in Current
+workspace (it starts from the current content by default); no disabled selector or "no named
+workspace" chip is shown. The Home quick-start **Save workspace file** / **Open workspace file**
+shortcuts and **Start from empty content** are shown only in this mode; with a named workspace
+active, Quick start offers **Clear current content** (the working copy is emptied, versions are kept,
+the change can be undone).
 
 When a named workspace is active, these single-file controls (and their Settings search entries)
 are hidden: saving, status and portability come from the named workspace (ZIP package, version
@@ -56,8 +70,8 @@ A *named workspace* (lineage) is an independent project line, for example **Seri
     every workspace with its history.
   - **This browser only**: the workspace stays in the browser library (IndexedDB). Export a ZIP
     package to copy it to another computer.
-- **Switch** with the selector on Home or in Settings > Workspace storage, or with the **Resume**
-  cards on Home.
+- **Switch** with the selector on Home or in Settings > Workspace storage, or with a workspace row
+  on Home.
   Unsaved work of the workspace you leave is preserved first; if that is impossible (storage full,
   folder permission revoked) the switch is refused. Undo/redo history never crosses workspaces.
 - **Rename** (Current workspace group) changes only the display name; identity, folder and file names stay.
@@ -72,13 +86,27 @@ A *named workspace* (lineage) is an independent project line, for example **Seri
 
 The status chip distinguishes: *Unsaved changes*, *Unsaved changes · recovery copy in this browser*,
 *Recovered unsaved changes*, *Unsaved changes · not protected*, *Saved to folder HH:MM (verified)*,
-*Stored in this browser · package export pending*, *Package download initiated*, *Conflict* and
-*Not saved: reason*.
+*Stored in this browser HH:MM* (success: the normal state of a browser-only workspace), *Package
+download initiated*, *Conflict* and *Not saved: reason*. Times and dates follow the application
+language (EN/FR), not the browser locale.
+
+For browser-only workspaces, an **export hint** is shown next to the status with **Export now**
+while changes have not been exported as a ZIP package. It is neutral, and becomes a warning only
+when the last package export — or the workspace creation, if it was never exported — is older than
+**7 days** (`EXPORT_REMINDER_WARNING_AFTER_DAYS` in `src/app/lib/lineage/lineageStatus.ts`). On Home,
+such a workspace row shows *Export overdue*. The last export date is kept in the browser library
+record (`lastPortableExportIso`, optional; records written before 1.19.2 fall back to the creation
+date).
 
 ### History, read-only consultation and resume
 
-**History** lists versions newest first with number, date, label, comment, provenance (device,
-legacy import source, "resumed from"), supplier handoff markers and a text filter.
+**History** lists versions newest first with number, date, label, comment, provenance (legacy
+import source, parent, "resumed from"; technical device identifiers are not displayed), supplier
+handoff markers and a text filter. The toolbar holds **Record supplier handoff** and **Export
+package (ZIP)**. Each row has one main action, **Open read-only**, and a **More** menu (keyboard:
+Enter or Arrow Down opens it, arrows / Home / End move, Escape closes it and keeps the dialog open)
+with **Download file**, **Record supplier handoff** and, after a separator and in the danger colour,
+**Resume from this version**. Confirmation messages stay visible above the dialog.
 
 - **Open read-only** shows a frozen version. The working session is suspended; every editing route
   (forms, canvas, undo/redo, imports, AI agent) and every background save is blocked. Navigation
@@ -126,7 +154,9 @@ existing versions), with original file name, digest and source IDs recorded. The
 read.
 
 When named workspaces are first introduced, the previous browser workspace is preserved and can be
-downloaded from Settings > Workspace storage (**Download preserved snapshot**).
+downloaded from Settings > Workspace storage > Transfer and recovery (**Download preserved
+snapshot**). Empty content and the untouched built-in sample are not preserved; a sample-only
+snapshot kept by an earlier release stays stored but is no longer announced.
 
 ## 2. Portable format contract
 
