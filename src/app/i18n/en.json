@@ -1500,14 +1500,14 @@
     "workspaceLineageErrorPermission": "Permission to write the workspace folder was denied or revoked.",
     "workspaceLineageErrorQuota": "Browser storage is full; nothing was reported as saved.",
     "workspaceLineageErrorUnknown": "The operation failed.",
-    "workspaceLineageErrorWrongFolder": "The selected folder belongs to a different workspace.",
+    "workspaceLineageErrorWrongFolder": "This folder contains no matching workspace. Choose its original root or parent folder; folder names alone do not identify a workspace.",
     "workspaceLineageExportPackage": "Export package (ZIP)",
     "workspaceLineageFilterLabel": "Filter history",
     "workspaceLineageFilterPlaceholder": "Number, label, supplier, date…",
     "workspaceLineageFolderOpened": "Workspace folder opened",
-    "workspaceLineageFolderPermissionRequired": "Folder access must be granted again before saving to disk.",
+    "workspaceLineageFolderPermissionRequired": "Folder permission is required. Use Choose folder to grant access to the workspace root or parent.",
     "workspaceLineageFolderReconnected": "Workspace folder reconnected",
-    "workspaceLineageFolderUnsupported": "This browser cannot write folders. The workspace stays in this browser; export a ZIP package to copy it.",
+    "workspaceLineageFolderUnsupported": "Folder access is unavailable in this browser or context. Use a supported browser in a secure context, or use browser workspaces and ZIP transfer. Storage mode has not changed.",
     "workspaceLineageHandoffConfirm": "Record handoff",
     "workspaceLineageHandoffCorrect": "Record correction",
     "workspaceLineageHandoffCorrectionTitle": "Record a superseding handoff",
@@ -1701,6 +1701,12 @@
     "workspaceLineageExportOverdueChip": "Export overdue",
     "workspaceLineageMoreActions": "More actions for {version}",
     "workspaceLineageResumeFromVersionHint": "Replaces the working copy with this version (a recovery copy is kept first)",
-    "workspaceLineageMoreActionsShort": "More"
+    "workspaceLineageMoreActionsShort": "More",
+    "workspaceLineageChooseFolder": "Choose folder…",
+    "workspaceLineageReconnectInstructions": "Reconnect {folder}, or choose its workspace root or original parent folder. Reconnecting does not save current edits; use Save afterwards.",
+    "workspaceLineageErrorInvalidFolder": "The selected workspace manifest is invalid or unsupported. Choose the original workspace folder.",
+    "workspaceLineageErrorAmbiguousFolder": "Several copies of this workspace were found. Choose the exact workspace root.",
+    "workspaceLineageConnectionBusy": "A folder connection or save is already in progress. Please retry when it finishes.",
+    "workspaceLineageLocalEdits": "Local edits before reconnection"
   }
 }

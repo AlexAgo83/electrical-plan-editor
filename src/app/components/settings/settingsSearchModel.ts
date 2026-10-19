@@ -38,7 +38,8 @@ function workspaceStorageLabels(mode: WorkspaceStorageSearchMode): string[] {
       t("ui.workspaceLineageHistory"),
       t("ui.workspaceLineageRecordHandoff"),
       t("ui.workspaceLineageExportPackage"),
-      t("ui.workspaceLineageReconnectFolder")
+      t("ui.workspaceLineageReconnectFolder"),
+      t("ui.workspaceLineageChooseFolder")
     ];
   }
   return [

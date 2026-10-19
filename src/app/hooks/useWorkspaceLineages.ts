@@ -58,7 +58,7 @@ export interface WorkspaceLineageModel {
   exportPackage: () => Promise<boolean>;
   importPackageFile: (file: File) => Promise<boolean>;
   openFolder: () => Promise<boolean>;
-  relinkFolder: () => Promise<boolean>;
+  relinkFolder: (chooseFolder?: boolean) => Promise<boolean>;
   chooseWorkingHead: (headId: string | null) => Promise<boolean>;
   adoptOrphanVersions: () => Promise<boolean>;
   previewLegacyFiles: (files: File[]) => Promise<LegacyAdoptionPreview>;
@@ -143,6 +143,7 @@ export function useWorkspaceLineages({ store, resetHistory, notifyToast, request
   const report = useCallback(
     <T,>(result: LineageResult<T>, successTitle: string | null, successMessage?: string): boolean => {
       if (!result.ok) {
+        if (result.cancelled) return false;
         notifyToast(t("ui.workspaceLineageActionFailed"), { message: result.error, variant: "error" });
         return false;
       }
@@ -235,7 +236,7 @@ export function useWorkspaceLineages({ store, resetHistory, notifyToast, request
         const result = await controller.openFolder();
         return report(result, t("ui.workspaceLineageFolderOpened"), result.ok ? String(result.value.opened.length) : undefined);
       },
-      relinkFolder: async () => report(await controller.relinkFolder(), t("ui.workspaceLineageFolderReconnected")),
+      relinkFolder: async (chooseFolder = false) => report(await controller.relinkFolder(chooseFolder), t("ui.workspaceLineageFolderReconnected")),
       chooseWorkingHead: async (headId) => report(await controller.chooseWorkingHead(headId), t("ui.workspaceLineageHeadChosen")),
       adoptOrphanVersions: async () => {
         const result = await controller.adoptOrphanVersions();

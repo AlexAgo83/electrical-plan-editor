@@ -31,8 +31,8 @@ export function describeLineageNotices(snapshot: LineageSessionSnapshot): Lineag
   if ((active?.manifest?.divergentHeads.length ?? 0) > 0) {
     push("divergence", "warning", t("ui.workspaceLineageDivergenceBanner"));
   }
-  if (active?.storage === "folder" && active.manifest === null) {
-    push("folder-permission", "warning", t("ui.workspaceLineageFolderPermissionRequired"));
+  if (active?.storage === "folder" && (active.manifest === null || snapshot.save.error !== null)) {
+    push("folder-permission", "warning", snapshot.save.error ?? t("ui.workspaceLineageFolderPermissionRequired"));
   }
   if (orphanCount > 0) {
     push("orphans", "warning", t("ui.workspaceLineageOrphansBanner", { count: orphanCount }));

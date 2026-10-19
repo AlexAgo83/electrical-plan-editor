@@ -1,14 +1,15 @@
 ## task_167_deliver_reliable_new_workspace_folder_reconnection - Deliver reliable new workspace folder reconnection
 > From version: 1.19.2
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 90%
+> Status: In progress
+> Understanding: 100%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 75%
 > Complexity: Medium
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
-> Indicators reviewed: 2026-10-19 18:08:08
+> Indicators reviewed: 2026-10-19 18:14:29
+> Owner: Codex
 
 # AI Context
 - Summary: Deliver the two linked slices in sequence: reproduce and repair the folder connection lifecycle, then validate and document recovery. The code review identifies hypotheses rather than a confirmed root cause; preserve both local and disk work throughout.
@@ -61,3 +62,8 @@
 - Request: `req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces`
 - Product brief(s): `prod_021_reliable_folder_reconnection_for_named_workspace_persistence`
 - Architecture decision(s): (none yet)
+
+# Delivery evidence — 2026-10-19
+- Reproduced with Vitest simulated File System Access handles: fresh creation reported success with a null active manifest when handle readback returned null; reconnection after an external working revision allowed Save to overwrite that revision. Both regression assertions failed before implementation (2 failures / 5 tests). These confirm controller defects, not the original user's unknown browser failure sequence.
+- Implementation retains the freshly initialized repository; explicit Choose folder invokes the picker before asynchronous lookup. Stored-handle reconnect queries permission without prompting, validates root or immediate child identity without repair, and only persists validated candidates. Divergent editor content is retained as a recovery head and Save remains blocked pending an explicit choice.
+- Real OS picker and native persistent-handle evidence remains pending. Mock tests are not evidence of browser activation behavior.

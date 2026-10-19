@@ -1,14 +1,14 @@
 ## item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection - Repair named workspace folder connection lifecycle and safe reconnection
 > From version: 1.19.2
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 75%
 > Complexity: High
 > Theme: Workspace persistence
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-19 18:08:07
+> Indicators reviewed: 2026-10-19 18:14:29
 
 # AI Context
 - Summary: Implement the connection lifecycle and localized recovery actions for request AC1-AC7. Candidate selection must preserve identity and dirty edits, validate before connection commit, retain the original save base and ignore results from stale sessions.

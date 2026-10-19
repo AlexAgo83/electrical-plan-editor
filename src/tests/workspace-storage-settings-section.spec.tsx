@@ -1,3 +1,4 @@
+import { setActiveLocale } from "../app/lib/i18n";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { SettingsWorkspaceStorageSection, type LegacyWorkspaceFileControls } from "../app/components/workspace/SettingsWorkspaceStorageSection";
@@ -209,6 +210,32 @@ describe("Settings > Workspace storage section", () => {
     expect(select.closest("label")).toHaveClass("stack-label");
     fireEvent.change(select, { target: { value: "workspace_b" } });
     expect(model.switchTo).toHaveBeenCalledWith("workspace_b");
+  });
+
+  it.each(["en", "fr"] as const)("provides a gesture-safe folder choice with recovery focus in %s", async (locale) => {
+    setActiveLocale(locale);
+    try {
+      const state = folderSnapshot({}, null);
+      const model = fakeModel(state);
+      requestWorkspaceStorageFocus(lineageNoticeTargetId("folder-permission"));
+      const { unmount } = render(<SettingsWorkspaceStorageSection model={model} legacy={legacyControls(legacyStatus())} normalizedQuery="" />);
+      const choose = document.getElementById(lineageNoticeTargetId("folder-permission"))!;
+      await waitFor(() => expect(choose).toHaveFocus());
+      expect(choose).toHaveTextContent(locale === "en" ? "Choose folder" : "Choisir un dossier");
+      fireEvent.click(choose);
+      expect(model.relinkFolder).toHaveBeenCalledWith(true);
+      expect(screen.getByText(/Reconnect serie|Reconnectez serie/)).toHaveTextContent(locale === "en" ? "parent" : "parent");
+      unmount();
+    } finally {
+      setActiveLocale("en");
+    }
+  });
+
+  it("disables both reconnect actions during historical consultation", () => {
+    const model = fakeModel(folderSnapshot({ historical: { versionId: "v1", label: "v001", title: "", createdAtIso: "2026-10-01T10:00:00Z" } }));
+    render(<SettingsWorkspaceStorageSection model={model} legacy={legacyControls(legacyStatus())} normalizedQuery="" />);
+    expect(screen.getByRole("button", { name: "Reconnect folder" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Choose folder…" })).toBeDisabled();
   });
 
   it("focuses the matching Settings recovery action when a focus target is requested", async () => {

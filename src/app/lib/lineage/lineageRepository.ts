@@ -255,7 +255,7 @@ export class LineageRepository {
    * Opens the lineage. Only the manifest and working copy are parsed; version snapshots and
    * attachments are read lazily. Missing/corrupt entries are isolated and reported as issues.
    */
-  open(): Promise<LineageOpenResult> {
+  open(options: { repair?: boolean } = {}): Promise<LineageOpenResult> {
     return this.enqueue(async () => {
       const issues: LineageIssue[] = [];
       const files = await this.directory.listFiles();
@@ -263,11 +263,13 @@ export class LineageRepository {
       const manifestBytes = await this.directory.readFile(LINEAGE_MANIFEST_FILE_NAME);
       let manifest: LineageManifest;
       if (manifestBytes === null) {
+        if (options.repair === false) throw new LineageError("unreadable", "The workspace manifest is missing.");
         manifest = await this.reconstructManifest(files);
         issues.push({ kind: "manifest-reconstructed" });
       } else {
         const parsed = parseLineageManifest(decodeText(manifestBytes));
         if (!parsed.ok) {
+          if (options.repair === false) throw new LineageError("unreadable", parsed.error);
           if (parsed.errorKind === "future-schema") {
             throw new LineageError("future-schema", parsed.error);
           }
@@ -282,6 +284,9 @@ export class LineageRepository {
         await writeVerifiedFile(this.directory, LINEAGE_MANIFEST_FILE_NAME, encodeText(serializeLineageManifest(manifest)));
       }
 
+      if (options.repair === false && this.parseWorkingBytes(await this.directory.readFile(manifest.workingFileName), manifest) === null) {
+        throw new LineageError("unreadable", "The working copy is missing or unreadable.");
+      }
       const working = await this.loadWorkingWithRecovery(manifest, issues);
       for (const version of manifest.versions) {
         if (!fileSet.has(version.fileName)) {
@@ -787,6 +792,22 @@ export class LineageRepository {
         throw new LineageError("corrupt", `Attachment does not match its recorded digest: ${attachment.originalFileName}`);
       }
       return { attachment, bytes };
+    });
+  }
+
+  /** Preserve unsaved editor content as an explicit alternative without replacing disk work. */
+  preserveWorkingAlternative(state: AppState, sourceLabel: string, baseRevisionId: string | null): Promise<void> {
+    return this.enqueue(async () => {
+      const manifest = await this.readManifestForWrite();
+      const payload = this.buildNextWorking(state);
+      if (payload.working !== undefined) payload.working.ancestorRevisionIds = baseRevisionId === null ? [] : [baseRevisionId];
+      const fileName = `${RECOVERY_DIRECTORY}/heads/${payload.revisionId}.epe.json`;
+      await writeVerifiedFile(this.directory, fileName, encodeText(serializeWorkspaceFilePayload(payload)));
+      await this.publishManifest({ ...manifest, divergentHeads: [...manifest.divergentHeads, {
+        headId: createPortableId("head"), revisionId: payload.revisionId,
+        baseVersionId: payload.working?.baseVersionId ?? null, fileName,
+        updatedAtIso: payload.updatedAtIso, sourceLabel
+      }] });
     });
   }
 

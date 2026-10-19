@@ -1,14 +1,14 @@
 ## item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow - Validate folder reconnection regressions and document the recovery workflow
 > From version: 1.19.2
 > Schema version: 1.0
-> Status: Ready
+> Status: In progress
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 75%
 > Complexity: Medium
 > Theme: Workspace persistence
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-19 18:08:07
+> Indicators reviewed: 2026-10-19 18:14:29
 
 # AI Context
 - Summary: Provide request AC8 evidence for the lifecycle fix. Simulated handles cover failure and isolation cases; a supported-browser run with an actual OS picker separately verifies gesture and persistent-handle behavior. Document unperformed checks explicitly.

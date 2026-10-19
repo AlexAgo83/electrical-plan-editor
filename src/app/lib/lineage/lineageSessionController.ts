@@ -21,16 +21,16 @@ import {
   getWorkspaceSessionToken,
   setProjectMutationBlocked
 } from "../workspaceSessionGate";
-import { decodeText, type LineageDirectory } from "./lineageDirectory";
+import { type LineageDirectory } from "./lineageDirectory";
 import {
   LINEAGE_MANIFEST_FILE_NAME,
   buildVersionDisplayLabels,
   createLineageSlug,
   createOperationId,
   formatVersionNumber,
-  parseLineageManifest,
   type LineageManifest
 } from "./lineageFormat";
+import { resolveLineageFolder } from "./lineageFolderConnection";
 import { applyLegacyAdoption, type LegacyAdoptionPlan, type LegacyAdoptionPreview } from "./lineageLegacyImport";
 import {
   FolderLineageDirectory,
@@ -116,7 +116,7 @@ export interface LineageSessionHost {
   now?(): string;
 }
 
-export type LineageResult<T = void> = { ok: true; value: T } | { ok: false; error: string };
+export type LineageResult<T = void> = { ok: true; value: T } | { ok: false; error: string; cancelled?: boolean };
 
 function initialSaveStatus(): LineageSaveStatus {
   return {
@@ -180,6 +180,7 @@ interface ActiveContext {
   record: LineageRegistryRecord;
   repository: LineageRepository | null;
   issues: LineageIssue[];
+  baseRevisionId: string | null;
 }
 
 export class LineageSessionController {
@@ -193,6 +194,7 @@ export class LineageSessionController {
   private lastSavedState: AppState | null = null;
   private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
   private busyCount = 0;
+  private connecting = false;
 
   constructor(library: LineageLibraryStore, host: LineageSessionHost, options: { deviceLabel?: string } = {}) {
     this.library = library;
@@ -343,11 +345,21 @@ export class LineageSessionController {
    * Activates a registered lineage. With `loadState`, its working (or locally recovered) state is
    * loaded into the editor; otherwise the editor's current state is kept as the session state.
    */
-  private async activate(record: LineageRegistryRecord, options: { loadState: boolean; requestPermission: boolean }): Promise<void> {
-    const { directory, permission } = await this.resolveDirectory(record, options.requestPermission);
-    let repository: LineageRepository | null = null;
+  private async activate(record: LineageRegistryRecord, options: { loadState: boolean; requestPermission: boolean; repository?: LineageRepository }): Promise<void> {
+    let directory: LineageDirectory | null = null;
+    let permission: LineageSaveStatus["permission"] = record.storage === "folder" ? "granted" : "not-applicable";
+    let resolutionError: string | null = null;
+    if (options.repository === undefined) {
+      try {
+        ({ directory, permission } = await this.resolveDirectory(record, false));
+      } catch (error) {
+        permission = "denied";
+        resolutionError = errorMessage(error);
+      }
+    }
+    let repository: LineageRepository | null = options.repository ?? null;
     let issues: LineageIssue[] = [];
-    let openError: string | null = null;
+    let openError: string | null = resolutionError;
     if (directory !== null) {
       repository = new LineageRepository(directory, { deviceLabel: this.deviceLabel });
       try {
@@ -358,12 +370,13 @@ export class LineageSessionController {
       }
     }
     advanceWorkspaceSessionToken();
-    this.active = { record, repository, issues };
+    this.active = { record, repository, issues, baseRevisionId: repository?.getWorking().revisionId ?? null };
     const session = await this.library.readSession(record.workspaceId).catch(() => null);
     const working = repository?.getWorking() ?? null;
+    this.active.baseRevisionId = session?.baseRevisionId ?? working?.revisionId ?? null;
     let state: AppState | null = null;
     let localRecovery: LineageSaveStatus["localRecovery"] = "none";
-    if (session !== null && (working === null || session.baseRevisionId === working.revisionId || session.baseRevisionId === null)) {
+    if (session !== null) {
       const parsed = parseJsonSafe<AppState>(session.stateJson);
       if (parsed.ok) {
         state = parsed.value;
@@ -384,14 +397,14 @@ export class LineageSessionController {
       save: {
         ...initialSaveStatus(),
         dirty,
-        durability: working === null ? "none" : record.storage === "folder" ? "disk-verified" : "browser-stored",
+        durability: dirty || working === null ? "none" : record.storage === "folder" ? "disk-verified" : "browser-stored",
         lastDurableSaveIso: working?.updatedAtIso ?? null,
         localRecovery: dirty && localRecovery === "none" ? "cached" : localRecovery,
         pendingPortableExport: record.storage === "browser" && record.pendingPortableExport,
         permission,
         error:
           openError ??
-          (record.storage === "folder" && directory === null
+          (record.storage === "folder" && repository === null
             ? permission === "prompt"
               ? t("ui.workspaceLineageFolderPermissionRequired")
               : t("ui.workspaceLineageErrorMissingFolder")
@@ -410,7 +423,7 @@ export class LineageSessionController {
       return;
     }
     if (!this.snapshot.save.dirty) {
-      this.updateSave({ dirty: true });
+      this.updateSave({ dirty: true, durability: "none" });
     }
     if (this.autosaveTimer !== null) {
       clearTimeout(this.autosaveTimer);
@@ -423,24 +436,21 @@ export class LineageSessionController {
   }
 
   private async writeLocalSession(state: AppState): Promise<boolean> {
-    if (this.active === null) {
-      return false;
-    }
+    const context = this.active;
+    const token = getWorkspaceSessionToken();
+    if (context === null) return false;
+    const current = (): boolean => this.active === context && token === getWorkspaceSessionToken();
     try {
       await this.library.writeSession({
-        workspaceId: this.active.record.workspaceId,
+        workspaceId: context.record.workspaceId,
         stateJson: JSON.stringify(state),
-        baseRevisionId: this.active.repository?.getWorking().revisionId ?? null,
+        baseRevisionId: this.snapshot.save.conflict ? context.baseRevisionId : context.repository?.getWorking().revisionId ?? context.baseRevisionId,
         savedAtIso: this.now()
       });
-      if (!this.library.durable) {
-        this.updateSave({ localRecovery: "failed" });
-        return false;
-      }
-      this.updateSave({ localRecovery: "cached" });
-      return true;
+      if (current()) this.updateSave({ localRecovery: this.library.durable ? "cached" : "failed" });
+      return this.library.durable;
     } catch (error) {
-      this.updateSave({ localRecovery: "failed", error: errorMessage(error) });
+      if (current()) this.updateSave({ localRecovery: "failed", error: errorMessage(error) });
       return false;
     }
   }
@@ -459,7 +469,7 @@ export class LineageSessionController {
 
   private async writeWorking(state: AppState, token: number, options: { explicit: boolean }): Promise<boolean> {
     const context = this.active;
-    if (context === null || context.repository === null) {
+    if (token !== getWorkspaceSessionToken() || this.snapshot.historical !== null || this.connecting || this.snapshot.save.conflict || context === null || context.repository === null) {
       return false;
     }
     if (this.lastSavedState !== null && !hasProjectContentChanged(this.lastSavedState, state) && !options.explicit) {
@@ -476,6 +486,7 @@ export class LineageSessionController {
         this.updateSave({ saving: false, conflict: true, error: t("ui.workspaceLineageErrorConflict") });
         return false;
       }
+      context.baseRevisionId = result.working.revisionId;
       this.lastSavedState = state;
       const stillDirty = this.host.getState() !== state && hasProjectContentChanged(state, this.host.getState());
       const isBrowser = context.record.storage === "browser";
@@ -484,15 +495,17 @@ export class LineageSessionController {
         dirty: stillDirty,
         conflict: false,
         error: null,
-        durability: isBrowser ? "browser-stored" : "disk-verified",
+        durability: stillDirty ? "none" : isBrowser ? "browser-stored" : "disk-verified",
         lastDurableSaveIso: result.working.updatedAtIso,
         pendingPortableExport: isBrowser ? true : this.snapshot.save.pendingPortableExport
       });
       if (!stillDirty) {
         await this.library.clearSession(context.record.workspaceId).catch(() => undefined);
+        if (token !== getWorkspaceSessionToken() || this.active !== context) return false;
         this.updateSave({ localRecovery: "none" });
       }
       await this.persistRecord({ lastDurableSaveIso: result.working.updatedAtIso, pendingPortableExport: isBrowser });
+      if (token !== getWorkspaceSessionToken() || this.active !== context) return false;
       this.publishActive();
       return true;
     } catch (error) {
@@ -525,17 +538,20 @@ export class LineageSessionController {
       clearTimeout(this.autosaveTimer);
       this.autosaveTimer = null;
     }
+    if (this.connecting || this.snapshot.save.saving) return { ok: false, error: t("ui.workspaceLineageConnectionBusy") };
     const token = getWorkspaceSessionToken();
     const state = this.host.getState();
     if (this.active.repository === null) {
       const relinked = this.active.record.storage === "folder" ? await this.relinkFolder() : { ok: false as const, error: "" };
+      if (token !== getWorkspaceSessionToken()) return { ok: false, error: "", cancelled: true };
       if (!relinked.ok || this.active?.repository == null) {
         await this.writeLocalSession(state);
-        return { ok: false, error: this.snapshot.save.error ?? t("ui.workspaceLineageErrorMissingFolder") };
+        return !relinked.ok ? relinked : { ok: false, error: t("ui.workspaceLineageErrorMissingFolder") };
       }
     }
     const saved = await this.writeWorking(state, token, { explicit: true });
     if (!saved) {
+      if (token !== getWorkspaceSessionToken()) return { ok: false, error: "", cancelled: true };
       await this.writeLocalSession(state);
       return { ok: false, error: this.snapshot.save.error ?? t("ui.workspaceLineageErrorUnknown") };
     }
@@ -624,9 +640,13 @@ export class LineageSessionController {
       }
       let parentHandle: FolderDirectoryHandle | null = null;
       if (input.storage === "folder") {
-        parentHandle = await pickLineageFolder().catch(() => null);
+        try {
+          parentHandle = await pickLineageFolder();
+        } catch (error) {
+          return { ok: false, error: errorMessage(error) };
+        }
         if (parentHandle === null) {
-          return { ok: false, error: t("ui.workspaceLineageErrorFolderNotSelected") };
+          return { ok: false, error: t("ui.workspaceLineageErrorFolderNotSelected"), cancelled: true };
         }
       }
       try {
@@ -642,40 +662,41 @@ export class LineageSessionController {
       const initialState = input.start === "current" ? this.snapshot.historical !== null && this.suspendedWorkingState !== null ? this.suspendedWorkingState : this.host.getState() : input.emptyState;
       this.leaveHistoricalMode();
       const slug = createLineageSlug(displayName, this.snapshot.records.map((record) => record.slug));
-      let directory: LineageDirectory;
-      let workspaceId: string = createPortableId("workspace");
-      let folderName: string | null = null;
-      if (parentHandle !== null) {
-        const rootHandle = await parentHandle.getDirectoryHandle(slug, { create: true });
-        directory = new FolderLineageDirectory(rootHandle);
-        folderName = `${parentHandle.name}/${slug}`;
-        await this.library.writeFolderHandle(workspaceId, rootHandle);
-      } else {
-        directory = this.library.browserDirectory(workspaceId, displayName);
-      }
       try {
+        let directory: LineageDirectory;
+        let rootHandle: FolderDirectoryHandle | null = null;
+        let workspaceId: string = createPortableId("workspace");
+        let folderName: string | null = null;
+        if (parentHandle !== null) {
+          rootHandle = await parentHandle.getDirectoryHandle(slug, { create: true });
+          directory = new FolderLineageDirectory(rootHandle);
+          folderName = `${parentHandle.name}/${slug}`;
+          await this.library.writeFolderHandle(workspaceId, rootHandle);
+        } else {
+          directory = this.library.browserDirectory(workspaceId, displayName);
+        }
         const repository = await LineageRepository.initialize(directory, { displayName, state: initialState, slug, workspaceId }, { deviceLabel: this.deviceLabel });
         workspaceId = repository.getManifest().workspaceId;
+        const nowIso = this.now();
+        const record: LineageRegistryRecord = {
+          workspaceId,
+          displayName,
+          slug,
+          storage: input.storage,
+          folderName,
+          createdAtIso: nowIso,
+          lastOpenedAtIso: nowIso,
+          pendingPortableExport: input.storage === "browser",
+          lastDurableSaveIso: nowIso,
+          versionCount: 0,
+          latestVersionLabel: null
+        };
+        await this.library.putRecord(record);
+        await this.activate(record, { loadState: true, requestPermission: false, repository });
+        return { ok: true, value: undefined };
       } catch (error) {
         return { ok: false, error: errorMessage(error) };
       }
-      const nowIso = this.now();
-      const record: LineageRegistryRecord = {
-        workspaceId,
-        displayName,
-        slug,
-        storage: input.storage,
-        folderName,
-        createdAtIso: nowIso,
-        lastOpenedAtIso: nowIso,
-        pendingPortableExport: input.storage === "browser",
-        lastDurableSaveIso: nowIso,
-        versionCount: 0,
-        latestVersionLabel: null
-      };
-      await this.library.putRecord(record);
-      await this.activate(record, { loadState: true, requestPermission: false });
-      return { ok: true, value: undefined };
     });
   }
 
@@ -724,37 +745,67 @@ export class LineageSessionController {
     });
   }
 
-  async relinkFolder(): Promise<LineageResult> {
+  async relinkFolder(chooseFolder = false): Promise<LineageResult> {
     const context = this.active;
     if (context === null || context.record.storage !== "folder") {
       return { ok: false, error: t("ui.workspaceLineageErrorNoActive") };
     }
-    let { directory, permission } = await this.resolveDirectory(context.record, true);
-    if (directory === null) {
-      const picked = await pickLineageFolder().catch(() => null);
-      if (picked === null) {
-        this.updateSave({ permission });
-        return { ok: false, error: t("ui.workspaceLineageErrorFolderNotSelected") };
+    if (this.snapshot.historical !== null) return { ok: false, error: t("ui.workspaceLineageReadOnlyBlocked") };
+    if (this.connecting || this.snapshot.save.saving) return { ok: false, error: t("ui.workspaceLineageConnectionBusy") };
+    const token = getWorkspaceSessionToken();
+    const current = (): boolean => this.active === context && token === getWorkspaceSessionToken();
+    const cancelled: LineageResult = { ok: false, error: "", cancelled: true };
+    this.connecting = true;
+    // Invoke the picker synchronously from the explicit Choose folder click, before any IDB await.
+    const selection = chooseFolder ? pickLineageFolder() : null;
+    return this.withBusy(async () => {
+      try {
+        let handle = selection === null ? await this.library.readFolderHandle(context.record.workspaceId) : await selection;
+        if (!current()) return cancelled;
+        if (handle === null) {
+          if (chooseFolder) return { ok: false, error: t("ui.workspaceLineageErrorFolderNotSelected"), cancelled: true };
+          throw new Error(t("ui.workspaceLineageErrorMissingFolder"));
+        }
+        const permission = await ensureFolderPermission(handle, false);
+        if (!current()) return cancelled;
+        if (permission !== "granted") {
+          this.updateSave({ permission });
+          throw new Error(t(permission === "prompt" ? "ui.workspaceLineageFolderPermissionRequired" : "ui.workspaceLineageErrorPermission"));
+        }
+        handle = await resolveLineageFolder(handle, context.record.workspaceId);
+        if (!current()) return cancelled;
+        const repository = new LineageRepository(new FolderLineageDirectory(handle), { deviceLabel: this.deviceLabel });
+        const opened = await repository.open({ repair: false });
+        if (!current()) return cancelled;
+        const base = this.snapshot.save.conflict ? context.baseRevisionId : context.repository?.getWorking().revisionId ?? context.baseRevisionId;
+        const conflict = base !== null ? base !== opened.working.revisionId : !projectContentEquals(this.host.getState(), opened.working.state);
+        await this.writeLocalSession(this.host.getState());
+        if (!current()) return cancelled;
+        // Persist only a fully validated connection. No candidate mutation occurs before this point.
+        await this.library.writeFolderHandle(context.record.workspaceId, handle);
+        if (!current()) return cancelled;
+        if (conflict) {
+          await repository.preserveWorkingAlternative(this.host.getState(), t("ui.workspaceLineageLocalEdits"), context.baseRevisionId);
+          if (!current()) return cancelled;
+        }
+        context.repository = repository;
+        context.issues = conflict ? [...opened.issues, { kind: "divergent-heads", count: repository.getManifest().divergentHeads.length }] : opened.issues;
+        context.record = { ...context.record, folderName: handle.name };
+        const dirty = conflict || !projectContentEquals(this.host.getState(), opened.working.state);
+        this.updateSave({ permission: "granted", error: conflict ? t("ui.workspaceLineageErrorConflict") : null, conflict, dirty, durability: dirty ? "none" : "disk-verified" });
+        await this.persistRecord({ folderName: handle.name });
+        if (!current()) return cancelled;
+        this.publishActive();
+        return conflict ? { ok: false, error: t("ui.workspaceLineageErrorConflict") } : { ok: true, value: undefined };
+      } catch (error) {
+        if (!current()) return cancelled;
+        const message = errorMessage(error);
+        this.updateSave({ error: message });
+        return { ok: false, error: message };
+      } finally {
+        this.connecting = false;
       }
-      const manifestBytes = await new FolderLineageDirectory(picked).readFile(LINEAGE_MANIFEST_FILE_NAME);
-      const parsed = manifestBytes === null ? null : parseLineageManifest(decodeText(manifestBytes));
-      if (parsed === null || !parsed.ok || parsed.manifest.workspaceId !== context.record.workspaceId) {
-        return { ok: false, error: t("ui.workspaceLineageErrorWrongFolder") };
-      }
-      await this.library.writeFolderHandle(context.record.workspaceId, picked);
-      directory = new FolderLineageDirectory(picked);
-      permission = "granted";
-    }
-    const repository = new LineageRepository(directory, { deviceLabel: this.deviceLabel });
-    try {
-      context.issues = (await repository.open()).issues;
-    } catch (error) {
-      return { ok: false, error: errorMessage(error) };
-    }
-    context.repository = repository;
-    this.updateSave({ permission, error: null });
-    this.publishActive();
-    return { ok: true, value: undefined };
+    });
   }
 
   /** Creates a numbered milestone of the current working state. Idempotent per operationId. */
@@ -766,6 +817,7 @@ export class LineageSessionController {
     if (this.snapshot.historical !== null) {
       return { ok: false, error: t("ui.workspaceLineageReadOnlyBlocked") };
     }
+    if (this.connecting || this.snapshot.save.conflict) return { ok: false, error: t("ui.workspaceLineageErrorConflict") };
     const repository = context.repository;
     return this.withBusy(async () => {
       const state = this.host.getState();
@@ -1143,16 +1195,21 @@ export class LineageSessionController {
     const repository = context.repository;
     return this.withBusy(async () => {
       try {
-        if (headId !== null && this.snapshot.save.dirty) {
+        const reconnectConflict = this.snapshot.save.conflict;
+        if (reconnectConflict) {
+          await repository.preserveWorkingAlternative(this.host.getState(), t("ui.workspaceLineageLocalEdits"), context.baseRevisionId);
+        }
+        if (!reconnectConflict && headId !== null && this.snapshot.save.dirty) {
           await this.writeWorking(this.host.getState(), getWorkspaceSessionToken(), { explicit: true });
         }
         const working = await repository.chooseWorkingHead(headId);
-        if (headId !== null) {
+        if (headId !== null || reconnectConflict) {
+          context.baseRevisionId = working.revisionId;
           advanceWorkspaceSessionToken();
           this.host.replaceState(working.state);
           this.host.resetHistory();
           this.lastSavedState = this.host.getState();
-          this.updateSave({ dirty: false });
+          this.updateSave({ dirty: false, conflict: false, error: null, durability: context.record.storage === "folder" ? "disk-verified" : "browser-stored" });
         }
         context.issues = context.issues.filter((issue) => issue.kind !== "divergent-heads");
         this.publishActive();

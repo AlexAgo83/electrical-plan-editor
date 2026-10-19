@@ -94,8 +94,8 @@ function NoticeActions({ notice, model, label }: { notice: LineageNotice; model:
       );
     case "folder-permission":
       return (
-        <button type="button" id={targetId} onClick={() => void model.relinkFolder()} disabled={model.snapshot.busy}>
-          {label(t("ui.workspaceLineageReconnectFolder"))}
+        <button type="button" id={targetId} onClick={() => void model.relinkFolder(true)} disabled={model.snapshot.busy || model.snapshot.historical !== null}>
+          {label(t("ui.workspaceLineageChooseFolder"))}
         </button>
       );
     case "orphans":
@@ -266,10 +266,16 @@ function NamedWorkspaceGroups({ model, label, normalizedQuery }: { model: Worksp
               </button>
             ) : null}
             {active?.storage === "folder" ? (
-              <button type="button" className="button-with-icon" onClick={() => void model.relinkFolder()} disabled={busy}>
+              <>
+              <p className="meta-line">{t("ui.workspaceLineageReconnectInstructions", { folder: active.folderName ?? active.slug })}</p>
+              <button type="button" className="button-with-icon" onClick={() => void model.relinkFolder()} disabled={busy || isReadOnly}>
                 <span className="action-button-icon is-swap" aria-hidden="true" />
                 {label(t("ui.workspaceLineageReconnectFolder"))}
               </button>
+              <button type="button" onClick={() => void model.relinkFolder(true)} disabled={busy || isReadOnly}>
+                {label(t("ui.workspaceLineageChooseFolder"))}
+              </button>
+              </>
             ) : null}
             {active === null ? <LegacyImportButton model={model} label={label} isReadOnly={isReadOnly} /> : null}
           </div>

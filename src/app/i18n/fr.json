@@ -1500,14 +1500,14 @@
     "workspaceLineageErrorPermission": "L'autorisation d'écrire dans le dossier de l'espace de travail a été refusée ou révoquée.",
     "workspaceLineageErrorQuota": "Le stockage du navigateur est plein ; rien n'a été indiqué comme enregistré.",
     "workspaceLineageErrorUnknown": "L'opération a échoué.",
-    "workspaceLineageErrorWrongFolder": "Le dossier sélectionné appartient à un autre espace de travail.",
+    "workspaceLineageErrorWrongFolder": "Ce dossier ne contient pas cet espace de travail. Choisissez sa racine ou son parent d’origine ; le nom du dossier ne suffit pas à identifier un espace.",
     "workspaceLineageExportPackage": "Exporter le paquet (ZIP)",
     "workspaceLineageFilterLabel": "Filtrer l'historique",
     "workspaceLineageFilterPlaceholder": "Numéro, libellé, fournisseur, date…",
     "workspaceLineageFolderOpened": "Dossier d'espace de travail ouvert",
-    "workspaceLineageFolderPermissionRequired": "L'accès au dossier doit être accordé de nouveau avant d'enregistrer sur disque.",
+    "workspaceLineageFolderPermissionRequired": "L’accès au dossier est requis. Utilisez Choisir un dossier pour autoriser l’accès à sa racine ou à son parent.",
     "workspaceLineageFolderReconnected": "Dossier d'espace de travail reconnecté",
-    "workspaceLineageFolderUnsupported": "Ce navigateur ne peut pas écrire dans des dossiers. L'espace de travail reste dans ce navigateur ; exportez un paquet ZIP pour le copier.",
+    "workspaceLineageFolderUnsupported": "L’accès aux dossiers est indisponible dans ce navigateur ou contexte. Utilisez un navigateur compatible dans un contexte sécurisé, ou les espaces du navigateur et le transfert ZIP. Le mode de stockage reste inchangé.",
     "workspaceLineageHandoffConfirm": "Enregistrer la remise",
     "workspaceLineageHandoffCorrect": "Enregistrer une correction",
     "workspaceLineageHandoffCorrectionTitle": "Enregistrer une remise de remplacement",
@@ -1701,6 +1701,12 @@
     "workspaceLineageExportOverdueChip": "Export en retard",
     "workspaceLineageMoreActions": "Autres actions pour {version}",
     "workspaceLineageResumeFromVersionHint": "Remplace la copie de travail par cette version (une copie de récupération est conservée avant)",
-    "workspaceLineageMoreActionsShort": "Plus"
+    "workspaceLineageMoreActionsShort": "Plus",
+    "workspaceLineageChooseFolder": "Choisir un dossier…",
+    "workspaceLineageReconnectInstructions": "Reconnectez {folder}, ou choisissez son dossier racine ou son dossier parent d’origine. La reconnexion ne sauvegarde pas les modifications ; utilisez ensuite Enregistrer.",
+    "workspaceLineageErrorInvalidFolder": "Le manifeste du dossier sélectionné est invalide ou non pris en charge. Choisissez le dossier d’origine.",
+    "workspaceLineageErrorAmbiguousFolder": "Plusieurs copies de cet espace ont été trouvées. Choisissez son dossier racine exact.",
+    "workspaceLineageConnectionBusy": "Une connexion au dossier ou un enregistrement est en cours. Réessayez après sa fin.",
+    "workspaceLineageLocalEdits": "Modifications locales avant reconnexion"
   }
 }

@@ -1,3 +1,4 @@
+import { translateCurrent as t } from "../i18n";
 /**
  * Local workspace library: per-lineage registry, browser-backed lineage storage, folder handles
  * and lineage-scoped local recovery sessions (IndexedDB). Falls back to an in-memory store when
@@ -230,12 +231,13 @@ export class IndexedDbLineageLibraryStore implements LineageLibraryStore {
     const db = await this.db();
     const transaction = db.transaction(storeName, mode);
     const result = requestToPromise(operation(transaction.objectStore(storeName)));
-    await new Promise<void>((resolve, reject) => {
+    const completed = new Promise<void>((resolve, reject) => {
       transaction.oncomplete = () => resolve();
       transaction.onerror = () => reject(transaction.error ?? new Error("IndexedDB transaction failed"));
       transaction.onabort = () => reject(transaction.error ?? new DOMException("IndexedDB transaction aborted", "QuotaExceededError"));
     });
-    return result;
+    const [value] = await Promise.all([result, completed]);
+    return value;
   }
 
   async listRecords(): Promise<LineageRegistryRecord[]> {
@@ -404,7 +406,7 @@ export function isDirectoryAccessSupported(): boolean {
 export async function pickLineageFolder(): Promise<FolderDirectoryHandle | null> {
   const picker = (window as unknown as DirectoryPickerWindow).showDirectoryPicker;
   if (picker === undefined) {
-    return null;
+    throw new Error(t("ui.workspaceLineageFolderUnsupported"));
   }
   try {
     return await picker({ id: "epe-workspace", mode: "readwrite" });
