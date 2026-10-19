@@ -1,0 +1,463 @@
+{
+  "budgets": {
+    "max_docs": 32,
+    "max_docs_per_ref": 8
+  },
+  "changed_paths": [],
+  "command": "logics-manager sync context-pack req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow task_167_deliver_reliable_new_workspace_folder_reconnection --mode summary-only --profile deep --handoff",
+  "companion_docs": [
+    {
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_674_named_lineage_and_immutable_workspace_version_contracts"
+        ],
+        "prod": [
+          "prod_018_portable_named_workspace_lineages_and_supplier_history"
+        ],
+        "req": [
+          "req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs"
+        ],
+        "task": [
+          "task_164_deliver_named_workspace_lineages_version_history_and_supplier_archives"
+        ]
+      },
+      "path": "logics/product/prod_018_portable_named_workspace_lineages_and_supplier_history.md",
+      "ref": "prod_018_portable_named_workspace_lineages_and_supplier_history",
+      "status": "Settled",
+      "title": "Portable named workspace lineages and supplier history"
+    },
+    {
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection",
+          "item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow"
+        ],
+        "prod": [
+          "prod_021_reliable_folder_reconnection_for_named_workspace_persistence"
+        ],
+        "req": [
+          "req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces"
+        ],
+        "task": [
+          "task_167_deliver_reliable_new_workspace_folder_reconnection"
+        ]
+      },
+      "path": "logics/product/prod_021_reliable_folder_reconnection_for_named_workspace_persistence.md",
+      "ref": "prod_021_reliable_folder_reconnection_for_named_workspace_persistence",
+      "status": "Proposed",
+      "title": "Reliable folder reconnection for named workspace persistence"
+    },
+    {
+      "kind": "product",
+      "linked_refs": {
+        "prod": [
+          "prod_005_cloud_file_workspace_sync"
+        ],
+        "req": [
+          "req_004_network_import_export_file_workflow",
+          "req_011_pwa_enablement_installability_and_offline_reliability",
+          "req_015_runtime_robustness_persistence_empty_workspace_semantics_and_ci_release_safety",
+          "req_113_technical_debt_hardening_persistence_safety_performance_and_architecture_quality"
+        ]
+      },
+      "path": "logics/product/prod_005_cloud_file_workspace_sync.md",
+      "ref": "prod_005_cloud_file_workspace_sync",
+      "status": "Settled",
+      "title": "Cloud file workspace sync"
+    },
+    {
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_681_consolidate_named_workspace_management_in_settings_storage",
+          "item_682_retire_obsolete_storage_controls_with_explicit_legacy_compatibility",
+          "item_683_align_storage_settings_and_lineage_dialogs_with_global_themes_and_localization",
+          "item_684_validate_workspace_storage_consolidation_and_document_the_updated_workflow"
+        ],
+        "prod": [
+          "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency"
+        ],
+        "req": [
+          "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui"
+        ],
+        "task": [
+          "task_165_deliver_workspace_storage_settings_consolidation_and_ui_alignment"
+        ]
+      },
+      "path": "logics/product/prod_019_workspace_storage_settings_information_architecture_and_theme_consistency.md",
+      "ref": "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency",
+      "status": "Settled",
+      "title": "Workspace storage settings information architecture and theme consistency"
+    }
+  ],
+  "docs": [
+    {
+      "ai_context": {
+        "keywords": "workspaceId, child directory handle, IndexedDB, relinkFolder, dirty recovery",
+        "skip when": "Publishing a release, changing portable schemas or converting browser-only storage.",
+        "summary": "The reported missing-folder error is the reproduction target. Check child-handle persistence, permission activation, stale handles and parent selection before attributing a root cause. Eight acceptance criteria protect edits, identity, verified saving and browser recovery.",
+        "use when": "Investigating the reported new-workspace missing-folder failure or implementing its scoped recovery criteria."
+      },
+      "kind": "request",
+      "linked_refs": {
+        "item": [
+          "item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection",
+          "item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow"
+        ],
+        "prod": [
+          "prod_018_portable_named_workspace_lineages_and_supplier_history",
+          "prod_021_reliable_folder_reconnection_for_named_workspace_persistence"
+        ],
+        "req": [
+          "req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs",
+          "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui",
+          "req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces"
+        ]
+      },
+      "path": "logics/request/req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces.md",
+      "ref": "req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Make folder reconnection reliable for newly created named workspaces"
+    },
+    {
+      "ai_context": {
+        "keywords": "named, portable, workspace, lineages, immutable, version, history, supplier, handoffs",
+        "skip when": "Changing individual harness exports or adding hosted collaboration.",
+        "summary": "Two independent named workspaces replace timestamp-only backups with stable working files and deliberately frozen milestones. Folder/ZIP copies preserve history and exact supplier artifacts.",
+        "use when": "Scoping or implementing the complete lineage persistence and historical consultation workflow."
+      },
+      "kind": "request",
+      "linked_refs": {
+        "item": [
+          "item_674_named_lineage_and_immutable_workspace_version_contracts",
+          "item_675_lineage_repository_with_durable_folder_storage_and_isolated_local_recovery",
+          "item_676_workspace_selector_home_resume_and_safe_history_consultation",
+          "item_677_supplier_handoff_records_and_exact_delivered_artifact_archives",
+          "item_678_portable_zip_transfer_and_divergence_reconciliation",
+          "item_679_previewable_adoption_of_legacy_timestamped_workspace_collections",
+          "item_680_workspace_lineage_release_validation_and_user_workflow_documentation"
+        ],
+        "prod": [
+          "prod_005_cloud_file_workspace_sync",
+          "prod_018_portable_named_workspace_lineages_and_supplier_history"
+        ],
+        "req": [
+          "req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs"
+        ]
+      },
+      "path": "logics/request/req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs.md",
+      "ref": "req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs",
+      "schema_version": "1.0",
+      "status": "Done",
+      "title": "Named portable workspace lineages with immutable version history and supplier handoffs"
+    },
+    {
+      "ai_context": {},
+      "kind": "request",
+      "linked_refs": {
+        "item": [
+          "item_681_consolidate_named_workspace_management_in_settings_storage",
+          "item_682_retire_obsolete_storage_controls_with_explicit_legacy_compatibility",
+          "item_683_align_storage_settings_and_lineage_dialogs_with_global_themes_and_localization",
+          "item_684_validate_workspace_storage_consolidation_and_document_the_updated_workflow"
+        ],
+        "prod": [
+          "prod_018_portable_named_workspace_lineages_and_supplier_history",
+          "prod_019_workspace_storage_settings_information_architecture_and_theme_consistency"
+        ],
+        "req": [
+          "req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs",
+          "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui"
+        ]
+      },
+      "path": "logics/request/req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui.md",
+      "ref": "req_168_consolidate_release_1_19_workspace_controls_in_settings_storage_and_align_global_ui",
+      "schema_version": "1.0",
+      "status": "Done",
+      "title": "Consolidate release 1.19 workspace controls in Settings storage and align global UI"
+    },
+    {
+      "ai_context": {
+        "keywords": "workspaceId, child directory handle, IndexedDB, relinkFolder, dirty recovery",
+        "skip when": "Publishing a release, changing portable schemas or converting browser-only storage.",
+        "summary": "Implement the connection lifecycle and localized recovery actions for request AC1-AC7. Candidate selection must preserve identity and dirty edits, validate before connection commit, retain the original save base and ignore results from stale sessions.",
+        "use when": "Investigating the reported new-workspace missing-folder failure or implementing its scoped recovery criteria."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection"
+        ],
+        "prod": [
+          "prod_021_reliable_folder_reconnection_for_named_workspace_persistence"
+        ],
+        "req": [
+          "req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces"
+        ],
+        "task": [
+          "task_167_deliver_reliable_new_workspace_folder_reconnection"
+        ]
+      },
+      "path": "logics/backlog/item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection.md",
+      "ref": "item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Repair named workspace folder connection lifecycle and safe reconnection"
+    },
+    {
+      "ai_context": {
+        "keywords": "workspaceId, child directory handle, IndexedDB, relinkFolder, dirty recovery",
+        "skip when": "Publishing a release, changing portable schemas or converting browser-only storage.",
+        "summary": "Provide request AC8 evidence for the lifecycle fix. Simulated handles cover failure and isolation cases; a supported-browser run with an actual OS picker separately verifies gesture and persistent-handle behavior. Document unperformed checks explicitly.",
+        "use when": "Investigating the reported new-workspace missing-folder failure or implementing its scoped recovery criteria."
+      },
+      "kind": "backlog",
+      "linked_refs": {
+        "item": [
+          "item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow"
+        ],
+        "prod": [
+          "prod_021_reliable_folder_reconnection_for_named_workspace_persistence"
+        ],
+        "req": [
+          "req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces"
+        ],
+        "task": [
+          "task_167_deliver_reliable_new_workspace_folder_reconnection"
+        ]
+      },
+      "path": "logics/backlog/item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow.md",
+      "ref": "item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Validate folder reconnection regressions and document the recovery workflow"
+    },
+    {
+      "ai_context": {},
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_674_named_lineage_and_immutable_workspace_version_contracts"
+        ],
+        "prod": [
+          "prod_018_portable_named_workspace_lineages_and_supplier_history"
+        ],
+        "req": [
+          "req_167_named_portable_workspace_lineages_with_immutable_version_history_and_supplier_handoffs"
+        ],
+        "task": [
+          "task_164_deliver_named_workspace_lineages_version_history_and_supplier_archives"
+        ]
+      },
+      "path": "logics/product/prod_018_portable_named_workspace_lineages_and_supplier_history.md",
+      "ref": "prod_018_portable_named_workspace_lineages_and_supplier_history",
+      "schema_version": "1.0",
+      "status": "Settled",
+      "title": "Portable named workspace lineages and supplier history"
+    },
+    {
+      "ai_context": {},
+      "kind": "product",
+      "linked_refs": {
+        "item": [
+          "item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection",
+          "item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow"
+        ],
+        "prod": [
+          "prod_021_reliable_folder_reconnection_for_named_workspace_persistence"
+        ],
+        "req": [
+          "req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces"
+        ],
+        "task": [
+          "task_167_deliver_reliable_new_workspace_folder_reconnection"
+        ]
+      },
+      "path": "logics/product/prod_021_reliable_folder_reconnection_for_named_workspace_persistence.md",
+      "ref": "prod_021_reliable_folder_reconnection_for_named_workspace_persistence",
+      "schema_version": "1.0",
+      "status": "Proposed",
+      "title": "Reliable folder reconnection for named workspace persistence"
+    },
+    {
+      "ai_context": {
+        "keywords": "workspaceId, child directory handle, IndexedDB, relinkFolder, dirty recovery",
+        "skip when": "Publishing a release, changing portable schemas or converting browser-only storage.",
+        "summary": "Deliver the two linked slices in sequence: reproduce and repair the folder connection lifecycle, then validate and document recovery. The code review identifies hypotheses rather than a confirmed root cause; preserve both local and disk work throughout.",
+        "use when": "Investigating the reported new-workspace missing-folder failure or implementing its scoped recovery criteria."
+      },
+      "kind": "task",
+      "linked_refs": {
+        "item": [
+          "item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection",
+          "item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow"
+        ],
+        "prod": [
+          "prod_021_reliable_folder_reconnection_for_named_workspace_persistence"
+        ],
+        "req": [
+          "req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces"
+        ],
+        "task": [
+          "task_167_deliver_reliable_new_workspace_folder_reconnection"
+        ]
+      },
+      "path": "logics/tasks/task_167_deliver_reliable_new_workspace_folder_reconnection.md",
+      "ref": "task_167_deliver_reliable_new_workspace_folder_reconnection",
+      "schema_version": "1.0",
+      "status": "Ready",
+      "title": "Deliver reliable new workspace folder reconnection"
+    }
+  ],
+  "estimates": {
+    "char_count": 12728,
+    "companion_doc_count": 4,
+    "doc_count": 8
+  },
+  "generated_at": "2026-10-19T16:08:16Z",
+  "handoff": {
+    "companion_doc_count": 4,
+    "enabled": true,
+    "source_refs": [
+      "req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces",
+      "item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection",
+      "item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow",
+      "task_167_deliver_reliable_new_workspace_folder_reconnection"
+    ],
+    "validation_summary_count": 1
+  },
+  "i18n": {
+    "actions": [
+      "Keep catalogs valid with logics-manager i18n validate in the project quality gate."
+    ],
+    "applicable": true,
+    "catalogs": {
+      "en": 1694,
+      "fr": 1694
+    },
+    "configured": true,
+    "contract": {
+      "applicability": "applicable",
+      "catalog": {
+        "path": "src/app/i18n/{locale}.json"
+      },
+      "default_locale": "en",
+      "fallback_locale": "en",
+      "locales": [
+        "en",
+        "fr"
+      ],
+      "schema_version": "1.0",
+      "source_locale": "en"
+    },
+    "contract_path": "logics/i18n/contract.json",
+    "findings": [],
+    "next_action": "The i18n contract is valid.",
+    "ok": true,
+    "state": "valid"
+  },
+  "mode": "summary-only",
+  "profile": "deep",
+  "ref": "req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces,item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection,item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow,task_167_deliver_reliable_new_workspace_folder_reconnection",
+  "refs": [
+    "req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces",
+    "item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection",
+    "item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow",
+    "task_167_deliver_reliable_new_workspace_folder_reconnection"
+  ],
+  "release": {
+    "blocking_reasons": [
+      "version_metadata: evidence targets a different version",
+      "changelog: evidence targets a different version",
+      "local_validation: evidence targets a different version",
+      "git_push: evidence targets a different version",
+      "ci: evidence targets a different version",
+      "github_release: evidence targets a different version",
+      "production_deployment: evidence targets a different version"
+    ],
+    "configured": true,
+    "contract_path": "logics/release/contract.json",
+    "guidance": [
+      "Release readiness must come from project-owned evidence, not conversational memory.",
+      "Use release status or validate before preparing or claiming release readiness.",
+      "Publication-oriented actions are explicit operator actions and are separate from safe read/validate actions."
+    ],
+    "next_action": "version_metadata: evidence targets a different version",
+    "publication_actions": [
+      "GitHub release publication",
+      "external publication"
+    ],
+    "required_gates": [
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "version_metadata",
+        "required": true,
+        "state": "preparing",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "changelog",
+        "required": true,
+        "state": "preparing",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "local_validation",
+        "required": true,
+        "state": "local_validation",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "git_push",
+        "required": true,
+        "state": "pushed",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "ci",
+        "required": true,
+        "state": "ci_verification",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "github_release",
+        "required": true,
+        "state": "github_release",
+        "status": "stale"
+      },
+      {
+        "blocking_reason": "evidence targets a different version",
+        "id": "production_deployment",
+        "required": true,
+        "state": "external_publication",
+        "status": "stale"
+      }
+    ],
+    "safe_actions": [
+      "logics-manager release status",
+      "logics-manager release plan <version>",
+      "logics-manager release validate <version>"
+    ],
+    "state": "blocked",
+    "target_id": null,
+    "target_version": "1.19.2",
+    "targets": []
+  },
+  "validation_summary": [
+    {
+      "items": [
+        "- Corpus scoping: request-chain dry-run and generation succeeded; inline validation reported ready-to-dev with no blocking findings. Implementation tests and real-picker validation remain pending."
+      ],
+      "path": "logics/tasks/task_167_deliver_reliable_new_workspace_folder_reconnection.md",
+      "ref": "task_167_deliver_reliable_new_workspace_folder_reconnection"
+    }
+  ]
+}
