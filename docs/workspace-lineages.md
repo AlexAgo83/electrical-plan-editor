@@ -249,3 +249,40 @@ falling back to uncompressed entries.
   raw lineage 24.89 MiB, ZIP 1.46 MiB; open (manifest + working copy, zero version files read)
   2.6 ms; history list 0.1 ms; lazily reading one version 1.9 ms; package export 222 ms. These are
   observations, not hardware-independent thresholds.
+
+## 4. Reconnecting a folder (2026-10-19)
+
+In Settings > Workspace storage > Transfer and recovery, **Reconnect folder** checks the
+stored connection without displaying a permission prompt. If access is missing, denied, or the
+stored handle is stale, use **Choose folder…**. That separate click opens the system picker
+immediately so the browser can accept the user gesture. Reloading never requests permission.
+
+Select the workspace's own root (the child created when naming the workspace), or its original
+parent. A parent is accepted only when exactly one immediate child has the active workspace ID.
+A matching folder name is insufficient. If several copies have the same ID, select the exact
+root you want. Empty, unrelated, unsupported or corrupt candidates are rejected without repair
+or initialization; reconnect does not create a replacement for a deleted workspace.
+
+Reconnection preserves editor edits and does **not** save them. After reconnecting, click **Save**;
+a successful save verifies the written bytes. Autosave resumes on subsequent edits. Canceling
+the picker leaves the connection unchanged and does not display a failure toast. A failed write
+keeps local recovery and offers another folder choice.
+
+If the disk working revision differs from the original editor base, the editor state is retained
+as an alternative recovery head and saving is blocked. Use **Choose working state** to resolve it:
+the current working copy in that dialog is the disk state; the alternative labelled **Local edits
+before reconnection** is the preserved editor state. Either choice retains recovery files. Later
+editor changes are also preserved before resolving. Version and handoff files are unchanged.
+
+If folder creation fails after disk initialization, keep the created child folder and use **Open
+workspace folder** to recover it; do not delete it or create a replacement over it. Unsupported
+folder access requires a compatible secure browser context. Browser-only workspaces and ZIP
+transfer remain available; reconnection never changes the storage mode automatically.
+
+**Français :** Dans Paramètres > Stockage de l’espace de travail, **Reconnecter le dossier**
+vérifie l’accès existant. En cas de refus ou d’accès perdu, **Choisir un dossier…** ouvre le
+sélecteur système. Sélectionnez la racine de l’espace ou son parent d’origine contenant une
+seule copie correspondante. La reconnexion conserve vos modifications ; cliquez ensuite sur
+**Enregistrer**. En cas de divergence, choisissez explicitement l’état de travail à conserver ;
+les modifications locales sont proposées comme état alternatif et les copies de récupération
+restent disponibles. Annuler le sélecteur ne modifie pas la connexion.

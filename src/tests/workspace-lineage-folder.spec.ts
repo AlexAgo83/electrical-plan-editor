@@ -9,7 +9,7 @@ import {
 import { LineageSessionController } from "../app/lib/lineage/lineageSessionController";
 import { LineageRepository } from "../app/lib/lineage/lineageRepository";
 import { describeLineageSaveStatus } from "../app/lib/lineage/lineageStatus";
-import { resetWorkspaceSessionGateForTests } from "../app/lib/workspaceSessionGate";
+import { advanceWorkspaceSessionToken, resetWorkspaceSessionGateForTests } from "../app/lib/workspaceSessionGate";
 
 /** In-memory File System Access directory handle with permission simulation. */
 class FakeDirectoryHandle implements FolderDirectoryHandle {
@@ -421,6 +421,83 @@ describe("folder-backed named workspaces", () => {
     await disk.open();
     expect(networkName(disk.getWorking().state)).toBe("local");
     expect(disk.getManifest().recovery.some((entry) => entry.kind === "divergent-head")).toBe(true);
+    controller.dispose();
+  });
+
+  it("preserves a cached old base across reload instead of rebasing dirty edits onto disk", async () => {
+    const { controller, library, host, folder, id } = await setupFolder();
+    const external = new LineageRepository(new FolderLineageDirectory(folder));
+    await external.open();
+    const base = external.getWorking().revisionId;
+    host.state = named(host.state, "cached local");
+    await library.writeSession({ workspaceId: id, stateJson: JSON.stringify(host.state), baseRevisionId: base, savedAtIso: new Date().toISOString() });
+    await external.saveWorking(named(host.state, "external after cache"));
+    const disk = folder.files.get("fresh-travail.epe.json")!.slice();
+    controller.dispose();
+    const reloaded = new LineageSessionController(library, host);
+    await reloaded.initialize();
+    expect((await reloaded.saveNow()).ok).toBe(false);
+    expect((await reloaded.relinkFolder()).ok).toBe(false);
+    expect(folder.files.get("fresh-travail.epe.json")).toEqual(disk);
+    expect(networkName(host.state)).toBe("cached local");
+    expect(reloaded.getSnapshot().active?.manifest?.divergentHeads.length).toBeGreaterThan(0);
+    reloaded.dispose();
+  });
+
+  it("reports handle persistence failure before creating files and can retry without duplicates", async () => {
+    const library = new MemoryLineageLibraryStore({ durable: true });
+    const host = new FakeHost(createSampleNetworkState());
+    const controller = new LineageSessionController(library, host);
+    await controller.initialize();
+    pickerResult = new FakeDirectoryHandle("Projects");
+    vi.spyOn(library, "writeFolderHandle").mockRejectedValueOnce(new DOMException("quota", "QuotaExceededError"));
+    const input = { displayName: "Fresh", start: "current" as const, storage: "folder" as const, emptyState: createEmptyWorkspaceState() };
+    expect((await controller.createLineage(input)).ok).toBe(false);
+    expect(await library.listRecords()).toHaveLength(0);
+    expect(pickerResult.directories.get("fresh")?.files.size).toBe(0);
+    expect((await controller.createLineage(input)).ok).toBe(true);
+    expect(await library.listRecords()).toHaveLength(1);
+    expect(pickerResult.directories.size).toBe(1);
+    controller.dispose();
+  });
+
+  it("does not claim a verified save after corrupted write readback", async () => {
+    const { controller, host, folder } = await setupFolder();
+    const previous = host.state;
+    host.state = named(host.state, "readback failure");
+    controller.notifyStateChanged(previous, host.state);
+    const original = folder.getFileHandle.bind(folder);
+    vi.spyOn(folder, "getFileHandle").mockImplementation(async (name, options) => {
+      const handle = await original(name, options);
+      if (options?.create && name === "fresh-travail.epe.json") {
+        const writable = await handle.createWritable();
+        return { ...handle, createWritable: () => Promise.resolve({
+          write: (data) => writable.write(data),
+          close: async () => { await writable.close(); folder.files.set(name, new Uint8Array([0])); }
+        }) };
+      }
+      return handle;
+    });
+    expect((await controller.saveNow()).ok).toBe(false);
+    expect(controller.getSnapshot().save).toMatchObject({ dirty: true, durability: "none", localRecovery: "cached" });
+    controller.dispose();
+  });
+
+  it("releases the saving flag when the session token changes during a save", async () => {
+    const { controller, host } = await setupFolder();
+    const previous = host.state;
+    host.state = named(host.state, "interrupted save");
+    controller.notifyStateChanged(previous, host.state);
+    // The nested call falls through to the real implementation once this one-shot mock is consumed.
+    vi.spyOn(LineageRepository.prototype, "saveWorking").mockImplementationOnce(async function (this: LineageRepository, state) {
+      const result = await LineageRepository.prototype.saveWorking.call(this, state);
+      advanceWorkspaceSessionToken();
+      return result;
+    });
+    expect(await controller.saveNow()).toMatchObject({ ok: false, cancelled: true });
+    expect(controller.getSnapshot().save.saving).toBe(false);
+    expect((await controller.saveNow()).ok).toBe(true);
+    expect((await controller.relinkFolder()).ok).toBe(true);
     controller.dispose();
   });
 

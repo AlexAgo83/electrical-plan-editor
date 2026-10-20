@@ -392,11 +392,13 @@ export class LineageSessionController {
     }
     const currentState = this.host.getState();
     const dirty = working === null || !projectContentEquals(working.state, currentState);
+    const conflict = dirty && working !== null && session !== null && session.baseRevisionId !== working.revisionId;
     this.lastSavedState = dirty ? working?.state ?? null : currentState;
     this.update({
       save: {
         ...initialSaveStatus(),
         dirty,
+        conflict,
         durability: dirty || working === null ? "none" : record.storage === "folder" ? "disk-verified" : "browser-stored",
         lastDurableSaveIso: working?.updatedAtIso ?? null,
         localRecovery: dirty && localRecovery === "none" ? "cached" : localRecovery,
@@ -404,6 +406,7 @@ export class LineageSessionController {
         permission,
         error:
           openError ??
+          (conflict ? t("ui.workspaceLineageErrorConflict") : null) ??
           (record.storage === "folder" && repository === null
             ? permission === "prompt"
               ? t("ui.workspaceLineageFolderPermissionRequired")
@@ -444,7 +447,7 @@ export class LineageSessionController {
       await this.library.writeSession({
         workspaceId: context.record.workspaceId,
         stateJson: JSON.stringify(state),
-        baseRevisionId: this.snapshot.save.conflict ? context.baseRevisionId : context.repository?.getWorking().revisionId ?? context.baseRevisionId,
+        baseRevisionId: context.baseRevisionId,
         savedAtIso: this.now()
       });
       if (current()) this.updateSave({ localRecovery: this.library.durable ? "cached" : "failed" });
@@ -513,6 +516,9 @@ export class LineageSessionController {
         this.updateSave({ saving: false, error: errorMessage(error) });
       }
       return false;
+    } finally {
+      // A superseded save must not leave this session permanently busy for Save and reconnect.
+      if (this.active === context && this.snapshot.save.saving) this.updateSave({ saving: false });
     }
   }
 
@@ -777,7 +783,7 @@ export class LineageSessionController {
         const repository = new LineageRepository(new FolderLineageDirectory(handle), { deviceLabel: this.deviceLabel });
         const opened = await repository.open({ repair: false });
         if (!current()) return cancelled;
-        const base = this.snapshot.save.conflict ? context.baseRevisionId : context.repository?.getWorking().revisionId ?? context.baseRevisionId;
+        const base = context.baseRevisionId;
         const conflict = base !== null ? base !== opened.working.revisionId : !projectContentEquals(this.host.getState(), opened.working.state);
         await this.writeLocalSession(this.host.getState());
         if (!current()) return cancelled;
@@ -825,6 +831,7 @@ export class LineageSessionController {
       try {
         const entry = await repository.createVersion(state, { ...input });
         if (token === getWorkspaceSessionToken()) {
+          context.baseRevisionId = repository.getWorking().revisionId;
           this.lastSavedState = state;
           const isBrowser = context.record.storage === "browser";
           this.updateSave({
@@ -906,6 +913,7 @@ export class LineageSessionController {
         this.host.replaceState(restored.state);
         this.host.resetHistory();
         this.lastSavedState = this.host.getState();
+        context.baseRevisionId = repository.getWorking().revisionId;
         await this.library.clearSession(context.record.workspaceId).catch(() => undefined);
         this.update({ historical: null });
         this.updateSave({ dirty: false, localRecovery: "none", error: null, lastDurableSaveIso: restored.working.updatedAtIso, pendingPortableExport: context.record.storage === "browser" || this.snapshot.save.pendingPortableExport });
@@ -1086,6 +1094,7 @@ export class LineageSessionController {
           this.host.replaceState(repository.getWorking().state);
           this.host.resetHistory();
           this.lastSavedState = this.host.getState();
+          this.active.baseRevisionId = repository.getWorking().revisionId;
           this.updateSave({ dirty: false });
         }
         this.publishActive();
@@ -1274,6 +1283,7 @@ export class LineageSessionController {
           this.host.replaceState(repository.getWorking().state);
           this.host.resetHistory();
           this.lastSavedState = this.host.getState();
+          context.baseRevisionId = repository.getWorking().revisionId;
           this.updateSave({ dirty: false });
         }
         await this.persistRecord({ pendingPortableExport: context.record.storage === "browser" });
