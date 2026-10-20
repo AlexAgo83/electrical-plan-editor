@@ -1,14 +1,14 @@
 ## item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection - Repair named workspace folder connection lifecycle and safe reconnection
 > From version: 1.19.2
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 75%
+> Progress: 100%
 > Complexity: High
 > Theme: Workspace persistence
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-19 18:14:29
+> Indicators reviewed: 2026-10-20 09:48:14
 
 # AI Context
 - Summary: Implement the connection lifecycle and localized recovery actions for request AC1-AC7. Candidate selection must preserve identity and dirty edits, validate before connection commit, retain the original save base and ignore results from stale sessions.
@@ -59,3 +59,9 @@
 # Priority
 - Priority: High
 - Rationale: The reported failure blocks reliable disk saving for new folder-backed workspaces.
+
+# Tasks
+- `task_167_deliver_reliable_new_workspace_folder_reconnection`
+
+# Notes
+- Task `task_167_deliver_reliable_new_workspace_folder_reconnection` was finished via `logics-manager flow finish task` on 2026-10-20.

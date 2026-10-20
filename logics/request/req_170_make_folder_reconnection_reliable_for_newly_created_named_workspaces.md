@@ -1,13 +1,13 @@
 ## req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces - Make folder reconnection reliable for newly created named workspaces
 > From version: 1.19.2
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
 > Complexity: High
 > Theme: Workspace persistence
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
-> Indicators reviewed: 2026-10-19 18:08:07
+> Indicators reviewed: 2026-10-20 09:48:13
 
 # AI Context
 - Summary: The reported missing-folder error is the reproduction target. Check child-handle persistence, permission activation, stale handles and parent selection before attributing a root cause. Eight acceptance criteria protect edits, identity, verified saving and browser recovery.

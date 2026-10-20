@@ -1,12 +1,12 @@
 ## prod_021_reliable_folder_reconnection_for_named_workspace_persistence - Reliable folder reconnection for named workspace persistence
 > Date: 2026-10-19
-> Status: Proposed
+> Status: Settled
 > Related request: `req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces`
-> Related backlog: `item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection`, `item_692_validate_folder_reconnection_regressions_and_document_the_recovery_workflow`
+> Related backlog: `item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection`
 > Related task: `task_167_deliver_reliable_new_workspace_folder_reconnection`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
-> Indicators reviewed: 2026-10-19 18:08:08
+> Indicators reviewed: 2026-10-20 09:48:14
 
 # Overview
 A focused extension of prod_018: a newly created or temporarily disconnected folder-backed workspace can regain access to its own lineage root and save current edits without losing recovery data or claiming unverified disk persistence. Settings explains the next action for each access outcome.
@@ -55,5 +55,5 @@ flowchart TD
 - Automated failure/isolation checks and a real OS picker scenario verify the complete workflow.
 
 # References
-- Product back-reference: `req_170_make_folder_reconnection_reliable_for_newly_created_named_workspaces`
+- Product back-reference: `item_691_repair_named_workspace_folder_connection_lifecycle_and_safe_reconnection`
 - Task back-reference: `task_167_deliver_reliable_new_workspace_folder_reconnection`
