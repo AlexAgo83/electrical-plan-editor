@@ -1714,6 +1714,17 @@
     "planIssueDateHint": "Distinct from the creation date; never updated automatically.",
     "planIssueDateIsInvalid": "Plan issue date must be a valid calendar date.",
     "exportCartouchePlanRevisionRow": "Revision: {value}",
-    "exportCartouchePlanIssueDateRow": "Issue date: {value}"
+    "exportCartouchePlanIssueDateRow": "Issue date: {value}",
+    "routingConsistency": "Routing consistency",
+    "routingDriftNetworkSummaryOne": "Network '{network}': Recompute routes would change {count} wire. Open Network Scope > Recompute routes to apply it.",
+    "routingDriftNetworkSummaryOther": "Network '{network}': Recompute routes would change {count} wires. Open Network Scope > Recompute routes to apply them.",
+    "routingDriftWireDetail": "Recompute would change {detail}",
+    "routingDriftCheckUnavailable": "Network '{network}': routing consistency check unavailable because the full recompute fails ({reason}).",
+    "routingDriftStatusLabel": "Routing consistency check",
+    "routingDriftStatusPending": "Checking…",
+    "routingDriftStatusConsistent": "Stored routes match Recompute routes.",
+    "routingDriftStatusDriftOne": "{count} wire would change.",
+    "routingDriftStatusDriftOther": "{count} wires would change.",
+    "routingDriftStatusFailed": "Unavailable (recompute fails)."
   }
 }

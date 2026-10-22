@@ -13,6 +13,8 @@ import type {
 import type { AppStore } from "../../store";
 import { normalizeSearch } from "../lib/app-utils-shared";
 import { buildValidationIssues } from "./validation/buildValidationIssues";
+import { buildRoutingDriftValidationIssues } from "./validation/buildRoutingDriftValidationIssues";
+import { useRoutingDriftDiagnostics, type RoutingDriftStatus } from "./validation/useRoutingDriftDiagnostics";
 import type { ValidationIssue, ValidationSeverityFilter } from "../types/app-controller";
 
 type AppState = ReturnType<AppStore["getState"]>;
@@ -57,6 +59,7 @@ interface UseValidationModelResult {
   getValidationIssueByCursor: () => ValidationIssue | null;
   getFocusedValidationIssueByCursor: () => ValidationIssue | null;
   setValidationIssueCursorFromIssue: (issue: ValidationIssue) => void;
+  routingDriftStatus: RoutingDriftStatus;
 }
 
 export function useValidationModel({
@@ -79,8 +82,15 @@ export function useValidationModel({
   const [validationSearchQuery, setValidationSearchQuery] = useState("");
   const [validationIssueCursor, setValidationIssueCursor] = useState(-1);
   const normalizedValidationSearch = normalizeSearch(validationSearchQuery);
+  const routingDrift = useRoutingDriftDiagnostics(state);
+  const routingDriftNetwork = routingDrift.preview === null ? undefined : state.networks.byId[routingDrift.preview.networkId];
+  const routingDriftNetworkLabel = routingDriftNetwork?.technicalId ?? routingDrift.preview?.networkId ?? "";
+  const routingDriftIssues = useMemo(
+    () => buildRoutingDriftValidationIssues(routingDrift.preview, routingDriftNetworkLabel),
+    [routingDrift.preview, routingDriftNetworkLabel]
+  );
 
-  const validationIssues = useMemo<ValidationIssue[]>(
+  const baseValidationIssues = useMemo<ValidationIssue[]>(
     () =>
       buildValidationIssues({
         state,
@@ -110,6 +120,10 @@ export function useValidationModel({
       spliceNodeBySpliceId,
       spliceSectionImbalanceRatioPercent
     ]
+  );
+  const validationIssues = useMemo(
+    () => (routingDriftIssues.length === 0 ? baseValidationIssues : [...baseValidationIssues, ...routingDriftIssues]),
+    [baseValidationIssues, routingDriftIssues]
   );
 
   const orderedValidationIssues = useMemo(
@@ -360,7 +374,8 @@ export function useValidationModel({
     findValidationIssueIndex,
     getValidationIssueByCursor,
     getFocusedValidationIssueByCursor,
-    setValidationIssueCursorFromIssue
+    setValidationIssueCursorFromIssue,
+    routingDriftStatus: routingDrift.status
   };
 }
 

@@ -1714,6 +1714,17 @@
     "planIssueDateHint": "Distincte de la date de création ; jamais mise à jour automatiquement.",
     "planIssueDateIsInvalid": "La date de diffusion du plan doit être une date calendaire valide.",
     "exportCartouchePlanRevisionRow": "Indice : {value}",
-    "exportCartouchePlanIssueDateRow": "Date de diffusion : {value}"
+    "exportCartouchePlanIssueDateRow": "Date de diffusion : {value}",
+    "routingConsistency": "Cohérence du routage",
+    "routingDriftNetworkSummaryOne": "Réseau « {network} » : « Recalculer les trajets » modifierait {count} fil. Ouvrez Périmètre réseau > Recalculer les trajets pour l'appliquer.",
+    "routingDriftNetworkSummaryOther": "Réseau « {network} » : « Recalculer les trajets » modifierait {count} fils. Ouvrez Périmètre réseau > Recalculer les trajets pour les appliquer.",
+    "routingDriftWireDetail": "Le recalcul modifierait {detail}",
+    "routingDriftCheckUnavailable": "Réseau « {network} » : vérification de cohérence du routage indisponible car le recalcul complet échoue ({reason}).",
+    "routingDriftStatusLabel": "Vérification de cohérence du routage",
+    "routingDriftStatusPending": "Vérification en cours…",
+    "routingDriftStatusConsistent": "Les routes enregistrées correspondent au recalcul.",
+    "routingDriftStatusDriftOne": "{count} fil serait modifié.",
+    "routingDriftStatusDriftOther": "{count} fils seraient modifiés.",
+    "routingDriftStatusFailed": "Indisponible (le recalcul échoue)."
   }
 }

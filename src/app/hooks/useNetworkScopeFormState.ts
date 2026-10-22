@@ -6,6 +6,8 @@ export type NetworkFormMode = "create" | "edit" | null;
 export interface NetworkFocusRequest {
   id: NetworkId | null;
   token: number;
+  /** The focused row is explicitly selected so its edit form shows (navigation from another screen). */
+  openEdit?: boolean;
 }
 
 export function useNetworkScopeFormState() {

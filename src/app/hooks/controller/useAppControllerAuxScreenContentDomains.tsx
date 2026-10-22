@@ -161,7 +161,8 @@ export function useAppControllerAuxScreenContentDomains({
     setValidationIssueCursorFromIssue: validation.setValidationIssueCursorFromIssue,
     handleValidationIssueRowGoTo: validation.handleValidationIssueRowGoTo,
     validationErrorCount: validation.validationErrorCount,
-    validationWarningCount: validation.validationWarningCount
+    validationWarningCount: validation.validationWarningCount,
+    routingDriftStatus: validation.routingDriftStatus
       })
     : null;
 

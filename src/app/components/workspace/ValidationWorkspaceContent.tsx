@@ -1,10 +1,11 @@
-import { translateCurrent as t } from "../../lib/i18n";
+import { translateCurrent as t, translateCurrentPlural as tp } from "../../lib/i18n";
 import { useMemo, useState, type ReactElement } from "react";
 import { useIsMobileViewport } from "../../hooks/useIsMobileViewport";
 import { getTableAriaSort } from "../../lib/accessibility";
 import { sortByTableColumns } from "../../lib/app-utils-shared";
 import { downloadCsvFile } from "../../lib/csv";
 import type { ValidationIssue, ValidationSeverityFilter } from "../../types/app-controller";
+import type { RoutingDriftStatus } from "../../hooks/validation/useRoutingDriftDiagnostics";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 
 interface ValidationWorkspaceContentProps {
@@ -26,6 +27,22 @@ interface ValidationWorkspaceContentProps {
   handleValidationIssueRowGoTo: (issue: ValidationIssue) => void;
   validationErrorCount: number;
   validationWarningCount: number;
+  routingDriftStatus?: RoutingDriftStatus;
+}
+
+function describeRoutingDriftStatus(status: RoutingDriftStatus): string | null {
+  switch (status.kind) {
+    case "idle":
+      return null;
+    case "pending":
+      return t("ui.routingDriftStatusPending");
+    case "consistent":
+      return t("ui.routingDriftStatusConsistent");
+    case "drift":
+      return tp("ui.routingDriftStatusDrift", status.wireCount);
+    case "failed":
+      return t("ui.routingDriftStatusFailed");
+  }
 }
 
 export function ValidationWorkspaceContent({
@@ -46,8 +63,10 @@ export function ValidationWorkspaceContent({
   setValidationIssueCursorFromIssue,
   handleValidationIssueRowGoTo,
   validationErrorCount,
-  validationWarningCount
+  validationWarningCount,
+  routingDriftStatus = { kind: "idle" }
 }: ValidationWorkspaceContentProps): ReactElement {
+  const routingDriftStatusText = describeRoutingDriftStatus(routingDriftStatus);
   type ValidationTableSortField = "severity" | "issue" | "actions";
   const isMobileViewport = useIsMobileViewport();
   const [validationTableSort, setValidationTableSort] = useState<{ field: ValidationTableSortField; direction: "asc" | "desc" }>({
@@ -107,6 +126,11 @@ export function ValidationWorkspaceContent({
           {t("ui.activeFilters")} {validationSeverityFilter === "all" ? t("ui.allSeverities") : validationSeverityFilter === "error" ? t("ui.errors2") : t("ui.warnings2")} / {" "}
           {validationCategoryFilter === "all" ? t("ui.allCategories") : validationCategoryFilter}
         </p>
+        {routingDriftStatusText !== null ? (
+          <p className="meta-line validation-routing-drift-status" role="status" data-routing-drift-status={routingDriftStatus.kind}>
+            {t("ui.routingDriftStatusLabel")}: {routingDriftStatusText}
+          </p>
+        ) : null}
       </section>
       <section className="panel">
         <header className="validation-center-header">

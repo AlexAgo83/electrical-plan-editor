@@ -20,7 +20,7 @@ type DispatchAction = (
 ) => void;
 
 interface SelectionRef {
-  kind: ValidationIssue["selectionKind"] | "catalog";
+  kind: Exclude<ValidationIssue["selectionKind"], "network">;
   id: string;
 }
 
@@ -56,6 +56,7 @@ interface UseSelectionHandlersParams {
   setValidationSeverityFilter: (value: ValidationSeverityFilter) => void;
   startConnectorEdit: (connector: Connector) => void;
   startCatalogEditFromValidation?: (catalogItemId: string) => void;
+  openNetworkRecomputeFromValidation?: (networkId: string) => void;
   startSpliceEdit: (splice: Splice) => void;
   startNodeEdit: (node: NetworkNode) => void;
   startSegmentEdit: (segment: Segment) => void;
@@ -94,6 +95,7 @@ export function useSelectionHandlers({
   setValidationSeverityFilter,
   startConnectorEdit,
   startCatalogEditFromValidation,
+  openNetworkRecomputeFromValidation,
   startSpliceEdit,
   startNodeEdit,
   startSegmentEdit,
@@ -214,6 +216,10 @@ export function useSelectionHandlers({
   }
 
   function handleValidationIssueGoTo(issue: ValidationIssue): void {
+    if (issue.selectionKind === "network") {
+      openNetworkRecomputeFromValidation?.(issue.selectionId);
+      return;
+    }
     markDetailPanelsSelectionSourceAsTable();
     setActiveScreen("modeling");
     setActiveSubScreen(issue.subScreen);

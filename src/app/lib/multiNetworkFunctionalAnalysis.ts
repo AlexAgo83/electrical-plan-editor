@@ -455,7 +455,7 @@ function navigationTargetFromIssue(
   networkId: NetworkId,
   issue: ValidationIssue
 ): MultiNetworkFunctionalAnalysisTarget | undefined {
-  if (issue.selectionKind === "catalog" || issue.subScreen === "catalog") {
+  if (issue.selectionKind === "catalog" || issue.selectionKind === "network" || issue.subScreen === "catalog") {
     return undefined;
   }
   return {

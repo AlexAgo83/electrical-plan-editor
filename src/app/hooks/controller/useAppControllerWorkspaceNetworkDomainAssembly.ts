@@ -207,6 +207,7 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
   const {
     handleOpenCreateNetworkForm,
     handleOpenEditNetworkForm,
+    handleOpenEditNetworkFormOnEnter,
     handleCloseNetworkForm,
     handleSubmitNetworkForm
   } = useNetworkScopeFormOrchestration({
@@ -263,6 +264,7 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     resetWorkspacePreferencesToDefaults,
     handleOpenCreateNetworkForm,
     handleOpenEditNetworkForm,
+    handleOpenEditNetworkFormOnEnter,
     handleCloseNetworkForm,
     handleSubmitNetworkForm,
     importFileInputRef: networkImportExportModel.importFileInputRef,

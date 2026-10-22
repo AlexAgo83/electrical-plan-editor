@@ -61,6 +61,7 @@ export function useNetworkScopeFormOrchestration({
 }: UseNetworkScopeFormOrchestrationParams) {
   void activeNetworkId;
   const wasNetworkScopeScreenRef = useRef(false);
+  const pendingEditOnEnterRef = useRef<NetworkId | null>(null);
   const buildDefaultCreatedAtInput = useCallback(() => formatIsoToLocalDateInput(new Date().toISOString()), []);
   const handleOpenCreateNetworkForm = useCallback(() => {
     setNetworkFormMode("create");
@@ -138,6 +139,22 @@ export function useNetworkScopeFormOrchestration({
       setNewNetworkEntityPrefix,
       setNewNetworkTechnicalId
     ]
+  );
+
+  /**
+   * Opens the edit form for a network from another screen: the request survives the
+   * Network Scope entry reset, which otherwise always starts with no form open.
+   */
+  const handleOpenEditNetworkFormOnEnter = useCallback(
+    (networkId: NetworkId) => {
+      setNetworkFocusRequest((current) => ({ id: networkId, token: current.token + 1, openEdit: true }));
+      if (wasNetworkScopeScreenRef.current) {
+        handleOpenEditNetworkForm(networkId);
+        return;
+      }
+      pendingEditOnEnterRef.current = networkId;
+    },
+    [handleOpenEditNetworkForm, setNetworkFocusRequest]
   );
 
   const handleCloseNetworkForm = useCallback(() => {
@@ -229,15 +246,23 @@ export function useNetworkScopeFormOrchestration({
       return;
     }
 
-    // Entering Network Scope should always start with no form open.
+    const pendingEditNetworkId = pendingEditOnEnterRef.current;
+    pendingEditOnEnterRef.current = null;
+    if (pendingEditNetworkId !== null) {
+      handleOpenEditNetworkForm(pendingEditNetworkId);
+      return;
+    }
+
+    // Entering Network Scope should otherwise always start with no form open.
     setNetworkFormMode(null);
     setNetworkFormTargetId(null);
     setNetworkFormError(null);
-  }, [isNetworkScopeScreen, networkFormMode, setNetworkFormError, setNetworkFormMode, setNetworkFormTargetId]);
+  }, [handleOpenEditNetworkForm, isNetworkScopeScreen, networkFormMode, setNetworkFormError, setNetworkFormMode, setNetworkFormTargetId]);
 
   return {
     handleOpenCreateNetworkForm,
     handleOpenEditNetworkForm,
+    handleOpenEditNetworkFormOnEnter,
     handleCloseNetworkForm,
     handleSubmitNetworkForm
   };

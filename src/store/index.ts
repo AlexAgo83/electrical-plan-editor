@@ -11,6 +11,14 @@ export * from "./selectors";
 export * from "./catalog";
 export { withPreservedNetworkSummaryViewStates } from "./networking";
 export {
+  createRoutingDriftPreviewJob,
+  previewActiveNetworkRoutingDrift,
+  sameRoutingDriftInputs,
+  selectRoutingDriftInputs,
+  type RoutingDriftPreview,
+  type RoutingDriftPreviewJob
+} from "./routingDriftPreview";
+export {
   createEmptyWorkspaceState,
   createAppError,
   createInitialState,

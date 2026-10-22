@@ -1,4 +1,4 @@
-import type { CatalogItemId } from "../../../core/entities";
+import type { CatalogItemId, NetworkId } from "../../../core/entities";
 import type { NodePosition } from "../../types/app-controller";
 import type { CatalogHandlersModel } from "../useCatalogHandlers";
 import type { AppControllerSelectionEntitiesModel } from "../useAppControllerSelectionEntities";
@@ -34,6 +34,8 @@ interface UseAppControllerSelectionHandlersDomainAssemblyParams {
     setActiveScreen: (screen: ScreenId) => void;
     setActiveSubScreen: SelectionHandlersAssemblyParams["navigation"]["setActiveSubScreen"];
     markDetailPanelsSelectionSourceAsTable: () => void;
+    /** Opens Network Scope in edit mode for the network, where Recompute routes lives. */
+    openNetworkEditForm: (networkId: NetworkId) => void;
   };
   validationModel: ValidationModel;
   modelingHandlers: ModelingHandlersModel;
@@ -92,6 +94,13 @@ export function useAppControllerSelectionHandlersDomainAssembly({
           return;
         }
         catalogHandlers.startCatalogEdit(item);
+      },
+      openNetworkRecomputeFromValidation: (networkId) => {
+        if (core.state.networks.byId[networkId as NetworkId] === undefined) {
+          return;
+        }
+        navigation.setActiveScreen("networkScope");
+        navigation.openNetworkEditForm(networkId as NetworkId);
       },
       startSpliceEdit: splice.startSpliceEdit,
       startNodeEdit: node.startNodeEdit,

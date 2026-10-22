@@ -633,7 +633,8 @@ export function AppController({ store = appStore }: AppProps): ReactElement {
     navigation: {
       setActiveScreen,
       setActiveSubScreen,
-      markDetailPanelsSelectionSourceAsTable: () => setDetailPanelsSelectionSource("table")
+      markDetailPanelsSelectionSourceAsTable: () => setDetailPanelsSelectionSource("table"),
+      openNetworkEditForm: workspaceNetworkDomain.handleOpenEditNetworkFormOnEnter
     },
     validationModel,
     modelingHandlers,

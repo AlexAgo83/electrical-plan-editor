@@ -83,6 +83,7 @@ interface NetworkScopeWorkspaceContentProps {
   handleSubmitNetworkForm: (event: FormEvent<HTMLFormElement>) => void;
   focusRequestedNetworkId: NetworkId | null;
   focusRequestedNetworkToken: number;
+  focusRequestedNetworkOpensEdit?: boolean;
   onOpenOnboardingHelp?: () => void;
   functionalSchematicPanel?: ReactNode;
   importOverwriteDialog?: ImportOverwriteDialogModel | null;
@@ -137,6 +138,7 @@ export function NetworkScopeWorkspaceContent({
   handleSubmitNetworkForm,
   focusRequestedNetworkId,
   focusRequestedNetworkToken,
+  focusRequestedNetworkOpensEdit = false,
   onOpenOnboardingHelp,
   functionalSchematicPanel,
   importOverwriteDialog = null,
@@ -158,6 +160,7 @@ export function NetworkScopeWorkspaceContent({
   const isMobileViewport = useIsMobileViewport();
   const rowRefs = useRef<Partial<Record<NetworkId, HTMLTableRowElement | null>>>({});
   const lastHandledFocusRequestTokenRef = useRef<number>(-1);
+  const pendingExplicitEditSelectionRef = useRef(false);
 
   const sortedNetworks = useMemo(
     () =>
@@ -249,6 +252,7 @@ export function NetworkScopeWorkspaceContent({
 
     lastHandledFocusRequestTokenRef.current = focusRequestedNetworkToken;
     setFocusedNetworkId(focusRequestedNetworkId);
+    pendingExplicitEditSelectionRef.current = focusRequestedNetworkOpensEdit;
     if (typeof window === "undefined") {
       focusElementWithoutScroll(rowRefs.current[focusRequestedNetworkId]);
       return;
@@ -256,7 +260,7 @@ export function NetworkScopeWorkspaceContent({
     window.requestAnimationFrame(() => {
       focusElementWithoutScroll(rowRefs.current[focusRequestedNetworkId]);
     });
-  }, [focusRequestedNetworkId, focusRequestedNetworkToken, networks]);
+  }, [focusRequestedNetworkId, focusRequestedNetworkOpensEdit, focusRequestedNetworkToken, networks]);
 
   useEffect(() => {
     if (!isEditMode || focusedNetwork !== null) {
@@ -274,6 +278,12 @@ export function NetworkScopeWorkspaceContent({
 
     if (!isEditMode) {
       setHasExplicitNetworkSelection(false);
+      return;
+    }
+
+    if (pendingExplicitEditSelectionRef.current) {
+      pendingExplicitEditSelectionRef.current = false;
+      setHasExplicitNetworkSelection(true);
     }
   }, [isCreateMode, isEditMode]);
 

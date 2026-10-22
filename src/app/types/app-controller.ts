@@ -104,12 +104,13 @@ export interface ValidationIssue {
   category: string;
   message: string;
   subScreen: SubScreenId;
-  selectionKind: "catalog" | "connector" | "splice" | "node" | "segment" | "wire";
+  /** `network` issues target the active network itself (e.g. Network > Recompute routes). */
+  selectionKind: "catalog" | "network" | "connector" | "splice" | "node" | "segment" | "wire";
   selectionId: string;
 }
 
 export interface SelectionTarget {
-  kind: Exclude<ValidationIssue["selectionKind"], "catalog">;
+  kind: Exclude<ValidationIssue["selectionKind"], "catalog" | "network">;
   id: string;
 }
 

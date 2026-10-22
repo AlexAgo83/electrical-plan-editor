@@ -87,7 +87,8 @@ describe("useAppControllerSelectionHandlersDomainAssembly", () => {
         navigation: {
           setActiveScreen: vi.fn(),
           setActiveSubScreen: vi.fn(),
-          markDetailPanelsSelectionSourceAsTable: vi.fn()
+          markDetailPanelsSelectionSourceAsTable: vi.fn(),
+          openNetworkEditForm: vi.fn()
         },
         validationModel,
         modelingHandlers: {
@@ -190,7 +191,8 @@ describe("useAppControllerSelectionHandlersDomainAssembly", () => {
         navigation: {
           setActiveScreen,
           setActiveSubScreen,
-          markDetailPanelsSelectionSourceAsTable: vi.fn()
+          markDetailPanelsSelectionSourceAsTable: vi.fn(),
+          openNetworkEditForm: vi.fn()
         },
         validationModel: {
           ...validationModel,

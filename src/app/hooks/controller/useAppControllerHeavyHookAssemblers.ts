@@ -194,6 +194,7 @@ interface UseAppControllerSelectionHandlersAssemblyParams {
     SelectionHandlersParams,
     | "startConnectorEdit"
     | "startCatalogEditFromValidation"
+    | "openNetworkRecomputeFromValidation"
     | "startSpliceEdit"
     | "startNodeEdit"
     | "startSegmentEdit"

@@ -150,7 +150,14 @@ export interface ImportRejection {
 }
 
 /** One kind of change a manual full-network recompute can produce for a wire. */
-export type WireRecomputeChangeKind = "route" | "length" | "sideA" | "sideB";
+export type WireRecomputeChangeKind =
+  | "route"
+  | "length"
+  | "sideA"
+  | "sideB"
+  | "endpointDetailA"
+  | "endpointDetailB"
+  | "other";
 
 export interface WireRecomputeReportEntry {
   wireId: WireId;

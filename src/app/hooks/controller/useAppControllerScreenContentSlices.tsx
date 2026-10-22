@@ -88,12 +88,13 @@ type NetworkSummaryPanelControllerSliceParams = Omit<
 
 type NetworkScopeScreenContentSliceParams = Omit<
   NetworkScopeWorkspaceContentProps,
-  "focusRequestedNetworkId" | "focusRequestedNetworkToken"
+  "focusRequestedNetworkId" | "focusRequestedNetworkToken" | "focusRequestedNetworkOpensEdit"
 > & {
   NetworkScopeWorkspaceContentComponent: ComponentType<NetworkScopeWorkspaceContentProps>;
   networkFocusRequest: {
     id: NetworkScopeWorkspaceContentProps["focusRequestedNetworkId"];
     token: NetworkScopeWorkspaceContentProps["focusRequestedNetworkToken"];
+    openEdit?: boolean;
   };
 };
 
@@ -384,6 +385,7 @@ export function buildNetworkScopeScreenContentSlice(
     handleSubmitNetworkForm: params.handleSubmitNetworkForm,
     focusRequestedNetworkId: params.networkFocusRequest.id,
     focusRequestedNetworkToken: params.networkFocusRequest.token,
+    focusRequestedNetworkOpensEdit: params.networkFocusRequest.openEdit === true,
     onOpenOnboardingHelp: params.onOpenOnboardingHelp,
     functionalSchematicPanel: params.functionalSchematicPanel,
   } satisfies NetworkScopeWorkspaceContentProps;
@@ -1009,6 +1011,7 @@ export function buildValidationScreenContentSlice(
     handleValidationIssueRowGoTo: params.handleValidationIssueRowGoTo,
     validationErrorCount: params.validationErrorCount,
     validationWarningCount: params.validationWarningCount,
+    routingDriftStatus: params.routingDriftStatus,
   } satisfies ValidationWorkspaceContentProps;
 
   return {
