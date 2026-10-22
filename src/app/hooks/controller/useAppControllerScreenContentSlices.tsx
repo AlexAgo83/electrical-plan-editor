@@ -214,6 +214,7 @@ export function buildNetworkSummaryPanelControllerSlice(
     labelRotationDegrees: params.networkLabelRotationDegrees,
     autoSegmentLabelRotation: params.networkAutoSegmentLabelRotation,
     showCalloutWireNames: params.showCalloutWireNames,
+    calloutEndpointReferences: params.calloutEndpointReferences,
     zoomInvariantNodeShapes: params.zoomInvariantNodeShapes,
     nodeShapeSizePercent: params.nodeShapeSizePercent,
     resizeBehaviorMode: params.resizeBehaviorMode,
@@ -1126,7 +1127,9 @@ export function buildSettingsScreenContentSlice(
     setCanvasDefaultAutoSegmentLabelRotation:
       params.setCanvasDefaultAutoSegmentLabelRotation,
     canvasShowCalloutWireNames: params.canvasShowCalloutWireNames,
+    canvasCalloutEndpointReferences: params.canvasCalloutEndpointReferences,
     setCanvasShowCalloutWireNames: params.setCanvasShowCalloutWireNames,
+    setCanvasCalloutEndpointReferences: params.setCanvasCalloutEndpointReferences,
     canvasConnectorDrawingDisplayMode: params.canvasConnectorDrawingDisplayMode,
     setCanvasConnectorDrawingDisplayMode:
       params.setCanvasConnectorDrawingDisplayMode,

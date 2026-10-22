@@ -4,8 +4,10 @@ import {
   DEFAULT_WIRE_EXPORT_STRIPPING_ALLOWANCE_MM,
   DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT
 } from "../lib/wireExportLength";
+import { DEFAULT_CALLOUT_ENDPOINT_REFERENCE_VISIBILITY } from "../lib/calloutEndpointReferenceVisibility";
 import type {
   AppLocale,
+  CalloutEndpointReferenceVisibility,
   CanvasCalloutTextSize,
   CanvasExportFormat,
   CanvasLabelRotationDegrees,
@@ -67,6 +69,9 @@ export function useAppControllerPreferencesState() {
     useState<CanvasLabelRotationDegrees>(0);
   const [canvasDefaultAutoSegmentLabelRotation, setCanvasDefaultAutoSegmentLabelRotation] = useState(true);
   const [canvasShowCalloutWireNames, setCanvasShowCalloutWireNames] = useState(false);
+  const [canvasCalloutEndpointReferences, setCanvasCalloutEndpointReferences] = useState<CalloutEndpointReferenceVisibility>(
+    DEFAULT_CALLOUT_ENDPOINT_REFERENCE_VISIBILITY
+  );
   const [canvasConnectorDrawingDisplayMode, setCanvasConnectorDrawingDisplayMode] =
     useState<ConnectorDrawingDisplayMode>("nodes");
   const [canvasUseConsistentConnectorLayoutScale, setCanvasUseConsistentConnectorLayoutScale] = useState(true);
@@ -164,7 +169,9 @@ export function useAppControllerPreferencesState() {
     canvasDefaultAutoSegmentLabelRotation,
     setCanvasDefaultAutoSegmentLabelRotation,
     canvasShowCalloutWireNames,
+    canvasCalloutEndpointReferences,
     setCanvasShowCalloutWireNames,
+    setCanvasCalloutEndpointReferences,
     canvasConnectorDrawingDisplayMode,
     setCanvasConnectorDrawingDisplayMode,
     canvasUseConsistentConnectorLayoutScale,

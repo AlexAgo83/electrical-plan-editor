@@ -1,6 +1,7 @@
 import type { ThemeMode } from "../../store";
 import type {
   AppLocale,
+  CalloutEndpointReferenceVisibility,
   CanvasCalloutTextSize,
   CanvasExportFormat,
   CanvasLabelRotationDegrees,
@@ -71,6 +72,7 @@ export interface UiPreferencesPayload {
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   canvasDefaultAutoSegmentLabelRotation: boolean;
   canvasShowCalloutWireNames: boolean;
+  canvasCalloutEndpointReferences: CalloutEndpointReferenceVisibility;
   canvasConnectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
   canvasUseConsistentConnectorLayoutScale: boolean;
   canvasCalloutConnectorDrawingScalePercent: number;

@@ -28,6 +28,10 @@ import {
   getCalloutColorSwatchesWidth,
   getCalloutRowCellValue,
   type CableCalloutViewModel,
+  type CalloutLayoutMetrics,
+  type CalloutRowLayout,
+  type CalloutTableColumnKey,
+  type CalloutTableRow,
   type CalloutTargetKey,
   type RenderedCableCallout
 } from "./calloutLayout";
@@ -350,6 +354,32 @@ export function renderConnectorLayoutDrawing(
   );
 }
 
+function getCalloutRowLayout(layout: CalloutLayoutMetrics, rowIndex: number): CalloutRowLayout {
+  return layout.rowLayouts[rowIndex] ?? { offsetY: rowIndex * layout.rowStep, height: layout.rowHeight, wrappedCells: {} };
+}
+
+function renderCalloutCellText(
+  row: CalloutTableRow,
+  rowLayout: CalloutRowLayout,
+  key: CalloutTableColumnKey,
+  x: number,
+  rowStep: number
+): ReactElement | string {
+  const lines = rowLayout.wrappedCells[key];
+  if (lines === undefined) {
+    return getCalloutRowCellValue(row, key);
+  }
+  return (
+    <>
+      {lines.map((line, lineIndex) => (
+        <tspan key={lineIndex} x={x} dy={lineIndex === 0 ? 0 : rowStep}>
+          {line}
+        </tspan>
+      ))}
+    </>
+  );
+}
+
 interface NetworkSummaryCalloutLeadersProps {
   renderedCableCallouts: RenderedCableCallout[];
   networkOffset: { x: number; y: number };
@@ -580,8 +610,8 @@ export function NetworkSummaryCalloutsLayer({
                         return null;
                       }
                       const dividerX = contentLeftX + (column.x + column.width + nextColumn.x) / 2;
-                      const tableBottomY =
-                        rowsStartY + Math.max(0, layout.rows.length - 1) * layout.rowStep + layout.rowHeight;
+                      const lastRowLayout = getCalloutRowLayout(layout, Math.max(0, layout.rows.length - 1));
+                      const tableBottomY = rowsStartY + lastRowLayout.offsetY + lastRowLayout.height;
                       return (
                         <line
                           key={`${callout.key}-col-divider-${column.key}`}
@@ -594,7 +624,8 @@ export function NetworkSummaryCalloutsLayer({
                       );
                     })}
                     {layout.rows.map((row, rowIndex) => {
-                      const rowY = rowsStartY + rowIndex * layout.rowStep;
+                      const rowLayout = getCalloutRowLayout(layout, rowIndex);
+                      const rowY = rowsStartY + rowLayout.offsetY;
                       const isSelectedWireRow = selectedWireId !== null && row.wireId === selectedWireId;
                       const rowClassName = `network-callout-table-row${isSelectedWireRow ? " is-selected-wire" : ""}`;
                       return (
@@ -609,7 +640,7 @@ export function NetworkSummaryCalloutsLayer({
                               x={contentLeftX - 0.8}
                               y={rowY - 0.25}
                               width={Math.max(0, tableRightX - contentLeftX + 1.6)}
-                              height={layout.rowHeight + 0.45}
+                              height={rowLayout.height + 0.45}
                               rx={0.5}
                               ry={0.5}
                             />
@@ -663,8 +694,9 @@ export function NetworkSummaryCalloutsLayer({
                                 y={rowY}
                                 textAnchor={column.textAnchor}
                                 dominantBaseline="hanging"
+                                data-callout-column={column.key}
                               >
-                                {getCalloutRowCellValue(row, column.key)}
+                                {renderCalloutCellText(row, rowLayout, column.key, x, layout.rowStep)}
                               </text>
                             );
                           })}

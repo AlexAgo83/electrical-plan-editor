@@ -352,6 +352,7 @@ export function useAppControllerWorkspaceContentAssembly({
     },
     preferencesState: {
       canvasShowCalloutWireNames: models.preferencesState.canvasShowCalloutWireNames,
+      canvasCalloutEndpointReferences: models.preferencesState.canvasCalloutEndpointReferences,
       canvasConnectorDrawingDisplayMode: models.preferencesState.canvasConnectorDrawingDisplayMode,
       canvasUseConsistentConnectorLayoutScale: models.preferencesState.canvasUseConsistentConnectorLayoutScale,
       canvasCalloutConnectorDrawingScalePercent: models.preferencesState.canvasCalloutConnectorDrawingScalePercent,

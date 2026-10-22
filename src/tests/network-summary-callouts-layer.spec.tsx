@@ -71,7 +71,8 @@ describe("NetworkSummaryCalloutsLayer", () => {
         rowHeight: 6,
         height: 56,
         columns: [],
-        rows: []
+        rows: [],
+        rowLayouts: []
       },
       lineEnd: { x: 10, y: 10 },
       calloutClassName: "network-callout-group",
@@ -136,7 +137,8 @@ describe("NetworkSummaryCalloutsLayer", () => {
         rowHeight: 6,
         height: 48,
         columns: [],
-        rows: []
+        rows: [],
+        rowLayouts: []
       },
       lineEnd: { x: 4940, y: 5000 },
       calloutClassName: "network-callout-group",
@@ -209,9 +211,14 @@ describe("NetworkSummaryCalloutsLayer", () => {
             targetPin: "P1",
             wireName: "Wire 1",
             length: "0 mm",
-            section: "0.5 mm²"
+            section: "0.5 mm²",
+            localConnection: "—",
+            localSeal: "—",
+            oppositeConnection: "—",
+            oppositeSeal: "—"
           }
-        ]
+        ],
+        rowLayouts: [{ offsetY: 0, height: 6, wrappedCells: {} }]
       },
       lineEnd: { x: 10, y: 10 },
       calloutClassName: "network-callout-group",

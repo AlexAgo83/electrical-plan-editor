@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { DEFAULT_WIRE_SECTION_MM2, normalizeWireSectionMm2 } from "../../core/wireSection";
 import type { ThemeMode } from "../../store";
+import { normalizeCalloutEndpointReferenceVisibility } from "../lib/calloutEndpointReferenceVisibility";
 import { normalizeAppLocale } from "../lib/i18n";
 import {
   normalizeWireExportStrippingAllowanceMm,
@@ -10,6 +11,7 @@ import { readUiPreferences, writeUiPreferences } from "./uiPreferencesStorage";
 import type { TableColumnPreferences, UiPreferencesPayload } from "./uiPreferencesStorage";
 import type {
   AppLocale,
+  CalloutEndpointReferenceVisibility,
   CanvasCalloutTextSize,
   CanvasExportFormat,
   CanvasLabelRotationDegrees,
@@ -148,6 +150,7 @@ interface UseUiPreferencesOptions {
   canvasDefaultLabelRotationDegrees: CanvasLabelRotationDegrees;
   canvasDefaultAutoSegmentLabelRotation: boolean;
   canvasShowCalloutWireNames: boolean;
+  canvasCalloutEndpointReferences: CalloutEndpointReferenceVisibility;
   canvasConnectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
   canvasUseConsistentConnectorLayoutScale: boolean;
   canvasCalloutConnectorDrawingScalePercent: number;
@@ -215,6 +218,7 @@ interface UseUiPreferencesOptions {
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   setCanvasShowCalloutWireNames: (value: boolean) => void;
+  setCanvasCalloutEndpointReferences: (value: CalloutEndpointReferenceVisibility) => void;
   setCanvasConnectorDrawingDisplayMode: (value: ConnectorDrawingDisplayMode) => void;
   setCanvasUseConsistentConnectorLayoutScale: (value: boolean) => void;
   setCanvasCalloutConnectorDrawingScalePercent: (value: number) => void;
@@ -398,6 +402,7 @@ export function useUiPreferences({
   canvasDefaultLabelRotationDegrees,
   canvasDefaultAutoSegmentLabelRotation,
   canvasShowCalloutWireNames,
+  canvasCalloutEndpointReferences,
   canvasConnectorDrawingDisplayMode,
   canvasUseConsistentConnectorLayoutScale,
   canvasCalloutConnectorDrawingScalePercent,
@@ -465,6 +470,7 @@ export function useUiPreferences({
   setCanvasDefaultLabelRotationDegrees,
   setCanvasDefaultAutoSegmentLabelRotation,
   setCanvasShowCalloutWireNames,
+  setCanvasCalloutEndpointReferences,
   setCanvasConnectorDrawingDisplayMode,
   setCanvasUseConsistentConnectorLayoutScale,
   setCanvasCalloutConnectorDrawingScalePercent,
@@ -618,6 +624,9 @@ export function useUiPreferences({
       setCanvasShowCalloutWireNames(
         typeof preferences.canvasShowCalloutWireNames === "boolean" ? preferences.canvasShowCalloutWireNames : false
       );
+      setCanvasCalloutEndpointReferences(
+        normalizeCalloutEndpointReferenceVisibility(preferences.canvasCalloutEndpointReferences)
+      );
       setCanvasConnectorDrawingDisplayMode(
         normalizeConnectorDrawingDisplayMode(preferences.canvasConnectorDrawingDisplayMode)
       );
@@ -719,6 +728,7 @@ export function useUiPreferences({
     setCanvasDefaultLabelRotationDegrees,
     setCanvasDefaultAutoSegmentLabelRotation,
     setCanvasShowCalloutWireNames,
+    setCanvasCalloutEndpointReferences,
     setCanvasConnectorDrawingDisplayMode,
     setCanvasUseConsistentConnectorLayoutScale,
     setCanvasCalloutConnectorDrawingScalePercent,
@@ -829,6 +839,7 @@ export function useUiPreferences({
       canvasDefaultLabelRotationDegrees,
       canvasDefaultAutoSegmentLabelRotation,
       canvasShowCalloutWireNames,
+      canvasCalloutEndpointReferences,
       canvasConnectorDrawingDisplayMode,
       canvasUseConsistentConnectorLayoutScale,
       canvasCalloutConnectorDrawingScalePercent,
@@ -872,6 +883,7 @@ export function useUiPreferences({
     canvasDefaultLabelRotationDegrees,
     canvasDefaultAutoSegmentLabelRotation,
     canvasShowCalloutWireNames,
+    canvasCalloutEndpointReferences,
     canvasConnectorDrawingDisplayMode,
     canvasUseConsistentConnectorLayoutScale,
     canvasCalloutConnectorDrawingScalePercent,

@@ -1,6 +1,13 @@
-import { translateCurrent as t } from "../../../lib/i18n";
+import { getActiveLocale, translateCurrent as t } from "../../../lib/i18n";
+import { DEFAULT_CALLOUT_ENDPOINT_REFERENCE_VISIBILITY } from "../../../lib/calloutEndpointReferenceVisibility";
 import type { ConnectorId, ConnectorLayout, NodeId, SpliceId } from "../../../../core/entities";
-import type { CanvasCalloutTextSize, NetworkCalloutContentMode, NodePosition } from "../../../types/app-controller";
+import type {
+  AppLocale,
+  CalloutEndpointReferenceVisibility,
+  CanvasCalloutTextSize,
+  NetworkCalloutContentMode,
+  NodePosition
+} from "../../../types/app-controller";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
 import { getConnectorLayoutShellPadding } from "../../../../core/connectorLayout";
 
@@ -72,6 +79,9 @@ export interface ComputeRenderedCableCalloutsOptions {
   connectorDrawingScale: number;
   calloutContentMode: NetworkCalloutContentMode;
   showCalloutWireNames: boolean;
+  calloutEndpointReferences?: CalloutEndpointReferenceVisibility;
+  /** App locale the translated headers are built for; defaults to the active one. */
+  locale?: AppLocale;
   inverseLabelScale: number;
   hoveredCalloutKey: CalloutTargetKey | null;
   draggingCalloutKey: CalloutTargetKey | null;
@@ -84,6 +94,9 @@ export interface ComputeRenderedCableCalloutsOptions {
 const CALLOUT_MIN_WIDTH = 44;
 const CALLOUT_MAX_WIDTH = 520;
 const CALLOUT_LAYOUT_CACHE_MAX_ENTRIES = 512;
+const CALLOUT_REFERENCE_COLUMN_MAX_WIDTH = 72;
+/** Shown in an enabled reference column when no effective code resolves. */
+export const CALLOUT_MISSING_REFERENCE_PLACEHOLDER = "—";
 const CALLOUT_CONNECTOR_DRAWING_FALLBACK_ASPECT_RATIO = 1.35;
 const CALLOUT_CONNECTOR_DRAWING_HEIGHT = 64;
 export const CALLOUT_OFFSET_SCREEN_UNITS = 92;
@@ -91,8 +104,11 @@ export const CALLOUT_COLOR_SWATCH_RADIUS = 1.35;
 export const CALLOUT_COLOR_SWATCH_GAP = 0.95;
 export const CALLOUT_COLOR_SWATCH_TO_TEXT_GAP = 1.5;
 
-type CalloutTableColumnKey =
+type CalloutReferenceColumnKey = "localConnection" | "localSeal" | "oppositeConnection" | "oppositeSeal";
+
+export type CalloutTableColumnKey =
   | "pin"
+  | CalloutReferenceColumnKey
   | "technicalId"
   | "color"
   | "targetId"
@@ -113,6 +129,20 @@ export interface CalloutTableRow {
   wireName: string;
   length: string;
   section: string;
+  localConnection: string;
+  localSeal: string;
+  oppositeConnection: string;
+  oppositeSeal: string;
+}
+
+/**
+ * Vertical placement of one table row. Rows grow when a reference cell wraps;
+ * `wrappedCells` holds the measured lines of every multi-line cell.
+ */
+export interface CalloutRowLayout {
+  offsetY: number;
+  height: number;
+  wrappedCells: Partial<Record<CalloutTableColumnKey, string[]>>;
 }
 
 export interface CalloutTableColumnLayout {
@@ -137,6 +167,8 @@ export interface CalloutLayoutMetrics {
   height: number;
   columns: CalloutTableColumnLayout[];
   rows: CalloutTableRow[];
+  /** Per-row offsets from `rowsStartY`; with no wrapping, `offsetY === index * rowStep`. */
+  rowLayouts: CalloutRowLayout[];
 }
 
 let calloutMeasureCanvas: HTMLCanvasElement | null = null;
@@ -299,7 +331,11 @@ function buildCalloutRows(groups: CalloutGroup[]): CalloutTableRow[] {
         targetPin: entry.targetPin,
         wireName: entry.name,
         length: `${entry.lengthMm} mm`,
-        section: `${entry.sectionMm2} mm²`
+        section: `${entry.sectionMm2} mm²`,
+        localConnection: entry.localConnectionReference ?? CALLOUT_MISSING_REFERENCE_PLACEHOLDER,
+        localSeal: entry.localSealReference ?? CALLOUT_MISSING_REFERENCE_PLACEHOLDER,
+        oppositeConnection: entry.oppositeConnectionReference ?? CALLOUT_MISSING_REFERENCE_PLACEHOLDER,
+        oppositeSeal: entry.oppositeSealReference ?? CALLOUT_MISSING_REFERENCE_PLACEHOLDER
       });
     }
   }
@@ -314,11 +350,17 @@ function buildCalloutLayoutCacheKey(
   showCalloutWireNames: boolean,
   hasConnectorDrawing: boolean,
   connectorDrawingScale: number,
-  connectorDrawingAspectRatio: number
+  connectorDrawingAspectRatio: number,
+  endpointReferences: CalloutEndpointReferenceVisibility,
+  locale: AppLocale
 ): string {
+  // Headers are translated, so the locale is part of the key alongside the
+  // reference flags and the row values (which include the reference codes).
   return JSON.stringify({
+    locale,
     calloutTextSize,
     showCalloutWireNames,
+    endpointReferences,
     hasConnectorDrawing,
     connectorDrawingScale,
     connectorDrawingAspectRatio,
@@ -377,7 +419,68 @@ export function getCalloutRowCellValue(row: CalloutTableRow, key: CalloutTableCo
   if (key === "length") {
     return row.length;
   }
+  if (key === "localConnection" || key === "localSeal" || key === "oppositeConnection" || key === "oppositeSeal") {
+    return row[key];
+  }
   return row.section;
+}
+
+function isCalloutReferenceColumn(key: CalloutTableColumnKey): key is CalloutReferenceColumnKey {
+  return key === "localConnection" || key === "localSeal" || key === "oppositeConnection" || key === "oppositeSeal";
+}
+
+function splitTokenToWidth(token: string, maxWidth: number, fontSizePx: number): string[] {
+  const pieces: string[] = [];
+  let current = "";
+  for (const character of token) {
+    const candidate = current + character;
+    if (current.length > 0 && measureCalloutRowTextWidth(candidate, fontSizePx) > maxWidth) {
+      pieces.push(current);
+      current = character;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current.length > 0) {
+    pieces.push(current);
+  }
+  return pieces;
+}
+
+/**
+ * Wrap a reference code into lines no wider than `maxWidth`. Breaks after
+ * spaces and common code separators first, and only splits inside a token
+ * when a single token is wider than the column. Nothing is truncated.
+ */
+export function wrapCalloutCellText(text: string, maxWidth: number, fontSizePx: number): string[] {
+  if (text.length === 0 || measureCalloutRowTextWidth(text, fontSizePx) <= maxWidth) {
+    return [text];
+  }
+  const tokens = text.match(/[^\s\-_/.:]*[\s\-_/.:]*/g)?.filter((token) => token.length > 0) ?? [text];
+  const lines: string[] = [];
+  let current = "";
+  for (const token of tokens) {
+    const candidate = current + token;
+    if (measureCalloutRowTextWidth(candidate.trimEnd(), fontSizePx) <= maxWidth) {
+      current = candidate;
+      continue;
+    }
+    if (current.length > 0) {
+      lines.push(current.trimEnd());
+      current = "";
+    }
+    if (measureCalloutRowTextWidth(token.trimEnd(), fontSizePx) <= maxWidth) {
+      current = token;
+      continue;
+    }
+    const pieces = splitTokenToWidth(token, maxWidth, fontSizePx);
+    current = pieces.pop() ?? "";
+    lines.push(...pieces);
+  }
+  if (current.trimEnd().length > 0) {
+    lines.push(current.trimEnd());
+  }
+  return lines.length > 0 ? lines : [text];
 }
 
 export function getCalloutColorSwatchesWidth(row: Pick<CalloutTableRow, "colorPrimaryHex" | "colorSecondaryHex">): number {
@@ -399,7 +502,9 @@ export function buildCalloutLayoutMetrics(
   showCalloutWireNames: boolean,
   hasConnectorDrawing = false,
   connectorDrawingScale = 1,
-  connectorDrawingAspectRatio = CALLOUT_CONNECTOR_DRAWING_FALLBACK_ASPECT_RATIO
+  connectorDrawingAspectRatio = CALLOUT_CONNECTOR_DRAWING_FALLBACK_ASPECT_RATIO,
+  endpointReferences: CalloutEndpointReferenceVisibility = DEFAULT_CALLOUT_ENDPOINT_REFERENCE_VISIBILITY,
+  locale: AppLocale = getActiveLocale()
 ): CalloutLayoutMetrics {
   const rows = buildCalloutRows(groups);
   const normalizedConnectorDrawingScale = clampNumber(connectorDrawingScale, 1, 2);
@@ -416,7 +521,9 @@ export function buildCalloutLayoutMetrics(
     showCalloutWireNames,
     hasConnectorDrawing,
     normalizedConnectorDrawingScale,
-    normalizedConnectorDrawingAspectRatio
+    normalizedConnectorDrawingAspectRatio,
+    endpointReferences,
+    locale
   );
   const cached = calloutLayoutCache.get(cacheKey);
   if (cached !== undefined) {
@@ -429,10 +536,23 @@ export function buildCalloutLayoutMetrics(
     textAnchor: "start" | "end";
   }> = [
     { key: "pin", header: "Pin", textAnchor: "start" },
+    // Local references sit beside the local pin, opposite ones beside End ID/PIN.
+    ...(endpointReferences.localConnection
+      ? ([{ key: "localConnection", header: t("ui.calloutLocalConnectionReferenceHeader"), textAnchor: "start" }] as const)
+      : []),
+    ...(endpointReferences.localSeal
+      ? ([{ key: "localSeal", header: t("ui.calloutLocalSealReferenceHeader"), textAnchor: "start" }] as const)
+      : []),
     { key: "technicalId", header: t("ui.wireID"), textAnchor: "start" },
     { key: "color", header: t("ui.color"), textAnchor: "start" },
     { key: "targetId", header: t("ui.endID"), textAnchor: "start" },
     { key: "targetPin", header: "PIN", textAnchor: "start" },
+    ...(endpointReferences.oppositeConnection
+      ? ([{ key: "oppositeConnection", header: t("ui.calloutOppositeConnectionReferenceHeader"), textAnchor: "start" }] as const)
+      : []),
+    ...(endpointReferences.oppositeSeal
+      ? ([{ key: "oppositeSeal", header: t("ui.calloutOppositeSealReferenceHeader"), textAnchor: "start" }] as const)
+      : []),
     ...(showCalloutWireNames
       ? ([{ key: "wireName", header: t("ui.wireName"), textAnchor: "start" }] as const)
       : []),
@@ -463,17 +583,34 @@ export function buildCalloutLayoutMetrics(
   const measuredTitleWidth = measureCalloutRowTextWidth(title, titleFontSize);
   const measuredSubtitleWidth = subtitle.length > 0 ? measureCalloutRowTextWidth(subtitle, subtitleFontSize) : 0;
   const columns: CalloutTableColumnLayout[] = [];
+  const wrappedCellsByRow: Array<Partial<Record<CalloutTableColumnKey, string[]>>> = rows.map(() => ({}));
   let tableWidth = 0;
   for (let columnIndex = 0; columnIndex < columnDefinitions.length; columnIndex += 1) {
     const definition = columnDefinitions[columnIndex];
     if (definition === undefined) {
       continue;
     }
-    let columnWidth = measureCalloutRowTextWidth(definition.header, rowFontSize);
-    for (const row of rows) {
-      const cellTextWidth = measureCalloutRowTextWidth(getCalloutRowCellValue(row, definition.key), rowFontSize);
-      const cellDecorationWidth = definition.key === "color" ? getCalloutColorSwatchesWidth(row) : 0;
-      columnWidth = Math.max(columnWidth, cellTextWidth + cellDecorationWidth);
+    const headerWidth = measureCalloutRowTextWidth(definition.header, rowFontSize);
+    let columnWidth = headerWidth;
+    if (isCalloutReferenceColumn(definition.key)) {
+      // Reference codes wrap inside a bounded column (never narrower than its
+      // header) instead of stretching the callout.
+      const maxCellWidth = Math.max(headerWidth, CALLOUT_REFERENCE_COLUMN_MAX_WIDTH);
+      rows.forEach((row, rowIndex) => {
+        const lines = wrapCalloutCellText(getCalloutRowCellValue(row, definition.key), maxCellWidth, rowFontSize);
+        if (lines.length > 1) {
+          wrappedCellsByRow[rowIndex]![definition.key] = lines;
+        }
+        for (const line of lines) {
+          columnWidth = Math.max(columnWidth, measureCalloutRowTextWidth(line, rowFontSize));
+        }
+      });
+    } else {
+      for (const row of rows) {
+        const cellTextWidth = measureCalloutRowTextWidth(getCalloutRowCellValue(row, definition.key), rowFontSize);
+        const cellDecorationWidth = definition.key === "color" ? getCalloutColorSwatchesWidth(row) : 0;
+        columnWidth = Math.max(columnWidth, cellTextWidth + cellDecorationWidth);
+      }
     }
     columns.push({
       key: definition.key,
@@ -492,9 +629,18 @@ export function buildCalloutLayoutMetrics(
   const drawingWidth = hasConnectorDrawing ? drawingHeight * normalizedConnectorDrawingAspectRatio : 0;
   const drawingBottomGap = hasConnectorDrawing ? 1 : 0;
   const measuredContentWidth = Math.max(tableWidth, measuredTitleWidth, measuredSubtitleWidth, drawingWidth);
+  const rowLayouts: CalloutRowLayout[] = [];
+  let nextRowOffsetY = 0;
+  for (const wrappedCells of wrappedCellsByRow) {
+    const lineCount = Math.max(1, ...Object.values(wrappedCells).map((lines) => lines.length));
+    const height = rowLineHeight + (lineCount - 1) * rowStep;
+    rowLayouts.push({ offsetY: nextRowOffsetY, height, wrappedCells });
+    nextRowOffsetY += height + rowGap;
+  }
+  const lastRowLayout = rowLayouts[rowLayouts.length - 1];
   const measuredContentHeight =
-    rows.length > 0
-      ? rowLineHeight + tableHeaderBottomGap + rowLineHeight + (rows.length - 1) * rowStep
+    lastRowLayout !== undefined
+      ? rowLineHeight + tableHeaderBottomGap + lastRowLayout.offsetY + lastRowLayout.height
       : rowLineHeight;
   const drawingTopY = hasConnectorDrawing ? topPadding : null;
   const titleStartY = topPadding + drawingHeight + drawingBottomGap - titleTextMetrics.topOffset;
@@ -526,7 +672,8 @@ export function buildCalloutLayoutMetrics(
     rowHeight: rowLineHeight,
     height,
     columns,
-    rows
+    rows,
+    rowLayouts
   } satisfies CalloutLayoutMetrics;
   if (calloutLayoutCache.size >= CALLOUT_LAYOUT_CACHE_MAX_ENTRIES) {
     calloutLayoutCache.clear();
@@ -572,7 +719,9 @@ export function computeRenderedCableCallouts(options: ComputeRenderedCableCallou
       options.connectorDrawingScale,
       callout.connectorLayout === undefined
         ? CALLOUT_CONNECTOR_DRAWING_FALLBACK_ASPECT_RATIO
-        : getConnectorLayoutDrawingAspectRatio(callout.connectorLayout)
+        : getConnectorLayoutDrawingAspectRatio(callout.connectorLayout),
+      options.calloutEndpointReferences,
+      options.locale
     );
     const halfWidthInModelUnits = (layout.width / 2) * options.inverseLabelScale;
     const halfHeightInModelUnits = (layout.height / 2) * options.inverseLabelScale;

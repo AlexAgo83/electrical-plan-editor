@@ -23,6 +23,7 @@ import type {
 import type { ShortestRouteResult } from "../../../core/pathfinding";
 import type { SubNetworkSummary, ThemeMode } from "../../../store";
 import type {
+  CalloutEndpointReferenceVisibility,
   CanvasCalloutTextSize,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
@@ -47,6 +48,7 @@ export interface NetworkSummaryPanelProps {
   calloutContentMode: NetworkCalloutContentMode;
   showSelectedCalloutOnly: boolean;
   showCalloutWireNames: boolean;
+  calloutEndpointReferences: CalloutEndpointReferenceVisibility;
   connectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
   useConsistentConnectorLayoutScale: boolean;
   connectorDrawingScalePercent: number;

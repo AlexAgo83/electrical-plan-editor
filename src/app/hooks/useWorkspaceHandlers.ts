@@ -5,6 +5,7 @@ import { formatIsoToLocalDateInput } from "../../core/networkMetadata";
 import type { AppState } from "../../store";
 import { appActions, appReducer, createSampleNetworkState, selectNetworkTechnicalIdTaken } from "../../store";
 import { buildUniqueNetworkTechnicalId, createEntityId } from "../lib/app-utils-shared";
+import { DEFAULT_CALLOUT_ENDPOINT_REFERENCE_VISIBILITY } from "../lib/calloutEndpointReferenceVisibility";
 import { buildNetworkFormDraft } from "../lib/networkFormDraft";
 import { DEFAULT_WIRE_EXPORT_STRIPPING_ALLOWANCE_MM, DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT } from "../lib/wireExportLength";
 import {
@@ -111,6 +112,7 @@ export function useWorkspaceHandlers({
   setCanvasDefaultLabelRotationDegrees,
   setCanvasDefaultAutoSegmentLabelRotation,
   setCanvasShowCalloutWireNames,
+  setCanvasCalloutEndpointReferences,
   setCanvasConnectorDrawingDisplayMode,
   setCanvasGlobalRenderScalePercent,
   setCanvasZoomInvariantNodeShapes,
@@ -460,6 +462,7 @@ export function useWorkspaceHandlers({
     setCanvasDefaultLabelRotationDegrees(0);
     setCanvasDefaultAutoSegmentLabelRotation(true);
     setCanvasShowCalloutWireNames(false);
+    setCanvasCalloutEndpointReferences(DEFAULT_CALLOUT_ENDPOINT_REFERENCE_VISIBILITY);
     setCanvasZoomInvariantNodeShapes(true);
     setCanvasNodeShapeSizePercent(70);
     setCanvasExportFormat("svg");

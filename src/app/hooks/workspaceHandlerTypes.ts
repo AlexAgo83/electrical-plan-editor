@@ -3,6 +3,7 @@ import type { AppState, AppStore, ThemeMode } from "../../store";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
 import type {
   AppLocale,
+  CalloutEndpointReferenceVisibility,
   CanvasCalloutTextSize,
   CanvasLabelRotationDegrees,
   CanvasLabelSizeMode,
@@ -128,6 +129,7 @@ export interface UseWorkspaceHandlersParams {
   setCanvasDefaultLabelRotationDegrees: (value: CanvasLabelRotationDegrees) => void;
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   setCanvasShowCalloutWireNames: (value: boolean) => void;
+  setCanvasCalloutEndpointReferences: (value: CalloutEndpointReferenceVisibility) => void;
   setCanvasConnectorDrawingDisplayMode: (value: ConnectorDrawingDisplayMode) => void;
   setCanvasGlobalRenderScalePercent: (value: number) => void;
   setCanvasZoomInvariantNodeShapes: (value: boolean) => void;

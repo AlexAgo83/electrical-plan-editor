@@ -34,7 +34,7 @@ import type {
   WorkspaceCurrencyCode,
   WorkspacePanelsLayoutMode
 } from "../../types/app-controller";
-import type { ImportExportStatus } from "../../types/app-controller";
+import type { CalloutEndpointReferenceVisibility, ImportExportStatus } from "../../types/app-controller";
 
 interface SettingsWorkspaceContentProps {
   isCurrentWorkspaceEmpty: boolean;
@@ -120,7 +120,9 @@ interface SettingsWorkspaceContentProps {
   canvasDefaultAutoSegmentLabelRotation: boolean;
   setCanvasDefaultAutoSegmentLabelRotation: (value: boolean) => void;
   canvasShowCalloutWireNames: boolean;
+  canvasCalloutEndpointReferences: CalloutEndpointReferenceVisibility;
   setCanvasShowCalloutWireNames: (value: boolean) => void;
+  setCanvasCalloutEndpointReferences: (value: CalloutEndpointReferenceVisibility) => void;
   canvasConnectorDrawingDisplayMode: ConnectorDrawingDisplayMode;
   setCanvasConnectorDrawingDisplayMode: (value: ConnectorDrawingDisplayMode) => void;
   canvasUseConsistentConnectorLayoutScale: boolean;
@@ -273,7 +275,9 @@ export function SettingsWorkspaceContent({
   canvasDefaultAutoSegmentLabelRotation,
   setCanvasDefaultAutoSegmentLabelRotation,
   canvasShowCalloutWireNames,
+  canvasCalloutEndpointReferences,
   setCanvasShowCalloutWireNames,
+  setCanvasCalloutEndpointReferences,
   canvasConnectorDrawingDisplayMode,
   setCanvasConnectorDrawingDisplayMode,
   canvasUseConsistentConnectorLayoutScale,
@@ -900,6 +904,49 @@ export function SettingsWorkspaceContent({
             />
             {renderSettingLabel(t("ui.showWireNamesInCalloutTable"))}
           </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasCalloutEndpointReferences.localConnection}
+              onChange={(event) =>
+                setCanvasCalloutEndpointReferences({ ...canvasCalloutEndpointReferences, localConnection: event.target.checked })
+              }
+            />
+            {renderSettingLabel(t("ui.showCalloutLocalConnectionReference"))}
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasCalloutEndpointReferences.localSeal}
+              onChange={(event) =>
+                setCanvasCalloutEndpointReferences({ ...canvasCalloutEndpointReferences, localSeal: event.target.checked })
+              }
+            />
+            {renderSettingLabel(t("ui.showCalloutLocalSealReference"))}
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasCalloutEndpointReferences.oppositeConnection}
+              onChange={(event) =>
+                setCanvasCalloutEndpointReferences({ ...canvasCalloutEndpointReferences, oppositeConnection: event.target.checked })
+              }
+            />
+            {renderSettingLabel(t("ui.showCalloutOppositeConnectionReference"))}
+          </label>
+          <label className="settings-checkbox">
+            <input
+              type="checkbox"
+              checked={canvasCalloutEndpointReferences.oppositeSeal}
+              onChange={(event) =>
+                setCanvasCalloutEndpointReferences({ ...canvasCalloutEndpointReferences, oppositeSeal: event.target.checked })
+              }
+            />
+            {renderSettingLabel(t("ui.showCalloutOppositeSealReference"))}
+          </label>
+          <p className="meta-line settings-callout-endpoint-references-hint">
+            {renderSettingLabel(t("ui.calloutEndpointReferencesHint"))}
+          </p>
           <label className="settings-checkbox">
             <input
               type="checkbox"

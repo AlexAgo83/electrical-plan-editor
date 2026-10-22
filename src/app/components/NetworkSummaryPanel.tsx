@@ -1,4 +1,4 @@
-import { translateCurrent as t } from "../lib/i18n";
+import { getActiveLocale, translateCurrent as t } from "../lib/i18n";
 import {
   useCallback,
   useEffect,
@@ -70,6 +70,7 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
   calloutContentMode,
   showSelectedCalloutOnly,
   showCalloutWireNames,
+  calloutEndpointReferences,
   connectorDrawingDisplayMode,
   useConsistentConnectorLayoutScale,
   connectorDrawingScalePercent,
@@ -643,6 +644,7 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
   const normalizedConnectorNodeDrawingScale =
     connectorDrawingDisplayMode === "nodes" ? normalizedConnectorDrawingScale * 2.4 : normalizedConnectorDrawingScale;
 
+  const activeLocale = getActiveLocale();
   const renderedCableCallouts = useMemo(() => {
     return computeRenderedCableCallouts({
       orderedCableCallouts,
@@ -650,6 +652,8 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
       connectorDrawingScale: normalizedConnectorDrawingScale,
       calloutContentMode,
       showCalloutWireNames,
+      calloutEndpointReferences,
+      locale: activeLocale,
       inverseLabelScale,
       hoveredCalloutKey,
       draggingCalloutKey: draggingCallout?.key ?? null,
@@ -664,6 +668,8 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
     normalizedConnectorDrawingScale,
     calloutContentMode,
     showCalloutWireNames,
+    calloutEndpointReferences,
+    activeLocale,
     inverseLabelScale,
     hoveredCalloutKey,
     draggingCallout?.key,

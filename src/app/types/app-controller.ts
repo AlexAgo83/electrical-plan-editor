@@ -73,6 +73,13 @@ export type CanvasLabelStrokeMode = "none" | "light" | "normal";
 export type CanvasLabelSizeMode = "extraSmall" | "small" | "normal" | "large" | "extraLarge";
 export type CanvasCalloutTextSize = "small" | "normal" | "large" | "extraLarge";
 export type NetworkCalloutContentMode = "wireDetails" | "connectorDrawing" | "both";
+/** Global display flags for effective endpoint material references in callout tables. */
+export interface CalloutEndpointReferenceVisibility {
+  localConnection: boolean;
+  localSeal: boolean;
+  oppositeConnection: boolean;
+  oppositeSeal: boolean;
+}
 export type ConnectorDrawingDisplayMode = "disabled" | "callouts" | "nodes";
 export type CanvasExportFormat = "svg" | "png";
 export type CanvasLabelRotationDegrees = -90 | -45 | -20 | 0 | 20 | 45 | 90;
