@@ -1,0 +1,181 @@
+{
+  "title": "Show local and opposite endpoint connection and seal references in plan callouts and expose Open folder beside workspace actions",
+  "references": [
+    "logics/product/prod_018_portable_named_workspace_lineages_and_supplier_history.md",
+    "logics/scaffold/plan-issue-metadata-routing-drift-and-workspace-visibility.json",
+    "src/core/entities.ts",
+    "src/core/connectorCatalogMaterials.ts",
+    "src/core/wireReferences.ts",
+    "src/app/components/network-summary/callouts/calloutModel.ts",
+    "src/app/components/network-summary/callouts/calloutLayout.ts",
+    "src/app/components/network-summary/callouts/NetworkSummaryCalloutsLayer.tsx",
+    "src/app/components/network-summary/export/networkSummaryExport.ts",
+    "src/app/lib/networkSummaryBomCsv.ts",
+    "src/app/hooks/uiPreferencesStorage.ts",
+    "src/app/hooks/useUiPreferences.ts",
+    "src/app/hooks/useAppControllerPreferencesState.ts",
+    "src/app/hooks/controller/useAppControllerUiPreferencesBindings.ts",
+    "src/app/hooks/controller/useAppControllerNetworkSummaryPanelDomain.tsx",
+    "src/app/components/workspace/SettingsWorkspaceContent.tsx",
+    "src/app/components/settings/settingsSearchModel.ts",
+    "src/app/components/workspace/SettingsWorkspaceStorageSection.tsx",
+    "src/app/components/workspace/WorkspaceLineagePanels.tsx",
+    "src/app/hooks/useWorkspaceLineages.ts",
+    "src/app/lib/lineage/lineageSessionController.ts",
+    "src/app/i18n/en.json",
+    "src/app/i18n/fr.json",
+    "src/tests/app.ui.settings-canvas-callouts.spec.tsx",
+    "src/tests/network-summary-callouts-layer.spec.tsx",
+    "src/tests/network-summary-callout-splice-side-labels.spec.ts",
+    "src/tests/network-summary-callout-prefix.spec.ts",
+    "src/tests/app.ui.network-summary-svg-export.spec.tsx",
+    "src/tests/workspace-storage-settings-section.spec.tsx",
+    "src/tests/app.ui.workspace-lineages.spec.tsx",
+    "src/tests/workspace-lineage-folder.spec.ts",
+    "docs/workspace-lineages.md",
+    "package.json"
+  ],
+  "request": {
+    "complexity": "Medium",
+    "theme": "Plan callout material visibility and workspace access",
+    "needs": [
+      "Display connection references and seal references for each wire in drawing callouts.",
+      "Let users check whether each reference is shown for the callout connector side, the opposite wire endpoint, or both, in Settings.",
+      "Expose Open folder next to Save, Rename and Copy beside the workspace selector."
+    ],
+    "context": [
+      "User request on 2026-10-22; repository version 1.20.0. This is a ready-to-develop documentation corpus; runtime implementation is deferred to the generated task. Logics docs use English and product UI supports EN/FR.",
+      "Wire already stores endpointAConnectionReference, endpointASealReference, endpointBConnectionReference and endpointBSealReference, plus separate names. A connection reference identifies the wire termination/contact, not the connector technical ID or catalog manufacturer reference. Seal means the endpoint seal (French joint).",
+      "calloutModel builds connector and splice groups by visiting both orientations of every wire. CalloutEntry currently loses the A/B orientation and material references. Preserve orientation explicitly when extending entries; local means the actual endpoint represented by that row, never always endpoint A. Opposite means the other endpoint of that same wire, without traversing another connector or splice.",
+      "Use effective endpoint references consistent with the existing BOM: a nonblank manual wire reference takes precedence; otherwise connector material configuration and catalog defaults resolve per cavity. applyCatalogSeals=false suppresses automatic seal fallback but does not hide an explicit manual seal. Splice endpoints have only their explicit references; do not invent catalog defaults for them. Reuse or extract pure resolution without changing BOM output.",
+      "Callout layout has dynamic columns, measured widths, a layout cache and a 520-unit width cap. Extra reference text requires explicit wrapping/measurement/export treatment rather than simply adding unbounded cells. Existing wire grouping, physical cavity labels, splice L/R labels, drawings and network-prefix formatting remain in use.",
+      "Settings already contains a global canvasShowCalloutWireNames preference. Follow that live display-preference pattern for the new checkboxes, rather than introducing network business fields or an unrelated settings store.",
+      "SettingsWorkspaceStorageSection already renders Save, Rename and Copy in Current workspace. Open folder currently appears under Transfer and recovery and calls model.openFolder. Scope is to relocate this existing browser directory-picker action next to the current-workspace selector/actions, not reveal the active directory in an OS file manager. Existing openFolder registers/reconciles a selected lineage root or immediate child lineages and refreshes the selector; it does not automatically activate a newly registered workspace. Retain those semantics and existing conflict/recovery behavior.",
+      "prod_018 remains authoritative for lineage identity/history. This brief groups the two requested UI improvements for delivery without reopening storage architecture or existing Copy semantics."
+    ],
+    "acceptance_criteria": [
+      "AC1: Add four independent, accessible EN/FR checkboxes to the existing Settings canvas/callout group: connection reference - this side, seal reference - this side, connection reference - opposite side, and seal reference - opposite side. Any combination is allowed, including all unchecked, local only, opposite only and both. All default to false for new or legacy preferences, preserving existing plan appearance. Settings search finds them using connection/contact, seal/joint and local/opposite terms.",
+      "AC2: Persist the four booleans through the existing UI preference storage/normalization pipeline; malformed or missing values default safely to false. Changes immediately update the active drawing and subsequent exports without an Apply defaults step. They remain effective across reloads and network/workspace switches, following existing global display preference scope. They do not mutate wires, trigger rerouting, add undo history, mark workspace content dirty or rewrite historical snapshots.",
+      "AC3: For each callout wire row, resolve this side from the actual grouped endpoint and opposite side from the other endpoint. If wire A is connector C1 and B is C2, C1 shows A locally/B opposite and C2 shows B locally/A opposite. Support connector-to-connector, connector-to-splice, splice-to-splice, self-loops and multiple wires sharing a cavity; keep one row per existing wire entry without collapsing distinct references. Existing splice callouts follow the same row-relative semantics, including directional sides. Switching A/B with its metadata leaves the references attached to the correct physical endpoints.",
+      "AC4: Display effective connection/seal reference codes using the manual-over-connector/catalog precedence described in Context, including cavity-specific material settings and applyCatalogSeals=false. Names never substitute for codes; do not apply the network entity-prefix formatter to reference strings. A missing reference renders an em dash in an enabled field and never borrows the other endpoint value. Empty cavities keep the existing empty-row convention. Rendering is read-only and never writes resolved defaults back to Wire. Cover explicit overrides, whitespace-only values, absent/deleted catalog links and seals disabled with/without a manual override.",
+      "AC5: Enabled reference fields appear as clearly labeled local/opposite columns in the existing wire-details table, grouped near their corresponding local pin and opposite End ID/PIN columns. All unchecked produces the existing columns. Headers and cells never overlap, silently truncate or confuse local and opposite values; long references wrap with measured row height and full values remain available in the drawing and exported output. Include new values, flags and locale in layout/cache invalidation. Preserve sorting, grouping, drawing-plus-table and wire-details-only modes, selected-only filtering, drag positions, hit targets and zoom behavior; drawing-only mode remains drawing-only.",
+      "AC6: Existing SVG/PNG and PDF paths consuming the plan callout renderer honor the same enabled fields, effective values and side labels as the screen. Fit/export bounds and callout dimensions include wrapped content without clipping. No reference is emitted when its field or the whole callout is hidden. Verify all four enabled with distinct A/B values, missing and long references, connector drawings, splice rows and EN/FR; exporting never changes preference values or design state.",
+      "AC7: Relocate the existing Open folder / Ouvrir un dossier button from Transfer and recovery into Current workspace beside Save, Rename and Copy, in the order Save, Rename, Copy, Open folder, New workspace when all actions are present. Keep it available in the same Current workspace group when no workspace is active so users can populate the selector. Render one primary Open folder action, retain the existing supported-directory-access visibility rule and unsupported-browser explanation, and disable while busy or not ready. Use the existing model.openFolder action from the direct user gesture. Preserve root/parent discovery, identity reconciliation and selector refresh without silently activating another workspace or discarding current unsaved work.",
+      "AC8: Open folder remains distinct from reconnecting the active folder, importing a ZIP and downloading Copy. Existing historical-mode/session/conflict safeguards remain authoritative. Cancellation or failure cannot report success or alter the current editor snapshot; successfully registered workspaces remain selectable through the existing selector. The action uses EN/FR labels, keyboard access and Settings search highlighting; Current workspace actions wrap accessibly at 360px and desktop widths. Test supported/unsupported API, no active workspace, busy/not-ready, picker cancellation/error and success through the relocated control. No new native file-manager integration is required.",
+      "AC9: Record evidence for AC1-AC8 using meaningful model/resolver/layout tests, Settings preference persistence/UI tests, export assertions and workspace-action regressions. Include asymmetric A/B references, endpoint reversal, shared cavity, splice opposite endpoint, all-off/local-only/opposite-only/both, long strings and stale-cache updates. Update workspace guidance and relevant callout help. Run applicable lint, typecheck, quality:i18n, targeted Vitest/browser checks and repository delivery gates during implementation; capture any environment limitation honestly. This documentation change does not implement runtime features or publish a release."
+    ]
+  },
+  "product": {
+    "title": "Configurable endpoint material references on plans and direct workspace folder access",
+    "overview": "Make plan callouts useful for wiring assembly by showing connection/contact and seal reference codes for the represented endpoint and optionally its opposite, while placing the existing workspace folder-opening action beside everyday workspace controls.",
+    "goals": [
+      "Choose connection and seal visibility independently for each endpoint side.",
+      "Keep on-screen and exported plan references readable and consistent with effective material configuration.",
+      "Open existing workspace folders from the current-workspace action row."
+    ],
+    "non_goals": [
+      "Editing termination metadata from callouts, changing routing or BOM quantities, or introducing new wire fields.",
+      "Per-wire/per-workspace visibility overrides, tracing through splices or new export formats.",
+      "OS file-manager reveal, new storage modes, automatic workspace switching, changing Copy/reconnect semantics or release publication."
+    ]
+  },
+  "backlog_items": [
+    {
+      "title": "Carry effective local and opposite endpoint material references into callout rows",
+      "priority": "Medium",
+      "complexity": "Medium",
+      "theme": "Callout endpoint semantics",
+      "request_acs": [
+        "AC3",
+        "AC4"
+      ],
+      "problem": [
+        "Callout entries discard endpoint orientation and material codes, preventing reliable local/opposite display."
+      ],
+      "scope_in": [
+        "Extend CalloutEntry and table-row models with explicit row-relative connection/seal values. Carry A/B orientation through both connector and splice grouping paths.",
+        "Reuse/extract pure effective-reference resolution aligned with BOM manual overrides and connector cavity/catalog materials. Preserve seal-application behavior and keep reference strings separate from entity ID formatting.",
+        "Add model/resolution coverage for reversed endpoints, shared cavities, self-loops, connector/splice combinations, missing references and catalog overrides."
+      ],
+      "scope_out": [
+        "UI controls and export layout, wire-schema changes, new metadata editing and changes to BOM output."
+      ],
+      "acceptance_criteria": [
+        "AC1: Every row resolves local/opposite from its actual endpoints and satisfies request AC3, with distinct asymmetric test values.",
+        "AC2: Effective reference precedence, empty values and read-only behavior satisfy request AC4 with resolver/BOM parity evidence."
+      ]
+    },
+    {
+      "title": "Add persisted callout reference checkboxes and readable screen and export columns",
+      "priority": "Medium",
+      "complexity": "Medium",
+      "theme": "Callout display preferences",
+      "request_acs": [
+        "AC1",
+        "AC2",
+        "AC5",
+        "AC6",
+        "AC9"
+      ],
+      "problem": [
+        "Users cannot choose endpoint material visibility and the current measured/cached table layout does not account for additional reference columns."
+      ],
+      "scope_in": [
+        "Add four default-false global UI preferences and propagate them through storage, hooks/controller slices, Settings and rendering/export contracts. Localize and index labels and side explanations for Settings search.",
+        "Consume the endpoint model slice; add dynamic clearly labeled columns near their corresponding endpoint fields. Wrap long codes with measured row height, include flags/values/locale in cache keys and expand export bounds without overlap or clipped text.",
+        "Exercise all-off, local-only, opposite-only, both and independent connection/seal combinations. Cover live updates, reload, switches, malformed legacy preferences, historical display, drawing modes, selected filtering and SVG/PNG/PDF consumers.",
+        "Record per-AC evidence, update callout guidance and run relevant quality gates for this slice and the full request."
+      ],
+      "scope_out": [
+        "Per-network business persistence or per-row overrides, altering callout visibility/content modes, changing wire routing or adding a new PDF flow."
+      ],
+      "acceptance_criteria": [
+        "AC1: Localized searchable checkboxes and persistent immediate read-only updates satisfy request AC1-AC2.",
+        "AC2: Table measurement/cache behavior and export parity satisfy request AC5-AC6 with long-reference and locale regressions.",
+        "AC3: Evidence and documentation cover the callout portions of request AC9 and trace model evidence from the prerequisite slice."
+      ]
+    },
+    {
+      "title": "Move Open folder beside Save Rename and Copy in Current workspace",
+      "priority": "Medium",
+      "complexity": "Low",
+      "theme": "Workspace action discoverability",
+      "request_acs": [
+        "AC7",
+        "AC8",
+        "AC9"
+      ],
+      "problem": [
+        "Open folder is separated from the workspace selector and Save/Rename/Copy actions under Transfer and recovery."
+      ],
+      "scope_in": [
+        "Relocate the existing directory-picker control into Current workspace with the specified action order and no-active-workspace access. Reuse model.openFolder and existing supported API visibility, add ready/busy disablement and preserve unsupported guidance.",
+        "Remove the redundant Transfer action; keep reconnect/import/Copy behavior intact. Preserve existing folder discovery, reconciliation and explicit selector activation semantics.",
+        "Update Settings search/help and workspace guide; add focused UI regressions for exact placement, one primary action, keyboard/localized labels, responsive wrapping and picker outcomes. Reuse folder tests for controller semantics; record evidence and applicable request AC9 gates."
+      ],
+      "scope_out": [
+        "OS file-manager reveal, redesigning folder import/reconnect, new storage architecture or automatic activation."
+      ],
+      "acceptance_criteria": [
+        "AC1: Current workspace contains the relocated action beside the specified controls, including no-active state, satisfying request AC7.",
+        "AC2: Existing picker/session behavior, localization, search and responsive states satisfy request AC8 without data loss or false success.",
+        "AC3: Workspace docs and focused regressions satisfy the workspace portion of request AC9."
+      ]
+    }
+  ],
+  "orchestration_task": {
+    "title": "Deliver configurable callout endpoint references and current workspace Open folder access",
+    "plan": [
+      "Wave 1: Confirm the four-checkbox UX, row-relative endpoint mapping and effective-reference precedence against current BOM/material behavior; establish asymmetric fixtures and record AC3-AC4 evidence while delivering the endpoint-model backlog slice.",
+      "Wave 2: Deliver persisted global settings and the measured dynamic table/export layout using the endpoint-model slice. Verify every visibility combination, EN/FR, wrapping and cache invalidation; record AC1-AC2 and AC5-AC6 evidence.",
+      "Wave 3: Deliver the independently implementable Open folder relocation with the existing picker action and selector semantics. Verify no-active, ready/busy, unsupported API, historical and unsaved states; record AC7-AC8 evidence.",
+      "Wave 4: Complete targeted UI/export/browser regressions, documentation and applicable repository quality/delivery gates. Map implementation proof for AC1-AC9, record limitations and close through lifecycle commands only after implementation is complete.",
+      "All backlog slices have Medium priority: these are requested additive usability improvements with no reported blocking defect. Deliver the endpoint model before its display consumer; Open folder has no dependency on the callout changes. Leave this corpus unimplemented and ready to start."
+    ]
+  },
+  "context_pack": {
+    "out": "logics/context-packs/callout-endpoint-material-references-and-workspace-open-folder.json",
+    "mode": "summary-only",
+    "profile": "deep"
+  }
+}
