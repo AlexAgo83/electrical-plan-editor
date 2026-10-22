@@ -1,14 +1,14 @@
 ## item_693_persist_plan_issue_revision_and_date_and_render_them_in_export_cartouches - Persist plan issue revision and date and render them in export cartouches
 > From version: 1.19.3
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 95%
 > Confidence: 90%
 > Progress: 100%
 > Complexity: Medium
 > Theme: Plan metadata
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-22 12:00:13
+> Indicators reviewed: 2026-10-22 12:53:37
 
 # AI Context
 - Extend explicit metadata allowlists in network normalization, migrations and portability, then propagate calendar-date values through forms, previews and export cartouches. Existing files leave both fields unset.
@@ -47,3 +47,9 @@
 # Priority
 - Priority: Medium
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Tasks
+- `task_168_deliver_plan_issue_metadata_routing_drift_checks_and_workspace_copy_visibility`
+
+# Notes
+- Task `task_168_deliver_plan_issue_metadata_routing_drift_checks_and_workspace_copy_visibility` was finished via `logics-manager flow finish task` on 2026-10-22.

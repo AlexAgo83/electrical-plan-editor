@@ -1,14 +1,14 @@
 ## item_695_download_the_current_workspace_snapshot_from_a_copy_action - Download the current workspace snapshot from a Copy action
 > From version: 1.19.3
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 95%
 > Confidence: 90%
 > Progress: 100%
 > Complexity: Medium
 > Theme: Workspace portability
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-22 12:00:13
+> Indicators reviewed: 2026-10-22 12:53:37
 
 # AI Context
 - Serialize the captured displayed state, including unsaved edits, through workspaceFile. Preserve lineage identity, source dirty status and technical save base. Historical copy exports the displayed frozen snapshot.
@@ -46,3 +46,9 @@
 # Priority
 - Priority: Medium
 - Rationale: Set by scaffold input or defaulted for grooming.
+
+# Tasks
+- `task_168_deliver_plan_issue_metadata_routing_drift_checks_and_workspace_copy_visibility`
+
+# Notes
+- Task `task_168_deliver_plan_issue_metadata_routing_drift_checks_and_workspace_copy_visibility` was finished via `logics-manager flow finish task` on 2026-10-22.

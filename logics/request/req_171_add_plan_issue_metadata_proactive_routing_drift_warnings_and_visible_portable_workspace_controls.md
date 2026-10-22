@@ -1,13 +1,13 @@
 ## req_171_add_plan_issue_metadata_proactive_routing_drift_warnings_and_visible_portable_workspace_controls - Add plan issue metadata, proactive routing drift warnings and visible portable workspace controls
 > From version: 1.19.3
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
 > Complexity: High
 > Theme: Plan release and workspace confidence
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
-> Indicators reviewed: 2026-10-22 11:56:36
+> Indicators reviewed: 2026-10-22 12:53:36
 
 # AI Context
 - Network metadata and cartouches use explicit issue fields. Recompute diagnostics share the pure manual engine; Copy exports current .epe.json content while preserving the source session. Header identity comes from the lineage snapshot.

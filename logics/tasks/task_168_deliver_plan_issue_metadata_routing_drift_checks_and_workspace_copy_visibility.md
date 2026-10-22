@@ -1,14 +1,14 @@
 ## task_168_deliver_plan_issue_metadata_routing_drift_checks_and_workspace_copy_visibility - Deliver plan issue metadata routing drift checks and workspace copy visibility
 > From version: 1.19.3
 > Schema version: 1.0
-> Status: In progress
+> Status: Done
 > Understanding: 95%
 > Confidence: 90%
 > Progress: 100%
 > Complexity: High
 > Theme: Implementation delivery
 > Reminder: Update status/understanding/confidence/progress and linked request/backlog references when you edit this doc.
-> Indicators reviewed: 2026-10-22 12:00:13
+> Indicators reviewed: 2026-10-22 12:53:36
 > Owner: claude
 
 # AI Context
@@ -60,10 +60,16 @@
 - command: `npm run -s ci:blocking` | result: failed at `quality:dependency-audit` | date: 2026-10-22 | note: Logics lint/audit, ESLint (0 errors, 1 existing warning), typecheck and i18n passed before it; the audit rejects new moderate advisories GHSA-qxg6-89mg-rqv8 / GHSA-xp26-3454-mjgp on vitest 4.1.11 (dev-only). package.json/package-lock.json are unchanged since the scoping commit d26d1202, so the base fails identically; the vitest bump is left to a separate change.
 - command: `npm run -s test:ci:segmentation:check && npm run -s test:ci:fast -- --coverage && npm run -s test:ci:ui && npm run -s test:e2e && npm run -s build:vite && npm run -s quality:pwa` | result: passed | date: 2026-10-22 | note: remaining ci:blocking steps; 719 fast tests, 9 UI chunks, Playwright 14 passed / 1 skipped (existing Chromium 153 reload skip), PWA gate passed.
 - command: `ROUTING_DRIFT_BENCH_RUNS=10 node scripts/quality/run-playwright-e2e.mjs tests/e2e/routing-drift-performance.spec.ts` | result: passed | date: 2026-10-22
+- command: `npm run -s test:ci:segmentation:check && npm run -s test:ci:fast -- --coverage && npm run -s test:ci:ui && npm run -s test:e2e && npm run -s build:vite && npm run -s quality:pwa` | result: passed | date: 2026-10-22
+- Finish workflow executed on 2026-10-22.
+- Linked backlog/request close verification passed.
 
 # Report
 - Delivered in e049bcad, 82745ba9, cc999826 and c91b5e3b. Evidence, cadence decision and limitations are under Delivery evidence.
 - Outstanding outside this task: vitest dev-dependency advisories block `quality:dependency-audit` (patch release available upstream).
+- Finished on 2026-10-22.
+- Linked backlog item(s): `item_693_persist_plan_issue_revision_and_date_and_render_them_in_export_cartouches`, `item_694_detect_full_network_recompute_drift_with_pure_cached_warnings`, `item_695_download_the_current_workspace_snapshot_from_a_copy_action`, `item_696_keep_active_workspace_identity_visible_beside_the_application_brand`
+- Related request(s): `req_171_add_plan_issue_metadata_proactive_routing_drift_warnings_and_visible_portable_workspace_controls`
 
 # Links
 - Request: `req_171_add_plan_issue_metadata_proactive_routing_drift_warnings_and_visible_portable_workspace_controls`
