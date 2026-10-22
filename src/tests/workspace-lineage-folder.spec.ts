@@ -381,6 +381,40 @@ describe("folder-backed named workspaces", () => {
     controller.dispose();
   });
 
+  it("opens a folder without activating it, losing unsaved work or reporting success on cancel or failure", async () => {
+    const { controller, host } = await setupFolder();
+    const activeId = controller.getSnapshot().active!.workspaceId;
+    const previous = host.state;
+    host.state = named(host.state, "unsaved edit");
+    controller.notifyStateChanged(previous, host.state);
+    const unsavedState = host.state;
+    const recordCount = controller.getSnapshot().records.length;
+
+    pickerResult = null;
+    expect((await controller.openFolder()).ok).toBe(false);
+    pickerResult = new FakeDirectoryHandle("Unrelated");
+    expect((await controller.openFolder()).ok).toBe(false);
+    expect(controller.getSnapshot().records).toHaveLength(recordCount);
+
+    const otherParent = new FakeDirectoryHandle("Shared");
+    const otherController = new LineageSessionController(new MemoryLineageLibraryStore({ durable: true }), new FakeHost(createSampleNetworkState()));
+    await otherController.initialize();
+    pickerResult = otherParent;
+    expect((await otherController.createLineage({ displayName: "Supplier", start: "current", storage: "folder", emptyState: createEmptyWorkspaceState() })).ok).toBe(true);
+    otherController.dispose();
+
+    pickerResult = otherParent.deepCopy("Shared (copy)");
+    const opened = await controller.openFolder();
+    expect(opened.ok && opened.value.opened).toHaveLength(1);
+    const snapshot = controller.getSnapshot();
+    expect(snapshot.records.map((record) => record.displayName)).toContain("Supplier");
+    expect(snapshot.active?.workspaceId).toBe(activeId);
+    expect(host.state).toBe(unsavedState);
+    expect(snapshot.save.dirty).toBe(true);
+    expect(snapshot.busy).toBe(false);
+    controller.dispose();
+  });
+
   it("reports cancellation neutrally and distinguishes an unavailable picker", async () => {
     const { controller } = await setupFolder();
     pickerResult = null;

@@ -13,9 +13,9 @@ main action (stronger outline) and secondary actions:
 
 | Group | Actions |
 | --- | --- |
-| **Current workspace** | Workspace selector (switch), save status and export hint, main action **Save** (Ctrl/Cmd+S), then **Rename**, **Copy** and **New workspace**. |
+| **Current workspace** | Workspace selector (switch), save status and export hint, main action **Save** (Ctrl/Cmd+S), then **Rename**, **Copy**, **Open workspace folder** (when the browser supports folders) and **New workspace**. **Open workspace folder** stays here when no workspace is active, so the selector can be populated; it registers the chosen workspace folder (or every workspace inside a chosen parent folder), reconciles known ones and refreshes the selector, but never switches by itself: pick the workspace in the selector afterwards. Cancelling the picker or choosing a folder without a workspace changes nothing. |
 | **Versions and handoffs** | Summary of the latest version (label, title, date) with the version and handoff counts, main action **Create version**, then **History** (read-only consultation, resume, version download, handoff files) and **Record supplier handoff**. |
-| **Transfer and recovery** | **Export package (ZIP)**, **Import package (ZIP)**, **Open workspace folder** (when the browser supports folders), **Reconnect folder** (folder workspaces); **Import old workspace files** sits under **Advanced** once a workspace exists. The preserved previous browser content, when there is one, is shown here as a neutral recovery copy with **Download preserved snapshot** / **Dismiss**. |
+| **Transfer and recovery** | **Export package (ZIP)**, **Import package (ZIP)**, **Reconnect folder** (folder workspaces, distinct from opening a new folder); **Import old workspace files** sits under **Advanced** once a workspace exists. The preserved previous browser content, when there is one, is shown here as a neutral recovery copy with **Download preserved snapshot** / **Dismiss**. |
 
 Recovery messages that need attention (choose the working state after a divergence, reconnect a
 folder, recover interrupted publications, missing files) appear at the top of the section with
@@ -155,7 +155,7 @@ Corrections create a new record that *supersedes* the earlier one; nothing is ov
 ### Transfer between computers
 
 - **Folder mode**: copy the workspace folder (or the parent holding several workspaces) and use
-  **Open workspace folder** on the other computer. The full working state, history and handoff files
+  **Open workspace folder** (Settings > Workspace storage > Current workspace) on the other computer. The full working state, history and handoff files
   are reconstructed without the original browser data.
 - **ZIP mode**: **Export package (ZIP)** and **Import package (ZIP)** (Settings > Workspace storage >
   Transfer and recovery; export is also available in History). One package

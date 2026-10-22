@@ -195,7 +195,9 @@ describe("Settings > Workspace storage section", () => {
         .map((button) => button.textContent?.trim());
       const copyLabel = locale === "en" ? "Copy" : "Copier";
       expect(names).toEqual(
-        locale === "en" ? ["Save", "Rename", "Copy", "New workspace"] : ["Enregistrer", "Renommer", "Copier", "Nouvel espace"]
+        locale === "en"
+          ? ["Save", "Rename", "Copy", "Open workspace folder", "New workspace"]
+          : ["Enregistrer", "Renommer", "Copier", "Ouvrir un dossier d'espace", "Nouvel espace"]
       );
       const copy = within(current).getByRole("button", { name: copyLabel });
       expect(copy).toHaveAttribute("title", expect.stringMatching(locale === "en" ? /snapshot.*unsaved edits/i : /instantané.*non enregistrées/i));
@@ -206,6 +208,67 @@ describe("Settings > Workspace storage section", () => {
     } finally {
       setActiveLocale("en");
     }
+  });
+
+  it("shows a single Open folder action in Current workspace and none under Transfer", () => {
+    // Separate spies: fakeModel shares one mock across async actions.
+    const model = {
+      ...fakeModel(folderSnapshot()),
+      openFolder: vi.fn(() => Promise.resolve(true)),
+      switchTo: vi.fn(() => Promise.resolve(true)),
+      saveNow: vi.fn(() => Promise.resolve(true))
+    } as WorkspaceLineageModel;
+    render(<SettingsWorkspaceStorageSection model={model} legacy={legacyControls(legacyStatus())} normalizedQuery="" />);
+    expect(screen.getAllByRole("button", { name: "Open workspace folder" })).toHaveLength(1);
+    const current = screen.getByRole("region", { name: "Current workspace" });
+    const transfer = screen.getByRole("region", { name: "Transfer and recovery" });
+    expect(within(transfer).queryByRole("button", { name: "Open workspace folder" })).toBeNull();
+    for (const name of ["Reconnect folder", "Import package (ZIP)", "Export package (ZIP)"]) {
+      expect(within(transfer).getByRole("button", { name })).toBeInTheDocument();
+    }
+    const openFolder = within(current).getByRole("button", { name: "Open workspace folder" });
+    expect(openFolder.tagName).toBe("BUTTON");
+    fireEvent.click(openFolder);
+    expect(model.openFolder).toHaveBeenCalledTimes(1);
+    expect(model.switchTo).not.toHaveBeenCalled();
+    expect(model.openDialog).not.toHaveBeenCalled();
+    expect(model.saveNow).not.toHaveBeenCalled();
+  });
+
+  it("keeps Open folder in Current workspace without an active workspace so the selector can be populated", () => {
+    render(<SettingsWorkspaceStorageSection model={fakeModel(snapshot())} legacy={legacyControls(legacyStatus())} normalizedQuery="" />);
+    const current = screen.getByRole("region", { name: "Current workspace" });
+    expect(within(current).getAllByRole("button").map((button) => button.textContent?.trim())).toEqual([
+      "Open workspace folder",
+      "New workspace"
+    ]);
+  });
+
+  it("disables Open folder while busy or not ready and explains unsupported folder access", () => {
+    const { unmount } = render(
+      <SettingsWorkspaceStorageSection model={fakeModel(folderSnapshot({ ready: false }))} legacy={legacyControls(legacyStatus())} normalizedQuery="" />
+    );
+    expect(screen.getByRole("button", { name: "Open workspace folder" })).toBeDisabled();
+    unmount();
+
+    const { unmount: unmountUnsupported } = render(
+      <SettingsWorkspaceStorageSection
+        model={fakeModel(snapshot({ directoryAccessSupported: false }))}
+        legacy={legacyControls(legacyStatus())}
+        normalizedQuery=""
+      />
+    );
+    expect(screen.queryByRole("button", { name: "Open workspace folder" })).toBeNull();
+    const current = screen.getByRole("region", { name: "Current workspace" });
+    expect(within(current).getByText(/Folder access is unavailable in this browser/)).toBeInTheDocument();
+    unmountUnsupported();
+  });
+
+  it("highlights Open folder for a Settings search", () => {
+    render(<SettingsWorkspaceStorageSection model={fakeModel(folderSnapshot())} legacy={legacyControls(legacyStatus())} normalizedQuery="folder" />);
+    const current = screen.getByRole("region", { name: "Current workspace" });
+    const openFolder = within(current).getByRole("button", { name: "Open workspace folder" });
+    expect(openFolder.querySelector("mark.settings-search-highlight")?.textContent).toBe("folder");
   });
 
   it("keeps Copy available read-only for the displayed version but not while busy or not ready", () => {

@@ -226,6 +226,19 @@ function NamedWorkspaceGroups({ model, label, normalizedQuery }: { model: Worksp
                 </button>
               </>
             ) : null}
+            {snapshot.directoryAccessSupported ? (
+              // Registers folder lineages and refreshes the selector; it never activates one by itself.
+              <button
+                type="button"
+                className="button-with-icon"
+                onClick={() => void model.openFolder()}
+                disabled={busy || !snapshot.ready}
+                data-workspace-action="open-folder"
+              >
+                <span className="action-button-icon is-open" aria-hidden="true" />
+                {label(t("ui.workspaceLineageOpenFolder"))}
+              </button>
+            ) : null}
             <button
               type="button"
               className={active === null ? "button-with-icon lineage-primary-action" : "button-with-icon"}
@@ -236,6 +249,7 @@ function NamedWorkspaceGroups({ model, label, normalizedQuery }: { model: Worksp
               {label(t("ui.workspaceLineageNew"))}
             </button>
           </div>
+          {!snapshot.directoryAccessSupported ? <p className="meta-line">{t("ui.workspaceLineageFolderUnsupported")}</p> : null}
         </StorageGroup>
         {active !== null ? (
           <StorageGroup title={t("ui.workspaceStorageGroupVersions")}>
@@ -269,12 +283,6 @@ function NamedWorkspaceGroups({ model, label, normalizedQuery }: { model: Worksp
               <span className="action-button-icon is-home-import" aria-hidden="true" />
               {label(t("ui.workspaceLineageImportPackage"))}
             </button>
-            {snapshot.directoryAccessSupported ? (
-              <button type="button" className="button-with-icon" onClick={() => void model.openFolder()} disabled={busy}>
-                <span className="action-button-icon is-open" aria-hidden="true" />
-                {label(t("ui.workspaceLineageOpenFolder"))}
-              </button>
-            ) : null}
             {active?.storage === "folder" ? (
               <>
               <p className="meta-line">{t("ui.workspaceLineageReconnectInstructions", { folder: active.folderName ?? active.slug })}</p>
@@ -297,7 +305,6 @@ function NamedWorkspaceGroups({ model, label, normalizedQuery }: { model: Worksp
               </div>
             </details>
           ) : null}
-          {!snapshot.directoryAccessSupported ? <p className="meta-line">{t("ui.workspaceLineageFolderUnsupported")}</p> : null}
           <LineagePackageFileInput inputRef={packageInputRef} model={model} />
         </StorageGroup>
       </div>
