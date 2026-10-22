@@ -17,6 +17,13 @@ export interface CalloutEntry {
   targetPin: string;
   lengthMm: number;
   sectionMm2: number;
+  /** Wire side (A/B) this row represents; the opposite side is the other one of the same wire. */
+  localEndpointSide: "A" | "B";
+  /** Effective (manual over cavity/catalog) reference codes, null when none resolves. */
+  localConnectionReference: string | null;
+  localSealReference: string | null;
+  oppositeConnectionReference: string | null;
+  oppositeSealReference: string | null;
 }
 
 export interface CalloutGroup {

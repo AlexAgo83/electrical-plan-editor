@@ -5,7 +5,8 @@ import type {
   ConnectorRearBackshell,
   ConnectorPlugDefinition,
   ConnectorTerminalMaterial,
-  Wire
+  Wire,
+  WireEndpoint
 } from "./entities";
 import { normalizePinElectricalRolesMap } from "./pinElectricalRole";
 import { occupantsAt } from "./connectorOccupancy";
@@ -250,5 +251,108 @@ export function resolveConnectorPlugMaterials(
     plugs: configuredPlugs.map((plug) => ({ ...plug, origin: "catalog default" })),
     unusedCavityCount,
     warnings
+  };
+}
+
+export interface ResolvedWireEndpointMaterial {
+  reference: string | undefined;
+  name: string | undefined;
+  origin: BomMaterialOrigin;
+}
+
+/**
+ * Effective termination (contact) of one wire endpoint: a nonblank manual wire
+ * reference wins; otherwise connector cavity material (instance override, then
+ * catalog defaults) resolves it. Splice endpoints only carry explicit values.
+ * Pure read: nothing is written back to the wire.
+ */
+export function resolveWireEndpointTerminalMaterial(
+  endpoint: WireEndpoint,
+  connectorById: ReadonlyMap<Connector["id"], Connector>,
+  catalogById: ReadonlyMap<CatalogItem["id"], CatalogItem>,
+  reference: string | undefined,
+  name: string | undefined
+): ResolvedWireEndpointMaterial {
+  const manualReference = normalizeReference(reference);
+  if (manualReference !== undefined) {
+    return { reference: manualReference, name, origin: "manual" };
+  }
+  if (endpoint.kind !== "connectorCavity") {
+    return { reference, name, origin: "manual" };
+  }
+  const connector = connectorById.get(endpoint.connectorId);
+  const catalogItem = connector?.catalogItemId === undefined ? undefined : catalogById.get(connector.catalogItemId);
+  const resolved = connector === undefined ? undefined : resolveConnectorTerminalMaterial(connector, catalogItem, endpoint.cavityIndex);
+  return {
+    reference: resolved?.terminalReference,
+    name: resolved?.terminalName,
+    origin: resolved?.origin ?? "manual"
+  };
+}
+
+/**
+ * Effective seal of one wire endpoint, with the same manual-first precedence.
+ * `applyCatalogSeals === false` suppresses the automatic cavity/catalog fallback
+ * but never hides an explicit manual seal.
+ */
+export function resolveWireEndpointSealMaterial(
+  endpoint: WireEndpoint,
+  connectorById: ReadonlyMap<Connector["id"], Connector>,
+  catalogById: ReadonlyMap<CatalogItem["id"], CatalogItem>,
+  reference: string | undefined,
+  name: string | undefined
+): ResolvedWireEndpointMaterial {
+  const manualReference = normalizeReference(reference);
+  if (manualReference !== undefined) {
+    return { reference: manualReference, name, origin: "manual" };
+  }
+  if (endpoint.kind !== "connectorCavity") {
+    return { reference, name, origin: "manual" };
+  }
+  const connector = connectorById.get(endpoint.connectorId);
+  if (connector === undefined || connector.applyCatalogSeals === false) {
+    return { reference, name, origin: "manual" };
+  }
+  const catalogItem = connector.catalogItemId === undefined ? undefined : catalogById.get(connector.catalogItemId);
+  const resolved = resolveConnectorTerminalMaterial(connector, catalogItem, endpoint.cavityIndex);
+  return {
+    reference: resolved?.sealReference,
+    name: resolved?.sealName,
+    origin: resolved?.origin ?? "manual"
+  };
+}
+
+export type WireEndpointSide = "A" | "B";
+
+export interface EffectiveWireEndpointReferences {
+  connectionReference: string | undefined;
+  sealReference: string | undefined;
+}
+
+/** Trimmed effective connection/seal reference codes of one side of a wire. */
+export function resolveEffectiveWireEndpointReferences(
+  wire: Wire,
+  side: WireEndpointSide,
+  connectorById: ReadonlyMap<Connector["id"], Connector>,
+  catalogById: ReadonlyMap<CatalogItem["id"], CatalogItem>
+): EffectiveWireEndpointReferences {
+  const endpoint = side === "A" ? wire.endpointA : wire.endpointB;
+  const terminal = resolveWireEndpointTerminalMaterial(
+    endpoint,
+    connectorById,
+    catalogById,
+    side === "A" ? wire.endpointAConnectionReference : wire.endpointBConnectionReference,
+    undefined
+  );
+  const seal = resolveWireEndpointSealMaterial(
+    endpoint,
+    connectorById,
+    catalogById,
+    side === "A" ? wire.endpointASealReference : wire.endpointBSealReference,
+    undefined
+  );
+  return {
+    connectionReference: normalizeReference(terminal.reference),
+    sealReference: normalizeReference(seal.reference)
   };
 }

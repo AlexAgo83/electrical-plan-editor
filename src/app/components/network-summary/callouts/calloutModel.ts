@@ -9,6 +9,7 @@ import type {
   SpliceId,
   Wire
 } from "../../../../core/entities";
+import { resolveEffectiveWireEndpointReferences, type WireEndpointSide } from "../../../../core/connectorCatalogMaterials";
 import { resolveConnectorCavityDisplayLabel, resolveEditedConnectorLayout } from "../../../../core/connectorLayout";
 import { portIndexToSpliceSide } from "../../../../core/directionalSplice";
 import { resolveSplicePortMode } from "../../../../core/splicePortMode";
@@ -94,12 +95,23 @@ function resolveWireColorSwatches(wire: Wire): WireColorSwatches {
   };
 }
 
+interface CalloutEndpointContext {
+  localSide: WireEndpointSide;
+  connectorMap: Map<ConnectorId, Connector>;
+  catalogItemMap: Map<CatalogItem["id"], CatalogItem>;
+}
+
 function createCalloutEntry(
   wire: Wire,
   target: CalloutTarget,
   colorSwatches: WireColorSwatches,
-  formatEntityId: FormatEntityId
+  formatEntityId: FormatEntityId,
+  { localSide, connectorMap, catalogItemMap }: CalloutEndpointContext
 ): CalloutEntry {
+  // Reference codes are read-only effective values; they are never prefixed
+  // like entity IDs and never borrowed from the other endpoint.
+  const local = resolveEffectiveWireEndpointReferences(wire, localSide, connectorMap, catalogItemMap);
+  const opposite = resolveEffectiveWireEndpointReferences(wire, localSide === "A" ? "B" : "A", connectorMap, catalogItemMap);
   return {
     wireId: wire.id,
     name: wire.name,
@@ -110,7 +122,12 @@ function createCalloutEntry(
     targetId: target.targetId,
     targetPin: target.targetPin,
     lengthMm: wire.lengthMm,
-    sectionMm2: wire.sectionMm2
+    sectionMm2: wire.sectionMm2,
+    localEndpointSide: localSide,
+    localConnectionReference: local.connectionReference ?? null,
+    localSealReference: local.sealReference ?? null,
+    oppositeConnectionReference: opposite.connectionReference ?? null,
+    oppositeSealReference: opposite.sealReference ?? null
   };
 }
 
@@ -152,10 +169,10 @@ export function buildConnectorCalloutGroupsById({
 
   for (const wire of wires) {
     const endpointPairs = [
-      { localEndpoint: wire.endpointA, targetEndpoint: wire.endpointB },
-      { localEndpoint: wire.endpointB, targetEndpoint: wire.endpointA }
+      { localSide: "A", localEndpoint: wire.endpointA, targetEndpoint: wire.endpointB },
+      { localSide: "B", localEndpoint: wire.endpointB, targetEndpoint: wire.endpointA }
     ] as const;
-    for (const { localEndpoint, targetEndpoint } of endpointPairs) {
+    for (const { localSide, localEndpoint, targetEndpoint } of endpointPairs) {
       if (localEndpoint.kind !== "connectorCavity") {
         continue;
       }
@@ -169,7 +186,9 @@ export function buildConnectorCalloutGroupsById({
       }
       const target = describeWireEndpointForCallout(targetEndpoint, connectorMap, catalogItemMap, spliceMap, formatEntityId);
       const colorSwatches = resolveWireColorSwatches(wire);
-      groups[groupIndex]?.entries.push(createCalloutEntry(wire, target, colorSwatches, formatEntityId));
+      groups[groupIndex]?.entries.push(
+        createCalloutEntry(wire, target, colorSwatches, formatEntityId, { localSide, connectorMap, catalogItemMap })
+      );
     }
   }
 
@@ -194,10 +213,10 @@ export function buildSpliceCalloutGroupsById({
 
   for (const wire of wires) {
     const endpointPairs = [
-      { localEndpoint: wire.endpointA, targetEndpoint: wire.endpointB },
-      { localEndpoint: wire.endpointB, targetEndpoint: wire.endpointA }
+      { localSide: "A", localEndpoint: wire.endpointA, targetEndpoint: wire.endpointB },
+      { localSide: "B", localEndpoint: wire.endpointB, targetEndpoint: wire.endpointA }
     ] as const;
-    for (const { localEndpoint, targetEndpoint } of endpointPairs) {
+    for (const { localSide, localEndpoint, targetEndpoint } of endpointPairs) {
       if (localEndpoint.kind !== "splicePort") {
         continue;
       }
@@ -219,7 +238,9 @@ export function buildSpliceCalloutGroupsById({
       const currentEntries = entriesByPort.get(localEndpoint.portIndex) ?? [];
       const target = describeWireEndpointForCallout(targetEndpoint, connectorMap, catalogItemMap, spliceMap, formatEntityId);
       const colorSwatches = resolveWireColorSwatches(wire);
-      currentEntries.push(createCalloutEntry(wire, target, colorSwatches, formatEntityId));
+      currentEntries.push(
+        createCalloutEntry(wire, target, colorSwatches, formatEntityId, { localSide, connectorMap, catalogItemMap })
+      );
       entriesByPort.set(localEndpoint.portIndex, currentEntries);
     }
   }

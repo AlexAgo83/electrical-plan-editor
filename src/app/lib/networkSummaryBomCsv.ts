@@ -5,7 +5,8 @@ import {
   type BomMaterialOrigin,
   type ConnectorCavityOccupancyMap,
   resolveConnectorPlugMaterials,
-  resolveConnectorTerminalMaterial
+  resolveWireEndpointSealMaterial,
+  resolveWireEndpointTerminalMaterial
 } from "../../core/connectorCatalogMaterials";
 import { buildWireEndpointReferenceNameLookup, normalizeWireEndpointReferenceName } from "../../core/wireReferences";
 import type { WorkspaceCurrencyCode } from "../types/app-controller";
@@ -284,57 +285,6 @@ function registerGroupedWireTermination(
   });
 }
 
-function resolveWireEndpointTerminal(
-  endpoint: WireEndpoint,
-  connectorById: ReadonlyMap<Connector["id"], Connector>,
-  catalogById: ReadonlyMap<CatalogItem["id"], CatalogItem>,
-  reference: string | undefined,
-  name: string | undefined
-): { reference: string | undefined; name: string | undefined; origin: BomMaterialOrigin } {
-  const manualReference = normalizeWireTerminationReference(reference);
-  if (manualReference !== undefined) {
-    return { reference: manualReference, name, origin: "manual" };
-  }
-  if (endpoint.kind !== "connectorCavity") {
-    return { reference, name, origin: "manual" };
-  }
-  const connector = connectorById.get(endpoint.connectorId);
-  const catalogItem = connector?.catalogItemId === undefined ? undefined : catalogById.get(connector.catalogItemId);
-  const resolved = connector === undefined ? undefined : resolveConnectorTerminalMaterial(connector, catalogItem, endpoint.cavityIndex);
-  return {
-    reference: resolved?.terminalReference,
-    name: resolved?.terminalName,
-    origin: resolved?.origin ?? "manual"
-  };
-}
-
-function resolveWireEndpointSeal(
-  endpoint: WireEndpoint,
-  connectorById: ReadonlyMap<Connector["id"], Connector>,
-  catalogById: ReadonlyMap<CatalogItem["id"], CatalogItem>,
-  reference: string | undefined,
-  name: string | undefined
-): { reference: string | undefined; name: string | undefined; origin: BomMaterialOrigin } {
-  const manualReference = normalizeWireTerminationReference(reference);
-  if (manualReference !== undefined) {
-    return { reference: manualReference, name, origin: "manual" };
-  }
-  if (endpoint.kind !== "connectorCavity") {
-    return { reference, name, origin: "manual" };
-  }
-  const connector = connectorById.get(endpoint.connectorId);
-  if (connector === undefined || connector.applyCatalogSeals === false) {
-    return { reference, name, origin: "manual" };
-  }
-  const catalogItem = connector.catalogItemId === undefined ? undefined : catalogById.get(connector.catalogItemId);
-  const resolved = resolveConnectorTerminalMaterial(connector, catalogItem, endpoint.cavityIndex);
-  return {
-    reference: resolved?.sealReference,
-    name: resolved?.sealName,
-    origin: resolved?.origin ?? "manual"
-  };
-}
-
 function buildNetworkSummaryBomExportData(
   catalogItems: CatalogItem[],
   connectors: Connector[],
@@ -461,28 +411,28 @@ function buildNetworkSummaryBomExportData(
   };
 
   for (const wire of wires) {
-    const endpointATerminal = resolveWireEndpointTerminal(
+    const endpointATerminal = resolveWireEndpointTerminalMaterial(
       wire.endpointA,
       connectorById,
       catalogById,
       wire.endpointAConnectionReference,
       wire.endpointAConnectionName
     );
-    const endpointASeal = resolveWireEndpointSeal(
+    const endpointASeal = resolveWireEndpointSealMaterial(
       wire.endpointA,
       connectorById,
       catalogById,
       wire.endpointASealReference,
       wire.endpointASealName
     );
-    const endpointBTerminal = resolveWireEndpointTerminal(
+    const endpointBTerminal = resolveWireEndpointTerminalMaterial(
       wire.endpointB,
       connectorById,
       catalogById,
       wire.endpointBConnectionReference,
       wire.endpointBConnectionName
     );
-    const endpointBSeal = resolveWireEndpointSeal(
+    const endpointBSeal = resolveWireEndpointSealMaterial(
       wire.endpointB,
       connectorById,
       catalogById,

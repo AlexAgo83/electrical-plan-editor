@@ -44,7 +44,12 @@ describe("NetworkSummaryCalloutsLayer", () => {
                 targetId: "S-1",
                 targetPin: "P1",
                 lengthMm: 0,
-                sectionMm2: 0.5
+                sectionMm2: 0.5,
+                localEndpointSide: "A",
+                localConnectionReference: null,
+                localSealReference: null,
+                oppositeConnectionReference: null,
+                oppositeSealReference: null
               }
             ]
           },
