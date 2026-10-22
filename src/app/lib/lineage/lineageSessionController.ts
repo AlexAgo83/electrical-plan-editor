@@ -13,15 +13,15 @@
  */
 import type { AppState } from "../../../store";
 import { translateCurrent as t } from "../i18n";
-import { toFilesystemSafeTimestamp } from "../exportFileName";
+import { normalizeFileNamePart, toFilesystemSafeTimestamp } from "../exportFileName";
 import { parseJsonSafe } from "../../../adapters/persistence/json";
-import { createPortableId } from "../workspaceFile";
+import { buildWorkspaceFilePayload, createPortableId, serializeWorkspaceFilePayload, type WorkspaceFilePayload } from "../workspaceFile";
 import {
   advanceWorkspaceSessionToken,
   getWorkspaceSessionToken,
   setProjectMutationBlocked
 } from "../workspaceSessionGate";
-import { type LineageDirectory } from "./lineageDirectory";
+import { encodeText, type LineageDirectory } from "./lineageDirectory";
 import {
   LINEAGE_MANIFEST_FILE_NAME,
   buildVersionDisplayLabels,
@@ -990,6 +990,63 @@ export class LineageSessionController {
     } catch (error) {
       return { ok: false, error: errorMessage(error) };
     }
+  }
+
+  /**
+   * Copy: initiates the download of one portable `.epe.json` snapshot of the displayed content
+   * (all networks, unsaved in-memory edits included) through the canonical workspace serializer.
+   * Content and identity are captured synchronously at call time. The working session is left
+   * untouched: nothing is written or relinked, dirty/pending-export flags, the technical save
+   * base, verified-save timestamps and milestones do not change, and no workspace is registered
+   * or activated. The working copy keeps its workspace identity and ancestry for portable reopen;
+   * a historical consultation copies only the displayed frozen snapshot (never the hidden
+   * working content) without claiming working ancestry. Download initiation is the only success.
+   */
+  copySnapshot(): LineageResult<{ fileName: string }> {
+    const context = this.active;
+    if (context === null) {
+      return { ok: false, error: t("ui.workspaceLineageErrorNoActive") };
+    }
+    if (!this.snapshot.ready || this.snapshot.busy) {
+      return { ok: false, error: t("ui.workspaceLineageConnectionBusy") };
+    }
+    const nowIso = this.now();
+    const state = this.host.getState();
+    const historical = this.snapshot.historical;
+    let source: WorkspaceFilePayload | null = null;
+    try {
+      source = context.repository?.getWorking() ?? null;
+    } catch {
+      source = null;
+    }
+    const identity: WorkspaceFilePayload = {
+      ...(source ?? buildWorkspaceFilePayload(state, null, nowIso)),
+      workspaceId: context.record.workspaceId,
+      lineage: { displayName: context.record.displayName, slug: context.record.slug }
+    };
+    if (historical !== null) {
+      delete identity.working;
+      delete identity.version;
+    }
+    const payload = buildWorkspaceFilePayload(state, identity, nowIso);
+    if (historical !== null) {
+      delete payload.working;
+    }
+    const nameParts = [
+      normalizeFileNamePart(context.record.slug) ?? normalizeFileNamePart(context.record.displayName) ?? "workspace",
+      ...(historical !== null ? [normalizeFileNamePart(historical.label) ?? "version"] : []),
+      "copy",
+      toFilesystemSafeTimestamp(nowIso)
+    ];
+    const fileName = `${nameParts.join("-")}.epe.json`;
+    try {
+      if (!this.host.downloadBytes(fileName, encodeText(serializeWorkspaceFilePayload(payload)), "application/json")) {
+        return { ok: false, error: t("ui.workspaceLineageErrorDownloadUnavailable") };
+      }
+    } catch (error) {
+      return { ok: false, error: errorMessage(error) };
+    }
+    return { ok: true, value: { fileName } };
   }
 
   /** Downloads one version file exactly as stored; it opens on its own as a workspace file. */

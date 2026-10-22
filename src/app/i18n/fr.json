@@ -1725,6 +1725,10 @@
     "routingDriftStatusConsistent": "Les routes enregistrées correspondent au recalcul.",
     "routingDriftStatusDriftOne": "{count} fil serait modifié.",
     "routingDriftStatusDriftOther": "{count} fils seraient modifiés.",
-    "routingDriftStatusFailed": "Indisponible (le recalcul échoue)."
+    "routingDriftStatusFailed": "Indisponible (le recalcul échoue).",
+    "workspaceLineageCopy": "Copier",
+    "workspaceLineageCopyTooltip": "Télécharger un instantané portable .epe.json de cet espace de travail, modifications non enregistrées comprises. N'enregistre pas, ne crée pas de version et n'enregistre pas de nouvel espace de travail.",
+    "workspaceLineageCopyTooltipHistorical": "Télécharger un instantané portable .epe.json de la version affichée en lecture seule. Votre copie de travail n'est pas incluse.",
+    "workspaceLineageCopyDownloadInitiated": "Téléchargement de la copie lancé"
   }
 }

@@ -100,6 +100,7 @@ function fakeModel(state: LineageSessionSnapshot): WorkspaceLineageModel {
     closeDialog: vi.fn(),
     switchTo: ok,
     saveNow: ok,
+    copySnapshot: vi.fn(() => true),
     createLineage: ok,
     rename: ok,
     createVersion: ok,
@@ -181,6 +182,47 @@ describe("Settings > Workspace storage section", () => {
     for (const name of ["Save", "New workspace", "Export package (ZIP)", "Open workspace folder"]) {
       expect(screen.getByRole("button", { name })).toBeDisabled();
     }
+  });
+
+  it.each(["en", "fr"] as const)("offers Copy beside Save, Rename and New workspace with snapshot semantics in %s", (locale) => {
+    setActiveLocale(locale);
+    try {
+      const model = fakeModel(folderSnapshot());
+      const { unmount } = render(<SettingsWorkspaceStorageSection model={model} legacy={legacyControls(legacyStatus())} normalizedQuery="" />);
+      const current = screen.getByRole("region", { name: locale === "en" ? "Current workspace" : "Espace actuel" });
+      const names = within(current)
+        .getAllByRole("button")
+        .map((button) => button.textContent?.trim());
+      const copyLabel = locale === "en" ? "Copy" : "Copier";
+      expect(names).toEqual(
+        locale === "en" ? ["Save", "Rename", "Copy", "New workspace"] : ["Enregistrer", "Renommer", "Copier", "Nouvel espace"]
+      );
+      const copy = within(current).getByRole("button", { name: copyLabel });
+      expect(copy).toHaveAttribute("title", expect.stringMatching(locale === "en" ? /snapshot.*unsaved edits/i : /instantané.*non enregistrées/i));
+      fireEvent.click(copy);
+      expect(model.copySnapshot).toHaveBeenCalledTimes(1);
+      expect(model.saveNow).not.toHaveBeenCalled();
+      unmount();
+    } finally {
+      setActiveLocale("en");
+    }
+  });
+
+  it("keeps Copy available read-only for the displayed version but not while busy or not ready", () => {
+    const readOnly = folderSnapshot({ historical: { versionId: "v1", label: "v001", title: "", createdAtIso: "2026-10-01T10:00:00Z" } });
+    const { unmount } = render(<SettingsWorkspaceStorageSection model={fakeModel(readOnly)} legacy={legacyControls(legacyStatus())} normalizedQuery="" />);
+    expect(screen.getByRole("button", { name: "Copy" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Copy" })).toHaveAttribute("title", expect.stringMatching(/displayed read-only version/));
+    unmount();
+
+    const { unmount: unmountBusy } = render(
+      <SettingsWorkspaceStorageSection model={fakeModel(folderSnapshot({ busy: true }))} legacy={legacyControls(legacyStatus())} normalizedQuery="" />
+    );
+    expect(screen.getByRole("button", { name: "Copy" })).toBeDisabled();
+    unmountBusy();
+
+    render(<SettingsWorkspaceStorageSection model={fakeModel(folderSnapshot({ ready: false }))} legacy={legacyControls(legacyStatus())} normalizedQuery="" />);
+    expect(screen.getByRole("button", { name: "Copy" })).toBeDisabled();
   });
 
   it("shows no permanent bar outside Settings, only the read-only warning while a version is consulted", () => {

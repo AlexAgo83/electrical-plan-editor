@@ -206,6 +206,30 @@ describe("folder-backed named workspaces", () => {
     expect(status.label).not.toMatch(/Saved to folder/);
   });
 
+  it("copies a snapshot of a folder workspace without write access and leaves the folder untouched", async () => {
+    const parent = new FakeDirectoryHandle("Projets");
+    const host = new FakeHost(createSampleNetworkState());
+    const controller = new LineageSessionController(new MemoryLineageLibraryStore({ durable: true }), host);
+    await controller.initialize();
+    pickerResult = parent;
+    await controller.createLineage({ displayName: "Série", start: "current", storage: "folder", emptyState: createEmptyWorkspaceState() });
+    const folder = parent.directories.get("serie")!;
+    folder.failWrites = true;
+    folder.permission = "denied";
+    const filesBefore = new Map([...folder.files.entries()].map(([name, bytes]) => [name, new TextDecoder().decode(bytes)]));
+
+    const previous = host.state;
+    host.state = named(host.state, "unsaved before copy");
+    controller.notifyStateChanged(previous, host.state);
+    const saveBefore = controller.getSnapshot().save;
+
+    const result = controller.copySnapshot();
+    expect(result.ok).toBe(true);
+    expect(result.ok && result.value.fileName).toMatch(/^serie-copy-.*\.epe\.json$/);
+    expect(controller.getSnapshot().save).toEqual(saveBefore);
+    expect(new Map([...folder.files.entries()].map(([name, bytes]) => [name, new TextDecoder().decode(bytes)]))).toEqual(filesBefore);
+  });
+
   it("keeps the newly initialized child repository when handle readback is unavailable", async () => {
     const library = new MemoryLineageLibraryStore({ durable: true });
     vi.spyOn(library, "readFolderHandle").mockResolvedValue(null);

@@ -1725,6 +1725,10 @@
     "routingDriftStatusConsistent": "Stored routes match Recompute routes.",
     "routingDriftStatusDriftOne": "{count} wire would change.",
     "routingDriftStatusDriftOther": "{count} wires would change.",
-    "routingDriftStatusFailed": "Unavailable (recompute fails)."
+    "routingDriftStatusFailed": "Unavailable (recompute fails).",
+    "workspaceLineageCopy": "Copy",
+    "workspaceLineageCopyTooltip": "Download a portable .epe.json snapshot of this workspace, including unsaved edits. Does not save, create a version or register a new workspace.",
+    "workspaceLineageCopyTooltipHistorical": "Download a portable .epe.json snapshot of the displayed read-only version. Your working copy is not included.",
+    "workspaceLineageCopyDownloadInitiated": "Copy download initiated"
   }
 }

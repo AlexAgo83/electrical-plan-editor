@@ -34,6 +34,7 @@ function workspaceStorageLabels(mode: WorkspaceStorageSearchMode): string[] {
       ...shared,
       t("ui.workspaceLineageSave"),
       t("ui.workspaceLineageRename"),
+      t("ui.workspaceLineageCopy"),
       t("ui.workspaceLineageCreateVersion"),
       t("ui.workspaceLineageHistory"),
       t("ui.workspaceLineageRecordHandoff"),

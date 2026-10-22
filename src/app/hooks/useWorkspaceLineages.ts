@@ -37,6 +37,8 @@ export interface WorkspaceLineageModel {
   closeDialog: () => void;
   switchTo: (workspaceId: string) => Promise<boolean>;
   saveNow: () => Promise<boolean>;
+  /** Downloads a portable `.epe.json` snapshot of the displayed workspace without saving. */
+  copySnapshot: () => boolean;
   createLineage: (input: { displayName: string; start: "current" | "empty"; storage: "browser" | "folder" }) => Promise<boolean>;
   rename: (displayName: string) => Promise<boolean>;
   createVersion: (input: { title: string; comment: string; operationId: string }) => Promise<boolean>;
@@ -191,6 +193,10 @@ export function useWorkspaceLineages({ store, resetHistory, notifyToast, request
           t("ui.workspaceLineageSaved"),
           storage === "browser" ? t("ui.workspaceLineageSavedBrowserDownloadInitiated") : t("ui.workspaceLineageSavedFolder")
         );
+      },
+      copySnapshot: () => {
+        const result = controller.copySnapshot();
+        return report(result, t("ui.workspaceLineageCopyDownloadInitiated"), result.ok ? result.value.fileName : undefined);
       },
       createLineage: async (input) =>
         report(await controller.createLineage({ ...input, emptyState: createEmptyWorkspaceState() }), t("ui.workspaceLineageCreated"), input.displayName),

@@ -214,6 +214,16 @@ function NamedWorkspaceGroups({ model, label, normalizedQuery }: { model: Worksp
                   <span className="action-button-icon is-edit" aria-hidden="true" />
                   {label(t("ui.workspaceLineageRename"))}
                 </button>
+                <button
+                  type="button"
+                  className="button-with-icon"
+                  onClick={() => model.copySnapshot()}
+                  disabled={busy || !snapshot.ready}
+                  title={isReadOnly ? t("ui.workspaceLineageCopyTooltipHistorical") : t("ui.workspaceLineageCopyTooltip")}
+                >
+                  <span className="action-button-icon is-duplicate" aria-hidden="true" />
+                  {label(t("ui.workspaceLineageCopy"))}
+                </button>
               </>
             ) : null}
             <button
