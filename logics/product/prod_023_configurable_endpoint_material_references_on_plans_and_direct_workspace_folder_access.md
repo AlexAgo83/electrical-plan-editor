@@ -1,12 +1,12 @@
 ## prod_023_configurable_endpoint_material_references_on_plans_and_direct_workspace_folder_access - Configurable endpoint material references on plans and direct workspace folder access
 > Date: 2026-10-22
-> Status: Proposed
+> Status: Settled
 > Related request: `req_172_show_local_and_opposite_endpoint_connection_and_seal_references_in_plan_callouts_and_expose_open_folder_beside_workspace_actions`
-> Related backlog: `item_697_carry_effective_local_and_opposite_endpoint_material_references_into_callout_rows`, `item_698_add_persisted_callout_reference_checkboxes_and_readable_screen_and_export_columns`, `item_699_move_open_folder_beside_save_rename_and_copy_in_current_workspace`
+> Related backlog: `item_697_carry_effective_local_and_opposite_endpoint_material_references_into_callout_rows`
 > Related task: `task_169_deliver_configurable_callout_endpoint_references_and_current_workspace_open_folder_access`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
-> Indicators reviewed: 2026-10-22 19:56:39
+> Indicators reviewed: 2026-10-22 20:30:10
 
 # Overview
 Make plan callouts useful for wiring assembly by showing connection/contact and seal reference codes for the represented endpoint and optionally its opposite, while placing the existing workspace folder-opening action beside everyday workspace controls.
@@ -54,3 +54,7 @@ flowchart LR
   J --> K[Register or reconcile lineages]
   K --> L[Workspace selector]
 ```
+
+# References
+- Product back-reference: `item_697_carry_effective_local_and_opposite_endpoint_material_references_into_callout_rows`
+- Task back-reference: `task_169_deliver_configurable_callout_endpoint_references_and_current_workspace_open_folder_access`

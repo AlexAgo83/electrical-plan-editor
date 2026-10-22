@@ -1,14 +1,14 @@
 ## item_699_move_open_folder_beside_save_rename_and_copy_in_current_workspace - Move Open folder beside Save Rename and Copy in Current workspace
 > From version: 1.20.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
-> Progress: 0%
+> Progress: 100%
 > Complexity: Low
 > Theme: Workspace action discoverability
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-22 19:56:02
+> Indicators reviewed: 2026-10-22 20:30:10
 
 # AI Context
 - Summary: Relocate the existing directory picker into Current workspace, retain explicit selector activation and show exactly one primary Open folder action.
@@ -50,3 +50,9 @@
 # Priority
 - Priority: Medium
 - Rationale: Requested additive usability improvement; no blocking defect reported. Deliver the endpoint-model prerequisite before its display consumer.
+
+# Tasks
+- `task_169_deliver_configurable_callout_endpoint_references_and_current_workspace_open_folder_access`
+
+# Notes
+- Task `task_169_deliver_configurable_callout_endpoint_references_and_current_workspace_open_folder_access` was finished via `logics-manager flow finish task` on 2026-10-22.

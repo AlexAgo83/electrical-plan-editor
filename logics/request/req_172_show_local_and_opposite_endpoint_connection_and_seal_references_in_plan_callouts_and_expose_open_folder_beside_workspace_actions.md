@@ -1,13 +1,13 @@
 ## req_172_show_local_and_opposite_endpoint_connection_and_seal_references_in_plan_callouts_and_expose_open_folder_beside_workspace_actions - Show local and opposite endpoint connection and seal references in plan callouts and expose Open folder beside workspace actions
 > From version: 1.20.0
 > Schema version: 1.0
-> Status: Ready
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
 > Complexity: Medium
 > Theme: Plan callout material visibility and workspace access
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
-> Indicators reviewed: 2026-10-22 19:56:02
+> Indicators reviewed: 2026-10-22 20:30:09
 
 # AI Context
 - Summary: Four default-off global checkboxes control effective endpoint codes; local/opposite is relative to each callout row. Open folder reuses the existing picker and registration semantics.
