@@ -1,14 +1,14 @@
 ## item_693_persist_plan_issue_revision_and_date_and_render_them_in_export_cartouches - Persist plan issue revision and date and render them in export cartouches
 > From version: 1.19.3
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Status: In progress
+> Understanding: 95%
+> Confidence: 90%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Plan metadata
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-22 11:57:04
+> Indicators reviewed: 2026-10-22 12:00:13
 
 # AI Context
 - Extend explicit metadata allowlists in network normalization, migrations and portability, then propagate calendar-date values through forms, previews and export cartouches. Existing files leave both fields unset.
@@ -29,10 +29,10 @@
 - AC2: Relevant checks and docs provide evidence for AC10.
 
 # AC Traceability
-- request-AC1 -> This backlog slice. Proof: Planned evidence: form validation and manual revision/date behavior tests (slice AC1).
-- request-AC2 -> This backlog slice. Proof: Planned evidence: persistence, network import/clone, undo and immutable-version roundtrips (slice AC1).
-- request-AC3 -> This backlog slice. Proof: Planned evidence: localized cartouche previews and SVG/PNG/PDF consumer assertions (slice AC1).
-- request-AC10 -> This backlog slice. Proof: Planned evidence: metadata/export regression results and help updates (slice AC2).
+- request-AC1 -> This backlog slice. Proof: Delivered in e049bcad; validated by task_168 evidence: form validation and manual revision/date behavior tests (slice AC1).
+- request-AC2 -> This backlog slice. Proof: Delivered in e049bcad; validated by task_168 evidence: persistence, network import/clone, undo and immutable-version roundtrips (slice AC1).
+- request-AC3 -> This backlog slice. Proof: Delivered in e049bcad; validated by task_168 evidence: localized cartouche previews and SVG/PNG/PDF consumer assertions (slice AC1).
+- request-AC10 -> This backlog slice. Proof: Delivered in e049bcad; validated by task_168 evidence: metadata/export regression results and help updates (slice AC2).
 
 # Decision framing
 - Product framing: Not needed

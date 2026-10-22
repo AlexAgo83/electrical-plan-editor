@@ -1,14 +1,14 @@
 ## item_695_download_the_current_workspace_snapshot_from_a_copy_action - Download the current workspace snapshot from a Copy action
 > From version: 1.19.3
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Status: In progress
+> Understanding: 95%
+> Confidence: 90%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Workspace portability
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-22 11:57:04
+> Indicators reviewed: 2026-10-22 12:00:13
 
 # AI Context
 - Serialize the captured displayed state, including unsaved edits, through workspaceFile. Preserve lineage identity, source dirty status and technical save base. Historical copy exports the displayed frozen snapshot.
@@ -29,9 +29,9 @@
 - AC2: Source/session invariants, historical snapshot behavior and accurate feedback meet AC8; targeted UI/roundtrip/browser evidence supports AC10.
 
 # AC Traceability
-- request-AC7 -> This backlog slice. Proof: Planned evidence: action placement, filename and unsaved multi-network download roundtrip (slice AC1).
-- request-AC8 -> This backlog slice. Proof: Planned evidence: source/session invariants, read-only export and download failure tests (slice AC2).
-- request-AC10 -> This backlog slice. Proof: Planned evidence: copy browser regression and workspace guide updates (slice AC2).
+- request-AC7 -> This backlog slice. Proof: Delivered in cc999826; validated by task_168 evidence: action placement, filename and unsaved multi-network download roundtrip (slice AC1).
+- request-AC8 -> This backlog slice. Proof: Delivered in cc999826; validated by task_168 evidence: source/session invariants, read-only export and download failure tests (slice AC2).
+- request-AC10 -> This backlog slice. Proof: Delivered in cc999826; validated by task_168 evidence: copy browser regression and workspace guide updates (slice AC2).
 
 # Decision framing
 - Product framing: Not needed

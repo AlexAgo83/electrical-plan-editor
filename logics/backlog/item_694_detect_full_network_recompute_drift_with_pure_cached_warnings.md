@@ -1,14 +1,14 @@
 ## item_694_detect_full_network_recompute_drift_with_pure_cached_warnings - Detect full-network recompute drift with pure cached warnings
 > From version: 1.19.3
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Status: In progress
+> Understanding: 95%
+> Confidence: 90%
+> Progress: 100%
 > Complexity: High
 > Theme: Routing consistency
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-22 11:57:04
+> Indicators reviewed: 2026-10-22 12:00:13
 
 # AI Context
 - Reuse buildWireRecomputeReport and recomputeAllWiresForNetwork without dispatch. Audit endpoint details and unset splice-side transitions before integrating cached Validation warnings. Frequent checks depend on measured latency.
@@ -31,10 +31,10 @@
 - AC3: Measured cadence, cache/race tests and documented performance decision satisfy AC6 and AC10.
 
 # AC Traceability
-- request-AC4 -> This backlog slice. Proof: Planned evidence: pure preview versus manual recompute output parity and activation tests (slice AC1).
-- request-AC5 -> This backlog slice. Proof: Planned evidence: warning lifecycle and absence of model/save/dialog side effects (slice AC2).
-- request-AC6 -> This backlog slice. Proof: Planned evidence: scheduler invalidation/races and measured latency decision (slice AC3).
-- request-AC10 -> This backlog slice. Proof: Planned evidence: recorded benchmark methodology and routing regression results (slice AC3).
+- request-AC4 -> This backlog slice. Proof: Delivered in 82745ba9; validated by task_168 evidence: pure preview versus manual recompute output parity and activation tests (slice AC1).
+- request-AC5 -> This backlog slice. Proof: Delivered in 82745ba9; validated by task_168 evidence: warning lifecycle and absence of model/save/dialog side effects (slice AC2).
+- request-AC6 -> This backlog slice. Proof: Delivered in 82745ba9; validated by task_168 evidence: scheduler invalidation/races and measured latency decision (slice AC3).
+- request-AC10 -> This backlog slice. Proof: Delivered in 82745ba9; validated by task_168 evidence: recorded benchmark methodology and routing regression results (slice AC3).
 
 # Decision framing
 - Product framing: Not needed

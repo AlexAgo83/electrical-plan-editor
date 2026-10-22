@@ -1,14 +1,14 @@
 ## item_696_keep_active_workspace_identity_visible_beside_the_application_brand - Keep active workspace identity visible beside the application brand
 > From version: 1.19.3
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Status: In progress
+> Understanding: 95%
+> Confidence: 90%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Workspace visibility
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-22 11:57:04
+> Indicators reviewed: 2026-10-22 12:00:13
 
 # AI Context
 - Bind lineage displayName to AppHeaderAndStats through shell composition. Preserve visible identity at 360px, accessible full text and correct historical/legacy/loading context through rename and switch.
@@ -29,8 +29,8 @@
 - AC2: Task evidence maps AC1-AC10 to tests/docs/performance findings and applicable repository checks; no implementation closeout before the required evidence exists.
 
 # AC Traceability
-- request-AC9 -> This backlog slice. Proof: Planned evidence: reactive identity and responsive header assertions (slice AC1).
-- request-AC10 -> This backlog slice. Proof: Planned evidence: consolidated AC matrix, EN/FR/browser checks and delivery gate results (slice AC2).
+- request-AC9 -> This backlog slice. Proof: Delivered in c91b5e3b; validated by task_168 evidence: reactive identity and responsive header assertions (slice AC1).
+- request-AC10 -> This backlog slice. Proof: Delivered in c91b5e3b; validated by task_168 evidence: consolidated AC matrix, EN/FR/browser checks and delivery gate results (slice AC2).
 
 # Decision framing
 - Product framing: Not needed
