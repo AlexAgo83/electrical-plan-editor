@@ -1707,6 +1707,13 @@
     "workspaceLineageErrorInvalidFolder": "The selected workspace manifest is invalid or unsupported. Choose the original workspace folder.",
     "workspaceLineageErrorAmbiguousFolder": "Several copies of this workspace were found. Choose the exact workspace root.",
     "workspaceLineageConnectionBusy": "A folder connection or save is already in progress. Please retry when it finishes.",
-    "workspaceLineageLocalEdits": "Local edits before reconnection"
+    "workspaceLineageLocalEdits": "Local edits before reconnection",
+    "planRevisionOptional": "Plan revision (optional)",
+    "planRevisionHint": "Issue index set manually, e.g. A, B02 or 03 (max 40 characters).",
+    "planIssueDateOptional": "Plan issue date (optional)",
+    "planIssueDateHint": "Distinct from the creation date; never updated automatically.",
+    "planIssueDateIsInvalid": "Plan issue date must be a valid calendar date.",
+    "exportCartouchePlanRevisionRow": "Revision: {value}",
+    "exportCartouchePlanIssueDateRow": "Issue date: {value}"
   }
 }

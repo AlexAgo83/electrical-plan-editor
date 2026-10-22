@@ -36,6 +36,10 @@ export function useWorkspaceHandlers({
   setNewNetworkLogoUrl,
   newNetworkExportNotes,
   setNewNetworkExportNotes,
+  newNetworkPlanRevision,
+  setNewNetworkPlanRevision,
+  newNetworkPlanIssueDate,
+  setNewNetworkPlanIssueDate,
   setNetworkFormError,
   isCurrentWorkspaceEmpty,
   hasBuiltInSampleState,
@@ -170,7 +174,9 @@ export function useWorkspaceHandlers({
       projectCode: newNetworkProjectCode,
       entityPrefix: newNetworkEntityPrefix,
       logoUrl: newNetworkLogoUrl,
-      exportNotes: newNetworkExportNotes
+      exportNotes: newNetworkExportNotes,
+      planRevision: newNetworkPlanRevision,
+      planIssueDate: newNetworkPlanIssueDate
     });
   }
 
@@ -203,6 +209,8 @@ export function useWorkspaceHandlers({
         entityPrefix: draft.entityPrefix,
         logoUrl: draft.logoUrl,
         exportNotes: draft.exportNotes,
+        planRevision: draft.planRevision,
+        planIssueDate: draft.planIssueDate,
         description: draft.description,
         updatedAt: nowIso
       })
@@ -220,6 +228,8 @@ export function useWorkspaceHandlers({
       setNewNetworkEntityPrefix("");
       setNewNetworkLogoUrl("");
       setNewNetworkExportNotes("");
+      setNewNetworkPlanRevision("");
+      setNewNetworkPlanIssueDate("");
       return;
     }
 
@@ -270,7 +280,9 @@ export function useWorkspaceHandlers({
           projectCode: draft.projectCode,
           entityPrefix: draft.entityPrefix,
           logoUrl: draft.logoUrl,
-          exportNotes: draft.exportNotes
+          exportNotes: draft.exportNotes,
+          planRevision: draft.planRevision,
+          planIssueDate: draft.planIssueDate
         }
       )
     );
@@ -303,6 +315,8 @@ export function useWorkspaceHandlers({
         entityPrefix: targetNetwork.entityPrefix,
         logoUrl: targetNetwork.logoUrl,
         exportNotes: targetNetwork.exportNotes,
+        planRevision: targetNetwork.planRevision,
+        planIssueDate: targetNetwork.planIssueDate,
         createdAt: nowIso,
         updatedAt: nowIso
       })

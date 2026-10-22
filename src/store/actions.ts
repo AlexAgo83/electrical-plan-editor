@@ -66,6 +66,8 @@ export type AppAction =
         logoUrl?: string;
         exportNotes?: string;
         entityPrefix?: string;
+        planRevision?: string;
+        planIssueDate?: string;
         updatedAt: string;
       };
     }
@@ -215,6 +217,8 @@ export const appActions = {
       logoUrl?: string;
       exportNotes?: string;
       entityPrefix?: string;
+      planRevision?: string;
+      planIssueDate?: string;
     }
   ): AppAction => ({
     type: "network/update",
@@ -230,7 +234,9 @@ export const appActions = {
       projectCode: metadata?.projectCode,
       logoUrl: metadata?.logoUrl,
       exportNotes: metadata?.exportNotes,
-      entityPrefix: metadata?.entityPrefix
+      entityPrefix: metadata?.entityPrefix,
+      planRevision: metadata?.planRevision,
+      planIssueDate: metadata?.planIssueDate
     }
   }),
   duplicateNetwork: (sourceNetworkId: NetworkId, network: Network): AppAction => ({

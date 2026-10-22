@@ -26,6 +26,8 @@ interface UseNetworkSummaryExportActionsParams {
   exportCartoucheNetworkName: string;
   exportCartoucheAuthor?: string;
   exportCartoucheProjectCode?: string;
+  exportCartouchePlanRevision?: string;
+  exportCartouchePlanIssueDate?: string;
   exportCartoucheCreatedAt: string;
   exportCartoucheLogoUrl?: string;
   exportCartoucheNotes?: string;
@@ -462,6 +464,8 @@ export function useNetworkSummaryExportActions({
   exportCartoucheNetworkName,
   exportCartoucheAuthor,
   exportCartoucheProjectCode,
+  exportCartouchePlanRevision,
+  exportCartouchePlanIssueDate,
   exportCartoucheCreatedAt,
   exportCartoucheLogoUrl,
   exportCartoucheNotes
@@ -519,6 +523,8 @@ export function useNetworkSummaryExportActions({
         cartoucheNetworkName: exportCartoucheNetworkName,
         cartoucheAuthor: exportCartoucheAuthor,
         cartoucheProjectCode: exportCartoucheProjectCode,
+        cartouchePlanRevision: exportCartouchePlanRevision,
+        cartouchePlanIssueDate: exportCartouchePlanIssueDate,
         cartoucheCreatedAt: exportCartoucheCreatedAt,
         cartoucheLogoUrl: exportCartoucheLogoUrl,
         cartoucheNotes: exportCartoucheNotes
@@ -536,6 +542,8 @@ export function useNetworkSummaryExportActions({
     exportCartoucheLogoUrl,
     exportCartoucheNetworkName,
     exportCartoucheNotes,
+    exportCartouchePlanIssueDate,
+    exportCartouchePlanRevision,
     exportCartoucheProjectCode,
     exportIncludeCartouche,
     exportIncludeFrame,

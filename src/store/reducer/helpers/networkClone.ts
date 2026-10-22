@@ -5,6 +5,8 @@ import {
   normalizeNetworkAuthor,
   normalizeNetworkExportNotes,
   normalizeNetworkLogoUrl,
+  normalizeNetworkPlanIssueDate,
+  normalizeNetworkPlanRevision,
   normalizeNetworkProjectCode
 } from "../../../core/networkMetadata";
 import { normalizeNetworkEntityPrefix } from "../../../core/networkEntityPrefix";
@@ -18,14 +20,19 @@ export function normalizeOptionalText(value: string | undefined): string | undef
   return normalized.length === 0 ? undefined : normalized;
 }
 
+type NetworkMetadataFields = Pick<
+  Network,
+  "author" | "projectCode" | "logoUrl" | "exportNotes" | "entityPrefix" | "planRevision" | "planIssueDate"
+>;
+
 export interface NormalizeNetworkMetadataResult {
-  metadata: Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes" | "entityPrefix">;
+  metadata: NetworkMetadataFields;
   error: string | null;
 }
 
 export function normalizeNetworkMetadata(
-  source: Partial<Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes" | "entityPrefix">>,
-  fallback: Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes" | "entityPrefix">
+  source: Partial<NetworkMetadataFields>,
+  fallback: NetworkMetadataFields
 ): NormalizeNetworkMetadataResult {
   const rawProjectCode = source.projectCode === undefined ? fallback.projectCode : source.projectCode;
   const rawLogoUrl = source.logoUrl === undefined ? fallback.logoUrl : source.logoUrl;
@@ -43,6 +50,15 @@ export function normalizeNetworkMetadata(
       error: "Logo URL must use http, https, or data:image/*."
     };
   }
+  const normalizedPlanIssueDate = normalizeNetworkPlanIssueDate(
+    source.planIssueDate === undefined ? fallback.planIssueDate : source.planIssueDate
+  );
+  if (normalizedPlanIssueDate === null) {
+    return {
+      metadata: fallback,
+      error: "Plan issue date must be a valid calendar date (YYYY-MM-DD)."
+    };
+  }
   return {
     metadata: {
       author: normalizeNetworkAuthor(source.author === undefined ? fallback.author : source.author),
@@ -51,7 +67,11 @@ export function normalizeNetworkMetadata(
       exportNotes: normalizeNetworkExportNotes(source.exportNotes === undefined ? fallback.exportNotes : source.exportNotes),
       entityPrefix: normalizeNetworkEntityPrefix(
         source.entityPrefix === undefined ? fallback.entityPrefix : source.entityPrefix
-      )
+      ),
+      planRevision: normalizeNetworkPlanRevision(
+        source.planRevision === undefined ? fallback.planRevision : source.planRevision
+      ),
+      planIssueDate: normalizedPlanIssueDate
     },
     error: null
   };

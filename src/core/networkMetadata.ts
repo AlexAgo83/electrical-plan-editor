@@ -3,6 +3,7 @@ export const NETWORK_PROJECT_CODE_MAX_LENGTH = 40;
 export const NETWORK_LOGO_URL_MAX_LENGTH = 2048;
 export const NETWORK_EXPORT_NOTES_MAX_LENGTH = 2000;
 export const NETWORK_EXPORT_NOTES_MAX_LINES = 8;
+export const NETWORK_PLAN_REVISION_MAX_LENGTH = 40;
 
 const NETWORK_PROJECT_CODE_ALLOWED_PATTERN = /^[A-Za-z0-9 _./-]+$/;
 const NETWORK_LOCAL_DATE_INPUT_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -51,6 +52,48 @@ export function isNetworkLogoUrlValid(value: string): boolean {
 
 export function normalizeNetworkExportNotes(value: unknown): string | undefined {
   return normalizeOptionalTrimmedText(value, NETWORK_EXPORT_NOTES_MAX_LENGTH);
+}
+
+export function normalizeNetworkPlanRevision(value: unknown): string | undefined {
+  return normalizeOptionalTrimmedText(value, NETWORK_PLAN_REVISION_MAX_LENGTH);
+}
+
+/**
+ * Validates a calendar date string `YYYY-MM-DD` without any timezone conversion.
+ */
+export function isNetworkPlanIssueDateValid(value: string): boolean {
+  const match = NETWORK_LOCAL_DATE_INPUT_PATTERN.exec(value);
+  if (match === null) {
+    return false;
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  if (year < 1 || month < 1 || month > 12 || day < 1) {
+    return false;
+  }
+
+  const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+  const daysInMonth = [31, isLeapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1] ?? 0;
+  return day <= daysInMonth;
+}
+
+/**
+ * Returns the trimmed calendar date when it is a valid `YYYY-MM-DD` value, `undefined` when empty,
+ * and `null` when a non-empty value is not a valid calendar date.
+ */
+export function normalizeNetworkPlanIssueDate(value: unknown): string | undefined | null {
+  if (typeof value !== "string") {
+    return value === undefined || value === null ? undefined : null;
+  }
+
+  const trimmed = value.trim();
+  if (trimmed.length === 0) {
+    return undefined;
+  }
+
+  return isNetworkPlanIssueDateValid(trimmed) ? trimmed : null;
 }
 
 export function normalizeNetworkIsoTimestamp(value: unknown, fallbackIso: string): string {

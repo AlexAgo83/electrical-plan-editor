@@ -91,6 +91,8 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
   exportCartoucheNetworkName,
   exportCartoucheAuthor,
   exportCartoucheProjectCode,
+  exportCartouchePlanRevision,
+  exportCartouchePlanIssueDate,
   exportCartoucheCreatedAt,
   exportCartoucheLogoUrl,
   exportCartoucheNotes,
@@ -603,6 +605,8 @@ function NetworkSummaryPanelComponent(props: NetworkSummaryPanelProps): ReactEle
     exportCartoucheNetworkName,
     exportCartoucheAuthor,
     exportCartoucheProjectCode,
+    exportCartouchePlanRevision,
+    exportCartouchePlanIssueDate,
     exportCartoucheCreatedAt,
     exportCartoucheLogoUrl,
     exportCartoucheNotes

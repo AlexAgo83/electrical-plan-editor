@@ -8,6 +8,8 @@ import {
   normalizeNetworkExportNotes,
   normalizeNetworkIsoTimestamp,
   normalizeNetworkLogoUrl,
+  normalizeNetworkPlanIssueDate,
+  normalizeNetworkPlanRevision,
   normalizeNetworkProjectCode
 } from "../../core/networkMetadata";
 import { normalizeNetworkEntityPrefix } from "../../core/networkEntityPrefix";
@@ -385,6 +387,8 @@ function normalizeNetworkEntityState(
         normalizedLogoUrl !== undefined && isNetworkLogoUrlValid(normalizedLogoUrl) ? normalizedLogoUrl : undefined,
       exportNotes: normalizeNetworkExportNotes(network.exportNotes),
       entityPrefix: normalizeNetworkEntityPrefix(network.entityPrefix),
+      planRevision: normalizeNetworkPlanRevision(network.planRevision),
+      planIssueDate: normalizeNetworkPlanIssueDate(network.planIssueDate) ?? undefined,
       createdAt: normalizedCreatedAt,
       updatedAt: normalizedUpdatedAt
     };

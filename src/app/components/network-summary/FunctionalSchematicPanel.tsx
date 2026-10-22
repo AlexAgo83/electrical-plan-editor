@@ -25,7 +25,8 @@ import {
 } from "./functionalSchematicNodeRendering";
 
 interface FunctionalSchematicPanelProps {
-  network: Pick<Network, "name" | "voltageV" | "createdAt" | "author" | "projectCode" | "logoUrl" | "exportNotes"> | null;
+  network: Pick<Network, "name" | "voltageV" | "createdAt" | "author" | "projectCode" | "logoUrl" | "exportNotes" | "planRevision" | "planIssueDate"
+  > | null;
   wires: Wire[];
   segments: Segment[];
   catalogItems: CatalogItem[];
@@ -47,6 +48,8 @@ interface FunctionalSchematicPanelProps {
   exportCartoucheName?: string;
   exportCartoucheAuthor?: string;
   exportCartoucheProjectCode?: string;
+  exportCartouchePlanRevision?: string;
+  exportCartouchePlanIssueDate?: string;
   exportCartoucheCreatedAt?: string;
   exportCartoucheLogoUrl?: string;
   exportCartoucheNotes?: string;
@@ -728,6 +731,8 @@ function FunctionalSchematicPanelComponent({
   exportCartoucheName,
   exportCartoucheAuthor,
   exportCartoucheProjectCode,
+  exportCartouchePlanRevision,
+  exportCartouchePlanIssueDate,
   exportCartoucheCreatedAt,
   exportCartoucheLogoUrl,
   exportCartoucheNotes,
@@ -949,6 +954,8 @@ function FunctionalSchematicPanelComponent({
     exportCartoucheNetworkName: exportCartoucheName ?? `${network?.name ?? "Network"} functional schematic`,
     exportCartoucheAuthor: exportCartoucheAuthor ?? network?.author,
     exportCartoucheProjectCode: exportCartoucheProjectCode ?? network?.projectCode,
+    exportCartouchePlanRevision: exportCartouchePlanRevision ?? network?.planRevision,
+    exportCartouchePlanIssueDate: exportCartouchePlanIssueDate ?? network?.planIssueDate,
     exportCartoucheCreatedAt: exportCartoucheCreatedAt ?? network?.createdAt ?? new Date().toISOString(),
     exportCartoucheLogoUrl: exportCartoucheLogoUrl ?? network?.logoUrl,
     exportCartoucheNotes: exportCartoucheNotes ?? network?.exportNotes

@@ -437,6 +437,8 @@ export function useAppControllerNetworkSummaryPanelDomain({
         exportCartoucheNetworkName: activeNetwork?.name ?? "",
         exportCartoucheAuthor: activeNetwork?.author,
         exportCartoucheProjectCode: activeNetwork?.projectCode,
+        exportCartouchePlanRevision: activeNetwork?.planRevision,
+        exportCartouchePlanIssueDate: activeNetwork?.planIssueDate,
         exportCartoucheCreatedAt: activeNetwork?.createdAt ?? new Date().toISOString(),
         exportCartoucheLogoUrl: activeNetwork?.logoUrl,
         exportCartoucheNotes: activeNetwork?.exportNotes,

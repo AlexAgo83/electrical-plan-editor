@@ -388,6 +388,48 @@ describe("App integration UI - networks", () => {
     });
   });
 
+  it("edits, validates and clears plan issue revision and date without touching the creation date", async () => {
+    const { store } = renderAppWithState(createInitialState());
+    switchScreen("networkScope");
+
+    const networkScopePanel = getPanelByHeading("Network Scope");
+    fireEvent.click(within(networkScopePanel).getByText("Main network (Sample)").closest("tr") as HTMLElement);
+    const formPanel = getPanelByHeading("Edit network");
+    const activeNetworkId = store.getState().activeNetworkId as NetworkId;
+    const createdAtBefore = formatIsoToLocalDateInput(store.getState().networks.byId[activeNetworkId]?.createdAt ?? "");
+    expect(within(formPanel).getByLabelText(/Plan revision \(optional\)/)).toHaveValue("");
+    expect(within(formPanel).getByLabelText(/Plan issue date \(optional\)/)).toHaveValue("");
+
+    fireEvent.change(within(formPanel).getByLabelText(/Plan revision \(optional\)/), {
+      target: { value: "  B02  " }
+    });
+    fireEvent.change(within(formPanel).getByLabelText(/Plan issue date \(optional\)/), {
+      target: { value: "2026-10-22" }
+    });
+    fireEvent.click(within(formPanel).getByRole("button", { name: "Save network" }));
+
+    await waitFor(() => {
+      const updatedNetwork = store.getState().networks.byId[activeNetworkId];
+      expect(updatedNetwork?.planRevision).toBe("B02");
+      expect(updatedNetwork?.planIssueDate).toBe("2026-10-22");
+      expect(formatIsoToLocalDateInput(updatedNetwork?.createdAt ?? "")).toBe(createdAtBefore);
+    });
+
+    fireEvent.change(within(formPanel).getByLabelText(/Plan revision \(optional\)/), {
+      target: { value: "" }
+    });
+    fireEvent.change(within(formPanel).getByLabelText(/Plan issue date \(optional\)/), {
+      target: { value: "" }
+    });
+    fireEvent.click(within(formPanel).getByRole("button", { name: "Save network" }));
+
+    await waitFor(() => {
+      const updatedNetwork = store.getState().networks.byId[activeNetworkId];
+      expect(updatedNetwork?.planRevision).toBeUndefined();
+      expect(updatedNetwork?.planIssueDate).toBeUndefined();
+    });
+  });
+
   it("focuses a network row on single click while opening the edit form", async () => {
     const base = createInitialState();
     const seeded = appReducer(

@@ -1707,6 +1707,13 @@
     "workspaceLineageErrorInvalidFolder": "Le manifeste du dossier sélectionné est invalide ou non pris en charge. Choisissez le dossier d’origine.",
     "workspaceLineageErrorAmbiguousFolder": "Plusieurs copies de cet espace ont été trouvées. Choisissez son dossier racine exact.",
     "workspaceLineageConnectionBusy": "Une connexion au dossier ou un enregistrement est en cours. Réessayez après sa fin.",
-    "workspaceLineageLocalEdits": "Modifications locales avant reconnexion"
+    "workspaceLineageLocalEdits": "Modifications locales avant reconnexion",
+    "planRevisionOptional": "Indice du plan (optionnel)",
+    "planRevisionHint": "Indice de diffusion saisi manuellement, ex. A, B02 ou 03 (40 caractères max.).",
+    "planIssueDateOptional": "Date de diffusion du plan (optionnelle)",
+    "planIssueDateHint": "Distincte de la date de création ; jamais mise à jour automatiquement.",
+    "planIssueDateIsInvalid": "La date de diffusion du plan doit être une date calendaire valide.",
+    "exportCartouchePlanRevisionRow": "Indice : {value}",
+    "exportCartouchePlanIssueDateRow": "Date de diffusion : {value}"
   }
 }

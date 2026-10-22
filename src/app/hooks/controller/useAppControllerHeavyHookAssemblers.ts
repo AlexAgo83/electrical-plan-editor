@@ -30,6 +30,10 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setNewNetworkLogoUrl"
     | "newNetworkExportNotes"
     | "setNewNetworkExportNotes"
+    | "newNetworkPlanRevision"
+    | "setNewNetworkPlanRevision"
+    | "newNetworkPlanIssueDate"
+    | "setNewNetworkPlanIssueDate"
     | "setNetworkFormError"
   >;
   workspace: Pick<

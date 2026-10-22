@@ -19,6 +19,8 @@ export function useNetworkScopeFormState() {
   const [newNetworkEntityPrefix, setNewNetworkEntityPrefix] = useState("");
   const [newNetworkLogoUrl, setNewNetworkLogoUrl] = useState("");
   const [newNetworkExportNotes, setNewNetworkExportNotes] = useState("");
+  const [newNetworkPlanRevision, setNewNetworkPlanRevision] = useState("");
+  const [newNetworkPlanIssueDate, setNewNetworkPlanIssueDate] = useState("");
   const [networkFormError, setNetworkFormError] = useState<string | null>(null);
   const [networkFormMode, setNetworkFormMode] = useState<NetworkFormMode>(null);
   const [networkFormTargetId, setNetworkFormTargetId] = useState<NetworkId | null>(null);
@@ -48,6 +50,10 @@ export function useNetworkScopeFormState() {
     setNewNetworkLogoUrl,
     newNetworkExportNotes,
     setNewNetworkExportNotes,
+    newNetworkPlanRevision,
+    setNewNetworkPlanRevision,
+    newNetworkPlanIssueDate,
+    setNewNetworkPlanIssueDate,
     networkFormError,
     setNetworkFormError,
     networkFormMode,

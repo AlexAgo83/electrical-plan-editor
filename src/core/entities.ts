@@ -30,6 +30,13 @@ export interface Network {
   entityPrefix?: string;
   logoUrl?: string;
   exportNotes?: string;
+  /**
+   * Optional user-controlled plan issue revision/index (e.g. `A`, `B02`, `03`).
+   * Never inferred from technical revisions, timestamps or releases.
+   */
+  planRevision?: string;
+  /** Optional plan issue date as a calendar date string `YYYY-MM-DD` (no timezone). */
+  planIssueDate?: string;
   createdAt: string;
   updatedAt: string;
   ampacityOverrides?: Record<number, number>;

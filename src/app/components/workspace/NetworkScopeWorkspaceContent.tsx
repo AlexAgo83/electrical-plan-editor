@@ -74,6 +74,10 @@ interface NetworkScopeWorkspaceContentProps {
   setNewNetworkLogoUrl: (value: string) => void;
   newNetworkExportNotes: string;
   setNewNetworkExportNotes: (value: string) => void;
+  newNetworkPlanRevision: string;
+  setNewNetworkPlanRevision: (value: string) => void;
+  newNetworkPlanIssueDate: string;
+  setNewNetworkPlanIssueDate: (value: string) => void;
   networkFormError: string | null;
   networkTechnicalIdAlreadyUsed: boolean;
   handleSubmitNetworkForm: (event: FormEvent<HTMLFormElement>) => void;
@@ -124,6 +128,10 @@ export function NetworkScopeWorkspaceContent({
   setNewNetworkLogoUrl,
   newNetworkExportNotes,
   setNewNetworkExportNotes,
+  newNetworkPlanRevision,
+  setNewNetworkPlanRevision,
+  newNetworkPlanIssueDate,
+  setNewNetworkPlanIssueDate,
   networkFormError,
   networkTechnicalIdAlreadyUsed,
   handleSubmitNetworkForm,
@@ -631,6 +639,25 @@ export function NetworkScopeWorkspaceContent({
                 maxLength={40}
               />
               <span className="form-hint">{t("ui.allowedLettersNumbersSpacesAnd")}</span>
+            </label>
+            <label className="stack-label">
+              <span className="network-form-label">{t("ui.planRevisionOptional")}</span>
+              <input
+                value={newNetworkPlanRevision}
+                onChange={(event) => setNewNetworkPlanRevision(event.target.value)}
+                placeholder="A"
+                maxLength={40}
+              />
+              <span className="form-hint">{t("ui.planRevisionHint")}</span>
+            </label>
+            <label className="stack-label">
+              <span className="network-form-label">{t("ui.planIssueDateOptional")}</span>
+              <input
+                type="date"
+                value={newNetworkPlanIssueDate}
+                onChange={(event) => setNewNetworkPlanIssueDate(event.target.value)}
+              />
+              <span className="form-hint">{t("ui.planIssueDateHint")}</span>
             </label>
             <label className="stack-label">
               <span className="network-form-label">{t("ui.entityIDPrefixOptional")}</span>

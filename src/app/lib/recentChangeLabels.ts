@@ -523,10 +523,17 @@ function describeNetworkChange(action: Extract<AppAction, { type: "network/updat
     return null;
   }
 
-  return describeChangedFields(previousNetwork, action.payload, [
+  // Empty plan issue values are explicit clear requests; compare them as unset.
+  const nextNetwork = {
+    ...action.payload,
+    planRevision: action.payload.planRevision || undefined,
+    planIssueDate: action.payload.planIssueDate || undefined
+  };
+  return describeChangedFields(previousNetwork, nextNetwork, [
     ["Identity", ["technicalId", "name"]],
     ["Metadata", ["description", "author"]],
     ["Export cartouche", ["projectCode", "exportNotes"]],
+    ["Plan issue", ["planRevision", "planIssueDate"]],
     ["Logo", ["logoUrl"]],
     ["Voltage", ["voltageV"]]
   ]);

@@ -49,6 +49,10 @@ export interface UseWorkspaceHandlersParams {
   setNewNetworkLogoUrl: (value: string) => void;
   newNetworkExportNotes: string;
   setNewNetworkExportNotes: (value: string) => void;
+  newNetworkPlanRevision: string;
+  setNewNetworkPlanRevision: (value: string) => void;
+  newNetworkPlanIssueDate: string;
+  setNewNetworkPlanIssueDate: (value: string) => void;
   setNetworkFormError: (value: string | null) => void;
   isCurrentWorkspaceEmpty: boolean;
   hasBuiltInSampleState: boolean;

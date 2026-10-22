@@ -225,6 +225,8 @@ export function useAppControllerWorkspaceNetworkDomainAssembly({
     setNewNetworkEntityPrefix: forms.networkScopeFormState.setNewNetworkEntityPrefix,
     setNewNetworkLogoUrl: forms.networkScopeFormState.setNewNetworkLogoUrl,
     setNewNetworkExportNotes: forms.networkScopeFormState.setNewNetworkExportNotes,
+    setNewNetworkPlanRevision: forms.networkScopeFormState.setNewNetworkPlanRevision,
+    setNewNetworkPlanIssueDate: forms.networkScopeFormState.setNewNetworkPlanIssueDate,
     setNetworkFormError: forms.networkScopeFormState.setNetworkFormError,
     networkFormMode: forms.networkScopeFormState.networkFormMode,
     setNetworkFormMode: forms.networkScopeFormState.setNetworkFormMode,

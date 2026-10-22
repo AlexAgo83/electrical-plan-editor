@@ -20,6 +20,8 @@ interface UseNetworkScopeFormOrchestrationParams {
   setNewNetworkEntityPrefix: Dispatch<SetStateAction<string>>;
   setNewNetworkLogoUrl: Dispatch<SetStateAction<string>>;
   setNewNetworkExportNotes: Dispatch<SetStateAction<string>>;
+  setNewNetworkPlanRevision: Dispatch<SetStateAction<string>>;
+  setNewNetworkPlanIssueDate: Dispatch<SetStateAction<string>>;
   setNetworkFormError: Dispatch<SetStateAction<string | null>>;
   networkFormMode: NetworkFormMode;
   setNetworkFormMode: Dispatch<SetStateAction<NetworkFormMode>>;
@@ -46,6 +48,8 @@ export function useNetworkScopeFormOrchestration({
   setNewNetworkEntityPrefix,
   setNewNetworkLogoUrl,
   setNewNetworkExportNotes,
+  setNewNetworkPlanRevision,
+  setNewNetworkPlanIssueDate,
   setNetworkFormError,
   networkFormMode,
   setNetworkFormMode,
@@ -71,6 +75,8 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkEntityPrefix("");
     setNewNetworkLogoUrl("");
     setNewNetworkExportNotes("");
+    setNewNetworkPlanRevision("");
+    setNewNetworkPlanIssueDate("");
     setNetworkFormError(null);
   }, [
     buildDefaultCreatedAtInput,
@@ -82,6 +88,8 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkCreatedAtDate,
     setNewNetworkDescription,
     setNewNetworkExportNotes,
+    setNewNetworkPlanRevision,
+    setNewNetworkPlanIssueDate,
     setNewNetworkLogoUrl,
     setNewNetworkName,
     setNewNetworkProjectCode,
@@ -108,6 +116,8 @@ export function useNetworkScopeFormOrchestration({
       setNewNetworkEntityPrefix(targetNetwork.entityPrefix ?? "");
       setNewNetworkLogoUrl(targetNetwork.logoUrl ?? "");
       setNewNetworkExportNotes(targetNetwork.exportNotes ?? "");
+      setNewNetworkPlanRevision(targetNetwork.planRevision ?? "");
+      setNewNetworkPlanIssueDate(targetNetwork.planIssueDate ?? "");
       setNetworkFormError(null);
     },
     [
@@ -120,6 +130,8 @@ export function useNetworkScopeFormOrchestration({
       setNewNetworkCreatedAtDate,
       setNewNetworkDescription,
       setNewNetworkExportNotes,
+      setNewNetworkPlanRevision,
+      setNewNetworkPlanIssueDate,
       setNewNetworkLogoUrl,
       setNewNetworkName,
       setNewNetworkProjectCode,
@@ -187,6 +199,8 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkEntityPrefix(targetNetwork.entityPrefix ?? "");
     setNewNetworkLogoUrl(targetNetwork.logoUrl ?? "");
     setNewNetworkExportNotes(targetNetwork.exportNotes ?? "");
+    setNewNetworkPlanRevision(targetNetwork.planRevision ?? "");
+    setNewNetworkPlanIssueDate(targetNetwork.planIssueDate ?? "");
   }, [
     networkFormMode,
     networkFormTargetId,
@@ -198,6 +212,8 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkCreatedAtDate,
     setNewNetworkDescription,
     setNewNetworkExportNotes,
+    setNewNetworkPlanRevision,
+    setNewNetworkPlanIssueDate,
     setNewNetworkLogoUrl,
     setNewNetworkName,
     setNewNetworkProjectCode,

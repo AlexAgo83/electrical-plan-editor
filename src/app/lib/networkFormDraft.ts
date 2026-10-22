@@ -3,6 +3,8 @@ import {
   isNetworkLogoUrlValid,
   isNetworkProjectCodeValid,
   normalizeNetworkLogoUrl,
+  normalizeNetworkPlanIssueDate,
+  normalizeNetworkPlanRevision,
   normalizeNetworkProjectCode,
   parseLocalDateInputToIso
 } from "../../core/networkMetadata";
@@ -20,6 +22,8 @@ export interface NetworkFormDraftInput {
   entityPrefix: string;
   logoUrl: string;
   exportNotes: string;
+  planRevision: string;
+  planIssueDate: string;
 }
 
 export type NetworkFormDraftResult =
@@ -40,6 +44,8 @@ export type NetworkFormDraftResult =
         entityPrefix: string;
         logoUrl: string;
         exportNotes: string;
+        planRevision: string;
+        planIssueDate: string;
       };
     };
 
@@ -70,6 +76,11 @@ export function buildNetworkFormDraft(input: NetworkFormDraftInput): NetworkForm
     return { kind: "error", message: t("ui.creationDateIsInvalid") };
   }
 
+  const normalizedPlanIssueDate = normalizeNetworkPlanIssueDate(input.planIssueDate);
+  if (normalizedPlanIssueDate === null) {
+    return { kind: "error", message: t("ui.planIssueDateIsInvalid") };
+  }
+
   const rawVoltage = input.voltageV.trim();
   const parsedVoltage = rawVoltage.length === 0 ? undefined : Number(rawVoltage);
   const normalizedVoltageV = rawVoltage.length === 0 ? undefined : normalizeNetworkVoltageV(parsedVoltage);
@@ -89,7 +100,10 @@ export function buildNetworkFormDraft(input: NetworkFormDraftInput): NetworkForm
       projectCode: input.projectCode,
       entityPrefix: input.entityPrefix,
       logoUrl: input.logoUrl,
-      exportNotes: input.exportNotes
+      exportNotes: input.exportNotes,
+      // Empty strings are explicit "clear" requests; the reducer normalizes them to unset.
+      planRevision: normalizeNetworkPlanRevision(input.planRevision) ?? "",
+      planIssueDate: normalizedPlanIssueDate ?? ""
     }
   };
 }

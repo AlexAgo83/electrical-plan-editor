@@ -37,6 +37,8 @@ describe("App integration UI - network summary SVG cartouche export", () => {
           createdAt: "2026-02-23T10:00:00.000Z",
           author: "Paul Mondou",
           projectCode: "PS5",
+          planRevision: "B02",
+          planIssueDate: "2026-10-22",
           exportNotes:
             "First design of the HVAC design in an independant harness for prototype testings.",
         },
@@ -91,6 +93,9 @@ describe("App integration UI - network summary SVG cartouche export", () => {
       expect(exportedSvg).not.toContain('fill="rgb(0, 0, 0)"');
       expect(exportedSvg).not.toContain('fill="#000000"');
       expect(exportedSvg).toContain("Author: Paul Mondou");
+      expect(exportedSvg).toContain("Revision: B02");
+      expect(exportedSvg).toContain("Issue date: 2026-10-22");
+      expect(exportedSvg).toContain("Created: ");
       expect(clickSpy).toHaveBeenCalledTimes(1);
     } finally {
       clickSpy.mockRestore();

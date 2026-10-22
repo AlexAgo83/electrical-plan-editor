@@ -79,7 +79,9 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         projectCode: undefined,
         logoUrl: undefined,
         exportNotes: undefined,
-        entityPrefix: undefined
+        entityPrefix: undefined,
+        planRevision: undefined,
+        planIssueDate: undefined
       });
       const normalizedVoltageV = normalizeNetworkVoltageV(network.voltageV);
       if (normalizedMetadata.error !== null) {
@@ -197,14 +199,18 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
           projectCode: action.payload.projectCode,
           logoUrl: action.payload.logoUrl,
           exportNotes: action.payload.exportNotes,
-          entityPrefix: action.payload.entityPrefix
+          entityPrefix: action.payload.entityPrefix,
+          planRevision: action.payload.planRevision,
+          planIssueDate: action.payload.planIssueDate
         },
         {
           author: existing.author,
           projectCode: existing.projectCode,
           logoUrl: existing.logoUrl,
           exportNotes: existing.exportNotes,
-          entityPrefix: existing.entityPrefix
+          entityPrefix: existing.entityPrefix,
+          planRevision: existing.planRevision,
+          planIssueDate: existing.planIssueDate
         }
       );
       const normalizedVoltageV = normalizeNetworkVoltageV(
@@ -256,7 +262,9 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         projectCode: source.projectCode,
         logoUrl: source.logoUrl,
         exportNotes: source.exportNotes,
-        entityPrefix: source.entityPrefix
+        entityPrefix: source.entityPrefix,
+        planRevision: source.planRevision,
+        planIssueDate: source.planIssueDate
       });
       const normalizedVoltageV = normalizeNetworkVoltageV(duplicated.voltageV);
       if (normalizedMetadata.error !== null) {

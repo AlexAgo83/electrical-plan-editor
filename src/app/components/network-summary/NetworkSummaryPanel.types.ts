@@ -68,6 +68,8 @@ export interface NetworkSummaryPanelProps {
   exportCartoucheNetworkName: string;
   exportCartoucheAuthor?: string;
   exportCartoucheProjectCode?: string;
+  exportCartouchePlanRevision?: string;
+  exportCartouchePlanIssueDate?: string;
   exportCartoucheCreatedAt: string;
   exportCartoucheLogoUrl?: string;
   exportCartoucheNotes?: string;

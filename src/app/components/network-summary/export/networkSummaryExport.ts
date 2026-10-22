@@ -3,6 +3,7 @@ import {
   isNetworkLogoUrlValid,
   normalizeNetworkLogoUrl
 } from "../../../../core/networkMetadata";
+import { translateCurrent as t } from "../../../lib/i18n";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
 import { NETWORK_GRID_STEP } from "../../../lib/app-utils-shared";
 
@@ -41,6 +42,9 @@ export interface ApplyExportDecorationsParams {
   cartoucheNetworkName: string;
   cartoucheAuthor?: string;
   cartoucheProjectCode?: string;
+  cartouchePlanRevision?: string;
+  /** Calendar date `YYYY-MM-DD`, rendered verbatim (never timezone-shifted). */
+  cartouchePlanIssueDate?: string;
   cartoucheCreatedAt: string;
   cartoucheLogoUrl?: string;
   cartoucheNotes?: string;
@@ -415,6 +419,8 @@ function appendExportCartoucheOverlay(params: {
   networkName: string;
   author?: string;
   projectCode?: string;
+  planRevision?: string;
+  planIssueDate?: string;
   createdAt: string;
   notes?: string;
   logoAsset: ExportLogoAsset;
@@ -458,6 +464,12 @@ function appendExportCartoucheOverlay(params: {
     { text: `Network: ${normalizedNetworkName}`, isTitle: true },
     ...(params.author?.trim() ? [{ text: `Author: ${params.author.trim()}`, isTitle: false }] : []),
     ...(params.projectCode?.trim() ? [{ text: `Code: ${params.projectCode.trim()}`, isTitle: false }] : []),
+    ...(params.planRevision?.trim()
+      ? [{ text: t("ui.exportCartouchePlanRevisionRow", { value: params.planRevision.trim() }), isTitle: false }]
+      : []),
+    ...(params.planIssueDate?.trim()
+      ? [{ text: t("ui.exportCartouchePlanIssueDateRow", { value: params.planIssueDate.trim() }), isTitle: false }]
+      : []),
     { text: `Created: ${createdAtLabel.length > 0 ? createdAtLabel : "N/A"}`, isTitle: false }
   ];
   const metadataMaxContentWidth = metadataRows.reduce((maxWidth, row) => {
@@ -616,6 +628,8 @@ export async function applyExportDecorations(params: ApplyExportDecorationsParam
     networkName: params.cartoucheNetworkName,
     author: params.cartoucheAuthor,
     projectCode: params.cartoucheProjectCode,
+    planRevision: params.cartouchePlanRevision,
+    planIssueDate: params.cartouchePlanIssueDate,
     createdAt: params.cartoucheCreatedAt,
     notes: params.cartoucheNotes,
     logoAsset

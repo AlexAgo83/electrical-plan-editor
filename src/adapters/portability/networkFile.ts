@@ -24,6 +24,8 @@ import {
   normalizeNetworkAuthor,
   normalizeNetworkExportNotes,
   normalizeNetworkLogoUrl,
+  normalizeNetworkPlanIssueDate,
+  normalizeNetworkPlanRevision,
   normalizeNetworkProjectCode
 } from "../../core/networkMetadata";
 import { detectNetworkEntityPrefix, normalizeNetworkEntityPrefix } from "../../core/networkEntityPrefix";
@@ -560,13 +562,26 @@ function normalizeImportedNetworkTimestamps(
 function normalizeImportedNetworkMetadata(
   network: Network,
   warnings: string[]
-): Pick<Network, "author" | "projectCode" | "logoUrl" | "exportNotes" | "voltageV" | "ampacityOverrides" | "entityPrefix"> {
+): Pick<
+  Network,
+  | "author"
+  | "projectCode"
+  | "logoUrl"
+  | "exportNotes"
+  | "voltageV"
+  | "ampacityOverrides"
+  | "entityPrefix"
+  | "planRevision"
+  | "planIssueDate"
+> {
   const normalizedAuthor = normalizeNetworkAuthor(network.author);
   const normalizedVoltageV = normalizeNetworkVoltageV(network.voltageV);
   const normalizedAmpacityOverrides = normalizeAmpacityOverrides(network.ampacityOverrides);
   const normalizedProjectCode = normalizeNetworkProjectCode(network.projectCode);
   const normalizedLogoUrl = normalizeNetworkLogoUrl(network.logoUrl);
   const normalizedExportNotes = normalizeNetworkExportNotes(network.exportNotes);
+  const normalizedPlanRevision = normalizeNetworkPlanRevision(network.planRevision);
+  const normalizedPlanIssueDate = normalizeNetworkPlanIssueDate(network.planIssueDate);
 
   const appliedFixes: string[] = [];
   if (network.voltageV !== undefined && normalizedVoltageV === undefined) {
@@ -580,6 +595,12 @@ function normalizeImportedNetworkMetadata(
   }
   if (normalizedLogoUrl !== undefined && !isNetworkLogoUrlValid(normalizedLogoUrl)) {
     appliedFixes.push("logoUrl<-undefined");
+  }
+  if (network.planRevision !== undefined && typeof network.planRevision !== "string") {
+    appliedFixes.push("planRevision<-undefined");
+  }
+  if (normalizedPlanIssueDate === null) {
+    appliedFixes.push("planIssueDate<-undefined");
   }
 
   if (appliedFixes.length > 0) {
@@ -600,7 +621,9 @@ function normalizeImportedNetworkMetadata(
         ? normalizedLogoUrl
         : undefined,
     exportNotes: normalizedExportNotes,
-    entityPrefix: normalizeNetworkEntityPrefix(network.entityPrefix)
+    entityPrefix: normalizeNetworkEntityPrefix(network.entityPrefix),
+    planRevision: normalizedPlanRevision,
+    planIssueDate: normalizedPlanIssueDate ?? undefined
   };
 }
 
@@ -684,7 +707,9 @@ export function buildNetworkFilePayload(
         logoUrl:
           normalizedLogoUrl !== undefined && isNetworkLogoUrlValid(normalizedLogoUrl) ? normalizedLogoUrl : undefined,
         exportNotes: normalizeNetworkExportNotes(network.exportNotes),
-        entityPrefix: normalizeNetworkEntityPrefix(network.entityPrefix)
+        entityPrefix: normalizeNetworkEntityPrefix(network.entityPrefix),
+        planRevision: normalizeNetworkPlanRevision(network.planRevision),
+        planIssueDate: normalizeNetworkPlanIssueDate(network.planIssueDate) ?? undefined
       };
 
       return {
