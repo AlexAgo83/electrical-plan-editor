@@ -20,6 +20,7 @@ import { ValidationWorkspaceContainer } from "../containers/ValidationWorkspaceC
 import type { ScreenContainerComponent } from "../containers/screenContainer.shared";
 import { NetworkSummaryQuickEntityNavigation } from "../network-summary/NetworkSummaryQuickEntityNavigation";
 import { AppHeaderAndStats } from "../workspace/AppHeaderAndStats";
+import { describeHeaderWorkspaceIdentity } from "../../lib/lineage/lineageStatus";
 import { OperationsHealthPanel } from "../workspace/OperationsHealthPanel";
 import { WorkspaceSidebarPanel } from "../workspace/WorkspaceSidebarPanel";
 
@@ -703,6 +704,7 @@ export function AppShellLayout({
         bootRecoveryMessage={bootRecoveryMessage}
         onCommitBootRecovery={onCommitBootRecovery}
         centerContent={headerCenterContent}
+        workspaceIdentity={describeHeaderWorkspaceIdentity(workspaceLineageSnapshot)}
       />
       {workspaceLineageBar ?? null}
 

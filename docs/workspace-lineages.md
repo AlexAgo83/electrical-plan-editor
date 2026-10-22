@@ -13,7 +13,7 @@ main action (stronger outline) and secondary actions:
 
 | Group | Actions |
 | --- | --- |
-| **Current workspace** | Workspace selector (switch), save status and export hint, main action **Save** (Ctrl/Cmd+S), then **Rename** and **New workspace**. |
+| **Current workspace** | Workspace selector (switch), save status and export hint, main action **Save** (Ctrl/Cmd+S), then **Rename**, **Copy** and **New workspace**. |
 | **Versions and handoffs** | Summary of the latest version (label, title, date) with the version and handoff counts, main action **Create version**, then **History** (read-only consultation, resume, version download, handoff files) and **Record supplier handoff**. |
 | **Transfer and recovery** | **Export package (ZIP)**, **Import package (ZIP)**, **Open workspace folder** (when the browser supports folders), **Reconnect folder** (folder workspaces); **Import old workspace files** sits under **Advanced** once a workspace exists. The preserved previous browser content, when there is one, is shown here as a neutral recovery copy with **Download preserved snapshot** / **Dismiss**. |
 
@@ -37,6 +37,15 @@ Outside Settings there is no permanent workspace bar:
 - The operations panel shows the active workspace, its save status and export hint with
   **Manage workspaces**.
 - **Ctrl/Cmd+S** saves the active working copy from any screen.
+- The persistent header shows the **current workspace** immediately to the right of *e-Plan
+  Editor* on every screen (Home, Network, Modeling, Validation, Settings…). It comes from the
+  named-workspace session — never the active network name, a file name or the folder slug — and
+  updates on restore, create, open, switch and rename. Other states: *Loading workspace…* until the
+  library is ready, *Unnamed workspace* when no named workspace is active (single-file
+  compatibility), and the display name followed by *read-only vNNN* while a version is consulted.
+  Long names are ellipsized; the complete text stays available as tooltip and to screen readers
+  ("Current workspace: …"). At 360 px the identity stays visible next to the brand without hiding
+  the menu, Settings or Ops buttons.
 
 ### Single-file compatibility (sessions without a named workspace)
 
@@ -75,6 +84,23 @@ A *named workspace* (lineage) is an independent project line, for example **Seri
   Unsaved work of the workspace you leave is preserved first; if that is impossible (storage full,
   folder permission revoked) the switch is refused. Undo/redo history never crosses workspaces.
 - **Rename** (Current workspace group) changes only the display name; identity, folder and file names stay.
+- **Copy** (Current workspace group) initiates the download of one portable workspace snapshot,
+  `<slug>-copy-<timestamp>.epe.json` (the standard `.epe.json` workspace file written by the normal
+  serializer). It contains every network of the displayed workspace, **including unsaved in-memory
+  edits**, captured at click time. It is not a save and not a version:
+  - nothing is written to the browser library or folder, nothing is relinked (it works without
+    folder write permission), the *Unsaved changes* / export hint state, the technical save base,
+    verified-save times and milestones are unchanged, and no second workspace is registered or
+    activated;
+  - the file keeps the workspace identity (`workspaceId`, `lineage`) and working ancestry, so
+    opening or importing it elsewhere is reconciled with the same workspace (fast-forward or
+    divergence, see *Transfer between computers*);
+  - while a version is consulted read-only, Copy downloads only the displayed frozen snapshot
+    (`<slug>-vNNN-copy-<timestamp>.epe.json`, no working ancestry); the hidden working copy is never
+    included;
+  - success only means the browser download was initiated, not that a file was verified on disk.
+  Copy is different from **Export package (ZIP)**, which carries the whole lineage (history,
+  versions, supplier handoff files). It is disabled while the session is busy or not ready.
 
 ### Save versus Create version
 

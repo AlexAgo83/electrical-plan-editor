@@ -1729,6 +1729,12 @@
     "workspaceLineageCopy": "Copy",
     "workspaceLineageCopyTooltip": "Download a portable .epe.json snapshot of this workspace, including unsaved edits. Does not save, create a version or register a new workspace.",
     "workspaceLineageCopyTooltipHistorical": "Download a portable .epe.json snapshot of the displayed read-only version. Your working copy is not included.",
-    "workspaceLineageCopyDownloadInitiated": "Copy download initiated"
+    "workspaceLineageCopyDownloadInitiated": "Copy download initiated",
+    "headerWorkspaceLoading": "Loading workspace…",
+    "headerWorkspaceUnnamed": "Unnamed workspace",
+    "headerWorkspaceReadOnlyVersion": "read-only {version}",
+    "headerWorkspaceFullText": "Current workspace: {name}",
+    "headerWorkspaceFullTextWithContext": "Current workspace: {name} ({context})",
+    "headerWorkspaceLabel": "Current workspace:"
   }
 }

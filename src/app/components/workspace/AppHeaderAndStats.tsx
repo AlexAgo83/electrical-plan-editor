@@ -1,6 +1,7 @@
 import { translateCurrent as t } from "../../lib/i18n";
 import type { ReactElement, ReactNode, RefObject } from "react";
 import type { AppError } from "../../../store/types";
+import type { HeaderWorkspaceIdentity } from "../../lib/lineage/lineageStatus";
 interface AppHeaderAndStatsProps {
   headerBlockRef: RefObject<HTMLElement | null>;
   isNavigationDrawerOpen: boolean;
@@ -24,6 +25,8 @@ interface AppHeaderAndStatsProps {
   bootRecoveryMessage: string | null;
   onCommitBootRecovery: () => void;
   centerContent?: ReactNode;
+  /** Active workspace identity from the lineage session; `null` when no lineage runtime exists. */
+  workspaceIdentity?: HeaderWorkspaceIdentity | null;
 }
 
 export function AppHeaderAndStats({
@@ -48,7 +51,8 @@ export function AppHeaderAndStats({
   onClearError,
   bootRecoveryMessage,
   onCommitBootRecovery,
-  centerContent = null
+  centerContent = null,
+  workspaceIdentity = null
 }: AppHeaderAndStatsProps): ReactElement {
   const headerClassName = [
     "header-block",
@@ -84,6 +88,18 @@ export function AppHeaderAndStats({
               <span className="header-title-accent">e</span>{t("ui.appheaderandstatsPlan")}<span className="header-title-full"> {t("ui.appheaderandstatsEditor")}</span>
             </button>
           </h1>
+          {workspaceIdentity !== null ? (
+            <p
+              className={`header-workspace-identity is-${workspaceIdentity.kind}`}
+              title={workspaceIdentity.fullText}
+            >
+              <span className="visually-hidden">{t("ui.headerWorkspaceLabel")} </span>
+              <span className="header-workspace-name">{workspaceIdentity.name}</span>
+              {workspaceIdentity.context !== null ? (
+                <span className="header-workspace-context">{workspaceIdentity.context}</span>
+              ) : null}
+            </p>
+          ) : null}
         </div>
         {centerContent !== null ? <div className="header-center-content">{centerContent}</div> : null}
         <div className="header-actions">

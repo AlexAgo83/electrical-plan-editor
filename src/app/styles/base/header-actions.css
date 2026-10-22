@@ -268,3 +268,90 @@
   background: #fde0e0;
   color: #902020;
 }
+
+/* Active workspace identity, immediately to the right of the brand (req_171 AC9). The brand
+   track may shrink so only the identity yields space; menu, title and actions keep theirs. */
+.header-block {
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto;
+}
+
+.header-block > .header-actions {
+  grid-column: 3;
+}
+
+.header-brand > .header-nav-toggle,
+.header-brand > .header-title {
+  flex: 0 0 auto;
+}
+
+.header-block .header-workspace-identity {
+  flex: 0 1 auto;
+  margin: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  min-width: 0;
+  max-width: min(22rem, 30vw);
+  padding-left: 0.75rem;
+  border-left: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.header-workspace-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.header-workspace-context {
+  flex: 0 0 auto;
+  font-size: 0.76rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.header-workspace-identity.is-loading,
+.header-workspace-identity.is-unnamed {
+  font-style: italic;
+  font-weight: 500;
+}
+
+@media (max-width: 520px) {
+  .header-brand {
+    gap: 0.5rem;
+  }
+
+  .header-brand:has(.header-workspace-identity) .header-title-full {
+    display: none;
+  }
+
+  .header-block .header-workspace-identity {
+    max-width: 30vw;
+    padding-left: 0.5rem;
+    font-size: 0.76rem;
+  }
+
+  .header-workspace-context {
+    font-size: 0.7rem;
+  }
+}
+
+/* Docked entity navigation keeps its room: a tighter identity on desktop, and on narrow screens
+   the docked navigation moves to a second header row instead of squeezing the identity. */
+.header-block.has-center-content .header-workspace-identity {
+  max-width: min(14rem, 16vw);
+}
+
+@media (max-width: 670px) {
+  .header-block:has(.header-center-content):has(.header-workspace-identity) .header-center-content {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .header-block.has-center-content .header-workspace-identity {
+    max-width: 40vw;
+  }
+}

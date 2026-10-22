@@ -44,12 +44,12 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 - Home workspace hub with Quick start actions, active-network context, changelog feed, and rich recent-change rows that can navigate back to changed objects when possible.
 - Themed toast notifications for important workspace actions, including undo/redo and connector/splice occupancy changes.
 - Export tooling for operational handoff:
-  - `SVG` / `PNG` network-plan export with optional frame and metadata cartouche
+  - `SVG` / `PNG` / `PDF` network-plan export with optional frame and metadata cartouche (network, author, code, plan revision, plan issue date, creation date, notes)
   - `BOM CSV` export with pricing context and a dedicated `Wire terminations` section
   - wire CSV export with explicit begin/end connection and seal reference columns
-- Network metadata authoring for export identity: creation date, author, project code, logo URL, and export notes.
+- Network metadata authoring for export identity: creation date, author, project code, plan revision (`planRevision`, free text up to 40 characters such as `A`, `B02`, `03`), plan issue date (`planIssueDate`, a calendar date `YYYY-MM-DD` distinct from the creation date), logo URL, and export notes. Plan revision and issue date are set manually per network and are never inferred or updated automatically (Save, export, recompute, versions); unset values are omitted from the cartouche like other optional metadata.
 - Local-first persistence so workspace state, settings, and export preferences survive reloads.
-- Validation center with grouped issues, issue navigation, and catalog integrity checks.
+- Validation center with grouped issues, issue navigation, and catalog integrity checks, plus a read-only **Routing consistency** check that warns when `Network Scope > Recompute routes` would change stored routes, lengths, endpoint details or directional splice sides (checked 500 ms after the latest routing edit, in idle-time slices; never applied automatically).
 - Built-in onboarding flow plus contextual help entry points to guide first-time usage.
 - Accessibility-oriented interactions across dialogs, tables, keyboard navigation, and assistive-technology semantics.
 - Theme, language, canvas, export, and onboarding preferences persisted per workspace.

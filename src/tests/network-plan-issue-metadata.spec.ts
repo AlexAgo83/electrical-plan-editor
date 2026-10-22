@@ -133,6 +133,15 @@ describe("plan issue metadata reducer behavior", () => {
     expect(next.networks.byId["net-a" as NetworkId]?.planIssueDate).toBe("2026-02-28");
   });
 
+  it("never changes plan issue metadata automatically on recompute or unrelated edits", () => {
+    let state = buildTwoNetworkState();
+    state = appReducer(state, appActions.selectNetwork("net-a" as NetworkId));
+    state = appReducer(state, appActions.recomputeAllWires());
+    state = appReducer(state, appActions.updateNetwork("net-a" as NetworkId, "Edited", "NET-A", NOW, "New description"));
+    expect(state.networks.byId["net-a" as NetworkId]).toMatchObject({ planRevision: "A", planIssueDate: "2026-02-28" });
+    expect(state.networks.byId["net-b" as NetworkId]?.planIssueDate).toBeUndefined();
+  });
+
   it("carries metadata into a duplicated network", () => {
     let state = buildTwoNetworkState();
     const source = state.networks.byId["net-a" as NetworkId] as Network;

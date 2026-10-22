@@ -1729,6 +1729,12 @@
     "workspaceLineageCopy": "Copier",
     "workspaceLineageCopyTooltip": "Télécharger un instantané portable .epe.json de cet espace de travail, modifications non enregistrées comprises. N'enregistre pas, ne crée pas de version et n'enregistre pas de nouvel espace de travail.",
     "workspaceLineageCopyTooltipHistorical": "Télécharger un instantané portable .epe.json de la version affichée en lecture seule. Votre copie de travail n'est pas incluse.",
-    "workspaceLineageCopyDownloadInitiated": "Téléchargement de la copie lancé"
+    "workspaceLineageCopyDownloadInitiated": "Téléchargement de la copie lancé",
+    "headerWorkspaceLoading": "Chargement de l'espace…",
+    "headerWorkspaceUnnamed": "Espace sans nom",
+    "headerWorkspaceReadOnlyVersion": "lecture seule {version}",
+    "headerWorkspaceFullText": "Espace actuel : {name}",
+    "headerWorkspaceFullTextWithContext": "Espace actuel : {name} ({context})",
+    "headerWorkspaceLabel": "Espace actuel :"
   }
 }

@@ -105,3 +105,39 @@ export function activeExportReminderRecord(snapshot: LineageSessionSnapshot): Ex
   const record = snapshot.records.find((entry) => entry.workspaceId === active.workspaceId) ?? null;
   return record === null ? null : { ...record, storage: active.storage, pendingPortableExport: snapshot.save.pendingPortableExport };
 }
+
+export interface HeaderWorkspaceIdentity {
+  kind: "loading" | "unnamed" | "named" | "historical";
+  /** Visible name (ellipsized by CSS when long). */
+  name: string;
+  /** Read-only consultation context shown next to the name, if any. */
+  context: string | null;
+  /** Complete accessible text, also used as tooltip. */
+  fullText: string;
+}
+
+/**
+ * Persistent header identity, read only from the lineage session (never the active network,
+ * a filename or the slug): loading until the registry is ready, the unnamed legacy browser
+ * workspace when no named workspace is active, otherwise the display name plus the
+ * historical read-only context while a version is consulted.
+ */
+export function describeHeaderWorkspaceIdentity(snapshot: LineageSessionSnapshot | undefined): HeaderWorkspaceIdentity | null {
+  if (snapshot === undefined) {
+    return null;
+  }
+  if (!snapshot.ready) {
+    const name = t("ui.headerWorkspaceLoading");
+    return { kind: "loading", name, context: null, fullText: t("ui.headerWorkspaceFullText", { name }) };
+  }
+  if (snapshot.active === null) {
+    const name = t("ui.headerWorkspaceUnnamed");
+    return { kind: "unnamed", name, context: null, fullText: t("ui.headerWorkspaceFullText", { name }) };
+  }
+  const name = snapshot.active.displayName;
+  if (snapshot.historical !== null) {
+    const context = t("ui.headerWorkspaceReadOnlyVersion", { version: snapshot.historical.label });
+    return { kind: "historical", name, context, fullText: t("ui.headerWorkspaceFullTextWithContext", { name, context }) };
+  }
+  return { kind: "named", name, context: null, fullText: t("ui.headerWorkspaceFullText", { name }) };
+}
