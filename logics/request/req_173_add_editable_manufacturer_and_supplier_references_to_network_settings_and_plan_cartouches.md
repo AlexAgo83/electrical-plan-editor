@@ -1,13 +1,13 @@
 ## req_173_add_editable_manufacturer_and_supplier_references_to_network_settings_and_plan_cartouches - Add editable manufacturer and supplier references to network settings and plan cartouches
 > From version: 1.21.0
 > Schema version: 1.0
-> Status: Draft
+> Status: Done
 > Understanding: 90%
 > Confidence: 85%
 > Complexity: Medium
 > Theme: Network plan identification
 > Reminder: Update status/understanding/confidence and linked backlog/task references when you edit this doc.
-> Indicators reviewed: 2026-10-23 10:32:04
+> Indicators reviewed: 2026-10-23 10:59:25
 
 # AI Context
 - Summary: Four optional per-network strings identify manufacturer and supplier plans; editable company names are business data, and legacy plans remain empty.

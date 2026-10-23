@@ -1,14 +1,14 @@
 ## item_700_persist_per_network_manufacturer_and_supplier_plan_reference_metadata - Persist per-network manufacturer and supplier plan reference metadata
 > From version: 1.21.0
 > Schema version: 1.0
-> Status: Ready
-> Understanding: 90%
-> Confidence: 85%
-> Progress: 0%
+> Status: Done
+> Understanding: 95%
+> Confidence: 92%
+> Progress: 100%
 > Complexity: Medium
 > Theme: Network metadata contract
 > Reminder: Update status/understanding/confidence/progress and linked request/task references when you edit this doc.
-> Indicators reviewed: 2026-10-23 10:32:33
+> Indicators reviewed: 2026-10-23 10:59:26
 
 # AI Context
 - Summary: Audit explicit Network metadata allowlists so all four strings survive clone, imports, workspace snapshots and frozen history.
@@ -32,10 +32,10 @@
 - AC2: Targeted data/history/compatibility evidence covers the corresponding AC6 cases and contributes to AC7.
 
 # AC Traceability
-- request-AC1 -> This backlog slice. Proof: Planned implementation evidence: Shared four-field normalization, Unicode/length/empty-value fixtures and string-preservation evidence.
-- request-AC3 -> This backlog slice. Proof: Planned implementation evidence: Clone, network/workspace portability, migrations and frozen-version roundtrip evidence.
-- request-AC6 -> This backlog slice. Proof: Planned implementation evidence: Metadata-specific reducer/history and malformed/legacy import regression evidence.
-- request-AC7 -> This backlog slice. Proof: Planned implementation evidence: Metadata contract documentation and delivery-check evidence contributed to the orchestration task.
+- request-AC1 -> This backlog slice. Proof: Delivered in 4f597bd4 (see task_170 AC Traceability for test files): Shared four-field normalization, Unicode/length/empty-value fixtures and string-preservation evidence.
+- request-AC3 -> This backlog slice. Proof: Delivered in 4f597bd4 (see task_170 AC Traceability for test files): Clone, network/workspace portability, migrations and frozen-version roundtrip evidence.
+- request-AC6 -> This backlog slice. Proof: Delivered in 4f597bd4 (see task_170 AC Traceability for test files): Metadata-specific reducer/history and malformed/legacy import regression evidence.
+- request-AC7 -> This backlog slice. Proof: Delivered in 4f597bd4 (see task_170 AC Traceability for test files): Metadata contract documentation and delivery-check evidence contributed to the orchestration task.
 
 # Decision framing
 - Product framing: Not needed
@@ -50,3 +50,9 @@
 # Priority
 - Priority: Medium
 - Rationale: Additive plan-identification capability with no reported blocking defect; deliver the metadata contract before its form and export consumers.
+
+# Tasks
+- `task_170_deliver_editable_network_manufacturer_and_supplier_references_in_plan_cartouches`
+
+# Notes
+- Task `task_170_deliver_editable_network_manufacturer_and_supplier_references_in_plan_cartouches` was finished via `logics-manager flow finish task` on 2026-10-23.

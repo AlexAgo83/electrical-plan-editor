@@ -1,11 +1,12 @@
 ## prod_024_editable_manufacturer_and_supplier_identification_on_network_plans - Editable manufacturer and supplier identification on network plans
 > Date: 2026-10-23
-> Status: Proposed
+> Status: Settled
 > Related request: `req_173_add_editable_manufacturer_and_supplier_references_to_network_settings_and_plan_cartouches`
-> Related backlog: `item_700_persist_per_network_manufacturer_and_supplier_plan_reference_metadata`, `item_701_edit_manufacturer_and_supplier_company_names_and_references_in_network_parameters`, `item_702_render_manufacturer_and_supplier_plan_references_in_export_cartouches`
+> Related backlog: `item_700_persist_per_network_manufacturer_and_supplier_plan_reference_metadata`
 > Related task: `task_170_deliver_editable_network_manufacturer_and_supplier_references_in_plan_cartouches`
 > Related architecture: (none yet)
 > Reminder: Update status, linked refs, scope, decisions, success signals, and open questions when you edit this doc.
+> Indicators reviewed: 2026-10-23 10:59:26
 
 # Overview
 Identify a network plan using two independent business reference codes with editable company names, maintained in network parameters and rendered consistently in plan cartouches.
@@ -42,5 +43,5 @@ flowchart LR
 - Context-pack output can be handed to an implementation agent directly.
 
 # References
-- Product back-reference: `req_173_add_editable_manufacturer_and_supplier_references_to_network_settings_and_plan_cartouches`
+- Product back-reference: `item_700_persist_per_network_manufacturer_and_supplier_plan_reference_metadata`
 - Task back-reference: `task_170_deliver_editable_network_manufacturer_and_supplier_references_in_plan_cartouches`
