@@ -314,13 +314,21 @@ describe("App integration UI - settings", () => {
     fireEvent.click(resetButton);
     const confirmDialog = screen.getByRole("dialog", { name: "Reset sample network" });
     fireEvent.click(within(confirmDialog).getByRole("button", { name: "Confirm" }));
+    // The reset runs after the async confirmation; wait for it before navigating.
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog", { name: "Reset sample network" })).not.toBeInTheDocument();
+    });
 
     switchScreenDrawerAware("modeling");
     switchSubScreenDrawerAware("connector");
-    connectorsPanel = getPanelByHeading("Connectors");
-    await waitFor(() => {
-      expect(within(connectorsPanel).queryByText("Extra connector")).not.toBeInTheDocument();
-    });
+    // Re-query the panel on each attempt: the reset replaces the workspace state and may remount it.
+    await waitFor(
+      () => {
+        connectorsPanel = getPanelByHeading("Connectors");
+        expect(within(connectorsPanel).queryByText("Extra connector")).not.toBeInTheDocument();
+      },
+      { timeout: 5_000 }
+    );
     expect(within(connectorsPanel).getByText("Power Source Connector")).toBeInTheDocument();
   });
 
