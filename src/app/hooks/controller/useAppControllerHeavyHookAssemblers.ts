@@ -34,6 +34,8 @@ interface UseAppControllerWorkspaceHandlersAssemblyParams {
     | "setNewNetworkPlanRevision"
     | "newNetworkPlanIssueDate"
     | "setNewNetworkPlanIssueDate"
+    | "newNetworkPlanParties"
+    | "setNewNetworkPlanParties"
     | "setNetworkFormError"
   >;
   workspace: Pick<

@@ -2,6 +2,11 @@ import { useCallback, useEffect, useRef, type Dispatch, type FormEvent, type Set
 import { formatIsoToLocalDateInput } from "../../core/networkMetadata";
 import type { Network, NetworkId } from "../../core/entities";
 import type { AppStore } from "../../store";
+import {
+  EMPTY_NETWORK_PLAN_PARTIES_FORM_VALUES,
+  toNetworkPlanPartiesFormValues,
+  type NetworkPlanPartiesFormValues
+} from "../lib/networkFormDraft";
 import type { NetworkFocusRequest, NetworkFormMode } from "./useNetworkScopeFormState";
 
 interface UseNetworkScopeFormOrchestrationParams {
@@ -22,6 +27,7 @@ interface UseNetworkScopeFormOrchestrationParams {
   setNewNetworkExportNotes: Dispatch<SetStateAction<string>>;
   setNewNetworkPlanRevision: Dispatch<SetStateAction<string>>;
   setNewNetworkPlanIssueDate: Dispatch<SetStateAction<string>>;
+  setNewNetworkPlanParties: Dispatch<SetStateAction<NetworkPlanPartiesFormValues>>;
   setNetworkFormError: Dispatch<SetStateAction<string | null>>;
   networkFormMode: NetworkFormMode;
   setNetworkFormMode: Dispatch<SetStateAction<NetworkFormMode>>;
@@ -50,6 +56,7 @@ export function useNetworkScopeFormOrchestration({
   setNewNetworkExportNotes,
   setNewNetworkPlanRevision,
   setNewNetworkPlanIssueDate,
+  setNewNetworkPlanParties,
   setNetworkFormError,
   networkFormMode,
   setNetworkFormMode,
@@ -78,6 +85,7 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkExportNotes("");
     setNewNetworkPlanRevision("");
     setNewNetworkPlanIssueDate("");
+    setNewNetworkPlanParties(EMPTY_NETWORK_PLAN_PARTIES_FORM_VALUES);
     setNetworkFormError(null);
   }, [
     buildDefaultCreatedAtInput,
@@ -91,6 +99,7 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkExportNotes,
     setNewNetworkPlanRevision,
     setNewNetworkPlanIssueDate,
+    setNewNetworkPlanParties,
     setNewNetworkLogoUrl,
     setNewNetworkName,
     setNewNetworkProjectCode,
@@ -119,6 +128,7 @@ export function useNetworkScopeFormOrchestration({
       setNewNetworkExportNotes(targetNetwork.exportNotes ?? "");
       setNewNetworkPlanRevision(targetNetwork.planRevision ?? "");
       setNewNetworkPlanIssueDate(targetNetwork.planIssueDate ?? "");
+      setNewNetworkPlanParties(toNetworkPlanPartiesFormValues(targetNetwork));
       setNetworkFormError(null);
     },
     [
@@ -133,6 +143,7 @@ export function useNetworkScopeFormOrchestration({
       setNewNetworkExportNotes,
       setNewNetworkPlanRevision,
       setNewNetworkPlanIssueDate,
+      setNewNetworkPlanParties,
       setNewNetworkLogoUrl,
       setNewNetworkName,
       setNewNetworkProjectCode,
@@ -218,6 +229,7 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkExportNotes(targetNetwork.exportNotes ?? "");
     setNewNetworkPlanRevision(targetNetwork.planRevision ?? "");
     setNewNetworkPlanIssueDate(targetNetwork.planIssueDate ?? "");
+    setNewNetworkPlanParties(toNetworkPlanPartiesFormValues(targetNetwork));
   }, [
     networkFormMode,
     networkFormTargetId,
@@ -231,6 +243,7 @@ export function useNetworkScopeFormOrchestration({
     setNewNetworkExportNotes,
     setNewNetworkPlanRevision,
     setNewNetworkPlanIssueDate,
+    setNewNetworkPlanParties,
     setNewNetworkLogoUrl,
     setNewNetworkName,
     setNewNetworkProjectCode,

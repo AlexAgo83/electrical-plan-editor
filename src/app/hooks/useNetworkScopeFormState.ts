@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { NetworkId } from "../../core/entities";
+import { EMPTY_NETWORK_PLAN_PARTIES_FORM_VALUES, type NetworkPlanPartiesFormValues } from "../lib/networkFormDraft";
 
 export type NetworkFormMode = "create" | "edit" | null;
 
@@ -23,6 +24,9 @@ export function useNetworkScopeFormState() {
   const [newNetworkExportNotes, setNewNetworkExportNotes] = useState("");
   const [newNetworkPlanRevision, setNewNetworkPlanRevision] = useState("");
   const [newNetworkPlanIssueDate, setNewNetworkPlanIssueDate] = useState("");
+  const [newNetworkPlanParties, setNewNetworkPlanParties] = useState<NetworkPlanPartiesFormValues>(
+    EMPTY_NETWORK_PLAN_PARTIES_FORM_VALUES
+  );
   const [networkFormError, setNetworkFormError] = useState<string | null>(null);
   const [networkFormMode, setNetworkFormMode] = useState<NetworkFormMode>(null);
   const [networkFormTargetId, setNetworkFormTargetId] = useState<NetworkId | null>(null);
@@ -56,6 +60,8 @@ export function useNetworkScopeFormState() {
     setNewNetworkPlanRevision,
     newNetworkPlanIssueDate,
     setNewNetworkPlanIssueDate,
+    newNetworkPlanParties,
+    setNewNetworkPlanParties,
     networkFormError,
     setNetworkFormError,
     networkFormMode,

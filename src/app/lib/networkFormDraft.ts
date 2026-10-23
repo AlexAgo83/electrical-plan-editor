@@ -1,15 +1,41 @@
 import { translateCurrent as t } from "./i18n";
 import {
+  NETWORK_PLAN_PARTY_FIELDS,
+  getNetworkPlanPartyFieldMaxLength,
+  hasNetworkPlanPartyLineBreak,
   isNetworkLogoUrlValid,
   isNetworkProjectCodeValid,
   normalizeNetworkLogoUrl,
   normalizeNetworkPlanIssueDate,
+  normalizeNetworkPlanPartyValue,
   normalizeNetworkPlanRevision,
   normalizeNetworkProjectCode,
   parseLocalDateInputToIso
 } from "../../core/networkMetadata";
 import { normalizeNetworkEntityPrefix } from "../../core/networkEntityPrefix";
 import { normalizeNetworkVoltageV } from "../../core/wireSizing";
+import type { Network, NetworkPlanPartyField } from "../../core/entities";
+
+/** Raw form text of the four plan manufacturer/supplier fields. */
+export type NetworkPlanPartiesFormValues = Record<NetworkPlanPartyField, string>;
+
+export const EMPTY_NETWORK_PLAN_PARTIES_FORM_VALUES: NetworkPlanPartiesFormValues = {
+  planManufacturerName: "",
+  planManufacturerReference: "",
+  planSupplierName: "",
+  planSupplierReference: ""
+};
+
+export function toNetworkPlanPartiesFormValues(
+  network: Pick<Network, NetworkPlanPartyField>
+): NetworkPlanPartiesFormValues {
+  return {
+    planManufacturerName: network.planManufacturerName ?? "",
+    planManufacturerReference: network.planManufacturerReference ?? "",
+    planSupplierName: network.planSupplierName ?? "",
+    planSupplierReference: network.planSupplierReference ?? ""
+  };
+}
 
 export interface NetworkFormDraftInput {
   name: string;
@@ -24,6 +50,7 @@ export interface NetworkFormDraftInput {
   exportNotes: string;
   planRevision: string;
   planIssueDate: string;
+  planParties?: NetworkPlanPartiesFormValues;
 }
 
 export type NetworkFormDraftResult =
@@ -46,8 +73,27 @@ export type NetworkFormDraftResult =
         exportNotes: string;
         planRevision: string;
         planIssueDate: string;
+        planParties: NetworkPlanPartiesFormValues;
       };
     };
+
+export type NetworkFormDraft = Extract<NetworkFormDraftResult, { kind: "valid" }>["draft"];
+
+/** Network metadata carried by a valid form draft, shared by create and update. */
+export function toNetworkDraftMetadata(draft: NetworkFormDraft) {
+  return {
+    createdAt: draft.createdAtIso,
+    author: draft.author,
+    voltageV: draft.voltageV,
+    projectCode: draft.projectCode,
+    entityPrefix: draft.entityPrefix,
+    logoUrl: draft.logoUrl,
+    exportNotes: draft.exportNotes,
+    planRevision: draft.planRevision,
+    planIssueDate: draft.planIssueDate,
+    ...draft.planParties
+  };
+}
 
 export function buildNetworkFormDraft(input: NetworkFormDraftInput): NetworkFormDraftResult {
   const trimmedName = input.name.trim();
@@ -81,6 +127,23 @@ export function buildNetworkFormDraft(input: NetworkFormDraftInput): NetworkForm
     return { kind: "error", message: t("ui.planIssueDateIsInvalid") };
   }
 
+  const planPartiesInput = input.planParties ?? EMPTY_NETWORK_PLAN_PARTIES_FORM_VALUES;
+  const planParties = { ...EMPTY_NETWORK_PLAN_PARTIES_FORM_VALUES };
+  for (const field of NETWORK_PLAN_PARTY_FIELDS) {
+    const rawValue = planPartiesInput[field];
+    if (hasNetworkPlanPartyLineBreak(rawValue)) {
+      return { kind: "error", message: t("ui.planPartyValueMustBeSingleLine") };
+    }
+    if (rawValue.trim().length > getNetworkPlanPartyFieldMaxLength(field)) {
+      return {
+        kind: "error",
+        message: t("ui.planPartyValueIsTooLong", { max: getNetworkPlanPartyFieldMaxLength(field) })
+      };
+    }
+    // Empty strings are explicit "clear" requests; the reducer normalizes them to unset.
+    planParties[field] = normalizeNetworkPlanPartyValue(field, rawValue) ?? "";
+  }
+
   const rawVoltage = input.voltageV.trim();
   const parsedVoltage = rawVoltage.length === 0 ? undefined : Number(rawVoltage);
   const normalizedVoltageV = rawVoltage.length === 0 ? undefined : normalizeNetworkVoltageV(parsedVoltage);
@@ -103,7 +166,8 @@ export function buildNetworkFormDraft(input: NetworkFormDraftInput): NetworkForm
       exportNotes: input.exportNotes,
       // Empty strings are explicit "clear" requests; the reducer normalizes them to unset.
       planRevision: normalizeNetworkPlanRevision(input.planRevision) ?? "",
-      planIssueDate: normalizedPlanIssueDate ?? ""
+      planIssueDate: normalizedPlanIssueDate ?? "",
+      planParties
     }
   };
 }

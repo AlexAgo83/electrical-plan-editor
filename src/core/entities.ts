@@ -50,6 +50,12 @@ export interface Network {
   ampacityOverrides?: Record<number, number>;
 }
 
+export type NetworkPlanPartyField =
+  | "planManufacturerName"
+  | "planManufacturerReference"
+  | "planSupplierName"
+  | "planSupplierReference";
+
 export type PinElectricalRoleKind = "source" | "consumer" | "passive" | "bidirectional";
 
 export interface PinElectricalRole {

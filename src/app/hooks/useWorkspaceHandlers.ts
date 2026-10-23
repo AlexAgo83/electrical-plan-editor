@@ -1,12 +1,16 @@
 import { translateCurrent as t } from "../lib/i18n";
 import type { FormEvent } from "react";
 import type { NetworkId } from "../../core/entities";
-import { formatIsoToLocalDateInput } from "../../core/networkMetadata";
+import { formatIsoToLocalDateInput, normalizeNetworkPlanParties } from "../../core/networkMetadata";
 import type { AppState } from "../../store";
 import { appActions, appReducer, createSampleNetworkState, selectNetworkTechnicalIdTaken } from "../../store";
 import { buildUniqueNetworkTechnicalId, createEntityId } from "../lib/app-utils-shared";
 import { DEFAULT_CALLOUT_ENDPOINT_REFERENCE_VISIBILITY } from "../lib/calloutEndpointReferenceVisibility";
-import { buildNetworkFormDraft } from "../lib/networkFormDraft";
+import {
+  EMPTY_NETWORK_PLAN_PARTIES_FORM_VALUES,
+  buildNetworkFormDraft,
+  toNetworkDraftMetadata
+} from "../lib/networkFormDraft";
 import { DEFAULT_WIRE_EXPORT_STRIPPING_ALLOWANCE_MM, DEFAULT_WIRE_EXPORT_TWISTED_PAIR_LENGTH_COEFFICIENT } from "../lib/wireExportLength";
 import {
   fitNetworkToContent as fitNetworkToContentViewport,
@@ -41,6 +45,8 @@ export function useWorkspaceHandlers({
   setNewNetworkPlanRevision,
   newNetworkPlanIssueDate,
   setNewNetworkPlanIssueDate,
+  newNetworkPlanParties,
+  setNewNetworkPlanParties,
   setNetworkFormError,
   isCurrentWorkspaceEmpty,
   hasBuiltInSampleState,
@@ -178,7 +184,8 @@ export function useWorkspaceHandlers({
       logoUrl: newNetworkLogoUrl,
       exportNotes: newNetworkExportNotes,
       planRevision: newNetworkPlanRevision,
-      planIssueDate: newNetworkPlanIssueDate
+      planIssueDate: newNetworkPlanIssueDate,
+      planParties: newNetworkPlanParties
     });
   }
 
@@ -204,15 +211,7 @@ export function useWorkspaceHandlers({
         id: networkId,
         name: draft.name,
         technicalId: draft.technicalId,
-        createdAt: draft.createdAtIso,
-        author: draft.author,
-        voltageV: draft.voltageV,
-        projectCode: draft.projectCode,
-        entityPrefix: draft.entityPrefix,
-        logoUrl: draft.logoUrl,
-        exportNotes: draft.exportNotes,
-        planRevision: draft.planRevision,
-        planIssueDate: draft.planIssueDate,
+        ...toNetworkDraftMetadata(draft),
         description: draft.description,
         updatedAt: nowIso
       })
@@ -232,6 +231,7 @@ export function useWorkspaceHandlers({
       setNewNetworkExportNotes("");
       setNewNetworkPlanRevision("");
       setNewNetworkPlanIssueDate("");
+      setNewNetworkPlanParties(EMPTY_NETWORK_PLAN_PARTIES_FORM_VALUES);
       return;
     }
 
@@ -275,17 +275,7 @@ export function useWorkspaceHandlers({
         draft.technicalId,
         new Date().toISOString(),
         draft.description,
-        {
-          createdAt: draft.createdAtIso,
-          author: draft.author,
-          voltageV: draft.voltageV,
-          projectCode: draft.projectCode,
-          entityPrefix: draft.entityPrefix,
-          logoUrl: draft.logoUrl,
-          exportNotes: draft.exportNotes,
-          planRevision: draft.planRevision,
-          planIssueDate: draft.planIssueDate
-        }
+        toNetworkDraftMetadata(draft)
       )
     );
     setNetworkFormError(null);
@@ -319,6 +309,7 @@ export function useWorkspaceHandlers({
         exportNotes: targetNetwork.exportNotes,
         planRevision: targetNetwork.planRevision,
         planIssueDate: targetNetwork.planIssueDate,
+        ...normalizeNetworkPlanParties(targetNetwork),
         createdAt: nowIso,
         updatedAt: nowIso
       })

@@ -1,6 +1,7 @@
 import type { Connector, ConnectorId, Network, NetworkNode, NodeId, Segment, Splice, SpliceId } from "../../core/entities";
 import type { AppState, AppStore, ThemeMode } from "../../store";
 import type { ConfirmDialogRequest } from "../types/confirm-dialog";
+import type { NetworkPlanPartiesFormValues } from "../lib/networkFormDraft";
 import type {
   AppLocale,
   CalloutEndpointReferenceVisibility,
@@ -54,6 +55,8 @@ export interface UseWorkspaceHandlersParams {
   setNewNetworkPlanRevision: (value: string) => void;
   newNetworkPlanIssueDate: string;
   setNewNetworkPlanIssueDate: (value: string) => void;
+  newNetworkPlanParties: NetworkPlanPartiesFormValues;
+  setNewNetworkPlanParties: (value: NetworkPlanPartiesFormValues) => void;
   setNetworkFormError: (value: string | null) => void;
   isCurrentWorkspaceEmpty: boolean;
   hasBuiltInSampleState: boolean;

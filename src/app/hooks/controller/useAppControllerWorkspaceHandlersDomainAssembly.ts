@@ -88,6 +88,8 @@ export function useAppControllerWorkspaceHandlersDomainAssembly({
       setNewNetworkPlanRevision: networkScopeFormState.setNewNetworkPlanRevision,
       newNetworkPlanIssueDate: networkScopeFormState.newNetworkPlanIssueDate,
       setNewNetworkPlanIssueDate: networkScopeFormState.setNewNetworkPlanIssueDate,
+      newNetworkPlanParties: networkScopeFormState.newNetworkPlanParties,
+      setNewNetworkPlanParties: networkScopeFormState.setNewNetworkPlanParties,
       setNetworkFormError: networkScopeFormState.setNetworkFormError
     },
     workspace: {

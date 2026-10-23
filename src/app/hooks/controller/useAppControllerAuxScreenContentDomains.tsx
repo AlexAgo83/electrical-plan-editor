@@ -132,6 +132,8 @@ export function useAppControllerAuxScreenContentDomains({
     setNewNetworkPlanRevision: networkScope.formState.setNewNetworkPlanRevision,
     newNetworkPlanIssueDate: networkScope.formState.newNetworkPlanIssueDate,
     setNewNetworkPlanIssueDate: networkScope.formState.setNewNetworkPlanIssueDate,
+    newNetworkPlanParties: networkScope.formState.newNetworkPlanParties,
+    setNewNetworkPlanParties: networkScope.formState.setNewNetworkPlanParties,
     networkFormError: networkScope.formState.networkFormError,
     networkTechnicalIdAlreadyUsed: networkScope.networkTechnicalIdAlreadyUsed,
     handleSubmitNetworkForm: networkScope.handleSubmitNetworkForm,

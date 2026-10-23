@@ -63,7 +63,7 @@ export default tseslint.config(
   },
   {
     files: ["src/app/hooks/controller/useAppControllerScreenContentSlices.tsx"],
-    rules: { "max-lines": ["error", { max: 1217, skipBlankLines: false, skipComments: false }] }
+    rules: { "max-lines": ["error", { max: 1219, skipBlankLines: false, skipComments: false }] }
   },
   {
     files: ["src/app/hooks/useWorkspaceHandlers.ts"],

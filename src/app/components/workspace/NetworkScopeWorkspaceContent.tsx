@@ -10,7 +10,9 @@ import {
   type ReactNode,
   type RefObject
 } from "react";
-import type { NetworkId } from "../../../core/entities";
+import type { NetworkId, NetworkPlanPartyField } from "../../../core/entities";
+import { getNetworkPlanPartyFieldMaxLength } from "../../../core/networkMetadata";
+import type { NetworkPlanPartiesFormValues } from "../../lib/networkFormDraft";
 import type { FileFeedbackDialogModel, ImportOverwriteDialogModel } from "../../hooks/useNetworkImportExport";
 import { ImportOverwriteDialog } from "../dialogs/ImportOverwriteDialog";
 import { FileFeedbackDialog } from "../dialogs/FileFeedbackDialog";
@@ -78,6 +80,8 @@ interface NetworkScopeWorkspaceContentProps {
   setNewNetworkPlanRevision: (value: string) => void;
   newNetworkPlanIssueDate: string;
   setNewNetworkPlanIssueDate: (value: string) => void;
+  newNetworkPlanParties: NetworkPlanPartiesFormValues;
+  setNewNetworkPlanParties: (value: NetworkPlanPartiesFormValues) => void;
   networkFormError: string | null;
   networkTechnicalIdAlreadyUsed: boolean;
   handleSubmitNetworkForm: (event: FormEvent<HTMLFormElement>) => void;
@@ -89,6 +93,34 @@ interface NetworkScopeWorkspaceContentProps {
   importOverwriteDialog?: ImportOverwriteDialogModel | null;
   importFailureDialog?: FileFeedbackDialogModel | null;
 }
+
+const PLAN_PARTY_ROLE_GROUPS: ReadonlyArray<{
+  legendKey: string;
+  fields: ReadonlyArray<{ field: NetworkPlanPartyField; labelKey: string; placeholderKey: string }>;
+}> = [
+  {
+    legendKey: "ui.planManufacturerRole",
+    fields: [
+      { field: "planManufacturerName", labelKey: "ui.planManufacturerNameOptional", placeholderKey: "ui.planPartyNamePlaceholder" },
+      {
+        field: "planManufacturerReference",
+        labelKey: "ui.planManufacturerReferenceOptional",
+        placeholderKey: "ui.planPartyReferencePlaceholder"
+      }
+    ]
+  },
+  {
+    legendKey: "ui.planSupplierRole",
+    fields: [
+      { field: "planSupplierName", labelKey: "ui.planSupplierNameOptional", placeholderKey: "ui.planPartyNamePlaceholder" },
+      {
+        field: "planSupplierReference",
+        labelKey: "ui.planSupplierReferenceOptional",
+        placeholderKey: "ui.planPartyReferencePlaceholder"
+      }
+    ]
+  }
+];
 
 export function NetworkScopeWorkspaceContent({
   networks,
@@ -133,6 +165,8 @@ export function NetworkScopeWorkspaceContent({
   setNewNetworkPlanRevision,
   newNetworkPlanIssueDate,
   setNewNetworkPlanIssueDate,
+  newNetworkPlanParties,
+  setNewNetworkPlanParties,
   networkFormError,
   networkTechnicalIdAlreadyUsed,
   handleSubmitNetworkForm,
@@ -669,6 +703,25 @@ export function NetworkScopeWorkspaceContent({
               />
               <span className="form-hint">{t("ui.planIssueDateHint")}</span>
             </label>
+            {PLAN_PARTY_ROLE_GROUPS.map((group) => (
+              <fieldset key={group.legendKey} className="network-form-role-group">
+                <legend className="network-form-label">{t(group.legendKey)}</legend>
+                {group.fields.map((input) => (
+                  <label key={input.field} className="stack-label">
+                    <span className="network-form-label">{t(input.labelKey)}</span>
+                    <input
+                      value={newNetworkPlanParties[input.field]}
+                      onChange={(event) =>
+                        setNewNetworkPlanParties({ ...newNetworkPlanParties, [input.field]: event.target.value })
+                      }
+                      placeholder={t(input.placeholderKey)}
+                      maxLength={getNetworkPlanPartyFieldMaxLength(input.field)}
+                    />
+                  </label>
+                ))}
+              </fieldset>
+            ))}
+            <p className="form-hint network-form-role-hint">{t("ui.planPartiesHint")}</p>
             <label className="stack-label">
               <span className="network-form-label">{t("ui.entityIDPrefixOptional")}</span>
               <input

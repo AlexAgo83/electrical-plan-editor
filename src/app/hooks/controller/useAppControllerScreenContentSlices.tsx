@@ -381,6 +381,8 @@ export function buildNetworkScopeScreenContentSlice(
     setNewNetworkPlanRevision: params.setNewNetworkPlanRevision,
     newNetworkPlanIssueDate: params.newNetworkPlanIssueDate,
     setNewNetworkPlanIssueDate: params.setNewNetworkPlanIssueDate,
+    newNetworkPlanParties: params.newNetworkPlanParties,
+    setNewNetworkPlanParties: params.setNewNetworkPlanParties,
     networkFormError: params.networkFormError,
     networkTechnicalIdAlreadyUsed: params.networkTechnicalIdAlreadyUsed,
     handleSubmitNetworkForm: params.handleSubmitNetworkForm,

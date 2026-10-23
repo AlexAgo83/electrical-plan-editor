@@ -1,3 +1,5 @@
+import type { NetworkPlanPartyField } from "./entities";
+
 export const NETWORK_AUTHOR_MAX_LENGTH = 80;
 export const NETWORK_PROJECT_CODE_MAX_LENGTH = 40;
 export const NETWORK_LOGO_URL_MAX_LENGTH = 2048;
@@ -61,14 +63,14 @@ export function normalizeNetworkPlanRevision(value: unknown): string | undefined
 }
 
 /** Plan-level manufacturer/supplier identification fields, in cartouche display order. */
-export const NETWORK_PLAN_PARTY_FIELDS = [
+export const NETWORK_PLAN_PARTY_FIELDS: readonly NetworkPlanPartyField[] = [
   "planManufacturerName",
   "planManufacturerReference",
   "planSupplierName",
   "planSupplierReference"
-] as const;
+];
 
-export type NetworkPlanPartyField = (typeof NETWORK_PLAN_PARTY_FIELDS)[number];
+export type { NetworkPlanPartyField };
 
 export type NetworkPlanParties = { [Field in NetworkPlanPartyField]?: string };
 
