@@ -1,7 +1,9 @@
 import {
   formatIsoToLocalDateInput,
   isNetworkLogoUrlValid,
-  normalizeNetworkLogoUrl
+  normalizeNetworkLogoUrl,
+  normalizeNetworkPlanParties,
+  type NetworkPlanParties
 } from "../../../../core/networkMetadata";
 import { translateCurrent as t } from "../../../lib/i18n";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
@@ -45,9 +47,41 @@ export interface ApplyExportDecorationsParams {
   cartouchePlanRevision?: string;
   /** Calendar date `YYYY-MM-DD`, rendered verbatim (never timezone-shifted). */
   cartouchePlanIssueDate?: string;
+  /** Plan-level manufacturer/supplier names and references of the exported network. */
+  cartouchePlanParties?: NetworkPlanParties;
   cartoucheCreatedAt: string;
   cartoucheLogoUrl?: string;
   cartoucheNotes?: string;
+}
+
+/** Final export size after decorations; the cartouche can grow the height for wrapped rows. */
+export interface ExportDecorationsResult {
+  width: number;
+  height: number;
+}
+
+/** Upper bound of wrapped lines per plan party row (a 120-character code at minimum width). */
+const CARTOUCHE_PLAN_PARTY_MAX_LINES = 16;
+
+/**
+ * Localized cartouche row for one plan party role; company names and references stay literal.
+ * Returns null when both values are unset so the role is omitted.
+ */
+export function formatCartouchePlanPartyRow(
+  role: "Manufacturer" | "Supplier",
+  name: string | undefined,
+  reference: string | undefined
+): string | null {
+  if (name !== undefined && reference !== undefined) {
+    return t(`ui.exportCartouchePlan${role}Row`, { name, reference });
+  }
+  if (reference !== undefined) {
+    return t(`ui.exportCartouchePlan${role}ReferenceRow`, { reference });
+  }
+  if (name !== undefined) {
+    return t(`ui.exportCartouchePlan${role}NameRow`, { name });
+  }
+  return null;
 }
 
 export function copyComputedStylesToSvgClone(sourceSvg: SVGSVGElement, cloneSvg: SVGSVGElement): void {
@@ -421,10 +455,11 @@ function appendExportCartoucheOverlay(params: {
   projectCode?: string;
   planRevision?: string;
   planIssueDate?: string;
+  planParties?: NetworkPlanParties;
   createdAt: string;
   notes?: string;
   logoAsset: ExportLogoAsset;
-}): void {
+}): number {
   const frameSource = params.sourceSvg.querySelector(".network-callout-frame");
   const connectorShapeSource = params.sourceSvg.querySelector(".network-node.connector .network-node-shape");
   const genericNodeShapeSource = params.sourceSvg.querySelector(".network-node .network-node-shape");
@@ -460,7 +495,12 @@ function appendExportCartoucheOverlay(params: {
 
   const createdAtLabel = formatIsoToLocalDateInput(params.createdAt);
   const normalizedNetworkName = params.networkName.trim().length > 0 ? params.networkName.trim() : "Unnamed network";
-  const metadataRows = [
+  const planParties = normalizeNetworkPlanParties(params.planParties ?? {});
+  const planPartyRows = [
+    formatCartouchePlanPartyRow("Manufacturer", planParties.planManufacturerName, planParties.planManufacturerReference),
+    formatCartouchePlanPartyRow("Supplier", planParties.planSupplierName, planParties.planSupplierReference)
+  ].flatMap((text) => (text === null ? [] : [{ text, isTitle: false, wraps: true }]));
+  const metadataRows: Array<{ text: string; isTitle: boolean; wraps?: boolean }> = [
     { text: `Network: ${normalizedNetworkName}`, isTitle: true },
     ...(params.author?.trim() ? [{ text: `Author: ${params.author.trim()}`, isTitle: false }] : []),
     ...(params.projectCode?.trim() ? [{ text: `Code: ${params.projectCode.trim()}`, isTitle: false }] : []),
@@ -470,6 +510,7 @@ function appendExportCartoucheOverlay(params: {
     ...(params.planIssueDate?.trim()
       ? [{ text: t("ui.exportCartouchePlanIssueDateRow", { value: params.planIssueDate.trim() }), isTitle: false }]
       : []),
+    ...planPartyRows,
     { text: `Created: ${createdAtLabel.length > 0 ? createdAtLabel : "N/A"}`, isTitle: false }
   ];
   const metadataMaxContentWidth = metadataRows.reduce((maxWidth, row) => {
@@ -486,11 +527,25 @@ function appendExportCartoucheOverlay(params: {
   const metadataWidth = cartoucheWidth - padding * 2 - logoWidth - 10;
   const notesLines = wrapTextWithClamp(params.notes ?? "", cartoucheWidth - padding * 2, notesFont, 8);
   const hasNotes = notesLines.length > 0;
-  const metadataHeight = Math.max(logoHeight, metadataRows.length * metadataLineHeight);
+  const renderedMetadataRows = metadataRows.map((metadataRow) => {
+    const rowFont = metadataRow.isTitle ? `700 11px ${titleFontFamily}` : `600 9.6px ${fontFamily}`;
+    const lines =
+      metadataRow.wraps === true
+        ? wrapTextWithClamp(metadataRow.text, metadataWidth, rowFont, CARTOUCHE_PLAN_PARTY_MAX_LINES)
+        : [
+            measureTextWidth(metadataRow.text, rowFont) > metadataWidth
+              ? truncateLineWithEllipsis(metadataRow.text, metadataWidth, rowFont)
+              : metadataRow.text
+          ];
+    return { ...metadataRow, lines };
+  });
+  const metadataLineCount = renderedMetadataRows.reduce((count, row) => count + row.lines.length, 0);
+  const metadataHeight = Math.max(logoHeight, metadataLineCount * metadataLineHeight);
   const notesBlockHeight = hasNotes ? 8 + 12 + notesLines.length * notesLineHeight : 0;
   const cartoucheHeight = padding * 2 + metadataHeight + notesBlockHeight;
+  const exportHeight = Math.max(params.height, cartoucheHeight + margin * 2);
   const cartoucheX = Math.max(margin, params.width - margin - cartoucheWidth);
-  const cartoucheY = Math.max(margin, params.height - margin - cartoucheHeight);
+  const cartoucheY = Math.max(margin, exportHeight - margin - cartoucheHeight);
 
   const group = createSvgElement("g");
   group.setAttribute("class", "network-export-cartouche");
@@ -547,21 +602,29 @@ function appendExportCartoucheOverlay(params: {
     group.appendChild(fallbackText);
   }
 
-  metadataRows.forEach((metadataRow, index) => {
+  let metadataLineIndex = 0;
+  renderedMetadataRows.forEach((metadataRow) => {
     const row = createSvgElement("text");
-    const rowFont = metadataRow.isTitle ? `700 11px ${titleFontFamily}` : `600 9.6px ${fontFamily}`;
+    const rowX = String(cartoucheX + metadataX);
     row.setAttribute("class", "network-export-cartouche-meta");
-    row.setAttribute("x", String(cartoucheX + metadataX));
-    row.setAttribute("y", String(cartoucheY + padding + 11 + index * metadataLineHeight));
+    row.setAttribute("x", rowX);
+    row.setAttribute("y", String(cartoucheY + padding + 11 + metadataLineIndex * metadataLineHeight));
     row.setAttribute("fill", metadataRow.isTitle ? textColor : subtleTextColor);
     row.setAttribute("font-family", metadataRow.isTitle ? titleFontFamily : fontFamily);
     row.setAttribute("font-size", metadataRow.isTitle ? "11px" : "9.6px");
     row.setAttribute("font-weight", metadataRow.isTitle ? "700" : "600");
-    if (measureTextWidth(metadataRow.text, rowFont) > metadataWidth) {
-      row.textContent = truncateLineWithEllipsis(metadataRow.text, metadataWidth, rowFont);
+    if (metadataRow.lines.length === 1) {
+      row.textContent = metadataRow.lines[0] ?? "";
     } else {
-      row.textContent = metadataRow.text;
+      metadataRow.lines.forEach((line, lineIndex) => {
+        const lineSpan = createSvgElement("tspan");
+        lineSpan.setAttribute("x", rowX);
+        lineSpan.setAttribute("dy", lineIndex === 0 ? "0" : String(metadataLineHeight));
+        lineSpan.textContent = line;
+        row.appendChild(lineSpan);
+      });
     }
+    metadataLineIndex += metadataRow.lines.length;
     group.appendChild(row);
   });
 
@@ -603,37 +666,50 @@ function appendExportCartoucheOverlay(params: {
   }
 
   params.cloneSvg.appendChild(group);
+  return exportHeight;
 }
 
-export async function applyExportDecorations(params: ApplyExportDecorationsParams): Promise<void> {
+function resizeSvgCloneHeight(cloneSvg: SVGSVGElement, width: number, height: number): void {
+  cloneSvg.setAttribute("height", String(height));
+  if (cloneSvg.hasAttribute("viewBox")) {
+    cloneSvg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  }
+}
+
+export async function applyExportDecorations(params: ApplyExportDecorationsParams): Promise<ExportDecorationsResult> {
+  let height = params.height;
+  if (params.includeCartouche) {
+    const logoAsset = await resolveExportLogoAsset(params.cartoucheLogoUrl);
+    height = appendExportCartoucheOverlay({
+      sourceSvg: params.sourceSvg,
+      cloneSvg: params.cloneSvg,
+      width: params.width,
+      height: params.height,
+      networkName: params.cartoucheNetworkName,
+      author: params.cartoucheAuthor,
+      projectCode: params.cartoucheProjectCode,
+      planRevision: params.cartouchePlanRevision,
+      planIssueDate: params.cartouchePlanIssueDate,
+      planParties: params.cartouchePlanParties,
+      createdAt: params.cartoucheCreatedAt,
+      notes: params.cartoucheNotes,
+      logoAsset
+    });
+    if (height > params.height) {
+      resizeSvgCloneHeight(params.cloneSvg, params.width, height);
+    }
+  }
+
   if (params.includeFrame) {
     appendExportFrameOverlay({
       sourceSvg: params.sourceSvg,
       cloneSvg: params.cloneSvg,
       width: params.width,
-      height: params.height
+      height
     });
   }
 
-  if (!params.includeCartouche) {
-    return;
-  }
-
-  const logoAsset = await resolveExportLogoAsset(params.cartoucheLogoUrl);
-  appendExportCartoucheOverlay({
-    sourceSvg: params.sourceSvg,
-    cloneSvg: params.cloneSvg,
-    width: params.width,
-    height: params.height,
-    networkName: params.cartoucheNetworkName,
-    author: params.cartoucheAuthor,
-    projectCode: params.cartoucheProjectCode,
-    planRevision: params.cartouchePlanRevision,
-    planIssueDate: params.cartouchePlanIssueDate,
-    createdAt: params.cartoucheCreatedAt,
-    notes: params.cartoucheNotes,
-    logoAsset
-  });
+  return { width: params.width, height };
 }
 
 export async function exportCanvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {

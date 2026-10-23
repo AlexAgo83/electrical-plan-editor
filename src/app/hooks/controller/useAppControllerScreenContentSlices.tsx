@@ -228,6 +228,7 @@ export function buildNetworkSummaryPanelControllerSlice(
     exportCartoucheProjectCode: params.exportCartoucheProjectCode,
     exportCartouchePlanRevision: params.exportCartouchePlanRevision,
     exportCartouchePlanIssueDate: params.exportCartouchePlanIssueDate,
+    exportCartouchePlanParties: params.exportCartouchePlanParties,
     exportCartoucheCreatedAt: params.exportCartoucheCreatedAt,
     exportCartoucheLogoUrl: params.exportCartoucheLogoUrl,
     exportCartoucheNotes: params.exportCartoucheNotes,

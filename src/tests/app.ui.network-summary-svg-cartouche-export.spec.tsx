@@ -1,4 +1,4 @@
-import { fireEvent, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { appActions, appReducer } from "../store";
 import {
@@ -97,6 +97,78 @@ describe("App integration UI - network summary SVG cartouche export", () => {
       expect(exportedSvg).toContain("Issue date: 2026-10-22");
       expect(exportedSvg).toContain("Created: ");
       expect(clickSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      clickSpy.mockRestore();
+      if (originalCreateObjectUrl !== undefined) {
+        Object.defineProperty(URL, "createObjectURL", originalCreateObjectUrl);
+      }
+      if (originalRevokeObjectUrl !== undefined) {
+        Object.defineProperty(URL, "revokeObjectURL", originalRevokeObjectUrl);
+      }
+    }
+  });
+
+  it("exports the active network manufacturer and supplier references, fresh after edits and without mutating state", async () => {
+    const baseState = createUiIntegrationState();
+    const activeNetworkId = baseState.activeNetworkId;
+    if (activeNetworkId === null) {
+      throw new Error("Expected active network in integration state.");
+    }
+    const stateWithParties = appReducer(
+      baseState,
+      appActions.updateNetwork(activeNetworkId, "Main network (Sample)", "NET-MAIN-SAMPLE", "2026-03-03T11:00:00.000Z", undefined, {
+        planManufacturerName: "Manufacturer A",
+        planManufacturerReference: "MFG-001",
+        planSupplierReference: "SUP-009"
+      })
+    );
+
+    const originalCreateObjectUrl = Object.getOwnPropertyDescriptor(URL, "createObjectURL");
+    const originalRevokeObjectUrl = Object.getOwnPropertyDescriptor(URL, "revokeObjectURL");
+    const capturedSvgBlobs: Blob[] = [];
+    const createObjectUrl = vi.fn((value: Blob) => {
+      capturedSvgBlobs.push(value);
+      return "blob:svg-export-plan-parties";
+    });
+    Object.defineProperty(URL, "createObjectURL", { configurable: true, writable: true, value: createObjectUrl });
+    Object.defineProperty(URL, "revokeObjectURL", { configurable: true, writable: true, value: vi.fn() });
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => undefined);
+
+    try {
+      const { store } = renderAppWithState(stateWithParties);
+      switchScreenDrawerAware("modeling");
+      const networkSummaryPanel = getPanelByHeading("Network summary");
+      const networksBefore = store.getState().networks;
+      openExportMenu(networkSummaryPanel);
+      await openSvgPreviewAndDownload(networkSummaryPanel);
+      await waitFor(() => expect(createObjectUrl).toHaveBeenCalledTimes(1));
+      // Long rows wrap into tspans, so compare the cartouche text without markup or whitespace.
+      const firstSvg = (await readBlobAsText(capturedSvgBlobs[0] as Blob)).replace(/<[^>]+>/g, "").replace(/\s/g, "");
+      expect(firstSvg).toContain("Manufacturer(ManufacturerA):MFG-001");
+      expect(firstSvg).toContain("Supplier:SUP-009");
+      expect(store.getState().networks).toBe(networksBefore);
+
+      const openPreview = screen.queryByRole("dialog", { name: "SVG preview" });
+      if (openPreview !== null) {
+        fireEvent.click(within(openPreview).getByRole("button", { name: "Cancel" }));
+      }
+      await waitFor(() => expect(screen.queryByRole("dialog", { name: "SVG preview" })).toBeNull());
+      act(() => {
+        store.dispatch(
+          appActions.updateNetwork(activeNetworkId, "Main network (Sample)", "NET-MAIN-SAMPLE", "2026-03-04T11:00:00.000Z", undefined, {
+            planManufacturerName: "Manufacturer C",
+            planManufacturerReference: "MFG-001",
+            planSupplierReference: ""
+          })
+        );
+      });
+      openExportMenu(networkSummaryPanel);
+      await openSvgPreviewAndDownload(networkSummaryPanel);
+      await waitFor(() => expect(createObjectUrl).toHaveBeenCalledTimes(2));
+      const secondSvg = (await readBlobAsText(capturedSvgBlobs[1] as Blob)).replace(/<[^>]+>/g, "").replace(/\s/g, "");
+      expect(secondSvg).toContain("Manufacturer(ManufacturerC):MFG-001");
+      expect(secondSvg).not.toContain("ManufacturerA");
+      expect(secondSvg).not.toContain("SUP-009");
     } finally {
       clickSpy.mockRestore();
       if (originalCreateObjectUrl !== undefined) {

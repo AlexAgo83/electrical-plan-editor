@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState, type RefObject } from "react";
 import type { ThemeMode } from "../../../../store";
+import type { NetworkPlanParties } from "../../../../core/networkMetadata";
 import { buildTimestampedFileName } from "../../../lib/exportFileName";
 import { getCanvasTextMeasurementContext } from "../../../lib/canvasTextMeasurement";
 import { getThemeClassNames } from "../../../lib/themeModes";
@@ -28,6 +29,7 @@ interface UseNetworkSummaryExportActionsParams {
   exportCartoucheProjectCode?: string;
   exportCartouchePlanRevision?: string;
   exportCartouchePlanIssueDate?: string;
+  exportCartouchePlanParties?: NetworkPlanParties;
   exportCartoucheCreatedAt: string;
   exportCartoucheLogoUrl?: string;
   exportCartoucheNotes?: string;
@@ -466,6 +468,7 @@ export function useNetworkSummaryExportActions({
   exportCartoucheProjectCode,
   exportCartouchePlanRevision,
   exportCartouchePlanIssueDate,
+  exportCartouchePlanParties,
   exportCartoucheCreatedAt,
   exportCartoucheLogoUrl,
   exportCartoucheNotes
@@ -513,7 +516,7 @@ export function useNetworkSummaryExportActions({
         }
       }
       applySvgGridVisibility(svgClone, options?.includeGrid ?? exportIncludeGrid);
-      await applyExportDecorations({
+      const decorated = await applyExportDecorations({
         sourceSvg: themedSourceSvg,
         cloneSvg: svgClone,
         width: exportWidth,
@@ -525,10 +528,12 @@ export function useNetworkSummaryExportActions({
         cartoucheProjectCode: exportCartoucheProjectCode,
         cartouchePlanRevision: exportCartouchePlanRevision,
         cartouchePlanIssueDate: exportCartouchePlanIssueDate,
+        cartouchePlanParties: exportCartouchePlanParties,
         cartoucheCreatedAt: exportCartoucheCreatedAt,
         cartoucheLogoUrl: exportCartoucheLogoUrl,
         cartoucheNotes: exportCartoucheNotes
       });
+      exportHeight = decorated.height;
 
       return {
         svgClone,
@@ -543,6 +548,7 @@ export function useNetworkSummaryExportActions({
     exportCartoucheNetworkName,
     exportCartoucheNotes,
     exportCartouchePlanIssueDate,
+    exportCartouchePlanParties,
     exportCartouchePlanRevision,
     exportCartoucheProjectCode,
     exportIncludeCartouche,

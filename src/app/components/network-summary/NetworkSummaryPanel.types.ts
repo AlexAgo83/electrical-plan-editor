@@ -1,5 +1,6 @@
 import type { Dispatch, MouseEvent as ReactMouseEvent, Ref, SetStateAction, WheelEvent as ReactWheelEvent } from "react";
 import type { PdfImagePage } from "../../lib/pdfExport";
+import type { NetworkPlanParties } from "../../../core/networkMetadata";
 
 export interface NetworkSummaryPanelHandle {
   exportPngDirect: () => Promise<void>;
@@ -72,6 +73,7 @@ export interface NetworkSummaryPanelProps {
   exportCartoucheProjectCode?: string;
   exportCartouchePlanRevision?: string;
   exportCartouchePlanIssueDate?: string;
+  exportCartouchePlanParties?: NetworkPlanParties;
   exportCartoucheCreatedAt: string;
   exportCartoucheLogoUrl?: string;
   exportCartoucheNotes?: string;

@@ -1,7 +1,7 @@
 import { translateCurrent as t } from "../../lib/i18n";
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from "react";
 import { logPerfDuration } from "../../lib/perfDebug";
-import type { CatalogItem, Connector, ConnectorId, Network, Segment, Splice, SpliceId, Wire } from "../../../core/entities";
+import type { CatalogItem, Connector, ConnectorId, Network, NetworkPlanPartyField, Segment, Splice, SpliceId, Wire } from "../../../core/entities";
 import {
   buildFunctionalSchematicGraph,
   type FunctionalSchematicEdge,
@@ -26,6 +26,7 @@ import {
 
 interface FunctionalSchematicPanelProps {
   network: Pick<Network, "name" | "voltageV" | "createdAt" | "author" | "projectCode" | "logoUrl" | "exportNotes" | "planRevision" | "planIssueDate"
+    | NetworkPlanPartyField
   > | null;
   wires: Wire[];
   segments: Segment[];
@@ -956,6 +957,7 @@ function FunctionalSchematicPanelComponent({
     exportCartoucheProjectCode: exportCartoucheProjectCode ?? network?.projectCode,
     exportCartouchePlanRevision: exportCartouchePlanRevision ?? network?.planRevision,
     exportCartouchePlanIssueDate: exportCartouchePlanIssueDate ?? network?.planIssueDate,
+    exportCartouchePlanParties: network ?? undefined,
     exportCartoucheCreatedAt: exportCartoucheCreatedAt ?? network?.createdAt ?? new Date().toISOString(),
     exportCartoucheLogoUrl: exportCartoucheLogoUrl ?? network?.logoUrl,
     exportCartoucheNotes: exportCartoucheNotes ?? network?.exportNotes
