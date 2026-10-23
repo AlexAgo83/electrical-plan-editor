@@ -4,6 +4,8 @@ export const NETWORK_LOGO_URL_MAX_LENGTH = 2048;
 export const NETWORK_EXPORT_NOTES_MAX_LENGTH = 2000;
 export const NETWORK_EXPORT_NOTES_MAX_LINES = 8;
 export const NETWORK_PLAN_REVISION_MAX_LENGTH = 40;
+export const NETWORK_PLAN_PARTY_NAME_MAX_LENGTH = 80;
+export const NETWORK_PLAN_PARTY_REFERENCE_MAX_LENGTH = 120;
 
 const NETWORK_PROJECT_CODE_ALLOWED_PATTERN = /^[A-Za-z0-9 _./-]+$/;
 const NETWORK_LOCAL_DATE_INPUT_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -56,6 +58,61 @@ export function normalizeNetworkExportNotes(value: unknown): string | undefined 
 
 export function normalizeNetworkPlanRevision(value: unknown): string | undefined {
   return normalizeOptionalTrimmedText(value, NETWORK_PLAN_REVISION_MAX_LENGTH);
+}
+
+/** Plan-level manufacturer/supplier identification fields, in cartouche display order. */
+export const NETWORK_PLAN_PARTY_FIELDS = [
+  "planManufacturerName",
+  "planManufacturerReference",
+  "planSupplierName",
+  "planSupplierReference"
+] as const;
+
+export type NetworkPlanPartyField = (typeof NETWORK_PLAN_PARTY_FIELDS)[number];
+
+export type NetworkPlanParties = { [Field in NetworkPlanPartyField]?: string };
+
+const NETWORK_PLAN_PARTY_LINE_BREAK_PATTERN = /[\r\n\u2028\u2029]/;
+const NETWORK_PLAN_PARTY_LINE_BREAK_RUN_PATTERN = /[ \t]*[\r\n\u2028\u2029]+[ \t]*/g;
+
+export function isNetworkPlanPartyNameField(field: NetworkPlanPartyField): boolean {
+  return field === "planManufacturerName" || field === "planSupplierName";
+}
+
+export function getNetworkPlanPartyFieldMaxLength(field: NetworkPlanPartyField): number {
+  return isNetworkPlanPartyNameField(field) ? NETWORK_PLAN_PARTY_NAME_MAX_LENGTH : NETWORK_PLAN_PARTY_REFERENCE_MAX_LENGTH;
+}
+
+/** True when the text spans several lines; plan party values are single-line. */
+export function hasNetworkPlanPartyLineBreak(value: string): boolean {
+  return NETWORK_PLAN_PARTY_LINE_BREAK_PATTERN.test(value);
+}
+
+/**
+ * Normalizes one plan party value: non-strings and blank text become unset, line breaks become
+ * single spaces, and the trimmed text is bounded. Case, punctuation and leading zeroes are kept.
+ */
+export function normalizeNetworkPlanPartyValue(field: NetworkPlanPartyField, value: unknown): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+  return normalizeOptionalTrimmedText(
+    value.replace(NETWORK_PLAN_PARTY_LINE_BREAK_RUN_PATTERN, " "),
+    getNetworkPlanPartyFieldMaxLength(field)
+  );
+}
+
+/** Normalizes all four plan party fields; every key is present, unset ones as `undefined`. */
+export function normalizeNetworkPlanParties(source: { [Field in NetworkPlanPartyField]?: unknown }): NetworkPlanParties {
+  return {
+    planManufacturerName: normalizeNetworkPlanPartyValue("planManufacturerName", source.planManufacturerName),
+    planManufacturerReference: normalizeNetworkPlanPartyValue(
+      "planManufacturerReference",
+      source.planManufacturerReference
+    ),
+    planSupplierName: normalizeNetworkPlanPartyValue("planSupplierName", source.planSupplierName),
+    planSupplierReference: normalizeNetworkPlanPartyValue("planSupplierReference", source.planSupplierReference)
+  };
 }
 
 /**

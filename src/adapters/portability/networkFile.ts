@@ -24,7 +24,9 @@ import {
   normalizeNetworkAuthor,
   normalizeNetworkExportNotes,
   normalizeNetworkLogoUrl,
+  NETWORK_PLAN_PARTY_FIELDS,
   normalizeNetworkPlanIssueDate,
+  normalizeNetworkPlanParties,
   normalizeNetworkPlanRevision,
   normalizeNetworkProjectCode
 } from "../../core/networkMetadata";
@@ -573,6 +575,10 @@ function normalizeImportedNetworkMetadata(
   | "entityPrefix"
   | "planRevision"
   | "planIssueDate"
+  | "planManufacturerName"
+  | "planManufacturerReference"
+  | "planSupplierName"
+  | "planSupplierReference"
 > {
   const normalizedAuthor = normalizeNetworkAuthor(network.author);
   const normalizedVoltageV = normalizeNetworkVoltageV(network.voltageV);
@@ -582,6 +588,7 @@ function normalizeImportedNetworkMetadata(
   const normalizedExportNotes = normalizeNetworkExportNotes(network.exportNotes);
   const normalizedPlanRevision = normalizeNetworkPlanRevision(network.planRevision);
   const normalizedPlanIssueDate = normalizeNetworkPlanIssueDate(network.planIssueDate);
+  const normalizedPlanParties = normalizeNetworkPlanParties(network);
 
   const appliedFixes: string[] = [];
   if (network.voltageV !== undefined && normalizedVoltageV === undefined) {
@@ -601,6 +608,18 @@ function normalizeImportedNetworkMetadata(
   }
   if (normalizedPlanIssueDate === null) {
     appliedFixes.push("planIssueDate<-undefined");
+  }
+  for (const field of NETWORK_PLAN_PARTY_FIELDS) {
+    const rawValue: unknown = network[field];
+    if (rawValue !== undefined && typeof rawValue !== "string") {
+      appliedFixes.push(`${field}<-undefined`);
+    } else if (
+      typeof rawValue === "string" &&
+      normalizedPlanParties[field] !== undefined &&
+      normalizedPlanParties[field] !== rawValue.trim()
+    ) {
+      appliedFixes.push(`${field}<-normalized`);
+    }
   }
 
   if (appliedFixes.length > 0) {
@@ -623,7 +642,8 @@ function normalizeImportedNetworkMetadata(
     exportNotes: normalizedExportNotes,
     entityPrefix: normalizeNetworkEntityPrefix(network.entityPrefix),
     planRevision: normalizedPlanRevision,
-    planIssueDate: normalizedPlanIssueDate ?? undefined
+    planIssueDate: normalizedPlanIssueDate ?? undefined,
+    ...normalizedPlanParties
   };
 }
 
@@ -709,7 +729,8 @@ export function buildNetworkFilePayload(
         exportNotes: normalizeNetworkExportNotes(network.exportNotes),
         entityPrefix: normalizeNetworkEntityPrefix(network.entityPrefix),
         planRevision: normalizeNetworkPlanRevision(network.planRevision),
-        planIssueDate: normalizeNetworkPlanIssueDate(network.planIssueDate) ?? undefined
+        planIssueDate: normalizeNetworkPlanIssueDate(network.planIssueDate) ?? undefined,
+        ...normalizeNetworkPlanParties(network)
       };
 
       return {

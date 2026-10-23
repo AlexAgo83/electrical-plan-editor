@@ -9,6 +9,7 @@ import {
   normalizeNetworkIsoTimestamp,
   normalizeNetworkLogoUrl,
   normalizeNetworkPlanIssueDate,
+  normalizeNetworkPlanParties,
   normalizeNetworkPlanRevision,
   normalizeNetworkProjectCode
 } from "../../core/networkMetadata";
@@ -389,6 +390,7 @@ function normalizeNetworkEntityState(
       entityPrefix: normalizeNetworkEntityPrefix(network.entityPrefix),
       planRevision: normalizeNetworkPlanRevision(network.planRevision),
       planIssueDate: normalizeNetworkPlanIssueDate(network.planIssueDate) ?? undefined,
+      ...normalizeNetworkPlanParties(network),
       createdAt: normalizedCreatedAt,
       updatedAt: normalizedUpdatedAt
     };

@@ -523,17 +523,22 @@ function describeNetworkChange(action: Extract<AppAction, { type: "network/updat
     return null;
   }
 
-  // Empty plan issue values are explicit clear requests; compare them as unset.
+  // Empty plan issue/reference values are explicit clear requests; compare them as unset.
   const nextNetwork = {
     ...action.payload,
     planRevision: action.payload.planRevision || undefined,
-    planIssueDate: action.payload.planIssueDate || undefined
+    planIssueDate: action.payload.planIssueDate || undefined,
+    planManufacturerName: action.payload.planManufacturerName || undefined,
+    planManufacturerReference: action.payload.planManufacturerReference || undefined,
+    planSupplierName: action.payload.planSupplierName || undefined,
+    planSupplierReference: action.payload.planSupplierReference || undefined
   };
   return describeChangedFields(previousNetwork, nextNetwork, [
     ["Identity", ["technicalId", "name"]],
     ["Metadata", ["description", "author"]],
     ["Export cartouche", ["projectCode", "exportNotes"]],
     ["Plan issue", ["planRevision", "planIssueDate"]],
+    ["Plan references", ["planManufacturerName", "planManufacturerReference", "planSupplierName", "planSupplierReference"]],
     ["Logo", ["logoUrl"]],
     ["Voltage", ["voltageV"]]
   ]);

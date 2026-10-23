@@ -6,6 +6,7 @@ import {
   normalizeNetworkExportNotes,
   normalizeNetworkLogoUrl,
   normalizeNetworkPlanIssueDate,
+  normalizeNetworkPlanParties,
   normalizeNetworkPlanRevision,
   normalizeNetworkProjectCode
 } from "../../../core/networkMetadata";
@@ -22,7 +23,17 @@ export function normalizeOptionalText(value: string | undefined): string | undef
 
 type NetworkMetadataFields = Pick<
   Network,
-  "author" | "projectCode" | "logoUrl" | "exportNotes" | "entityPrefix" | "planRevision" | "planIssueDate"
+  | "author"
+  | "projectCode"
+  | "logoUrl"
+  | "exportNotes"
+  | "entityPrefix"
+  | "planRevision"
+  | "planIssueDate"
+  | "planManufacturerName"
+  | "planManufacturerReference"
+  | "planSupplierName"
+  | "planSupplierReference"
 >;
 
 export interface NormalizeNetworkMetadataResult {
@@ -71,7 +82,18 @@ export function normalizeNetworkMetadata(
       planRevision: normalizeNetworkPlanRevision(
         source.planRevision === undefined ? fallback.planRevision : source.planRevision
       ),
-      planIssueDate: normalizedPlanIssueDate
+      planIssueDate: normalizedPlanIssueDate,
+      ...normalizeNetworkPlanParties({
+        planManufacturerName:
+          source.planManufacturerName === undefined ? fallback.planManufacturerName : source.planManufacturerName,
+        planManufacturerReference:
+          source.planManufacturerReference === undefined
+            ? fallback.planManufacturerReference
+            : source.planManufacturerReference,
+        planSupplierName: source.planSupplierName === undefined ? fallback.planSupplierName : source.planSupplierName,
+        planSupplierReference:
+          source.planSupplierReference === undefined ? fallback.planSupplierReference : source.planSupplierReference
+      })
     },
     error: null
   };

@@ -68,6 +68,10 @@ export type AppAction =
         entityPrefix?: string;
         planRevision?: string;
         planIssueDate?: string;
+        planManufacturerName?: string;
+        planManufacturerReference?: string;
+        planSupplierName?: string;
+        planSupplierReference?: string;
         updatedAt: string;
       };
     }
@@ -219,6 +223,10 @@ export const appActions = {
       entityPrefix?: string;
       planRevision?: string;
       planIssueDate?: string;
+      planManufacturerName?: string;
+      planManufacturerReference?: string;
+      planSupplierName?: string;
+      planSupplierReference?: string;
     }
   ): AppAction => ({
     type: "network/update",
@@ -236,7 +244,11 @@ export const appActions = {
       exportNotes: metadata?.exportNotes,
       entityPrefix: metadata?.entityPrefix,
       planRevision: metadata?.planRevision,
-      planIssueDate: metadata?.planIssueDate
+      planIssueDate: metadata?.planIssueDate,
+      planManufacturerName: metadata?.planManufacturerName,
+      planManufacturerReference: metadata?.planManufacturerReference,
+      planSupplierName: metadata?.planSupplierName,
+      planSupplierReference: metadata?.planSupplierReference
     }
   }),
   duplicateNetwork: (sourceNetworkId: NetworkId, network: Network): AppAction => ({

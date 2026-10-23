@@ -71,7 +71,11 @@ export function collectNetworkImportRejections(
       logoUrl: undefined,
       exportNotes: undefined,
       planRevision: undefined,
-      planIssueDate: undefined
+      planIssueDate: undefined,
+      planManufacturerName: undefined,
+      planManufacturerReference: undefined,
+      planSupplierName: undefined,
+      planSupplierReference: undefined
     });
     if (normalizedMetadata.error !== null) {
       pushRejection(network, normalizedMetadata.error);

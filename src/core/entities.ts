@@ -37,6 +37,14 @@ export interface Network {
   planRevision?: string;
   /** Optional plan issue date as a calendar date string `YYYY-MM-DD` (no timezone). */
   planIssueDate?: string;
+  /**
+   * Optional plan-level manufacturer/supplier identification: editable company names and the
+   * reference each company gives this network plan. Unrelated to component catalog references.
+   */
+  planManufacturerName?: string;
+  planManufacturerReference?: string;
+  planSupplierName?: string;
+  planSupplierReference?: string;
   createdAt: string;
   updatedAt: string;
   ampacityOverrides?: Record<number, number>;

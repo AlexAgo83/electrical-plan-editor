@@ -81,7 +81,11 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         exportNotes: undefined,
         entityPrefix: undefined,
         planRevision: undefined,
-        planIssueDate: undefined
+        planIssueDate: undefined,
+        planManufacturerName: undefined,
+        planManufacturerReference: undefined,
+        planSupplierName: undefined,
+        planSupplierReference: undefined
       });
       const normalizedVoltageV = normalizeNetworkVoltageV(network.voltageV);
       if (normalizedMetadata.error !== null) {
@@ -201,7 +205,11 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
           exportNotes: action.payload.exportNotes,
           entityPrefix: action.payload.entityPrefix,
           planRevision: action.payload.planRevision,
-          planIssueDate: action.payload.planIssueDate
+          planIssueDate: action.payload.planIssueDate,
+          planManufacturerName: action.payload.planManufacturerName,
+          planManufacturerReference: action.payload.planManufacturerReference,
+          planSupplierName: action.payload.planSupplierName,
+          planSupplierReference: action.payload.planSupplierReference
         },
         {
           author: existing.author,
@@ -210,7 +218,11 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
           exportNotes: existing.exportNotes,
           entityPrefix: existing.entityPrefix,
           planRevision: existing.planRevision,
-          planIssueDate: existing.planIssueDate
+          planIssueDate: existing.planIssueDate,
+          planManufacturerName: existing.planManufacturerName,
+          planManufacturerReference: existing.planManufacturerReference,
+          planSupplierName: existing.planSupplierName,
+          planSupplierReference: existing.planSupplierReference
         }
       );
       const normalizedVoltageV = normalizeNetworkVoltageV(
@@ -264,7 +276,11 @@ export function handleNetworkActions(state: AppState, action: AppAction): AppSta
         exportNotes: source.exportNotes,
         entityPrefix: source.entityPrefix,
         planRevision: source.planRevision,
-        planIssueDate: source.planIssueDate
+        planIssueDate: source.planIssueDate,
+        planManufacturerName: source.planManufacturerName,
+        planManufacturerReference: source.planManufacturerReference,
+        planSupplierName: source.planSupplierName,
+        planSupplierReference: source.planSupplierReference
       });
       const normalizedVoltageV = normalizeNetworkVoltageV(duplicated.voltageV);
       if (normalizedMetadata.error !== null) {
