@@ -94,12 +94,18 @@ jobs:
       - name: Trigger Render deploy
         env:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          RELEASE_SHA: ${{ steps.release.outputs.sha }}
         run: |
           if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
             echo "RENDER_DEPLOY_HOOK_URL secret is not configured."
             exit 1
           fi
 
+          separator='?'
+          if [[ "$RENDER_DEPLOY_HOOK_URL" == *\?* ]]; then
+            separator='&'
+          fi
+
           curl --fail-with-body \
             --request POST \
-            "$RENDER_DEPLOY_HOOK_URL"
+            "${RENDER_DEPLOY_HOOK_URL}${separator}ref=${RELEASE_SHA}"

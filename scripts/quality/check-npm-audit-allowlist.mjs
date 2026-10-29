@@ -13,6 +13,37 @@ function isNoViableFix(fixAvailable) {
 
 const ALLOWED_VULNERABILITIES = [
   {
+    name: "pwa-build-deepmerge-prototype-poisoning",
+    severity: "low",
+    reason: "GHSA-gcqx-w48m-w2h4 has no patched deepmerge release (latest: 4.3.1). Even vite-plugin-pwa@2.0.0 retains workbox-build@7.4.1 and @rollup/plugin-node-resolve@16.0.3. npm only offers a downgrade to vite-plugin-pwa@0.2.1. This build-only chain merges trusted build configuration, not imported workspace data; revisit when upstream publishes a fix.",
+    matches(vulnerability) {
+      const chain = {
+        "deepmerge": { via: null, effects: ["@rollup/plugin-node-resolve"], isDirect: false },
+        "@rollup/plugin-node-resolve": { via: "deepmerge", effects: ["workbox-build"], isDirect: false },
+        "workbox-build": { via: "@rollup/plugin-node-resolve", effects: ["vite-plugin-pwa"], isDirect: false },
+        "vite-plugin-pwa": { via: "workbox-build", effects: [], isDirect: true }
+      };
+      const expected = Object.hasOwn(chain, vulnerability.name) ? chain[vulnerability.name] : undefined;
+      return (
+        expected !== undefined &&
+        vulnerability.severity === "low" &&
+        vulnerability.isDirect === expected.isDirect &&
+        (vulnerability.fixAvailable === false ||
+          (vulnerability.fixAvailable?.name === "vite-plugin-pwa" &&
+            vulnerability.fixAvailable.version === "0.2.1" &&
+            vulnerability.fixAvailable.isSemVerMajor === true)) &&
+        Array.isArray(vulnerability.effects) &&
+        vulnerability.effects.length === expected.effects.length &&
+        expected.effects.every((name) => vulnerability.effects.includes(name)) &&
+        Array.isArray(vulnerability.via) &&
+        vulnerability.via.length === 1 &&
+        (expected.via === null
+          ? vulnerability.via[0]?.url === "https://github.com/advisories/GHSA-gcqx-w48m-w2h4"
+          : vulnerability.via[0] === expected.via)
+      );
+    }
+  },
+  {
     name: "legacy-build-chain",
     severity: "high",
     reason: "The latest compatible ExcelJS, ESLint 9, and Vite PWA releases retain this build-only dependency chain. npm only offers incompatible major upgrades or a downgrade; the affected packages are not shipped by the application.",

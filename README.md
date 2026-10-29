@@ -196,6 +196,8 @@ This repository includes a ready-to-use [`render.yaml`](render.yaml) for static 
 2. In Render, create a new service with **Blueprint** from this repository.
 3. Render will build with `npm ci && npm run build` and publish `dist/`.
 
+The [release deployment workflow](.github/workflows/render-release-deploy.yml) runs when a GitHub release is published, or manually for a selected release tag (the latest release by default). Configure the `RENDER_DEPLOY_HOOK_URL` repository secret with the Render deploy hook URL. The workflow resolves the release tag to `RELEASE_SHA`, waits for CI to succeed on that commit, and POSTs the hook with `ref=RELEASE_SHA` so Render deploys the published release commit even if the branch has advanced. Existing hook query parameters are preserved, and the hook URL is not logged. The workflow triggers deployment but does not poll its completion.
+
 ### Any static server
 
 The app is a SPA and can be hosted from `dist/` on any static server/CDN.
