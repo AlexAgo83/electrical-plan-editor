@@ -436,9 +436,11 @@ export function useWorkspaceFileStorage({
   }, [notifyToast, writeCurrentStateToHandle]);
 
   useEffect(() => {
+    // Keep the ref container so cleanup cancels the latest scheduled timer.
+    const timerRef = autosaveTimerRef;
     return () => {
-      if (autosaveTimerRef.current !== null) {
-        clearTimeout(autosaveTimerRef.current);
+      if (timerRef.current !== null) {
+        clearTimeout(timerRef.current);
       }
     };
   }, []);

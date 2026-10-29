@@ -69,7 +69,7 @@ describe("named workspace lineages UI", () => {
     expect(within(legacy).queryByRole("button", { name: /named workspace/i })).toBeNull();
   });
 
-  it("manages Series and Prototypes from Settings, saves after navigation and consults history read-only", async () => {
+  it("manages Series and Prototypes from Settings and saves after navigation", async () => {
     const initial = createUiIntegrationState();
     const { store } = renderAppWithState(initial);
     switchScreenDrawerAware("settings");
@@ -104,6 +104,14 @@ describe("named workspace lineages UI", () => {
     await waitFor(() => expect(store.getState().networks.allIds).toHaveLength(initialNetworkCount), ASYNC_UI);
     fireEvent.keyDown(window, { key: "s", ctrlKey: true });
     await screen.findByText("Working copy saved", {}, ASYNC_UI);
+  });
+
+  it("creates a version and consults history read-only across screens", async () => {
+    const { store } = renderAppWithState(createUiIntegrationState());
+    switchScreenDrawerAware("settings");
+    await waitFor(() => expect(within(storageGroup("Current workspace")).getByRole("button", { name: "New workspace" })).not.toBeDisabled(), ASYNC_UI);
+    await createWorkspace("Série", "current");
+    switchScreenDrawerAware("home");
 
     fireEvent.click(within(homePanel()).getByRole("button", { name: "Manage workspaces" }));
     fireEvent.click(within(await waitFor(() => storageGroup("Versions and handoffs"), ASYNC_UI)).getByRole("button", { name: "Create version" }));
