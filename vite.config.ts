@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { resolveRuntimeEnvironment } from "./src/config/environment";
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const env = resolveRuntimeEnvironment(loadEnv(mode, process.cwd(), ""));
   const isCi = process.env.CI === "true";
   for (const warning of env.warnings) {
@@ -11,6 +11,12 @@ export default defineConfig(({ mode }) => {
   }
 
   return {
+    // Supported browsers provide the features polyfilled by the default ExcelJS bundle.
+    resolve: {
+      alias: command === "build"
+        ? [{ find: /^exceljs$/, replacement: "exceljs/dist/exceljs.bare.min.js" }]
+        : []
+    },
     plugins: [
       react(),
       VitePWA({
@@ -81,17 +87,20 @@ export default defineConfig(({ mode }) => {
       port: env.previewPort
     },
     build: {
+      minify: "terser",
+      terserOptions: { compress: { passes: 2 } },
       rollupOptions: {
         output: {
           manualChunks(id) {
+            // Compress repeated release-note text together.
+            if (id.includes("/changelogs/")) {
+              return "changelogs";
+            }
             if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/")) {
               return "vendor-react";
             }
             if (id.includes("node_modules/workbox-window")) {
               return "vendor-pwa";
-            }
-            if (id.includes("/src/app/lib/aiAgent") || id.includes("/src/app/components/workspace/ModelingAiAgentPanel")) {
-              return "feature-ai-agent";
             }
             return undefined;
           }
