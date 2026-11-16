@@ -1719,6 +1719,8 @@
     "workspaceLineageLocalEdits": "Local edits before reconnection",
     "planRevisionOptional": "Plan revision (optional)",
     "planRevisionExample": "OR/00",
+    "previousPlanRevision": "Previous plan revision",
+    "previousPlanRevisionSequenceHint": "Z/26 → … → B/02 → A/01 → OR/00. Empty values, free text and OR/00 stay unchanged.",
     "nextPlanRevision": "Next plan revision",
     "planRevisionSequenceHint": "OR/00 → A/01 → B/02 → … → Z/26. Free text and Z/26 stay unchanged.",
     "planRevisionHint": "Free text (max 40 characters). +1 starts an empty field at OR/00, then advances letter and number together through Z/26.",
