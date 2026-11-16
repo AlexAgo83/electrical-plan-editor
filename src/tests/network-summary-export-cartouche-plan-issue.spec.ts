@@ -46,6 +46,10 @@ describe("export cartouche plan issue rows", () => {
     expect(rows.some((row) => row.startsWith("Created: 2026-01-1"))).toBe(true);
   });
 
+  it.each(["OR/00", "A/01", "B/02", "Z/26"])("keeps the revision %s literal in the shared SVG/PDF cartouche", async (planRevision) => {
+    expect(await renderCartoucheRows({ planRevision })).toContain(`Revision: ${planRevision}`);
+  });
+
   it("keeps the issue date verbatim regardless of timezone edges", async () => {
     const rows = await renderCartoucheRows({ planIssueDate: "2026-01-01" });
     expect(rows).toContain("Issue date: 2026-01-01");

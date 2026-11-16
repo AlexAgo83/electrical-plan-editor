@@ -304,6 +304,16 @@
   font-weight: 600;
 }
 
+.network-plan-revision-input {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.network-plan-revision-input button {
+  flex: 0 0 auto;
+}
+
 .network-form-grid input,
 .network-form-grid textarea {
   width: 100%;

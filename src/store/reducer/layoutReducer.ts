@@ -1,12 +1,12 @@
 import type { AppAction } from "../actions";
 import type { AppState } from "../types";
-import { bumpRevision, clearLastError } from "./shared";
+import { bumpRevision, clearLastError, withError } from "./shared";
 
 export function handleLayoutActions(state: AppState, action: AppAction): AppState | null {
   switch (action.type) {
     case "layout/setNodePosition": {
       if (state.nodes.byId[action.payload.nodeId] === undefined) {
-        return state;
+        return withError(state, `Cannot move unknown node '${action.payload.nodeId}'.`);
       }
 
       return bumpRevision({

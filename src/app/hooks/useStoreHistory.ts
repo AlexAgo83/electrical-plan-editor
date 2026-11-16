@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { loadRecentChangesMetadata, saveRecentChangesMetadata } from "../../adapters/persistence/recentChanges";
 import { buildReplaceStateHistoryEntry, buildUndoHistoryEntry } from "../lib/recentChangeLabels";
-import type { AppStore } from "../../store";
+import { appActions, type AppStore } from "../../store";
+import { translateCurrent as t } from "../lib/i18n";
 import type { UndoHistoryEntry } from "../types/app-controller";
 import { isProjectMutationBlocked, reportBlockedMutationAttempt } from "../lib/workspaceSessionGate";
 
@@ -12,6 +13,7 @@ interface UseStoreHistoryParams {
   historyLimit: number;
   onUndoRedoApplied?: (event: { direction: "undo" | "redo"; entry: UndoHistoryEntry }) => void;
   onReplaceStateApplied?: () => void;
+  onDispatchError?: (message: string) => void;
   transformUndoRedoTargetState?: (targetState: StoreState, currentState: StoreState) => StoreState;
 }
 
@@ -20,7 +22,7 @@ interface UseStoreHistoryResult {
   isUndoAvailable: boolean;
   isRedoAvailable: boolean;
   undoHistoryEntries: UndoHistoryEntry[];
-  dispatchAction: (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean; background?: boolean }) => void;
+  dispatchAction: (action: Parameters<AppStore["dispatch"]>[0], options?: { trackHistory?: boolean; background?: boolean }) => boolean;
   handleUndo: () => void;
   handleRedo: () => void;
   replaceStateWithHistory: (nextState: StoreState) => void;
@@ -43,6 +45,7 @@ export function useStoreHistory({
   historyLimit,
   onUndoRedoApplied,
   onReplaceStateApplied,
+  onDispatchError,
   transformUndoRedoTargetState
 }: UseStoreHistoryParams): UseStoreHistoryResult {
   const [undoStack, setUndoStack] = useState<StoreState[]>([]);
@@ -89,30 +92,39 @@ export function useStoreHistory({
          */
         background?: boolean;
       }
-    ): void => {
+    ): boolean => {
       const shouldTrackHistory = options?.trackHistory ?? !action.type.startsWith("ui/");
       if (!action.type.startsWith("ui/") && isProjectMutationBlocked()) {
         if (options?.background !== true) {
           reportBlockedMutationAttempt();
         }
-        return;
+        return false;
       }
-      const previousState = store.getState();
-
+      let previousState = store.getState();
       try {
+        // A new user attempt gets fresh feedback even if it fails for the same reason.
+        // Keep reducers idempotent for automatic/background dispatches.
+        if (!action.type.startsWith("ui/") && options?.background !== true && store.getState().ui.lastError !== null) {
+          store.dispatch(appActions.clearError());
+          previousState = store.getState();
+        }
         store.dispatch(action);
-      } catch {
+      } catch (error) {
         setSaveStatus("error");
-        return;
+        onDispatchError?.(error instanceof Error ? error.message : t("ui.actionCouldNotBeApplied"));
+        return false;
       }
 
       const nextState = store.getState();
+      if (!action.type.startsWith("ui/") && nextState.ui.lastError !== null) {
+        return false;
+      }
       if (nextState === previousState) {
-        return;
+        return false;
       }
 
       if (!shouldTrackHistory) {
-        return;
+        return true;
       }
 
       const historyEntry = buildUndoHistoryEntry(
@@ -135,8 +147,9 @@ export function useStoreHistory({
       setRedoHistoryEntries([]);
       setSaveStatus("unsaved");
       queueSavedStatus();
+      return true;
     },
-    [historyLimit, queueSavedStatus, store]
+    [historyLimit, onDispatchError, queueSavedStatus, store]
   );
 
   const handleUndo = useCallback((): void => {

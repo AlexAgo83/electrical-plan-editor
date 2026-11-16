@@ -1,4 +1,5 @@
 import type { AppAction } from "../actions";
+import { occupiedEndpointMessage } from "./helpers/occupiedEndpointMessage";
 import { normalizeConnectorTerminalMaterial } from "../../core/connectorCatalogMaterials";
 import { occupantsAt } from "../../core/connectorOccupancy";
 import { normalizePinElectricalRolesMap } from "../../core/pinElectricalRole";
@@ -276,7 +277,7 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
           cavityIndex: action.payload.cavityIndex,
           cavityCount: connector.cavityCount
         });
-        return state;
+        return withError(state, `Way ${action.payload.cavityIndex} of connector ${connector.name} (${connector.technicalId}) is out of range (1–${connector.cavityCount}).`);
       }
 
       const occupantRef = action.payload.occupantRef.trim();
@@ -291,7 +292,9 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
       if (foreignOccupants.length > 0) {
         return withError(
           state,
-          `Way ${action.payload.cavityIndex} is already occupied by '${foreignOccupants[0]}'.`
+          occupiedEndpointMessage(state, {
+            kind: "connectorCavity", connectorId: connector.id, cavityIndex: action.payload.cavityIndex
+          }, foreignOccupants)
         );
       }
 
@@ -323,7 +326,7 @@ export function handleConnectorActions(state: AppState, action: AppAction): AppS
           cavityIndex: action.payload.cavityIndex,
           cavityCount: connector.cavityCount
         });
-        return state;
+        return withError(state, `Way ${action.payload.cavityIndex} of connector ${connector.name} (${connector.technicalId}) is out of range (1–${connector.cavityCount}).`);
       }
 
       const connectorOccupancy = state.connectorCavityOccupancy[action.payload.connectorId];

@@ -1,4 +1,5 @@
 import type { AppAction } from "../actions";
+import { occupiedEndpointMessage } from "./helpers/occupiedEndpointMessage";
 import { analyzeSpliceDeleteImpact } from "../deleteImpact";
 import { recomputeWireRouteAndDirectionalEndpoints } from "./helpers/wireTransitions";
 import { convertWireEndpointsForDirectionalSplice } from "./helpers/spliceDirectionalConversion";
@@ -385,7 +386,7 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
           portMode: splice.portMode ?? "bounded",
           portCount: splice.portCount
         });
-        return state;
+        return withError(state, `Port ${action.payload.portIndex} of splice ${splice.name} (${splice.technicalId}) is out of range.`);
       }
 
       const occupantRef = action.payload.occupantRef.trim();
@@ -398,7 +399,9 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
       if (currentOccupant !== undefined && currentOccupant !== occupantRef) {
         return withError(
           state,
-          `Port ${action.payload.portIndex} is already occupied by '${currentOccupant}'.`
+          occupiedEndpointMessage(state, {
+            kind: "splicePort", spliceId: splice.id, portIndex: action.payload.portIndex
+          }, [currentOccupant])
         );
       }
 
@@ -431,7 +434,7 @@ export function handleSpliceActions(state: AppState, action: AppAction): AppStat
           portMode: splice.portMode ?? "bounded",
           portCount: splice.portCount
         });
-        return state;
+        return withError(state, `Port ${action.payload.portIndex} of splice ${splice.name} (${splice.technicalId}) is out of range.`);
       }
 
       const spliceOccupancy = state.splicePortOccupancy[action.payload.spliceId];

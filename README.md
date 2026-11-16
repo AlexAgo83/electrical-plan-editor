@@ -5,7 +5,7 @@ A local-first electrical network editor for modeling, validating, and documentin
 The app treats connectors, splices, nodes, segments, and wires as a graph, computes routes deterministically, and keeps canvas preferences and export outputs aligned with the current workspace state.
 
 [![CI](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/AlexAgo83/electrical-plan-editor/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/AlexAgo83/electrical-plan-editor)](LICENSE)
-[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.22.0-4C8BF5)
+[![Live Demo](https://img.shields.io/badge/live%20demo-Render-46E3B7?logo=render&logoColor=white)](https://e-plan-editor.onrender.com) ![Version](https://img.shields.io/badge/version-v1.23.0-4C8BF5)
 
 <img width="951" height="708" alt="network_summary" src="https://github.com/user-attachments/assets/342133f2-4171-4836-a2dd-2b8354af73f3" />
 
@@ -27,7 +27,7 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
 
 - Production: [https://e-plan-editor.onrender.com](https://e-plan-editor.onrender.com)
 - Hosting: Render Static Site (Blueprint via `render.yaml`)
-- Current version: `1.22.0`
+- Current version: `1.23.0`
 - CI status: see the GitHub Actions badge above
 
 ## Product
@@ -48,7 +48,7 @@ The app treats connectors, splices, nodes, segments, and wires as a graph, compu
   - `SVG` / `PNG` / `PDF` network-plan export with optional frame and metadata cartouche (network, author, code, plan revision, plan issue date, manufacturer and supplier plan references, creation date, notes)
   - `BOM CSV` export with pricing context and a dedicated `Wire terminations` section
   - wire CSV export with explicit begin/end connection and seal reference columns
-- Network metadata authoring for export identity: creation date, author, project code, plan revision (`planRevision`, free text up to 40 characters such as `A`, `B02`, `03`), plan issue date (`planIssueDate`, a calendar date `YYYY-MM-DD` distinct from the creation date), logo URL, and export notes. Plan revision and issue date are set manually per network and are never inferred or updated automatically (Save, export, recompute, versions); unset values are omitted from the cartouche like other optional metadata.
+- Network metadata authoring for export identity: creation date, author, project code, plan revision (`planRevision`, free text up to 40 characters such as `A`, `B02`, `03`), plan issue date (`planIssueDate`, a calendar date `YYYY-MM-DD` distinct from the creation date), logo URL, and export notes. The revision field offers +1 and -1 buttons for `OR/00` → `A/01` → `B/02` … `Z/26` (+1 on empty starts at `OR/00`; -1 stops at `OR/00` and is disabled on empty; free text stays unchanged; +1 stops at `Z/26`). Plan revision and issue date are set manually per network and are never inferred or updated automatically (Save, export, recompute, versions); unset values are omitted from the cartouche like other optional metadata.
 - Manufacturer and supplier plan references: two fixed roles per network, each with an editable company name (`planManufacturerName` / `planSupplierName`, up to 80 characters) and the reference that company gives this network plan (`planManufacturerReference` / `planSupplierReference`, up to 120 characters). All four values are optional, single-line and kept literally (case, punctuation, leading zeroes); blank values are unset. They identify the whole network plan and are unrelated to component catalog `manufacturerReference`, wire endpoint material references or BOM references. In the export cartouche each role shows as `Manufacturer (Manufacturer A): MFG-001` / `Supplier (Supplier B): SUP-009` (localized role label, literal name and reference), as `Manufacturer: MFG-001` with only a reference, as `Manufacturer (Manufacturer A)` with only a name, and is omitted when both values are unset. Long values wrap, and the cartouche grows the export height when needed.
 - Local-first persistence so workspace state, settings, and export preferences survive reloads.
 - Validation center with grouped issues, issue navigation, and catalog integrity checks, plus a read-only **Routing consistency** check that warns when `Network Scope > Recompute routes` would change stored routes, lengths, endpoint details or directional splice sides (checked 500 ms after the latest routing edit, in idle-time slices; never applied automatically).

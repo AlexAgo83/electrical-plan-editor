@@ -24,6 +24,7 @@ import { FORM_PANEL_IDS, scrollToFormPanel } from "../../lib/form-panel-scroll";
 import type { SortState } from "../../types/app-controller";
 import { TableEntryCountFooter } from "./TableEntryCountFooter";
 import { TableFilterBar } from "./TableFilterBar";
+import { nextPlanRevision, previousPlanRevision } from "../../../core/planRevision";
 
 interface NetworkScopeWorkspaceContentProps {
   networks: Array<{ id: NetworkId; name: string; technicalId: string }>;
@@ -684,16 +685,45 @@ export function NetworkScopeWorkspaceContent({
               />
               <span className="form-hint">{t("ui.allowedLettersNumbersSpacesAnd")}</span>
             </label>
-            <label className="stack-label">
-              <span className="network-form-label">{t("ui.planRevisionOptional")}</span>
-              <input
-                value={newNetworkPlanRevision}
-                onChange={(event) => setNewNetworkPlanRevision(event.target.value)}
-                placeholder="A"
-                maxLength={40}
-              />
+            <div className="stack-label">
+              <label className="network-form-label" htmlFor="network-plan-revision">{t("ui.planRevisionOptional")}</label>
+              <div className="network-plan-revision-input">
+                <input
+                  id="network-plan-revision"
+                  value={newNetworkPlanRevision}
+                  onChange={(event) => setNewNetworkPlanRevision(event.target.value)}
+                  placeholder={t("ui.planRevisionExample")}
+                  maxLength={40}
+                />
+                <button
+                  type="button"
+                  className="button-with-icon"
+                  aria-label={t("ui.previousPlanRevision")}
+                  title={t("ui.previousPlanRevisionSequenceHint")}
+                  disabled={previousPlanRevision(newNetworkPlanRevision) === null}
+                  onClick={() => {
+                    const previous = previousPlanRevision(newNetworkPlanRevision);
+                    if (previous !== null) setNewNetworkPlanRevision(previous);
+                  }}
+                >
+                  -1
+                </button>
+                <button
+                  type="button"
+                  className="button-with-icon"
+                  aria-label={t("ui.nextPlanRevision")}
+                  title={t("ui.planRevisionSequenceHint")}
+                  disabled={nextPlanRevision(newNetworkPlanRevision) === null}
+                  onClick={() => {
+                    const next = nextPlanRevision(newNetworkPlanRevision);
+                    if (next !== null) setNewNetworkPlanRevision(next);
+                  }}
+                >
+                  +1
+                </button>
+              </div>
               <span className="form-hint">{t("ui.planRevisionHint")}</span>
-            </label>
+            </div>
             <label className="stack-label">
               <span className="network-form-label">{t("ui.planIssueDateOptional")}</span>
               <input

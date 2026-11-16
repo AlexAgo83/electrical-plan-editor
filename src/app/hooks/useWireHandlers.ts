@@ -832,7 +832,7 @@ export function useWireHandlers({
 
       const nextState = store.getState();
       const savedWire = nextState.wires.byId[wireId];
-      if (savedWire !== undefined) {
+      if (nextState.ui.lastError === null && savedWire !== undefined) {
         if (wasCreateMode) {
           startWireEdit(savedWire, true);
           return;
