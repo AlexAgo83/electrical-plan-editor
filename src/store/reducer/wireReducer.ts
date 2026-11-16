@@ -15,6 +15,7 @@ import {
   type EndpointOccupancyState
 } from "./helpers/occupancy";
 import { canWriteEndpointOccupancy, isEndpointOccupancyExclusive } from "./helpers/wireEndpointOccupancyGuards";
+import { occupiedEndpointMessage } from "./helpers/occupiedEndpointMessage";
 import {
   computeForcedRouteWithAnchors,
   computeShortestWireRoute,
@@ -228,7 +229,9 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
 
       if (existingWire !== undefined) {
         if (!canWriteEndpointOccupancy(state, existingWire.endpointA) || !canWriteEndpointOccupancy(state, existingWire.endpointB)) {
-          return state;
+          return withError(state, getEndpointValidationError(state, existingWire.endpointA)
+            ?? getEndpointValidationError(state, existingWire.endpointB)
+            ?? "Cannot update wire occupancy: existing endpoints are invalid.");
         }
         if (isEndpointOccupancyExclusive(state, existingWire.endpointA)) {
           occupancyState = releaseEndpointOccupant(
@@ -247,7 +250,9 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
       }
 
       if (!canWriteEndpointOccupancy(state, endpointA) || !canWriteEndpointOccupancy(state, endpointB)) {
-        return state;
+        return withError(state, getEndpointValidationError(state, endpointA)
+          ?? getEndpointValidationError(state, endpointB)
+          ?? "Cannot update wire occupancy: selected endpoints are invalid.");
       }
 
       const endpointAOccupantRef = getWireEndpointOccupantRef(action.payload.id, "A");
@@ -266,11 +271,17 @@ export function handleWireActions(state: AppState, action: AppAction): AppState 
         endpoint.kind === "connectorCavity" && endpoint.allowSharedCavity === true;
 
       if (foreignOccupants(endpointA).length > 0 && !endpointAllowsSharing(endpointA)) {
-        return withError(state, "Wire endpoint A is already occupied.");
+        return withError(state, {
+          code: "WIRE_ENDPOINT_A_IS_ALREADY_OCCUPIED",
+          message: occupiedEndpointMessage(state, endpointA, foreignOccupants(endpointA))
+        });
       }
 
       if (foreignOccupants(endpointB).length > 0 && !endpointAllowsSharing(endpointB)) {
-        return withError(state, "Wire endpoint B is already occupied.");
+        return withError(state, {
+          code: "WIRE_ENDPOINT_B_IS_ALREADY_OCCUPIED",
+          message: occupiedEndpointMessage(state, endpointB, foreignOccupants(endpointB))
+        });
       }
 
       if (isEndpointOccupancyExclusive(state, endpointA)) {

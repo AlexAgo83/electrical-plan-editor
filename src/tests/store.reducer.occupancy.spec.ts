@@ -17,7 +17,7 @@ describe("appReducer occupancy guards", () => {
 
     const nextState = appReducer(baseState, appActions.occupyConnectorCavity(asConnectorId("C1"), 3, "wire:W1:A"));
 
-    expect(nextState).toBe(baseState);
+    expect(nextState.ui.lastError?.message).toContain("out of range");
     expect(nextState.connectorCavityOccupancy).toEqual(baseState.connectorCavityOccupancy);
     expect(warnSpy).toHaveBeenCalledTimes(1);
     warnSpy.mockRestore();
@@ -37,7 +37,7 @@ describe("appReducer occupancy guards", () => {
 
     const nextState = appReducer(baseState, appActions.occupySplicePort(asSpliceId("S1"), 3, "wire:W1:B"));
 
-    expect(nextState).toBe(baseState);
+    expect(nextState.ui.lastError?.message).toContain("out of range");
     expect(nextState.splicePortOccupancy).toEqual(baseState.splicePortOccupancy);
     expect(warnSpy).toHaveBeenCalledTimes(1);
     warnSpy.mockRestore();

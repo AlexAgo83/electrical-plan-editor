@@ -190,7 +190,7 @@ describe("appReducer entity lifecycle", () => {
     expect(secondConnectorOccupancy).toBeDefined();
     expect(firstConnectorOccupancy?.[2]).toEqual(["wire-draft-1:A"]);
     expect(secondConnectorOccupancy?.[2]).toEqual(["wire-draft-1:A"]);
-    expect(second.ui.lastError?.message).toBe("Way 2 is already occupied by 'wire-draft-1:A'.");
+    expect(second.ui.lastError?.message).toBe("Way 2 of connector Connector 1 (C-1) is already occupied by 'wire-draft-1:A'.");
   });
 
   it("clears connector occupancy on connector removal", () => {
@@ -275,7 +275,7 @@ describe("appReducer entity lifecycle", () => {
     expect(secondSpliceOccupancy).toBeDefined();
     expect(firstSpliceOccupancy?.[2]).toBe("wire-draft-1:B");
     expect(secondSpliceOccupancy?.[2]).toBe("wire-draft-1:B");
-    expect(second.ui.lastError?.message).toBe("Port 2 is already occupied by 'wire-draft-1:B'.");
+    expect(second.ui.lastError?.message).toBe("Port 2 of splice Splice 1 (S-1) is already occupied by 'wire-draft-1:B'.");
   });
 
   it("clears splice occupancy on splice removal", () => {

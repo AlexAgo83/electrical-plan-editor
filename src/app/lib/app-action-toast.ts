@@ -103,6 +103,14 @@ function buildSplicePortOccupancyToast(params: {
 }
 
 export function buildAppActionToast(action: AppAction, previousState: AppState, nextState: AppState): AppActionToast | null {
+  if (!action.type.startsWith("ui/") && nextState.ui.lastError !== null) {
+    return {
+      title: t("ui.actionRejected"),
+      message: nextState.ui.lastError.message,
+      variant: "error"
+    };
+  }
+
   switch (action.type) {
     case "network/create":
       return {

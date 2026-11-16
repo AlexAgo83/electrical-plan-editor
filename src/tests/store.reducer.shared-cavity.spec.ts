@@ -57,7 +57,7 @@ describe("shared connector way (multi-wire crimp)", () => {
       saveWire("W2", "W-2", { connectorId: "C1", cavityIndex: 1 }, { connectorId: "C2", cavityIndex: 2 })
     );
 
-    expect(next.ui.lastError?.message).toBe("Wire endpoint A is already occupied.");
+    expect(next.ui.lastError?.message).toBe("Way 1 of connector Connector 1 (C-1) is already occupied by wire W1 (W-1).");
     expect(next.wires.byId[asWireId("W2")]).toBeUndefined();
     expect(next.connectorCavityOccupancy[asConnectorId("C1")]?.[1]).toEqual(["wire:W1:A"]);
   });

@@ -150,11 +150,11 @@ describe("workspace UX remediation (req_169)", () => {
     const networkId = before.networks.allIds[0]!;
     const viewState = appActions.setNetworkSummaryViewState(networkId, { scale: 2, offset: { x: 1, y: 1 } } as never);
 
-    act(() => result.current.dispatchAction(viewState, { trackHistory: false, background: true }));
+    act(() => { result.current.dispatchAction(viewState, { trackHistory: false, background: true }); });
     expect(store.getState()).toBe(before);
     expect(reports).toEqual([]);
 
-    act(() => result.current.dispatchAction(viewState, { trackHistory: false }));
+    act(() => { result.current.dispatchAction(viewState, { trackHistory: false }); });
     expect(store.getState()).toBe(before);
     expect(reports).toEqual(["Read-only v001"]);
   });

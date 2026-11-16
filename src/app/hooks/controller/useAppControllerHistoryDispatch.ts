@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { translateCurrent as t } from "../../lib/i18n";
 import type { AppStore } from "../../../store";
 import { withPreservedNetworkSummaryViewStates } from "../../../store";
 import { buildAppActionToast } from "../../lib/app-action-toast";
@@ -25,9 +26,14 @@ export function useAppControllerHistoryDispatch({
   setInteractionMode,
   notifyToast
 }: UseAppControllerHistoryDispatchParams) {
+  const handleDispatchError = useCallback((message: string) => {
+    notifyToast(t("ui.actionRejected"), { message, variant: "error" });
+  }, [notifyToast]);
+
   const { dispatchAction: dispatchActionWithHistory, ...history } = useStoreHistory({
     store,
     historyLimit: HISTORY_LIMIT,
+    onDispatchError: handleDispatchError,
     transformUndoRedoTargetState: (targetState, currentState) =>
       restoreViewportOnUndo ? targetState : withPreservedNetworkSummaryViewStates(targetState, currentState),
     onUndoRedoApplied: ({ direction, entry }) => {
@@ -51,11 +57,15 @@ export function useAppControllerHistoryDispatch({
       options?: Parameters<typeof dispatchActionWithHistory>[1]
     ): void => {
       const previousState = store.getState();
-      dispatchActionWithHistory(action, options);
+      const applied = dispatchActionWithHistory(action, options);
       const nextState = store.getState();
-      if (nextState === previousState || options?.trackHistory === false) {
+      if (nextState === previousState || action.type.startsWith("ui/")) {
         return;
       }
+      if (!applied && nextState.ui.lastError === null) return;
+
+      // A rejected edit must remain visible even when history tracking is disabled.
+      if (nextState.ui.lastError === null && options?.trackHistory === false) return;
 
       const toast = buildAppActionToast(action, previousState, nextState);
       if (toast !== null) {

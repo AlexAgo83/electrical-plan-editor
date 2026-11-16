@@ -116,7 +116,7 @@ describe("appReducer wire lifecycle and routing", () => {
 
     expect(state.wires.byId[asWireId("W2")]).toBeUndefined();
     expect(state.ui.lastError?.code).toBe("WIRE_ENDPOINT_A_IS_ALREADY_OCCUPIED");
-    expect(state.ui.lastError?.message).toBe("Wire endpoint A is already occupied.");
+    expect(state.ui.lastError?.message).toBe("Way 1 of connector Connector 1 (C-1) is already occupied by wire Wire 1 (W-1).");
   });
 
   it("validates fuse catalog association and persists fuse protection on save", () => {
